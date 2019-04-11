@@ -15,18 +15,21 @@ import android.widget.GridView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.sapuseven.untis.R
 import com.sapuseven.untis.adapters.GridViewDatabaseItemAdapter
+import com.sapuseven.untis.adapters.GridViewDatabaseItemCheckBoxAdapter
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 
 class ElementPickerDialog : DialogFragment() {
 	private var timetableDatabaseInterface: TimetableDatabaseInterface? = null
 	private var type: TimetableDatabaseInterface.Type? = null
+	private var config: ElementPickerDialogConfig? = null
 
 	private lateinit var adapter: GridViewDatabaseItemAdapter
 
@@ -38,6 +41,7 @@ class ElementPickerDialog : DialogFragment() {
 	interface ElementPickerDialogListener {
 		fun onDialogDismissed(dialog: DialogInterface?)
 		fun onPeriodElementClick(dialog: DialogFragment, element: PeriodElement?)
+		fun onPositiveButtonClicked(dialog: ElementPickerDialog)
 	}
 
 	override fun onAttach(context: Context) {
@@ -48,7 +52,7 @@ class ElementPickerDialog : DialogFragment() {
 			throw ClassCastException("$context must implement ElementPickerDialogListener")
 
 		timetableDatabaseInterface?.let { timetableDatabaseInterface ->
-			adapter = GridViewDatabaseItemAdapter(context)
+			adapter = if (config?.multiSelect == true) GridViewDatabaseItemCheckBoxAdapter(context) else GridViewDatabaseItemAdapter(context)
 			adapter.timetableDatabaseInterface = timetableDatabaseInterface
 			adapter.notifyDataSetChanged()
 		}
@@ -59,6 +63,13 @@ class ElementPickerDialog : DialogFragment() {
 			val builder = AlertDialog.Builder(activity)
 
 			builder.setView(generateView(activity))
+
+			config?.let {
+				builder.setPositiveButton(it.positiveButtonText) { dialogInterface: DialogInterface, which: Int ->
+					listener.onPositiveButtonClicked(this)
+				}
+
+			}
 
 			builder.create()
 		} ?: throw IllegalStateException("Activity cannot be null")
@@ -73,16 +84,16 @@ class ElementPickerDialog : DialogFragment() {
 	private fun generateView(activity: FragmentActivity): View {
 		val root = activity.layoutInflater.inflate(R.layout.dialog_element_picker, null) as LinearLayout
 
-		val gridView = root.findViewById<GridView>(R.id.gv)
+		val gridView = root.findViewById<GridView>(R.id.gridview_elementpicker_list)
 		gridView.setOnItemClickListener { _, _, position, _ -> listener.onPeriodElementClick(this@ElementPickerDialog, adapter.itemAt(position)) }
 		gridView.adapter = adapter
 
 		holder = Holder(
-				etSearch = root.findViewById(R.id.etLayout),
-				tvTeachers = root.findViewById(R.id.tvTeachers),
-				tvPersonal = root.findViewById(R.id.tvPersonal),
-				tvClasses = root.findViewById(R.id.tvClasses),
-				tvRooms = root.findViewById(R.id.tvRooms))
+				etSearch = root.findViewById(R.id.textinputlayout_elementpicker_search),
+				tvTeachers = root.findViewById(R.id.textview_elementpicker_teachers),
+				tvPersonal = root.findViewById(R.id.textview_elementpicker_personal),
+				tvClasses = root.findViewById(R.id.textview_elementpicker_classes),
+				tvRooms = root.findViewById(R.id.textview_elementpicker_rooms))
 
 		defaultTextColor = holder.tvPersonal.textColors
 
@@ -114,7 +125,10 @@ class ElementPickerDialog : DialogFragment() {
 
 		select(getTextViewFromElemType(type))
 
-		val searchField = root.findViewById<TextInputEditText>(R.id.et)
+		if (config?.hideTypeSelection == true)
+			root.findViewById<ConstraintLayout>(R.id.constraintlayout_elementpicker_typeselect).visibility = View.GONE
+
+		val searchField = root.findViewById<TextInputEditText>(R.id.textinputedittext_elementpicker_search)
 		searchField.addTextChangedListener(object : TextWatcher {
 			override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
 				adapter.filter.filter(s.toString())
@@ -180,6 +194,13 @@ class ElementPickerDialog : DialogFragment() {
 		}
 	}
 
+	fun getSelectedItems(): List<PeriodElement> {
+		return if (adapter is GridViewDatabaseItemCheckBoxAdapter)
+			(adapter as GridViewDatabaseItemCheckBoxAdapter).getSelectedItems()
+		else
+			emptyList()
+	}
+
 	/*private fun checkIfValid() {
 		if (dialog != null)
 			dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled((selectedType == Type.UNKNOWN || selectedPosition >= 0));
@@ -194,11 +215,21 @@ class ElementPickerDialog : DialogFragment() {
 	)
 
 	companion object {
-		fun createInstance(timetableDatabaseInterface: TimetableDatabaseInterface, startPage: TimetableDatabaseInterface.Type): ElementPickerDialog {
+		fun createInstance(
+				timetableDatabaseInterface: TimetableDatabaseInterface,
+				config: ElementPickerDialogConfig): ElementPickerDialog {
 			val fragment = ElementPickerDialog()
 			fragment.timetableDatabaseInterface = timetableDatabaseInterface
-			fragment.type = startPage
+			fragment.type = config.startPage
+			fragment.config = config
 			return fragment
 		}
+
+		data class ElementPickerDialogConfig(
+				val startPage: TimetableDatabaseInterface.Type,
+				val multiSelect: Boolean = false,
+				val hideTypeSelection: Boolean = false,
+				val positiveButtonText: String? = null
+		)
 	}
 }

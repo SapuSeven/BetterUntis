@@ -456,6 +456,7 @@ class MainActivity :
 			}
 			R.id.nav_free_rooms -> {
 				val i3 = Intent(this@MainActivity, RoomFinderActivity::class.java)
+				i3.putExtra(RoomFinderActivity.EXTRA_LONG_PROFILE_ID, profileId)
 				startActivityForResult(i3, REQUEST_CODE_ROOM_FINDER)
 			}
 			R.id.nav_donations -> {
@@ -484,7 +485,10 @@ class MainActivity :
 
 	private fun showItemList(type: TimetableDatabaseInterface.Type) {
 		timetableDatabaseInterface?.let { timetableDatabaseInterface ->
-			ElementPickerDialog.createInstance(timetableDatabaseInterface, type).show(supportFragmentManager, "elementPicker") // TODO: Do not hard-code
+			ElementPickerDialog.createInstance(
+					timetableDatabaseInterface,
+					ElementPickerDialog.Companion.ElementPickerDialogConfig(type)
+			).show(supportFragmentManager, "elementPicker") // TODO: Do not hard-code the tag
 		}
 	}
 
@@ -547,6 +551,10 @@ class MainActivity :
 
 	override fun onDialogDismissed(dialog: DialogInterface?) {
 		refreshNavigationViewSelection()
+	}
+
+	override fun onPositiveButtonClicked(dialog: ElementPickerDialog) {
+		dialog.dismiss() // unused, but just in case
 	}
 
 	private fun refreshNavigationViewSelection() {

@@ -1,23 +1,5 @@
 package com.sapuseven.untis.helpers
 
-import android.annotation.SuppressLint
-import android.app.Activity
-import android.text.Editable
-import android.text.TextWatcher
-import android.view.View
-import android.view.ViewStub
-import android.widget.GridView
-import androidx.annotation.StringRes
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
-import com.sapuseven.untis.R
-import com.sapuseven.untis.adapters.GridViewAdapter
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import org.json.JSONException
-import org.json.JSONObject
-import java.util.*
-
 // NOTES: Should do the same as ElementPickerDialog, bit with support of dynamic list changes.
 //        Maybe create a common class for these two pickers to simplify the implementation of future feaures.
 /*open class ElementSelectionListHelper protected constructor(private val contextActivity: Activity) {

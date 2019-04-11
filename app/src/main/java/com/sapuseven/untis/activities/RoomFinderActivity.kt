@@ -1,38 +1,52 @@
 package com.sapuseven.untis.activities
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.DialogFragment
+import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
+import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.dialogs.ElementPickerDialog
+import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import kotlinx.android.synthetic.main.activity_room_finder.*
 
-class RoomFinderActivity : BaseActivity()/*, View.OnClickListener*/ {
+class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDialogListener/*, View.OnClickListener*/ {
 	private var roomListMargins: Int = 0
 	//private var dialog: AlertDialog? = null
 	private var roomList: ArrayList</*AdapterItemRoomFinder*/ String>? = null
 	//private var roomAdapter: AdapterRoomFinder? = null
 	private var currentHourIndex = -1
 	private var hourIndexOffset: Int = 0
-	//private var requestQueue: ArrayList<RequestModel>? = null
+	private var requestQueue: MutableList<RequestModel> = ArrayList()
 	//private var recyclerView: RecyclerView? = null
 	//private var currentHour: TextView? = null
 	private var maxHourIndex = 0
 
+	companion object {
+		const val EXTRA_LONG_PROFILE_ID = "profile_id"
+	}
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_room_finder)
+		supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-		/*roomListMargins = (12 * resources.displayMetrics.density + 0.5f).toInt()
+		roomListMargins = (12 * resources.displayMetrics.density + 0.5f).toInt()
 
-		userDataList = ListManager.getUserData(applicationContext)
-
-		recyclerView = findViewById<View>(R.id.lvRoomList)*/
 		setupNoRoomsIndicator()
-		//setupRoomList(recyclerView!!)
+		setupRoomList(recyclerview_roomfinder_roomlist)
+		setupFab(intent.getLongExtra(EXTRA_LONG_PROFILE_ID, -1))
 		setupHourSelector()
+	}
+
+	private fun setupFab(profileId: Long) {
+		fab_roomfinder_add.setOnClickListener { showItemList(profileId) }
 	}
 
 	private fun setupHourSelector() {
@@ -70,21 +84,34 @@ class RoomFinderActivity : BaseActivity()/*, View.OnClickListener*/ {
 		}
 	}
 
-	/*private fun setupRoomList(listView: RecyclerView) {
-		roomList = ArrayList<AdapterItemRoomFinder>()
+	private fun setupRoomList(listView: RecyclerView) {
+		/*roomList = ArrayList<AdapterItemRoomFinder>()
 		requestQueue = ArrayList()
 
-		listView.setLayoutManager(LinearLayoutManager(this))
+		listView.layoutManager = LinearLayoutManager(this)
 		roomAdapter = AdapterRoomFinder(this, roomList)
-		listView.setAdapter(roomAdapter)
+		listView.adapter = roomAdapter
 
-		reload()
-
-		val myFab = findViewById<View>(R.id.fabAddRoomWatcher)
-		myFab.setOnClickListener { v -> showItemList() }
+		reload()*/
 	}
 
-	private fun reload() {
+	override fun onDialogDismissed(dialog: DialogInterface?) {
+
+	}
+
+	override fun onPeriodElementClick(dialog: DialogFragment, element: PeriodElement?) {
+
+	}
+
+	override fun onPositiveButtonClicked(dialog: ElementPickerDialog) {
+		addRooms(dialog.getSelectedItems())
+	}
+
+	fun addRooms(rooms: List<PeriodElement>) {
+		TODO("not implemented")
+	}
+
+	/*private fun reload() {
 		roomList!!.clear()
 		try {
 			val reader = BufferedReader(InputStreamReader(openFileInput("roomList.txt")))
@@ -111,13 +138,6 @@ class RoomFinderActivity : BaseActivity()/*, View.OnClickListener*/ {
 		}
 
 		refreshRoomList()
-	}
-
-	private fun isInRequestQueue(name: String): Boolean {
-		for (r in requestQueue!!)
-			if (r.displayName == name)
-				return true
-		return false
 	}*/
 
 	private fun refreshRoomList() {
@@ -131,82 +151,22 @@ class RoomFinderActivity : BaseActivity()/*, View.OnClickListener*/ {
 		displayCurrentHour()
 	}
 
-	/*private fun showItemList() {
-		try {
-			val elementName = ElementName(ROOM, userDataList)
-			val content = LinearLayout(this)
-			content.orientation = LinearLayout.VERTICAL
-
-			val list = ArrayList<String>()
-			val roomList = userDataList!!.optJSONObject("masterData").optJSONArray("rooms")
-			for (i in 0 until roomList.length())
-				list.add(roomList.getJSONObject(i).getString("name"))
-			Collections.sort(list) { obj, str -> obj.compareTo(str, ignoreCase = true) }
-
-			val adapter = AdapterCheckBoxGridView(this, list)
-			val titleContainer = TextInputLayout(this)
-			val searchFieldParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-					ViewGroup.LayoutParams.WRAP_CONTENT)
-			searchFieldParams.setMargins(roomListMargins, roomListMargins, roomListMargins, 0)
-			titleContainer.setLayoutParams(searchFieldParams)
-
-			val gridView = GridView(this)
-			val gridParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f)
-			gridView.layoutParams = gridParams
-			gridView.choiceMode = AbsListView.CHOICE_MODE_NONE
-			gridView.adapter = adapter
-			gridView.numColumns = 3
-
-			val searchField = TextInputEditText(this)
-			searchField.setHint(R.string.hint_add_room)
-			searchField.addTextChangedListener(object : TextWatcher {
-				override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-					adapter.getFilter().filter(s.toString())
-				}
-
-				override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-
-				override fun afterTextChanged(s: Editable) {}
-			})
-			titleContainer.addView(searchField)
-			@SuppressLint("InflateParams") val selectAll = layoutInflater
-					.inflate(R.layout.borderless_button, null) as Button
-			selectAll.setText(R.string.add)
-			val context = this
-			selectAll.setOnClickListener { v ->
-				for (item in adapter.getSelectedItems()) {
-					try {
-						addRoom(AdapterItemRoomFinder(context, item, true),
-								elementName.findFieldByValue("name", item, "id") as Int)
-					} catch (e: JSONException) {
-						e.printStackTrace() // Not expected to occur
-					}
-
-				}
-				dialog!!.dismiss()
-				executeRequestQueue()
-			}
-
-			content.addView(titleContainer)
-			content.addView(gridView)
-			content.addView(selectAll)
-
-			dialog = AlertDialog.Builder(this)
-					.setView(content)
-					.create()
-			dialog!!.show()
-		} catch (e: JSONException) {
-			e.printStackTrace()
-			AlertDialog.Builder(this)
-					.setTitle(getString(R.string.error))
-					.setMessage(e.message)
-					.setNeutralButton(R.string.ok, { dialog, which -> dialog.dismiss() })
-					.show()
-		}
-
+	private fun showItemList(profileId: Long) {
+		val userDatabase = UserDatabase.createInstance(this)
+		val timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, userDatabase.getUser(profileId)?.id
+				?: -1)
+		ElementPickerDialog.createInstance(
+				timetableDatabaseInterface,
+				ElementPickerDialog.Companion.ElementPickerDialogConfig(
+						TimetableDatabaseInterface.Type.ROOM,
+						multiSelect = true,
+						hideTypeSelection = true,
+						positiveButtonText = "Add") // TODO: Extract string resource
+		).show(supportFragmentManager, "elementPicker") // TODO: Do not hard-code the tag
 	}
 
-	private fun addRoom(item: AdapterItemRoomFinder, roomID: Int) {
+
+	/*private fun addRoom(item: AdapterItemRoomFinder, roomID: Int) {
 		if (roomList!!.contains(item))
 			return
 
@@ -497,27 +457,16 @@ class RoomFinderActivity : BaseActivity()/*, View.OnClickListener*/ {
 		intent.putExtra("displayName", getString(R.string.title_room, item.getName()))
 		setResult(Activity.RESULT_OK, intent)
 		finish()
+	}*/
+
+	private data class RequestModel(
+			val displayName: String
+	) {
+		val roomID: Int = 0
+		val isRefreshOnly: Boolean = false
 	}
 
-	private inner class RequestModel {
-		private var displayName: String? = null
-		internal var roomID: Int = 0
-			private set
-		internal val isRefreshOnly: Boolean
-
-		internal constructor(roomID: Int, displayName: String) {
-			this.roomID = roomID
-			this.displayName = displayName
-		}
-
-		internal constructor(roomID: Int, displayName: String, refreshOnly: Boolean) {
-			this.roomID = roomID
-			this.displayName = displayName
-			this.isRefreshOnly = refreshOnly
-		}
-	}
-
-	companion object {
+	/*companion object {
 
 		fun getRooms(context: Context, includeDisable: Boolean): ArrayList<String> {
 			val roomList = ArrayList<String>()
