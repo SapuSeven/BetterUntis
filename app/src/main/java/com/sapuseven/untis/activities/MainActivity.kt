@@ -63,6 +63,8 @@ class MainActivity :
 		private const val MINUTE_MILLIS: Int = 60 * 1000
 		private const val HOUR_MILLIS: Int = 60 * MINUTE_MILLIS
 		private const val DAY_MILLIS: Int = 24 * HOUR_MILLIS
+
+		private const val REQUEST_CODE_ROOM_FINDER = 1
 	}
 
 	//private var listManager: ListManager? = null
@@ -453,8 +455,8 @@ class MainActivity :
 				startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
 			}
 			R.id.nav_free_rooms -> {
-				/*val i3 = Intent(this@ActivityMain, ActivityRoomFinder::class.java)
-				startActivityForResult(i3, REQUEST_CODE_ROOM_FINDER)*/
+				val i3 = Intent(this@MainActivity, RoomFinderActivity::class.java)
+				startActivityForResult(i3, REQUEST_CODE_ROOM_FINDER)
 			}
 			R.id.nav_donations -> {
 				/*val i4 = Intent(this@ActivityMain, ActivityDonations::class.java)

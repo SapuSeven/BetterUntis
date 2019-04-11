@@ -48,11 +48,11 @@ open class BaseActivity : AppCompatActivity() {
 
 	private fun setAppTheme(hasOwnToolbar: Boolean) {
 		when (currentTheme) {
-			"untis" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_NoActionBar_ThemeUntis else R.style.AppTheme_ThemeUntis)
-			"blue" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_NoActionBar_ThemeBlue else R.style.AppTheme_ThemeBlue)
-			"green" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_NoActionBar_ThemeGreen else R.style.AppTheme_ThemeGreen)
-			"pink" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_NoActionBar_ThemePink else R.style.AppTheme_ThemePink)
-			"cyan" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_NoActionBar_ThemeCyan else R.style.AppTheme_ThemeCyan)
+			"untis" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_ThemeUntis_NoActionBar else R.style.AppTheme_ThemeUntis)
+			"blue" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_ThemeBlue_NoActionBar else R.style.AppTheme_ThemeBlue)
+			"green" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_ThemeGreen_NoActionBar else R.style.AppTheme_ThemeGreen)
+			"pink" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_ThemePink_NoActionBar else R.style.AppTheme_ThemePink)
+			"cyan" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_ThemeCyan_NoActionBar else R.style.AppTheme_ThemeCyan)
 			else -> setTheme(if (hasOwnToolbar) R.style.AppTheme_NoActionBar else R.style.AppTheme)
 		}
 		delegate.setLocalNightMode(when (PreferenceUtils.getPrefString(preferenceManager, "preference_dark_theme", currentDarkTheme)) {

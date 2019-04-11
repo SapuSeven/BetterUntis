@@ -10,7 +10,7 @@
 
 	<color name="colorPrimaryThemeBlue">#03a9f4</color>
 	<color name="colorPrimaryDarkThemeBlue">#0288d1</color>
-	<color name="colorAccentThemeBlue">#ff5722</color>
+	<color name="colorAccentThemeBlue">#FF5722</color>
 
 	<color name="colorPrimaryThemeGreen">#4caf50</color>
 	<color name="colorPrimaryDarkThemeGreen">#388e3c</color>

@@ -31,6 +31,10 @@
 		</activity>
 
 		<activity
+			android:name=".activities.RoomFinderActivity">
+		</activity>
+
+		<activity
 			android:name=".activities.LoginDataInputActivity"
 			android:parentActivityName=".activities.LoginActivity"
 			android:windowSoftInputMode="adjustResize">
