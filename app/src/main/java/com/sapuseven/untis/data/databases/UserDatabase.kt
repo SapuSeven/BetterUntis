@@ -18,7 +18,7 @@ import kotlinx.serialization.json.JSON
 
 
 private const val DATABASE_VERSION = 1
-private const val DATABASE_NAME = "userdata"
+private const val DATABASE_NAME = "userdata.db"
 
 class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 	companion object {
