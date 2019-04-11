@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+	<bool name="preference_alternating_days_default">false</bool>
+	<bool name="preference_alternating_hours_default">false</bool>
+	<bool name="preference_alternating_colors_use_custom_default">false</bool>
+	<bool name="preference_use_default_background_default">false</bool>
+	<bool name="preference_use_theme_background_default">false</bool>
+	<bool name="preference_dark_theme_oled_default">false</bool>
+	<bool name="preference_timetable_refresh_in_background_default">true</bool>
+	<bool name="preference_timetable_centered_lesson_info_default">false</bool>
+	<bool name="preference_timetable_bold_lesson_name_default">true</bool>
+	<bool name="preference_timetable_item_text_light_default">true</bool>
+	<bool name="preference_timetable_hide_cancelled">false</bool>
+
+	<integer name="preference_alternating_color_default">0xFFEEEEEE</integer>
+	<integer name="preference_background_regular_default">0xFFF44336</integer>
+	<integer name="preference_background_regular_past_default">0xFFD32F2F</integer>
+	<integer name="preference_background_exam_default">0xFF03A9F4</integer>
+	<integer name="preference_background_exam_past_default">0xFF0288D1</integer>
+	<integer name="preference_background_irregular_default">0xFF4CAF50</integer>
+	<integer name="preference_background_irregular_past_default">0xFF388E3C</integer>
+	<integer name="preference_background_cancelled_default">0xFF9E9E9E</integer>
+	<integer name="preference_background_cancelled_past_default">0xFF616161</integer>
+	<integer name="preference_background_free_default">0xFFFFCDD2</integer>
+	<integer name="preference_background_future_default">0x00000000</integer>
+	<integer name="preference_background_past_default">0x20FFFFFF</integer>
+	<integer name="preference_marker_default">0xFFFFFFFF</integer>
+	<integer name="preference_timetable_item_padding_overlap_default">4</integer>
+	<integer name="preference_timetable_item_padding_default">4</integer>
+	<integer name="preference_timetable_item_corner_radius_default">2</integer>
+	<integer name="preference_timetable_lesson_name_font_size_default">14</integer>
+	<integer name="preference_timetable_lesson_info_font_size_default">10</integer>
+
+	<string name="preference_theme_default">default</string>
+	<string name="preference_dark_theme_default">system</string>
+</resources>

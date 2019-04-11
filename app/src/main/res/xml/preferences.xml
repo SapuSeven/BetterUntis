@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                                      xmlns:app="http://schemas.android.com/apk/res-auto">
+	<PreferenceScreen
+		android:icon="@drawable/settings_styling"
+		android:key="preferences_styling"
+		android:title="@string/pref_styling">
+
+		<PreferenceCategory android:title="@string/preference_category_colors">
+			<!-- Currently not in use
+			<CheckBoxPreference
+				android:enabled="false"
+				android:defaultValue="@bool/preference_alternating_days_default"
+				android:key="preference_alternating_days"
+				android:summary="@string/preference_alternating_days_desc"
+				android:title="@string/preference_alternating_days" />
+
+			<CheckBoxPreference
+				android:enabled="false"
+				android:defaultValue="@bool/preference_alternating_hours_default"
+				android:key="preference_alternating_hours"
+				android:summary="@string/preference_alternating_hours_desc"
+				android:title="@string/preference_alternating_hours" />
+
+			<CheckBoxPreference
+				android:enabled="false"
+				android:defaultValue="@bool/preference_alternating_colors_use_custom_default"
+				android:key="preference_alternating_colors_use_custom"
+				android:summary="@string/preference_alternating_colors_use_custom_desc"
+				android:title="@string/preference_alternating_colors_use_custom" />
+
+			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
+				android:enabled="false"
+				android:defaultValue="@integer/preference_alternating_color_default"
+				android:dependency="preference_alternating_colors_use_custom"
+				android:key="preference_alternating_color"
+				android:summary="@string/preference_alternating_color_desc"
+				android:title="@string/preference_alternating_color" />
+				-->
+
+			<CheckBoxPreference
+				android:defaultValue="@bool/preference_timetable_item_text_light_default"
+				android:key="preference_timetable_item_text_light"
+				android:title="@string/preference_timetable_item_text_light"/>
+
+		</PreferenceCategory>
+
+		<PreferenceCategory android:title="@string/preference_category_backgrounds">
+
+			<CheckBoxPreference
+				android:defaultValue="@bool/preference_use_default_background_default"
+				android:disableDependentsState="true"
+				android:key="preference_use_default_background"
+				android:summary="@string/preference_use_default_background_desc"
+				android:title="@string/preference_use_default_background"/>
+
+			<CheckBoxPreference
+				android:defaultValue="@bool/preference_use_theme_background_default"
+				android:dependency="preference_use_default_background"
+				android:disableDependentsState="true"
+				android:key="preference_use_theme_background"
+				android:summary="@string/preference_use_theme_background_desc"
+				android:title="@string/preference_use_theme_background"/>
+
+			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
+				android:defaultValue="@integer/preference_background_regular_default"
+				android:dependency="preference_use_theme_background"
+				android:key="preference_background_regular"
+				android:title="@string/preference_background_regular"/>
+
+			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
+				android:defaultValue="@integer/preference_background_regular_past_default"
+				android:dependency="preference_use_theme_background"
+				android:key="preference_background_regular_past"
+				android:title="@string/preference_background_regular_past"/>
+
+			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
+				android:defaultValue="@integer/preference_background_exam_default"
+				android:dependency="preference_use_default_background"
+				android:key="preference_background_exam"
+				android:title="@string/preference_background_exam"/>
+
+			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
+				android:defaultValue="@integer/preference_background_exam_past_default"
+				android:dependency="preference_use_default_background"
+				android:key="preference_background_exam_past"
+				android:title="@string/preference_background_exam_past"/>
+
+			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
+				android:defaultValue="@integer/preference_background_irregular_default"
+				android:dependency="preference_use_default_background"
+				android:key="preference_background_irregular"
+				android:title="@string/preference_background_irregular"/>
+
+			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
+				android:defaultValue="@integer/preference_background_irregular_past_default"
+				android:dependency="preference_use_default_background"
+				android:key="preference_background_irregular_past"
+				android:title="@string/preference_background_irregular_past"/>
+
+			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
+				android:defaultValue="@integer/preference_background_cancelled_default"
+				android:dependency="preference_use_default_background"
+				android:key="preference_background_cancelled"
+				android:title="@string/preference_background_cancelled"/>
+
+			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
+				android:defaultValue="@integer/preference_background_cancelled_past_default"
+				android:dependency="preference_use_default_background"
+				android:key="preference_background_cancelled_past"
+				android:title="@string/preference_background_cancelled_past"/>
+
+			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
+				android:defaultValue="@integer/preference_background_future_default"
+				android:key="preference_background_future"
+				android:title="Future day background"
+				app:cpv_showAlphaSlider="true"
+				app:cpv_showColorShades="false"/>
+
+			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
+				android:defaultValue="@integer/preference_background_past_default"
+				android:key="preference_background"
+				android:title="Past day background"
+				app:cpv_showAlphaSlider="true"
+				app:cpv_showColorShades="false"/>
+
+			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
+				android:defaultValue="@integer/preference_background_free_default"
+				android:enabled="false"
+				android:key="preference_background_free"
+				android:title="@string/preference_background_free"/>
+
+			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
+				android:defaultValue="@integer/preference_marker_default"
+				android:key="preference_marker"
+				android:title="@string/preference_marker"/>
+
+			<Preference
+				android:enabled="false"
+				android:key="preference_timetable_colors_reset"
+				android:title="@string/preference_timetable_colors_reset"/>
+
+		</PreferenceCategory>
+
+		<PreferenceCategory android:title="@string/preferences_timetable_others">
+
+			<CheckBoxPreference
+				android:defaultValue="@bool/preference_timetable_hide_cancelled"
+				android:enabled="false"
+				android:key="preference_timetable_hide_cancelled"
+				android:title="@string/preference_timetable_hide_cancelled"/>
+
+		</PreferenceCategory>
+
+		<PreferenceCategory android:title="@string/preference_category_themes">
+
+			<ListPreference
+				android:defaultValue="@string/preference_theme_default"
+				android:entries="@array/preferences_themes"
+				android:entryValues="@array/preferences_theme_values"
+				android:icon="@drawable/settings_timetable_format_paint"
+				android:key="preference_theme"
+				android:summary="%s"
+				android:title="@string/preference_theme"/>
+
+			<ListPreference
+				android:defaultValue="@string/preference_dark_theme_default"
+				android:entries="@array/preferences_dark_theme"
+				android:entryValues="@array/preferences_dark_theme_values"
+				android:icon="@drawable/settings_timetable_brightness_medium"
+				android:key="preference_dark_theme"
+				android:summary="%s"
+				android:title="@string/preference_dark_theme"/>
+
+			<CheckBoxPreference
+				android:defaultValue="@bool/preference_dark_theme_oled_default"
+				android:dependency="preference_dark_theme"
+				android:key="preference_dark_theme_oled"
+				android:summary="@string/preference_dark_theme_oled_desc"
+				android:title="@string/preference_dark_theme_oled"/>
+
+		</PreferenceCategory>
+	</PreferenceScreen>
+
+	<PreferenceScreen
+		android:icon="@drawable/settings_notifications"
+		android:key="preferences_notifications"
+		android:title="@string/pref_notifications">
+
+		<CheckBoxPreference
+			android:defaultValue="true"
+			android:enabled="false"
+			android:icon="@drawable/settings_notifications_active"
+			android:key="preference_notifications_enable"
+			android:summary="@string/preference_notifications_enable_desc"
+			android:title="@string/preference_notifications_enable"/>
+
+		<CheckBoxPreference
+			android:defaultValue="false"
+			android:dependency="preference_notifications_enable"
+			android:enabled="false"
+			android:key="preference_notifications_in_multiple"
+			android:summary="@string/preference_notifications_multiple_desc"
+			android:title="@string/preference_notifications_multiple"/>
+
+		<Preference
+			android:enabled="false"
+			android:icon="@drawable/settings_notifications_clear_all"
+			android:key="preference_notifications_clear"
+			android:title="@string/preference_notifications_clear"/>
+
+		<PreferenceCategory android:title="@string/preference_notifications_group_visible_fields">
+
+			<ListPreference
+				android:defaultValue="long"
+				android:dependency="preference_notifications_enable"
+				android:enabled="false"
+				android:entries="@array/preferences_notifications_visibility"
+				android:entryValues="@array/preferences_notifications_visibility_values"
+				android:key="preference_notifications_visibility_subjects"
+				android:summary="%s"
+				android:title="@string/subjects"/>
+
+			<ListPreference
+				android:defaultValue="short"
+				android:dependency="preference_notifications_enable"
+				android:enabled="false"
+				android:entries="@array/preferences_notifications_visibility"
+				android:entryValues="@array/preferences_notifications_visibility_values"
+				android:icon="@drawable/all_rooms"
+				android:key="preference_notifications_visibility_rooms"
+				android:summary="%s"
+				android:title="@string/all_rooms"/>
+
+			<ListPreference
+				android:defaultValue="short"
+				android:dependency="preference_notifications_enable"
+				android:enabled="false"
+				android:entries="@array/preferences_notifications_visibility"
+				android:entryValues="@array/preferences_notifications_visibility_values"
+				android:icon="@drawable/all_teacher"
+				android:key="preference_notifications_visibility_teachers"
+				android:summary="%s"
+				android:title="@string/all_teachers"/>
+
+		</PreferenceCategory>
+
+	</PreferenceScreen>
+
+	<PreferenceScreen
+		android:icon="@drawable/settings_roomfinder"
+		android:key="preferences_rooms"
+		android:title="@string/title_free_rooms">
+
+		<ListPreference
+			android:enabled="false"
+			android:key="preference_room_to_display_in_free_lessons"
+			android:summary="%s"
+			android:title="@string/preference_room_to_display_in_free_lessons"/>
+
+		<CheckBoxPreference
+			android:enabled="false"
+			android:key="preference_room_to_display_in_free_lessons_trim"
+			android:summary="@string/preference_room_to_display_in_free_lessons_trim_desc"
+			android:title="@string/preference_room_to_display_in_free_lessons_trim"/>
+
+	</PreferenceScreen>
+
+	<PreferenceScreen
+		android:icon="@drawable/settings_timetable"
+		android:key="preferences_timetable"
+		android:title="@string/pref_timetable">
+
+		<com.sapuseven.untis.preferences.ElementPickerPreference
+			android:key="preference_timetable_personal_timetable"
+			android:title="@string/preference_timetable_personal_timetable"/>
+
+		<CheckBoxPreference
+			android:defaultValue="@bool/preference_timetable_refresh_in_background_default"
+			android:enabled="false"
+			android:key="preference_timetable_refresh_in_background"
+			android:summary="@string/preference_timetable_refresh_in_background_desc"
+			android:title="@string/preference_timetable_refresh_in_background"/>
+
+		<PreferenceCategory android:title="@string/preference_category_item_appearance">
+
+			<com.sapuseven.untis.preferences.UnitPreference
+				android:defaultValue="@integer/preference_timetable_item_padding_overlap_default"
+				android:key="preference_timetable_item_padding_overlap"
+				android:numeric="integer"
+				android:selectAllOnFocus="true"
+				android:singleLine="true"
+				android:title="@string/preference_timetable_item_padding_overlap"
+				app:unit="dp"/>
+
+			<com.sapuseven.untis.preferences.UnitPreference
+				android:defaultValue="@integer/preference_timetable_item_padding_default"
+				android:key="preference_timetable_item_padding"
+				android:numeric="integer"
+				android:selectAllOnFocus="true"
+				android:singleLine="true"
+				android:title="@string/preference_timetable_item_padding"
+				app:unit="dp"/>
+
+			<com.sapuseven.untis.preferences.UnitPreference
+				android:defaultValue="@integer/preference_timetable_item_corner_radius_default"
+				android:icon="@drawable/settings_timetable_rounded_corner"
+				android:key="preference_timetable_item_corner_radius"
+				android:numeric="integer"
+				android:selectAllOnFocus="true"
+				android:singleLine="true"
+				android:title="@string/preference_timetable_item_corner_radius"
+				app:unit="dp"/>
+		</PreferenceCategory>
+
+		<PreferenceCategory android:title="@string/preference_category_lesson_text">
+
+			<CheckBoxPreference
+				android:defaultValue="@bool/preference_timetable_centered_lesson_info_default"
+				android:icon="@drawable/settings_timetable_align_center"
+				android:key="preference_timetable_centered_lesson_info"
+				android:title="@string/preference_timetable_centered_lesson_info"/>
+
+			<CheckBoxPreference
+				android:defaultValue="@bool/preference_timetable_bold_lesson_name_default"
+				android:icon="@drawable/settings_timetable_format_bold"
+				android:key="preference_timetable_bold_lesson_name"
+				android:title="@string/preference_timetable_bold_lesson_name"/>
+
+			<com.sapuseven.untis.preferences.UnitPreference
+				android:defaultValue="@integer/preference_timetable_lesson_name_font_size_default"
+				android:key="preference_timetable_lesson_name_font_size"
+				android:numeric="integer"
+				android:selectAllOnFocus="true"
+				android:singleLine="true"
+				android:title="@string/preference_timetable_lesson_name_font_size"
+				app:unit="sp"/>
+
+			<com.sapuseven.untis.preferences.UnitPreference
+				android:defaultValue="@integer/preference_timetable_lesson_info_font_size_default"
+				android:key="preference_timetable_lesson_info_font_size"
+				android:numeric="integer"
+				android:selectAllOnFocus="true"
+				android:singleLine="true"
+				android:title="@string/preference_timetable_lesson_info_font_size"
+				app:unit="sp"/>
+		</PreferenceCategory>
+	</PreferenceScreen>
+
+	<PreferenceScreen
+		android:icon="@drawable/settings_personal"
+		android:key="preferences_account"
+		android:title="@string/pref_account">
+
+		<Preference
+			android:enabled="false"
+			android:icon="@drawable/settings_account_key"
+			android:key="preference_account_access_key"
+			android:title="@string/preference_account_access_key"/>
+
+		<Preference
+			android:enabled="false"
+			android:icon="@drawable/settings_account_logout"
+			android:key="preference_account_logout"
+			android:title="@string/logout"/>
+
+	</PreferenceScreen>
+
+	<PreferenceScreen
+		android:icon="@drawable/settings_info"
+		android:key="preferences_info"
+		android:title="@string/pref_infos">
+
+		<DialogPreference
+			android:key="preference_info_disabled"
+			android:title="Disabled Preferences?"
+			android:summary="Tap to see why some preferences are not available."/>
+
+		<Preference
+			android:enabled="false"
+			android:key="preference_info_app_version"
+			android:title="@string/preferences_info_app_version"/>
+
+		<Preference
+			android:enabled="false"
+			android:icon="@drawable/settings_info_list_bulleted"
+			android:key="preference_info_changelog"
+			android:title="@string/preferences_info_changelog"/>
+
+		<Preference
+			android:enabled="false"
+			android:icon="@drawable/settings_info_message"
+			android:key="preference_info_contact_email"
+			android:summary="@string/all_contact_email"
+			android:title="@string/preferences_info_contact"/>
+
+		<!--PreferenceCategory
+			android:title="@string/preferences_info_category_coming_soon">
+
+			<CheckBoxPreference
+				android:defaultValue="true"
+				android:enabled="false"
+				android:key="preference_send_stats"
+				android:summary="@string/preferences_info_send_stats_desc"
+				android:title="@string/preferences_info_send_stats"/>
+
+			<Preference
+				android:enabled="false"
+				android:key="preference_info_stats"
+				android:summary="@string/preferences_info_stats_details_desc"
+				android:title="@string/preferences_info_stats_details"/>
+
+		</PreferenceCategory-->
+	</PreferenceScreen>
+</androidx.preference.PreferenceScreen>

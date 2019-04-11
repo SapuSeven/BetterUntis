@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string-array name="preferences_themes">
+		<item>@string/preferences_theme_default</item>
+		<item>@string/preferences_theme_untis</item>
+		<item>@string/preferences_theme_blue</item>
+		<item>@string/preferences_theme_green</item>
+		<item>@string/preferences_theme_pink</item>
+		<item>@string/preferences_theme_cyan</item>
+	</string-array>
+
+	<string-array name="preferences_theme_values" translatable="false">
+		<item>default</item>
+		<item>untis</item>
+		<item>blue</item>
+		<item>green</item>
+		<item>pink</item>
+		<item>cyan</item>
+	</string-array>
+
+	<string-array name="preferences_dark_theme">
+		<item>@string/preferences_dark_theme_auto</item>
+		<item>@string/preferences_dark_theme_system</item>
+		<item>@string/preferences_dark_theme_on</item>
+		<item>@string/preferences_dark_theme_off</item>
+	</string-array>
+
+	<string-array name="preferences_dark_theme_values" translatable="false">
+		<item>auto</item>
+		<item>system</item>
+		<item>on</item>
+		<item>off</item>
+	</string-array>
+
+	<string-array name="preferences_notifications_visibility">
+		<item>@string/preferences_notifications_visibility_hidden</item>
+		<item>@string/preferences_notifications_visibility_short</item>
+		<item>@string/preferences_notifications_visibility_long</item>
+	</string-array>
+
+	<string-array name="preferences_notifications_visibility_values" translatable="false">
+		<item>hidden</item>
+		<item>short</item>
+		<item>long</item>
+	</string-array>
+
+	<string-array name="logindatainput_webuntis_servers" translatable="false">
+		<item>antiope.webuntis.com</item>
+		<item>aoide.webuntis.com</item>
+		<item>arche.webuntis.com</item>
+		<item>asopo.webuntis.com</item>
+		<item>borys.webuntis.com</item>
+		<item>cissa.webuntis.com</item>
+		<item>erato.webuntis.com</item>
+		<item>euterpe.webuntis.com</item>
+		<item>hepta.webuntis.com</item>
+		<item>hypate.webuntis.com</item>
+		<item>kalliope.webuntis.com</item>
+		<item>klio.webuntis.com</item>
+		<item>melete.webuntis.com</item>
+		<item>melpomene.webuntis.com</item>
+		<item>mese.webuntis.com</item>
+		<item>neilo.webuntis.com</item>
+		<item>nete.webuntis.com</item>
+		<item>poly.webuntis.com</item>
+		<item>terpsichore.webuntis.com</item>
+		<item>thalia.webuntis.com</item>
+		<item>tipo.webuntis.com</item>
+		<item>tritone.webuntis.com</item>
+		<item>urania.webuntis.com</item>
+	</string-array>
+</resources>

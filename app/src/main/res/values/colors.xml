@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<color name="colorPrimary">#F44336</color>
+	<color name="colorPrimaryDark">#D32F2F</color>
+	<color name="colorAccent">#607D8B</color>
+	<color name="colorDivider">#1F000000</color>
+
+	<color name="colorPrimaryThemeUntis">#ff9800</color>
+	<color name="colorPrimaryDarkThemeUntis">#f57c00</color>
+
+	<color name="colorPrimaryThemeBlue">#03a9f4</color>
+	<color name="colorPrimaryDarkThemeBlue">#0288d1</color>
+	<color name="colorAccentThemeBlue">#ff5722</color>
+
+	<color name="colorPrimaryThemeGreen">#4caf50</color>
+	<color name="colorPrimaryDarkThemeGreen">#388e3c</color>
+	<color name="colorAccentThemeGreen">#607d8b</color>
+
+	<color name="colorPrimaryThemePink">#e91e63</color>
+	<color name="colorPrimaryDarkThemePink">#c2185b</color>
+	<color name="colorAccentThemePink">#536dfe</color>
+
+	<color name="colorPrimaryThemeCyan">#00bcd4</color>
+	<color name="colorPrimaryDarkThemeCyan">#0097a7</color>
+	<color name="colorAccentThemeCyan">#ff4081</color>
+
+	<color name="colorRoomOccupied">#fff44336</color>
+	<color name="colorRoomAvailable">#ff4caf50</color>
+
+	<color name="color_launcher_background">#FFFFFF</color>
+	<color name="color_anonymous_login_info_background">#44ffffff</color>
+</resources>
