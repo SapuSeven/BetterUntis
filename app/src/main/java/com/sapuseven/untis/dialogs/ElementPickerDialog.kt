@@ -5,7 +5,6 @@ import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
@@ -16,6 +15,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.textfield.TextInputEditText
@@ -161,10 +161,11 @@ class ElementPickerDialog : DialogFragment() {
 		//selectedPosition = -1
 		//updateView(oldPosition)
 
-		tv.setTextColor(context?.resources?.getColor(R.color.colorPrimary) ?: Color.BLACK)
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-			tv.compoundDrawables[1 /* TOP */].setTint(context?.resources?.getColor(R.color.colorPrimary)
-					?: Color.BLACK)
+		context?.let {
+			tv.setTextColor(ContextCompat.getColor(it, R.color.colorPrimary))
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+				tv.compoundDrawables[1 /* TOP */].setTint(ContextCompat.getColor(it, R.color.colorPrimary))
+		}
 
 		holder.etSearch.hint = getHint()
 
