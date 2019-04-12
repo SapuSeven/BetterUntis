@@ -15,12 +15,8 @@ import android.widget.TextView
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.KotlinUtils.safeLet
-import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import com.sapuseven.untis.models.untis.timetable.PeriodHomework
-import kotlinx.serialization.json.JSON
-import kotlinx.serialization.stringify
 
 class TimetableItemDetailsDialog : DialogFragment() {
 	private var item: TimegridItem? = null
@@ -90,7 +86,7 @@ class TimetableItemDetailsDialog : DialogFragment() {
 
 		item.periodData.element.homeWorks.forEach {
 			val infoView = activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_homework, null)
-			(infoView.findViewById<TextView>(R.id.tvName)).text = it.text
+			(infoView.findViewById<TextView>(R.id.textview_roomfinder_name)).text = it.text
 			(infoView.findViewById<TextView>(R.id.tvDate)).text = "von " + it.startDate + " bis " + it.endDate
 			root.addView(infoView)
 		}

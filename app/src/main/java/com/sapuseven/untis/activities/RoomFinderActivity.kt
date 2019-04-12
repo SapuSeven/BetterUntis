@@ -6,27 +6,35 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.sapuseven.untis.R
+import com.sapuseven.untis.adapters.RoomFinderAdapter
+import com.sapuseven.untis.adapters.RoomFinderAdapterItem
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.dialogs.ElementPickerDialog
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import kotlinx.android.synthetic.main.activity_room_finder.*
 
-class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDialogListener/*, View.OnClickListener*/ {
+class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDialogListener, RoomFinderAdapter.RoomFinderClickListener {
 	private var roomListMargins: Int = 0
-	//private var dialog: AlertDialog? = null
-	private var roomList: ArrayList</*AdapterItemRoomFinder*/ String>? = null
-	//private var roomAdapter: AdapterRoomFinder? = null
 	private var currentHourIndex = -1
 	private var hourIndexOffset: Int = 0
-	private var requestQueue: MutableList<RequestModel> = ArrayList()
+	//private var dialog: AlertDialog? = null
+	private var roomList: MutableList<RoomFinderAdapterItem> = ArrayList()
+	private var roomListAdapter = RoomFinderAdapter(this, this)
+	private var requestQueue: MutableList<PeriodElement> = ArrayList()
 	//private var recyclerView: RecyclerView? = null
 	//private var currentHour: TextView? = null
 	private var maxHourIndex = 0
+
+	private lateinit var userDatabase: UserDatabase
+	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 
 	companion object {
 		const val EXTRA_LONG_PROFILE_ID = "profile_id"
@@ -40,13 +48,22 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		roomListMargins = (12 * resources.displayMetrics.density + 0.5f).toInt()
 
 		setupNoRoomsIndicator()
-		setupRoomList(recyclerview_roomfinder_roomlist)
-		setupFab(intent.getLongExtra(EXTRA_LONG_PROFILE_ID, -1))
+		setupRoomList()
+		setupFab()
 		setupHourSelector()
+
+		refreshRoomList()
+		loadUserDatabase(intent.getLongExtra(EXTRA_LONG_PROFILE_ID, -1))
 	}
 
-	private fun setupFab(profileId: Long) {
-		fab_roomfinder_add.setOnClickListener { showItemList(profileId) }
+	private fun loadUserDatabase(profileId: Long) {
+		// TODO: Make async
+		userDatabase = UserDatabase.createInstance(this)
+		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, userDatabase.getUser(profileId)?.id ?: -1)
+	}
+
+	private fun setupFab() {
+		fab_roomfinder_add.setOnClickListener { showItemList() }
 	}
 
 	private fun setupHourSelector() {
@@ -84,15 +101,12 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		}
 	}
 
-	private fun setupRoomList(listView: RecyclerView) {
-		/*roomList = ArrayList<AdapterItemRoomFinder>()
-		requestQueue = ArrayList()
+	private fun setupRoomList() {
+		recyclerview_roomfinder_roomlist.layoutManager = LinearLayoutManager(this)
+		roomListAdapter = RoomFinderAdapter(this, this, roomList)
+		recyclerview_roomfinder_roomlist.adapter = roomListAdapter
 
-		listView.layoutManager = LinearLayoutManager(this)
-		roomAdapter = AdapterRoomFinder(this, roomList)
-		listView.adapter = roomAdapter
-
-		reload()*/
+		//reload()
 	}
 
 	override fun onDialogDismissed(dialog: DialogInterface?) {
@@ -107,8 +121,25 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		addRooms(dialog.getSelectedItems())
 	}
 
-	fun addRooms(rooms: List<PeriodElement>) {
-		TODO("not implemented")
+	override fun onClick(v: View?) {
+		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+	}
+
+	override fun onDeleteClick(position: Int) {
+		showDeleteItemDialog(position)
+	}
+
+	override fun onExpiredClick(position: Int) {
+		//refreshItem(position)
+	}
+
+	private fun addRooms(rooms: List<PeriodElement>) {
+		//requestQueue.addAll(rooms)
+		rooms.forEach {
+			roomList.add(RoomFinderAdapterItem(timetableDatabaseInterface.getShortName(it.id, TimetableDatabaseInterface.Type.ROOM), true))
+		}
+
+		refreshRoomList()
 	}
 
 	/*private fun reload() {
@@ -141,20 +172,17 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 	}*/
 
 	private fun refreshRoomList() {
-		if (roomList?.isEmpty() == false)
+		if (roomList.isNotEmpty())
 			textview_roomfinder_roomlistempty.visibility = View.GONE
 		else // default to visible if null or empty
 			textview_roomfinder_roomlistempty.visibility = View.VISIBLE
 
-		/*Collections.sort(roomList!!) // TODO: Due to multiple calls of getIndex(), this takes quite a bit of time. Better make this asynchronous and display a loading indicator
+		/*Collections.sort(roomList!!)
 		roomAdapter!!.notifyDataSetChanged()*/
 		displayCurrentHour()
 	}
 
-	private fun showItemList(profileId: Long) {
-		val userDatabase = UserDatabase.createInstance(this)
-		val timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, userDatabase.getUser(profileId)?.id
-				?: -1)
+	private fun showItemList() {
 		ElementPickerDialog.createInstance(
 				timetableDatabaseInterface,
 				ElementPickerDialog.Companion.ElementPickerDialogConfig(
@@ -166,16 +194,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 	}
 
 
-	/*private fun addRoom(item: AdapterItemRoomFinder, roomID: Int) {
-		if (roomList!!.contains(item))
-			return
-
-		requestQueue!!.add(RequestModel(roomID, item.getName()))
-
-		refreshRoomList()
-	}
-
-	private fun executeRequestQueue() {
+	/*private fun executeRequestQueue() {
 		reload()
 
 		if (requestQueue!!.size > 0)
@@ -336,32 +355,25 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		Log.d("RoomFinder", "Current Hour Index: $index")
 		currentHourIndex = Math.max(index, 0)
 		return currentHourIndex + hourIndexOffset
-	}
+	}*/
 
-	fun showDeleteItemDialog(position: Int) {
+	private fun showDeleteItemDialog(position: Int) {
 		AlertDialog.Builder(this)
-				.setTitle(getString(R.string.delete_item_title, roomList!![position].getName()))
+				.setTitle(getString(R.string.delete_item_title, roomList[position]))
 				.setMessage(R.string.delete_item_text)
-				.setPositiveButton(R.string.yes, { dialog, which ->
-					try {
-						if (deleteItem(roomList!![position].getName())) {
-							roomList!!.removeAt(position)
-							roomAdapter!!.notifyItemRemoved(position)
+				.setPositiveButton(R.string.yes) { _, _ ->
+						/*if (deleteItem(roomList[position].name)) {
+							roomList.removeAt(position)
+							roomListAdapter.notifyItemRemoved(position)
 							refreshRoomList()
-						}
-					} catch (e: IOException) {
-						Snackbar.make(recyclerView, getString(R.string.snackbar_error,
-								e.message),
-								Snackbar.LENGTH_LONG).setAction("OK", null).show()
-					}
-				})
-				.setNegativeButton(R.string.no, { dialog, which -> dialog.dismiss() })
+						}*/
+				}
+				.setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
 				.create()
 				.show()
 	}
 
-	@Throws(IOException::class)
-	private fun deleteItem(name: String?): Boolean {
+	/*private fun deleteItem(name: String?): Boolean {
 		val inputFile = File(filesDir, "roomList.txt")
 		val tempFile = File(filesDir, "roomList.txt.tmp")
 
