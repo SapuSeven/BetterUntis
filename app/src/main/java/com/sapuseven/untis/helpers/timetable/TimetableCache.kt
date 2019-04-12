@@ -4,8 +4,7 @@ import android.content.Context
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.timetable.Period
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.cbor.CBOR
-import kotlinx.serialization.list
+import kotlinx.serialization.cbor.Cbor
 import java.io.File
 import java.lang.ref.WeakReference
 
@@ -22,11 +21,12 @@ class TimetableCache(val context: WeakReference<Context>) {
 	}
 
 	fun load(): CacheObject {
-		return CBOR.load(CacheObject.serializer(), targetCacheFile(target)?.readBytes() ?: ByteArray(0))
+		return Cbor.load(CacheObject.serializer(), targetCacheFile(target)?.readBytes()
+				?: ByteArray(0))
 	}
 
 	fun save(items: CacheObject) {
-		targetCacheFile(target)?.writeBytes(CBOR.dump(CacheObject.serializer(), items))
+		targetCacheFile(target)?.writeBytes(Cbor.dump(CacheObject.serializer(), items))
 	}
 
 	private fun targetCacheFile(target: CacheTarget?): File? {

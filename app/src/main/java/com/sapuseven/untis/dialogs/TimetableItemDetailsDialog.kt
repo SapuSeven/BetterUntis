@@ -4,23 +4,19 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.FragmentActivity
-import androidx.appcompat.app.AlertDialog
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentActivity
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.KotlinUtils.safeLet
-import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import com.sapuseven.untis.models.untis.timetable.PeriodHomework
-import kotlinx.serialization.json.JSON
-import kotlinx.serialization.stringify
 
 class TimetableItemDetailsDialog : DialogFragment() {
 	private var item: TimegridItem? = null

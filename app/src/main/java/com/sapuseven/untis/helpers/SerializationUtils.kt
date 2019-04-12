@@ -1,10 +1,11 @@
 package com.sapuseven.untis.helpers
 
 import com.sapuseven.untis.BuildConfig
-import kotlinx.serialization.json.JSON
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 
 object SerializationUtils {
-	fun getJSON(): JSON {
-		return JSON(strictMode = BuildConfig.DEBUG) // Disable strict mode for release builds to prevent crashes when the API changes
+	fun getJSON(): Json {
+		return Json(configuration = JsonConfiguration.Stable.copy(strictMode = BuildConfig.DEBUG)) // Disable strict mode for release builds to prevent crashes when the API changes
 	}
 }

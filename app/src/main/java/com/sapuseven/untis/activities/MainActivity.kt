@@ -512,7 +512,7 @@ class MainActivity :
 	}
 
 	private fun setTarget(id: Int, type: String, displayName: String) {
-		displayedElement = PeriodElement(type, id)
+		displayedElement = PeriodElement(type, id, id)
 		loadedMonths.clear()
 		items.clear()
 		weekView?.notifyDataSetChanged()

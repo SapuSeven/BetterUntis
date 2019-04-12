@@ -50,11 +50,11 @@ class TimetableDatabaseInterface(val database: UserDatabase, id: Long) {
 	private fun tableModelToPeriodElement(values: Collection<TableModel>): List<PeriodElement> {
 		return values.map { item: TableModel ->
 			when (item) {
-				is Klasse -> PeriodElement(Type.CLASS.name, item.id)
-				is Teacher -> PeriodElement(Type.TEACHER.name, item.id)
-				is Subject -> PeriodElement(Type.SUBJECT.name, item.id)
-				is Room -> PeriodElement(Type.ROOM.name, item.id)
-				else -> PeriodElement("", -1)
+				is Klasse -> PeriodElement(Type.CLASS.name, item.id, item.id)
+				is Teacher -> PeriodElement(Type.TEACHER.name, item.id, item.id)
+				is Subject -> PeriodElement(Type.SUBJECT.name, item.id, item.id)
+				is Room -> PeriodElement(Type.ROOM.name, item.id, item.id)
+				else -> PeriodElement("", -1, -1)
 			}
 		}
 	}
