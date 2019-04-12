@@ -56,10 +56,9 @@ open class BaseActivity : AppCompatActivity() {
 			else -> setTheme(if (hasOwnToolbar) R.style.AppTheme_NoActionBar else R.style.AppTheme)
 		}
 		delegate.setLocalNightMode(when (PreferenceUtils.getPrefString(preferenceManager, "preference_dark_theme", currentDarkTheme)) {
-			"auto" -> AppCompatDelegate.MODE_NIGHT_AUTO
 			"on" -> AppCompatDelegate.MODE_NIGHT_YES
-			"off" -> AppCompatDelegate.MODE_NIGHT_NO
-			else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+			"auto" -> AppCompatDelegate.MODE_NIGHT_AUTO
+			else -> AppCompatDelegate.MODE_NIGHT_NO
 		})
 	}
 

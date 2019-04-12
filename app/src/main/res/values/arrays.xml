@@ -20,14 +20,12 @@
 
 	<string-array name="preferences_dark_theme">
 		<item>@string/preferences_dark_theme_auto</item>
-		<item>@string/preferences_dark_theme_system</item>
 		<item>@string/preferences_dark_theme_on</item>
 		<item>@string/preferences_dark_theme_off</item>
 	</string-array>
 
 	<string-array name="preferences_dark_theme_values" translatable="false">
 		<item>auto</item>
-		<item>system</item>
 		<item>on</item>
 		<item>off</item>
 	</string-array>
