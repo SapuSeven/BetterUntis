@@ -623,8 +623,8 @@ class MainActivity :
 		calendar.set(Calendar.DAY_OF_MONTH, day)
 		weekView?.goToDate(calendar)
 	}
-}
 
-private fun Int.darken(ratio: Float): Int {
-	return ColorUtils.blendARGB(this, Color.BLACK, ratio)
+	private fun Int.darken(ratio: Float): Int {
+		return ColorUtils.blendARGB(this, Color.BLACK, ratio)
+	}
 }
