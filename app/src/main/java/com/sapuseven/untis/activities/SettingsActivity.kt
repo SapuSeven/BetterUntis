@@ -11,6 +11,8 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceScreen
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.config.PreferenceManager
+import com.sapuseven.untis.preferences.AlertPreference
+import com.sapuseven.untis.preferences.AlertPreferenceDialog
 import com.sapuseven.untis.preferences.ElementPickerPreference
 import com.sapuseven.untis.preferences.ElementPickerPreferenceDialog
 import kotlinx.android.synthetic.main.activity_settings.*
@@ -91,12 +93,18 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 					return
 				}
 
-				if (preference is ElementPickerPreference) {
-					val f: DialogFragment = ElementPickerPreferenceDialog.newInstance(preference.key)
-					f.setTargetFragment(this, 0)
-					f.show(manager, DIALOG_FRAGMENT_TAG)
-				} else {
-					super.onDisplayPreferenceDialog(preference)
+				when (preference) {
+					is ElementPickerPreference -> {
+						val f: DialogFragment = ElementPickerPreferenceDialog.newInstance(preference.key)
+						f.setTargetFragment(this, 0)
+						f.show(manager, DIALOG_FRAGMENT_TAG)
+					}
+					is AlertPreference -> {
+						val f: DialogFragment = AlertPreferenceDialog.newInstance(preference.key)
+						f.setTargetFragment(this, 0)
+						f.show(manager, DIALOG_FRAGMENT_TAG)
+					}
+					else -> super.onDisplayPreferenceDialog(preference)
 				}
 			}
 		}
