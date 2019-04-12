@@ -518,7 +518,7 @@ class MainActivity :
 	}
 
 	private fun setTarget(id: Int, type: String, displayName: String) {
-		displayedElement = PeriodElement(type, id)
+		displayedElement = PeriodElement(type, id, id)
 		loadedMonths.clear()
 		items.clear()
 		weekView?.notifyDataSetChanged()
@@ -633,8 +633,8 @@ class MainActivity :
 		calendar.set(Calendar.DAY_OF_MONTH, day)
 		weekView?.goToDate(calendar)
 	}
-}
 
-private fun Int.darken(ratio: Float): Int {
-	return ColorUtils.blendARGB(this, Color.BLACK, ratio)
+	private fun Int.darken(ratio: Float): Int {
+		return ColorUtils.blendARGB(this, Color.BLACK, ratio)
+	}
 }

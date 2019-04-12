@@ -39,7 +39,7 @@ open class GridViewDatabaseItemAdapter(context: Context)
 	}
 
 	private inner class ItemFilter : Filter() {
-		override fun publishResults(constraint: CharSequence, results: Filter.FilterResults) {
+		override fun publishResults(constraint: CharSequence, results: FilterResults) {
 			filteredItems.clear()
 
 			if (results.values is List<*>)
@@ -50,8 +50,8 @@ open class GridViewDatabaseItemAdapter(context: Context)
 			notifyDataSetChanged()
 		}
 
-		override fun performFiltering(constraint: CharSequence?): Filter.FilterResults {
-			val results = Filter.FilterResults()
+		override fun performFiltering(constraint: CharSequence?): FilterResults {
+			val results = FilterResults()
 			val filteredList = ArrayList<PeriodElement>()
 
 			if (constraint.isNullOrBlank()) {

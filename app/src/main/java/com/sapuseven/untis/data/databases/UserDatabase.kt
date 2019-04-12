@@ -14,8 +14,6 @@ import com.sapuseven.untis.models.untis.MasterData
 import com.sapuseven.untis.models.untis.Settings
 import com.sapuseven.untis.models.untis.UserData
 import com.sapuseven.untis.models.untis.masterdata.*
-import kotlinx.serialization.json.JSON
-
 
 private const val DATABASE_VERSION = 1
 private const val DATABASE_NAME = "userdata.db"
@@ -256,8 +254,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 
 		val cursor = db.query(
 				table.getTableName(),
-				table.generateValues().keySet().toTypedArray(),
-				UserDatabase.COLUMN_NAME_USER_ID + "=?",
+				table.generateValues().keySet().toTypedArray(), "$COLUMN_NAME_USER_ID=?",
 				arrayOf(userId.toString()), null, null, "id DESC")
 
 		if (!cursor.moveToFirst())

@@ -1,10 +1,9 @@
 package com.sapuseven.untis.models.untis
 
+import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.models.untis.params.AppSharedSecretParams
-import com.sapuseven.untis.models.untis.params.PlainObjectSerializer
 import com.sapuseven.untis.models.untis.params.SchoolSearchParams
 import com.sapuseven.untis.models.untis.params.UserDataParams
-import kotlinx.serialization.json.JSON
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -12,10 +11,10 @@ import org.junit.Test
 class ParamsTest {
 	@Test
 	fun appSharedSecretParams_serialization() {
-		assertThat(getJSON().stringify(PlainObjectSerializer, AppSharedSecretParams(
+		/*assertThat(getJSON().stringify(PlainObjectSerializer, AppSharedSecretParams(
 				userName = "user",
 				password = "pass"
-		)), `is`("""{"userName":"user","password":"pass"}"""))
+		)), `is`("""{"userName":"user","password":"pass"}"""))*/
 
 		assertThat(getJSON().stringify(AppSharedSecretParams.serializer(), AppSharedSecretParams(
 				userName = "user",

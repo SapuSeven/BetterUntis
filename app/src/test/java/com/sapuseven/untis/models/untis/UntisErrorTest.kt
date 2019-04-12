@@ -1,6 +1,6 @@
 package com.sapuseven.untis.models.untis
 
-import kotlinx.serialization.json.JSON
+import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
 import org.junit.Test

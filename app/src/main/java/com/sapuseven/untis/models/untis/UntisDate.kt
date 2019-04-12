@@ -9,12 +9,12 @@ class UntisDate(
 ) {
 	@Serializer(forClass = UntisDate::class)
 	companion object : KSerializer<UntisDate> {
-		override fun serialize(output: Encoder, obj: UntisDate) {
-			output.encodeString(obj.date)
+		override fun serialize(encoder: Encoder, obj: UntisDate) {
+			encoder.encodeString(obj.date)
 		}
 
-		override fun deserialize(input: Decoder): UntisDate {
-			return UntisDate(input.decodeString())
+		override fun deserialize(decoder: Decoder): UntisDate {
+			return UntisDate(decoder.decodeString())
 		}
 	}
 

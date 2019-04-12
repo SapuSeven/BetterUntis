@@ -1,19 +1,5 @@
 package com.sapuseven.untis.data.databases
 
-import android.content.ContentValues
-import android.content.Context
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
-import android.provider.BaseColumns
-import com.sapuseven.untis.helpers.DatabaseQueryHelper.generateCreateTable
-import com.sapuseven.untis.helpers.DatabaseQueryHelper.generateDropTable
-import com.sapuseven.untis.helpers.DatabaseQueryHelper.generateValues
-import com.sapuseven.untis.models.untis.MasterData
-import com.sapuseven.untis.models.untis.Settings
-import com.sapuseven.untis.models.untis.UserData
-import com.sapuseven.untis.models.untis.masterdata.*
-import kotlinx.serialization.json.JSON
-
 
 private const val DATABASE_VERSION = 1
 private const val DATABASE_NAME = "timetable"

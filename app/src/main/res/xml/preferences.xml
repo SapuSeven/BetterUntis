@@ -371,9 +371,13 @@
 		android:key="preferences_info"
 		android:title="@string/pref_infos">
 
-		<DialogPreference
+		<com.sapuseven.untis.preferences.AlertPreference
+			android:dialogMessage="Some preferences are not implemented yet, so they are disabled until development is finished."
 			android:key="preference_info_disabled"
+			android:dialogTitle="This app isn't finished."
 			android:title="Disabled Preferences?"
+			android:icon="@drawable/settings_info"
+			android:negativeButtonText=""
 			android:summary="Tap to see why some preferences are not available."/>
 
 		<Preference
