@@ -56,7 +56,7 @@ class LoginDataInputActivity : BaseActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		setContentView(R.layout.activity_login_data_input)
+		setContentView(R.layout.activity_logindatainput)
 
 		btnLogin = findViewById(R.id.button_logindatainput_login)
 		etUrl = findViewById(R.id.edittext_logindatainput_url)
@@ -94,13 +94,8 @@ class LoginDataInputActivity : BaseActivity() {
 		sAnonymousLogin?.setOnCheckedChangeListener { _, isChecked ->
 			anonymous = isChecked
 
-			if (isChecked) {
-				etUserContainer?.visibility = View.GONE
-				etKeyContainer?.visibility = View.GONE
-			} else {
-				etUserContainer?.visibility = View.VISIBLE
-				etKeyContainer?.visibility = View.VISIBLE
-			}
+			etUserContainer?.isEnabled = !isChecked
+			etKeyContainer?.isEnabled = !isChecked
 		}
 
 		pbLoadingStatus = findViewById(R.id.progressbar_logindatainput_loadingstatus)
