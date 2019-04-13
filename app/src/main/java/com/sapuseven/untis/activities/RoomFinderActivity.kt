@@ -72,7 +72,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 	override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
 		R.id.item_roomfinder_add -> {
 			showItemList()
-			true
+			false
 		}
 		else -> {
 			super.onOptionsItemSelected(item)
