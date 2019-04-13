@@ -10,16 +10,23 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
 import com.sapuseven.untis.R
 import com.sapuseven.untis.adapters.RoomFinderAdapter
 import com.sapuseven.untis.adapters.RoomFinderAdapterItem
+import com.sapuseven.untis.data.databases.User
 import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.dialogs.ElementPickerDialog
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import com.sapuseven.untis.helpers.timetable.TimetableLoader
+import com.sapuseven.untis.interfaces.TimetableDisplay
+import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import kotlinx.android.synthetic.main.activity_room_finder.*
+import kotlinx.android.synthetic.main.activity_roomfinder.*
+import org.joda.time.DateTimeConstants
+import org.joda.time.LocalDate
+import org.joda.time.format.ISODateTimeFormat
+import java.lang.ref.WeakReference
 
 class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDialogListener, RoomFinderAdapter.RoomFinderClickListener {
 	private var roomListMargins: Int = 0
@@ -33,6 +40,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 	//private var currentHour: TextView? = null
 	private var maxHourIndex = 0
 
+	private var profileUser: User? = null
 	private lateinit var userDatabase: UserDatabase
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 
@@ -42,7 +50,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		setContentView(R.layout.activity_room_finder)
+		setContentView(R.layout.activity_roomfinder)
 		supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
 		roomListMargins = (12 * resources.displayMetrics.density + 0.5f).toInt()
@@ -57,9 +65,9 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 	}
 
 	private fun loadUserDatabase(profileId: Long) {
-		// TODO: Make async
 		userDatabase = UserDatabase.createInstance(this)
-		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, userDatabase.getUser(profileId)?.id ?: -1)
+		profileUser = userDatabase.getUser(profileId)
+		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileUser?.id ?: -1)
 	}
 
 	private fun setupFab() {
@@ -137,6 +145,19 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		//requestQueue.addAll(rooms)
 		rooms.forEach {
 			roomList.add(RoomFinderAdapterItem(timetableDatabaseInterface.getShortName(it.id, TimetableDatabaseInterface.Type.ROOM), true))
+
+			profileUser?.let { user ->
+				// TODO: Dynamic week length
+				val startDate = UntisDate(LocalDate.now().withDayOfWeek(DateTimeConstants.MONDAY).toString(ISODateTimeFormat.date()))
+				val endDate = UntisDate(LocalDate.now().withDayOfWeek(DateTimeConstants.FRIDAY).toString(ISODateTimeFormat.date()))
+
+				TimetableLoader(WeakReference(this), object : TimetableDisplay {
+					override fun addData(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
+						roomList.add(RoomFinderAdapterItem(timetableDatabaseInterface.getShortName(it.id, TimetableDatabaseInterface.Type.ROOM), false))
+						refreshRoomList()
+					}
+				}, user, timetableDatabaseInterface).load(startDate, endDate, it.id, it.type)
+			}
 		}
 
 		refreshRoomList()
@@ -177,9 +198,8 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		else // default to visible if null or empty
 			textview_roomfinder_roomlistempty.visibility = View.VISIBLE
 
-		/*Collections.sort(roomList!!)
-		roomAdapter!!.notifyDataSetChanged()*/
-		displayCurrentHour()
+		roomList.sort()
+		roomListAdapter.notifyDataSetChanged()
 	}
 
 	private fun showItemList() {
@@ -362,11 +382,11 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 				.setTitle(getString(R.string.delete_item_title, roomList[position]))
 				.setMessage(R.string.delete_item_text)
 				.setPositiveButton(R.string.yes) { _, _ ->
-						/*if (deleteItem(roomList[position].name)) {
-							roomList.removeAt(position)
-							roomListAdapter.notifyItemRemoved(position)
-							refreshRoomList()
-						}*/
+					/*if (deleteItem(roomList[position].name)) {
+						roomList.removeAt(position)
+						roomListAdapter.notifyItemRemoved(position)
+						refreshRoomList()
+					}*/
 				}
 				.setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
 				.create()
