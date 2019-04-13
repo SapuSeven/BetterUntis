@@ -201,14 +201,14 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 			super.onBackPressed()
 	}
 
-	override fun onOptionsItemSelected(item: MenuItem): Boolean {
-		when (item.itemId) {
-			android.R.id.home -> {
-				enableSearchMode(false)
-				return false
-			}
+	override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+		android.R.id.home -> {
+			enableSearchMode(false)
+			false
 		}
-		return super.onOptionsItemSelected(item)
+		else -> {
+			super.onOptionsItemSelected(item)
+		}
 	}
 
 	private fun enableSearchMode(enable: Boolean) {
