@@ -37,7 +37,6 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 	//private var dialog: AlertDialog? = null
 	private var roomList: MutableList<RoomFinderAdapterItem> = ArrayList()
 	private var roomListAdapter = RoomFinderAdapter(this, this)
-	private var requestQueue: MutableList<PeriodElement> = ArrayList()
 	//private var recyclerView: RecyclerView? = null
 	//private var currentHour: TextView? = null
 	private var maxHourIndex = 0
@@ -165,8 +164,49 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 
 				TimetableLoader(WeakReference(this), object : TimetableDisplay {
 					override fun addData(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
+						/*items.forEach {
+
+						}
+
+
+
+
+						val states = BooleanArray(days * hours)
+
+
+
+						for (i in states.indices) {
+							val day = i / hours
+							val hour = i % hours
+
+							if (timetable.getItems(day, hour).size() > 0)
+								states[day * hours + hour] = true
+						}
+
+						val binaryData = StringBuilder()
+						for (value in states)
+							binaryData.append(if (value) '1' else '0')
+
+						if (!TextUtils.isEmpty(binaryData.toString())) {
+							if (requestModel.isRefreshOnly)
+								deleteItem(requestModel.displayName)
+
+							val writer = BufferedWriter(OutputStreamWriter(
+									openFileOutput("roomList.txt", Context.MODE_APPEND), "UTF-8"))
+							writer.write(requestModel.displayName!!)
+							writer.newLine()
+							writer.write(binaryData.toString())
+							writer.newLine()
+							writer.write(String.valueOf(getStartDateFromWeek(Calendar.getInstance(), 0,
+									true).getTimeInMillis()))
+							writer.newLine()
+							writer.close()
+						}
+
+
+
 						roomList.add(RoomFinderAdapterItem(timetableDatabaseInterface.getShortName(it.id, TimetableDatabaseInterface.Type.ROOM), false))
-						refreshRoomList()
+						refreshRoomList()*/
 					}
 				}, user, timetableDatabaseInterface).load(startDate, endDate, it.id, it.type)
 			}
@@ -225,15 +265,33 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		).show(supportFragmentManager, "elementPicker") // TODO: Do not hard-code the tag
 	}
 
-
-	/*private fun executeRequestQueue() {
-		reload()
-
-		if (requestQueue!!.size > 0)
-			loadRoom(requestQueue!![0])
+	private fun showDeleteItemDialog(position: Int) {
+		AlertDialog.Builder(this)
+				.setTitle(getString(R.string.delete_item_title, roomList[position]))
+				.setMessage(R.string.delete_item_text)
+				.setPositiveButton(R.string.yes) { _, _ ->
+					/*if (deleteItem(roomList[position].name)) {
+						roomList.removeAt(position)
+						roomListAdapter.notifyItemRemoved(position)
+						refreshRoomList()
+					}*/
+				}
+				.setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
+				.create()
+				.show()
 	}
 
-	private fun loadRoom(room: RequestModel) {
+	private fun displayCurrentHour() {
+		when {
+			hourIndexOffset < 0 -> textview_roomfinder_currenthour.text = resources.getQuantityString(R.plurals.hour_index_last,
+					Math.abs(hourIndexOffset), Math.abs(hourIndexOffset))
+			hourIndexOffset > 0 -> textview_roomfinder_currenthour.text = resources.getQuantityString(R.plurals.hour_index_next,
+					hourIndexOffset, hourIndexOffset)
+			else -> textview_roomfinder_currenthour.text = getString(R.string.hour_index_current)
+		}
+	}
+
+	/*private fun loadRoom(room: RequestModel) {
 		val unitManager: TimegridUnitManager
 		try {
 			unitManager = TimegridUnitManager(MasterData(ListManager.getUserData(application).getJSONObject("masterData")))
@@ -387,25 +445,9 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		Log.d("RoomFinder", "Current Hour Index: $index")
 		currentHourIndex = Math.max(index, 0)
 		return currentHourIndex + hourIndexOffset
-	}*/
-
-	private fun showDeleteItemDialog(position: Int) {
-		AlertDialog.Builder(this)
-				.setTitle(getString(R.string.delete_item_title, roomList[position]))
-				.setMessage(R.string.delete_item_text)
-				.setPositiveButton(R.string.yes) { _, _ ->
-					/*if (deleteItem(roomList[position].name)) {
-						roomList.removeAt(position)
-						roomListAdapter.notifyItemRemoved(position)
-						refreshRoomList()
-					}*/
-				}
-				.setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
-				.create()
-				.show()
 	}
 
-	/*private fun deleteItem(name: String?): Boolean {
+	private fun deleteItem(name: String?): Boolean {
 		val inputFile = File(filesDir, "roomList.txt")
 		val tempFile = File(filesDir, "roomList.txt.tmp")
 
@@ -473,19 +515,9 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 			e.printStackTrace() // Not expected to occur
 		}
 
-	}*/
-
-	private fun displayCurrentHour() {
-		when {
-			hourIndexOffset < 0 -> textview_roomfinder_currenthour.text = resources.getQuantityString(R.plurals.hour_index_last,
-					Math.abs(hourIndexOffset), Math.abs(hourIndexOffset))
-			hourIndexOffset > 0 -> textview_roomfinder_currenthour.text = resources.getQuantityString(R.plurals.hour_index_next,
-					hourIndexOffset, hourIndexOffset)
-			else -> textview_roomfinder_currenthour.text = getString(R.string.hour_index_current)
-		}
 	}
 
-	/*override fun onClick(v: View) {
+	override fun onClick(v: View) {
 		val itemPosition = recyclerView!!.getChildLayoutPosition(v)
 		val item = roomList!![itemPosition]
 
@@ -501,17 +533,9 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		intent.putExtra("displayName", getString(R.string.title_room, item.getName()))
 		setResult(Activity.RESULT_OK, intent)
 		finish()
-	}*/
-
-	private data class RequestModel(
-			val displayName: String
-	) {
-		val roomID: Int = 0
-		val isRefreshOnly: Boolean = false
 	}
 
-	/*companion object {
-
+	companion object {
 		fun getRooms(context: Context, includeDisable: Boolean): ArrayList<String> {
 			val roomList = ArrayList<String>()
 
