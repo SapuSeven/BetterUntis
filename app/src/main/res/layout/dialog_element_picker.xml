@@ -7,11 +7,12 @@
 	android:orientation="vertical">
 
 	<androidx.constraintlayout.widget.ConstraintLayout
+		android:id="@+id/constraintlayout_elementpicker_typeselect"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content">
 
 		<TextView
-			android:id="@+id/tvPersonal"
+			android:id="@+id/textview_elementpicker_personal"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="24dp"
@@ -23,12 +24,12 @@
 			android:text="@string/personal"
 			android:tint="?android:attr/textColorPrimary"
 			app:layout_constraintBottom_toBottomOf="parent"
-			app:layout_constraintEnd_toStartOf="@+id/tvClasses"
+			app:layout_constraintEnd_toStartOf="@+id/textview_elementpicker_classes"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent"/>
 
 		<TextView
-			android:id="@+id/tvClasses"
+			android:id="@+id/textview_elementpicker_classes"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="24dp"
@@ -40,12 +41,12 @@
 			android:text="@string/all_classes"
 			android:tint="?android:attr/textColorPrimary"
 			app:layout_constraintBottom_toBottomOf="parent"
-			app:layout_constraintEnd_toStartOf="@+id/tvTeachers"
-			app:layout_constraintStart_toEndOf="@+id/tvPersonal"
+			app:layout_constraintEnd_toStartOf="@+id/textview_elementpicker_teachers"
+			app:layout_constraintStart_toEndOf="@+id/textview_elementpicker_personal"
 			app:layout_constraintTop_toTopOf="parent"/>
 
 		<TextView
-			android:id="@+id/tvTeachers"
+			android:id="@+id/textview_elementpicker_teachers"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="24dp"
@@ -57,12 +58,12 @@
 			android:text="@string/all_teachers"
 			android:tint="?android:attr/textColorPrimary"
 			app:layout_constraintBottom_toBottomOf="parent"
-			app:layout_constraintEnd_toStartOf="@+id/tvRooms"
-			app:layout_constraintStart_toEndOf="@+id/tvClasses"
+			app:layout_constraintEnd_toStartOf="@+id/textview_elementpicker_rooms"
+			app:layout_constraintStart_toEndOf="@+id/textview_elementpicker_classes"
 			app:layout_constraintTop_toTopOf="parent"/>
 
 		<TextView
-			android:id="@+id/tvRooms"
+			android:id="@+id/textview_elementpicker_rooms"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="24dp"
@@ -75,13 +76,13 @@
 			android:tint="?android:attr/textColorPrimary"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintEnd_toEndOf="parent"
-			app:layout_constraintStart_toEndOf="@+id/tvTeachers"
+			app:layout_constraintStart_toEndOf="@+id/textview_elementpicker_teachers"
 			app:layout_constraintTop_toTopOf="parent"/>
 
 	</androidx.constraintlayout.widget.ConstraintLayout>
 
 	<com.google.android.material.textfield.TextInputLayout
-		android:id="@+id/etLayout"
+		android:id="@+id/textinputlayout_elementpicker_search"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_marginStart="8dp"
@@ -91,7 +92,7 @@
 		app:layout_constraintTop_toTopOf="parent">
 
 		<com.google.android.material.textfield.TextInputEditText
-			android:id="@+id/et"
+			android:id="@+id/textinputedittext_elementpicker_search"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:ems="10"
@@ -100,16 +101,26 @@
 	</com.google.android.material.textfield.TextInputLayout>
 
 	<GridView
-		android:id="@+id/gv"
+		android:id="@+id/gridview_elementpicker_list"
 		android:layout_width="match_parent"
-		android:layout_height="match_parent"
+		android:layout_height="0dp"
 		android:layout_marginStart="8dp"
 		android:layout_marginEnd="8dp"
 		android:layout_marginBottom="8dp"
+		android:layout_weight="1"
 		android:numColumns="3"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@+id/tvPersonal"/>
+		app:layout_constraintTop_toBottomOf="@+id/textview_elementpicker_personal"/>
+
+	<Button
+		android:id="@+id/button_elementpicker_confirm"
+		style="@style/Widget.MaterialComponents.Button.TextButton"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_margin="8dp"
+		android:text=""
+		android:visibility="gone"/>
 
 </LinearLayout>

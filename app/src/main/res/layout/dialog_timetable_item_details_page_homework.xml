@@ -20,7 +20,7 @@
 		app:srcCompat="@drawable/all_homework"/>
 
 	<TextView
-		android:id="@+id/tvName"
+		android:id="@+id/textview_roomfinder_name"
 		android:layout_width="0dp"
 		android:layout_height="wrap_content"
 		android:layout_marginStart="24dp"
@@ -42,8 +42,8 @@
 		android:paddingEnd="12dp"
 		android:textColor="?android:attr/textColorSecondary"
 		app:layout_constraintBottom_toBottomOf="parent"
-		app:layout_constraintEnd_toEndOf="@+id/tvName"
-		app:layout_constraintStart_toStartOf="@+id/tvName"
-		app:layout_constraintTop_toBottomOf="@+id/tvName"/>
+		app:layout_constraintEnd_toEndOf="@+id/textview_roomfinder_name"
+		app:layout_constraintStart_toStartOf="@+id/textview_roomfinder_name"
+		app:layout_constraintTop_toBottomOf="@+id/textview_roomfinder_name"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

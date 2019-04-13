@@ -62,6 +62,8 @@ class MainActivity :
 		private const val MINUTE_MILLIS: Int = 60 * 1000
 		private const val HOUR_MILLIS: Int = 60 * MINUTE_MILLIS
 		private const val DAY_MILLIS: Int = 24 * HOUR_MILLIS
+
+		private const val REQUEST_CODE_ROOM_FINDER = 1
 	}
 
 	//private var listManager: ListManager? = null
@@ -452,8 +454,9 @@ class MainActivity :
 				startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
 			}
 			R.id.nav_free_rooms -> {
-				/*val i3 = Intent(this@ActivityMain, ActivityRoomFinder::class.java)
-				startActivityForResult(i3, REQUEST_CODE_ROOM_FINDER)*/
+				val i3 = Intent(this@MainActivity, RoomFinderActivity::class.java)
+				i3.putExtra(RoomFinderActivity.EXTRA_LONG_PROFILE_ID, profileId)
+				startActivityForResult(i3, REQUEST_CODE_ROOM_FINDER)
 			}
 			R.id.nav_donations -> {
 				/*val i4 = Intent(this@ActivityMain, ActivityDonations::class.java)
@@ -481,7 +484,10 @@ class MainActivity :
 
 	private fun showItemList(type: TimetableDatabaseInterface.Type) {
 		timetableDatabaseInterface?.let { timetableDatabaseInterface ->
-			ElementPickerDialog.createInstance(timetableDatabaseInterface, type).show(supportFragmentManager, "elementPicker") // TODO: Do not hard-code
+			ElementPickerDialog.createInstance(
+					timetableDatabaseInterface,
+					ElementPickerDialog.Companion.ElementPickerDialogConfig(type)
+			).show(supportFragmentManager, "elementPicker") // TODO: Do not hard-code the tag
 		}
 	}
 
@@ -544,6 +550,10 @@ class MainActivity :
 
 	override fun onDialogDismissed(dialog: DialogInterface?) {
 		refreshNavigationViewSelection()
+	}
+
+	override fun onPositiveButtonClicked(dialog: ElementPickerDialog) {
+		dialog.dismiss() // unused, but just in case
 	}
 
 	private fun refreshNavigationViewSelection() {

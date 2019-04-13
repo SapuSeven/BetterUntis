@@ -86,7 +86,7 @@ class TimetableItemDetailsDialog : DialogFragment() {
 
 		item.periodData.element.homeWorks.forEach {
 			val infoView = activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_homework, null)
-			(infoView.findViewById<TextView>(R.id.tvName)).text = it.text
+			(infoView.findViewById<TextView>(R.id.textview_roomfinder_name)).text = it.text
 			(infoView.findViewById<TextView>(R.id.tvDate)).text = "von " + it.startDate + " bis " + it.endDate
 			root.addView(infoView)
 		}
