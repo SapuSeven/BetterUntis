@@ -192,7 +192,7 @@
 	<string name="ok">OK</string>
 	<string name="room_desc_occupied">This Room is occupied.</string>
 	<string name="delete_item">delete item</string>
-	<string name="add">add</string>
+	<string name="add">Add</string>
 	<string name="no_rooms_to_display">No rooms to display.\nTap + to add one!</string>
 	<string name="room_expired">Room data expired</string>
 	<string name="delete_item_title">Delete %1$s</string>

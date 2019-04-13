@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ImageSpan
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -57,21 +59,31 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 
 		setupNoRoomsIndicator()
 		setupRoomList()
-		setupFab()
 		setupHourSelector()
 
 		refreshRoomList()
 		loadUserDatabase(intent.getLongExtra(EXTRA_LONG_PROFILE_ID, -1))
 	}
 
+	override fun onCreateOptionsMenu(menu: Menu): Boolean {
+		menuInflater.inflate(R.menu.activity_roomfinder_actions, menu)
+		return true
+	}
+
+	override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+		R.id.item_roomfinder_add -> {
+			showItemList()
+			true
+		}
+		else -> {
+			super.onOptionsItemSelected(item)
+		}
+	}
+
 	private fun loadUserDatabase(profileId: Long) {
 		userDatabase = UserDatabase.createInstance(this)
 		profileUser = userDatabase.getUser(profileId)
 		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileUser?.id ?: -1)
-	}
-
-	private fun setupFab() {
-		fab_roomfinder_add.setOnClickListener { showItemList() }
 	}
 
 	private fun setupHourSelector() {

@@ -9,19 +9,9 @@
 		android:id="@+id/recyclerview_roomfinder_roomlist"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:layout_marginBottom="48dp" />
+		android:layout_marginBottom="56dp" />
 
 	<!--TODO: Implement and add app:layout_behavior="com.sapuseven.untis.view.behavior.ScrollAwareFabBehavior"-->
-	<com.google.android.material.floatingactionbutton.FloatingActionButton
-		android:id="@+id/fab_roomfinder_add"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_gravity="bottom|end"
-		android:layout_marginEnd="16dp"
-		android:layout_marginBottom="64dp"
-		app:layout_anchor="@id/recyclerview_roomfinder_roomlist"
-		app:layout_anchorGravity="bottom|right|end"
-		app:srcCompat="@drawable/roomfinder_add" />
 
 	<TextView
 		android:id="@+id/textview_roomfinder_roomlistempty"
@@ -34,16 +24,16 @@
 
 	<androidx.constraintlayout.widget.ConstraintLayout
 		android:layout_width="match_parent"
-		android:layout_height="72dp"
+		android:layout_height="56dp"
 		android:layout_gravity="bottom"
 		android:gravity="center_vertical"
 		android:orientation="horizontal">
 
 		<ImageButton
 			android:id="@+id/button_roomfinder_previous"
-			android:layout_width="24dp"
-			android:layout_height="24dp"
-			android:layout_marginStart="24dp"
+			android:layout_width="32dp"
+			android:layout_height="32dp"
+			android:layout_marginStart="16dp"
 			android:background="?attr/selectableItemBackgroundBorderless"
 			android:contentDescription="@string/previous_hour"
 			app:layout_constraintBottom_toBottomOf="parent"
@@ -62,6 +52,8 @@
 			android:focusable="true"
 			android:gravity="center_horizontal"
 			android:text="Monday, 4. Lesson"
+			android:textColor="?android:attr/textColorPrimary"
+			android:textSize="16sp"
 			app:layout_constraintEnd_toStartOf="@+id/button_roomfinder_next"
 			app:layout_constraintStart_toEndOf="@+id/button_roomfinder_previous"
 			app:layout_constraintTop_toTopOf="parent" />
@@ -74,15 +66,17 @@
 			android:layout_marginEnd="8dp"
 			android:layout_marginBottom="8dp"
 			android:text="10:40 - 11:30"
+			android:textColor="?android:attr/textColorSecondary"
+			android:textSize="14sp"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintEnd_toStartOf="@+id/button_roomfinder_next"
 			app:layout_constraintStart_toEndOf="@+id/button_roomfinder_previous" />
 
 		<ImageButton
 			android:id="@+id/button_roomfinder_next"
-			android:layout_width="24dp"
-			android:layout_height="wrap_content"
-			android:layout_marginEnd="24dp"
+			android:layout_width="32dp"
+			android:layout_height="32dp"
+			android:layout_marginEnd="16dp"
 			android:background="?attr/selectableItemBackgroundBorderless"
 			android:contentDescription="@string/next_hour"
 			app:layout_constraintBottom_toBottomOf="parent"
