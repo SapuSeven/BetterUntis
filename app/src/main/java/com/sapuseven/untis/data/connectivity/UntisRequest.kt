@@ -7,6 +7,7 @@ import com.github.kittinunf.result.Result
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.TextUtils
 import com.sapuseven.untis.models.untis.params.BaseParams
+import kotlinx.serialization.ContextualSerialization
 import kotlinx.serialization.Serializable
 import java.io.UnsupportedEncodingException
 import java.net.URI
@@ -44,7 +45,7 @@ class UntisRequest {
 		var id: String = ""
 		var jsonrpc: String = "2.0"
 		var method: String = ""
-		var params: List<BaseParams> = emptyList()
+		var params: List<@ContextualSerialization BaseParams> = emptyList()
 	}
 }
 

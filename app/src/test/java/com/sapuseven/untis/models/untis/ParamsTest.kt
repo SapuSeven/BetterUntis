@@ -26,12 +26,13 @@ class ParamsTest {
 	fun schoolSearchParams_serialization() {
 		assertThat(getJSON().stringify(SchoolSearchParams.serializer(), SchoolSearchParams(
 				search = "school",
-				schoolid = 123
-		)), `is`("""{"search":"school","schoolid":123}"""))
+				schoolid = 123,
+				schoolname = "name"
+		)), `is`("""{"search":"school","schoolid":123,"schoolname":"name"}"""))
 
 		assertThat(getJSON().stringify(SchoolSearchParams.serializer(), SchoolSearchParams(
 				search = "school"
-		)), `is`("""{"search":"school","schoolid":0}"""))
+		)), `is`("""{"search":"school","schoolid":0,"schoolname":""}"""))
 	}
 
 	@Test

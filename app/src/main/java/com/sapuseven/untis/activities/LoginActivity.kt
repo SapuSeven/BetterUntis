@@ -31,7 +31,6 @@ import com.sapuseven.untis.models.untis.response.SchoolSearchResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.json.JSONException
 
 class LoginActivity : BaseActivity(), View.OnClickListener {
 	companion object {
@@ -85,7 +84,6 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 					i.data = Uri.parse("https://sapuseven.com/scan_qr.php")
 					startActivity(i)
 				}
-
 			} catch (e: SecurityException) {
 				try {
 					val i = Intent(Intent.ACTION_VIEW)
@@ -254,7 +252,6 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 		tvSearchMessage?.text = message
 	}
 
-	@Throws(JSONException::class)
 	private fun showSchools(schools: List<UntisSchoolInfo>) {
 		adapter?.clearDataset()
 
