@@ -11,11 +11,6 @@ import org.junit.Test
 class ParamsTest {
 	@Test
 	fun appSharedSecretParams_serialization() {
-		/*assertThat(getJSON().stringify(PlainObjectSerializer, AppSharedSecretParams(
-				userName = "user",
-				password = "pass"
-		)), `is`("""{"userName":"user","password":"pass"}"""))*/
-
 		assertThat(getJSON().stringify(AppSharedSecretParams.serializer(), AppSharedSecretParams(
 				userName = "user",
 				password = "pass"

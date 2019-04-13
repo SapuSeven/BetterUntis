@@ -3,8 +3,7 @@ package com.sapuseven.untis.models.untis
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.models.UntisSchoolInfo
 import com.sapuseven.untis.models.untis.response.*
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.CoreMatchers.nullValue
+import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
@@ -130,6 +129,7 @@ class ResponseTest {
 		assertThat(userDataResponse1.id, `is`("id"))
 		assertThat(userDataResponse1.jsonrpc, `is`("2.0"))
 		assertThat(userDataResponse1.result, nullValue())
+		assertThat(userDataResponse1.error, notNullValue())
 		assertThat(userDataResponse1.error!!.code, `is`(1000))
 		assertThat(userDataResponse1.error!!.message, `is`("error message"))
 		assertThat(userDataResponse1.error!!.data, nullValue())
@@ -137,11 +137,7 @@ class ResponseTest {
 		val userDataResponse2 = getJSON().parse(UserDataResponse.serializer(), """{"id":"id","jsonrpc":"2.0","result":{"masterData":{"timeStamp":0},"userData":{"elemType":null,"elemId":0,"displayName":"","schoolName":"","departmentId":0},"settings":{"showAbsenceReason":true,"showAbsenceText":true,"absenceCheckRequired":false,"defaultAbsenceReasonId":0,"defaultLatenessReasonId":0,"defaultAbsenceEndTime":null,"customAbsenceEndTime":null}}}""")
 		assertThat(userDataResponse2.id, `is`("id"))
 		assertThat(userDataResponse2.jsonrpc, `is`("2.0"))
-		/*assertThat(userDataResponse2.result, `is`(UntisUserData(
-				masterData = MasterData(),
-				userData = UserData(),
-				settings = Settings()
-		)))*/
+		assertThat(userDataResponse2.result, notNullValue())
 		assertThat(userDataResponse2.error, nullValue())
 	}
 }

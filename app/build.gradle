@@ -53,7 +53,7 @@ dependencies {
 	implementation 'com.jaredrummler:colorpicker-compat:1.0.5'
 	implementation 'com.github.cesarferreira:MaterialComponent.Banner:0.13.0'
 	testImplementation 'junit:junit:4.12'
-	testImplementation 'org.mockito:mockito-core:1.10.19'
+	testImplementation 'org.mockito:mockito-core:2.27.0'
 	androidTestImplementation 'androidx.test:runner:1.1.1'
 	androidTestImplementation 'androidx.test:rules:1.1.1'
 	androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
