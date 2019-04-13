@@ -30,7 +30,6 @@ import com.sapuseven.untis.dialogs.ElementPickerDialog
 import com.sapuseven.untis.dialogs.TimetableItemDetailsDialog
 import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.DateTimeUtils
-import com.sapuseven.untis.helpers.KotlinUtils
 import com.sapuseven.untis.helpers.KotlinUtils.safeLet
 import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.helpers.config.PreferenceUtils
@@ -169,7 +168,7 @@ class MainActivity :
 		weekView?.notifyDataSetChanged()
 		showLoading(true)
 
-		KotlinUtils.safeLet(profileUser, timetableDatabaseInterface) { user, db ->
+		safeLet(profileUser, timetableDatabaseInterface) { user, db ->
 			TimetableLoader(WeakReference(this), this, user, db).load(startDate, endDate, id, type)
 		}
 	}
