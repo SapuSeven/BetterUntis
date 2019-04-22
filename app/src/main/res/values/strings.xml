@@ -46,6 +46,9 @@
 	<string name="errormessagedictionary_no_public_access">Anonymous access is disabled.</string>
 	<string name="errormessagedictionary_invalid_time_settings">Invalid date and/or time settings!</string>
 
+	<string name="roomfinder_current_hour">%1$s, %2$d. Lesson</string>
+	<string name="roomfinder_current_hour_time">%1$s - %2$s</string>
+
 	<string name="preferences_notifications_visibility_hidden">Hidden</string>
 	<string name="preferences_notifications_visibility_short">Short name</string>
 	<string name="preferences_notifications_visibility_long">Long name</string>

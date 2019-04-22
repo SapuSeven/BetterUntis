@@ -23,17 +23,21 @@ import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
+import com.sapuseven.untis.models.untis.masterdata.timegrid.Day
+import com.sapuseven.untis.models.untis.masterdata.timegrid.Unit
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import kotlinx.android.synthetic.main.activity_roomfinder.*
 import org.joda.time.DateTimeConstants
 import org.joda.time.LocalDate
+import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.ISODateTimeFormat
 import java.lang.ref.WeakReference
+import java.util.*
+import kotlin.collections.ArrayList
 
 class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDialogListener, RoomFinderAdapter.RoomFinderClickListener {
 	private var roomListMargins: Int = 0
-	private var currentHourIndex = -1
-	private var hourIndexOffset: Int = 0
+	private var hourIndex: Int = 0
 	//private var dialog: AlertDialog? = null
 	private var roomList: MutableList<RoomFinderAdapterItem> = ArrayList()
 	private var roomListAdapter = RoomFinderAdapter(this, this)
@@ -58,10 +62,12 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 
 		setupNoRoomsIndicator()
 		setupRoomList()
-		setupHourSelector()
 
 		refreshRoomList()
+
 		loadUserDatabase(intent.getLongExtra(EXTRA_LONG_PROFILE_ID, -1))
+
+		setupHourSelector()
 	}
 
 	override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -86,24 +92,36 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 	}
 
 	private fun setupHourSelector() {
+		maxHourIndex = -1 // maxIndex = -1 + length
+		profileUser?.let {
+			it.timeGrid.days.forEach { day ->
+				maxHourIndex += day.units.size
+			}
+		}
+
 		button_roomfinder_next.setOnClickListener {
-			if (currentHourIndex + hourIndexOffset < maxHourIndex) {
-				hourIndexOffset++
+			if (hourIndex < maxHourIndex) {
+				hourIndex++
 				refreshRoomList()
+				displayCurrentHour()
 			}
 		}
 
 		button_roomfinder_previous.setOnClickListener {
-			if (currentHourIndex + hourIndexOffset > 0) {
-				hourIndexOffset--
+			if (hourIndex > 0) {
+				hourIndex--
 				refreshRoomList()
+				displayCurrentHour()
 			}
 		}
 
 		textview_roomfinder_currenthour.setOnClickListener {
-			hourIndexOffset = 0
+			hourIndex = 0
 			refreshRoomList()
+			displayCurrentHour()
 		}
+
+		displayCurrentHour()
 	}
 
 	private fun setupNoRoomsIndicator() {
@@ -168,12 +186,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 
 						}
 
-
-
-
 						val states = BooleanArray(days * hours)
-
-
 
 						for (i in states.indices) {
 							val day = i / hours
@@ -202,8 +215,6 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 							writer.newLine()
 							writer.close()
 						}
-
-
 
 						roomList.add(RoomFinderAdapterItem(timetableDatabaseInterface.getShortName(it.id, TimetableDatabaseInterface.Type.ROOM), false))
 						refreshRoomList()*/
@@ -282,13 +293,32 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 	}
 
 	private fun displayCurrentHour() {
-		when {
-			hourIndexOffset < 0 -> textview_roomfinder_currenthour.text = resources.getQuantityString(R.plurals.hour_index_last,
-					Math.abs(hourIndexOffset), Math.abs(hourIndexOffset))
-			hourIndexOffset > 0 -> textview_roomfinder_currenthour.text = resources.getQuantityString(R.plurals.hour_index_next,
-					hourIndexOffset, hourIndexOffset)
-			else -> textview_roomfinder_currenthour.text = getString(R.string.hour_index_current)
+		val unit = getUnitFromIndex(hourIndex)
+		unit?.let {
+			textview_roomfinder_currenthour.text = getString(R.string.roomfinder_current_hour, translateDay(unit.first.day), unit.second)
+			textview_roomfinder_currenthourtime.text = getString(R.string.roomfinder_current_hour_time, unit.third.startTime.substring(1), unit.third.endTime.substring(1))
 		}
+		// TODO: Fallback if unit is null
+	}
+
+	private fun translateDay(day: String): String {
+		return DateTimeFormat.forPattern("EEEE").print(DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(day))
+	}
+
+	/**
+	 * @return A triple of the day, the unit index of day (1-indexed) and the unit corresponding to the provided hour index.
+	 */
+	private fun getUnitFromIndex(index: Int): Triple<Day, Int, Unit>? {
+		profileUser?.let {
+			var indexCounter = index
+			it.timeGrid.days.forEach { day ->
+				if (indexCounter >= day.units.size)
+					indexCounter -= day.units.size
+				else
+					return Triple(day, indexCounter + 1, day.units[indexCounter])
+			}
+		}
+		return null
 	}
 
 	/*private fun loadRoom(room: RequestModel) {
@@ -402,7 +432,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 
 	fun getCurrentHourIndex(): Int {
 		if (currentHourIndex >= 0)
-			return currentHourIndex + hourIndexOffset
+			return currentHourIndex + hourIndex
 
 		var index = 0
 
@@ -444,7 +474,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 
 		Log.d("RoomFinder", "Current Hour Index: $index")
 		currentHourIndex = Math.max(index, 0)
-		return currentHourIndex + hourIndexOffset
+		return currentHourIndex + hourIndex
 	}
 
 	private fun deleteItem(name: String?): Boolean {
