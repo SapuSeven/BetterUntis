@@ -1,23 +1,19 @@
 package com.sapuseven.untis.adapters
 
-import org.joda.time.DateTimeConstants
-import org.joda.time.Days
-import org.joda.time.LocalDate
-
 class RoomFinderAdapterItem(val name: String, var loading: Boolean) : Comparable<RoomFinderAdapterItem> {
-	private var states: BooleanArray = BooleanArray(0)
-	private var startDate: LocalDate = LocalDate.now()
+	var states = emptyList<Boolean>()
+	//private var startDate: LocalDate = LocalDate.now()
 	var hourIndex: Int = 0
 
 	val isOutdated: Boolean
-		get() = Days.daysBetween(startDate, LocalDate.now().withDayOfWeek(DateTimeConstants.MONDAY)).days != 0
+		get() = false // Days.daysBetween(startDate, LocalDate.now().withDayOfWeek(DateTimeConstants.MONDAY)).days != 0 // TODO: Rework this function
 
-	fun getState(index: Int): Int {
+	fun getState(): Int {
 		if (loading)
 			return STATE_LOADING
 		var i = 0
 		var hours = 0
-		while (index + i < states.size && !states[index + i]) {
+		while (hourIndex + i < states.size && !states[hourIndex + i]) {
 			hours++
 			i++
 		}
@@ -25,11 +21,11 @@ class RoomFinderAdapterItem(val name: String, var loading: Boolean) : Comparable
 	}
 
 	override fun compareTo(other: RoomFinderAdapterItem): Int {
-		val state1 = getState(hourIndex)
-		val state2 = other.getState(other.hourIndex)
+		val state1 = getState()
+		val state2 = other.getState()
 
 		return when {
-			state1 < state2 -> 1
+			state2 > state1 -> 1
 			state1 > state2 -> -1
 			else -> name.compareTo(other.name)
 		}

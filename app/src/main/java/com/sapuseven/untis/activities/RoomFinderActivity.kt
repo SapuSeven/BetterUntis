@@ -38,13 +38,10 @@ import kotlin.collections.ArrayList
 class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDialogListener, RoomFinderAdapter.RoomFinderClickListener {
 	private var roomListMargins: Int = 0
 	private var hourIndex: Int = 0
+	private var maxHourIndex = 0
 	//private var dialog: AlertDialog? = null
 	private var roomList: MutableList<RoomFinderAdapterItem> = ArrayList()
 	private var roomListAdapter = RoomFinderAdapter(this, this)
-	//private var recyclerView: RecyclerView? = null
-	//private var currentHour: TextView? = null
-	private var maxHourIndex = 0
-
 	private var profileUser: User? = null
 	private lateinit var userDatabase: UserDatabase
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
@@ -61,13 +58,13 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		roomListMargins = (12 * resources.displayMetrics.density + 0.5f).toInt()
 
 		setupNoRoomsIndicator()
-		setupRoomList()
-
-		refreshRoomList()
 
 		loadUserDatabase(intent.getLongExtra(EXTRA_LONG_PROFILE_ID, -1))
 
 		setupHourSelector()
+
+		setupRoomList()
+		refreshRoomList()
 	}
 
 	override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -158,8 +155,22 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		addRooms(dialog.getSelectedItems())
 	}
 
-	override fun onClick(v: View?) {
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+	override fun onClick(v: View) {
+		/*val itemPosition = recyclerview_roomfinder_roomlist.getChildLayoutPosition(v)
+		val item = roomList!![itemPosition]
+
+		val intent = Intent()
+		val elementName = ElementName(ROOM, userDataList)
+		try {
+			intent.putExtra("elemId", elementName.findFieldByValue("name", item.getName(), "id") as Int)
+		} catch (e: JSONException) {
+			e.printStackTrace() // Not expected to occur
+		}
+
+		intent.putExtra("elemType", ROOM)
+		intent.putExtra("displayName", getString(R.string.title_room, item.getName()))
+		setResult(Activity.RESULT_OK, intent)
+		finish()*/
 	}
 
 	override fun onDeleteClick(position: Int) {
@@ -171,9 +182,11 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 	}
 
 	private fun addRooms(rooms: List<PeriodElement>) {
-		//requestQueue.addAll(rooms)
-		rooms.forEach {
-			roomList.add(RoomFinderAdapterItem(timetableDatabaseInterface.getShortName(it.id, TimetableDatabaseInterface.Type.ROOM), true))
+		rooms.forEach { room ->
+			val item = RoomFinderAdapterItem(timetableDatabaseInterface.getShortName(room.id, TimetableDatabaseInterface.Type.ROOM), true)
+			item.hourIndex = hourIndex
+
+			roomList.add(item)
 
 			profileUser?.let { user ->
 				// TODO: Dynamic week length
@@ -182,25 +195,42 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 
 				TimetableLoader(WeakReference(this), object : TimetableDisplay {
 					override fun addData(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
-						/*items.forEach {
+						val states = mutableListOf<Boolean>()
 
+						profileUser?.let {
+							it.timeGrid.days.forEach { day ->
+								val dayDateTime = DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(day.day)
+
+								day.units.forEach { unit ->
+									val unitStartDateTime = DateTimeFormat.forPattern("'T'HH:mm").withLocale(Locale.ENGLISH).parseDateTime(unit.startTime)
+									val unitEndDateTime = DateTimeFormat.forPattern("'T'HH:mm").withLocale(Locale.ENGLISH).parseDateTime(unit.endTime)
+
+									var isOccupied = false
+									items.forEach allItems@{ item ->
+										if (item.startDateTime.dayOfWeek == dayDateTime.dayOfWeek)
+											if (item.startDateTime.millisOfDay <= unitEndDateTime.millisOfDay
+													&& item.endDateTime.millisOfDay >= unitStartDateTime.millisOfDay) {
+												isOccupied = true
+												return@allItems
+											}
+									}
+
+									states.add(isOccupied)
+								}
+							}
 						}
 
-						val states = BooleanArray(days * hours)
+						item.states = states.toList()
+						item.loading = false
 
-						for (i in states.indices) {
-							val day = i / hours
-							val hour = i % hours
+						refreshRoomList()
 
-							if (timetable.getItems(day, hour).size() > 0)
-								states[day * hours + hour] = true
-						}
-
-						val binaryData = StringBuilder()
+						// TODO: Save the result
+						/*val binaryData = StringBuilder()
 						for (value in states)
-							binaryData.append(if (value) '1' else '0')
+							binaryData.append(if (value) '1' else '0')*/
 
-						if (!TextUtils.isEmpty(binaryData.toString())) {
+						/*if (!TextUtils.isEmpty(binaryData.toString())) {
 							if (requestModel.isRefreshOnly)
 								deleteItem(requestModel.displayName)
 
@@ -214,12 +244,10 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 									true).getTimeInMillis()))
 							writer.newLine()
 							writer.close()
-						}
+						}*/
 
-						roomList.add(RoomFinderAdapterItem(timetableDatabaseInterface.getShortName(it.id, TimetableDatabaseInterface.Type.ROOM), false))
-						refreshRoomList()*/
 					}
-				}, user, timetableDatabaseInterface).load(startDate, endDate, it.id, it.type)
+				}, user, timetableDatabaseInterface).load(startDate, endDate, room.id, room.type)
 			}
 		}
 
@@ -258,9 +286,10 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 	private fun refreshRoomList() {
 		if (roomList.isNotEmpty())
 			textview_roomfinder_roomlistempty.visibility = View.GONE
-		else // default to visible if null or empty
+		else // default to visible if empty
 			textview_roomfinder_roomlistempty.visibility = View.VISIBLE
 
+		roomListAdapter.currentHourIndex = hourIndex
 		roomList.sort()
 		roomListAdapter.notifyDataSetChanged()
 	}
@@ -281,11 +310,11 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 				.setTitle(getString(R.string.delete_item_title, roomList[position]))
 				.setMessage(R.string.delete_item_text)
 				.setPositiveButton(R.string.yes) { _, _ ->
-					/*if (deleteItem(roomList[position].name)) {
+					//if (deleteSavedItemData()) { // TODO: Implement if item data is actually stored
 						roomList.removeAt(position)
 						roomListAdapter.notifyItemRemoved(position)
 						refreshRoomList()
-					}*/
+					//}
 				}
 				.setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
 				.create()
@@ -563,47 +592,5 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		intent.putExtra("displayName", getString(R.string.title_room, item.getName()))
 		setResult(Activity.RESULT_OK, intent)
 		finish()
-	}
-
-	companion object {
-		fun getRooms(context: Context, includeDisable: Boolean): ArrayList<String> {
-			val roomList = ArrayList<String>()
-
-			if (includeDisable)
-				roomList.add(context.getString(R.string.preference_note_disable))
-
-			try {
-				val file = context.getFileStreamPath("roomList.txt")
-				if (file != null && file.exists()) {
-					val reader = BufferedReader(InputStreamReader(context.openFileInput("roomList.txt")))
-					var name: String
-					while ((name = reader.readLine()) != null) {
-						for (i in 0..1)
-							reader.readLine()
-						roomList.add(name)
-					}
-				}
-			} catch (e: IOException) {
-				e.printStackTrace()
-			}
-
-			return roomList
-		}
-
-		fun getRoomStates(context: Context, name: String): String {
-			try {
-				val reader = BufferedReader(InputStreamReader(
-						context.openFileInput("roomList.txt")))
-				var line: String
-				while ((line = reader.readLine()) != null) {
-					if (line == name)
-						return reader.readLine()
-				}
-			} catch (e: IOException) {
-				e.printStackTrace()
-			}
-
-			return ""
-		}
 	}*/
 }
