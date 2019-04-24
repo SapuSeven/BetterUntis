@@ -17,7 +17,7 @@ class RoomFinderAdapter(
 		private val roomList: List<RoomFinderAdapterItem> = ArrayList()
 ) : RecyclerView.Adapter<RoomFinderAdapter.ViewHolder>() {
 
-	var currentHourIndex: Int = 0
+	private var currentHourIndex: Int = 0
 
 	init {
 		setHasStableIds(true)
@@ -38,7 +38,7 @@ class RoomFinderAdapter(
 		when {
 			room.getState(currentHourIndex) == RoomFinderAdapterItem.STATE_OCCUPIED -> holder.tvDetails.text = context.resources.getString(R.string.room_desc_occupied)
 			room.getState(currentHourIndex) >= RoomFinderAdapterItem.STATE_FREE -> holder.tvDetails.text = context.resources.getQuantityString(R.plurals.room_desc, room.getState(currentHourIndex), room.getState(currentHourIndex))
-			else -> holder.tvDetails.text = "Loading data" //context.resources.getString(R.string.loading_data)
+			else -> holder.tvDetails.text = "Loading data" //context.resources.getString(R.string.loading_data) // TODO: extract string
 		}
 
 		if (room.getState(currentHourIndex) >= RoomFinderAdapterItem.STATE_FREE && !room.loading) {
