@@ -17,7 +17,11 @@ class RoomFinderAdapter(
 		private val roomList: List<RoomFinderAdapterItem> = ArrayList()
 ) : RecyclerView.Adapter<RoomFinderAdapter.ViewHolder>() {
 
-	private var currentHourIndex: Int = 0
+	var currentHourIndex: Int = 0
+		set(value) {
+			field = value
+			roomList.forEach { it.hourIndex = value }
+		}
 
 	init {
 		setHasStableIds(true)
@@ -31,22 +35,21 @@ class RoomFinderAdapter(
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 		val room = roomList[position]
-		room.hourIndex = currentHourIndex
 
 		holder.tvName.text = room.name
 
 		when {
-			room.getState(currentHourIndex) == RoomFinderAdapterItem.STATE_OCCUPIED -> holder.tvDetails.text = context.resources.getString(R.string.room_desc_occupied)
-			room.getState(currentHourIndex) >= RoomFinderAdapterItem.STATE_FREE -> holder.tvDetails.text = context.resources.getQuantityString(R.plurals.room_desc, room.getState(currentHourIndex), room.getState(currentHourIndex))
-			else -> holder.tvDetails.text = "Loading data" //context.resources.getString(R.string.loading_data) // TODO: extract string
+			room.getState() == RoomFinderAdapterItem.STATE_OCCUPIED -> holder.tvDetails.text = context.resources.getString(R.string.room_desc_occupied)
+			room.getState() >= RoomFinderAdapterItem.STATE_FREE -> holder.tvDetails.text = context.resources.getQuantityString(R.plurals.room_desc, room.getState(), room.getState())
+			else -> holder.tvDetails.text = context.resources.getString(R.string.roomfinder_loading_data)
 		}
 
-		if (room.getState(currentHourIndex) >= RoomFinderAdapterItem.STATE_FREE && !room.loading) {
+		if (room.getState() >= RoomFinderAdapterItem.STATE_FREE && !room.loading) {
 			holder.ivState.setImageResource(R.drawable.roomfinder_available)
 			holder.ivState.visibility = View.VISIBLE
 			holder.pbLoading.visibility = View.GONE
 			holder.btnRoomExpired.visibility = if (room.isOutdated) View.VISIBLE else View.GONE
-		} else if (room.getState(currentHourIndex) == RoomFinderAdapterItem.STATE_OCCUPIED && !room.loading) {
+		} else if (room.getState() == RoomFinderAdapterItem.STATE_OCCUPIED && !room.loading) {
 			holder.ivState.setImageResource(R.drawable.roomfinder_occupied)
 			holder.ivState.visibility = View.VISIBLE
 			holder.pbLoading.visibility = View.GONE
@@ -79,7 +82,7 @@ class RoomFinderAdapter(
 		val btnRoomExpired: ImageButton = rootView.findViewById(R.id.button_roomfinder_expired)
 	}
 
-	interface RoomFinderClickListener:View.OnClickListener {
+	interface RoomFinderClickListener : View.OnClickListener {
 		fun onDeleteClick(position: Int)
 		fun onExpiredClick(position: Int)
 	}

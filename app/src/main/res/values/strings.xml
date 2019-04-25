@@ -268,4 +268,5 @@
 	<string name="settings_designing_hide">Don\'t show again</string>
 	<string name="settings_designing_info">Learn more</string>
 	<string name="betteruntis_logo">BetterUntis Logo</string>
+	<string name="roomfinder_loading_data">Loading data…</string>
 </resources>
