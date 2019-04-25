@@ -2,8 +2,11 @@
 <full-backup-content>
 	<include
 		domain="sharedpref"
-		path="."/>
+		path="." />
 	<include
 		domain="database"
-		path="userdata.db"/>
+		path="userdata.db" />
+	<include
+		domain="database"
+		path="roomfinder.db" />
 </full-backup-content>
