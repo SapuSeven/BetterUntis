@@ -29,6 +29,7 @@ import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import kotlinx.android.synthetic.main.activity_roomfinder.*
 import org.joda.time.DateTimeConstants
 import org.joda.time.LocalDate
+import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.ISODateTimeFormat
 import java.lang.ref.WeakReference
@@ -113,12 +114,34 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		}
 
 		textview_roomfinder_currenthour.setOnClickListener {
-			hourIndex = 0
+			hourIndex = calculateCurrentHourIndex()
 			refreshRoomList()
 			displayCurrentHour()
 		}
 
+		hourIndex = calculateCurrentHourIndex()
 		displayCurrentHour()
+	}
+
+	private fun calculateCurrentHourIndex(): Int {
+		profileUser?.let {
+			val now = LocalDateTime.now()
+			var index = 0
+
+			it.timeGrid.days.forEach { day ->
+				val dayDate = DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseLocalDate(day.day)
+				if (dayDate.dayOfWeek == now.dayOfWeek)
+					day.units.forEach { unit ->
+						val unitEndTime = DateTimeFormat.forPattern("'T'HH:mm").withLocale(Locale.ENGLISH).parseLocalTime(unit.endTime)
+						if (unitEndTime.millisOfDay > now.millisOfDay)
+							return index
+						index++
+					}
+				else
+					index += day.units.size
+			}
+		}
+		return 0
 	}
 
 	private fun setupNoRoomsIndicator() {
@@ -311,9 +334,9 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 				.setMessage(R.string.delete_item_text)
 				.setPositiveButton(R.string.yes) { _, _ ->
 					//if (deleteSavedItemData()) { // TODO: Implement if item data is actually stored
-						roomList.removeAt(position)
-						roomListAdapter.notifyItemRemoved(position)
-						refreshRoomList()
+					roomList.removeAt(position)
+					roomListAdapter.notifyItemRemoved(position)
+					refreshRoomList()
 					//}
 				}
 				.setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
