@@ -3,7 +3,6 @@ package com.sapuseven.untis.data.databases
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.provider.BaseColumns
 import com.sapuseven.untis.models.RoomFinderItem
 
 private const val DATABASE_VERSION = 1
@@ -29,21 +28,26 @@ class RoomfinderDatabase private constructor(context: Context, profileId: Long) 
 		onCreate(db)
 	}
 
-	fun addRoom(room: RoomFinderItem): Long? {
+	fun addRoom(room: RoomFinderItem) {
 		val db = writableDatabase
 
 		db.delete(RoomfinderDatabaseContract.TABLE_NAME, RoomfinderDatabaseContract.COLUMN_NAME_ROOM_ID + "=?", arrayOf(room.id.toString()))
-		val id = db.insert(RoomfinderDatabaseContract.TABLE_NAME, null, room.generateValues())
+		db.insert(RoomfinderDatabaseContract.TABLE_NAME, null, room.generateValues())
+
+		db.close()
+	}
+
+	fun deleteRoom(id: Int): Boolean {
+		val db = writableDatabase
+
+		val affectedRows = db.delete(RoomfinderDatabaseContract.TABLE_NAME, RoomfinderDatabaseContract.COLUMN_NAME_ROOM_ID + "=?", arrayOf(id.toString()))
 
 		db.close()
 
-		return if (id == -1L)
-			null
-		else
-			id
+		return affectedRows > 0
 	}
 
-	fun getRoom(id: Long): RoomFinderItem? {
+	fun getRoom(id: Int): RoomFinderItem? {
 		val db = this.readableDatabase
 
 		val cursor = db.query(
@@ -53,7 +57,7 @@ class RoomfinderDatabase private constructor(context: Context, profileId: Long) 
 						RoomfinderDatabaseContract.COLUMN_NAME_ROOM_ID,
 						RoomfinderDatabaseContract.COLUMN_NAME_STATES
 				),
-				BaseColumns._ID + "=?",
+				RoomfinderDatabaseContract.COLUMN_NAME_ROOM_ID + "=?",
 				arrayOf(id.toString()), null, null, null)
 
 		if (!cursor.moveToFirst())
@@ -78,7 +82,6 @@ class RoomfinderDatabase private constructor(context: Context, profileId: Long) 
 		val cursor = db.query(
 				RoomfinderDatabaseContract.TABLE_NAME,
 				arrayOf(
-						BaseColumns._ID,
 						RoomfinderDatabaseContract.COLUMN_NAME_ROOM_NAME,
 						RoomfinderDatabaseContract.COLUMN_NAME_ROOM_ID,
 						RoomfinderDatabaseContract.COLUMN_NAME_STATES

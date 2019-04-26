@@ -253,32 +253,11 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 
 						refreshRoomList()
 
-						// TODO: Save the result
 						roomFinderDatabase.addRoom(RoomFinderItem(
 								room.id,
 								roomName,
 								item.states
 						))
-						/*val binaryData = StringBuilder()
-						for (value in states)
-							binaryData.append(if (value) '1' else '0')*/
-
-						/*if (!TextUtils.isEmpty(binaryData.toString())) {
-							if (requestModel.isRefreshOnly)
-								deleteItem(requestModel.displayName)
-
-							val writer = BufferedWriter(OutputStreamWriter(
-									openFileOutput("roomList.txt", Context.MODE_APPEND), "UTF-8"))
-							writer.write(requestModel.displayName!!)
-							writer.newLine()
-							writer.write(binaryData.toString())
-							writer.newLine()
-							writer.write(String.valueOf(getStartDateFromWeek(Calendar.getInstance(), 0,
-									true).getTimeInMillis()))
-							writer.newLine()
-							writer.close()
-						}*/
-
 					}
 				}, user, timetableDatabaseInterface).load(startDate, endDate, room.id, room.type)
 			}
@@ -343,11 +322,11 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 				.setTitle(getString(R.string.delete_item_title, roomList[position]))
 				.setMessage(R.string.delete_item_text)
 				.setPositiveButton(R.string.yes) { _, _ ->
-					//if (deleteSavedItemData()) { // TODO: Implement if item data is actually stored
-					roomList.removeAt(position)
-					roomListAdapter.notifyItemRemoved(position)
-					refreshRoomList()
-					//}
+					if (roomFinderDatabase.deleteRoom(roomList[position].id)) {
+						roomList.removeAt(position)
+						roomListAdapter.notifyItemRemoved(position)
+						refreshRoomList()
+					}
 				}
 				.setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
 				.create()
