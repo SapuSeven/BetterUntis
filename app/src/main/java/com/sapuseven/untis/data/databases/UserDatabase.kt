@@ -5,9 +5,9 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
-import com.sapuseven.untis.helpers.DatabaseQueryHelper.generateCreateTable
-import com.sapuseven.untis.helpers.DatabaseQueryHelper.generateDropTable
-import com.sapuseven.untis.helpers.DatabaseQueryHelper.generateValues
+import com.sapuseven.untis.helpers.UserDatabaseQueryHelper.generateCreateTable
+import com.sapuseven.untis.helpers.UserDatabaseQueryHelper.generateDropTable
+import com.sapuseven.untis.helpers.UserDatabaseQueryHelper.generateValues
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.interfaces.TableModel
 import com.sapuseven.untis.models.untis.MasterData
@@ -276,6 +276,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 	}
 }
 
+// TODO: Move to UserDatabase class
 class User(
 		val id: Long? = null,
 		val url: String? = null,

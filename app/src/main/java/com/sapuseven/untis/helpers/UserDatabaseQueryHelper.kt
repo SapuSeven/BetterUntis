@@ -9,7 +9,7 @@ import com.sapuseven.untis.interfaces.TableModel
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.javaField
 
-object DatabaseQueryHelper {
+object UserDatabaseQueryHelper {
 	inline fun <reified T : Any> generateCreateTable(): String? {
 		val tableName = generateTableName<T>()
 		tableName?.let { _ ->

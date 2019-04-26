@@ -1,7 +1,6 @@
 package com.sapuseven.untis.adapters
 
-class RoomFinderAdapterItem(val name: String, var loading: Boolean) : Comparable<RoomFinderAdapterItem> {
-	var states = emptyList<Boolean>()
+class RoomFinderAdapterItem(val name: String, val id: Int, var loading: Boolean, var states: List<Boolean> = emptyList()) : Comparable<RoomFinderAdapterItem> {
 	//private var startDate: LocalDate = LocalDate.now()
 	var hourIndex: Int = 0
 

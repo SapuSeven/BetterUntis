@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.sapuseven.untis.R
 import com.sapuseven.untis.adapters.RoomFinderAdapter
 import com.sapuseven.untis.adapters.RoomFinderAdapterItem
+import com.sapuseven.untis.data.databases.RoomfinderDatabase
 import com.sapuseven.untis.data.databases.User
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
@@ -22,6 +23,7 @@ import com.sapuseven.untis.dialogs.ElementPickerDialog
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.interfaces.TimetableDisplay
+import com.sapuseven.untis.models.RoomFinderItem
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.timegrid.Day
 import com.sapuseven.untis.models.untis.masterdata.timegrid.Unit
@@ -46,6 +48,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 	private var profileUser: User? = null
 	private lateinit var userDatabase: UserDatabase
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
+	private lateinit var roomFinderDatabase: RoomfinderDatabase
 
 	companion object {
 		const val EXTRA_LONG_PROFILE_ID = "profile_id"
@@ -59,11 +62,8 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		roomListMargins = (12 * resources.displayMetrics.density + 0.5f).toInt()
 
 		setupNoRoomsIndicator()
-
-		loadUserDatabase(intent.getLongExtra(EXTRA_LONG_PROFILE_ID, -1))
-
+		loadDatabases(intent.getLongExtra(EXTRA_LONG_PROFILE_ID, -1))
 		setupHourSelector()
-
 		setupRoomList()
 		refreshRoomList()
 	}
@@ -83,10 +83,12 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		}
 	}
 
-	private fun loadUserDatabase(profileId: Long) {
+	private fun loadDatabases(profileId: Long) {
 		userDatabase = UserDatabase.createInstance(this)
 		profileUser = userDatabase.getUser(profileId)
 		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileUser?.id ?: -1)
+
+		roomFinderDatabase = RoomfinderDatabase.createInstance(this, profileId)
 	}
 
 	private fun setupHourSelector() {
@@ -163,7 +165,9 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		roomListAdapter = RoomFinderAdapter(this, this, roomList)
 		recyclerview_roomfinder_roomlist.adapter = roomListAdapter
 
-		//reload()
+		roomFinderDatabase.getAllRooms().forEach {
+			roomList.add(RoomFinderAdapterItem(it.name, it.id, false, it.states))
+		}
 	}
 
 	override fun onDialogDismissed(dialog: DialogInterface?) {
@@ -206,7 +210,8 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 
 	private fun addRooms(rooms: List<PeriodElement>) {
 		rooms.forEach { room ->
-			val item = RoomFinderAdapterItem(timetableDatabaseInterface.getShortName(room.id, TimetableDatabaseInterface.Type.ROOM), true)
+			val roomName = timetableDatabaseInterface.getShortName(room.id, TimetableDatabaseInterface.Type.ROOM)
+			val item = RoomFinderAdapterItem(roomName, room.id, true)
 			item.hourIndex = hourIndex
 
 			roomList.add(item)
@@ -249,6 +254,11 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 						refreshRoomList()
 
 						// TODO: Save the result
+						roomFinderDatabase.addRoom(RoomFinderItem(
+								room.id,
+								roomName,
+								item.states
+						))
 						/*val binaryData = StringBuilder()
 						for (value in states)
 							binaryData.append(if (value) '1' else '0')*/
