@@ -29,7 +29,6 @@ import com.sapuseven.untis.models.untis.masterdata.timegrid.Day
 import com.sapuseven.untis.models.untis.masterdata.timegrid.Unit
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import kotlinx.android.synthetic.main.activity_roomfinder.*
-import org.joda.time.DateTimeConstants
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
@@ -217,9 +216,12 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 			roomList.add(item)
 
 			profileUser?.let { user ->
-				// TODO: Dynamic week length
-				val startDate = UntisDate(LocalDate.now().withDayOfWeek(DateTimeConstants.MONDAY).toString(ISODateTimeFormat.date()))
-				val endDate = UntisDate(LocalDate.now().withDayOfWeek(DateTimeConstants.FRIDAY).toString(ISODateTimeFormat.date()))
+				val startDate = UntisDate(LocalDate.now().withDayOfWeek(
+						DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(user.timeGrid.days.first().day).dayOfWeek
+				).toString(ISODateTimeFormat.date()))
+				val endDate = UntisDate(LocalDate.now().withDayOfWeek(
+						DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(user.timeGrid.days.last().day).dayOfWeek
+				).toString(ISODateTimeFormat.date()))
 
 				TimetableLoader(WeakReference(this), object : TimetableDisplay {
 					override fun addData(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
@@ -313,7 +315,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 						TimetableDatabaseInterface.Type.ROOM,
 						multiSelect = true,
 						hideTypeSelection = true,
-						positiveButtonText = "Add") // TODO: Extract string resource
+						positiveButtonText = getString(R.string.add))
 		).show(supportFragmentManager, "elementPicker") // TODO: Do not hard-code the tag
 	}
 
