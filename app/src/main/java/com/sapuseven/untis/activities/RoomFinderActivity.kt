@@ -1,6 +1,8 @@
 package com.sapuseven.untis.activities
 
+import android.app.Activity
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -51,6 +53,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 
 	companion object {
 		const val EXTRA_LONG_PROFILE_ID = "profile_id"
+		const val EXTRA_INT_ROOM_ID = "roomId"
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -182,21 +185,10 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 	}
 
 	override fun onClick(v: View) {
-		/*val itemPosition = recyclerview_roomfinder_roomlist.getChildLayoutPosition(v)
-		val item = roomList!![itemPosition]
-
 		val intent = Intent()
-		val elementName = ElementName(ROOM, userDataList)
-		try {
-			intent.putExtra("elemId", elementName.findFieldByValue("name", item.getName(), "id") as Int)
-		} catch (e: JSONException) {
-			e.printStackTrace() // Not expected to occur
-		}
-
-		intent.putExtra("elemType", ROOM)
-		intent.putExtra("displayName", getString(R.string.title_room, item.getName()))
+		intent.putExtra(EXTRA_INT_ROOM_ID, roomList[recyclerview_roomfinder_roomlist.getChildLayoutPosition(v)].id)
 		setResult(Activity.RESULT_OK, intent)
-		finish()*/
+		finish()
 	}
 
 	override fun onDeleteClick(position: Int) {

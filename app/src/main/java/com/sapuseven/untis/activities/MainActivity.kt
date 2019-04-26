@@ -1,5 +1,6 @@
 package com.sapuseven.untis.activities
 
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.DialogInterface
 import android.content.Intent
@@ -491,6 +492,18 @@ class MainActivity :
 		}
 	}
 
+	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+		when (requestCode) {
+			REQUEST_CODE_ROOM_FINDER -> {
+				if (resultCode == Activity.RESULT_OK) {
+					val roomId = data?.getIntExtra(RoomFinderActivity.EXTRA_INT_ROOM_ID, -1) ?: -1
+					if (roomId != -1)
+						setTarget(roomId, TimetableDatabaseInterface.Type.ROOM.toString(), timetableDatabaseInterface?.getLongName(roomId, TimetableDatabaseInterface.Type.ROOM))
+				}
+			}
+		}
+	}
+
 	override fun onBackPressed() {
 		val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
 		if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -516,12 +529,12 @@ class MainActivity :
 		}
 	}
 
-	private fun setTarget(id: Int, type: String, displayName: String) {
+	private fun setTarget(id: Int, type: String, displayName: String?) {
 		displayedElement = PeriodElement(type, id, id)
 		loadedMonths.clear()
 		items.clear()
 		weekView?.notifyDataSetChanged()
-		supportActionBar?.title = displayName
+		supportActionBar?.title = displayName ?: getString(R.string.app_name)
 	}
 
 	override fun onEventClick(data: TimegridItem?, eventRect: RectF?) {
