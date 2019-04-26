@@ -103,7 +103,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 			if (hourIndex < maxHourIndex) {
 				hourIndex++
 				refreshRoomList()
-				displayCurrentHour()
+				refreshHourSelector()
 			}
 		}
 
@@ -111,18 +111,18 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 			if (hourIndex > 0) {
 				hourIndex--
 				refreshRoomList()
-				displayCurrentHour()
+				refreshHourSelector()
 			}
 		}
 
 		textview_roomfinder_currenthour.setOnClickListener {
 			hourIndex = calculateCurrentHourIndex()
 			refreshRoomList()
-			displayCurrentHour()
+			refreshHourSelector()
 		}
 
 		hourIndex = calculateCurrentHourIndex()
-		displayCurrentHour()
+		refreshHourSelector()
 	}
 
 	private fun calculateCurrentHourIndex(): Int {
@@ -354,13 +354,15 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 				.show()
 	}
 
-	private fun displayCurrentHour() {
+	private fun refreshHourSelector() {
 		val unit = getUnitFromIndex(hourIndex)
 		unit?.let {
 			textview_roomfinder_currenthour.text = getString(R.string.roomfinder_current_hour, translateDay(unit.first.day), unit.second)
 			textview_roomfinder_currenthourtime.text = getString(R.string.roomfinder_current_hour_time, unit.third.startTime.substring(1), unit.third.endTime.substring(1))
 		}
-		// TODO: Fallback if unit is null
+
+		button_roomfinder_previous.isEnabled = hourIndex != 0
+		button_roomfinder_next.isEnabled = hourIndex != maxHourIndex
 	}
 
 	private fun translateDay(day: String): String {
