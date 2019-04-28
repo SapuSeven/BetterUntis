@@ -178,16 +178,12 @@ class LoginDataInputActivity : BaseActivity() {
 		sendRequest()
 	}
 
-	private fun sendRequest() = GlobalScope.launch(Dispatchers.Main) {
-		setElementsEnabled(false)
+	private suspend fun aquireAppSharedSecret(): String? {
 		updateLoadingStatus(getString(R.string.logindatainput_aquiring_app_secret))
-
 		val url = etUrl?.text.toString()
 		val school = etSchool?.text.toString()
 		val user = etUser?.text.toString()
 		val key = etKey?.text.toString()
-
-		var appSharedSecret = key
 
 		var stopLoading = false
 
@@ -203,11 +199,10 @@ class LoginDataInputActivity : BaseActivity() {
 			val untisResponse = getJSON().parse(AppSharedSecretResponse.serializer(), data)
 
 			if (untisResponse.error?.code == ErrorMessageDictionary.ERROR_CODE_USER_LOCKED)
-				stopLoading = !true
+				stopLoading = true
 
 			if (untisResponse.result != null && !TextUtils.isEmpty(untisResponse.result)) {
-				appSharedSecret = untisResponse.result
-				updateLoadingStatus(getString(R.string.logindatainput_loading_user_data))
+				return untisResponse.result
 			} else {
 				if (stopLoading)
 					stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code))
@@ -221,14 +216,22 @@ class LoginDataInputActivity : BaseActivity() {
 		})
 
 		if (stopLoading)
-			return@launch
+			return null
+	}
+
+	private fun sendRequest() = GlobalScope.launch(Dispatchers.Main) {
+		setElementsEnabled(false)
+
+		var appSharedSecret: String? = null
+
+		updateLoadingStatus(getString(R.string.logindatainput_loading_user_data))
 
 		query.data.method = UntisApiConstants.METHOD_GET_USER_DATA
 
 		if (anonymous)
 			query.data.params = listOf(UserDataParams(UntisAuthentication.getAnonymousAuthObject()))
 		else
-			query.data.params = listOf(UserDataParams(UntisAuthentication.getAuthObject(user, appSharedSecret)))
+			query.data.params = listOf(UserDataParams(UntisAuthentication.getAuthObject(user, aquireAppSharedSecret())))
 
 		val userDataResult = api.request(query)
 
