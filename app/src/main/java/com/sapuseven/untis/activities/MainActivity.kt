@@ -39,6 +39,7 @@ import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import kotlinx.android.synthetic.main.activity_main_content.*
 import org.joda.time.DateTimeConstants
 import org.joda.time.Instant
 import org.joda.time.LocalDate
@@ -147,7 +148,14 @@ class MainActivity :
 		setupHours()
 
 		profileUser?.let { user ->
-			setTarget(user.userData.elemId, user.userData.elemType, user.userData.displayName)
+			user.userData.elemType?.let { type ->
+				setTarget(
+						user.userData.elemId,
+						type,
+						user.userData.displayName)
+			} ?: run {
+				setTarget(anonymous = true)
+			}
 		}
 	}
 
@@ -431,10 +439,14 @@ class MainActivity :
 
 				if (customType === UNKNOWN) {*/
 				profileUser?.let { user ->
-					setTarget(
-							user.userData.elemId,
-							user.userData.elemType,
-							user.userData.displayName) // TODO: Display name should be anonymous, check if it works that way
+					user.userData.elemType?.let { type ->
+						setTarget(
+								user.userData.elemId,
+								type,
+								user.userData.displayName)
+					} ?: run {
+						setTarget(anonymous = true)
+					}
 				}
 				/*} else {
 					val customId = prefs.getInt("preference_timetable_personal_timetable_id", -1)
@@ -512,10 +524,14 @@ class MainActivity :
 			if (displayedElement?.id != profileUser?.userData?.elemId) {
 				// Go to personal timetable
 				profileUser?.let { user ->
-					setTarget(
-							user.userData.elemId,
-							user.userData.elemType,
-							user.userData.displayName)
+					user.userData.elemType?.let { type ->
+						setTarget(
+								user.userData.elemId,
+								type,
+								user.userData.displayName)
+					} ?: run {
+						setTarget(anonymous = true)
+					}
 				}
 			} else {
 				if (System.currentTimeMillis() - 2000 > lastBackPress) {
@@ -529,7 +545,26 @@ class MainActivity :
 		}
 	}
 
+	private fun setTarget(anonymous: Boolean) {
+		if (anonymous) {
+			showLoading(false)
+
+			displayedElement = null
+
+			loadedMonths.clear()
+			items.clear()
+			weekView?.notifyDataSetChanged()
+
+			supportActionBar?.title = getString(R.string.anonymous_name)
+			constraintlayout_anonymouslogininfo.visibility = View.VISIBLE
+		} else {
+			constraintlayout_anonymouslogininfo.visibility = View.GONE
+		}
+	}
+
 	private fun setTarget(id: Int, type: String, displayName: String?) {
+		setTarget(anonymous = false)
+
 		displayedElement = PeriodElement(type, id, id)
 		loadedMonths.clear()
 		items.clear()
@@ -546,10 +581,14 @@ class MainActivity :
 	override fun onPeriodElementClick(dialog: DialogFragment, element: PeriodElement?) {
 		if (element == null) {
 			profileUser?.let { user ->
-				setTarget(
-						user.userData.elemId,
-						user.userData.elemType,
-						user.userData.displayName) // TODO: This should be anonymous, check if it works that way
+				user.userData.elemType?.let { type ->
+					setTarget(
+							user.userData.elemId,
+							type,
+							user.userData.displayName)
+				} ?: run {
+					setTarget(anonymous = true)
+				}
 			}
 		}
 		element?.let {

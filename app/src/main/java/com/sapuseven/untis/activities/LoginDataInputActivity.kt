@@ -178,17 +178,12 @@ class LoginDataInputActivity : BaseActivity() {
 		sendRequest()
 	}
 
-	private suspend fun aquireAppSharedSecret(): String? {
+	private suspend fun acquireAppSharedSecret(): String? {
 		updateLoadingStatus(getString(R.string.logindatainput_aquiring_app_secret))
-		val url = etUrl?.text.toString()
-		val school = etSchool?.text.toString()
 		val user = etUser?.text.toString()
 		val key = etKey?.text.toString()
 
 		var stopLoading = false
-
-		query.url = schoolInfo?.mobileServiceUrl ?: DEFAULT_PROTOCOL + url + DEFAULT_WEBUNTIS_PATH
-		query.school = schoolInfo?.loginName ?: school
 
 		query.data.method = UntisApiConstants.METHOD_GET_APP_SHARED_SECRET
 		query.data.params = listOf(AppSharedSecretParams(user, key))
@@ -215,7 +210,7 @@ class LoginDataInputActivity : BaseActivity() {
 			})
 		})
 
-		if (stopLoading)
+		//if (stopLoading)
 			return null
 	}
 
@@ -223,15 +218,21 @@ class LoginDataInputActivity : BaseActivity() {
 		setElementsEnabled(false)
 
 		var appSharedSecret: String? = null
+		val user = etUser?.text.toString()
 
 		updateLoadingStatus(getString(R.string.logindatainput_loading_user_data))
+
+		query.url = schoolInfo?.mobileServiceUrl ?: DEFAULT_PROTOCOL + etUrl?.text.toString() + DEFAULT_WEBUNTIS_PATH
+		query.school = schoolInfo?.loginName ?: etSchool?.text.toString()
 
 		query.data.method = UntisApiConstants.METHOD_GET_USER_DATA
 
 		if (anonymous)
 			query.data.params = listOf(UserDataParams(UntisAuthentication.getAnonymousAuthObject()))
-		else
-			query.data.params = listOf(UserDataParams(UntisAuthentication.getAuthObject(user, aquireAppSharedSecret())))
+		else {
+			appSharedSecret = acquireAppSharedSecret()
+			query.data.params = listOf(UserDataParams(UntisAuthentication.getAuthObject(user, appSharedSecret)))
+		}
 
 		val userDataResult = api.request(query)
 

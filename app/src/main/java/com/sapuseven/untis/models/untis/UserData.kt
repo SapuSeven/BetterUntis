@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserData (
-		val elemType: String, // TODO: Enumerate all possible values
+		val elemType: String?, // TODO: Enumerate all possible values
 		val elemId: Int,
 		val displayName: String,
 		val schoolName: String,
