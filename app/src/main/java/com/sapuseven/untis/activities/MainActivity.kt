@@ -318,9 +318,8 @@ class MainActivity :
 
 			val day = endDateTime.dayOfWeek - DateTimeConstants.MONDAY
 
+			if (day < 0 || day >= days.size) return@forEach
 
-			// TODO: Crashes at teacher:KLAF@htl-salzburg (day out of bounds)
-			// TODO: This can probably be optimized
 			val thisUnitStartIndex = days[day].units.indexOfFirst {
 				it.startTime == startDateTime.toString(DateTimeUtils.tTimeNoSeconds())
 			}
@@ -657,7 +656,8 @@ class MainActivity :
 
 	override fun onError(code: Int?, message: String?) {
 		showLoading(false)
-		Snackbar.make(content_main, if (code != null) ErrorMessageDictionary.getErrorMessage(resources, code) else message ?: getString(R.string.error), Snackbar.LENGTH_INDEFINITE)
+		Snackbar.make(content_main, if (code != null) ErrorMessageDictionary.getErrorMessage(resources, code) else message
+				?: getString(R.string.error), Snackbar.LENGTH_INDEFINITE)
 				.show()
 		// TODO: Show a button for more info and possibly bug reports
 	}
@@ -671,7 +671,7 @@ class MainActivity :
 		val year = c.get(Calendar.YEAR)
 		val month = c.get(Calendar.MONTH)
 		val day = c.get(Calendar.DAY_OF_MONTH)
-		val datePickerDialog = DatePickerDialog(this, android.R.style.Theme_Material_Dialog, this, year, month, day)
+		val datePickerDialog = DatePickerDialog(this, this, year, month, day)
 		datePickerDialog.show()
 
 		/*val fragment = DatePickerFragment()

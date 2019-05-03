@@ -13,7 +13,7 @@ import java.util.List;
 
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
 
-import static android.view.KeyEvent.ACTION_UP;
+import static android.view.MotionEvent.ACTION_UP;
 import static java.lang.Math.ceil;
 import static java.lang.Math.floor;
 import static java.lang.Math.round;
@@ -41,6 +41,7 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
 	private TopLeftCornerLongPressListener topLeftCornerLongPressListener;
 	private WeekViewLoader<T> weekViewLoader;
 	private ScrollListener scrollListener;
+
 	WeekViewGestureHandler(Context context, View view,
 	                       WeekViewConfig config, WeekViewData<T> data) {
 		this.listener = (Listener) view;
