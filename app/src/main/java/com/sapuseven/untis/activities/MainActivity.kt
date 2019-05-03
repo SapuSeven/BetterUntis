@@ -192,7 +192,7 @@ class MainActivity :
 
 		preferenceManager?.let { profileId = it.defaultPrefs.getInt("profile", -1).toLong() }  // TODO: Do not hard-code "profile"
 		profileId = userDatabase.getAllUsers()[0].id
-				?: 0 // TODO: Debugging only. This is a dynamic id.
+				?: -1 // TODO: Debugging only. This is a dynamic id.
 		profileUser = userDatabase.getUser(profileId) // TODO: Show error (invalid profile) if (profileId == -1) or (profileUser == null) and default to the first profile/re-login if necessary. It is mandatory to stop the execution of more code, or else the app will crash.
 
 		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileUser?.id ?: -1)

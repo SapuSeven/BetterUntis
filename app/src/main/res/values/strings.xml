@@ -36,6 +36,7 @@
 	<string name="logindatainput_aquiring_app_secret">Acquiring app secret…</string>
 	<string name="logindatainput_loading_user_data">Loading user data…</string>
 	<string name="logindatainput_adding_user_unknown_error">An unknown error happened while adding the user.</string>
+	<string name="logindatainput_error_generic">Error: %1$s</string>
 
 	<string name="errormessagedictionary_generic">Unknown error</string>
 	<string name="errormessagedictionary_too_many_results">Too many results</string>

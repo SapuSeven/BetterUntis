@@ -3,7 +3,6 @@ package com.sapuseven.untis.activities
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.text.TextUtils
 import android.util.Patterns
 import android.view.View
 import android.widget.*
@@ -52,7 +51,6 @@ class LoginDataInputActivity : BaseActivity() {
 	private var schoolInfo: UntisSchoolInfo? = null
 
 	private var api: UntisRequest = UntisRequest()
-	private var query: UntisRequest.UntisRequestQuery = UntisRequest.UntisRequestQuery()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -180,11 +178,15 @@ class LoginDataInputActivity : BaseActivity() {
 
 	private suspend fun acquireAppSharedSecret(): String? {
 		updateLoadingStatus(getString(R.string.logindatainput_aquiring_app_secret))
+
+		val query = UntisRequest.UntisRequestQuery()
+
 		val user = etUser?.text.toString()
 		val key = etKey?.text.toString()
 
-		var stopLoading = false
-
+		query.url = schoolInfo?.mobileServiceUrl
+				?: (DEFAULT_PROTOCOL + etUrl?.text.toString() + DEFAULT_WEBUNTIS_PATH)
+		query.school = schoolInfo?.loginName ?: etSchool?.text.toString()
 		query.data.method = UntisApiConstants.METHOD_GET_APP_SHARED_SECRET
 		query.data.params = listOf(AppSharedSecretParams(user, key))
 
@@ -193,92 +195,94 @@ class LoginDataInputActivity : BaseActivity() {
 		appSharedSecretResult.fold({ data ->
 			val untisResponse = getJSON().parse(AppSharedSecretResponse.serializer(), data)
 
-			if (untisResponse.error?.code == ErrorMessageDictionary.ERROR_CODE_USER_LOCKED)
-				stopLoading = true
-
-			if (untisResponse.result != null && !TextUtils.isEmpty(untisResponse.result)) {
+			if (untisResponse.error?.code == ErrorMessageDictionary.ERROR_CODE_INVALID_CREDENTIALS)
+				return ""
+			if (untisResponse.result.isNullOrEmpty())
+				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code))
+			else
 				return untisResponse.result
-			} else {
-				if (stopLoading)
-					stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code))
-			}
 		}, { error ->
-			stopLoading = true
+			updateLoadingStatus(error.toString())
 			stopLoadingAndShowError(when (error.exception) {
 				is UnknownHostException -> ErrorMessageDictionary.getErrorMessage(resources, ErrorMessageDictionary.ERROR_CODE_NO_SERVER_FOUND)
 				else -> ErrorMessageDictionary.getErrorMessage(resources, null)
 			})
 		})
 
-		//if (stopLoading)
-			return null
+		return null
 	}
 
-	private fun sendRequest() = GlobalScope.launch(Dispatchers.Main) {
-		setElementsEnabled(false)
+	private fun sendRequest() {
+		GlobalScope.launch(Dispatchers.Main) {
+			setElementsEnabled(false)
 
-		var appSharedSecret: String? = null
-		val user = etUser?.text.toString()
+			val query = UntisRequest.UntisRequestQuery()
 
-		updateLoadingStatus(getString(R.string.logindatainput_loading_user_data))
+			var appSharedSecret: String? = null
+			val user = etUser?.text.toString()
 
-		query.url = schoolInfo?.mobileServiceUrl ?: DEFAULT_PROTOCOL + etUrl?.text.toString() + DEFAULT_WEBUNTIS_PATH
-		query.school = schoolInfo?.loginName ?: etSchool?.text.toString()
+			query.url = schoolInfo?.mobileServiceUrl
+					?: (DEFAULT_PROTOCOL + etUrl?.text.toString() + DEFAULT_WEBUNTIS_PATH)
+			query.school = schoolInfo?.loginName ?: etSchool?.text.toString()
+			query.data.method = UntisApiConstants.METHOD_GET_USER_DATA
 
-		query.data.method = UntisApiConstants.METHOD_GET_USER_DATA
-
-		if (anonymous)
-			query.data.params = listOf(UserDataParams(UntisAuthentication.getAnonymousAuthObject()))
-		else {
-			appSharedSecret = acquireAppSharedSecret()
-			query.data.params = listOf(UserDataParams(UntisAuthentication.getAuthObject(user, appSharedSecret)))
-		}
-
-		val userDataResult = api.request(query)
-
-		userDataResult.fold({ data ->
-			val untisResponse = getJSON().parse(UserDataResponse.serializer(), data)
-
-			if (untisResponse.result != null) {
-				val userDatabase = UserDatabase.createInstance(this@LoginDataInputActivity)
-				val userId = userDatabase.addUser(User(
-						-1,
-						query.url,
-						schoolInfo?.mobileServiceUrl,
-						query.school,
-						user,
-						appSharedSecret,
-						anonymous,
-						untisResponse.result.masterData.timeGrid,
-						untisResponse.result.masterData.timeStamp,
-						untisResponse.result.userData,
-						untisResponse.result.settings
-				))
-
-				if (userId == null) {
-					stopLoadingAndShowError(String.format(getString(R.string.logindatainput_adding_user_unknown_error)))
-				}
-
-				userId?.let {
-					userDatabase.setAdditionalUserData(userId, untisResponse.result.masterData)
-
-					pbLoadingStatus?.visibility = View.GONE
-					ivLoadingStatusSuccess?.visibility = View.VISIBLE
-					tvLoadingStatus?.text = getString(R.string.logindatainput_data_loaded)
-					finish()
-
-					// TODO: Save userId in the defaultPrefs of my PreferenceManager
-
-					return@fold
-				}
-			} else {
-				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code))
+			if (anonymous)
+				query.data.params = listOf(UserDataParams(UntisAuthentication.getAnonymousAuthObject()))
+			else {
+				appSharedSecret = acquireAppSharedSecret()
+				if (appSharedSecret == null)
+					return@launch
+				if (appSharedSecret.isEmpty())
+					appSharedSecret = etKey?.text.toString()
+				query.data.params = listOf(UserDataParams(UntisAuthentication.getAuthObject(user, appSharedSecret)))
 			}
 
-			setElementsEnabled(true)
-		}, { error ->
-			println("An error happened: ${error.exception}") // TODO: Localize and notify user
-		})
+			updateLoadingStatus(getString(R.string.logindatainput_loading_user_data))
+
+			val userDataResult = api.request(query)
+
+			userDataResult.fold({ data ->
+				val untisResponse = getJSON().parse(UserDataResponse.serializer(), data)
+
+				if (untisResponse.result != null) {
+					val userDatabase = UserDatabase.createInstance(this@LoginDataInputActivity)
+					val userId = userDatabase.addUser(User(
+							-1,
+							query.url,
+							schoolInfo?.mobileServiceUrl,
+							query.school,
+							user,
+							appSharedSecret,
+							anonymous,
+							untisResponse.result.masterData.timeGrid,
+							untisResponse.result.masterData.timeStamp,
+							untisResponse.result.userData,
+							untisResponse.result.settings
+					))
+
+					userId?.let {
+						userDatabase.setAdditionalUserData(userId, untisResponse.result.masterData)
+
+						pbLoadingStatus?.visibility = View.GONE
+						ivLoadingStatusSuccess?.visibility = View.VISIBLE
+						tvLoadingStatus?.text = getString(R.string.logindatainput_data_loaded)
+						finish()
+
+						// TODO: Save userId in the defaultPrefs of my PreferenceManager
+
+						return@fold
+					} ?: run {
+						stopLoadingAndShowError(String.format(getString(R.string.logindatainput_adding_user_unknown_error)))
+					}
+				} else {
+					stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code))
+				}
+
+				setElementsEnabled(true)
+			}, { error ->
+				stopLoadingAndShowError(getString(R.string.logindatainput_error_generic, error.exception))
+			})
+		}
 	}
 
 	private fun updateLoadingStatus(msg: String) {
