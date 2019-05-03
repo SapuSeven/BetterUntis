@@ -14,6 +14,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.sapuseven.untis.R
 import com.sapuseven.untis.adapters.RoomFinderAdapter
 import com.sapuseven.untis.adapters.RoomFinderAdapterItem
@@ -22,6 +23,7 @@ import com.sapuseven.untis.data.databases.User
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.dialogs.ElementPickerDialog
+import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.interfaces.TimetableDisplay
@@ -30,6 +32,7 @@ import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.timegrid.Day
 import com.sapuseven.untis.models.untis.masterdata.timegrid.Unit
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_roomfinder.*
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
@@ -252,6 +255,16 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 								item.states
 						))
 					}
+
+					override fun onError(code: Int?, message: String?) {
+						roomList.remove(item)
+						refreshRoomList()
+						Snackbar.make(content_main, if (code != null) ErrorMessageDictionary.getErrorMessage(resources, code) else message
+								?: getString(R.string.error), Snackbar.LENGTH_INDEFINITE)
+								.show()
+						// TODO: Show a button for more info and possibly bug reports
+					}
+
 				}, user, timetableDatabaseInterface).load(startDate, endDate, room.id, room.type)
 			}
 		}

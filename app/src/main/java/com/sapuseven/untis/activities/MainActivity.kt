@@ -31,6 +31,7 @@ import com.sapuseven.untis.dialogs.ElementPickerDialog
 import com.sapuseven.untis.dialogs.TimetableItemDetailsDialog
 import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.DateTimeUtils
+import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.KotlinUtils.safeLet
 import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.helpers.config.PreferenceUtils
@@ -137,7 +138,7 @@ class MainActivity :
 		navigationView.setNavigationItemSelectedListener(this)
 		navigationView.setCheckedItem(R.id.nav_show_personal)
 
-		val line1 = profileUser?.userData?.displayName
+		val line1 = if (profileUser?.anonymous == true) getString(R.string.anonymous_name) else profileUser?.userData?.displayName
 		val line2 = profileUser?.userData?.schoolName
 		(navigationView.getHeaderView(0).findViewById<View>(R.id.textview_activitymaindrawer_line1) as TextView).text =
 				if (line1.isNullOrBlank()) getString(R.string.app_name) else line1
@@ -652,6 +653,13 @@ class MainActivity :
 		weekView?.notifyDataSetChanged()
 		showLoading(false)
 		setLastRefresh(timestamp)
+	}
+
+	override fun onError(code: Int?, message: String?) {
+		showLoading(false)
+		Snackbar.make(content_main, if (code != null) ErrorMessageDictionary.getErrorMessage(resources, code) else message ?: getString(R.string.error), Snackbar.LENGTH_INDEFINITE)
+				.show()
+		// TODO: Show a button for more info and possibly bug reports
 	}
 
 	private fun showLoading(loading: Boolean) {

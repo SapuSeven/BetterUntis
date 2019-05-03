@@ -8,6 +8,7 @@ import com.sapuseven.untis.data.databases.User
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.DateTimeUtils
+import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
@@ -46,7 +47,8 @@ class TimetableLoader(context: WeakReference<Context>,
 	private suspend fun loadFromServer(startDate: UntisDate, endDate: UntisDate, id: Int, type: String) {
 		cache.setTarget(startDate, endDate, id, type)
 
-		query.url = user.apiUrl ?: UntisApiConstants.DEFAULT_PROTOCOL + user.url + UntisApiConstants.DEFAULT_WEBUNTIS_PATH
+		query.url = user.apiUrl
+				?: (UntisApiConstants.DEFAULT_PROTOCOL + user.url + UntisApiConstants.DEFAULT_WEBUNTIS_PATH)
 		query.school = user.school
 
 		val params = TimetableParams(
@@ -57,7 +59,7 @@ class TimetableLoader(context: WeakReference<Context>,
 				emptyList(),
 				id,
 				type,
-				UntisAuthentication.getAuthObject(user.user, user.key)
+				if (user.anonymous) UntisAuthentication.getAnonymousAuthObject() else UntisAuthentication.getAuthObject(user.user, user.key)
 		)
 
 		query.data.method = UntisApiConstants.METHOD_GET_TIMETABLE
@@ -75,10 +77,10 @@ class TimetableLoader(context: WeakReference<Context>,
 
 				// TODO: Interpret masterData in the response
 			} else {
-				// TODO: Show error message
+				timetableDisplay.onError(untisResponse.error?.code, untisResponse.error?.message)
 			}
 		}, { error ->
-			println("An error happened: ${error.exception}") // TODO: Localize and notify user
+			timetableDisplay.onError(null, error.exception.toString())
 		})
 	}
 

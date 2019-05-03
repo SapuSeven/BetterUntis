@@ -271,4 +271,5 @@
 	<string name="betteruntis_logo">BetterUntis Logo</string>
 	<string name="roomfinder_loading_data">Loading data…</string>
 	<string name="anonymous_name">Anonymous</string>
+	<string name="errormessagedictionary_no_right">No right for timetable</string>
 </resources>
