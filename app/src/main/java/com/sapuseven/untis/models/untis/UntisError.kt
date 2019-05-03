@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UntisError(
 		val code: Int,
-		val message: String,
+		val message: String?,
 		val data: UntisErrorData? = null
 )
 

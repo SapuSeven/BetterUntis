@@ -5,9 +5,8 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Patterns
 import android.view.View
-import android.widget.*
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
+import android.widget.ArrayAdapter
+import android.widget.EditText
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_PROTOCOL
@@ -23,6 +22,7 @@ import com.sapuseven.untis.models.untis.params.AppSharedSecretParams
 import com.sapuseven.untis.models.untis.params.UserDataParams
 import com.sapuseven.untis.models.untis.response.AppSharedSecretResponse
 import com.sapuseven.untis.models.untis.response.UserDataResponse
+import kotlinx.android.synthetic.main.activity_logindatainput.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -33,20 +33,6 @@ class LoginDataInputActivity : BaseActivity() {
 		private const val BACKUP_PREF_NAME = "loginDataInputBackup"
 	}
 
-	private var pbLoadingStatus: ProgressBar? = null
-	private var ivLoadingStatusSuccess: ImageView? = null
-	private var ivLoadingStatusFailed: ImageView? = null
-	private var tvLoadingStatus: TextView? = null
-
-	private var etUrl: AutoCompleteTextView? = null
-	private var etSchool: TextInputEditText? = null
-	private var etUser: TextInputEditText? = null
-	private var etUserContainer: TextInputLayout? = null
-	private var etKey: TextInputEditText? = null
-	private var etKeyContainer: TextInputLayout? = null
-	private var btnLogin: Button? = null
-	private var sAnonymousLogin: Switch? = null
-
 	private var anonymous: Boolean = false
 	private var schoolInfo: UntisSchoolInfo? = null
 
@@ -56,31 +42,22 @@ class LoginDataInputActivity : BaseActivity() {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_logindatainput)
 
-		btnLogin = findViewById(R.id.button_logindatainput_login)
-		etUrl = findViewById(R.id.edittext_logindatainput_url)
-		etSchool = findViewById(R.id.edittext_logindatainput_school)
-		etUser = findViewById(R.id.edittext_logindatainput_user)
-		etUserContainer = findViewById(R.id.textinputlayout_logindatainput_user)
-		etKey = findViewById(R.id.edittext_logindatainput_key)
-		etKeyContainer = findViewById(R.id.textinputlayout_logindatainput_key)
-		sAnonymousLogin = findViewById(R.id.switch_logindatainput_anonymouslogin)
-
-		btnLogin?.setOnClickListener {
+		button_logindatainput_login?.setOnClickListener {
 			var error: EditText? = null
-			if (etUser?.text?.isEmpty() == true && !anonymous) {
-				etUser?.error = getString(R.string.logindatainput_error_field_empty)
-				error = etUser
+			if (edittext_logindatainput_user?.text?.isEmpty() == true && !anonymous) {
+				edittext_logindatainput_user?.error = getString(R.string.logindatainput_error_field_empty)
+				error = edittext_logindatainput_user
 			}
-			if (etSchool?.text?.isEmpty() == true) {
-				etSchool?.error = getString(R.string.logindatainput_error_field_empty)
-				error = etSchool
+			if (edittext_logindatainput_school?.text?.isEmpty() == true) {
+				edittext_logindatainput_school?.error = getString(R.string.logindatainput_error_field_empty)
+				error = edittext_logindatainput_school
 			}
-			if (etUrl?.text?.isEmpty() == true) {
-				etUrl?.error = getString(R.string.logindatainput_error_field_empty)
-				error = etUrl
-			} else if (!Patterns.DOMAIN_NAME.matcher(etUrl?.text).matches()) {
-				etUrl?.error = getString(R.string.logindatainput_error_invalid_url)
-				error = etUrl
+			if (edittext_logindatainput_url?.text?.isEmpty() == true) {
+				edittext_logindatainput_url?.error = getString(R.string.logindatainput_error_field_empty)
+				error = edittext_logindatainput_url
+			} else if (!Patterns.DOMAIN_NAME.matcher(edittext_logindatainput_url?.text).matches()) {
+				edittext_logindatainput_url?.error = getString(R.string.logindatainput_error_invalid_url)
+				error = edittext_logindatainput_url
 			}
 
 			if (error == null)
@@ -89,21 +66,16 @@ class LoginDataInputActivity : BaseActivity() {
 				error.requestFocus()
 		}
 
-		sAnonymousLogin?.setOnCheckedChangeListener { _, isChecked ->
+		switch_logindatainput_anonymouslogin?.setOnCheckedChangeListener { _, isChecked ->
 			anonymous = isChecked
 
-			etUserContainer?.isEnabled = !isChecked
-			etKeyContainer?.isEnabled = !isChecked
+			textinputlayout_logindatainput_user?.isEnabled = !isChecked
+			textinputlayout_logindatainput_key?.isEnabled = !isChecked
 		}
-
-		pbLoadingStatus = findViewById(R.id.progressbar_logindatainput_loadingstatus)
-		ivLoadingStatusSuccess = findViewById(R.id.imageview_logindatainput_loadingstatussuccess)
-		ivLoadingStatusFailed = findViewById(R.id.imageview_logindatainput_loadingstatusfailed)
-		tvLoadingStatus = findViewById(R.id.textview_logindatainput_loadingstatus)
 
 		val servers = resources.getStringArray(R.array.logindatainput_webuntis_servers)
 		val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, servers)
-		etUrl?.setAdapter(adapter)
+		edittext_logindatainput_url?.setAdapter(adapter)
 
 		val prefs = this.getSharedPreferences(BACKUP_PREF_NAME, Context.MODE_PRIVATE)
 		prefs?.let {
@@ -114,15 +86,15 @@ class LoginDataInputActivity : BaseActivity() {
 
 		if (appLinkData?.isHierarchical == true) {
 			if (appLinkData.scheme == "untis" && appLinkData.host == "setschool") {
-				etUrl?.setText(appLinkData.getQueryParameter("url"))
-				etSchool?.setText(appLinkData.getQueryParameter("school"))
-				etUser?.setText(appLinkData.getQueryParameter("user"))
-				etKey?.setText(appLinkData.getQueryParameter("key"))
+				edittext_logindatainput_url?.setText(appLinkData.getQueryParameter("url"))
+				edittext_logindatainput_school?.setText(appLinkData.getQueryParameter("school"))
+				edittext_logindatainput_user?.setText(appLinkData.getQueryParameter("user"))
+				edittext_logindatainput_key?.setText(appLinkData.getQueryParameter("key"))
 			} else {
 				appLinkData.getQueryParameter("schoolInfo")?.let { schoolInfo = getJSON().parse(UntisSchoolInfo.serializer(), it) }
 
-				etUrl?.setText(schoolInfo?.server)
-				etSchool?.setText(schoolInfo?.loginName)
+				edittext_logindatainput_url?.setText(schoolInfo?.server)
+				edittext_logindatainput_school?.setText(schoolInfo?.loginName)
 			}
 		}
 
@@ -133,12 +105,12 @@ class LoginDataInputActivity : BaseActivity() {
 
 	private fun focusFirstFreeField() {
 		when {
-			etUrl?.text?.isEmpty() == true -> etUrl
-			etSchool?.text?.isEmpty() == true -> etSchool
-			etUser?.text?.isEmpty() == true -> etUser
-			etKey?.text?.isEmpty() == true -> etKey
-			else -> etUser
-		}?.requestFocus()
+			edittext_logindatainput_url?.text?.isEmpty() == true -> edittext_logindatainput_url as EditText
+			edittext_logindatainput_school?.text?.isEmpty() == true -> edittext_logindatainput_school as EditText
+			edittext_logindatainput_user?.text?.isEmpty() == true -> edittext_logindatainput_user as EditText
+			edittext_logindatainput_key?.text?.isEmpty() == true -> edittext_logindatainput_key as EditText
+			else -> edittext_logindatainput_user as EditText
+		}.requestFocus()
 	}
 
 	public override fun onResume() {
@@ -153,25 +125,29 @@ class LoginDataInputActivity : BaseActivity() {
 
 	private fun backupInput(prefs: SharedPreferences) {
 		val editor = prefs.edit()
-		editor.putString("etUrl", etUrl?.text.toString())
-		editor.putString("etSchool", etSchool?.text.toString())
-		editor.putString("etUser", etUser?.text.toString())
-		editor.putString("etKey", etKey?.text.toString())
+		editor.putString("edittext_logindatainput_url", edittext_logindatainput_url?.text.toString())
+		editor.putString("edittext_logindatainput_school", edittext_logindatainput_school?.text.toString())
+		editor.putBoolean("switch_logindatainput_anonymouslogin", switch_logindatainput_anonymouslogin.isChecked)
+		editor.putString("edittext_logindatainput_user", edittext_logindatainput_user?.text.toString())
+		editor.putString("edittext_logindatainput_key", edittext_logindatainput_key?.text.toString())
 		editor.apply()
 	}
 
 	private fun restoreInput(prefs: SharedPreferences) {
-		etUrl?.setText(prefs.getString("etUrl", ""))
-		etSchool?.setText(prefs.getString("etSchool", ""))
-		etUser?.setText(prefs.getString("etUser", ""))
-		etKey?.setText(prefs.getString("etKey", ""))
+		edittext_logindatainput_url?.setText(prefs.getString("edittext_logindatainput_url", ""))
+		edittext_logindatainput_school?.setText(prefs.getString("edittext_logindatainput_school", ""))
+		switch_logindatainput_anonymouslogin?.isChecked = prefs.getBoolean("switch_logindatainput_anonymouslogin", false)
+		textinputlayout_logindatainput_user?.isEnabled = switch_logindatainput_anonymouslogin?.isChecked == false
+		textinputlayout_logindatainput_key?.isEnabled = switch_logindatainput_anonymouslogin?.isChecked == false
+		edittext_logindatainput_user?.setText(prefs.getString("edittext_logindatainput_user", ""))
+		edittext_logindatainput_key?.setText(prefs.getString("edittext_logindatainput_key", ""))
 	}
 
 	private fun loadData() {
-		ivLoadingStatusFailed?.visibility = View.GONE
-		ivLoadingStatusSuccess?.visibility = View.GONE
-		pbLoadingStatus?.visibility = View.VISIBLE
-		tvLoadingStatus?.visibility = View.VISIBLE
+		imageview_logindatainput_loadingstatusfailed?.visibility = View.GONE
+		imageview_logindatainput_loadingstatussuccess?.visibility = View.GONE
+		progressbar_logindatainput_loadingstatus?.visibility = View.VISIBLE
+		textview_logindatainput_loadingstatus?.visibility = View.VISIBLE
 
 		sendRequest()
 	}
@@ -181,12 +157,12 @@ class LoginDataInputActivity : BaseActivity() {
 
 		val query = UntisRequest.UntisRequestQuery()
 
-		val user = etUser?.text.toString()
-		val key = etKey?.text.toString()
+		val user = edittext_logindatainput_user?.text.toString()
+		val key = edittext_logindatainput_key?.text.toString()
 
 		query.url = schoolInfo?.mobileServiceUrl
-				?: (DEFAULT_PROTOCOL + etUrl?.text.toString() + DEFAULT_WEBUNTIS_PATH)
-		query.school = schoolInfo?.loginName ?: etSchool?.text.toString()
+				?: (DEFAULT_PROTOCOL + edittext_logindatainput_url?.text.toString() + DEFAULT_WEBUNTIS_PATH)
+		query.school = schoolInfo?.loginName ?: edittext_logindatainput_school?.text.toString()
 		query.data.method = UntisApiConstants.METHOD_GET_APP_SHARED_SECRET
 		query.data.params = listOf(AppSharedSecretParams(user, key))
 
@@ -219,11 +195,11 @@ class LoginDataInputActivity : BaseActivity() {
 			val query = UntisRequest.UntisRequestQuery()
 
 			var appSharedSecret: String? = null
-			val user = etUser?.text.toString()
+			val user = edittext_logindatainput_user?.text.toString()
 
 			query.url = schoolInfo?.mobileServiceUrl
-					?: (DEFAULT_PROTOCOL + etUrl?.text.toString() + DEFAULT_WEBUNTIS_PATH)
-			query.school = schoolInfo?.loginName ?: etSchool?.text.toString()
+					?: (DEFAULT_PROTOCOL + edittext_logindatainput_url?.text.toString() + DEFAULT_WEBUNTIS_PATH)
+			query.school = schoolInfo?.loginName ?: edittext_logindatainput_school?.text.toString()
 			query.data.method = UntisApiConstants.METHOD_GET_USER_DATA
 
 			if (anonymous)
@@ -233,7 +209,7 @@ class LoginDataInputActivity : BaseActivity() {
 				if (appSharedSecret == null)
 					return@launch
 				if (appSharedSecret.isEmpty())
-					appSharedSecret = etKey?.text.toString()
+					appSharedSecret = edittext_logindatainput_key?.text.toString()
 				query.data.params = listOf(UserDataParams(UntisAuthentication.getAuthObject(user, appSharedSecret)))
 			}
 
@@ -263,9 +239,9 @@ class LoginDataInputActivity : BaseActivity() {
 					userId?.let {
 						userDatabase.setAdditionalUserData(userId, untisResponse.result.masterData)
 
-						pbLoadingStatus?.visibility = View.GONE
-						ivLoadingStatusSuccess?.visibility = View.VISIBLE
-						tvLoadingStatus?.text = getString(R.string.logindatainput_data_loaded)
+						progressbar_logindatainput_loadingstatus?.visibility = View.GONE
+						imageview_logindatainput_loadingstatussuccess?.visibility = View.VISIBLE
+						textview_logindatainput_loadingstatus?.text = getString(R.string.logindatainput_data_loaded)
 						finish()
 
 						// TODO: Save userId in the defaultPrefs of my PreferenceManager
@@ -286,27 +262,27 @@ class LoginDataInputActivity : BaseActivity() {
 	}
 
 	private fun updateLoadingStatus(msg: String) {
-		tvLoadingStatus?.text = msg
+		textview_logindatainput_loadingstatus?.text = msg
 	}
 
 	private fun stopLoadingAndShowError(msg: String) {
 		updateLoadingStatus(msg)
-		pbLoadingStatus?.visibility = View.GONE
-		ivLoadingStatusFailed?.visibility = View.VISIBLE
+		progressbar_logindatainput_loadingstatus?.visibility = View.GONE
+		imageview_logindatainput_loadingstatusfailed?.visibility = View.VISIBLE
 		setElementsEnabled(true)
 	}
 
 	override fun onBackPressed() {
-		btnLogin?.isEnabled = false
+		button_logindatainput_login?.isEnabled = false
 		super.onBackPressed()
 	}
 
 	private fun setElementsEnabled(enabled: Boolean) {
-		etUrl?.isEnabled = enabled && schoolInfo == null
-		etSchool?.isEnabled = enabled && schoolInfo == null
-		etUser?.isEnabled = enabled
-		etKey?.isEnabled = enabled
-		btnLogin?.isEnabled = enabled
-		sAnonymousLogin?.isEnabled = enabled
+		textinputlayout_logindatainput_url?.isEnabled = enabled && schoolInfo == null
+		textinputlayout_logindatainput_school?.isEnabled = enabled && schoolInfo == null
+		textinputlayout_logindatainput_user?.isEnabled = enabled
+		textinputlayout_logindatainput_key?.isEnabled = enabled
+		button_logindatainput_login?.isEnabled = enabled
+		switch_logindatainput_anonymouslogin?.isEnabled = enabled
 	}
 }
