@@ -101,6 +101,8 @@
         <attr name="horizontalScrollingEnabled" format="boolean" />
         <attr name="scrollDuration" format="integer" />
 
+        <attr name="topLeftCornerDrawable" format="reference" />
+        <attr name="topLeftCornerPadding" format="dimension" />
         <attr name="firstDay" format="integer" />
         <attr name="startOnFirstDay" format="boolean" />
 

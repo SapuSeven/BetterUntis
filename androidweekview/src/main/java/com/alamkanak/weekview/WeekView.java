@@ -46,6 +46,7 @@ public final class WeekView<T> extends View
 	private DayBackgroundDrawer dayBackgroundDrawer;
 	private BackgroundGridDrawer backgroundGridDrawer;
 	private NowLineDrawer nowLineDrawer;
+	private TopLeftCornerDrawer topLeftCornerDrawer;
 
 	private EventChipsProvider<T> eventChipsProvider;
 
@@ -78,6 +79,7 @@ public final class WeekView<T> extends View
 		dayBackgroundDrawer = new DayBackgroundDrawer(config);
 		backgroundGridDrawer = new BackgroundGridDrawer(config);
 		nowLineDrawer = new NowLineDrawer(config);
+		topLeftCornerDrawer = new TopLeftCornerDrawer(config);
 
 		eventChipsProvider = new EventChipsProvider<>(config, data, viewState);
 		eventChipsProvider.setWeekViewLoader(getWeekViewLoader());
@@ -147,7 +149,11 @@ public final class WeekView<T> extends View
 
 		eventsDrawer.drawAllDayEvents(data.getAllDayEventChips(), drawingContext, canvas);
 
+		topLeftCornerDrawer.draw(canvas);
+
 		timeColumnDrawer.drawTimeColumn(canvas);
+
+		// TODO: Combine all Drawer-classes and add the topLeftImage to it
 
 		//canvas.drawText(config.debug, 50, 50, drawConfig.headerSecondaryTextPaint);
 

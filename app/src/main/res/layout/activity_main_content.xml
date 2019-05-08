@@ -47,7 +47,9 @@
 		app:scrollDuration="150"
 		app:showNowLine="true"
 		app:nowLineColor="@color/white"
-		app:nowLineStrokeWidth="2dp"/>
+		app:nowLineStrokeWidth="2dp"
+		app:topLeftCornerDrawable="@drawable/all_calendar"
+		app:topLeftCornerPadding="4dp"/>
 
 	<ProgressBar
 		android:id="@+id/progressbar_main_loading"

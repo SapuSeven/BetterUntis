@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 
@@ -105,6 +105,8 @@ final class WeekViewConfig {
 	int scrollDuration = 250;
 
 	// Custom properties
+	Drawable topLeftCornerDrawable = null;
+	int topLeftCornerPadding = 0;
 	int[] hourLines; // in minutes
 	//String[] times;
 	int startTime; // in minutes
@@ -209,6 +211,9 @@ final class WeekViewConfig {
 			verticalFlingEnabled = a.getBoolean(R.styleable.WeekView_verticalFlingEnabled, verticalFlingEnabled);
 			scrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, scrollDuration);
 
+			// Custom
+			topLeftCornerDrawable = a.getDrawable(R.styleable.WeekView_topLeftCornerDrawable);
+			topLeftCornerPadding = a.getDimensionPixelSize(R.styleable.WeekView_topLeftCornerPadding, topLeftCornerPadding);
 			firstDay = a.getInt(R.styleable.WeekView_firstDay, firstDay);
 			startOnFirstDay = a.getBoolean(R.styleable.WeekView_startOnFirstDay, startOnFirstDay);
 		} finally {
