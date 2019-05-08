@@ -1,12 +1,15 @@
 package com.sapuseven.untis.activities
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.DialogInterface
+import android.content.DialogInterface.BUTTON_NEUTRAL
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.RectF
 import android.os.Bundle
+import android.text.format.DateUtils
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
@@ -22,6 +25,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
 import com.alamkanak.weekview.*
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.picker.MaterialStyledDatePickerDialog
 import com.google.android.material.snackbar.Snackbar
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.User
@@ -666,24 +670,43 @@ class MainActivity :
 		pbLoadingIndicator?.visibility = if (loading) View.VISIBLE else View.GONE
 	}
 
+	@SuppressLint("RestrictedApi", "PrivateResource")
 	override fun onCornerClick() {
-		val c = Calendar.getInstance()
-		val year = c.get(Calendar.YEAR)
-		val month = c.get(Calendar.MONTH)
-		val day = c.get(Calendar.DAY_OF_MONTH)
-		val datePickerDialog = DatePickerDialog(this, this, year, month, day)
-		datePickerDialog.show()
+		/*val fragment = DatePickerFragment()
+		fragment.callback = {
+			weekView?.goToDate(it)
+		}
+		val lastCalendar = Calendar.getInstance()
+		val args = Bundle()
+		args.putInt("year", lastCalendar.get(Calendar.YEAR))
+		args.putInt("month", lastCalendar.get(Calendar.MONTH))
+		args.putInt("day", lastCalendar.get(Calendar.DAY_OF_MONTH))
+		fragment.arguments = args
+		fragment.show(supportFragmentManager, "datePicker")*/
+
+		val calendar = Calendar.getInstance()
+		val dialog = MaterialStyledDatePickerDialog(this, R.style.DialogTheme, { _, year: Int, month: Int, dayOfMonth: Int ->
+			val c = DateTimeUtils.today()
+			c.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+			c.set(Calendar.MONTH, month)
+			c.set(Calendar.YEAR, year)
+			weekView?.goToDate(c)
+		}, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
+		dialog.setButton(BUTTON_NEUTRAL, getString(R.string.today)) { d, _ ->
+			d.dismiss()
+			weekView?.goToToday()
+		}
+		dialog.show()
 
 		/*val fragment = DatePickerFragment()
 		val args = Bundle()
-		args.putInt(DIALOG_THEME, R.style.Dialog)
+		args.putInt(DIALOG_THEME, R.style.ThemeOverlay_MaterialComponents_DatePicker)
 		fragment.arguments = args
 		fragment.callback = {
 			weekView?.goToDate(it)
 		}
 		fragment.show(supportFragmentManager, "datePicker")*/
 	}
-
 
 	override fun onDateSet(view: DatePicker, year: Int, month: Int, day: Int) {
 		val calendar = Calendar.getInstance()

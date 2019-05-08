@@ -20,12 +20,13 @@ import static java.lang.Math.round;
 
 final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureListener {
 
-	private Listener listener;
+	Listener listener;
+	OverScroller scroller;
+
 	private WeekViewData<T> data;
 	private WeekViewConfig config;
 	private WeekViewDrawingConfig drawingConfig;
 	private WeekViewTouchHandler touchHandler;
-	private OverScroller scroller;
 	private Direction currentScrollDirection = Direction.NONE;
 	private Direction currentFlingDirection = Direction.NONE;
 	private GestureDetector gestureDetector;

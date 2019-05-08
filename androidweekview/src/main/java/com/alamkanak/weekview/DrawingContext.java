@@ -37,8 +37,8 @@ class DrawingContext {
 			//final int start = (int) days(DateUtils.today(), DateUtils.today(leftDaysWithGaps + 1 - offset));
 			final int start = leftDaysWithGaps + 1 - offset + days(-offset, leftDaysWithGaps - offset);
 			final int size = config.numberOfVisibleDays + 1;
-			dayRange.addAll(DateUtils.getDateRange(start, size, Calendar.MONDAY, Calendar.FRIDAY));
 			// TODO: Dynamic week length
+			dayRange.addAll(DateUtils.getDateRange(start, size, Calendar.MONDAY, Calendar.FRIDAY));
 
 			// TODO: Remove debugging
 			//config.debug = Integer.toString(leftDaysWithGaps);

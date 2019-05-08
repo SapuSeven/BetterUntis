@@ -13,7 +13,6 @@ import java.util.Locale;
  * Created by jesse on 6/02/2016.
  */
 class DateUtils {
-	// TODO: Check if this function works on every possible weekday
 	@SuppressWarnings("SameParameterValue")
 	static List<Calendar> getDateRange(int daysSinceToday, int size, int weekStart, int weekEnd) {
 		final List<Calendar> days = new ArrayList<>();
@@ -54,6 +53,22 @@ class DateUtils {
 		final long todayInMillis = today().getTimeInMillis();
 		final long diff = dateInMillis - todayInMillis;
 		return (int) (diff / Constants.DAY_IN_MILLIS);
+	}
+
+	static int getDisplayedDays(Calendar startDay, int size, int weekStart, int weekEnd) {
+		int startDayIndex = startDay.get(Calendar.DAY_OF_WEEK);
+		if (startDayIndex > weekEnd) startDayIndex -= 7; // TODO: Is this line correct?
+		int offsetForWeekStart = (startDayIndex > weekStart) ? startDayIndex - weekStart : 0;
+
+		int days = 0;
+
+		for (int i = 0; i < Math.abs(size); i++) {
+			startDay.add(Calendar.DATE, size > 0 ? 1 : -1);
+			if (startDay.get(Calendar.DAY_OF_WEEK) >= weekStart && startDay.get(Calendar.DAY_OF_WEEK) <= weekEnd)
+				days += size > 0 ? 1 : -1;
+		}
+
+		return days + offsetForWeekStart;
 	}
 
 	/**

@@ -5,13 +5,15 @@
 		<item name="colorAccent">@color/colorAccent</item>
 		<item name="colorSecondary">@color/colorAccent</item>
 		<item name="colorDivider">@color/colorDivider</item>
-		<item name="colorOnPrimary">@color/white</item>
-		<item name="colorOnSecondary">@color/white</item>
 	</style>
 
 	<style name="AppTheme.NoActionBar">
 		<item name="windowActionBar">false</item>
 		<item name="windowNoTitle">true</item>
+	</style>
+
+	<style name="DialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date">
+		<!-- TODO: Find a way to style the 'neutral'-button here in XML -->
 	</style>
 
 	<style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar"/>

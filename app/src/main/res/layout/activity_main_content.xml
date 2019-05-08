@@ -44,7 +44,7 @@
 		app:showDaySeparator="true"
 		app:showHourSeparator="true"
 		app:startOnFirstDay="true"
-		app:scrollDuration="100"
+		app:scrollDuration="150"
 		app:showNowLine="true"
 		app:nowLineColor="@color/white"
 		app:nowLineStrokeWidth="2dp"/>

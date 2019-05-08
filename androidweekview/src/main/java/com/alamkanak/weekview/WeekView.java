@@ -6,13 +6,15 @@ import android.graphics.Canvas;
 import android.graphics.Typeface;
 import android.os.Parcel;
 import android.os.Parcelable;
-import androidx.annotation.Nullable;
-import androidx.core.view.ViewCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.Calendar;
+
+import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
 
 import static com.alamkanak.weekview.DateUtils.today;
 import static java.lang.Math.ceil;
@@ -232,10 +234,10 @@ public final class WeekView<T> extends View
 	 * once.
 	 * </p>
 	 *
-	 * @param firstDayOfWeek The supported values are {@link java.util.Calendar#SUNDAY},
-	 *                       {@link java.util.Calendar#MONDAY}, {@link java.util.Calendar#TUESDAY},
-	 *                       {@link java.util.Calendar#WEDNESDAY}, {@link java.util.Calendar#THURSDAY},
-	 *                       {@link java.util.Calendar#FRIDAY}.
+	 * @param firstDayOfWeek The supported values are {@link Calendar#SUNDAY},
+	 *                       {@link Calendar#MONDAY}, {@link Calendar#TUESDAY},
+	 *                       {@link Calendar#WEDNESDAY}, {@link Calendar#THURSDAY},
+	 *                       {@link Calendar#FRIDAY}.
 	 */
 	public void setFirstDayOfWeek(int firstDayOfWeek) {
 		config.firstDayOfWeek = firstDayOfWeek;
@@ -1033,6 +1035,7 @@ public final class WeekView<T> extends View
 	 * @param date The date to show.
 	 */
 	public void goToDate(Calendar date) {
+		// TODO: If the date is in the future, selecting a weekend day will jump to the previous week. It works for past dates. This should be fixed to always jump to the next week when selecting a weekend.
 		gestureHandler.forceScrollFinished();
 
 		if (viewState.areDimensionsInvalid) {
@@ -1040,10 +1043,42 @@ public final class WeekView<T> extends View
 			return;
 		}
 
-		viewState.shouldRefreshEvents = true;
-
 		final int diff = DateUtils.getDaysUntilDate(date);
-		config.drawingConfig.currentOrigin.x = diff * (-1) * config.getTotalDayWidth();
+		// TODO: Dynamic week length
+		double actualDiff = DateUtils.getDisplayedDays(today(), diff, Calendar.MONDAY, Calendar.FRIDAY);
+
+		final float totalDayWidth = config.getTotalDayWidth();
+
+		if (config.startOnFirstDay)
+			actualDiff /= (double) config.numberOfVisibleDays;
+
+		int leftOriginCount = (int) Math.floor(actualDiff);
+
+		int nearestOrigin = 0;
+		if (config.startOnFirstDay)
+			nearestOrigin -= leftOriginCount * totalDayWidth * config.numberOfVisibleDays;
+		else
+			nearestOrigin -= leftOriginCount * totalDayWidth;
+
+		Log.d("WeekViewDebug", String.format("diff = %d, actualDiff = %f, leftOriginCount = %d, nearestOrigin = %d (in days: %d), currentOrigin = %d (in days: %d)",
+				diff, actualDiff, leftOriginCount,
+				nearestOrigin, (int) (nearestOrigin / totalDayWidth),
+				(int) config.drawingConfig.currentOrigin.x, (int) (config.drawingConfig.currentOrigin.x / totalDayWidth))
+		);
+
+		if (nearestOrigin - config.drawingConfig.currentOrigin.x != 0) {
+			gestureHandler.scroller.forceFinished(true);
+
+			final int startX = (int) config.drawingConfig.currentOrigin.x;
+
+			final int distanceX = (int) (nearestOrigin - config.drawingConfig.currentOrigin.x);
+
+			final int duration = config.scrollDuration;
+
+			gestureHandler.scroller.startScroll(startX, (int) config.drawingConfig.currentOrigin.y, distanceX, 0, duration);
+			gestureHandler.listener.onScrolled();
+		}
+
 		invalidate();
 	}
 
