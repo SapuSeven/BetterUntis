@@ -256,7 +256,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 						))
 					}
 
-					override fun onError(code: Int?, message: String?) {
+					override fun onError(requestId: Int, code: Int?, message: String?) {
 						roomList.remove(item)
 						refreshRoomList()
 						Snackbar.make(content_main, if (code != null) ErrorMessageDictionary.getErrorMessage(resources, code) else message
@@ -264,8 +264,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 								.show()
 						// TODO: Show a button for more info and possibly bug reports
 					}
-
-				}, user, timetableDatabaseInterface).load(startDate, endDate, room.id, room.type)
+				}, user, timetableDatabaseInterface).load(TimetableLoader.TimetableLoaderTarget(startDate, endDate, room.id, room.type), TimetableLoader.FLAG_LOAD_SERVER)
 			}
 		}
 

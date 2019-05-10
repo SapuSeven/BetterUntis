@@ -33,6 +33,10 @@ class TimetableCache(val context: WeakReference<Context>) {
 		return File(context.get()?.cacheDir, target?.getName())
 	}
 
+	override fun toString(): String {
+		return target?.getName() ?: "null"
+	}
+
 	@Serializable
 	data class CacheObject(
 			val timestamp: Long,
