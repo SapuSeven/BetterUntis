@@ -5,17 +5,19 @@ import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.TypedValue
 import android.view.View
 import android.widget.GridView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.ColorInt
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.textfield.TextInputEditText
@@ -162,9 +164,9 @@ class ElementPickerDialog : DialogFragment() {
 		//updateView(oldPosition)
 
 		context?.let {
-			tv.setTextColor(ContextCompat.getColor(it, R.color.colorPrimary))
+			tv.setTextColor(getAttrColor(R.attr.colorPrimary))
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-				tv.compoundDrawables[1 /* TOP */].setTint(ContextCompat.getColor(it, R.color.colorPrimary))
+				tv.compoundDrawables[1 /* TOP */].setTint(getAttrColor(R.attr.colorPrimary))
 		}
 
 		holder.etSearch.hint = getHint()
@@ -179,12 +181,16 @@ class ElementPickerDialog : DialogFragment() {
 			tv.compoundDrawables[1 /* TOP */].setTintList(null)
 	}
 
-	/*private fun updateView(position: Int) {
-		GridView gridView = helper.getView().findViewById(R.id.gv);
+	private fun getAttrColor(@ColorInt id: Int): Int {
+		val typedValue = TypedValue()
 
-		if (position >= gridView.getFirstVisiblePosition() && position <= gridView.getLastVisiblePosition())
-			refreshStyling(gridView.getChildAt(position - gridView.getFirstVisiblePosition()), position);
-	}*/
+		val a = context?.obtainStyledAttributes(typedValue.data, intArrayOf(id))
+		val color = a?.getColor(0, 0)
+
+		a?.recycle()
+
+		return color ?: Color.GRAY
+	}
 
 	private fun getTextViewFromElemType(elemType: TimetableDatabaseInterface.Type?): TextView {
 		return when (elemType) {
