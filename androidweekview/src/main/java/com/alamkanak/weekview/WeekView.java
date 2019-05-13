@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import org.joda.time.LocalDate;
+
 import java.util.Calendar;
 
 import androidx.annotation.Nullable;
@@ -1265,6 +1267,31 @@ public final class WeekView<T> extends View
 		invalidate();
 	}
 
+	public boolean swipeRefreshAvailable() {
+		return gestureHandler.currentFlingDirection == WeekViewGestureHandler.Direction.NONE
+				&& gestureHandler.currentScrollDirection == WeekViewGestureHandler.Direction.NONE
+				&& drawConfig.currentOrigin.y == 0;
+	}
+
+	public LocalDate getCurrentDate() {
+		int weekOffset = (int) (-drawConfig.currentOrigin.x / drawConfig.widthPerDay / config.numberOfVisibleDays);
+
+		// TODO: Re-do day offset calculation
+		int offset = 0;
+		int today = DateUtils.today().get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY;
+		if (today == 0)
+			today = 7;
+
+		if (today - Calendar.MONDAY + 1 < config.numberOfVisibleDays)
+			offset = today - Calendar.MONDAY + 1;
+
+		LocalDate localDate = LocalDate.now().plusWeeks(weekOffset).minusDays(offset);
+
+		Log.d("WeekViewDebug", "getCurrentDate localDate = " + localDate);
+
+		return localDate;
+	}
+
 	protected static class SavedState extends BaseSavedState {
 
 		public static final Parcelable.Creator<SavedState> CREATOR = new Creator<SavedState>() {
@@ -1295,7 +1322,5 @@ public final class WeekView<T> extends View
 			super.writeToParcel(destination, flags);
 			destination.writeInt(numberOfVisibleDays);
 		}
-
 	}
-
 }

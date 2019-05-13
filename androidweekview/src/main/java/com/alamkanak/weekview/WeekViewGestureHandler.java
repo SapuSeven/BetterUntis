@@ -27,8 +27,8 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
 	private WeekViewConfig config;
 	private WeekViewDrawingConfig drawingConfig;
 	private WeekViewTouchHandler touchHandler;
-	private Direction currentScrollDirection = Direction.NONE;
-	private Direction currentFlingDirection = Direction.NONE;
+	Direction currentScrollDirection = Direction.NONE;
+	Direction currentFlingDirection = Direction.NONE;
 	private GestureDetector gestureDetector;
 	private ScaleGestureDetector scaleDetector;
 	private boolean isZooming;
@@ -470,7 +470,7 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
 		return scroller.getCurrVelocity() <= minimumFlingVelocity;
 	}
 
-	private enum Direction {
+	enum Direction {
 		NONE, LEFT, RIGHT, VERTICAL
 	}
 

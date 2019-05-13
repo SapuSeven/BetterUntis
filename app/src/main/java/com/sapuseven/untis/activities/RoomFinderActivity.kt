@@ -210,12 +210,12 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 			roomList.add(item)
 
 			profileUser?.let { user ->
-				val startDate = UntisDate(LocalDate.now().withDayOfWeek(
+				val startDate = UntisDate.fromLocalDate(LocalDate.now().withDayOfWeek(
 						DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(user.timeGrid.days.first().day).dayOfWeek
-				).toString(ISODateTimeFormat.date()))
-				val endDate = UntisDate(LocalDate.now().withDayOfWeek(
+				))
+				val endDate = UntisDate.fromLocalDate(LocalDate.now().withDayOfWeek(
 						DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(user.timeGrid.days.last().day).dayOfWeek
-				).toString(ISODateTimeFormat.date()))
+				))
 
 				TimetableLoader(WeakReference(this), object : TimetableDisplay {
 					override fun addData(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {

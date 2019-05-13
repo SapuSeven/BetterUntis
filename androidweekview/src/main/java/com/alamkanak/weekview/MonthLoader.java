@@ -72,6 +72,5 @@ public class MonthLoader<T> implements WeekViewLoader<T> {
          * @return The list of {@link WeekViewDisplayable} of the provided month
          */
         List<WeekViewDisplayable<T>> onMonthChange(Calendar startDate, Calendar endDate);
-
     }
 }

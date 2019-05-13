@@ -47,7 +47,6 @@ import org.joda.time.DateTimeConstants
 import org.joda.time.Instant
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
-import org.joda.time.format.ISODateTimeFormat
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.collections.ArrayList
@@ -153,20 +152,55 @@ class MainActivity :
 
 		lastRefresh = findViewById(R.id.textview_main_lastrefresh)
 		lastRefresh?.text = getString(R.string.last_refreshed, getString(R.string.never))
+
+		setupSwipeRefresh()
 	}
 
-	private fun loadTimetable(target: TimetableLoader.TimetableLoaderTarget) {
+	private fun setupSwipeRefresh() {
+		swiperefreshlayout_main_timetable.setOnRefreshListener {
+			displayedElement?.let {
+				Log.d("MainActivityDebug", "onRefresh called for months ${getDisplayedMonths()}")
+				getDisplayedMonths().forEach { date ->
+					loadTimetable(TimetableLoader.TimetableLoaderTarget(
+							date.first,
+							date.second,
+							it.id, it.type),
+							true)
+				}
+			}
+		}
+	}
+
+	private fun getDisplayedMonths(): List<Pair<UntisDate, UntisDate>> {
+		val displayedWeekStartDate = weekView.currentDate
+		// TODO: Dynamic week length
+		val displayedWeekEndDate = displayedWeekStartDate.plusDays(5)
+
+		return if (displayedWeekStartDate.monthOfYear == displayedWeekEndDate.monthOfYear)
+			listOf(Pair(
+					UntisDate.fromLocalDate(displayedWeekStartDate.dayOfMonth().withMinimumValue()),
+					UntisDate.fromLocalDate(displayedWeekStartDate.dayOfMonth().withMaximumValue())
+			))
+		else
+			listOf(
+					Pair(UntisDate.fromLocalDate(displayedWeekStartDate.dayOfMonth().withMinimumValue()),
+							UntisDate.fromLocalDate(displayedWeekStartDate.dayOfMonth().withMaximumValue())),
+					Pair(UntisDate.fromLocalDate(displayedWeekEndDate.dayOfMonth().withMinimumValue()),
+							UntisDate.fromLocalDate(displayedWeekEndDate.dayOfMonth().withMaximumValue()))
+			)
+	}
+
+	private fun loadTimetable(target: TimetableLoader.TimetableLoaderTarget, forceRefresh: Boolean = false) {
+		Log.d("MainActivityDebug", "loadTimetable called for target $target")
 		weekView.notifyDataSetChanged()
-		showLoading(true)
+		showLoading(!forceRefresh)
 
 		val alwaysLoad = PreferenceUtils.getPrefBool(preferenceManager, "preference_timetable_refresh_in_background")
-		val flags = TimetableLoader.FLAG_LOAD_CACHE or (if (alwaysLoad) TimetableLoader.FLAG_LOAD_SERVER else 0)
+		val flags = (if (!forceRefresh) TimetableLoader.FLAG_LOAD_CACHE else 0) or (if (alwaysLoad || forceRefresh) TimetableLoader.FLAG_LOAD_SERVER else 0)
 		timetableLoader.load(target, flags)
 	}
 
 	private fun loadProfile(): Boolean {
-		//userDatabase.onUpgrade(userDatabase.writableDatabase, 0, 0) // TODO: This deletes all saved profiles, remove after testing
-
 		if (userDatabase.getUsersCount() < 1)
 			return true
 
@@ -180,7 +214,7 @@ class MainActivity :
 	}
 
 	private fun setupWeekView() {
-		weekView = findViewById(R.id.weekView)
+		weekView = findViewById(R.id.weekview_main_timetable)
 		weekView.setOnEventClickListener(this)
 		weekView.setOnCornerClickListener(this)
 		weekView.setMonthChangeListener(this)
@@ -206,12 +240,12 @@ class MainActivity :
 		val newYear = startDate.get(Calendar.YEAR)
 		val newMonth = startDate.get(Calendar.MONTH)
 
-		if (!loadedMonths.contains(newMonth)) {
+		if (!loadedMonths.contains(newYear * 100 + newMonth)) {
 			displayedElement?.let {
-				loadedMonths.add(newMonth)
+				loadedMonths.add(newYear * 100 + newMonth)
 				loadTimetable(TimetableLoader.TimetableLoaderTarget(
-						UntisDate(LocalDate(startDate).toString(ISODateTimeFormat.date())),
-						UntisDate(LocalDate(endDate).toString(ISODateTimeFormat.date())),
+						UntisDate.fromLocalDate(LocalDate(startDate)),
+						UntisDate.fromLocalDate(LocalDate(endDate)),
 						it.id, it.type))
 			}
 		}
@@ -245,7 +279,6 @@ class MainActivity :
 		val lines = MutableList(0) { return@MutableList 0 }
 
 		// TODO: Replace the fixed day index AND/OR display a warning at login if the days are not equal AND/OR support inequal days
-		// TODO: Prevent from crashing
 		profileUser.timeGrid.days[0].units.forEach { hour ->
 			val startTime = DateTimeUtils.tTimeNoSeconds().parseLocalTime(hour.startTime).toString(DateTimeUtils.shortDisplayableTime())
 			val endTime = DateTimeUtils.tTimeNoSeconds().parseLocalTime(hour.endTime).toString(DateTimeUtils.shortDisplayableTime())
@@ -589,6 +622,7 @@ class MainActivity :
 		TimetableItemDetailsDialog.createInstance(item, timetableDatabaseInterface).show(supportFragmentManager, "itemDetails") // TODO: Remove hard-coded tag
 	}
 
+	// TODO: Implement this properly and re-enable the view in XML
 	private fun setLastRefresh(timestamp: Long) {
 		if (timestamp == -1L)
 			lastRefresh?.text = getString(R.string.last_refreshed, getString(R.string.never))
@@ -617,7 +651,11 @@ class MainActivity :
 		val preparedItems = prepareItems(items)
 		this.items.addAll(preparedItems)
 		weekView.notifyDataSetChanged()
+
+		// TODO: Only disable these loading indicators when everything finished loading
+		swiperefreshlayout_main_timetable.isRefreshing = false
 		showLoading(false)
+
 		setLastRefresh(timestamp)
 	}
 
