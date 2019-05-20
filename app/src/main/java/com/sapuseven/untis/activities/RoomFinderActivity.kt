@@ -37,7 +37,6 @@ import kotlinx.android.synthetic.main.activity_roomfinder.*
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.ISODateTimeFormat
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.collections.ArrayList
@@ -178,7 +177,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		// Nothing to do
 	}
 
-	override fun onPeriodElementClick(dialog: DialogFragment, element: PeriodElement?) {
+	override fun onPeriodElementClick(dialog: DialogFragment, element: PeriodElement?, useOrgId: Boolean) {
 		// Ignore single clicks, wait for onPositiveButtonClick instead
 	}
 

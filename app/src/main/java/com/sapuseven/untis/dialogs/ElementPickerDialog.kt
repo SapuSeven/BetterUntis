@@ -40,7 +40,7 @@ class ElementPickerDialog : DialogFragment() {
 
 	interface ElementPickerDialogListener {
 		fun onDialogDismissed(dialog: DialogInterface?)
-		fun onPeriodElementClick(dialog: DialogFragment, element: PeriodElement?)
+		fun onPeriodElementClick(dialog: DialogFragment, element: PeriodElement?, useOrgId: Boolean)
 		fun onPositiveButtonClicked(dialog: ElementPickerDialog)
 	}
 
@@ -85,7 +85,7 @@ class ElementPickerDialog : DialogFragment() {
 		val root = activity.layoutInflater.inflate(R.layout.dialog_element_picker, null) as LinearLayout
 
 		val gridView = root.findViewById<GridView>(R.id.gridview_elementpicker_list)
-		gridView.setOnItemClickListener { _, _, position, _ -> listener.onPeriodElementClick(this@ElementPickerDialog, adapter.itemAt(position)) }
+		gridView.setOnItemClickListener { _, _, position, _ -> listener.onPeriodElementClick(this@ElementPickerDialog, adapter.itemAt(position), false) }
 		gridView.adapter = adapter
 
 		holder = Holder(
@@ -98,7 +98,7 @@ class ElementPickerDialog : DialogFragment() {
 		defaultTextColor = holder.tvPersonal.textColors
 
 		holder.tvPersonal.setOnClickListener {
-			listener.onPeriodElementClick(this@ElementPickerDialog, null)
+			listener.onPeriodElementClick(this@ElementPickerDialog, null, false)
 			dismiss()
 		}
 

@@ -578,8 +578,13 @@ class MainActivity :
 		}
 	}
 
-	override fun onPeriodElementClick(dialog: DialogFragment, element: PeriodElement?) {
-		if (element == null) {
+	override fun onPeriodElementClick(dialog: DialogFragment, element: PeriodElement?, useOrgId: Boolean) {
+		element?.let {
+			dialog.dismiss()
+			setTarget(if (useOrgId) element.orgId else element.id, element.type, timetableDatabaseInterface.getLongName(
+					if (useOrgId) element.orgId else element.id, TimetableDatabaseInterface.Type.valueOf(element.type)))
+			refreshNavigationViewSelection()
+		} ?: run {
 			profileUser.userData.elemType?.let { type ->
 				setTarget(
 						profileUser.userData.elemId,
@@ -588,12 +593,6 @@ class MainActivity :
 			} ?: run {
 				setTarget(anonymous = true)
 			}
-		}
-		element?.let {
-			dialog.dismiss()
-			setTarget(element.id, element.type, timetableDatabaseInterface.getLongName(
-					element.id, TimetableDatabaseInterface.Type.valueOf(element.type)))
-			refreshNavigationViewSelection()
 		}
 	}
 

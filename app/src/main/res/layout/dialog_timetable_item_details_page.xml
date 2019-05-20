@@ -31,11 +31,9 @@
 			android:layout_height="wrap_content"
 			android:layout_marginBottom="12dp"
 			android:layout_marginEnd="24dp"
-			android:layout_marginLeft="12dp"
-			android:layout_marginRight="24dp"
 			android:layout_marginStart="12dp"
 			android:layout_marginTop="12dp"
-			android:contentDescription="string/teachers"
+			android:contentDescription="@string/all_teachers"
 			android:tint="?android:attr/textColorPrimary"
 			app:srcCompat="@drawable/all_teacher"/>
 
@@ -43,8 +41,6 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:paddingEnd="12dp"
-			android:paddingLeft="0dp"
-			android:paddingRight="12dp"
 			android:paddingStart="0dp">
 
 			<LinearLayout
@@ -68,11 +64,9 @@
 			android:layout_height="wrap_content"
 			android:layout_marginBottom="12dp"
 			android:layout_marginEnd="24dp"
-			android:layout_marginLeft="12dp"
-			android:layout_marginRight="24dp"
 			android:layout_marginStart="12dp"
 			android:layout_marginTop="12dp"
-			android:contentDescription="string/classes"
+			android:contentDescription="@string/all_classes"
 			android:tint="?android:attr/textColorPrimary"
 			app:srcCompat="@drawable/all_classes"/>
 
@@ -80,8 +74,6 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:paddingEnd="12dp"
-			android:paddingLeft="0dp"
-			android:paddingRight="12dp"
 			android:paddingStart="0dp">
 
 			<LinearLayout
@@ -105,11 +97,9 @@
 			android:layout_height="wrap_content"
 			android:layout_marginBottom="12dp"
 			android:layout_marginEnd="24dp"
-			android:layout_marginLeft="12dp"
-			android:layout_marginRight="24dp"
 			android:layout_marginStart="12dp"
 			android:layout_marginTop="12dp"
-			android:contentDescription="string/rooms"
+			android:contentDescription="@string/all_rooms"
 			android:tint="?android:attr/textColorPrimary"
 			app:srcCompat="@drawable/all_rooms"/>
 
@@ -117,8 +107,6 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:paddingEnd="12dp"
-			android:paddingLeft="0dp"
-			android:paddingRight="12dp"
 			android:paddingStart="0dp">
 
 			<LinearLayout

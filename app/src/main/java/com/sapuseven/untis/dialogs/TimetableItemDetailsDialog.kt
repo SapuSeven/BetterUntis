@@ -3,6 +3,7 @@ package com.sapuseven.untis.dialogs
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
+import android.graphics.Paint
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -14,6 +15,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.timetable.TimegridItem
+import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.KotlinUtils.safeLet
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
@@ -25,7 +27,7 @@ class TimetableItemDetailsDialog : DialogFragment() {
 	private lateinit var listener: TimetableItemDetailsDialogListener
 
 	interface TimetableItemDetailsDialogListener {
-		fun onPeriodElementClick(dialog: DialogFragment, element: PeriodElement?)
+		fun onPeriodElementClick(dialog: DialogFragment, element: PeriodElement?, useOrgId: Boolean)
 	}
 
 	override fun onAttach(context: Context) {
@@ -33,7 +35,7 @@ class TimetableItemDetailsDialog : DialogFragment() {
 		if (context is TimetableItemDetailsDialogListener)
 			listener = context
 		else
-			throw ClassCastException((context.toString() + " must implement TimetableItemDetailsDialogListener"))
+			throw ClassCastException("$context must implement TimetableItemDetailsDialogListener")
 	}
 
 	override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -84,6 +86,7 @@ class TimetableItemDetailsDialog : DialogFragment() {
 			}
 		}
 
+		// TODO: Fix homework display
 		item.periodData.element.homeWorks.forEach {
 			val infoView = activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_homework, null)
 			(infoView.findViewById<TextView>(R.id.textview_roomfinder_name)).text = it.text
@@ -121,21 +124,35 @@ class TimetableItemDetailsDialog : DialogFragment() {
 	                         type: TimetableDatabaseInterface.Type,
 	                         textColor: Int?) {
 		data.forEach { element ->
-			val tv = TextView(context!!.applicationContext)
-			val params = LinearLayout.LayoutParams(
-					ViewGroup.LayoutParams.WRAP_CONTENT,
-					ViewGroup.LayoutParams.MATCH_PARENT)
-			params.setMargins(0, 0, /*dp2px(12)*/20, 0) // TODO: Make resolution-independent
-			tv.text = timetableDatabaseInterface.getShortName(element.id, type)
-			tv.layoutParams = params
-			textColor?.let { tv.setTextColor(it) }
-			tv.gravity = Gravity.CENTER_VERTICAL
-			tv.setOnClickListener {
-				listener.onPeriodElementClick(this, element)
-				dismiss()
-			}
-			list.addView(tv)
+			if (element.id > 0)
+				list.addView(generateTextViewForElement(element, type, timetableDatabaseInterface, textColor))
+			if (element.id != element.orgId)
+				list.addView(generateTextViewForElement(element, type, timetableDatabaseInterface, textColor, true))
 		}
+	}
+
+	private fun generateTextViewForElement(element: PeriodElement,
+	                                       type: TimetableDatabaseInterface.Type,
+	                                       timetableDatabaseInterface: TimetableDatabaseInterface,
+	                                       textColor: Int?,
+	                                       useOrgId: Boolean = false): TextView {
+		val tv = TextView(requireContext())
+		val params = LinearLayout.LayoutParams(
+				ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.MATCH_PARENT)
+		params.setMargins(0, 0, ConversionUtils.dpToPx(12.0f, requireContext()), 0)
+		tv.text = timetableDatabaseInterface.getShortName(if (useOrgId) element.orgId else element.id, type)
+		tv.layoutParams = params
+		textColor?.let { tv.setTextColor(it) }
+		tv.gravity = Gravity.CENTER_VERTICAL
+		if (useOrgId) {
+			tv.paintFlags = tv.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+		}
+		tv.setOnClickListener {
+			listener.onPeriodElementClick(this, element, useOrgId)
+			dismiss()
+		}
+		return tv
 	}
 
 	companion object {
