@@ -222,7 +222,7 @@ class ElementPickerDialog : DialogFragment() {
 	)
 
 	companion object {
-		fun createInstance(
+		fun newInstance(
 				timetableDatabaseInterface: TimetableDatabaseInterface,
 				config: ElementPickerDialogConfig): ElementPickerDialog {
 			val fragment = ElementPickerDialog()

@@ -8,7 +8,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.preference.PreferenceDialogFragmentCompat
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 
-
+// Only dialog handling here (frontend)
 class ElementPickerPreferenceDialog : PreferenceDialogFragmentCompat() {
 	private var tvPersonal: TextView? = null
 	private var tvClasses: TextView? = null
@@ -29,12 +29,13 @@ class ElementPickerPreferenceDialog : PreferenceDialogFragmentCompat() {
 		fun newInstance(key: String): ElementPickerPreferenceDialog {
 			val fragment = ElementPickerPreferenceDialog()
 			val bundle = Bundle(1)
-			bundle.putString(PreferenceDialogFragmentCompat.ARG_KEY, key)
+			bundle.putString(ARG_KEY, key)
 			fragment.arguments = bundle
 			return fragment
 		}
 	}
 
+	// TODO: No idea how this works, the code below is from past experiments
 	/*init {
 		dialogLayoutResource = R.layout.dialog_element_picker
 	}
@@ -133,12 +134,12 @@ class ElementPickerPreferenceDialog : PreferenceDialogFragmentCompat() {
 	}*/
 
 	override fun onDialogClosed(positiveResult: Boolean) {
-		if (positiveResult) {
+		/*if (positiveResult) {
 			/*saveSelected()
 			if (selectedType != UNKNOWN)
 				setSummary(selectedName)
 			else
 				setSummary("")*/
-		}
+		}*/
 	}
 }

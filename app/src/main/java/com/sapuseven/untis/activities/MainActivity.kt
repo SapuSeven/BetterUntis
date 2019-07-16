@@ -480,7 +480,7 @@ class MainActivity :
 				startActivity(i4)*/
 			}
 			R.id.nav_share -> {
-				/*Answers.createInstance().logShare(ShareEvent()
+				/*Answers.newInstance().logShare(ShareEvent()
 						.putMethod("Share via Intent")
 						.putContentName("Share the BetterUntis download link")
 						.putContentType("share")
@@ -500,7 +500,7 @@ class MainActivity :
 	}
 
 	private fun showItemList(type: TimetableDatabaseInterface.Type) {
-		ElementPickerDialog.createInstance(
+		ElementPickerDialog.newInstance(
 				timetableDatabaseInterface,
 				ElementPickerDialog.Companion.ElementPickerDialogConfig(type)
 		).show(supportFragmentManager, "elementPicker") // TODO: Do not hard-code the tag

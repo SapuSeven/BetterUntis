@@ -27,7 +27,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setupActionBar()
-		setContentView(com.sapuseven.untis.R.layout.activity_settings)
+		setContentView(R.layout.activity_settings)
 		val prefs = PreferenceManager(this)
 		if (!prefs.defaultPrefs.getBoolean(DIALOG_DESIGNING_HIDE, false))
 			banner_settings_designing.visibility = View.VISIBLE
@@ -96,6 +96,8 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 				when (preference) {
 					is ElementPickerPreference -> {
 						val f: DialogFragment = ElementPickerPreferenceDialog.newInstance(preference.key)
+						/*val f: DialogFragment = ElementPickerDialog.newInstance(timetableDatabaseInterface,
+								ElementPickerDialog.Companion.ElementPickerDialogConfig(TimetableDatabaseInterface.Type.TEACHER))*/
 						f.setTargetFragment(this, 0)
 						f.show(manager, DIALOG_FRAGMENT_TAG)
 					}

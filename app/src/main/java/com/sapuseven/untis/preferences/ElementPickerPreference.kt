@@ -1,18 +1,47 @@
 package com.sapuseven.untis.preferences
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.util.AttributeSet
-import android.view.ViewGroup
-import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.preference.DialogPreference
-import androidx.preference.Preference
-import com.sapuseven.untis.R
+import com.sapuseven.untis.data.databases.User
+import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 
+// Only data handling here (backend)
 class ElementPickerPreference(context: Context, attrs: AttributeSet) : DialogPreference(context, attrs) {
-	private var tvPersonal: TextView? = null
+	private val DIALOG_FRAGMENT_TAG = "ElementPickerPreference"
+	private var profileId: Long = -1
+	private val userDatabase = UserDatabase.createInstance(context)
+	private lateinit var profileUser: User
+	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
+
+	// TODO: No idea how this works, the code below is from past experiments
+	/*override fun onClick() {
+		if (!loadProfile())
+			showElementPicker()
+	}
+
+	private fun loadProfile(): Boolean {
+		if (userDatabase.getUsersCount() < 1)
+			return true
+
+		profileId = PreferenceManager(context).defaultPrefs.getInt("profile", -1).toLong() // TODO: Do not hard-code "profile"
+		profileId = userDatabase.getAllUsers()[0].id
+				?: -1 // TODO: Debugging only. This is a dynamic id.
+		profileUser = userDatabase.getUser(profileId)!! // TODO: Show error (invalid profile) if (profileId == -1) or (profileUser == null) and default to the first profile/re-login if necessary. It is mandatory to stop the execution of more code, or else the app will crash.
+
+		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileUser.id ?: -1)
+		return false
+	}
+
+	private fun showElementPicker() {
+		ElementPickerDialog.newInstance(
+				timetableDatabaseInterface,
+				ElementPickerDialog.Companion.ElementPickerDialogConfig(TimetableDatabaseInterface.Type.TEACHER)
+		)//.show(, DIALOG_FRAGMENT_TAG) // TODO: Do not hard-code the tag
+	}*/
+
+	/*private var tvPersonal: TextView? = null
 	private var tvClasses: TextView? = null
 	private var tvTeachers: TextView? = null
 	private var tvRooms: TextView? = null
@@ -26,14 +55,14 @@ class ElementPickerPreference(context: Context, attrs: AttributeSet) : DialogPre
 	private var defaultItemTextColor: ColorStateList? = null
 	private var elemList: ViewGroup? = null
 	private var dialog: AlertDialog? = null
-	private val DIALOG_FRAGMENT_TAG = "ElementPickerPreference"
+	private val DIALOG_FRAGMENT_TAG = "ElementPickerPreference"*/
 
 
-	override fun getDialogLayoutResource(): Int {
+	/*override fun getDialogLayoutResource(): Int {
 		return R.layout.dialog_element_picker
 	}
 
-	/*val summary: CharSequence?
+	val summary: CharSequence?
 		get() {
 			if (selectedName == null) {
 				val sharedPrefs = sharedPreferences
