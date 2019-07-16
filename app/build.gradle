@@ -6,6 +6,8 @@ apply plugin: 'kotlinx-serialization'
 
 android {
 	compileSdkVersion 28
+	buildToolsVersion '28.0.3'
+
 	defaultConfig {
 		applicationId "com.sapuseven.untis"
 		minSdkVersion 21
@@ -14,14 +16,14 @@ android {
 		versionName "3.0.0"
 		vectorDrawables.useSupportLibrary = true
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-
 	}
+
 	buildTypes {
 		release {
 			minifyEnabled false
 			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 		}
+
 		debug {
 			minifyEnabled false
 			shrinkResources false
@@ -30,12 +32,11 @@ android {
 			versionNameSuffix '-DEBUG'
 		}
 	}
-	buildToolsVersion '28.0.3'
+
 	compileOptions {
 		sourceCompatibility JavaVersion.VERSION_1_8
 		targetCompatibility JavaVersion.VERSION_1_8
 	}
-
 }
 
 dependencies {
@@ -49,14 +50,14 @@ dependencies {
 	implementation "com.github.kittinunf.fuel:fuel-coroutines:2.0.1"
 	implementation "commons-codec:commons-codec:1.11"
 	implementation "joda-time:joda-time:2.10"
-	implementation 'com.google.android.material:material:1.1.0-alpha05'
+	implementation 'com.google.android.material:material:1.1.0-alpha08'
 	implementation 'com.jaredrummler:colorpicker-compat:1.0.5'
 	implementation 'com.github.cesarferreira:MaterialComponent.Banner:0.13.0'
 	testImplementation 'junit:junit:4.12'
 	testImplementation 'org.mockito:mockito-core:2.27.0'
-	androidTestImplementation 'androidx.test:runner:1.1.1'
-	androidTestImplementation 'androidx.test:rules:1.1.1'
-	androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+	androidTestImplementation 'androidx.test:runner:1.2.0'
+	androidTestImplementation 'androidx.test:rules:1.2.0'
+	androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
 	// Use my own heavily modified version of the library
 	//implementation 'com.github.thellmund:Android-Week-View:3.1'
