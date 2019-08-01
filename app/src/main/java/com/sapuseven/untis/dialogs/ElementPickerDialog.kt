@@ -67,7 +67,7 @@ class ElementPickerDialog : DialogFragment() {
 			builder.setView(generateView(activity))
 
 			config?.let {
-				builder.setPositiveButton(it.positiveButtonText) { dialogInterface: DialogInterface, which: Int ->
+				builder.setPositiveButton(it.positiveButtonText) { _: DialogInterface, _: Int ->
 					listener.onPositiveButtonClicked(this)
 				}
 

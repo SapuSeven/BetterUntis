@@ -20,7 +20,7 @@ class GridViewDatabaseItemCheckBoxAdapter(context: Context) :
 		holder.checkBox.text = getItem(position)
 		holder.checkBox.setOnCheckedChangeListener(null)
 		holder.checkBox.isChecked = selectedItems.contains(itemAt(position))
-		holder.checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+		holder.checkBox.setOnCheckedChangeListener { _, isChecked ->
 			if (isChecked && !selectedItems.contains(itemAt(position)))
 				selectedItems.add(itemAt(position))
 			else if (selectedItems.contains(itemAt(position)))

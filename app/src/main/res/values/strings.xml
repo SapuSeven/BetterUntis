@@ -68,7 +68,7 @@
 	<string name="preferences_info_send_stats_desc">Crash reports will always be sent.</string>
 	<string name="preferences_info_stats_details">About data collection</string>
 	<string name="preferences_info_stats_details_desc">Tap to view what data this app is collecting and sending to a server.</string>
-	<string name="preferences_dark_theme_auto">Enable at night</string>
+	<string name="preferences_dark_theme_auto">Enable on low battery</string>
 	<string name="preferences_dark_theme_on">Always on</string>
 	<string name="preferences_dark_theme_off">Always off</string>
 

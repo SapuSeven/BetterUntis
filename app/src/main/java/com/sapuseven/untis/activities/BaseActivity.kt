@@ -55,11 +55,11 @@ open class BaseActivity : AppCompatActivity() {
 			"cyan" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_ThemeCyan_NoActionBar else R.style.AppTheme_ThemeCyan)
 			else -> setTheme(if (hasOwnToolbar) R.style.AppTheme_NoActionBar else R.style.AppTheme)
 		}
-		delegate.setLocalNightMode(when (PreferenceUtils.getPrefString(preferenceManager, "preference_dark_theme", currentDarkTheme)) {
+		delegate.localNightMode = when (PreferenceUtils.getPrefString(preferenceManager, "preference_dark_theme", currentDarkTheme)) {
 			"on" -> AppCompatDelegate.MODE_NIGHT_YES
-			"auto" -> AppCompatDelegate.MODE_NIGHT_AUTO
+			"auto" -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 			else -> AppCompatDelegate.MODE_NIGHT_NO
-		})
+		}
 	}
 
 	private fun setBlackBackground(blackBackground: Boolean) {
