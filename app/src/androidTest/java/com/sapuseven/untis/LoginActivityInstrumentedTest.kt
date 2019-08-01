@@ -23,7 +23,7 @@ class LoginActivityInstrumentedTest {
 	}*/
 
 	@get:Rule
-	val loginActivityTestRule = ActivityTestRule<LoginActivity>(LoginActivity::class.java)
+	val loginActivityTestRule = ActivityTestRule(LoginActivity::class.java)
 
 	@Test
 	fun automatedDebug() {

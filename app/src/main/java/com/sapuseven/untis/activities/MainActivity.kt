@@ -317,7 +317,7 @@ class MainActivity :
 
 		val days = profileUser.timeGrid.days
 
-		val itemGrid: Array<Array<MutableList<TimegridItem>>> = Array(days.size) { Array(days[0].units.size) { mutableListOf<TimegridItem>() } }
+		val itemGrid: Array<Array<MutableList<TimegridItem>>> = Array(days.size) { Array(days[0].units.size) { mutableListOf() } }
 
 		val newItems = mutableListOf<TimegridItem>()
 
@@ -507,6 +507,8 @@ class MainActivity :
 	}
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+		super.onActivityResult(requestCode, resultCode, intent);
+
 		when (requestCode) {
 			REQUEST_CODE_ROOM_FINDER -> {
 				if (resultCode == Activity.RESULT_OK) {

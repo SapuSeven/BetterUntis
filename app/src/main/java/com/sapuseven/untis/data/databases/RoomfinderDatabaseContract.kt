@@ -1,7 +1,5 @@
 package com.sapuseven.untis.data.databases
 
-import android.provider.BaseColumns
-
 
 object RoomfinderDatabaseContract {
 	const val TABLE_NAME = "roomFinder"

@@ -33,7 +33,7 @@ class TimetableItemDetailsDialog : DialogFragment() {
 		if (context is TimetableItemDetailsDialogListener)
 			listener = context
 		else
-			throw ClassCastException((context.toString() + " must implement TimetableItemDetailsDialogListener"))
+			throw ClassCastException(("$context must implement TimetableItemDetailsDialogListener"))
 	}
 
 	override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

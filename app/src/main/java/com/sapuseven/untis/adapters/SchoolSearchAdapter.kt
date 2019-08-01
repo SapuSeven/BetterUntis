@@ -1,17 +1,17 @@
 package com.sapuseven.untis.adapters
 
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
 import java.util.*
 
 class SchoolSearchAdapter(private val onClickListener: View.OnClickListener) : RecyclerView.Adapter<SchoolSearchAdapter.ViewHolder>() {
 	private val dataset = ArrayList<SchoolSearchAdapterItem>()
 
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SchoolSearchAdapter.ViewHolder {
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		val inflater = LayoutInflater.from(parent.context)
 		val v = inflater.inflate(R.layout.item_schoolsearch, parent, false)
 		v.setOnClickListener(onClickListener)

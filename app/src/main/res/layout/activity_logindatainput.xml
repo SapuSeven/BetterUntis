@@ -51,7 +51,6 @@
 		</com.google.android.material.textfield.TextInputLayout>
 
 		<View
-			android:id="@+id/view_logindatainput_divider"
 			android:layout_width="match_parent"
 			android:layout_height="1dp"
 			android:layout_marginStart="16dp"

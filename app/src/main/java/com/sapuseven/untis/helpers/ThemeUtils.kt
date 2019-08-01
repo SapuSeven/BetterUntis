@@ -1,11 +1,5 @@
 package com.sapuseven.untis.helpers
 
-import android.app.Activity
-import android.content.Context
-import android.graphics.Color
-import android.preference.PreferenceManager
-import com.sapuseven.untis.R
-
 object ThemeUtils {
 	// --Commented out by Inspection START (24-Mar-18 9:16):
 	//	@SuppressWarnings("SameParameterValue")
