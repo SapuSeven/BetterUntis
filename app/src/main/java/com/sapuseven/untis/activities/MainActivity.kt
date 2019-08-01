@@ -317,7 +317,7 @@ class MainActivity :
 
 		val days = profileUser.timeGrid.days
 
-		val itemGrid: Array<Array<MutableList<TimegridItem>>> = Array(days.size) { Array(days[0].units.size) { mutableListOf() } }
+		val itemGrid: Array<Array<MutableList<TimegridItem>>> = Array(days.size) { Array(days[0].units.size) { mutableListOf<TimegridItem>() } }
 
 		val newItems = mutableListOf<TimegridItem>()
 
