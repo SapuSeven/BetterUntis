@@ -23,7 +23,6 @@ Another major change is the use of a custom WeekView (based on [Till Hellmund](h
 - Flexible timegrid allows to display hours outside the regular timetable (like consultation times with teachers)
 
 ## Missing features / Ways to contribute
-
 - No holiday or free day indicators
 - No translations, as of now the app is only available in English
 - No notifications
@@ -32,3 +31,21 @@ Another major change is the use of a custom WeekView (based on [Till Hellmund](h
 - No account settings
 - No support for multiple accounts _(although I wrote timetable-specific code in a way to allow relatively easy implementation of this)_
 - No 'last updated'-indicator
+- Almost no unit and integration tests
+
+## Project Git Structure
+I established a simple system to manage this Git repository.
+Basically, there are two main branches: **master** and **develop**. They both are permanent and can't be deleted.
+
+### Branch: master
+This branch always and only contains the latest release version. This includes alpha/beta releases.
+
+### Branch: develop
+This branch contains the current development version. Small changes and fixes can be committed directly to this branch.
+
+When it reaches a state ready to release, it can be merged into the **master**-branch and a new release can be published.
+
+### Other branches
+Especially bigger features which require multiple commits should branch off **develop** and merge back into it. These should be named to describe the feature as clearly as possible.
+
+These branches have a limited lifetime. After the last merge back into **develop**, they should be deleted if no longer needed.
