@@ -32,4 +32,3 @@ Another major change is the use of a custom WeekView (based on [Till Hellmund](h
 - No account settings
 - No support for multiple accounts _(although I wrote timetable-specific code in a way to allow relatively easy implementation of this)_
 - No 'last updated'-indicator
-- (...)
