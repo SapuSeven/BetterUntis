@@ -1,7 +1,7 @@
 # BetterUntis
 An alternative mobile client for the Untis timetable system.
 
-## Development
+## Development history
 It was more and more obvious that my [original version](https://github.com/SapuSeven/BetterUntis-Legacy) of BetterUntis had many design and performance flaws.
 As a result, development became increasingly more difficult.
 So I came to the conclusion to scrap the project and start over from scratch.
