@@ -12,7 +12,7 @@ Kotlin has many features and libraries that immensly help to communicate with th
 Another major change is the use of a custom WeekView (based on [Till Hellmund](https://github.com/thellmund)'s fork of [Android-Week-View](https://github.com/alamkanak/Android-Week-View)) for the timetable display. This also improved performance by a lot.
 
 ## New features
-- Select your school by searing the name instead of providing an URL
+- Select your school by searching the name instead of providing an URL
 - Login by optionally using your password instead of app key
 - Zoomable timetable view
 - Improved overall design
@@ -46,6 +46,6 @@ This branch contains the current development version. Small changes and fixes ca
 When it reaches a state ready to release, it can be merged into the **master**-branch and a new release can be published.
 
 ### Other branches
-Especially bigger features which require multiple commits should branch off **develop** and merge back into it. These should be named to describe the feature as clearly as possible.
+Especially bigger features which require multiple commits should branch off **develop** and merge back into it. These should be named in a way to describe the feature as clearly as possible.
 
 These branches have a limited lifetime. After the last merge back into **develop**, they should be deleted if no longer needed.
