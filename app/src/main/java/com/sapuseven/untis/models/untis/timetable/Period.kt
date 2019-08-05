@@ -18,7 +18,8 @@ data class Period(
 		val can: List<String>,
 		val `is`: List<String>,
 		val homeWorks: List<PeriodHomework>,
-		@ContextualSerialization val messengerChannel: Any? = null // This is a new element with unknown usage, it disappeared again after a while
+		@ContextualSerialization val messengerChannel: Any? = null, // This is a new element with unknown usage
+		@ContextualSerialization val exam: Any? = null // This is a new element with unknown usage
 ) {
 	companion object {
 		const val CODE_REGULAR = "REGULAR"
