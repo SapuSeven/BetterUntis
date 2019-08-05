@@ -14,6 +14,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.timetable.TimegridItem
+import com.sapuseven.untis.helpers.ConversionUtils.dpToPx
 import com.sapuseven.untis.helpers.KotlinUtils.safeLet
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
@@ -87,7 +88,7 @@ class TimetableItemDetailsDialog : DialogFragment() {
 		item.periodData.element.homeWorks.forEach {
 			val infoView = activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_homework, null)
 			(infoView.findViewById<TextView>(R.id.textview_roomfinder_name)).text = it.text
-			(infoView.findViewById<TextView>(R.id.tvDate)).text = "von " + it.startDate + " bis " + it.endDate
+			(infoView.findViewById<TextView>(R.id.tvDate)).text = "from " + it.startDate + " to " + it.endDate // TODO: Localize
 			root.addView(infoView)
 		}
 
@@ -125,7 +126,7 @@ class TimetableItemDetailsDialog : DialogFragment() {
 			val params = LinearLayout.LayoutParams(
 					ViewGroup.LayoutParams.WRAP_CONTENT,
 					ViewGroup.LayoutParams.MATCH_PARENT)
-			params.setMargins(0, 0, /*dp2px(12)*/20, 0) // TODO: Make resolution-independent
+			params.setMargins(0, 0, dpToPx(12.0f, requireContext()), 0)
 			tv.text = timetableDatabaseInterface.getShortName(element.id, type)
 			tv.layoutParams = params
 			textColor?.let { tv.setTextColor(it) }

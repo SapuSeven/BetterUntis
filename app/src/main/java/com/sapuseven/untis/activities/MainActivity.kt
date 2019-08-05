@@ -27,7 +27,6 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.picker.MaterialStyledDatePickerDialog
 import com.google.android.material.snackbar.Snackbar
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.databases.User
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.dialogs.ElementPickerDialog
@@ -79,7 +78,7 @@ class MainActivity :
 	private val items: ArrayList<WeekViewEvent<TimegridItem>> = ArrayList()
 	private val loadedMonths = mutableListOf<Int>()
 	private var displayedElement: PeriodElement? = null
-	private lateinit var profileUser: User
+	private lateinit var profileUser: UserDatabase.User
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 	private lateinit var timetableLoader: TimetableLoader
 	private lateinit var preferenceManager: PreferenceManager
@@ -507,7 +506,7 @@ class MainActivity :
 	}
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-		super.onActivityResult(requestCode, resultCode, intent);
+		super.onActivityResult(requestCode, resultCode, intent)
 
 		when (requestCode) {
 			REQUEST_CODE_ROOM_FINDER -> {

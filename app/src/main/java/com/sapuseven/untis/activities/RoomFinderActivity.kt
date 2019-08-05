@@ -19,7 +19,6 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.adapters.RoomFinderAdapter
 import com.sapuseven.untis.adapters.RoomFinderAdapterItem
 import com.sapuseven.untis.data.databases.RoomfinderDatabase
-import com.sapuseven.untis.data.databases.User
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.dialogs.ElementPickerDialog
@@ -47,7 +46,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 	private var maxHourIndex = 0
 	private var roomList: MutableList<RoomFinderAdapterItem> = ArrayList()
 	private var roomListAdapter = RoomFinderAdapter(this, this)
-	private var profileUser: User? = null
+	private var profileUser: UserDatabase.User? = null
 	private lateinit var userDatabase: UserDatabase
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 	private lateinit var roomFinderDatabase: RoomfinderDatabase

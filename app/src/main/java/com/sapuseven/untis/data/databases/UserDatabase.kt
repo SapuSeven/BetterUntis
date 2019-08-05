@@ -5,10 +5,10 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
+import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.UserDatabaseQueryHelper.generateCreateTable
 import com.sapuseven.untis.helpers.UserDatabaseQueryHelper.generateDropTable
 import com.sapuseven.untis.helpers.UserDatabaseQueryHelper.generateValues
-import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.interfaces.TableModel
 import com.sapuseven.untis.models.untis.MasterData
 import com.sapuseven.untis.models.untis.Settings
@@ -69,9 +69,6 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 	}
 
 	fun addUser(user: User): Long? {
-		//if (!true) // TODO: Remove after testing
-		//return null
-
 		val db = writableDatabase
 
 		val values = ContentValues()
@@ -274,21 +271,19 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 
 		return result.toMap()
 	}
+
+	class User(
+			val id: Long? = null,
+			val url: String? = null,
+			val apiUrl: String? = null,
+			val school: String,
+			val user: String? = null,
+			val key: String? = null,
+			val anonymous: Boolean = false,
+			val timeGrid: TimeGrid,
+			val masterDataTimestamp: Long,
+			val userData: UserData,
+			val settings: Settings,
+			val created: Long? = null
+	)
 }
-
-// TODO: Move to UserDatabase class
-class User(
-		val id: Long? = null,
-		val url: String? = null,
-		val apiUrl: String? = null,
-		val school: String,
-		val user: String? = null,
-		val key: String? = null,
-		val anonymous: Boolean = false,
-		val timeGrid: TimeGrid,
-		val masterDataTimestamp: Long,
-		val userData: UserData,
-		val settings: Settings,
-		val created: Long? = null
-)
-

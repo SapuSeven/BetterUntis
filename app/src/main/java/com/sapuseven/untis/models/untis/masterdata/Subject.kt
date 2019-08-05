@@ -4,8 +4,8 @@ import android.content.ContentValues
 import android.database.Cursor
 import com.sapuseven.untis.annotations.Table
 import com.sapuseven.untis.annotations.TableColumn
-import com.sapuseven.untis.interfaces.TableModel
 import com.sapuseven.untis.data.databases.TABLE_NAME_SUBJECTS
+import com.sapuseven.untis.interfaces.TableModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -48,7 +48,7 @@ data class Subject(
 				cursor.getInt(cursor.getColumnIndex("id")),
 				cursor.getString(cursor.getColumnIndex("name")),
 				cursor.getString(cursor.getColumnIndex("longName")),
-				listOf(cursor.getInt(cursor.getColumnIndex("departmentIds"))), // TODO: Probably doesn't work, but this value is always empty anyway (see above)
+				listOf(cursor.getInt(cursor.getColumnIndex("departmentIds"))), // TODO: Probably doesn't work, but this value is always empty anyway (see TODO-Item above)
 				cursor.getString(cursor.getColumnIndex("foreColor")),
 				cursor.getString(cursor.getColumnIndex("backColor")),
 				cursor.getInt(cursor.getColumnIndex("active")) != 0,
