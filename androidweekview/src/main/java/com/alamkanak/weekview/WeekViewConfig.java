@@ -68,14 +68,14 @@ final class WeekViewConfig {
 	boolean showDistinctPastFutureColor = false;
 	int pastBackgroundColor = Color.rgb(227, 227, 227);
 	int futureBackgroundColor = Color.rgb(245, 245, 245);
-	int pastWeekendBackgroundColor = 0;
-	int futureWeekendBackgroundColor = 0;
+	int pastWeekendBackgroundColor;
+	int futureWeekendBackgroundColor;
 
 	// Hour height
 	int hourHeight = 50;
 	int minHourHeight = 0; // no minimum specified (will be dynamic, based on screen)
 	int maxHourHeight = 250;
-	int effectiveMinHourHeight = minHourHeight; // compensates for the fact that you can't keep zooming out.
+	int effectiveMinHourHeight; // compensates for the fact that you can't keep zooming out.
 
 	// Now line
 	boolean showNowLine = false;
@@ -105,7 +105,7 @@ final class WeekViewConfig {
 	int scrollDuration = 250;
 
 	// Custom properties
-	Drawable topLeftCornerDrawable = null;
+	Drawable topLeftCornerDrawable;
 	int topLeftCornerPadding = 0;
 	int[] hourLines; // in minutes
 	//String[] times;

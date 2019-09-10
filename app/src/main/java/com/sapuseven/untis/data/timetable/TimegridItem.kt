@@ -2,7 +2,6 @@ package com.sapuseven.untis.data.timetable
 
 import com.alamkanak.weekview.WeekViewEvent
 import com.sapuseven.untis.helpers.DateTimeUtils.toCalendar
-import kotlinx.serialization.Serializable
 import org.joda.time.LocalDateTime
 import java.util.*
 

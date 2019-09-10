@@ -161,6 +161,8 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 	}
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+		super.onActivityResult(requestCode, resultCode, intent);
+
 		when (requestCode) {
 			REQUEST_SCAN_CODE -> if (resultCode == Activity.RESULT_OK) {
 				val i = Intent(this, LoginDataInputActivity::class.java)

@@ -5,7 +5,7 @@ import android.util.Log
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
-import com.sapuseven.untis.data.databases.User
+import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.DateTimeUtils
@@ -23,7 +23,7 @@ import java.lang.ref.WeakReference
 
 class TimetableLoader(private val context: WeakReference<Context>,
                       private val timetableDisplay: TimetableDisplay,
-                      private val user: User,
+                      private val user: UserDatabase.User,
                       private val timetableDatabaseInterface: TimetableDatabaseInterface) {
 	companion object {
 		const val FLAG_LOAD_CACHE = 0b00000001

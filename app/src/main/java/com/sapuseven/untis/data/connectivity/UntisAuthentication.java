@@ -18,10 +18,7 @@ public class UntisAuthentication {
 		byte[] arrayOfByte = new byte[8];
 		int i = 8;
 
-		while (true) {
-			if (--i <= 0)
-				break;
-
+		while (--i > 0) {
 			arrayOfByte[i] = (byte) t;
 			t >>>= 8;
 		}

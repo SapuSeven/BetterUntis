@@ -13,7 +13,6 @@ import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_PROTOCOL
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_WEBUNTIS_PATH
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
-import com.sapuseven.untis.data.databases.User
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
@@ -222,7 +221,7 @@ class LoginDataInputActivity : BaseActivity() {
 
 				if (untisResponse.result != null) {
 					val userDatabase = UserDatabase.createInstance(this@LoginDataInputActivity)
-					val userId = userDatabase.addUser(User(
+					val userId = userDatabase.addUser(UserDatabase.User(
 							-1,
 							query.url,
 							schoolInfo?.mobileServiceUrl,

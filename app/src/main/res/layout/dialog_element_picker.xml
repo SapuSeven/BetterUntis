@@ -116,7 +116,6 @@
 		app:layout_constraintTop_toBottomOf="@+id/textview_elementpicker_personal"/>
 
 	<Button
-		android:id="@+id/button_elementpicker_confirm"
 		style="@style/Widget.MaterialComponents.Button.TextButton"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"

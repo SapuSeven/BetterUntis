@@ -39,7 +39,8 @@
 	</group>
 
 	<group
-		android:checkableBehavior="none">
+		android:checkableBehavior="none"
+		android:visible="false">
 		<item
 			android:id="@+id/nav_share"
 			android:icon="@drawable/all_share"

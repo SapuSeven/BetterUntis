@@ -1,12 +1,5 @@
 package com.sapuseven.untis
 
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.rule.ActivityTestRule
-import androidx.test.runner.AndroidJUnit4
 import com.sapuseven.untis.activities.LoginActivity
 import org.hamcrest.CoreMatchers.not
 import org.junit.Rule
@@ -23,7 +16,7 @@ class LoginActivityInstrumentedTest {
 	}*/
 
 	@get:Rule
-	val loginActivityTestRule = ActivityTestRule<LoginActivity>(LoginActivity::class.java)
+	val loginActivityTestRule = ActivityTestRule(LoginActivity::class.java)
 
 	@Test
 	fun automatedDebug() {

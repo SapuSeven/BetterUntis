@@ -28,7 +28,7 @@ public class TopLeftCornerDrawer {
 					destRect.right - config.topLeftCornerPadding, destRect.bottom - diff - config.topLeftCornerPadding);
 		} else {
 			int diff = (destRect.width() - sourceRect.width()) / 4;
-			bounds = new Rect(diff + config.topLeftCornerPadding, 0 + config.topLeftCornerPadding,
+			bounds = new Rect(diff + config.topLeftCornerPadding, config.topLeftCornerPadding,
 					destRect.right - diff + config.topLeftCornerPadding, destRect.bottom - config.topLeftCornerPadding);
 		}
 
