@@ -197,13 +197,11 @@
 		<CheckBoxPreference
 			android:defaultValue="false"
 			android:dependency="preference_notifications_enable"
-			android:enabled="false"
 			android:key="preference_notifications_in_multiple"
 			android:summary="@string/preference_notifications_multiple_desc"
 			android:title="@string/preference_notifications_multiple"/>
 
 		<Preference
-			android:enabled="false"
 			android:icon="@drawable/settings_notifications_clear_all"
 			android:key="preference_notifications_clear"
 			android:title="@string/preference_notifications_clear"/>
@@ -211,9 +209,8 @@
 		<PreferenceCategory android:title="@string/preference_notifications_group_visible_fields">
 
 			<ListPreference
-				android:defaultValue="long"
+				android:defaultValue="@string/preference_notifications_visibility_subjects_default"
 				android:dependency="preference_notifications_enable"
-				android:enabled="false"
 				android:entries="@array/preferences_notifications_visibility"
 				android:entryValues="@array/preferences_notifications_visibility_values"
 				android:key="preference_notifications_visibility_subjects"
@@ -221,9 +218,8 @@
 				android:title="@string/subjects"/>
 
 			<ListPreference
-				android:defaultValue="short"
+				android:defaultValue="@string/preference_notifications_visibility_rooms_default"
 				android:dependency="preference_notifications_enable"
-				android:enabled="false"
 				android:entries="@array/preferences_notifications_visibility"
 				android:entryValues="@array/preferences_notifications_visibility_values"
 				android:icon="@drawable/all_rooms"
@@ -232,15 +228,24 @@
 				android:title="@string/all_rooms"/>
 
 			<ListPreference
-				android:defaultValue="short"
+				android:defaultValue="@string/preference_notifications_visibility_teachers_default"
 				android:dependency="preference_notifications_enable"
-				android:enabled="false"
 				android:entries="@array/preferences_notifications_visibility"
 				android:entryValues="@array/preferences_notifications_visibility_values"
 				android:icon="@drawable/all_teacher"
 				android:key="preference_notifications_visibility_teachers"
 				android:summary="%s"
 				android:title="@string/all_teachers"/>
+
+			<ListPreference
+				android:defaultValue="@string/preference_notifications_visibility_classes_default"
+				android:dependency="preference_notifications_enable"
+				android:entries="@array/preferences_notifications_visibility"
+				android:entryValues="@array/preferences_notifications_visibility_values"
+				android:icon="@drawable/all_classes"
+				android:key="preference_notifications_visibility_teachers"
+				android:summary="%s"
+				android:title="@string/all_classes" />
 
 		</PreferenceCategory>
 

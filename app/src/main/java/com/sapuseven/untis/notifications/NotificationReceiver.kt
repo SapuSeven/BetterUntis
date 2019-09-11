@@ -63,17 +63,17 @@ class NotificationReceiver : BroadcastReceiver() {
 	// TODO: Add parameter to optionally only include the raw values instead of the string templates (for the short message)
 	private fun buildMessage(context: Context, intent: Intent, preferenceManager: PreferenceManager, separator: String) = listOfNotNull(
 			when (PreferenceUtils.getPrefString(preferenceManager, "preference_notifications_visibility_subjects")) {
-				"short" -> context.getString(R.string.notification_classes, intent.getStringExtra("nextSubject"))
+				"short" -> context.getString(R.string.notification_subjects, intent.getStringExtra("nextSubject"))
 				"long" -> context.getString(R.string.notification_subjects, intent.getStringExtra("nextSubjectLong"))
 				else -> null
 			},
 			when (PreferenceUtils.getPrefString(preferenceManager, "preference_notifications_visibility_rooms")) {
-				"short" -> context.getString(R.string.notification_classes, intent.getStringExtra("nextRoom"))
+				"short" -> context.getString(R.string.notification_rooms, intent.getStringExtra("nextRoom"))
 				"long" -> context.getString(R.string.notification_rooms, intent.getStringExtra("nextRoomLong"))
 				else -> null
 			},
 			when (PreferenceUtils.getPrefString(preferenceManager, "preference_notifications_visibility_teachers")) {
-				"short" -> context.getString(R.string.notification_classes, intent.getStringExtra("nextTeacher"))
+				"short" -> context.getString(R.string.notification_teachers, intent.getStringExtra("nextTeacher"))
 				"long" -> context.getString(R.string.notification_teachers, intent.getStringExtra("nextTeacherLong"))
 				else -> null
 			},
