@@ -202,6 +202,7 @@
 			android:title="@string/preference_notifications_multiple"/>
 
 		<Preference
+			android:enabled="false"
 			android:icon="@drawable/settings_notifications_clear_all"
 			android:key="preference_notifications_clear"
 			android:title="@string/preference_notifications_clear"/>
