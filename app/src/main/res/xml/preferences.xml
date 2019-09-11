@@ -189,7 +189,6 @@
 
 		<CheckBoxPreference
 			android:defaultValue="true"
-			android:enabled="false"
 			android:icon="@drawable/settings_notifications_active"
 			android:key="preference_notifications_enable"
 			android:summary="@string/preference_notifications_enable_desc"
