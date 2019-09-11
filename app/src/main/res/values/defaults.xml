@@ -30,4 +30,8 @@
 
 	<string name="preference_theme_default">default</string>
 	<string name="preference_dark_theme_default">off</string>
+	<string name="preference_notifications_visibility_subjects_default">long</string>
+	<string name="preference_notifications_visibility_rooms_default">long</string>
+	<string name="preference_notifications_visibility_teachers_default">long</string>
+	<string name="preference_notifications_visibility_classes_default">long</string>
 </resources>

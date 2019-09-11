@@ -11,6 +11,7 @@ import com.sapuseven.untis.helpers.config.PreferenceUtils
 import java.util.*
 
 class StartupReceiver : BroadcastReceiver() {
+	// TODO: This gets called twice on starting the app. While this doesn't impair functionality, it is still unwanted behaviour.
 	override fun onReceive(context: Context, intent: Intent) {
 		Log.d("StartupReceiver", "StartupReceiver received")
 		val preferenceManager = PreferenceManager(context)

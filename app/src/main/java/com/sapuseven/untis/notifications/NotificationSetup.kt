@@ -66,7 +66,7 @@ class NotificationSetup : BroadcastReceiver() {
 
 			override fun onError(requestId: Int, code: Int?, message: String?) {
 				// TODO: Handle error
-				Log.d("NotificationSetup", "loadTimetable error")
+				Log.d("NotificationSetup", "loadTimetable error $code for $requestId: $message")
 			}
 		}, profileUser!!, timetableDatabaseInterface)
 				.load(target, TimetableLoader.FLAG_LOAD_CACHE)
@@ -74,12 +74,14 @@ class NotificationSetup : BroadcastReceiver() {
 
 	private fun setupNotifications(context: Context, items: List<TimegridItem>) {
 		items.sortedBy { it.startDateTime }.zipWithNext().forEach { item ->
+			// TODO: Check if multi-hour lesson notifications are enabled
 			Log.d("NotificationSetup", "found ${item.first.periodData.getShortTitle()}")
 			val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
 			val id = item.first.endDateTime.millisOfDay / 1000
 
 			if (item.second.startDateTime.millisOfDay < LocalDateTime.now().millisOfDay) return@forEach // ignore lessons in the past
 
+			// TODO: Correct extra key names
 			val intent = Intent(context, NotificationReceiver::class.java)
 					.putExtra("id", id)
 					.putExtra("breakEndTime", item.second.startDateTime.toString(DateTimeUtils.shortDisplayableTime()))
@@ -89,7 +91,8 @@ class NotificationSetup : BroadcastReceiver() {
 					.putExtra("nextRoomLong", item.second.periodData.getLongRooms())
 					.putExtra("nextTeacher", item.second.periodData.getShortTeachers())
 					.putExtra("nextTeacherLong", item.second.periodData.getLongTeachers())
-					.putExtra("clear", false)
+					.putExtra("nextClass", item.second.periodData.getShortClasses())
+					.putExtra("nextClassLong", item.second.periodData.getLongClasses())
 
 			val pendingIntent = PendingIntent.getBroadcast(context, item.first.endDateTime.millisOfDay, intent, 0)
 			alarmManager.setExact(AlarmManager.RTC_WAKEUP, item.first.endDateTime.millis, pendingIntent)
