@@ -20,6 +20,12 @@ class PeriodData(
 	val subjects = ArrayList<PeriodElement>()
 	val rooms = ArrayList<PeriodElement>()
 
+	companion object {
+		// TODO: Convert to string resources
+		const val ELEMENT_NAME_SEPARATOR = ", "
+		const val ELEMENT_NAME_UNKNOWN = "?"
+	}
+
 	private fun parseElements() {
 		element.elements.forEach { element ->
 			// TODO: Don't hard-code these values
@@ -32,86 +38,59 @@ class PeriodData(
 		}
 	}
 
-	private fun addClass(element: PeriodElement) {
-		classes.add(element)
+	private fun addClass(element: PeriodElement) = classes.add(element)
+
+	private fun addTeacher(element: PeriodElement) = teachers.add(element)
+
+	private fun addSubject(element: PeriodElement) = subjects.add(element)
+
+	private fun addRoom(element: PeriodElement) = rooms.add(element)
+
+	fun setup() = parseElements()
+
+	fun getShortTitle() = subjects.joinToString(ELEMENT_NAME_SEPARATOR) {
+		timetableDatabaseInterface?.getShortName(it.id, TimetableDatabaseInterface.Type.SUBJECT)
+				?: ELEMENT_NAME_UNKNOWN
 	}
 
-	private fun addTeacher(element: PeriodElement) {
-		teachers.add(element)
+	fun getLongTitle() = subjects.joinToString(ELEMENT_NAME_SEPARATOR) {
+		timetableDatabaseInterface?.getLongName(it.id, TimetableDatabaseInterface.Type.SUBJECT)
+				?: ELEMENT_NAME_UNKNOWN
 	}
 
-	private fun addSubject(element: PeriodElement) {
-		subjects.add(element)
+	fun getShortTeachers() = teachers.joinToString(ELEMENT_NAME_SEPARATOR) {
+		timetableDatabaseInterface?.getShortName(it.id, TimetableDatabaseInterface.Type.TEACHER)
+				?: ELEMENT_NAME_UNKNOWN
 	}
 
-	private fun addRoom(element: PeriodElement) {
-		rooms.add(element)
+	fun getLongTeachers() = teachers.joinToString(ELEMENT_NAME_SEPARATOR) {
+		timetableDatabaseInterface?.getLongName(it.id, TimetableDatabaseInterface.Type.TEACHER)
+				?: ELEMENT_NAME_UNKNOWN
 	}
 
-	fun setup() {
-		parseElements()
+	fun getShortRooms() = rooms.joinToString(ELEMENT_NAME_SEPARATOR) {
+		timetableDatabaseInterface?.getShortName(it.id, TimetableDatabaseInterface.Type.ROOM)
+				?: ELEMENT_NAME_UNKNOWN
 	}
 
-	fun getShortTitle(): String {
-		if (subjects.size == 0)
-			return ""
-
-		val text = StringBuilder(timetableDatabaseInterface?.getShortName(subjects[0].id, TimetableDatabaseInterface.Type.SUBJECT) ?: "?")
-		for (i in 1 until subjects.size)
-			text.append(", ").append(timetableDatabaseInterface?.getShortName(subjects[i].id, TimetableDatabaseInterface.Type.SUBJECT))
-		return text.toString()
+	fun getLongRooms() = rooms.joinToString(ELEMENT_NAME_SEPARATOR) {
+		timetableDatabaseInterface?.getLongName(it.id, TimetableDatabaseInterface.Type.ROOM)
+				?: ELEMENT_NAME_UNKNOWN
 	}
 
-	fun getLongTitle(): String {
-		if (subjects.size == 0)
-			return ""
-
-		val text = StringBuilder(timetableDatabaseInterface?.getLongName(subjects[0].id, TimetableDatabaseInterface.Type.SUBJECT) ?: "?")
-		for (i in 1 until subjects.size)
-			text.append(", ").append(timetableDatabaseInterface?.getLongName(subjects[i].id, TimetableDatabaseInterface.Type.SUBJECT))
-		return text.toString()
+	fun getShortClasses() = classes.joinToString(ELEMENT_NAME_SEPARATOR) {
+		timetableDatabaseInterface?.getShortName(it.id, TimetableDatabaseInterface.Type.CLASS)
+				?: ELEMENT_NAME_UNKNOWN
 	}
 
-	fun getShortTeachers(): String {
-		if (teachers.size == 0)
-			return ""
-
-		val text = StringBuilder(timetableDatabaseInterface?.getShortName(teachers[0].id, TimetableDatabaseInterface.Type.TEACHER) ?: "?")
-		for (i in 1 until teachers.size)
-			text.append(", ").append(timetableDatabaseInterface?.getShortName(teachers[i].id, TimetableDatabaseInterface.Type.TEACHER))
-		return text.toString()
+	fun getLongClasses() = classes.joinToString(ELEMENT_NAME_SEPARATOR) {
+		timetableDatabaseInterface?.getLongName(it.id, TimetableDatabaseInterface.Type.CLASS)
+				?: ELEMENT_NAME_UNKNOWN
 	}
 
-	fun getShortRooms(): String {
-		if (rooms.size == 0)
-			return ""
+	fun isCancelled(): Boolean = element.`is`.contains(Period.CODE_CANCELLED)
 
-		val text = StringBuilder(timetableDatabaseInterface?.getShortName(rooms[0].id, TimetableDatabaseInterface.Type.ROOM) ?: "?")
-		for (i in 1 until rooms.size)
-			text.append(", ").append(timetableDatabaseInterface?.getShortName(rooms[i].id, TimetableDatabaseInterface.Type.ROOM))
-		return text.toString()
-	}
+	fun isIrregular(): Boolean = element.`is`.contains(Period.CODE_IRREGULAR)
 
-	fun getShortClasses(): String {
-		if (classes.size == 0)
-			return ""
-
-		val text = StringBuilder(timetableDatabaseInterface?.getShortName(classes[0].id, TimetableDatabaseInterface.Type.CLASS) ?: "?")
-		for (i in 1 until classes.size)
-			text.append(", ").append(timetableDatabaseInterface?.getShortName(classes[i].id, TimetableDatabaseInterface.Type.CLASS))
-		return text.toString()
-	}
-
-	fun isCancelled(): Boolean {
-		return element.`is`.contains(Period.CODE_CANCELLED)
-	}
-
-	fun isIrregular(): Boolean {
-		return element.`is`.contains(Period.CODE_IRREGULAR)
-	}
-
-	fun isExam(): Boolean {
-		return element.`is`.contains(Period.CODE_EXAM)
-	}
-
+	fun isExam(): Boolean = element.`is`.contains(Period.CODE_EXAM)
 }
