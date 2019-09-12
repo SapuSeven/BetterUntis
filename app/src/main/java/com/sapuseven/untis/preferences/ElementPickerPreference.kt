@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.util.AttributeSet
 import androidx.preference.Preference
 import androidx.preference.PreferenceManager
+import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 
 
@@ -23,10 +24,10 @@ class ElementPickerPreference(context: Context, attrs: AttributeSet) : Preferenc
 	}
 
 	fun setElement(element: PeriodElement?, displayName: String) {
+		summary = displayName
+
 		val editor = prefs.edit()
 		element?.let {
-			summary = element.toString()
-
 			editor.apply {
 				putString(key, displayName)
 				putInt(key + KEY_SUFFIX_ID, element.id)
@@ -41,4 +42,7 @@ class ElementPickerPreference(context: Context, attrs: AttributeSet) : Preferenc
 		}
 		editor.apply()
 	}
+
+	fun getSavedType() = prefs.getString(key + KEY_SUFFIX_TYPE, null)
+			?: TimetableDatabaseInterface.Type.CLASS.toString()
 }

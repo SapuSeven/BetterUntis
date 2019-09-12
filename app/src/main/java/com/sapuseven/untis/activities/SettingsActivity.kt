@@ -104,7 +104,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 
 				ElementPickerDialog.newInstance(
 						timetableDatabaseInterface,
-						ElementPickerDialog.Companion.ElementPickerDialogConfig(TimetableDatabaseInterface.Type.CLASS),
+						ElementPickerDialog.Companion.ElementPickerDialogConfig(TimetableDatabaseInterface.Type.valueOf(preference.getSavedType())),
 						object : ElementPickerDialog.ElementPickerDialogListener {
 							override fun onDialogDismissed(dialog: DialogInterface?) {
 								// ignore
