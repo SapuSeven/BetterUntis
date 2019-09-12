@@ -152,7 +152,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		val text = textview_roomfinder_roomlistempty.text.toString()
 		if (text.contains("+")) {
 			val ss = SpannableString(text)
-			val img = ContextCompat.getDrawable(this, R.drawable.roomfinder_add)
+			val img = ContextCompat.getDrawable(this, R.drawable.all_add)
 			if (img != null) {
 				img.setBounds(0, 0, img.intrinsicWidth, img.intrinsicHeight)
 				ss.setSpan(ImageSpan(img, ImageSpan.ALIGN_BOTTOM),

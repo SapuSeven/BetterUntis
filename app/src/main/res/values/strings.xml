@@ -16,6 +16,9 @@
 	<string name="menu_share">Share</string>
 	<string name="menu_donations">Donations</string>
 
+	<string name="mainactivitydrawer_dropdown_show">Show profile list</string>
+	<string name="mainactivitydrawer_dropdown_hide">Hide profile list</string>
+
 	<string name="login_scan_code">Scan QR Code</string>
 	<string name="login_welcome">Welcome to BetterUntis!</string>
 	<string name="login_please_log_in">Choose one of the following options to login:</string>

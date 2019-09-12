@@ -13,9 +13,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.DatePicker
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.view.ViewGroup
+import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -23,11 +22,14 @@ import androidx.core.graphics.ColorUtils
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.alamkanak.weekview.*
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.picker.MaterialStyledDatePickerDialog
 import com.google.android.material.snackbar.Snackbar
 import com.sapuseven.untis.R
+import com.sapuseven.untis.adapters.ProfileListAdapter
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.dialogs.ElementPickerDialog
@@ -104,30 +106,16 @@ class MainActivity :
 		setContentView(R.layout.activity_main)
 
 		setupActionBar()
-
-		/*val alternatingHours = defaultPrefs.getBoolean("preference_alternating_hours", false)
-
-		var alternativeBackgroundColor = resources.getInteger(R.integer.preference_alternating_color_default_light)
-		if (getPrefBool(this, defaultPrefs, "preference_alternating_colors_use_custom"))
-			alternativeBackgroundColor = getPrefInt(this, defaultPrefs, "preference_alternating_color")
-		else if (defaultPrefs.getBoolean("preference_dark_theme", false))
-			alternativeBackgroundColor = resources.getInteger(R.integer.preference_alternating_color_default_dark)*/
-
-		val navigationView = findViewById<NavigationView>(R.id.navigationview_main)
-		navigationView.setNavigationItemSelectedListener(this)
-		navigationView.setCheckedItem(R.id.nav_show_personal)
-
-		val line1 = if (profileUser.anonymous) getString(R.string.anonymous_name) else profileUser.userData.displayName
-		val line2 = profileUser.userData.schoolName
-		(navigationView.getHeaderView(0).findViewById<View>(R.id.textview_activitymaindrawer_line1) as TextView).text =
-				if (line1.isNullOrBlank()) getString(R.string.app_name) else line1
-		(navigationView.getHeaderView(0).findViewById<View>(R.id.textview_activitymaindrawer_line2) as TextView).text =
-				if (line2.isBlank()) getString(R.string.all_contact_email) else line2
+		setupNavDrawer()
 
 		setupViews()
 		setupHours()
 
-		timetableLoader = TimetableLoader(WeakReference(this), this, profileUser, timetableDatabaseInterface)
+		setupTimetableLoader()
+		loadPersonalTimetable()
+	}
+
+	private fun loadPersonalTimetable() {
 		profileUser.userData.elemType?.let { type ->
 			setTarget(
 					profileUser.userData.elemId,
@@ -135,6 +123,86 @@ class MainActivity :
 					profileUser.userData.displayName)
 		} ?: run {
 			setTarget(anonymous = true)
+		}
+	}
+
+	private fun setupTimetableLoader() {
+		timetableLoader = TimetableLoader(WeakReference(this), this, profileUser, timetableDatabaseInterface)
+	}
+
+	private fun setupNavDrawer() {
+		val navigationView = findViewById<NavigationView>(R.id.navigationview_main)
+		navigationView.setNavigationItemSelectedListener(this)
+		navigationView.setCheckedItem(R.id.nav_show_personal)
+
+		setupNavDrawerHeader(navigationView)
+
+		val header = navigationView.getHeaderView(0)
+		val dropdown = header.findViewById<ConstraintLayout>(R.id.constraintlayout_mainactivitydrawer_dropdown)
+		val dropdownView = header.findViewById<LinearLayout>(R.id.linearlayout_mainactivitydrawer_dropdown_view)
+		val dropdownImage = header.findViewById<ImageView>(R.id.imageview_mainactivitydrawer_dropdown_arrow)
+		val dropdownList = header.findViewById<RecyclerView>(R.id.recyclerview_mainactivitydrawer_profile_list)
+		dropdown.setOnClickListener {
+			toggleProfileDropdown(dropdownView, dropdownImage, dropdownList)
+		}
+
+		val profileListAdd = header.findViewById<LinearLayout>(R.id.linearlayout_mainactivitydrawer_add)
+		profileListAdd.setOnClickListener {
+			val loginIntent = Intent(this, LoginActivity::class.java)
+			startActivity(loginIntent)
+			// TODO: Start for result and reload afterwards
+		}
+	}
+
+	private fun setupNavDrawerHeader(navigationView: NavigationView) {
+		val line1 = if (profileUser.anonymous) getString(R.string.anonymous_name) else profileUser.userData.displayName
+		val line2 = profileUser.userData.schoolName
+		(navigationView.getHeaderView(0).findViewById<View>(R.id.textview_mainactivtydrawer_line1) as TextView).text =
+				if (line1.isNullOrBlank()) getString(R.string.app_name) else line1
+		(navigationView.getHeaderView(0).findViewById<View>(R.id.textview_mainactivitydrawer_line2) as TextView).text =
+				if (line2.isBlank()) getString(R.string.all_contact_email) else line2
+	}
+
+	private fun toggleProfileDropdown(dropdownView: ViewGroup, dropdownImage: ImageView, dropdownList: RecyclerView) {
+		if (dropdownImage.scaleY < 0) {
+			dropdownImage.scaleY = 1F
+			dropdownView.visibility = View.GONE
+		} else {
+			dropdownImage.scaleY = -1F
+			val userList = userDatabase.getAllUsers()
+			val adapter = ProfileListAdapter(userList, View.OnClickListener { view ->
+				toggleProfileDropdown(dropdownView, dropdownImage, dropdownList)
+				switchToProfile(userList[dropdownList.getChildLayoutPosition(view)])
+			})
+
+			dropdownList.setHasFixedSize(true)
+			dropdownList.layoutManager = LinearLayoutManager(this)
+
+			dropdownList.adapter = adapter
+
+			dropdownView.visibility = View.VISIBLE
+		}
+	}
+
+	@SuppressLint("ApplySharedPref")
+	private fun switchToProfile(user: UserDatabase.User) {
+		val editor = preferenceManager.defaultPrefs.edit()
+		editor.putInt("profile", user.id!!.toInt()) // TODO: Do not hard-code "profile"
+		editor.commit()
+		if (!loadProfile()) finish() // TODO: Show error
+		else {
+			items.clear()
+			loadedMonths.clear()
+
+			setupNavDrawerHeader(findViewById(R.id.navigationview_main))
+
+			setupTimetableLoader()
+			loadPersonalTimetable()
+
+			val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
+			drawer.closeDrawer(GravityCompat.START)
+
+			weekView.invalidate()
 		}
 	}
 
@@ -201,13 +269,15 @@ class MainActivity :
 	}
 
 	private fun loadProfile(): Boolean {
+		// TODO: Show error (invalid profile) if loading fails (return false) and re-login. It is mandatory to stop the execution of more code, or else the app will crash.
+
 		if (userDatabase.getUsersCount() < 1)
 			return false
 
 		profileId = preferenceManager.defaultPrefs.getInt("profile", -1).toLong() // TODO: Do not hard-code "profile"
-		profileId = userDatabase.getAllUsers()[0].id
-				?: -1 // TODO: Debugging only. This is a dynamic id.
-		profileUser = userDatabase.getUser(profileId)!! // TODO: Show error (invalid profile) if (profileId == -1) or (profileUser == null) and default to the first profile/re-login if necessary. It is mandatory to stop the execution of more code, or else the app will crash.
+		if (profileId == -1L) profileId = userDatabase.getAllUsers()[0].id ?: -1
+		if (profileId == -1L) return false
+		profileUser = userDatabase.getUser(profileId) ?: return false
 
 		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileUser.id ?: -1)
 		return true
