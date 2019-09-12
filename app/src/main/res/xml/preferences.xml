@@ -164,7 +164,7 @@
 			android:title="@string/preference_notifications_enable"/>
 
 		<CheckBoxPreference
-			android:defaultValue="false"
+			android:defaultValue="@bool/preference_notifications_in_multiple_default"
 			android:dependency="preference_notifications_enable"
 			android:key="preference_notifications_in_multiple"
 			android:summary="@string/preference_notifications_multiple_desc"

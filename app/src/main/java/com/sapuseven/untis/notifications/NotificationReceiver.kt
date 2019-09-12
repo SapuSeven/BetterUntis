@@ -17,8 +17,19 @@ import com.sapuseven.untis.helpers.config.PreferenceUtils
 
 class NotificationReceiver : BroadcastReceiver() {
 	companion object {
-		const val CHANNEL_ID_LESSONINFO = "notifications.breakinfo"
 		const val CHANNEL_ID_BREAKINFO = "notifications.breakinfo"
+
+		const val EXTRA_INT_ID = "com.sapuseven.untis.notifications.id"
+		const val EXTRA_BOOLEAN_CLEAR = "com.sapuseven.untis.notifications.clear"
+		const val EXTRA_STRING_BREAK_END_TIME = "com.sapuseven.untis.notifications.breakEndTime"
+		const val EXTRA_STRING_NEXT_SUBJECT = "com.sapuseven.untis.notifications.nextSubject"
+		const val EXTRA_STRING_NEXT_SUBJECT_LONG = "com.sapuseven.untis.notifications.nextSubjectLong"
+		const val EXTRA_STRING_NEXT_ROOM = "com.sapuseven.untis.notifications.nextRoom"
+		const val EXTRA_STRING_NEXT_ROOM_LONG = "com.sapuseven.untis.notifications.nextRoomLong"
+		const val EXTRA_STRING_NEXT_TEACHER = "com.sapuseven.untis.notifications.nextTeacher"
+		const val EXTRA_STRING_NEXT_TEACHER_LONG = "com.sapuseven.untis.notifications.nextTeacherLong"
+		const val EXTRA_STRING_NEXT_CLASS = "com.sapuseven.untis.notifications.nextClass"
+		const val EXTRA_STRING_NEXT_CLASS_LONG = "com.sapuseven.untis.notifications.nextClassLong"
 	}
 
 	override fun onReceive(context: Context, intent: Intent) {
@@ -27,11 +38,11 @@ class NotificationReceiver : BroadcastReceiver() {
 		val preferenceManager = PreferenceManager(context)
 		if (!PreferenceUtils.getPrefBool(preferenceManager, "preference_notifications_enable")) return
 
-		if (intent.hasExtra("breakEndTime")) {
+		if (intent.hasExtra(EXTRA_STRING_BREAK_END_TIME)) {
 			createNotificationChannel(context)
 
 			val pendingIntent = PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), 0)
-			val breakEndTime = intent.getStringExtra("breakEndTime")
+			val breakEndTime = intent.getStringExtra(EXTRA_STRING_BREAK_END_TIME)
 
 			val title = "Break until $breakEndTime" // TODO: Extract string
 			val message = buildMessage(context, intent, preferenceManager, " / ") // TODO: Extract string
@@ -48,13 +59,13 @@ class NotificationReceiver : BroadcastReceiver() {
 					.setCategory(NotificationCompat.CATEGORY_STATUS)
 
 			with(NotificationManagerCompat.from(context)) {
-				notify(intent.getIntExtra("id", -1), builder.build())
+				notify(intent.getIntExtra(EXTRA_INT_ID, -1), builder.build())
 			}
 			Log.d("NotificationReceiver", "notification delivered: $title")
 		} else {
-			Log.d("NotificationReceiver", "Attempting to cancel notification #${intent.getIntExtra("id", -1)}")
+			Log.d("NotificationReceiver", "Attempting to cancel notification #${intent.getIntExtra(EXTRA_INT_ID, -1)}")
 			with(NotificationManagerCompat.from(context)) {
-				cancel(intent.getIntExtra("id", -1))
+				cancel(intent.getIntExtra(EXTRA_INT_ID, -1))
 			}
 		}
 	}
@@ -63,23 +74,23 @@ class NotificationReceiver : BroadcastReceiver() {
 	// TODO: Add parameter to optionally only include the raw values instead of the string templates (for the short message)
 	private fun buildMessage(context: Context, intent: Intent, preferenceManager: PreferenceManager, separator: String) = listOfNotNull(
 			when (PreferenceUtils.getPrefString(preferenceManager, "preference_notifications_visibility_subjects")) {
-				"short" -> context.getString(R.string.notification_subjects, intent.getStringExtra("nextSubject"))
-				"long" -> context.getString(R.string.notification_subjects, intent.getStringExtra("nextSubjectLong"))
+				"short" -> context.getString(R.string.notification_subjects, intent.getStringExtra(EXTRA_STRING_NEXT_SUBJECT))
+				"long" -> context.getString(R.string.notification_subjects, intent.getStringExtra(EXTRA_STRING_NEXT_SUBJECT_LONG))
 				else -> null
 			},
 			when (PreferenceUtils.getPrefString(preferenceManager, "preference_notifications_visibility_rooms")) {
-				"short" -> context.getString(R.string.notification_rooms, intent.getStringExtra("nextRoom"))
-				"long" -> context.getString(R.string.notification_rooms, intent.getStringExtra("nextRoomLong"))
+				"short" -> context.getString(R.string.notification_rooms, intent.getStringExtra(EXTRA_STRING_NEXT_ROOM))
+				"long" -> context.getString(R.string.notification_rooms, intent.getStringExtra(EXTRA_STRING_NEXT_ROOM_LONG))
 				else -> null
 			},
 			when (PreferenceUtils.getPrefString(preferenceManager, "preference_notifications_visibility_teachers")) {
-				"short" -> context.getString(R.string.notification_teachers, intent.getStringExtra("nextTeacher"))
-				"long" -> context.getString(R.string.notification_teachers, intent.getStringExtra("nextTeacherLong"))
+				"short" -> context.getString(R.string.notification_teachers, intent.getStringExtra(EXTRA_STRING_NEXT_TEACHER))
+				"long" -> context.getString(R.string.notification_teachers, intent.getStringExtra(EXTRA_STRING_NEXT_TEACHER_LONG))
 				else -> null
 			},
 			when (PreferenceUtils.getPrefString(preferenceManager, "preference_notifications_visibility_classes")) {
-				"short" -> context.getString(R.string.notification_classes, intent.getStringExtra("nextClass"))
-				"long" -> context.getString(R.string.notification_classes, intent.getStringExtra("nextClassLong"))
+				"short" -> context.getString(R.string.notification_classes, intent.getStringExtra(EXTRA_STRING_NEXT_CLASS))
+				"long" -> context.getString(R.string.notification_classes, intent.getStringExtra(EXTRA_STRING_NEXT_CLASS_LONG))
 				else -> null
 			}
 	).joinToString(separator)
