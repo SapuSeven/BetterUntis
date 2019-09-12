@@ -17,7 +17,7 @@ data class Period(
 		val elements: List<PeriodElement>,
 		val can: List<String>,
 		val `is`: List<String>,
-		val homeWorks: List<PeriodHomework>,
+		val homeWorks: List<PeriodHomework>?,
 		@ContextualSerialization val messengerChannel: Any? = null, // This is a new element with unknown usage
 		@ContextualSerialization val exam: Any? = null // This is a new element with unknown usage
 ) {
