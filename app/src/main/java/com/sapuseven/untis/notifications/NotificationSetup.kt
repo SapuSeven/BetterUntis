@@ -81,7 +81,7 @@ class NotificationSetup : BroadcastReceiver() {
 				Log.d("NotificationSetup", "loadTimetable error $code for $requestId: $message")
 			}
 		}, profileUser!!, timetableDatabaseInterface)
-				.load(target, TimetableLoader.FLAG_LOAD_CACHE)
+				.load(target, TimetableLoader.FLAG_LOAD_SERVER)
 	}
 
 	private fun setupNotifications(context: Context, items: List<TimegridItem>) {
