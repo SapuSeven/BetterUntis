@@ -7,37 +7,6 @@
 		android:title="@string/pref_styling">
 
 		<PreferenceCategory android:title="@string/preference_category_colors">
-			<!-- Currently not in use
-			<CheckBoxPreference
-				android:enabled="false"
-				android:defaultValue="@bool/preference_alternating_days_default"
-				android:key="preference_alternating_days"
-				android:summary="@string/preference_alternating_days_desc"
-				android:title="@string/preference_alternating_days" />
-
-			<CheckBoxPreference
-				android:enabled="false"
-				android:defaultValue="@bool/preference_alternating_hours_default"
-				android:key="preference_alternating_hours"
-				android:summary="@string/preference_alternating_hours_desc"
-				android:title="@string/preference_alternating_hours" />
-
-			<CheckBoxPreference
-				android:enabled="false"
-				android:defaultValue="@bool/preference_alternating_colors_use_custom_default"
-				android:key="preference_alternating_colors_use_custom"
-				android:summary="@string/preference_alternating_colors_use_custom_desc"
-				android:title="@string/preference_alternating_colors_use_custom" />
-
-			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
-				android:enabled="false"
-				android:defaultValue="@integer/preference_alternating_color_default"
-				android:dependency="preference_alternating_colors_use_custom"
-				android:key="preference_alternating_color"
-				android:summary="@string/preference_alternating_color_desc"
-				android:title="@string/preference_alternating_color" />
-				-->
-
 			<CheckBoxPreference
 				android:defaultValue="@bool/preference_timetable_item_text_light_default"
 				android:key="preference_timetable_item_text_light"
@@ -288,7 +257,7 @@
 			<com.sapuseven.untis.preferences.UnitPreference
 				android:defaultValue="@integer/preference_timetable_item_padding_overlap_default"
 				android:key="preference_timetable_item_padding_overlap"
-				android:numeric="integer"
+				android:inputType="number"
 				android:selectAllOnFocus="true"
 				android:singleLine="true"
 				android:title="@string/preference_timetable_item_padding_overlap"
@@ -297,7 +266,7 @@
 			<com.sapuseven.untis.preferences.UnitPreference
 				android:defaultValue="@integer/preference_timetable_item_padding_default"
 				android:key="preference_timetable_item_padding"
-				android:numeric="integer"
+				android:inputType="number"
 				android:selectAllOnFocus="true"
 				android:singleLine="true"
 				android:title="@string/preference_timetable_item_padding"
@@ -307,7 +276,7 @@
 				android:defaultValue="@integer/preference_timetable_item_corner_radius_default"
 				android:icon="@drawable/settings_timetable_rounded_corner"
 				android:key="preference_timetable_item_corner_radius"
-				android:numeric="integer"
+				android:inputType="number"
 				android:selectAllOnFocus="true"
 				android:singleLine="true"
 				android:title="@string/preference_timetable_item_corner_radius"
@@ -331,7 +300,7 @@
 			<com.sapuseven.untis.preferences.UnitPreference
 				android:defaultValue="@integer/preference_timetable_lesson_name_font_size_default"
 				android:key="preference_timetable_lesson_name_font_size"
-				android:numeric="integer"
+				android:inputType="number"
 				android:selectAllOnFocus="true"
 				android:singleLine="true"
 				android:title="@string/preference_timetable_lesson_name_font_size"
@@ -340,7 +309,7 @@
 			<com.sapuseven.untis.preferences.UnitPreference
 				android:defaultValue="@integer/preference_timetable_lesson_info_font_size_default"
 				android:key="preference_timetable_lesson_info_font_size"
-				android:numeric="integer"
+				android:inputType="number"
 				android:selectAllOnFocus="true"
 				android:singleLine="true"
 				android:title="@string/preference_timetable_lesson_info_font_size"
