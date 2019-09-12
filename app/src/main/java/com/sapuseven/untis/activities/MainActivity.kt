@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.Button
 import android.widget.DatePicker
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -105,14 +106,6 @@ class MainActivity :
 
 		setupActionBar()
 
-		/*val alternatingHours = defaultPrefs.getBoolean("preference_alternating_hours", false)
-
-		var alternativeBackgroundColor = resources.getInteger(R.integer.preference_alternating_color_default_light)
-		if (getPrefBool(this, defaultPrefs, "preference_alternating_colors_use_custom"))
-			alternativeBackgroundColor = getPrefInt(this, defaultPrefs, "preference_alternating_color")
-		else if (defaultPrefs.getBoolean("preference_dark_theme", false))
-			alternativeBackgroundColor = resources.getInteger(R.integer.preference_alternating_color_default_dark)*/
-
 		val navigationView = findViewById<NavigationView>(R.id.navigationview_main)
 		navigationView.setNavigationItemSelectedListener(this)
 		navigationView.setCheckedItem(R.id.nav_show_personal)
@@ -152,6 +145,12 @@ class MainActivity :
 
 		lastRefresh = findViewById(R.id.textview_main_lastrefresh)
 		lastRefresh?.text = getString(R.string.last_refreshed, getString(R.string.never))
+
+		findViewById<Button>(R.id.button_main_settings).setOnClickListener {
+			val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+			// TODO: Find a way to jump directly to the personal timetable setting
+			startActivity(intent)
+		}
 
 		setupSwipeRefresh()
 	}
@@ -558,9 +557,9 @@ class MainActivity :
 			weekView.notifyDataSetChanged()
 
 			supportActionBar?.title = getString(R.string.anonymous_name)
-			constraintlayout_anonymouslogininfo.visibility = View.VISIBLE
+			constraintlayout_main_anonymouslogininfo.visibility = View.VISIBLE
 		} else {
-			constraintlayout_anonymouslogininfo.visibility = View.GONE
+			constraintlayout_main_anonymouslogininfo.visibility = View.GONE
 		}
 	}
 

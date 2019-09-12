@@ -50,8 +50,8 @@ class ElementPickerDialog : DialogFragment() {
 		super.onAttach(context)
 		if (context is ElementPickerDialogListener)
 			listener = context
-		else
-			throw ClassCastException("$context must implement ElementPickerDialogListener")
+		else if (!::listener.isInitialized)
+			throw ClassCastException("$context must implement ElementPickerDialogListener if no listener is passed to initialize()")
 
 		timetableDatabaseInterface?.let { timetableDatabaseInterface ->
 			adapter = if (config?.multiSelect == true) GridViewDatabaseItemCheckBoxAdapter(context) else GridViewDatabaseItemAdapter(context)
@@ -101,7 +101,6 @@ class ElementPickerDialog : DialogFragment() {
 
 		holder.tvPersonal.setOnClickListener {
 			listener.onPeriodElementClick(this@ElementPickerDialog, null, false)
-			dismiss()
 		}
 
 		holder.tvClasses.setOnClickListener {
@@ -159,10 +158,6 @@ class ElementPickerDialog : DialogFragment() {
 		deselect(holder.tvTeachers)
 		deselect(holder.tvRooms)
 
-		//val oldPosition = selectedPosition
-		//selectedPosition = -1
-		//updateView(oldPosition)
-
 		context?.let {
 			tv.setTextColor(getAttrColor(R.attr.colorPrimary))
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
@@ -208,11 +203,6 @@ class ElementPickerDialog : DialogFragment() {
 			emptyList()
 	}
 
-	/*private fun checkIfValid() {
-		if (dialog != null)
-			dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled((selectedType == Type.UNKNOWN || selectedPosition >= 0));
-	}*/
-
 	data class Holder(
 			val etSearch: TextInputLayout,
 			val tvTeachers: TextView,
@@ -224,11 +214,13 @@ class ElementPickerDialog : DialogFragment() {
 	companion object {
 		fun newInstance(
 				timetableDatabaseInterface: TimetableDatabaseInterface,
-				config: ElementPickerDialogConfig): ElementPickerDialog {
+				config: ElementPickerDialogConfig,
+				listener: ElementPickerDialogListener? = null): ElementPickerDialog {
 			val fragment = ElementPickerDialog()
 			fragment.timetableDatabaseInterface = timetableDatabaseInterface
 			fragment.type = config.startPage
 			fragment.config = config
+			listener?.let { fragment.listener = it }
 			return fragment
 		}
 
