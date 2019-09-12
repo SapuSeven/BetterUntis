@@ -45,6 +45,7 @@ import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.notifications.StartupReceiver
+import com.sapuseven.untis.preferences.ElementPickerPreference
 import kotlinx.android.synthetic.main.activity_main_content.*
 import org.joda.time.DateTimeConstants
 import org.joda.time.Instant
@@ -115,17 +116,28 @@ class MainActivity :
 		setupHours()
 
 		setupTimetableLoader()
-		loadPersonalTimetable()
+		showPersonalTimetable()
 	}
 
-	private fun loadPersonalTimetable() {
-		profileUser.userData.elemType?.let { type ->
-			setTarget(
-					profileUser.userData.elemId,
-					type,
-					profileUser.userData.displayName)
-		} ?: run {
-			setTarget(anonymous = true)
+	private fun showPersonalTimetable() {
+		val customType = TimetableDatabaseInterface.Type.valueOf(PreferenceUtils.getPrefString(
+				preferenceManager,
+				"preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_TYPE}",
+				TimetableDatabaseInterface.Type.SUBJECT.toString()
+		))
+
+		if (customType === TimetableDatabaseInterface.Type.SUBJECT) {
+			profileUser.userData.elemType?.let { type ->
+				setTarget(
+						profileUser.userData.elemId,
+						type,
+						profileUser.userData.displayName)
+			} ?: run {
+				setTarget(anonymous = true)
+			}
+		} else {
+			val customId = preferenceManager.defaultPrefs.getInt("preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_ID}", -1)
+			setTarget(customId, customType.toString(), timetableDatabaseInterface.getLongName(customId, customType))
 		}
 	}
 
@@ -205,7 +217,7 @@ class MainActivity :
 			setupNavDrawerHeader(findViewById(R.id.navigationview_main))
 
 			setupTimetableLoader()
-			loadPersonalTimetable()
+			showPersonalTimetable()
 
 			val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
 			drawer.closeDrawer(GravityCompat.START)
@@ -525,22 +537,7 @@ class MainActivity :
 
 		when (item.itemId) {
 			R.id.nav_show_personal -> {
-				/*val customType = fromValue(PreferenceUtils.getPrefInt(preferenceManager, "preference_timetable_personal_timetable", UNKNOWN.value))
-
-				if (customType === UNKNOWN) {*/
-				profileUser.userData.elemType?.let { type ->
-					setTarget(
-							profileUser.userData.elemId,
-							type,
-							profileUser.userData.displayName)
-				} ?: run {
-					setTarget(anonymous = true)
-				}
-				/*} else {
-					val customId = prefs.getInt("preference_timetable_personal_timetable_id", -1)
-					val customName = prefs.getString("preference_timetable_personal_timetable_name", "")
-					setTarget(customId, customType, customName)
-				}*/
+				showPersonalTimetable()
 			}
 			R.id.nav_show_classes -> {
 				showItemList(TimetableDatabaseInterface.Type.CLASS)
@@ -758,7 +755,7 @@ class MainActivity :
 	}
 
 	private fun showErrorDialog(requestId: Int, code: Int?, message: String?) {
-		val dialog = AlertDialog.Builder(application)
+		val dialog = AlertDialog.Builder(this)
 				.setTitle("Error Information")
 				.setMessage("Request ID: $requestId\nError code: $code\nError message: $message")
 				.setPositiveButton(R.string.ok) { dialog, _ ->
