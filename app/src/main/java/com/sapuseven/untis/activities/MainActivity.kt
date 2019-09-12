@@ -109,17 +109,6 @@ class MainActivity :
 		setContentView(R.layout.activity_main)
 
 		setupActionBar()
-
-		val navigationView = findViewById<NavigationView>(R.id.navigationview_main)
-		navigationView.setNavigationItemSelectedListener(this)
-		navigationView.setCheckedItem(R.id.nav_show_personal)
-
-		val line1 = if (profileUser.anonymous) getString(R.string.anonymous_name) else profileUser.userData.displayName
-		val line2 = profileUser.userData.schoolName
-		(navigationView.getHeaderView(0).findViewById<View>(R.id.textview_activitymaindrawer_line1) as TextView).text =
-				if (line1.isNullOrBlank()) getString(R.string.app_name) else line1
-		(navigationView.getHeaderView(0).findViewById<View>(R.id.textview_activitymaindrawer_line2) as TextView).text =
-				if (line2.isBlank()) getString(R.string.all_contact_email) else line2
 		setupNavDrawer()
 
 		setupViews()
