@@ -63,4 +63,5 @@ dependencies {
 	// Use my own heavily modified version of the library
 	//implementation 'com.github.thellmund:Android-Week-View:3.1'
 	implementation project(':androidweekview')
+	implementation 'androidx.recyclerview:recyclerview:1.0.0'
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<dimen name="height_header_content">160dp</dimen>
+	<dimen name="height_header_content">172dp</dimen>
 	<dimen name="margin_header_icon">16dp</dimen>
 	<dimen name="margin_listitem_text">16dp</dimen>
 	<dimen name="margin_listitem_text_top">12dp</dimen>
@@ -14,7 +14,5 @@
 	<dimen name="textsize_listitem_line2">14sp</dimen>
 	<dimen name="textsize_login_welcome">36sp</dimen>
 
-
 	<dimen name="width_main_leftsidebar">38dp</dimen>
-
 </resources>
