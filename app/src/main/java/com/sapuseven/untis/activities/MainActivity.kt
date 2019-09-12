@@ -2,6 +2,7 @@ package com.sapuseven.untis.activities
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.DialogInterface
 import android.content.DialogInterface.BUTTON_NEUTRAL
@@ -93,7 +94,7 @@ class MainActivity :
 
 		preferenceManager = PreferenceManager(this)
 
-		if (loadProfile()) {
+		if (!loadProfile()) {
 			val loginIntent = Intent(this, LoginActivity::class.java)
 			startActivity(loginIntent)
 			finish()
@@ -201,7 +202,7 @@ class MainActivity :
 
 	private fun loadProfile(): Boolean {
 		if (userDatabase.getUsersCount() < 1)
-			return true
+			return false
 
 		profileId = preferenceManager.defaultPrefs.getInt("profile", -1).toLong() // TODO: Do not hard-code "profile"
 		profileId = userDatabase.getAllUsers()[0].id
@@ -209,7 +210,7 @@ class MainActivity :
 		profileUser = userDatabase.getUser(profileId)!! // TODO: Show error (invalid profile) if (profileId == -1) or (profileUser == null) and default to the first profile/re-login if necessary. It is mandatory to stop the execution of more code, or else the app will crash.
 
 		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileUser.id ?: -1)
-		return false
+		return true
 	}
 
 	private fun setupWeekView() {
@@ -660,15 +661,29 @@ class MainActivity :
 	}
 
 	override fun onError(requestId: Int, code: Int?, message: String?) {
-		if (code == TimetableLoader.CODE_CACHE_MISSING) {
-			timetableLoader.repeat(requestId, TimetableLoader.FLAG_LOAD_SERVER)
-		} else {
-			showLoading(false)
-			Snackbar.make(content_main, if (code != null) ErrorMessageDictionary.getErrorMessage(resources, code) else message
-					?: getString(R.string.error), Snackbar.LENGTH_INDEFINITE)
-					.show()
-			// TODO: Show a button for more info and possibly bug reports
+		when (code) {
+			TimetableLoader.CODE_CACHE_MISSING -> timetableLoader.repeat(requestId, TimetableLoader.FLAG_LOAD_SERVER)
+			else -> {
+				showLoading(false)
+				Snackbar.make(content_main, if (code != null) ErrorMessageDictionary.getErrorMessage(resources, code) else message
+						?: getString(R.string.error), Snackbar.LENGTH_INDEFINITE)
+						.setAction("Show") { showErrorDialog(requestId, code, message) }
+						.show()
+			}
 		}
+	}
+
+	private fun showErrorDialog(requestId: Int, code: Int?, message: String?) {
+		val dialog = AlertDialog.Builder(application)
+				.setTitle("Error Information")
+				.setMessage("Request ID: $requestId\nError code: $code\nError message: $message")
+				.setPositiveButton(R.string.ok) { dialog, _ ->
+					dialog.dismiss()
+				}
+				.create()
+
+		// TODO: Add button to create a GitHub issue
+		dialog.show()
 	}
 
 	private fun showLoading(loading: Boolean) {
