@@ -222,7 +222,7 @@ class LoginDataInputActivity : BaseActivity() {
 				if (untisResponse.result != null) {
 					val userDatabase = UserDatabase.createInstance(this@LoginDataInputActivity)
 					val userId = userDatabase.addUser(UserDatabase.User(
-							-1,
+							null,
 							query.url,
 							schoolInfo?.mobileServiceUrl,
 							query.school,

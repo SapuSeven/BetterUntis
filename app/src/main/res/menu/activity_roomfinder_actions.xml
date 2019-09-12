@@ -4,7 +4,7 @@
 
 	<item
 		android:id="@+id/item_roomfinder_add"
-		android:icon="@drawable/roomfinder_add"
+		android:icon="@drawable/all_add"
 		android:title="@string/add"
 		app:showAsAction="always" />
 </menu>
