@@ -72,6 +72,11 @@
 	<string name="preferences_dark_theme_on">Always on</string>
 	<string name="preferences_dark_theme_off">Always off</string>
 
+	<string name="notifications_channel_lessoninfo">Lesson info</string>
+	<string name="notifications_channel_lessoninfo_desc">Shows information about the ongoing lesson</string>
+	<string name="notifications_channel_breakinfo">Break info</string>
+	<string name="notifications_channel_breakinfo_desc">Shows information about the current break and the following lesson</string>
+
 	<plurals name="main_time_diff_minutes">
 		<item quantity="one">a minute ago</item>
 		<item quantity="other">%d minutes ago</item>
@@ -175,6 +180,7 @@
 	<string name="notification_subjects">Next lesson: %1$s</string>
 	<string name="notification_rooms">Room: %1$s</string>
 	<string name="notification_teachers">Teacher: %1$s</string>
+	<string name="notification_classes">Class: %1$s</string>
 	<string name="close">Close</string>
 	<string name="preference_account_access_key">Access key</string>
 	<string name="firebase_key">Firebase key</string>

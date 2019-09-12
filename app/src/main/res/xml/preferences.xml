@@ -114,7 +114,7 @@
 		<PreferenceCategory android:title="@string/preferences_timetable_others">
 
 			<CheckBoxPreference
-				android:defaultValue="@bool/preference_timetable_hide_cancelled"
+				android:defaultValue="@bool/preference_timetable_hide_cancelled_default"
 				android:enabled="false"
 				android:key="preference_timetable_hide_cancelled"
 				android:title="@string/preference_timetable_hide_cancelled"/>
@@ -157,8 +157,7 @@
 		android:title="@string/pref_notifications">
 
 		<CheckBoxPreference
-			android:defaultValue="true"
-			android:enabled="false"
+			android:defaultValue="@bool/preference_notifications_enable_default"
 			android:icon="@drawable/settings_notifications_active"
 			android:key="preference_notifications_enable"
 			android:summary="@string/preference_notifications_enable_desc"
@@ -167,7 +166,6 @@
 		<CheckBoxPreference
 			android:defaultValue="false"
 			android:dependency="preference_notifications_enable"
-			android:enabled="false"
 			android:key="preference_notifications_in_multiple"
 			android:summary="@string/preference_notifications_multiple_desc"
 			android:title="@string/preference_notifications_multiple"/>
@@ -181,9 +179,8 @@
 		<PreferenceCategory android:title="@string/preference_notifications_group_visible_fields">
 
 			<ListPreference
-				android:defaultValue="long"
+				android:defaultValue="@string/preference_notifications_visibility_subjects_default"
 				android:dependency="preference_notifications_enable"
-				android:enabled="false"
 				android:entries="@array/preferences_notifications_visibility"
 				android:entryValues="@array/preferences_notifications_visibility_values"
 				android:key="preference_notifications_visibility_subjects"
@@ -191,9 +188,8 @@
 				android:title="@string/subjects"/>
 
 			<ListPreference
-				android:defaultValue="short"
+				android:defaultValue="@string/preference_notifications_visibility_rooms_default"
 				android:dependency="preference_notifications_enable"
-				android:enabled="false"
 				android:entries="@array/preferences_notifications_visibility"
 				android:entryValues="@array/preferences_notifications_visibility_values"
 				android:icon="@drawable/all_rooms"
@@ -202,15 +198,24 @@
 				android:title="@string/all_rooms"/>
 
 			<ListPreference
-				android:defaultValue="short"
+				android:defaultValue="@string/preference_notifications_visibility_teachers_default"
 				android:dependency="preference_notifications_enable"
-				android:enabled="false"
 				android:entries="@array/preferences_notifications_visibility"
 				android:entryValues="@array/preferences_notifications_visibility_values"
 				android:icon="@drawable/all_teacher"
 				android:key="preference_notifications_visibility_teachers"
 				android:summary="%s"
 				android:title="@string/all_teachers"/>
+
+			<ListPreference
+				android:defaultValue="@string/preference_notifications_visibility_classes_default"
+				android:dependency="preference_notifications_enable"
+				android:entries="@array/preferences_notifications_visibility"
+				android:entryValues="@array/preferences_notifications_visibility_values"
+				android:icon="@drawable/all_classes"
+				android:key="preference_notifications_visibility_teachers"
+				android:summary="%s"
+				android:title="@string/all_classes" />
 
 		</PreferenceCategory>
 

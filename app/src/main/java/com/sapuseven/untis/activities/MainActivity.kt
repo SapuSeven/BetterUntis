@@ -43,6 +43,7 @@ import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import com.sapuseven.untis.notifications.StartupReceiver
 import kotlinx.android.synthetic.main.activity_main_content.*
 import org.joda.time.DateTimeConstants
 import org.joda.time.Instant
@@ -93,6 +94,8 @@ class MainActivity :
 
 		super.onCreate(savedInstanceState)
 
+		setupNotifications()
+
 		preferenceManager = PreferenceManager(this)
 
 		if (!loadProfile()) {
@@ -129,6 +132,11 @@ class MainActivity :
 		} ?: run {
 			setTarget(anonymous = true)
 		}
+	}
+
+	private fun setupNotifications() {
+		val intent = Intent(this, StartupReceiver::class.java)
+		sendBroadcast(intent)
 	}
 
 	override fun onResume() {
