@@ -42,7 +42,7 @@ class NotificationSetup : BroadcastReceiver() {
 	private var profileUser: UserDatabase.User? = null
 
 	companion object {
-		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.profileTd"
+		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.notifications.profileid"
 	}
 
 	override fun onReceive(context: Context, intent: Intent) {
@@ -52,7 +52,7 @@ class NotificationSetup : BroadcastReceiver() {
 		if (!PreferenceUtils.getPrefBool(preferenceManager, "preference_notifications_enable"))
 			return
 
-		loadDatabase(context, 1/*intent.getLongExtra(EXTRA_LONG_PROFILE_ID, -1)*/) // TODO: Add setting to select user
+		loadDatabase(context, intent.getLongExtra(EXTRA_LONG_PROFILE_ID, 0)) // TODO: Add setting to select user
 		profileUser?.run { loadTimetable(context) }
 	}
 
