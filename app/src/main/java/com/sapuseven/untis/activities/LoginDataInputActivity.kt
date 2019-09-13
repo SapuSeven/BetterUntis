@@ -136,10 +136,10 @@ class LoginDataInputActivity : BaseActivity() {
 		edittext_logindatainput_url?.setText(prefs.getString("edittext_logindatainput_url", ""))
 		edittext_logindatainput_school?.setText(prefs.getString("edittext_logindatainput_school", ""))
 		switch_logindatainput_anonymouslogin?.isChecked = prefs.getBoolean("switch_logindatainput_anonymouslogin", false)
-		textinputlayout_logindatainput_user?.isEnabled = switch_logindatainput_anonymouslogin?.isChecked == false
-		textinputlayout_logindatainput_key?.isEnabled = switch_logindatainput_anonymouslogin?.isChecked == false
-		edittext_logindatainput_user?.setText(prefs.getString("edittext_logindatainput_user", ""))
-		edittext_logindatainput_key?.setText(prefs.getString("edittext_logindatainput_key", ""))
+		if (switch_logindatainput_anonymouslogin?.isChecked == false) {
+			edittext_logindatainput_user?.setText(prefs.getString("edittext_logindatainput_user", ""))
+			edittext_logindatainput_key?.setText(prefs.getString("edittext_logindatainput_key", ""))
+		}
 	}
 
 	private fun loadData() {
@@ -284,8 +284,10 @@ class LoginDataInputActivity : BaseActivity() {
 	private fun setElementsEnabled(enabled: Boolean) {
 		textinputlayout_logindatainput_url?.isEnabled = enabled && schoolInfo == null
 		textinputlayout_logindatainput_school?.isEnabled = enabled && schoolInfo == null
-		textinputlayout_logindatainput_user?.isEnabled = enabled
-		textinputlayout_logindatainput_key?.isEnabled = enabled
+		textinputlayout_logindatainput_user?.isEnabled = enabled && !(switch_logindatainput_anonymouslogin?.isChecked
+				?: false)
+		textinputlayout_logindatainput_key?.isEnabled = enabled && !(switch_logindatainput_anonymouslogin?.isChecked
+				?: false)
 		button_logindatainput_login?.isEnabled = enabled
 		switch_logindatainput_anonymouslogin?.isEnabled = enabled
 	}
