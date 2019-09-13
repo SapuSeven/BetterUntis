@@ -52,8 +52,8 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 	private lateinit var roomFinderDatabase: RoomfinderDatabase
 
 	companion object {
-		const val EXTRA_LONG_PROFILE_ID = "profile_id"
-		const val EXTRA_INT_ROOM_ID = "room_id"
+		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileid"
+		const val EXTRA_INT_ROOM_ID = "com.sapuseven.untis.activities.roomid"
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {

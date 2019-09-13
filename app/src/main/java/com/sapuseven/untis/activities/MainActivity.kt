@@ -103,6 +103,7 @@ class MainActivity :
 		if (!loadProfile()) {
 			val loginIntent = Intent(this, LoginActivity::class.java)
 			startActivity(loginIntent)
+			// TODO: Start for result and set profileId from result
 			finish()
 			return
 		}
@@ -170,7 +171,7 @@ class MainActivity :
 		profileListAdd.setOnClickListener {
 			val loginIntent = Intent(this, LoginActivity::class.java)
 			startActivity(loginIntent)
-			// TODO: Start for result and reload afterwards
+			// TODO: Start for result, set new profileId from result and reload
 		}
 	}
 
@@ -206,14 +207,12 @@ class MainActivity :
 
 	@SuppressLint("ApplySharedPref")
 	private fun switchToProfile(user: UserDatabase.User) {
-		val editor = preferenceManager.defaultPrefs.edit()
-		editor.putInt("profile", user.id!!.toInt()) // TODO: Do not hard-code "profile"
+		val editor = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this).edit()
+		editor.putLong("profile", user.id!!.toLong()) // TODO: Do not hard-code "profile"
 		editor.commit()
+		preferenceManager.reload()
 		if (!loadProfile()) finish() // TODO: Show error
 		else {
-			items.clear()
-			loadedMonths.clear()
-
 			setupNavDrawerHeader(findViewById(R.id.navigationview_main))
 
 			setupTimetableLoader()
@@ -222,14 +221,16 @@ class MainActivity :
 			val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
 			drawer.closeDrawer(GravityCompat.START)
 
-			weekView.invalidate()
+			recreate()
 		}
 	}
 
 	override fun onResume() {
 		super.onResume()
+		preferenceManager.reload()
 		setupWeekViewConfig()
 		items.clear()
+		loadedMonths.clear()
 		weekView.invalidate()
 	}
 
@@ -243,6 +244,7 @@ class MainActivity :
 
 		findViewById<Button>(R.id.button_main_settings).setOnClickListener {
 			val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+			intent.putExtra(SettingsActivity.EXTRA_LONG_PROFILE_ID, profileId)
 			// TODO: Find a way to jump directly to the personal timetable setting
 			startActivity(intent)
 		}
@@ -300,12 +302,12 @@ class MainActivity :
 		if (userDatabase.getUsersCount() < 1)
 			return false
 
-		profileId = preferenceManager.defaultPrefs.getInt("profile", -1).toLong() // TODO: Do not hard-code "profile"
-		if (profileId == -1L) profileId = userDatabase.getAllUsers()[0].id ?: -1
-		if (profileId == -1L) return false
+		profileId = preferenceManager.profileId
+		if (profileId == 0L) profileId = userDatabase.getAllUsers()[0].id ?: 0
+		if (profileId == 0L) return false
 		profileUser = userDatabase.getUser(profileId) ?: return false
 
-		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileUser.id ?: -1)
+		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileUser.id ?: 0)
 		return true
 	}
 
@@ -549,7 +551,9 @@ class MainActivity :
 				showItemList(TimetableDatabaseInterface.Type.ROOM)
 			}
 			R.id.nav_settings -> {
-				startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
+				val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+				intent.putExtra(SettingsActivity.EXTRA_LONG_PROFILE_ID, profileId)
+				startActivity(intent)
 			}
 			R.id.nav_free_rooms -> {
 				val i3 = Intent(this@MainActivity, RoomFinderActivity::class.java)

@@ -241,9 +241,14 @@ class LoginDataInputActivity : BaseActivity() {
 						progressbar_logindatainput_loadingstatus?.visibility = View.GONE
 						imageview_logindatainput_loadingstatussuccess?.visibility = View.VISIBLE
 						textview_logindatainput_loadingstatus?.text = getString(R.string.logindatainput_data_loaded)
-						finish()
 
-						// TODO: Save userId in the defaultPrefs of my PreferenceManager
+						val editor = androidx.preference.PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
+						editor.putLong("profile", userId.toLong())
+						editor.apply()
+
+						// TODO: Return userId as result
+
+						finish()
 
 						return@fold
 					} ?: run {

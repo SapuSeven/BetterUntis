@@ -23,13 +23,22 @@ import kotlinx.android.synthetic.main.activity_settings.*
 
 // TODO: The actionbar back arrow still exits the entire activity; go back on the backstack instead
 // TODO: The current settings page should be displayed in the actionbar
+// TODO: On preference change of theme selection, recreate() the activity
+// TODO: On an active darkTheme, the ActionBar is dark, but should be primary color
 class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback {
+	private var profileId: Long? = null
+
 	companion object {
+		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileId"
+
 		private const val DIALOG_DESIGNING_HIDE = "preferences_dialog_designing_hide"
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+
+		profileId = intent.extras?.getLong(EXTRA_LONG_PROFILE_ID)
+
 		setupActionBar()
 		setContentView(R.layout.activity_settings)
 		setupDesigningDialog()
@@ -39,6 +48,9 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 			// ie. not after orientation changes
 			val fragment = supportFragmentManager.findFragmentByTag(PreferencesFragment.FRAGMENT_TAG)
 					?: PreferencesFragment()
+			val args = Bundle()
+			profileId?.let { args.putLong(EXTRA_LONG_PROFILE_ID, it) }
+			fragment.arguments = args
 
 			supportFragmentManager
 					.beginTransaction()
@@ -74,6 +86,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 		val fragment = PreferencesFragment()
 		val args = Bundle()
 		args.putString(PreferenceFragmentCompat.ARG_PREFERENCE_ROOT, preferenceScreen.key)
+		profileId?.let { args.putLong(EXTRA_LONG_PROFILE_ID, it) }
 		fragment.arguments = args
 
 		supportFragmentManager
@@ -91,16 +104,20 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 			const val DIALOG_FRAGMENT_TAG = "preference_dialog_fragment"
 		}
 
+		private var profileId: Long = 0
+
 		override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+			profileId = arguments?.getLong(EXTRA_LONG_PROFILE_ID) ?: 0
+			// TODO: Show error if profileId == 0
+			preferenceManager.sharedPreferencesName = "preferences_$profileId"
+
 			setPreferencesFromResource(R.xml.preferences, rootKey)
 		}
 
 		override fun onPreferenceTreeClick(preference: Preference): Boolean {
 			if (preference is ElementPickerPreference) {
-				//val timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileUser.id ?: -1)
 				val userDatabase = UserDatabase.createInstance(requireContext())
-				val timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, userDatabase.getUser(1)!!.id
-						?: -1) // TODO: Get current user
+				val timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileId)
 
 				ElementPickerDialog.newInstance(
 						timetableDatabaseInterface,
@@ -134,13 +151,6 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 				if (manager.findFragmentByTag(DIALOG_FRAGMENT_TAG) != null) return
 
 				when (preference) {
-					/*is ElementPickerPreference -> {
-						val f: DialogFragment = ElementPickerPreferenceDialog.newInstance(preference.key)
-						/*val f: DialogFragment = ElementPickerDialog.newInstance(timetableDatabaseInterface,
-								ElementPickerDialog.Companion.ElementPickerDialogConfig(TimetableDatabaseInterface.Type.TEACHER))*/
-						f.setTargetFragment(this, 0)
-						f.show(manager, DIALOG_FRAGMENT_TAG)
-					}*/
 					is AlertPreference -> {
 						val f: DialogFragment = AlertPreferenceDialog.newInstance(preference.key)
 						f.setTargetFragment(this, 0)
