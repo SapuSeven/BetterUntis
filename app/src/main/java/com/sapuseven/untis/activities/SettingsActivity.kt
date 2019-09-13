@@ -23,7 +23,6 @@ import kotlinx.android.synthetic.main.activity_settings.*
 
 // TODO: The actionbar back arrow still exits the entire activity; go back on the backstack instead
 // TODO: The current settings page should be displayed in the actionbar
-// TODO: On an active darkTheme, the ActionBar is dark, but should be primary color
 class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback {
 	private var profileId: Long? = null
 
