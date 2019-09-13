@@ -665,21 +665,14 @@ class MainActivity :
 	}
 
 	override fun onPeriodElementClick(dialog: DialogFragment, element: PeriodElement?, useOrgId: Boolean) {
+		dialog.dismiss()
 		element?.let {
-			dialog.dismiss()
 			setTarget(if (useOrgId) element.orgId else element.id, element.type, timetableDatabaseInterface.getLongName(
 					if (useOrgId) element.orgId else element.id, TimetableDatabaseInterface.Type.valueOf(element.type)))
-			refreshNavigationViewSelection()
 		} ?: run {
-			profileUser.userData.elemType?.let { type ->
-				setTarget(
-						profileUser.userData.elemId,
-						type,
-						profileUser.userData.displayName)
-			} ?: run {
-				setTarget(anonymous = true)
-			}
+			showPersonalTimetable()
 		}
+		refreshNavigationViewSelection()
 	}
 
 	override fun onDialogDismissed(dialog: DialogInterface?) {
