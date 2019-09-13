@@ -1,32 +1,25 @@
 package com.sapuseven.untis.preferences
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.util.AttributeSet
 import androidx.preference.Preference
-import androidx.preference.PreferenceManager
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 
-
 class ElementPickerPreference(context: Context, attrs: AttributeSet) : Preference(context, attrs) {
-	private lateinit var prefs: SharedPreferences
-
 	companion object {
 		const val KEY_SUFFIX_ID = "_id"
 		const val KEY_SUFFIX_TYPE = "_type"
 	}
 
 	override fun onAttached() {
-		prefs = PreferenceManager.getDefaultSharedPreferences(context)
-
-		summary = prefs.getString(key, "")
+		summary = sharedPreferences.getString(key, "")
 	}
 
 	fun setElement(element: PeriodElement?, displayName: String) {
 		summary = displayName
 
-		val editor = prefs.edit()
+		val editor = sharedPreferences.edit()
 		element?.let {
 			editor.apply {
 				putString(key, displayName)
@@ -43,6 +36,6 @@ class ElementPickerPreference(context: Context, attrs: AttributeSet) : Preferenc
 		editor.apply()
 	}
 
-	fun getSavedType() = prefs.getString(key + KEY_SUFFIX_TYPE, null)
+	fun getSavedType() = sharedPreferences.getString(key + KEY_SUFFIX_TYPE, null)
 			?: TimetableDatabaseInterface.Type.CLASS.toString()
 }
