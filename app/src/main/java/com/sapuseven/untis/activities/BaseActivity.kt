@@ -1,6 +1,7 @@
 package com.sapuseven.untis.activities
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.util.TypedValue
@@ -24,9 +25,13 @@ open class BaseActivity : AppCompatActivity() {
 		preferenceManager = PreferenceManager(this)
 		currentTheme = PreferenceUtils.getPrefString(preferenceManager, "preference_theme")
 		currentDarkTheme = PreferenceUtils.getPrefString(preferenceManager, "preference_dark_theme")
-		setAppTheme(hasOwnToolbar)
-		setBlackBackground(PreferenceUtils.getPrefBool(preferenceManager, "preference_dark_theme_oled"))
 		super.onCreate(savedInstanceState)
+	}
+
+	override fun onStart() {
+		setBlackBackground(PreferenceUtils.getPrefBool(preferenceManager, "preference_dark_theme_oled"))
+		setAppTheme(hasOwnToolbar)
+		super.onStart()
 	}
 
 	override fun onResume() {
@@ -63,8 +68,15 @@ open class BaseActivity : AppCompatActivity() {
 	}
 
 	private fun setBlackBackground(blackBackground: Boolean) {
-		if (blackBackground)
+		if (blackBackground
+				&& resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES)
 			window.decorView.setBackgroundColor(Color.BLACK)
+		else {
+			val typedValue = TypedValue()
+			theme.resolveAttribute(android.R.attr.windowBackground, typedValue, true)
+			if (typedValue.type >= TypedValue.TYPE_FIRST_COLOR_INT && typedValue.type <= TypedValue.TYPE_LAST_COLOR_INT)
+				window.decorView.setBackgroundColor(typedValue.data)
+		}
 	}
 
 	protected fun getAttr(@AttrRes attr: Int): Int {

@@ -23,7 +23,6 @@ import kotlinx.android.synthetic.main.activity_settings.*
 
 // TODO: The actionbar back arrow still exits the entire activity; go back on the backstack instead
 // TODO: The current settings page should be displayed in the actionbar
-// TODO: On preference change of theme selection, recreate() the activity
 // TODO: On an active darkTheme, the ActionBar is dark, but should be primary color
 class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback {
 	private var profileId: Long? = null
@@ -112,6 +111,16 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 			preferenceManager.sharedPreferencesName = "preferences_$profileId"
 
 			setPreferencesFromResource(R.xml.preferences, rootKey)
+
+			when (rootKey) {
+				"preferences_styling" ->
+					listOf("preference_theme", "preference_dark_theme", "preference_dark_theme_oled").forEach { key ->
+						findPreference(key)?.setOnPreferenceChangeListener { _, _ ->
+							activity?.recreate()
+							true
+						}
+					}
+			}
 		}
 
 		override fun onPreferenceTreeClick(preference: Preference): Boolean {

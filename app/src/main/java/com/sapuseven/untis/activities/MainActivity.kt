@@ -192,7 +192,6 @@ class MainActivity :
 			dropdownImage.scaleY = -1F
 			val userList = userDatabase.getAllUsers()
 			val adapter = ProfileListAdapter(userList, View.OnClickListener { view ->
-				toggleProfileDropdown(dropdownView, dropdownImage, dropdownList)
 				switchToProfile(userList[dropdownList.getChildLayoutPosition(view)])
 			})
 

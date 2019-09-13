@@ -5,6 +5,7 @@
 		<item name="colorAccent">@color/colorAccent</item>
 		<item name="colorSecondary">@color/colorAccent</item>
 		<item name="colorDivider">@color/colorDivider</item>
+		<item name="android:windowAnimationStyle">@style/WindowFadeTransition</item>
 	</style>
 
 	<style name="AppTheme.NoActionBar">
@@ -79,5 +80,10 @@
 	<style name="AppTheme.ThemeCyan.NoActionBar">
 		<item name="windowActionBar">false</item>
 		<item name="windowNoTitle">true</item>
+	</style>
+
+	<style name="WindowFadeTransition">
+		<item name="android:windowEnterAnimation">@android:anim/fade_in</item>
+		<item name="android:windowExitAnimation">@android:anim/fade_out</item>
 	</style>
 </resources>

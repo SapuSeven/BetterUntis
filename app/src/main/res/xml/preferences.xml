@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-                                      xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.preference.PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto">
 	<PreferenceScreen
 		android:icon="@drawable/settings_styling"
 		android:key="preferences_styling"
@@ -132,10 +133,11 @@
 				android:summary="%s"
 				android:title="@string/preference_theme"/>
 
-			<ListPreference
+			<com.sapuseven.untis.preferences.DependentListPreference
 				android:defaultValue="@string/preference_dark_theme_default"
 				android:entries="@array/preferences_dark_theme"
 				android:entryValues="@array/preferences_dark_theme_values"
+				app:disabledDependentValue="off"
 				android:icon="@drawable/settings_timetable_brightness_medium"
 				android:key="preference_dark_theme"
 				android:summary="%s"
@@ -213,9 +215,9 @@
 				android:entries="@array/preferences_notifications_visibility"
 				android:entryValues="@array/preferences_notifications_visibility_values"
 				android:icon="@drawable/all_classes"
-				android:key="preference_notifications_visibility_teachers"
+				android:key="preference_notifications_visibility_classes"
 				android:summary="%s"
-				android:title="@string/all_classes" />
+				android:title="@string/all_classes"/>
 
 		</PreferenceCategory>
 
@@ -260,8 +262,8 @@
 
 			<com.sapuseven.untis.preferences.UnitPreference
 				android:defaultValue="@integer/preference_timetable_item_padding_overlap_default"
-				android:key="preference_timetable_item_padding_overlap"
 				android:inputType="number"
+				android:key="preference_timetable_item_padding_overlap"
 				android:selectAllOnFocus="true"
 				android:singleLine="true"
 				android:title="@string/preference_timetable_item_padding_overlap"
@@ -269,8 +271,8 @@
 
 			<com.sapuseven.untis.preferences.UnitPreference
 				android:defaultValue="@integer/preference_timetable_item_padding_default"
-				android:key="preference_timetable_item_padding"
 				android:inputType="number"
+				android:key="preference_timetable_item_padding"
 				android:selectAllOnFocus="true"
 				android:singleLine="true"
 				android:title="@string/preference_timetable_item_padding"
@@ -279,8 +281,8 @@
 			<com.sapuseven.untis.preferences.UnitPreference
 				android:defaultValue="@integer/preference_timetable_item_corner_radius_default"
 				android:icon="@drawable/settings_timetable_rounded_corner"
-				android:key="preference_timetable_item_corner_radius"
 				android:inputType="number"
+				android:key="preference_timetable_item_corner_radius"
 				android:selectAllOnFocus="true"
 				android:singleLine="true"
 				android:title="@string/preference_timetable_item_corner_radius"
@@ -303,8 +305,8 @@
 
 			<com.sapuseven.untis.preferences.UnitPreference
 				android:defaultValue="@integer/preference_timetable_lesson_name_font_size_default"
-				android:key="preference_timetable_lesson_name_font_size"
 				android:inputType="number"
+				android:key="preference_timetable_lesson_name_font_size"
 				android:selectAllOnFocus="true"
 				android:singleLine="true"
 				android:title="@string/preference_timetable_lesson_name_font_size"
@@ -312,8 +314,8 @@
 
 			<com.sapuseven.untis.preferences.UnitPreference
 				android:defaultValue="@integer/preference_timetable_lesson_info_font_size_default"
-				android:key="preference_timetable_lesson_info_font_size"
 				android:inputType="number"
+				android:key="preference_timetable_lesson_info_font_size"
 				android:selectAllOnFocus="true"
 				android:singleLine="true"
 				android:title="@string/preference_timetable_lesson_info_font_size"
@@ -347,12 +349,12 @@
 
 		<com.sapuseven.untis.preferences.AlertPreference
 			android:dialogMessage="Some preferences are not implemented yet, so they are disabled until development is finished."
-			android:key="preference_info_disabled"
 			android:dialogTitle="This app isn't finished."
-			android:title="Disabled Preferences?"
 			android:icon="@drawable/settings_info"
+			android:key="preference_info_disabled"
 			android:negativeButtonText=""
-			android:summary="Tap to see why some preferences are not available."/>
+			android:summary="Tap to see why some preferences are not available."
+			android:title="Disabled Preferences?"/>
 
 		<Preference
 			android:enabled="false"
