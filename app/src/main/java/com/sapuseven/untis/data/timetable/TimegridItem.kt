@@ -60,7 +60,7 @@ class TimegridItem(
 		return merged
 	}
 
-	private fun equalsIgnoreTime(secondItem: TimegridItem): Boolean {
+	fun equalsIgnoreTime(secondItem: TimegridItem): Boolean {
 		// TODO: Optimize
 		return periodData.element.`is` == secondItem.periodData.element.`is`
 				&& periodData.element.can == secondItem.periodData.element.can
