@@ -1,5 +1,7 @@
 package com.sapuseven.untis.activities
 
+import android.app.NotificationManager
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -118,6 +120,11 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 							activity?.recreate()
 							true
 						}
+					}
+				"preferences_notifications" ->
+					findPreference("preference_notifications_clear")?.setOnPreferenceChangeListener { _, _ ->
+						(context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?)?.cancelAll()
+						true
 					}
 			}
 		}
