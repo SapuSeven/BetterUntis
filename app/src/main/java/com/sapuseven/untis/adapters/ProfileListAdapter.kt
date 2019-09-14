@@ -1,5 +1,6 @@
 package com.sapuseven.untis.adapters
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +10,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
 
-class ProfileListAdapter(private val dataset: List<UserDatabase.User>, private val onClickListener: View.OnClickListener) :
+class ProfileListAdapter(
+		private val context: Context,
+		private val dataset: List<UserDatabase.User>,
+		private val onClickListener: View.OnClickListener
+) :
 		RecyclerView.Adapter<ProfileListAdapter.ViewHolder>() {
 
 	class ViewHolder(val layout: ConstraintLayout) : RecyclerView.ViewHolder(layout) {
@@ -25,7 +30,7 @@ class ProfileListAdapter(private val dataset: List<UserDatabase.User>, private v
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 		val item = dataset[position]
-		holder.tvName.text = item.userData.displayName
+		holder.tvName.text = if (item.anonymous) context.getString(R.string.anonymous_name) else item.userData.displayName
 		holder.tvSchool.text = item.userData.schoolName
 	}
 
