@@ -14,13 +14,15 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.MainActivity
 import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.helpers.config.PreferenceUtils
+import org.joda.time.LocalDateTime
 
 class NotificationReceiver : BroadcastReceiver() {
 	companion object {
 		const val CHANNEL_ID_BREAKINFO = "notifications.breakinfo"
 
-		const val EXTRA_INT_ID = "com.sapuseven.untis.notifications.id"
 		const val EXTRA_BOOLEAN_CLEAR = "com.sapuseven.untis.notifications.clear"
+		const val EXTRA_INT_ID = "com.sapuseven.untis.notifications.id"
+		const val EXTRA_INT_BREAK_END_TIME = "com.sapuseven.untis.notifications.breakEndTimeSeconds"
 		const val EXTRA_STRING_BREAK_END_TIME = "com.sapuseven.untis.notifications.breakEndTime"
 		const val EXTRA_STRING_NEXT_SUBJECT = "com.sapuseven.untis.notifications.nextSubject"
 		const val EXTRA_STRING_NEXT_SUBJECT_LONG = "com.sapuseven.untis.notifications.nextSubjectLong"
@@ -39,6 +41,8 @@ class NotificationReceiver : BroadcastReceiver() {
 		if (!PreferenceUtils.getPrefBool(preferenceManager, "preference_notifications_enable")) return
 
 		if (intent.hasExtra(EXTRA_STRING_BREAK_END_TIME)) {
+			if (LocalDateTime.now().millisOfDay >= intent.getIntExtra(EXTRA_INT_BREAK_END_TIME, 0)) return // Notification delayed for too long
+
 			createNotificationChannel(context)
 
 			val pendingIntent = PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), 0)

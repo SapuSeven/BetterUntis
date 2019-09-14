@@ -17,6 +17,7 @@ import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.notifications.NotificationReceiver.Companion.EXTRA_BOOLEAN_CLEAR
+import com.sapuseven.untis.notifications.NotificationReceiver.Companion.EXTRA_INT_BREAK_END_TIME
 import com.sapuseven.untis.notifications.NotificationReceiver.Companion.EXTRA_INT_ID
 import com.sapuseven.untis.notifications.NotificationReceiver.Companion.EXTRA_STRING_BREAK_END_TIME
 import com.sapuseven.untis.notifications.NotificationReceiver.Companion.EXTRA_STRING_NEXT_CLASS
@@ -98,6 +99,7 @@ class NotificationSetup : BroadcastReceiver() {
 
 			val intent = Intent(context, NotificationReceiver::class.java)
 					.putExtra(EXTRA_INT_ID, id)
+					.putExtra(EXTRA_INT_BREAK_END_TIME, item.second.startDateTime.millisOfDay)
 					.putExtra(EXTRA_STRING_BREAK_END_TIME, item.second.startDateTime.toString(DateTimeUtils.shortDisplayableTime()))
 					.putExtra(EXTRA_STRING_NEXT_SUBJECT, item.second.periodData.getShortTitle())
 					.putExtra(EXTRA_STRING_NEXT_SUBJECT_LONG, item.second.periodData.getLongTitle())
