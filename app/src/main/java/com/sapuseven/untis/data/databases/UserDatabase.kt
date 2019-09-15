@@ -73,7 +73,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 
 		val values = ContentValues()
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_URL, user.url)
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_APIURL, user.url)
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_APIURL, user.apiUrl)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL, user.school)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USER, user.user)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_KEY, user.key)
@@ -93,9 +93,31 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 			id
 	}
 
-	fun deleteUser(user: User) {
+	fun editUser(user: User): Long? {
 		val db = writableDatabase
-		db.delete(UserDatabaseContract.Users.TABLE_NAME, BaseColumns._ID + "=?", arrayOf(user.id.toString()))
+
+		val values = ContentValues()
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_URL, user.url)
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_APIURL, user.apiUrl)
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL, user.school)
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_USER, user.user)
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_KEY, user.key)
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS, user.anonymous)
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID, getJSON().stringify(TimeGrid.serializer(), user.timeGrid))
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP, user.masterDataTimestamp)
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_USERDATA, getJSON().stringify(UserData.serializer(), user.userData))
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().stringify(Settings.serializer(), user.settings))
+
+		db.update(UserDatabaseContract.Users.TABLE_NAME, values, BaseColumns._ID + "=?", arrayOf(user.id.toString()))
+
+		db.close()
+
+		return user.id
+	}
+
+	fun deleteUser(userId: Long) {
+		val db = writableDatabase
+		db.delete(UserDatabaseContract.Users.TABLE_NAME, BaseColumns._ID + "=?", arrayOf(userId.toString()))
 		db.close()
 	}
 
@@ -211,32 +233,23 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		val db = writableDatabase
 		db.beginTransaction()
 
-		var tableName = AbsenceReason.TABLE_NAME
-		tableName.let { masterData.absenceReasons.forEach { data -> db.insert(tableName, null, generateValues(userId, data)) } }
-		tableName = Department.TABLE_NAME
-		tableName.let { masterData.departments.forEach { data -> db.insert(tableName, null, generateValues(userId, data)) } }
-		tableName = Duty.TABLE_NAME
-		tableName.let { masterData.duties.forEach { data -> db.insert(tableName, null, generateValues(userId, data)) } }
-		tableName = EventReason.TABLE_NAME
-		tableName.let { masterData.eventReasons.forEach { data -> db.insert(tableName, null, generateValues(userId, data)) } }
-		tableName = EventReasonGroup.TABLE_NAME
-		tableName.let { masterData.eventReasonGroups.forEach { data -> db.insert(tableName, null, generateValues(userId, data)) } }
-		tableName = ExcuseStatus.TABLE_NAME
-		tableName.let { masterData.excuseStatuses.forEach { data -> db.insert(tableName, null, generateValues(userId, data)) } }
-		tableName = Holiday.TABLE_NAME
-		tableName.let { masterData.holidays.forEach { data -> db.insert(tableName, null, generateValues(userId, data)) } }
-		tableName = Klasse.TABLE_NAME
-		tableName.let { masterData.klassen.forEach { data -> db.insert(tableName, null, generateValues(userId, data)) } }
-		tableName = Room.TABLE_NAME
-		tableName.let { masterData.rooms.forEach { data -> db.insert(tableName, null, generateValues(userId, data)) } }
-		tableName = Subject.TABLE_NAME
-		tableName.let { masterData.subjects.forEach { data -> db.insert(tableName, null, generateValues(userId, data)) } }
-		tableName = Teacher.TABLE_NAME
-		tableName.let { masterData.teachers.forEach { data -> db.insert(tableName, null, generateValues(userId, data)) } }
-		tableName = TeachingMethod.TABLE_NAME
-		tableName.let { masterData.teachingMethods.forEach { data -> db.insert(tableName, null, generateValues(userId, data)) } }
-		tableName = SchoolYear.TABLE_NAME
-		tableName.let { masterData.schoolyears.forEach { data -> db.insert(tableName, null, generateValues(userId, data)) } }
+		val data = listOf(
+				AbsenceReason.TABLE_NAME to masterData.absenceReasons,
+				Department.TABLE_NAME to masterData.departments,
+				Duty.TABLE_NAME to masterData.duties,
+				EventReason.TABLE_NAME to masterData.eventReasons,
+				EventReasonGroup.TABLE_NAME to masterData.eventReasonGroups,
+				ExcuseStatus.TABLE_NAME to masterData.excuseStatuses,
+				Holiday.TABLE_NAME to masterData.holidays,
+				Klasse.TABLE_NAME to masterData.klassen,
+				Room.TABLE_NAME to masterData.rooms,
+				Subject.TABLE_NAME to masterData.subjects,
+				Teacher.TABLE_NAME to masterData.teachers,
+				TeachingMethod.TABLE_NAME to masterData.teachingMethods,
+				SchoolYear.TABLE_NAME to masterData.schoolyears
+		)
+
+		data.forEach { refreshAdditionalUserData(db, userId, it.first, it.second) }
 
 		val values = ContentValues()
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP, masterData.timeStamp)
@@ -249,6 +262,11 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		db.setTransactionSuccessful()
 		db.endTransaction()
 		db.close()
+	}
+
+	private fun refreshAdditionalUserData(db: SQLiteDatabase, userId: Long, tableName: String, items: List<TableModel>) {
+		db.delete(tableName, "$COLUMN_NAME_USER_ID=?", arrayOf(userId.toString()))
+		items.forEach { data -> db.insert(tableName, null, generateValues(userId, data)) }
 	}
 
 

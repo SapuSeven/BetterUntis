@@ -25,7 +25,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alamkanak.weekview.*
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.picker.MaterialStyledDatePickerDialog
 import com.google.android.material.snackbar.Snackbar
@@ -73,6 +72,8 @@ class MainActivity :
 		private const val DAY_MILLIS: Int = 24 * HOUR_MILLIS
 
 		private const val REQUEST_CODE_ROOM_FINDER = 1
+		private const val REQUEST_CODE_LOGINDATAINPUT_ADD = 2
+		private const val REQUEST_CODE_LOGINDATAINPUT_EDIT = 3
 	}
 
 	private val userDatabase = UserDatabase.createInstance(this)
@@ -121,8 +122,7 @@ class MainActivity :
 
 	private fun login() {
 		val loginIntent = Intent(this, LoginActivity::class.java)
-		startActivity(loginIntent)
-		// TODO: Start for result and set profileId from result
+		startActivityForResult(loginIntent, REQUEST_CODE_LOGINDATAINPUT_ADD)
 		finish()
 	}
 
@@ -174,7 +174,8 @@ class MainActivity :
 			toggleProfileDropdown(dropdownView, dropdownImage, dropdownList)
 			switchToProfile(profileListAdapter.itemAt(dropdownList.getChildLayoutPosition(view)))
 		}, View.OnLongClickListener { view ->
-			deleteProfile(profileListAdapter.itemAt(dropdownList.getChildLayoutPosition(view)))
+			closeDrawer()
+			editProfile(profileListAdapter.itemAt(dropdownList.getChildLayoutPosition(view)))
 			true
 		})
 		dropdownList.adapter = profileListAdapter
@@ -184,9 +185,8 @@ class MainActivity :
 
 		val profileListAdd = header.findViewById<LinearLayout>(R.id.linearlayout_mainactivitydrawer_add)
 		profileListAdd.setOnClickListener {
-			val loginIntent = Intent(this, LoginActivity::class.java)
-			startActivity(loginIntent)
-			// TODO: Start for result, set new profileId from result and reload
+			closeDrawer()
+			addProfile()
 		}
 	}
 
@@ -213,23 +213,15 @@ class MainActivity :
 		}
 	}
 
-	private fun deleteProfile(user: UserDatabase.User) {
-		MaterialAlertDialogBuilder(this)
-				.setTitle(getString(R.string.main_dialog_delete_profile_title))
-				.setMessage(getString(R.string.main_dialog_delete_profile_message, user.userData.displayName, user.userData.schoolName))
-				.setNegativeButton(getString(R.string.cancel), null)
-				.setPositiveButton(getString(R.string.delete)) { _, _ ->
-					userDatabase.deleteUser(user)
-					if (user.id == profileId) {
-						if (!loadProfile())
-							login()
+	private fun addProfile() {
+		val loginIntent = Intent(this, LoginActivity::class.java)
+		startActivityForResult(loginIntent, REQUEST_CODE_LOGINDATAINPUT_ADD)
+	}
 
-						recreate()
-					}
-					profileListAdapter.deleteUser(user)
-					profileListAdapter.notifyDataSetChanged()
-				}
-				.show()
+	private fun editProfile(user: UserDatabase.User) {
+		val loginIntent = Intent(this, LoginDataInputActivity::class.java)
+		loginIntent.putExtra(LoginDataInputActivity.EXTRA_LONG_PROFILE_ID, user.id)
+		startActivityForResult(loginIntent, REQUEST_CODE_LOGINDATAINPUT_EDIT)
 	}
 
 	@SuppressLint("ApplySharedPref")
@@ -240,11 +232,9 @@ class MainActivity :
 		else {
 			setupNavDrawerHeader(findViewById(R.id.navigationview_main))
 
+			closeDrawer()
 			setupTimetableLoader()
 			showPersonalTimetable()
-
-			val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-			drawer.closeDrawer(GravityCompat.START)
 
 			recreate()
 		}
@@ -584,27 +574,9 @@ class MainActivity :
 				i3.putExtra(RoomFinderActivity.EXTRA_LONG_PROFILE_ID, profileId)
 				startActivityForResult(i3, REQUEST_CODE_ROOM_FINDER)
 			}
-			R.id.nav_donations -> {
-				/*val i4 = Intent(this@ActivityMain, ActivityDonations::class.java)
-				startActivity(i4)*/
-			}
-			R.id.nav_share -> {
-				/*Answers.newInstance().logShare(ShareEvent()
-						.putMethod("Share via Intent")
-						.putContentName("Share the BetterUntis download link")
-						.putContentType("share")
-						.putContentId(CONTENT_ID_SHARE))
-
-				val i = Intent(Intent.ACTION_SEND)
-				i.type = "text/plain"
-				i.putExtra(Intent.EXTRA_SUBJECT, getFirebaseString("recommendation_subject"))
-				i.putExtra(Intent.EXTRA_TEXT, getFirebaseString("recommendation_text"))
-				startActivity(Intent.createChooser(i, getString(R.string.link_sending_caption, getString(R.string.app_name))))*/
-			}
 		}
 
-		val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-		drawer.closeDrawer(GravityCompat.START)
+		closeDrawer()
 		return true
 	}
 
@@ -626,13 +598,21 @@ class MainActivity :
 						setTarget(roomId, TimetableDatabaseInterface.Type.ROOM.toString(), timetableDatabaseInterface.getLongName(roomId, TimetableDatabaseInterface.Type.ROOM))
 				}
 			}
+			REQUEST_CODE_LOGINDATAINPUT_ADD -> {
+				if (resultCode == Activity.RESULT_OK)
+					recreate()
+			}
+			REQUEST_CODE_LOGINDATAINPUT_EDIT -> {
+				if (resultCode == Activity.RESULT_OK)
+					recreate()
+			}
 		}
 	}
 
 	override fun onBackPressed() {
 		val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
 		if (drawer.isDrawerOpen(GravityCompat.START)) {
-			drawer.closeDrawer(GravityCompat.START)
+			closeDrawer(drawer)
 		} else {
 			if (displayedElement?.id != profileUser.userData.elemId) {
 				// Go to personal timetable
@@ -823,6 +803,8 @@ class MainActivity :
 		calendar.set(Calendar.DAY_OF_MONTH, day)
 		weekView.goToDate(calendar)
 	}
+
+	private fun closeDrawer(drawer: DrawerLayout = findViewById(R.id.drawer_layout)) = drawer.closeDrawer(GravityCompat.START)
 
 	private fun Int.darken(ratio: Float): Int {
 		return ColorUtils.blendARGB(this, Color.BLACK, ratio)
