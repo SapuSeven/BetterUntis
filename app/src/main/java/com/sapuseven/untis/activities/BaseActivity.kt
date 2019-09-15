@@ -25,13 +25,13 @@ open class BaseActivity : AppCompatActivity() {
 		preferences = PreferenceManager(this)
 		currentTheme = PreferenceUtils.getPrefString(preferences, "preference_theme")
 		currentDarkTheme = PreferenceUtils.getPrefString(preferences, "preference_dark_theme")
+		setAppTheme(hasOwnToolbar)
 		super.onCreate(savedInstanceState)
 	}
 
 	override fun onStart() {
-		setAppTheme(hasOwnToolbar)
-		setBlackBackground(PreferenceUtils.getPrefBool(preferences, "preference_dark_theme_oled"))
 		super.onStart()
+		setBlackBackground(PreferenceUtils.getPrefBool(preferences, "preference_dark_theme_oled"))
 	}
 
 	override fun onResume() {
