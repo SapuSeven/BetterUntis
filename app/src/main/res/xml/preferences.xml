@@ -324,25 +324,6 @@
 	</PreferenceScreen>
 
 	<PreferenceScreen
-		android:icon="@drawable/settings_personal"
-		android:key="preferences_account"
-		android:title="@string/pref_account">
-
-		<Preference
-			android:enabled="false"
-			android:icon="@drawable/settings_account_key"
-			android:key="preference_account_access_key"
-			android:title="@string/preference_account_access_key"/>
-
-		<Preference
-			android:enabled="false"
-			android:icon="@drawable/settings_account_logout"
-			android:key="preference_account_logout"
-			android:title="@string/logout"/>
-
-	</PreferenceScreen>
-
-	<PreferenceScreen
 		android:icon="@drawable/settings_info"
 		android:key="preferences_info"
 		android:title="@string/pref_infos">
@@ -373,23 +354,5 @@
 			android:key="preference_info_contact_email"
 			android:summary="@string/all_contact_email"
 			android:title="@string/preferences_info_contact"/>
-
-		<!--PreferenceCategory
-			android:title="@string/preferences_info_category_coming_soon">
-
-			<CheckBoxPreference
-				android:defaultValue="true"
-				android:enabled="false"
-				android:key="preference_send_stats"
-				android:summary="@string/preferences_info_send_stats_desc"
-				android:title="@string/preferences_info_send_stats"/>
-
-			<Preference
-				android:enabled="false"
-				android:key="preference_info_stats"
-				android:summary="@string/preferences_info_stats_details_desc"
-				android:title="@string/preferences_info_stats_details"/>
-
-		</PreferenceCategory-->
 	</PreferenceScreen>
 </androidx.preference.PreferenceScreen>

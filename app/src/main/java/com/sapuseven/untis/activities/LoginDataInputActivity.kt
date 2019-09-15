@@ -1,5 +1,6 @@
 package com.sapuseven.untis.activities
 
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.util.Patterns
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.EditText
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_PROTOCOL
@@ -30,6 +32,8 @@ import java.net.UnknownHostException
 class LoginDataInputActivity : BaseActivity() {
 	companion object {
 		private const val BACKUP_PREF_NAME = "loginDataInputBackup"
+
+		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileId"
 	}
 
 	private var anonymous: Boolean = false
@@ -37,32 +41,41 @@ class LoginDataInputActivity : BaseActivity() {
 
 	private var api: UntisRequest = UntisRequest()
 
+	private var existingUser: UserDatabase.User? = null
+	private var existingUserId: Long? = null
+
+	private lateinit var userDatabase: UserDatabase
+
 	override fun onCreate(savedInstanceState: Bundle?) {
+		if (intent.hasExtra(EXTRA_LONG_PROFILE_ID))
+			existingUserId = intent.getLongExtra(EXTRA_LONG_PROFILE_ID, 0)
+
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_logindatainput)
 
-		button_logindatainput_login?.setOnClickListener {
-			var error: EditText? = null
-			if (edittext_logindatainput_user?.text?.isEmpty() == true && !anonymous) {
-				edittext_logindatainput_user?.error = getString(R.string.logindatainput_error_field_empty)
-				error = edittext_logindatainput_user
+		userDatabase = UserDatabase.createInstance(this)
+		existingUserId?.let { id ->
+			existingUser = userDatabase.getUser(id)
+			existingUser?.let { user ->
+				restoreInput(user)
 			}
-			if (edittext_logindatainput_school?.text?.isEmpty() == true) {
-				edittext_logindatainput_school?.error = getString(R.string.logindatainput_error_field_empty)
-				error = edittext_logindatainput_school
+		} ?: run {
+			this.getSharedPreferences(BACKUP_PREF_NAME, Context.MODE_PRIVATE)?.let {
+				restoreInput(it)
 			}
-			if (edittext_logindatainput_url?.text?.isEmpty() == true) {
-				edittext_logindatainput_url?.error = getString(R.string.logindatainput_error_field_empty)
-				error = edittext_logindatainput_url
-			} else if (!Patterns.DOMAIN_NAME.matcher(edittext_logindatainput_url?.text).matches()) {
-				edittext_logindatainput_url?.error = getString(R.string.logindatainput_error_invalid_url)
-				error = edittext_logindatainput_url
-			}
+		}
 
-			if (error == null)
-				loadData()
-			else
-				error.requestFocus()
+		title = getString(if (existingUserId == null) R.string.logindatainput_title_add else R.string.logindatainput_title_edit)
+
+		button_logindatainput_login?.setOnClickListener {
+			validate()?.requestFocus() ?: run { loadData() }
+		}
+
+		existingUser?.let { user ->
+			button_logindatainput_delete?.visibility = View.VISIBLE
+			button_logindatainput_delete?.setOnClickListener {
+				deleteProfile(user)
+			}
 		}
 
 		switch_logindatainput_anonymouslogin?.setOnCheckedChangeListener { _, isChecked ->
@@ -75,11 +88,6 @@ class LoginDataInputActivity : BaseActivity() {
 		val servers = resources.getStringArray(R.array.logindatainput_webuntis_servers)
 		val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, servers)
 		edittext_logindatainput_url?.setAdapter(adapter)
-
-		val prefs = this.getSharedPreferences(BACKUP_PREF_NAME, Context.MODE_PRIVATE)
-		prefs?.let {
-			restoreInput(prefs)
-		}
 
 		val appLinkData = intent.data
 
@@ -100,6 +108,25 @@ class LoginDataInputActivity : BaseActivity() {
 		focusFirstFreeField()
 
 		setElementsEnabled(true)
+	}
+
+	private fun validate(): EditText? {
+		if (edittext_logindatainput_user?.text?.isEmpty() == true && !anonymous) {
+			edittext_logindatainput_user?.error = getString(R.string.logindatainput_error_field_empty)
+			return edittext_logindatainput_user
+		}
+		if (edittext_logindatainput_school?.text?.isEmpty() == true) {
+			edittext_logindatainput_school?.error = getString(R.string.logindatainput_error_field_empty)
+			return edittext_logindatainput_school
+		}
+		if (edittext_logindatainput_url?.text?.isEmpty() == true) {
+			edittext_logindatainput_url?.error = getString(R.string.logindatainput_error_field_empty)
+			return edittext_logindatainput_url
+		} else if (!Patterns.DOMAIN_NAME.matcher(edittext_logindatainput_url?.text).matches()) {
+			edittext_logindatainput_url?.error = getString(R.string.logindatainput_error_invalid_url)
+			return edittext_logindatainput_url
+		}
+		return null
 	}
 
 	private fun focusFirstFreeField() {
@@ -140,6 +167,14 @@ class LoginDataInputActivity : BaseActivity() {
 			edittext_logindatainput_user?.setText(prefs.getString("edittext_logindatainput_user", ""))
 			edittext_logindatainput_key?.setText(prefs.getString("edittext_logindatainput_key", ""))
 		}
+	}
+
+	private fun restoreInput(user: UserDatabase.User) {
+		edittext_logindatainput_url?.setText(user.url)
+		edittext_logindatainput_school?.setText(user.school)
+		switch_logindatainput_anonymouslogin?.isChecked = user.anonymous
+		edittext_logindatainput_user?.setText(user.user)
+		edittext_logindatainput_key?.setText(user.key)
 	}
 
 	private fun loadData() {
@@ -194,22 +229,25 @@ class LoginDataInputActivity : BaseActivity() {
 			val query = UntisRequest.UntisRequestQuery()
 
 			var appSharedSecret: String? = null
-			val user = edittext_logindatainput_user?.text.toString()
+			val username = edittext_logindatainput_user?.text.toString()
+			val url = edittext_logindatainput_url?.text.toString()
 
 			query.url = schoolInfo?.mobileServiceUrl
-					?: (DEFAULT_PROTOCOL + edittext_logindatainput_url?.text.toString() + DEFAULT_WEBUNTIS_PATH)
+					?: (DEFAULT_PROTOCOL + url + DEFAULT_WEBUNTIS_PATH)
 			query.school = schoolInfo?.loginName ?: edittext_logindatainput_school?.text.toString()
 			query.data.method = UntisApiConstants.METHOD_GET_USER_DATA
 
 			if (anonymous)
 				query.data.params = listOf(UserDataParams(UntisAuthentication.getAnonymousAuthObject()))
 			else {
+				//appSharedSecret = edittext_logindatainput_key?.text.toString()
+				// TODO: Skip this step and try the input directly if it matches the pattern of a key
 				appSharedSecret = acquireAppSharedSecret()
 				if (appSharedSecret == null)
 					return@launch
 				if (appSharedSecret.isEmpty())
 					appSharedSecret = edittext_logindatainput_key?.text.toString()
-				query.data.params = listOf(UserDataParams(UntisAuthentication.getAuthObject(user, appSharedSecret)))
+				query.data.params = listOf(UserDataParams(UntisAuthentication.getAuthObject(username, appSharedSecret)))
 			}
 
 			updateLoadingStatus(getString(R.string.logindatainput_loading_user_data))
@@ -220,20 +258,21 @@ class LoginDataInputActivity : BaseActivity() {
 				val untisResponse = getJSON().parse(UserDataResponse.serializer(), data)
 
 				if (untisResponse.result != null) {
-					val userDatabase = UserDatabase.createInstance(this@LoginDataInputActivity)
-					val userId = userDatabase.addUser(UserDatabase.User(
-							null,
-							query.url,
+					val user = UserDatabase.User(
+							existingUserId,
+							url,
 							schoolInfo?.mobileServiceUrl,
 							query.school,
-							user,
+							username,
 							appSharedSecret,
 							anonymous,
 							untisResponse.result.masterData.timeGrid,
 							untisResponse.result.masterData.timeStamp,
 							untisResponse.result.userData,
 							untisResponse.result.settings
-					))
+					)
+
+					val userId = if (existingUserId == null) userDatabase.addUser(user) else userDatabase.editUser(user)
 
 					userId?.let {
 						userDatabase.setAdditionalUserData(userId, untisResponse.result.masterData)
@@ -244,11 +283,8 @@ class LoginDataInputActivity : BaseActivity() {
 
 						preferences.saveProfileId(userId.toLong())
 
-						// TODO: Return userId as result
-
+						setResult(Activity.RESULT_OK)
 						finish()
-
-						return@fold
 					} ?: run {
 						stopLoadingAndShowError(String.format(getString(R.string.logindatainput_adding_user_unknown_error)))
 					}
@@ -263,6 +299,19 @@ class LoginDataInputActivity : BaseActivity() {
 		}
 	}
 
+	private fun deleteProfile(user: UserDatabase.User) {
+		MaterialAlertDialogBuilder(this)
+				.setTitle(getString(R.string.main_dialog_delete_profile_title))
+				.setMessage(getString(R.string.main_dialog_delete_profile_message, user.userData.displayName, user.userData.schoolName))
+				.setNegativeButton(getString(R.string.cancel), null)
+				.setPositiveButton(getString(R.string.delete)) { _, _ ->
+					userDatabase.deleteUser(user.id!!)
+					setResult(RESULT_OK)
+					finish()
+				}
+				.show()
+	}
+
 	private fun updateLoadingStatus(msg: String) {
 		textview_logindatainput_loadingstatus?.text = msg
 	}
@@ -275,18 +324,17 @@ class LoginDataInputActivity : BaseActivity() {
 	}
 
 	override fun onBackPressed() {
-		button_logindatainput_login?.isEnabled = false
+		setElementsEnabled(false)
 		super.onBackPressed()
 	}
 
 	private fun setElementsEnabled(enabled: Boolean) {
 		textinputlayout_logindatainput_url?.isEnabled = enabled && schoolInfo == null
 		textinputlayout_logindatainput_school?.isEnabled = enabled && schoolInfo == null
-		textinputlayout_logindatainput_user?.isEnabled = enabled && !(switch_logindatainput_anonymouslogin?.isChecked
-				?: false)
-		textinputlayout_logindatainput_key?.isEnabled = enabled && !(switch_logindatainput_anonymouslogin?.isChecked
-				?: false)
+		textinputlayout_logindatainput_user?.isEnabled = enabled && switch_logindatainput_anonymouslogin?.isChecked == false
+		textinputlayout_logindatainput_key?.isEnabled = enabled && switch_logindatainput_anonymouslogin?.isChecked == false
 		button_logindatainput_login?.isEnabled = enabled
+		button_logindatainput_delete?.isEnabled = enabled
 		switch_logindatainput_anonymouslogin?.isEnabled = enabled
 	}
 }
