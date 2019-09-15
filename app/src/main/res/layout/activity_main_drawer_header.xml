@@ -107,7 +107,7 @@
 				android:id="@+id/textview_mainactivitydrawer_add_text"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:text="Add a profile..."
+				android:text="@string/mainactivitydrawer_profile_add"
 				android:textColor="?android:attr/textColorPrimary"
 				android:textSize="13sp" />
 
@@ -124,7 +124,7 @@
 			android:layout_marginStart="16dp"
 			android:layout_marginTop="16dp"
 			android:layout_marginEnd="8dp"
-			android:text="Long-press a profile to delete"
+			android:text="@string/mainactivitydrawer_profile_delete_hint"
 			android:textColor="?android:attr/textColorSecondary"
 			android:textSize="13sp" />
 
