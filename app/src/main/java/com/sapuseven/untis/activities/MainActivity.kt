@@ -3,9 +3,7 @@ package com.sapuseven.untis.activities
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.DatePickerDialog
 import android.content.DialogInterface
-import android.content.DialogInterface.BUTTON_NEUTRAL
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.RectF
@@ -27,12 +25,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.alamkanak.weekview.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.picker.MaterialStyledDatePickerDialog
 import com.google.android.material.snackbar.Snackbar
 import com.sapuseven.untis.R
 import com.sapuseven.untis.adapters.ProfileListAdapter
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
+import com.sapuseven.untis.dialogs.DatePickerDialog
 import com.sapuseven.untis.dialogs.ElementPickerDialog
 import com.sapuseven.untis.dialogs.TimetableItemDetailsDialog
 import com.sapuseven.untis.helpers.ConversionUtils
@@ -63,8 +61,7 @@ class MainActivity :
 		TopLeftCornerClickListener,
 		TimetableDisplay,
 		TimetableItemDetailsDialog.TimetableItemDetailsDialogListener,
-		ElementPickerDialog.ElementPickerDialogListener,
-		DatePickerDialog.OnDateSetListener {
+		ElementPickerDialog.ElementPickerDialogListener {
 
 	companion object {
 		private const val MINUTE_MILLIS: Int = 60 * 1000
@@ -83,6 +80,7 @@ class MainActivity :
 	private val items: ArrayList<WeekViewEvent<TimegridItem>> = ArrayList()
 	private val loadedMonths = mutableListOf<Int>()
 	private var displayedElement: PeriodElement? = null
+	private var lastPickedDate: Calendar? = null
 	private lateinit var profileUser: UserDatabase.User
 	private lateinit var profileListAdapter: ProfileListAdapter
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
@@ -789,29 +787,27 @@ class MainActivity :
 		pbLoadingIndicator?.visibility = if (loading) View.VISIBLE else View.GONE
 	}
 
-	@SuppressLint("RestrictedApi", "PrivateResource")
 	override fun onCornerClick() {
-		val calendar = Calendar.getInstance()
-		val dialog = MaterialStyledDatePickerDialog(this, R.style.DialogTheme, { _, year: Int, month: Int, dayOfMonth: Int ->
-			val c = DateTimeUtils.today()
-			c.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-			c.set(Calendar.MONTH, month)
-			c.set(Calendar.YEAR, year)
-			weekView.goToDate(c)
-		}, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
-		dialog.setButton(BUTTON_NEUTRAL, getString(R.string.today)) { d, _ ->
-			d.dismiss()
-			weekView.goToToday()
-		}
-		dialog.show()
-	}
+		val fragment = DatePickerDialog()
 
-	override fun onDateSet(view: DatePicker, year: Int, month: Int, day: Int) {
-		val calendar = Calendar.getInstance()
-		calendar.set(Calendar.YEAR, year)
-		calendar.set(Calendar.MONTH, month)
-		calendar.set(Calendar.DAY_OF_MONTH, day)
-		weekView.goToDate(calendar)
+		lastPickedDate?.let {
+			val args = Bundle()
+			args.putInt("year", it.get(Calendar.YEAR))
+			args.putInt("month", it.get(Calendar.MONTH))
+			args.putInt("day", it.get(Calendar.DAY_OF_MONTH))
+			fragment.arguments = args
+		}
+		fragment.setOnDateSetListener(android.app.DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
+			val c = DateTimeUtils.today()
+			c.set(Calendar.YEAR, year)
+			c.set(Calendar.MONTH, month)
+			c.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+			weekView.goToDate(c)
+
+			lastPickedDate = c
+		})
+		fragment.show(
+				supportFragmentManager, "datePicker")
 	}
 
 	private fun Int.darken(ratio: Float): Int {
