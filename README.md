@@ -21,15 +21,13 @@ Another major change is the use of a custom WeekView (based on [Till Hellmund](h
 - Near instantaneous timetable loading
 - Lag-free timetable scrolling
 - Flexible timegrid allows to display hours outside the regular timetable (like consultation times with teachers)
+- Support for multiple accounts
 
 ## Missing features / Ways to contribute
 - No holiday or free day indicators
 - No translations, as of now the app is only available in English
-- No notifications
 - No in-timetable room availability indicator
-- No custom personal timetable
 - No account settings
-- No support for multiple accounts _(although I wrote timetable-specific code in a way to allow relatively easy implementation of this)_
 - No 'last updated'-indicator
 - Almost no unit and integration tests
 
@@ -39,6 +37,8 @@ Basically, there are two main branches: **master** and **develop**. They both ar
 
 ### Branch: master
 This branch always and only contains the latest release version. This includes alpha/beta releases.
+
+_Note: As the app hasn't been released yet, this branch doesn't contain any useful code (see below)._
 
 ### Branch: develop
 This branch contains the current development version. Small changes and fixes can be committed directly to this branch.
