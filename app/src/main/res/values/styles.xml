@@ -1,4 +1,5 @@
 <resources>
+
 	<style name="AppTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
 		<item name="colorPrimary">@color/colorPrimary</item>
 		<item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -18,9 +19,19 @@
 		<!-- TODO: Find a way to style the 'neutral'-button here in XML -->
 	</style>
 
-	<style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar"/>
+	<style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
 
-	<style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light"/>
+	<style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
+
+	<style name="AppTheme.Launcher">
+		<item name="android:windowBackground">@drawable/app_splash</item>
+		<item name="android:statusBarColor">@android:color/transparent</item>
+	</style>
+
+	<style name="AppTheme.Launcher.NoActionBar">
+		<item name="windowActionBar">false</item>
+		<item name="windowNoTitle">true</item>
+	</style>
 
 	<style name="AppTheme.ThemeUntis">
 		<item name="colorPrimary">@color/colorPrimaryThemeUntis</item>
@@ -56,7 +67,6 @@
 		<item name="colorAccent">@color/colorAccentThemeCyan</item>
 		<item name="colorSecondary">@color/colorAccentThemeCyan</item>
 	</style>
-
 
 	<style name="AppTheme.ThemeUntis.NoActionBar">
 		<item name="windowActionBar">false</item>
