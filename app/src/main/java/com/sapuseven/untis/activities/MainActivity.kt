@@ -25,6 +25,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alamkanak.weekview.*
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.picker.MaterialStyledDatePickerDialog
 import com.google.android.material.snackbar.Snackbar
@@ -84,6 +85,7 @@ class MainActivity :
 	private val loadedMonths = mutableListOf<Int>()
 	private var displayedElement: PeriodElement? = null
 	private lateinit var profileUser: UserDatabase.User
+	private lateinit var profileListAdapter: ProfileListAdapter
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 	private lateinit var timetableLoader: TimetableLoader
 	private lateinit var preferenceManager: PreferenceManager
@@ -101,10 +103,7 @@ class MainActivity :
 		preferenceManager = PreferenceManager(this)
 
 		if (!loadProfile()) {
-			val loginIntent = Intent(this, LoginActivity::class.java)
-			startActivity(loginIntent)
-			// TODO: Start for result and set profileId from result
-			finish()
+			login()
 			return
 		}
 
@@ -118,6 +117,13 @@ class MainActivity :
 
 		setupTimetableLoader()
 		showPersonalTimetable()
+	}
+
+	private fun login() {
+		val loginIntent = Intent(this, LoginActivity::class.java)
+		startActivity(loginIntent)
+		// TODO: Start for result and set profileId from result
+		finish()
 	}
 
 	private fun showPersonalTimetable() {
@@ -163,6 +169,16 @@ class MainActivity :
 		val dropdownView = header.findViewById<LinearLayout>(R.id.linearlayout_mainactivitydrawer_dropdown_view)
 		val dropdownImage = header.findViewById<ImageView>(R.id.imageview_mainactivitydrawer_dropdown_arrow)
 		val dropdownList = header.findViewById<RecyclerView>(R.id.recyclerview_mainactivitydrawer_profile_list)
+
+		val userList = userDatabase.getAllUsers()
+		profileListAdapter = ProfileListAdapter(this, userList.toMutableList(), View.OnClickListener { view ->
+			toggleProfileDropdown(dropdownView, dropdownImage, dropdownList)
+			switchToProfile(userList[dropdownList.getChildLayoutPosition(view)])
+		}, View.OnLongClickListener { view ->
+			deleteProfile(userList[dropdownList.getChildLayoutPosition(view)])
+			true
+		})
+		dropdownList.adapter = profileListAdapter
 		dropdown.setOnClickListener {
 			toggleProfileDropdown(dropdownView, dropdownImage, dropdownList)
 		}
@@ -190,26 +206,36 @@ class MainActivity :
 			dropdownView.visibility = View.GONE
 		} else {
 			dropdownImage.scaleY = -1F
-			val userList = userDatabase.getAllUsers()
-			val adapter = ProfileListAdapter(this, userList, View.OnClickListener { view ->
-				toggleProfileDropdown(dropdownView, dropdownImage, dropdownList)
-				switchToProfile(userList[dropdownList.getChildLayoutPosition(view)])
-			})
 
 			dropdownList.setHasFixedSize(true)
 			dropdownList.layoutManager = LinearLayoutManager(this)
-
-			dropdownList.adapter = adapter
 
 			dropdownView.visibility = View.VISIBLE
 		}
 	}
 
+	private fun deleteProfile(user: UserDatabase.User) {
+		MaterialAlertDialogBuilder(this)
+				.setTitle("Delete profile?")
+				.setMessage("This will delete your profile with user ${user.userData.displayName} at school ${user.userData.schoolName}.")
+				.setNegativeButton("Cancel", null)
+				.setPositiveButton("Delete") { _, _ ->
+					userDatabase.deleteUser(user)
+					if (user.id == profileId) {
+						if (!loadProfile())
+							login()
+
+						recreate()
+					}
+					profileListAdapter.deleteUser(user)
+					profileListAdapter.notifyDataSetChanged()
+				}
+				.show()
+	}
+
 	@SuppressLint("ApplySharedPref")
 	private fun switchToProfile(user: UserDatabase.User) {
-		val editor = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this).edit()
-		editor.putLong("profile", user.id!!.toLong()) // TODO: Do not hard-code "profile"
-		editor.commit()
+		preferenceManager.saveProfileId(user.id!!)
 		preferenceManager.reload()
 		if (!loadProfile()) finish() // TODO: Show error
 		else {
@@ -297,14 +323,13 @@ class MainActivity :
 	}
 
 	private fun loadProfile(): Boolean {
-		// TODO: Show error (invalid profile) if loading fails (return false) and re-login. It is mandatory to stop the execution of more code, or else the app will crash.
-
 		if (userDatabase.getUsersCount() < 1)
 			return false
 
 		profileId = preferenceManager.profileId
-		if (profileId == 0L) profileId = userDatabase.getAllUsers()[0].id ?: 0
-		if (profileId == 0L) return false
+		if (profileId == 0L || userDatabase.getUser(profileId) == null) profileId = userDatabase.getAllUsers()[0].id
+				?: 0 // Fall back to the first user if an invalid user id is saved
+		if (profileId == 0L) return false // No user found in database
 		profileUser = userDatabase.getUser(profileId) ?: return false
 
 		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileUser.id ?: 0)

@@ -77,40 +77,56 @@
 		android:orientation="vertical"
 		android:visibility="gone">
 
-		<androidx.recyclerview.widget.RecyclerView
-			android:id="@+id/recyclerview_mainactivitydrawer_profile_list"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"/>
-
 		<LinearLayout
 			android:id="@+id/linearlayout_mainactivitydrawer_add"
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
+			android:layout_height="48dp"
+			android:background="?android:attr/selectableItemBackground"
 			android:clickable="true"
-			android:focusable="true">
+			android:focusable="true"
+			android:gravity="center_vertical"
+			android:orientation="horizontal"
+			android:paddingStart="24dp"
+			android:paddingEnd="8dp">
+
+			<TextView
+				android:id="@+id/textview_mainactivitydrawer_add_text"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="Add a profile..."
+				android:textColor="?android:attr/textColorPrimary"
+				android:textSize="13sp" />
 
 			<androidx.appcompat.widget.AppCompatImageView
 				android:id="@+id/imageview_mainactivitydrawer_add_image"
 				android:layout_width="24dp"
 				android:layout_height="24dp"
-				android:layout_marginStart="32dp"
-				android:layout_marginTop="16dp"
-				android:layout_marginBottom="16dp"
-				android:contentDescription="@string/room_availability_indicator"
-				app:srcCompat="@drawable/all_add"/>
+				android:layout_marginEnd="24dp"
+				app:srcCompat="@drawable/all_add" />
 
-			<TextView
-				android:id="@+id/textview_mainactivitydrawer_add_text"
-				android:layout_width="match_parent"
-				android:layout_height="24dp"
-				android:layout_marginStart="16dp"
-				android:layout_marginTop="16dp"
-				android:layout_marginEnd="16dp"
-				android:layout_marginBottom="16dp"
-				android:gravity="center_vertical"
-				android:text="Add a profile..."
-				android:textColor="?android:attr/textColorPrimary"
-				android:textSize="13sp"/>
 		</LinearLayout>
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="16dp"
+			android:layout_marginTop="16dp"
+			android:layout_marginEnd="8dp"
+			android:text="Long-press a profile to delete"
+			android:textColor="?android:attr/textColorSecondary"
+			android:textSize="13sp" />
+
+		<View
+			android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:background="?android:attr/listDivider" />
+
+		<androidx.recyclerview.widget.RecyclerView
+			android:id="@+id/recyclerview_mainactivitydrawer_profile_list"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+
+		</androidx.recyclerview.widget.RecyclerView>
+
 	</LinearLayout>
 </LinearLayout>

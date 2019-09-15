@@ -12,8 +12,9 @@ import com.sapuseven.untis.data.databases.UserDatabase
 
 class ProfileListAdapter(
 		private val context: Context,
-		private val dataset: List<UserDatabase.User>,
-		private val onClickListener: View.OnClickListener
+		private val dataset: MutableList<UserDatabase.User>,
+		private val onClickListener: View.OnClickListener,
+		private val onLongClickListener: View.OnLongClickListener
 ) :
 		RecyclerView.Adapter<ProfileListAdapter.ViewHolder>() {
 
@@ -25,6 +26,7 @@ class ProfileListAdapter(
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		val v = LayoutInflater.from(parent.context).inflate(R.layout.item_profiles, parent, false) as ConstraintLayout
 		v.setOnClickListener(onClickListener)
+		v.setOnLongClickListener(onLongClickListener)
 		return ViewHolder(v)
 	}
 
@@ -35,4 +37,6 @@ class ProfileListAdapter(
 	}
 
 	override fun getItemCount() = dataset.size
+
+	fun deleteUser(user: UserDatabase.User) = dataset.remove(user)
 }
