@@ -38,7 +38,6 @@ import com.sapuseven.untis.dialogs.TimetableItemDetailsDialog
 import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
-import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.helpers.config.PreferenceUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
@@ -88,7 +87,6 @@ class MainActivity :
 	private lateinit var profileListAdapter: ProfileListAdapter
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 	private lateinit var timetableLoader: TimetableLoader
-	private lateinit var preferenceManager: PreferenceManager
 	private lateinit var weekView: WeekView<TimegridItem>
 
 	private var pbLoadingIndicator: ProgressBar? = null
@@ -99,8 +97,6 @@ class MainActivity :
 		super.onCreate(savedInstanceState)
 
 		setupNotifications()
-
-		preferenceManager = PreferenceManager(this)
 
 		if (!loadProfile()) {
 			login()
@@ -128,7 +124,7 @@ class MainActivity :
 
 	private fun showPersonalTimetable() {
 		val customType = TimetableDatabaseInterface.Type.valueOf(PreferenceUtils.getPrefString(
-				preferenceManager,
+				preferences,
 				"preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_TYPE}",
 				TimetableDatabaseInterface.Type.SUBJECT.toString()
 		))
@@ -143,7 +139,7 @@ class MainActivity :
 				setTarget(anonymous = true)
 			}
 		} else {
-			val customId = preferenceManager.defaultPrefs.getInt("preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_ID}", -1)
+			val customId = preferences.defaultPrefs.getInt("preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_ID}", -1)
 			setTarget(customId, customType.toString(), timetableDatabaseInterface.getLongName(customId, customType))
 		}
 	}
@@ -234,8 +230,8 @@ class MainActivity :
 
 	@SuppressLint("ApplySharedPref")
 	private fun switchToProfile(user: UserDatabase.User) {
-		preferenceManager.saveProfileId(user.id!!)
-		preferenceManager.reload()
+		preferences.saveProfileId(user.id!!)
+		preferences.reload()
 		if (!loadProfile()) finish() // TODO: Show error
 		else {
 			setupNavDrawerHeader(findViewById(R.id.navigationview_main))
@@ -252,7 +248,7 @@ class MainActivity :
 
 	override fun onResume() {
 		super.onResume()
-		preferenceManager.reload()
+		preferences.reload()
 		setupWeekViewConfig()
 		items.clear()
 		loadedMonths.clear()
@@ -316,7 +312,7 @@ class MainActivity :
 		weekView.notifyDataSetChanged()
 		showLoading(!forceRefresh)
 
-		val alwaysLoad = PreferenceUtils.getPrefBool(preferenceManager, "preference_timetable_refresh_in_background")
+		val alwaysLoad = PreferenceUtils.getPrefBool(preferences, "preference_timetable_refresh_in_background")
 		val flags = (if (!forceRefresh) TimetableLoader.FLAG_LOAD_CACHE else 0) or (if (alwaysLoad || forceRefresh) TimetableLoader.FLAG_LOAD_SERVER else 0)
 		timetableLoader.load(target, flags)
 	}
@@ -325,12 +321,13 @@ class MainActivity :
 		if (userDatabase.getUsersCount() < 1)
 			return false
 
-		profileId = preferenceManager.profileId
+		profileId = preferences.profileId
 		if (profileId == 0L || userDatabase.getUser(profileId) == null) profileId = userDatabase.getAllUsers()[0].id
 				?: 0 // Fall back to the first user if an invalid user id is saved
 		if (profileId == 0L) return false // No user found in database
 		profileUser = userDatabase.getUser(profileId) ?: return false
 
+		preferences.saveProfileId(profileId)
 		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileUser.id ?: 0)
 		return true
 	}
@@ -347,15 +344,15 @@ class MainActivity :
 		// Customization
 
 		// Timetable
-		weekView.columnGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferenceManager, "preference_timetable_item_padding").toFloat(), this)
-		weekView.overlappingEventGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferenceManager, "preference_timetable_item_padding_overlap").toFloat(), this)
-		weekView.eventCornerRadius = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferenceManager, "preference_timetable_item_corner_radius").toFloat(), this)
-		weekView.eventSecondaryTextCentered = PreferenceUtils.getPrefBool(preferenceManager, "preference_timetable_centered_lesson_info")
-		weekView.eventTextBold = PreferenceUtils.getPrefBool(preferenceManager, "preference_timetable_bold_lesson_name")
-		weekView.eventTextSize = ConversionUtils.spToPx(PreferenceUtils.getPrefInt(preferenceManager, "preference_timetable_lesson_name_font_size").toFloat(), this)
-		weekView.eventSecondaryTextSize = ConversionUtils.spToPx(PreferenceUtils.getPrefInt(preferenceManager, "preference_timetable_lesson_info_font_size").toFloat(), this)
-		weekView.eventTextColor = if (PreferenceUtils.getPrefBool(preferenceManager, "preference_timetable_item_text_light")) Color.WHITE else Color.BLACK
-		weekView.nowLineColor = PreferenceUtils.getPrefInt(preferenceManager, "preference_marker")
+		weekView.columnGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_padding").toFloat(), this)
+		weekView.overlappingEventGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_padding_overlap").toFloat(), this)
+		weekView.eventCornerRadius = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_corner_radius").toFloat(), this)
+		weekView.eventSecondaryTextCentered = PreferenceUtils.getPrefBool(preferences, "preference_timetable_centered_lesson_info")
+		weekView.eventTextBold = PreferenceUtils.getPrefBool(preferences, "preference_timetable_bold_lesson_name")
+		weekView.eventTextSize = ConversionUtils.spToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_lesson_name_font_size").toFloat(), this)
+		weekView.eventSecondaryTextSize = ConversionUtils.spToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_lesson_info_font_size").toFloat(), this)
+		weekView.eventTextColor = if (PreferenceUtils.getPrefBool(preferences, "preference_timetable_item_text_light")) Color.WHITE else Color.BLACK
+		weekView.nowLineColor = PreferenceUtils.getPrefInt(preferences, "preference_marker")
 	}
 
 	override fun onMonthChange(startDate: Calendar, endDate: Calendar): List<WeekViewDisplayable<TimegridItem>> {
@@ -514,18 +511,18 @@ class MainActivity :
 	}
 
 	private fun setupColors(items: List<TimegridItem>) {
-		val regularColor = PreferenceUtils.getPrefInt(preferenceManager, "preference_background_regular")
-		val examColor = PreferenceUtils.getPrefInt(preferenceManager, "preference_background_exam")
-		val cancelledColor = PreferenceUtils.getPrefInt(preferenceManager, "preference_background_cancelled")
-		val irregularColor = PreferenceUtils.getPrefInt(preferenceManager, "preference_background_irregular")
+		val regularColor = PreferenceUtils.getPrefInt(preferences, "preference_background_regular")
+		val examColor = PreferenceUtils.getPrefInt(preferences, "preference_background_exam")
+		val cancelledColor = PreferenceUtils.getPrefInt(preferences, "preference_background_cancelled")
+		val irregularColor = PreferenceUtils.getPrefInt(preferences, "preference_background_irregular")
 
-		val regularPastColor = PreferenceUtils.getPrefInt(preferenceManager, "preference_background_regular_past")
-		val examPastColor = PreferenceUtils.getPrefInt(preferenceManager, "preference_background_exam_past")
-		val cancelledPastColor = PreferenceUtils.getPrefInt(preferenceManager, "preference_background_cancelled_past")
-		val irregularPastColor = PreferenceUtils.getPrefInt(preferenceManager, "preference_background_irregular_past")
+		val regularPastColor = PreferenceUtils.getPrefInt(preferences, "preference_background_regular_past")
+		val examPastColor = PreferenceUtils.getPrefInt(preferences, "preference_background_exam_past")
+		val cancelledPastColor = PreferenceUtils.getPrefInt(preferences, "preference_background_cancelled_past")
+		val irregularPastColor = PreferenceUtils.getPrefInt(preferences, "preference_background_irregular_past")
 
-		val useDefault = PreferenceUtils.getPrefBool(preferenceManager, "preference_use_default_background")
-		val useTheme = PreferenceUtils.getPrefBool(preferenceManager, "preference_use_theme_background")
+		val useDefault = PreferenceUtils.getPrefBool(preferences, "preference_use_default_background")
+		val useTheme = PreferenceUtils.getPrefBool(preferences, "preference_use_theme_background")
 
 		items.forEach { item ->
 			item.color = when {

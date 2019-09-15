@@ -16,28 +16,28 @@ import com.sapuseven.untis.helpers.config.PreferenceUtils
 open class BaseActivity : AppCompatActivity() {
 	private var currentTheme: String = ""
 	private var currentDarkTheme: String = ""
-	private lateinit var preferenceManager: PreferenceManager
+	protected lateinit var preferences: PreferenceManager
 	protected var hasOwnToolbar: Boolean = false
 
 	private var themeId = -1
 
 	override fun onCreate(savedInstanceState: Bundle?) {
-		preferenceManager = PreferenceManager(this)
-		currentTheme = PreferenceUtils.getPrefString(preferenceManager, "preference_theme")
-		currentDarkTheme = PreferenceUtils.getPrefString(preferenceManager, "preference_dark_theme")
+		preferences = PreferenceManager(this)
+		currentTheme = PreferenceUtils.getPrefString(preferences, "preference_theme")
+		currentDarkTheme = PreferenceUtils.getPrefString(preferences, "preference_dark_theme")
 		super.onCreate(savedInstanceState)
 	}
 
 	override fun onStart() {
-		setBlackBackground(PreferenceUtils.getPrefBool(preferenceManager, "preference_dark_theme_oled"))
+		setBlackBackground(PreferenceUtils.getPrefBool(preferences, "preference_dark_theme_oled"))
 		setAppTheme(hasOwnToolbar)
 		super.onStart()
 	}
 
 	override fun onResume() {
 		super.onResume()
-		val theme = PreferenceUtils.getPrefString(preferenceManager, "preference_theme")
-		val darkTheme = PreferenceUtils.getPrefString(preferenceManager, "preference_dark_theme")
+		val theme = PreferenceUtils.getPrefString(preferences, "preference_theme")
+		val darkTheme = PreferenceUtils.getPrefString(preferences, "preference_dark_theme")
 
 		if (currentTheme != theme || currentDarkTheme != darkTheme)
 			recreate()
@@ -60,7 +60,7 @@ open class BaseActivity : AppCompatActivity() {
 			"cyan" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_ThemeCyan_NoActionBar else R.style.AppTheme_ThemeCyan)
 			else -> setTheme(if (hasOwnToolbar) R.style.AppTheme_NoActionBar else R.style.AppTheme)
 		}
-		delegate.localNightMode = when (PreferenceUtils.getPrefString(preferenceManager, "preference_dark_theme", currentDarkTheme)) {
+		delegate.localNightMode = when (PreferenceUtils.getPrefString(preferences, "preference_dark_theme", currentDarkTheme)) {
 			"on" -> AppCompatDelegate.MODE_NIGHT_YES
 			"auto" -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 			else -> AppCompatDelegate.MODE_NIGHT_NO

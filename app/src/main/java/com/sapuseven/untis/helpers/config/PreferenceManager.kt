@@ -15,6 +15,8 @@ class PreferenceManager(val context: Context) {
 	}
 
 	fun saveProfileId(profileId: Long) {
+		this.profileId = profileId
+
 		val editor = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context).edit()
 		editor.putLong("profile", profileId)
 		editor.apply()
