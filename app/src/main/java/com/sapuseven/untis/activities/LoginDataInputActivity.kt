@@ -16,6 +16,7 @@ import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
+import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.models.UntisSchoolInfo
 import com.sapuseven.untis.models.untis.params.AppSharedSecretParams
 import com.sapuseven.untis.models.untis.params.UserDataParams
@@ -242,9 +243,7 @@ class LoginDataInputActivity : BaseActivity() {
 						imageview_logindatainput_loadingstatussuccess?.visibility = View.VISIBLE
 						textview_logindatainput_loadingstatus?.text = getString(R.string.logindatainput_data_loaded)
 
-						val editor = androidx.preference.PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
-						editor.putLong("profile", userId.toLong())
-						editor.apply()
+						PreferenceManager(applicationContext).saveProfileId(userId.toLong())
 
 						// TODO: Return userId as result
 

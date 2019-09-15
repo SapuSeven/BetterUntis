@@ -18,6 +18,11 @@
 
 	<string name="mainactivitydrawer_dropdown_show">Show profile list</string>
 	<string name="mainactivitydrawer_dropdown_hide">Hide profile list</string>
+	<string name="mainactivitydrawer_profile_add">Add a profile…</string>
+	<string name="mainactivitydrawer_profile_delete_hint">Long-press a profile to delete</string>
+
+	<string name="main_dialog_delete_profile_title">Delete profile?</string>
+	<string name="main_dialog_delete_profile_message">This will delete your profile with user %1$s at school %2$s.</string>
 
 	<string name="login_scan_code">Scan QR Code</string>
 	<string name="login_welcome">Welcome to BetterUntis!</string>
@@ -216,6 +221,7 @@
 	<string name="refresh_this_item">Refresh this room</string>
 	<string name="refresh_all_items">Refresh all rooms</string>
 	<string name="cancel">Cancel</string>
+	<string name="delete">Delete</string>
 	<string name="preference_note_disable">(disable)</string>
 	<string name="previous_hour">previous hour</string>
 	<string name="next_hour">next hour</string>

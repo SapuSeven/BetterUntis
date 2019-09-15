@@ -2,29 +2,14 @@
 <androidx.constraintlayout.widget.ConstraintLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools"
 	android:id="@+id/relativeLayout"
 	android:layout_width="match_parent"
-	android:layout_height="72dp"
+	android:layout_height="wrap_content"
+	android:paddingStart="16dp"
+	android:paddingEnd="16dp"
 	android:background="?android:attr/selectableItemBackground"
 	android:clickable="true"
 	android:focusable="true">
-
-	<androidx.appcompat.widget.AppCompatImageView
-		android:id="@+id/imageview_profiles_portrait"
-		android:layout_width="40dp"
-		android:layout_height="40dp"
-		android:layout_marginStart="16dp"
-		android:layout_marginTop="16dp"
-		android:layout_marginBottom="16dp"
-		android:contentDescription="@string/room_availability_indicator"
-		app:layout_constraintBottom_toBottomOf="parent"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toTopOf="parent"
-		app:srcCompat="@drawable/all_prefs_personal"
-		tools:layout_conversion_absoluteHeight="32dp"
-		tools:layout_conversion_absoluteWidth="32dp"/>
-
 
 	<TextView
 		android:id="@+id/textview_profiles_name"
@@ -32,26 +17,36 @@
 		android:layout_height="20dp"
 		android:layout_marginStart="16dp"
 		android:layout_marginTop="16dp"
-		android:layout_marginEnd="16dp"
 		android:gravity="center_vertical"
+		android:lines="1"
 		android:textColor="?android:attr/textColorPrimary"
-		android:textSize="13sp"
+		android:textSize="@dimen/textsize_listitem_line1"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toEndOf="@+id/imageview_profiles_portrait"
-		app:layout_constraintTop_toTopOf="parent"/>
+		app:layout_constraintTop_toTopOf="parent" />
 
 	<TextView
 		android:id="@+id/textview_profiles_school"
 		android:layout_width="0dp"
 		android:layout_height="20dp"
 		android:layout_marginStart="16dp"
-		android:layout_marginEnd="16dp"
 		android:layout_marginBottom="16dp"
 		android:gravity="center_vertical"
+		android:lines="1"
 		android:textColor="?android:attr/textColorSecondary"
-		android:textSize="13sp"
+		android:textSize="@dimen/textsize_listitem_line2"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintStart_toEndOf="@+id/imageview_profiles_portrait"/>
+		app:layout_constraintStart_toEndOf="@+id/imageview_profiles_portrait" />
 
+	<androidx.appcompat.widget.AppCompatImageView
+		android:id="@+id/imageview_profiles_portrait"
+		android:layout_width="40dp"
+		android:layout_height="40dp"
+		android:layout_marginTop="16dp"
+		android:layout_marginBottom="16dp"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="parent"
+		app:srcCompat="@drawable/all_prefs_personal" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -21,7 +21,7 @@
 			android:layout_marginTop="48dp"
 			android:layout_marginBottom="8dp"
 			android:contentDescription="@string/betteruntis_logo"
-			app:srcCompat="@drawable/mainactivitydrawer_headericon"/>
+			app:srcCompat="@drawable/mainactivitydrawer_headericon" />
 
 		<androidx.constraintlayout.widget.ConstraintLayout
 			android:id="@+id/constraintlayout_mainactivitydrawer_dropdown"
@@ -41,7 +41,7 @@
 				android:textAppearance="@style/TextAppearance.AppCompat.Body1"
 				android:textSize="@dimen/textsize_header_line1"
 				app:layout_constraintStart_toStartOf="parent"
-				app:layout_constraintTop_toTopOf="parent"/>
+				app:layout_constraintTop_toTopOf="parent" />
 
 			<TextView
 				android:id="@+id/textview_mainactivitydrawer_line2"
@@ -54,7 +54,7 @@
 				android:textSize="@dimen/textsize_header_line2"
 				app:layout_constraintBottom_toBottomOf="parent"
 				app:layout_constraintStart_toStartOf="parent"
-				app:layout_constraintTop_toBottomOf="@+id/textview_mainactivtydrawer_line1"/>
+				app:layout_constraintTop_toBottomOf="@+id/textview_mainactivtydrawer_line1" />
 
 			<ImageView
 				android:id="@+id/imageview_mainactivitydrawer_dropdown_arrow"
@@ -65,7 +65,7 @@
 				app:layout_constraintBottom_toBottomOf="parent"
 				app:layout_constraintEnd_toEndOf="parent"
 				app:layout_constraintTop_toTopOf="parent"
-				app:srcCompat="@drawable/mainactivitydrawer_dropdown"/>
+				app:srcCompat="@drawable/mainactivitydrawer_dropdown" />
 		</androidx.constraintlayout.widget.ConstraintLayout>
 
 	</LinearLayout>
@@ -80,37 +80,53 @@
 		<androidx.recyclerview.widget.RecyclerView
 			android:id="@+id/recyclerview_mainactivitydrawer_profile_list"
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content"/>
+			android:layout_height="wrap_content">
+
+		</androidx.recyclerview.widget.RecyclerView>
 
 		<LinearLayout
 			android:id="@+id/linearlayout_mainactivitydrawer_add"
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
+			android:layout_height="48dp"
+			android:background="?android:attr/selectableItemBackground"
 			android:clickable="true"
-			android:focusable="true">
+			android:focusable="true"
+			android:gravity="center_vertical"
+			android:orientation="horizontal"
+			android:paddingStart="24dp"
+			android:paddingEnd="8dp">
 
 			<androidx.appcompat.widget.AppCompatImageView
 				android:id="@+id/imageview_mainactivitydrawer_add_image"
 				android:layout_width="24dp"
 				android:layout_height="24dp"
-				android:layout_marginStart="32dp"
-				android:layout_marginTop="16dp"
-				android:layout_marginBottom="16dp"
-				android:contentDescription="@string/room_availability_indicator"
-				app:srcCompat="@drawable/all_add"/>
+				android:layout_marginEnd="24dp"
+				app:srcCompat="@drawable/all_add" />
 
 			<TextView
 				android:id="@+id/textview_mainactivitydrawer_add_text"
 				android:layout_width="match_parent"
-				android:layout_height="24dp"
-				android:layout_marginStart="16dp"
-				android:layout_marginTop="16dp"
-				android:layout_marginEnd="16dp"
-				android:layout_marginBottom="16dp"
-				android:gravity="center_vertical"
-				android:text="Add a profile..."
+				android:layout_height="wrap_content"
+				android:text="@string/mainactivitydrawer_profile_add"
 				android:textColor="?android:attr/textColorPrimary"
-				android:textSize="13sp"/>
+				android:textSize="13sp" />
+
 		</LinearLayout>
+
+		<View
+			android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:background="?android:attr/listDivider" />
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="16dp"
+			android:layout_marginTop="16dp"
+			android:layout_marginEnd="8dp"
+			android:text="@string/mainactivitydrawer_profile_delete_hint"
+			android:textColor="?android:attr/textColorSecondary"
+			android:textSize="13sp" />
+
 	</LinearLayout>
 </LinearLayout>

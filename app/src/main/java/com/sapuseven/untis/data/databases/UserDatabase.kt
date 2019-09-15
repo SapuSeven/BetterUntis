@@ -93,6 +93,12 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 			id
 	}
 
+	fun deleteUser(user: User) {
+		val db = writableDatabase
+		db.delete(UserDatabaseContract.Users.TABLE_NAME, BaseColumns._ID + "=?", arrayOf(user.id.toString()))
+		db.close()
+	}
+
 	fun getUser(id: Long): User? {
 		val db = this.readableDatabase
 
