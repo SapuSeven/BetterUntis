@@ -170,12 +170,11 @@ class MainActivity :
 		val dropdownImage = header.findViewById<ImageView>(R.id.imageview_mainactivitydrawer_dropdown_arrow)
 		val dropdownList = header.findViewById<RecyclerView>(R.id.recyclerview_mainactivitydrawer_profile_list)
 
-		val userList = userDatabase.getAllUsers()
-		profileListAdapter = ProfileListAdapter(this, userList.toMutableList(), View.OnClickListener { view ->
+		profileListAdapter = ProfileListAdapter(this, userDatabase.getAllUsers().toMutableList(), View.OnClickListener { view ->
 			toggleProfileDropdown(dropdownView, dropdownImage, dropdownList)
-			switchToProfile(userList[dropdownList.getChildLayoutPosition(view)])
+			switchToProfile(profileListAdapter.itemAt(dropdownList.getChildLayoutPosition(view)))
 		}, View.OnLongClickListener { view ->
-			deleteProfile(userList[dropdownList.getChildLayoutPosition(view)])
+			deleteProfile(profileListAdapter.itemAt(dropdownList.getChildLayoutPosition(view)))
 			true
 		})
 		dropdownList.adapter = profileListAdapter

@@ -39,4 +39,6 @@ class ProfileListAdapter(
 	override fun getItemCount() = dataset.size
 
 	fun deleteUser(user: UserDatabase.User) = dataset.remove(user)
+
+	fun itemAt(position: Int) = dataset[position]
 }
