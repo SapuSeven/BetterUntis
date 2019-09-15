@@ -15,10 +15,6 @@
 		<item name="windowNoTitle">true</item>
 	</style>
 
-	<style name="DialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date">
-		<!-- TODO: Find a way to style the 'neutral'-button here in XML -->
-	</style>
-
 	<style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
 
 	<style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
