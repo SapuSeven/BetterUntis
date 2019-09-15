@@ -216,10 +216,10 @@ class MainActivity :
 
 	private fun deleteProfile(user: UserDatabase.User) {
 		MaterialAlertDialogBuilder(this)
-				.setTitle("Delete profile?")
-				.setMessage("This will delete your profile with user ${user.userData.displayName} at school ${user.userData.schoolName}.")
-				.setNegativeButton("Cancel", null)
-				.setPositiveButton("Delete") { _, _ ->
+				.setTitle(getString(R.string.main_dialog_delete_profile_title))
+				.setMessage(getString(R.string.main_dialog_delete_profile_message, user.userData.displayName, user.userData.schoolName))
+				.setNegativeButton(getString(R.string.cancel), null)
+				.setPositiveButton(getString(R.string.delete)) { _, _ ->
 					userDatabase.deleteUser(user)
 					if (user.id == profileId) {
 						if (!loadProfile())
