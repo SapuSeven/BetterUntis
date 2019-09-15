@@ -29,8 +29,8 @@ open class BaseActivity : AppCompatActivity() {
 	}
 
 	override fun onStart() {
-		setBlackBackground(PreferenceUtils.getPrefBool(preferences, "preference_dark_theme_oled"))
 		setAppTheme(hasOwnToolbar)
+		setBlackBackground(PreferenceUtils.getPrefBool(preferences, "preference_dark_theme_oled"))
 		super.onStart()
 	}
 
