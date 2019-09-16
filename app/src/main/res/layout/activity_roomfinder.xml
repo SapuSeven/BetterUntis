@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:id="@+id/content_roomfinder"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:animateLayoutChanges="true">
@@ -10,8 +12,6 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:layout_marginBottom="56dp" />
-
-	<!--TODO: Implement and add app:layout_behavior="com.sapuseven.untis.view.behavior.ScrollAwareFabBehavior"-->
 
 	<TextView
 		android:id="@+id/textview_roomfinder_roomlistempty"

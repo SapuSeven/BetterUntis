@@ -31,7 +31,6 @@ import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.timegrid.Day
 import com.sapuseven.untis.models.untis.masterdata.timegrid.Unit
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_roomfinder.*
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
@@ -257,7 +256,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 					override fun onError(requestId: Int, code: Int?, message: String?) {
 						roomList.remove(item)
 						refreshRoomList()
-						Snackbar.make(content_main, if (code != null) ErrorMessageDictionary.getErrorMessage(resources, code) else message
+						Snackbar.make(content_roomfinder, if (code != null) ErrorMessageDictionary.getErrorMessage(resources, code) else message
 								?: getString(R.string.error), Snackbar.LENGTH_INDEFINITE)
 								.show()
 						// TODO: Show a button for more info and possibly bug reports
