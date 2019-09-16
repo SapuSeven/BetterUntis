@@ -737,6 +737,7 @@ public final class WeekView<T> extends View
 	 */
 	public void setNowLineColor(int nowLineColor) {
 		config.nowLineColor = nowLineColor;
+		config.drawingConfig.nowLinePaint.setColor(config.nowLineColor);
 		invalidate();
 	}
 
