@@ -162,8 +162,9 @@ class LoginDataInputActivity : BaseActivity() {
 	private fun restoreInput(prefs: SharedPreferences) {
 		edittext_logindatainput_url?.setText(prefs.getString("edittext_logindatainput_url", ""))
 		edittext_logindatainput_school?.setText(prefs.getString("edittext_logindatainput_school", ""))
-		switch_logindatainput_anonymouslogin?.isChecked = prefs.getBoolean("switch_logindatainput_anonymouslogin", false)
-		if (switch_logindatainput_anonymouslogin?.isChecked == false) {
+		anonymous = prefs.getBoolean("switch_logindatainput_anonymouslogin", false)
+		switch_logindatainput_anonymouslogin?.isChecked = anonymous
+		if (!anonymous) {
 			edittext_logindatainput_user?.setText(prefs.getString("edittext_logindatainput_user", ""))
 			edittext_logindatainput_key?.setText(prefs.getString("edittext_logindatainput_key", ""))
 		}
@@ -172,7 +173,8 @@ class LoginDataInputActivity : BaseActivity() {
 	private fun restoreInput(user: UserDatabase.User) {
 		edittext_logindatainput_url?.setText(user.url)
 		edittext_logindatainput_school?.setText(user.school)
-		switch_logindatainput_anonymouslogin?.isChecked = user.anonymous
+		anonymous = user.anonymous
+		switch_logindatainput_anonymouslogin?.isChecked = anonymous
 		edittext_logindatainput_user?.setText(user.user)
 		edittext_logindatainput_key?.setText(user.key)
 	}
