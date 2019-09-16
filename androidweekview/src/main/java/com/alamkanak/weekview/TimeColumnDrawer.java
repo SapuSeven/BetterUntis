@@ -45,16 +45,14 @@ class TimeColumnDrawer {
 				throw new IllegalStateException("A DateTimeInterpreter must not return null time");
 
 			if (top - (hourTop - lastHourTop) < bottom) {
-				final float x = drawingConfig.timeTextWidth + config.timeColumnPadding;
-
 				if (i % 2 == 0)
 					canvas.drawText(time, config.timeColumnPadding, top + drawingConfig.timeTextHeight, drawingConfig.timeTextTopPaint);
 				else
-					canvas.drawText(time, x, top - bottomTimeOffset, drawingConfig.timeTextBottomPaint);
+					canvas.drawText(time, config.timeColumnPadding + drawingConfig.timeTextWidth, top - bottomTimeOffset, drawingConfig.timeTextBottomPaint);
 
 
 				if (i % 2 == 1) {
-					canvas.drawText(String.valueOf(i / 2 + 1), x / 2, top - (hourTop - lastHourTop) / 2 + (bottomTimeOffset * 1.5f), drawingConfig.timeCaptionPaint);
+					canvas.drawText(String.valueOf(i / 2 + 1), config.timeColumnPadding + drawingConfig.timeTextWidth / 2, top - (hourTop - lastHourTop) / 2 + (bottomTimeOffset * 1.5f), drawingConfig.timeCaptionPaint);
 				}
 			}
 		}

@@ -266,7 +266,7 @@ class WeekViewDrawingConfig {
 	private void initTimeTextWidth(Context context) {
 		final DateTimeInterpreter interpreter = getDateTimeInterpreter(context);
 
-		timeTextWidth = timeTextTopPaint.measureText(interpreter.interpretTime(11 * 60 + 11));
+		timeTextWidth = timeTextTopPaint.measureText(interpreter.interpretTime(22 * 60 + 22));
 	}
 
 	private void initTimeCaptionWidth() {
