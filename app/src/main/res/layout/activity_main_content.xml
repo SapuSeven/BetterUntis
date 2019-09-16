@@ -51,6 +51,7 @@
 			app:timeColumnCaptionSize="16sp"
 			app:timeColumnTextColor="?android:textColorPrimary"
 			app:timeColumnTextSize="12sp"
+			app:timeColumnPadding="4dp"
 			app:todayBackgroundColor="@android:color/transparent"
 			app:todayHeaderTextColor="?attr/colorPrimary"
 			app:topLeftCornerDrawable="@drawable/all_calendar"
