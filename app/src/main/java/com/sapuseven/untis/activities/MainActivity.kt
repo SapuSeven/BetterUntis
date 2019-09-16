@@ -68,8 +68,9 @@ class MainActivity :
 		private const val DAY_MILLIS: Int = 24 * HOUR_MILLIS
 
 		private const val REQUEST_CODE_ROOM_FINDER = 1
-		private const val REQUEST_CODE_LOGINDATAINPUT_ADD = 2
-		private const val REQUEST_CODE_LOGINDATAINPUT_EDIT = 3
+		private const val REQUEST_CODE_SETTINGS = 2
+		private const val REQUEST_CODE_LOGINDATAINPUT_ADD = 3
+		private const val REQUEST_CODE_LOGINDATAINPUT_EDIT = 4
 	}
 
 	private val userDatabase = UserDatabase.createInstance(this)
@@ -255,7 +256,7 @@ class MainActivity :
 			val intent = Intent(this@MainActivity, SettingsActivity::class.java)
 			intent.putExtra(SettingsActivity.EXTRA_LONG_PROFILE_ID, profileId)
 			// TODO: Find a way to jump directly to the personal timetable setting
-			startActivity(intent)
+			startActivityForResult(intent, REQUEST_CODE_SETTINGS)
 		}
 
 		setupSwipeRefresh()
@@ -592,6 +593,9 @@ class MainActivity :
 					if (roomId != -1)
 						setTarget(roomId, TimetableDatabaseInterface.Type.ROOM.toString(), timetableDatabaseInterface.getLongName(roomId, TimetableDatabaseInterface.Type.ROOM))
 				}
+			}
+			REQUEST_CODE_SETTINGS -> {
+				recreate()
 			}
 			REQUEST_CODE_LOGINDATAINPUT_ADD -> {
 				if (resultCode == Activity.RESULT_OK)
