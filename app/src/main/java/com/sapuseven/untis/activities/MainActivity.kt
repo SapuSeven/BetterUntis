@@ -22,7 +22,12 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.alamkanak.weekview.*
+import com.alamkanak.weekview.MonthLoader
+import com.alamkanak.weekview.WeekView
+import com.alamkanak.weekview.WeekViewDisplayable
+import com.alamkanak.weekview.WeekViewEvent
+import com.alamkanak.weekview.listeners.EventClickListener
+import com.alamkanak.weekview.listeners.TopLeftCornerClickListener
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.sapuseven.untis.R
@@ -333,9 +338,9 @@ class MainActivity :
 		// Customization
 
 		// Timetable
-		weekView.columnGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_padding").toFloat(), this)
-		weekView.overlappingEventGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_padding_overlap").toFloat(), this)
-		weekView.eventCornerRadius = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_corner_radius").toFloat(), this)
+		weekView.columnGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_padding").toFloat(), this).toInt()
+		weekView.overlappingEventGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_padding_overlap").toFloat(), this).toInt()
+		weekView.eventCornerRadius = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_corner_radius").toFloat(), this).toInt()
 		weekView.eventSecondaryTextCentered = PreferenceUtils.getPrefBool(preferences, "preference_timetable_centered_lesson_info")
 		weekView.eventTextBold = PreferenceUtils.getPrefBool(preferences, "preference_timetable_bold_lesson_name")
 		weekView.eventTextSize = ConversionUtils.spToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_lesson_name_font_size").toFloat(), this)
@@ -662,10 +667,8 @@ class MainActivity :
 		supportActionBar?.title = displayName ?: getString(R.string.app_name)
 	}
 
-	override fun onEventClick(data: TimegridItem?, eventRect: RectF?) {
-		data?.let { item ->
-			showLessonInfo(item)
-		}
+	override fun onEventClick(data: TimegridItem, eventRect: RectF) {
+		showLessonInfo(data)
 	}
 
 	override fun onPeriodElementClick(dialog: DialogFragment, element: PeriodElement?, useOrgId: Boolean) {

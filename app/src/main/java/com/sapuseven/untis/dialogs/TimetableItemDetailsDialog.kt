@@ -140,7 +140,7 @@ class TimetableItemDetailsDialog : DialogFragment() {
 		val params = LinearLayout.LayoutParams(
 				ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.MATCH_PARENT)
-		params.setMargins(0, 0, ConversionUtils.dpToPx(12.0f, requireContext()), 0)
+		params.setMargins(0, 0, ConversionUtils.dpToPx(12.0f, requireContext()).toInt(), 0)
 		tv.text = timetableDatabaseInterface.getShortName(if (useOrgId) element.orgId else element.id, type)
 		tv.layoutParams = params
 		textColor?.let { tv.setTextColor(it) }

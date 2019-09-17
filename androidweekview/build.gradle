@@ -1,13 +1,6 @@
 apply plugin: 'com.android.library'
 
-repositories {
-    jcenter()
-    mavenCentral()
-    maven {
-        url 'https://maven.google.com/'
-        name 'Google'
-    }
-}
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 28
@@ -20,9 +13,7 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.interpolator:interpolator:1.0.0'
     implementation "joda-time:joda-time:2.10"
 }
-
-//apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'

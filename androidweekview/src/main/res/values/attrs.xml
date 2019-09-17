@@ -36,12 +36,12 @@
 
         <!-- Header row -->
         <attr name="headerRowTextColor" format="color" />
+        <attr name="headerRowTextSize" format="dimension"/>
         <attr name="headerRowSecondaryTextColor" format="color" />
+        <attr name="headerRowSecondaryTextSize" format="dimension"/>
         <attr name="headerRowBackgroundColor" format="color" />
         <attr name="headerRowPadding" format="dimension" />
         <attr name="headerRowTextSpacing" format="dimension" />
-        <attr name="headerRowTextSize" format="dimension" />
-        <attr name="headerRowSecondaryTextSize" format="dimension" />
         <attr name="todayHeaderTextColor" format="color" />
 
         <!-- Event chips -->
@@ -49,6 +49,7 @@
         <attr name="eventCornerRadius" format="dimension" />
         <attr name="eventTextSize" format="dimension" />
         <attr name="eventSecondaryTextSize" format="dimension" />
+        <attr name="eventSecondaryTextCentered" format="boolean"/>
         <attr name="eventTextColor" format="color" />
         <attr name="eventPadding" format="dimension" />
         <attr name="defaultEventColor" format="color" />
@@ -62,12 +63,9 @@
         <!-- Colors -->
         <attr name="dayBackgroundColor" format="color" />
         <attr name="todayBackgroundColor" format="color" />
-        <attr name="showDistinctWeekendColor" format="boolean" />
         <attr name="showDistinctPastFutureColor" format="boolean" />
         <attr name="pastBackgroundColor" format="color" />
         <attr name="futureBackgroundColor" format="color" />
-        <attr name="pastWeekendBackgroundColor" format="color" />
-        <attr name="futureWeekendBackgroundColor" format="color" />
 
         <!-- Hour height -->
         <attr name="hourHeight" format="dimension" />
@@ -78,11 +76,6 @@
         <attr name="showNowLine" format="boolean" />
         <attr name="nowLineColor" format="color" />
         <attr name="nowLineStrokeWidth" format="dimension" />
-
-        <!-- Now line dot -->
-        <attr name="showNowLineDot" format="boolean" />
-        <attr name="nowLineDotColor" format="color" />
-        <attr name="nowLineDotRadius" format="dimension" />
 
         <!-- Hour separators -->
         <attr name="showHourSeparator" format="boolean" />
@@ -103,7 +96,6 @@
 
         <attr name="topLeftCornerDrawable" format="reference" />
         <attr name="topLeftCornerPadding" format="dimension" />
-        <attr name="firstDay" format="integer" />
         <attr name="startOnFirstDay" format="boolean" />
 
     </declare-styleable>

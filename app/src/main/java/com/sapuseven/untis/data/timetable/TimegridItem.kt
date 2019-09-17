@@ -11,7 +11,7 @@ class TimegridItem(
 		val endDateTime: LocalDateTime,
 		contextType: String, // TODO: enum this somewhere
 		val periodData: PeriodData)
-	: WeekViewEvent<TimegridItem>(id, toCalendar(startDateTime), toCalendar(endDateTime)) {
+	: WeekViewEvent<TimegridItem>(id, startTime = toCalendar(startDateTime), endTime = toCalendar(endDateTime)) {
 
 	init {
 		periodData.setup()
@@ -34,7 +34,6 @@ class TimegridItem(
 	}
 
 	override fun toWeekViewEvent(): WeekViewEvent<TimegridItem> {
-		// TODO: This is stupid! Make it compatible with using "this"
 		return WeekViewEvent(id, title, top, bottom, startTime, endTime, color, pastColor, false, this)
 	}
 
