@@ -28,11 +28,11 @@ import com.sapuseven.untis.notifications.NotificationReceiver.Companion.EXTRA_ST
 import com.sapuseven.untis.notifications.NotificationReceiver.Companion.EXTRA_STRING_NEXT_SUBJECT_LONG
 import com.sapuseven.untis.notifications.NotificationReceiver.Companion.EXTRA_STRING_NEXT_TEACHER
 import com.sapuseven.untis.notifications.NotificationReceiver.Companion.EXTRA_STRING_NEXT_TEACHER_LONG
+import com.sapuseven.untis.preferences.ElementPickerPreference
 import org.joda.time.DateTimeZone
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
 import java.lang.ref.WeakReference
-
 
 /**
  * This receiver is responsible for setting up alarms for every notification of the current day.
@@ -40,7 +40,7 @@ import java.lang.ref.WeakReference
 class NotificationSetup : BroadcastReceiver() {
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 	private lateinit var preferenceManager: PreferenceManager
-	private var profileUser: UserDatabase.User? = null
+	private lateinit var profileUser: UserDatabase.User
 
 	companion object {
 		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.notifications.profileid"
@@ -54,35 +54,58 @@ class NotificationSetup : BroadcastReceiver() {
 			return
 
 		loadDatabase(context, intent.getLongExtra(EXTRA_LONG_PROFILE_ID, 0)) // TODO: Add setting to select user
-		profileUser?.run { loadTimetable(context) }
+		if (::profileUser.isInitialized) loadTimetable(context)
 	}
 
 	private fun loadDatabase(context: Context, profileId: Long) {
 		val userDatabase = UserDatabase.createInstance(context)
-		profileUser = userDatabase.getUser(profileId)
-		// TODO: Check if user not found and handle error (prevent call to loadTimetable)
-		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileUser?.id ?: -1)
+		userDatabase.getUser(profileId)?.let {
+			profileUser = it
+			timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, it.id ?: -1)
+		}
 	}
 
 	private fun loadTimetable(context: Context) {
-		Log.d("NotificationSetup", "loadTimetable for user ${profileUser?.id}")
+		Log.d("NotificationSetup", "loadTimetable for user ${profileUser.id}")
 
 		val currentDate = UntisDate.fromLocalDate(LocalDate.now())
 
-		val target = TimetableLoader.TimetableLoaderTarget(currentDate, currentDate, profileUser!!.userData.elemId, profileUser!!.userData.elemType
-				?: "STUDENT")
 
-		TimetableLoader(WeakReference(context), object : TimetableDisplay {
-			override fun addData(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
-				setupNotifications(context, items)
-			}
+		val targetTimetable = createPersonalTimetable()
+		targetTimetable?.let {
+			val target = TimetableLoader.TimetableLoaderTarget(currentDate, currentDate, it.second, it.first)
 
-			override fun onError(requestId: Int, code: Int?, message: String?) {
-				// TODO: Handle error
-				Log.d("NotificationSetup", "loadTimetable error $code for $requestId: $message")
+			TimetableLoader(WeakReference(context), object : TimetableDisplay {
+				override fun addData(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
+					setupNotifications(context, items)
+				}
+
+				override fun onError(requestId: Int, code: Int?, message: String?) {
+					// TODO: Handle error
+					Log.d("NotificationSetup", "loadTimetable error $code for $requestId: $message")
+				}
+			}, profileUser, timetableDatabaseInterface)
+					.load(target, TimetableLoader.FLAG_LOAD_SERVER)
+		}
+	}
+
+	private fun createPersonalTimetable(): Pair<String, Int>? {
+		val customType = TimetableDatabaseInterface.Type.valueOf(PreferenceUtils.getPrefString(
+				preferenceManager,
+				"preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_TYPE}",
+				TimetableDatabaseInterface.Type.SUBJECT.toString()
+		))
+
+		if (customType === TimetableDatabaseInterface.Type.SUBJECT) {
+			profileUser.userData.elemType?.let { type ->
+				return type to profileUser.userData.elemId
+			} ?: run {
+				return null
 			}
-		}, profileUser!!, timetableDatabaseInterface)
-				.load(target, TimetableLoader.FLAG_LOAD_SERVER)
+		} else {
+			val customId = preferenceManager.defaultPrefs.getInt("preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_ID}", -1)
+			return customType.toString() to customId
+		}
 	}
 
 	private fun setupNotifications(context: Context, items: List<TimegridItem>) {
