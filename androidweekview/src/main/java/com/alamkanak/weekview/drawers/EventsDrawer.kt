@@ -2,6 +2,7 @@ package com.alamkanak.weekview.drawers
 
 import android.graphics.Canvas
 import android.graphics.RectF
+import android.util.Log
 import com.alamkanak.weekview.*
 import com.alamkanak.weekview.config.WeekViewConfig
 import java.util.*
@@ -9,7 +10,7 @@ import java.util.*
 class EventsDrawer<T>(private val config: WeekViewConfig) {
 	private val rectCalculator: EventChipRectCalculator = EventChipRectCalculator(config)
 
-	internal fun drawSingleEvents(eventChips: List<EventChip<T>>, drawingContext: DrawingContext, canvas: Canvas) {
+	internal fun drawEvents(eventChips: List<EventChip<T>>, drawingContext: DrawingContext, canvas: Canvas) {
 		var startPixel = drawingContext.startPixel
 		val now = Calendar.getInstance().timeInMillis
 
@@ -23,25 +24,28 @@ class EventsDrawer<T>(private val config: WeekViewConfig) {
 		}
 	}
 
-	private fun drawEventsForDate(eventChips: List<EventChip<T>>?, date: Calendar, nowMillis: Long, startFromPixel: Float, canvas: Canvas) {
-		if (eventChips == null) return
+	private fun drawEventsForDate(eventChips: List<EventChip<T>>, date: Calendar, nowMillis: Long, startFromPixel: Float, canvas: Canvas) {
+		val dateString = date.get(Calendar.DAY_OF_MONTH).toString() + "." + date.get(Calendar.MONTH).toString()
 
-		for (i in eventChips.indices) {
-			val eventChip = eventChips[i]
+		eventChips.forEach { eventChip ->
 			val event = eventChip.event
-			if (!event.isSameDay(date)) continue
+			if (date.get(Calendar.DAY_OF_MONTH) == 13)
+				Log.d("EventsDrawer", "Drawing event ${eventChip.event.title} for date $dateString, item at ${eventChip.event.startTime.get(Calendar.DAY_OF_MONTH)}")
+			if (!event.isSameDay(date)) return@forEach
 
 			val chipRect = SplitRect(
 					rectCalculator.calculateSingleEvent(eventChip, startFromPixel),
 					calculateDivision(event, nowMillis)
 			)
-			if (isValidSingleEventRect(chipRect)) {
+			if (isValidEventRect(chipRect)) {
 				eventChip.rect = chipRect
 				eventChip.draw(config, canvas)
 			} else {
 				eventChip.rect = null
 			}
 		}
+		if (date.get(Calendar.DAY_OF_MONTH) == 13)
+			Log.d("EventsDrawer", "Drawing cycle finished")
 	}
 
 	private fun calculateDivision(event: WeekViewEvent<*>, nowMillis: Long): Float {
@@ -55,7 +59,7 @@ class EventsDrawer<T>(private val config: WeekViewConfig) {
 		}
 	}
 
-	private fun isValidSingleEventRect(rect: RectF): Boolean {
+	private fun isValidEventRect(rect: RectF): Boolean {
 		return (rect.left < rect.right
 				&& rect.left < WeekView.viewWidth
 				&& rect.top < WeekView.viewHeight

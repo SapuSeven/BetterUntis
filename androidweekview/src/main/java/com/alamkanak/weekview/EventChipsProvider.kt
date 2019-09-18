@@ -19,13 +19,12 @@ internal class EventChipsProvider<T>(
 		if (view.isInEditMode) return
 
 		for (day in dayRange) {
-			val hasNoEvents = data.eventChips == null
 			val needsToFetchPeriod = data.fetchedPeriod.toDouble() != weekViewLoader?.toWeekViewPeriodIndex(day)
 					&& abs(data.fetchedPeriod - (weekViewLoader?.toWeekViewPeriodIndex(day)
 					?: 0.0)) > 0.5
 
 			// Check if this particular day has been fetched
-			if (hasNoEvents || viewState.shouldRefreshEvents || needsToFetchPeriod) {
+			if (viewState.shouldRefreshEvents || needsToFetchPeriod) {
 				loadEventsAndCalculateEventChipPositions(view, day)
 				viewState.shouldRefreshEvents = false
 			}
@@ -40,23 +39,15 @@ internal class EventChipsProvider<T>(
 	 * @param day The day the user is currently in.
 	 */
 	private fun loadEventsAndCalculateEventChipPositions(view: View, day: Calendar) {
-		// Get more events if the month is changed.
-		if (data.eventChips == null) {
-			data.setEventChips(ArrayList())
-		}
-
 		if (weekViewLoader == null && !view.isInEditMode) {
 			throw IllegalStateException("You must provide a MonthChangeListener")
 		}
 
-		// If a refresh was requested then reset some variables.
-		if (viewState.shouldRefreshEvents) {
+		if (viewState.shouldRefreshEvents)
 			data.clear()
-		}
 
-		if (weekViewLoader != null) {
+		if (weekViewLoader != null)
 			loadEvents(day)
-		}
 
 		// Prepare to calculate positions of each events.
 		calculateEventChipPositions()
@@ -102,7 +93,7 @@ internal class EventChipsProvider<T>(
 		if (nextPeriodEvents == null) nextPeriodEvents = weekViewLoader?.onLoad(periodToFetch + 1)?.sorted()
 
 		// Clear events.
-		data.eventChips?.clear()
+		data.eventChips.clear()
 		previousPeriodEvents?.let { data.cacheEvents(it) }
 		currentPeriodEvents?.let { data.cacheEvents(it) }
 		nextPeriodEvents?.let { data.cacheEvents(it) }
@@ -115,7 +106,7 @@ internal class EventChipsProvider<T>(
 
 	private fun calculateEventChipPositions() {
 		// Prepare to calculate positions of each events.
-		val tempEvents = data.eventChips ?: mutableListOf()
+		val tempEvents = data.eventChips
 		val results = ArrayList<EventChip<T>>()
 
 		// Iterate through each day with events to calculate the position of the events.
@@ -143,7 +134,7 @@ internal class EventChipsProvider<T>(
 			results.addAll(eventChips)
 		}
 
-		data.setEventChips(results)
+		data.eventChips = results
 	}
 
 	/**
@@ -160,7 +151,7 @@ internal class EventChipsProvider<T>(
 
 			outerLoop@ for (collisionGroup in collisionGroups) {
 				for (groupEvent in collisionGroup) {
-					if (groupEvent.event.collidesWith(eventChip.event) && groupEvent.event.isAllDay == eventChip.event.isAllDay) {
+					if (groupEvent.event.collidesWith(eventChip.event)) {
 						collisionGroup.add(eventChip)
 						isPlaced = true
 						break@outerLoop
@@ -228,13 +219,8 @@ internal class EventChipsProvider<T>(
 					eventChip.width = 1.0f / columns.size
 					eventChip.left = j / columns.size
 
-					if (!eventChip.event.isAllDay) {
-						eventChip.top = (eventChip.event.startTime.get(HOUR_OF_DAY) * 60 + eventChip.event.startTime.get(MINUTE) - config.startTime).toFloat()
-						eventChip.bottom = (eventChip.event.endTime.get(HOUR_OF_DAY) * 60 + eventChip.event.endTime.get(MINUTE) - config.startTime).toFloat()
-					} else {
-						eventChip.top = 0.0f
-						eventChip.bottom = config.allDayEventHeight.toFloat()
-					}
+					eventChip.top = (eventChip.event.startTime.get(HOUR_OF_DAY) * 60 + eventChip.event.startTime.get(MINUTE) - config.startTime).toFloat()
+					eventChip.bottom = (eventChip.event.endTime.get(HOUR_OF_DAY) * 60 + eventChip.event.endTime.get(MINUTE) - config.startTime).toFloat()
 				}
 				j++
 			}

@@ -2,6 +2,7 @@ package com.alamkanak.weekview.loaders
 
 import com.alamkanak.weekview.DateUtils
 import com.alamkanak.weekview.DateUtils.today
+import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.WeekViewEvent
 import java.util.*
@@ -12,7 +13,7 @@ import java.util.*
  * an interface that can be implemented in one's actual data class and handles the conversion to a
  * [WeekViewEvent].
  */
-class WeekLoader<T> internal constructor(var onWeekChangeListener: WeekChangeListener<T>) : WeekViewLoader<T> {
+class WeekLoader<T> internal constructor(private var onWeekChangeListener: WeekChangeListener<T>) : WeekViewLoader<T> {
 	companion object {
 		private const val WEEKS_PER_YEAR = 53
 	}

@@ -52,8 +52,6 @@ internal constructor(var event: WeekViewEvent<T>, var originalEvent: WeekViewEve
 
 	fun draw(config: WeekViewConfig, canvas: Canvas) {
 		val cornerRadius = config.eventCornerRadius.toFloat()
-		val backgroundPaint = backgroundPaint
-		val pastBackgroundPaint = pastBackgroundPaint
 
 		rect!!.drawTo(canvas, cornerRadius, cornerRadius, pastBackgroundPaint, backgroundPaint)
 

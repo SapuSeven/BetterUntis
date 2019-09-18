@@ -266,7 +266,7 @@ class WeekView<T>(
 		dayBackgroundDrawer.draw(drawingContext, canvas)
 		backgroundGridDrawer.draw(drawingContext, canvas)
 
-		eventsDrawer.drawSingleEvents(data.normalEventChips, drawingContext, canvas)
+		eventsDrawer.drawEvents(data.eventChips, drawingContext, canvas)
 		nowLineDrawer.draw(drawingContext, canvas)
 
 		headerRowDrawer.draw(drawingContext, canvas)
@@ -319,7 +319,7 @@ class WeekView<T>(
 		val height = viewHeight
 
 		// Clip to paint events only.
-		canvas.clipRect(config.drawConfig.timeColumnWidth, config.drawConfig.headerHeight, width.toFloat(), height.toFloat())
+		//canvas.clipRect(config.drawConfig.timeColumnWidth, config.drawConfig.headerHeight, width.toFloat(), height.toFloat())
 	}
 
 	override fun onScaled() {

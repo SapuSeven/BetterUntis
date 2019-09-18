@@ -2,6 +2,7 @@ package com.alamkanak.weekview.loaders
 
 import com.alamkanak.weekview.DateUtils
 import com.alamkanak.weekview.DateUtils.today
+import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.WeekViewEvent
 import java.util.*

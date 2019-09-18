@@ -12,7 +12,6 @@ open class WeekViewEvent<T>(
 		var endTime: Calendar,
 		var color: Int = 0,
 		var pastColor: Int = 0,
-		var isAllDay: Boolean = false,
 		var data: T? = null
 ) : WeekViewDisplayable<T>, Comparable<WeekViewEvent<*>> {
 	companion object {
@@ -84,7 +83,7 @@ open class WeekViewEvent<T>(
 			endTime.set(Calendar.HOUR_OF_DAY, 23)
 			endTime.set(Calendar.MINUTE, 59)
 
-			val event1 = WeekViewEvent<T>(id, title, top, bottom, startTime, endTime, isAllDay = isAllDay)
+			val event1 = WeekViewEvent<T>(id, title, top, bottom, startTime, endTime)
 			event1.color = color
 			event1.pastColor = pastColor
 			events.add(event1)
@@ -102,7 +101,7 @@ open class WeekViewEvent<T>(
 				endOfOverDay.set(Calendar.HOUR_OF_DAY, 23)
 				endOfOverDay.set(Calendar.MINUTE, 59)
 
-				val eventMore = WeekViewEvent<T>(id, title, top, bottom, overDay, endOfOverDay, isAllDay = isAllDay)
+				val eventMore = WeekViewEvent<T>(id, title, top, bottom, overDay, endOfOverDay)
 				eventMore.color = color
 				eventMore.pastColor = pastColor
 				events.add(eventMore)
@@ -116,7 +115,7 @@ open class WeekViewEvent<T>(
 			startTime.set(Calendar.HOUR_OF_DAY, 0)
 			startTime.set(Calendar.MINUTE, 0)
 
-			val event2 = WeekViewEvent<T>(id, title, top, bottom, startTime, endTime, isAllDay = isAllDay)
+			val event2 = WeekViewEvent<T>(id, title, top, bottom, startTime, endTime)
 			event2.color = color
 			event2.pastColor = pastColor
 			events.add(event2)

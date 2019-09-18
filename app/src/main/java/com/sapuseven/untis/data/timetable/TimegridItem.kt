@@ -34,7 +34,7 @@ class TimegridItem(
 	}
 
 	override fun toWeekViewEvent(): WeekViewEvent<TimegridItem> {
-		return WeekViewEvent(id, title, top, bottom, startTime, endTime, color, pastColor, false, this)
+		return WeekViewEvent(id, title, top, bottom, startTime, endTime, color, pastColor, this)
 	}
 
 	fun mergeWith(items: MutableList<TimegridItem>): Boolean {
