@@ -4,7 +4,7 @@ import android.graphics.RectF
 
 import com.alamkanak.weekview.config.WeekViewConfig
 
-internal class EventChipRectCalculator internal constructor(private val config: WeekViewConfig) {
+class EventChipRectCalculator internal constructor(private val config: WeekViewConfig) {
 	/**
 	 * Calculates the exact position and dimensions of an EventChip in the WeekView.
 	 *
@@ -13,7 +13,7 @@ internal class EventChipRectCalculator internal constructor(private val config: 
 	 *
 	 * @return A [RectF] at the absolute location and size of the EventChip's final position in the WeekView
 	 */
-	internal fun calculateEventRect(eventChip: EventChip<*>, startFromPixel: Float): RectF {
+	fun calculateEventRect(eventChip: EventChip<*>, startFromPixel: Float): RectF {
 		val eventMargin = config.eventMarginVertical.toFloat()
 
 		val verticalOrigin = config.drawConfig.currentOrigin.y
