@@ -1,6 +1,9 @@
-package com.alamkanak.weekview
+package com.alamkanak.weekview.loaders
 
+import com.alamkanak.weekview.DateUtils
 import com.alamkanak.weekview.DateUtils.today
+import com.alamkanak.weekview.WeekViewDisplayable
+import com.alamkanak.weekview.WeekViewEvent
 import java.util.*
 
 /**
@@ -9,7 +12,7 @@ import java.util.*
  * an interface that can be implemented in one's actual data class and handles the conversion to a
  * [WeekViewEvent].
  */
-class MonthLoader<T> internal constructor(var onMonthChangeListener: MonthChangeListener<T>?) : WeekViewLoader<T> {
+class MonthLoader<T> internal constructor(var onMonthChangeListener: MonthChangeListener<T>) : WeekViewLoader<T> {
 	override fun toWeekViewPeriodIndex(instance: Calendar): Double {
 		return ((instance.get(Calendar.YEAR) * 12).toDouble()
 				+ instance.get(Calendar.MONTH).toDouble()
@@ -32,7 +35,7 @@ class MonthLoader<T> internal constructor(var onMonthChangeListener: MonthChange
 		endDate.set(Calendar.MONTH, month)
 		endDate.set(Calendar.DAY_OF_MONTH, maxDays)
 
-		val displayableItems = onMonthChangeListener!!.onMonthChange(startDate, endDate)
+		val displayableItems = onMonthChangeListener.onMonthChange(startDate, endDate)
 
 		val events = ArrayList<WeekViewEvent<T>>()
 		for (displayableItem in displayableItems) {

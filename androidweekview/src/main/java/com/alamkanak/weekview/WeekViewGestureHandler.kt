@@ -8,6 +8,7 @@ import androidx.interpolator.view.animation.FastOutLinearInInterpolator
 import com.alamkanak.weekview.config.WeekViewConfig
 import com.alamkanak.weekview.config.WeekViewDrawConfig
 import com.alamkanak.weekview.listeners.*
+import com.alamkanak.weekview.loaders.WeekViewLoader
 import java.lang.Math.*
 
 internal class WeekViewGestureHandler<T>(

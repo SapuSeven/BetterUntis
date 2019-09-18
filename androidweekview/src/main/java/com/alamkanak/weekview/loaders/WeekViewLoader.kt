@@ -1,5 +1,6 @@
-package com.alamkanak.weekview
+package com.alamkanak.weekview.loaders
 
+import com.alamkanak.weekview.WeekViewEvent
 import java.util.*
 
 interface WeekViewLoader<T> {

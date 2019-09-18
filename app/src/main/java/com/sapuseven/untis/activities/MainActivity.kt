@@ -22,12 +22,12 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.alamkanak.weekview.MonthLoader
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.WeekViewEvent
 import com.alamkanak.weekview.listeners.EventClickListener
 import com.alamkanak.weekview.listeners.TopLeftCornerClickListener
+import com.alamkanak.weekview.loaders.WeekLoader
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.sapuseven.untis.R
@@ -60,7 +60,7 @@ import kotlin.collections.ArrayList
 class MainActivity :
 		BaseActivity(),
 		NavigationView.OnNavigationItemSelectedListener,
-		MonthLoader.MonthChangeListener<TimegridItem>,
+		WeekLoader.WeekChangeListener<TimegridItem>,
 		EventClickListener<TimegridItem>,
 		TopLeftCornerClickListener,
 		TimetableDisplay,
@@ -85,7 +85,7 @@ class MainActivity :
 	private var lastBackPress: Long = 0
 	private var profileId: Long = -1
 	private val items: ArrayList<WeekViewEvent<TimegridItem>> = ArrayList()
-	private val loadedMonths = mutableListOf<Int>()
+	private val loadedWeeks = mutableListOf<Int>()
 	private var displayedElement: PeriodElement? = null
 	private var lastPickedDate: Calendar? = null
 	private lateinit var profileUser: UserDatabase.User
@@ -245,7 +245,7 @@ class MainActivity :
 		preferences.reload()
 		setupWeekViewConfig()
 		items.clear()
-		loadedMonths.clear()
+		loadedWeeks.clear()
 		weekView.invalidate()
 	}
 
@@ -330,7 +330,7 @@ class MainActivity :
 		weekView = findViewById(R.id.weekview_main_timetable)
 		weekView.setOnEventClickListener(this)
 		weekView.setOnCornerClickListener(this)
-		weekView.setMonthChangeListener(this)
+		weekView.setWeekChangeListener(this)
 		setupWeekViewConfig()
 	}
 
@@ -349,13 +349,13 @@ class MainActivity :
 		weekView.nowLineColor = PreferenceUtils.getPrefInt(preferences, "preference_marker")
 	}
 
-	override fun onMonthChange(startDate: Calendar, endDate: Calendar): List<WeekViewDisplayable<TimegridItem>> {
+	override fun onWeekChange(startDate: Calendar, endDate: Calendar): List<WeekViewDisplayable<TimegridItem>> {
 		val newYear = startDate.get(Calendar.YEAR)
-		val newMonth = startDate.get(Calendar.MONTH)
+		val newWeek = startDate.get(Calendar.WEEK_OF_YEAR)
 
-		if (!loadedMonths.contains(newYear * 100 + newMonth)) {
+		if (!loadedWeeks.contains(newYear * 100 + newWeek)) {
 			displayedElement?.let {
-				loadedMonths.add(newYear * 100 + newMonth)
+				loadedWeeks.add(newYear * 100 + newWeek)
 				loadTimetable(TimetableLoader.TimetableLoaderTarget(
 						UntisDate.fromLocalDate(LocalDate(startDate)),
 						UntisDate.fromLocalDate(LocalDate(endDate)),
@@ -365,7 +365,7 @@ class MainActivity :
 
 		val matchedEvents = ArrayList<WeekViewDisplayable<TimegridItem>>()
 		for (event in items) {
-			if (eventMatches(event, newYear, newMonth)) {
+			if (eventMatches(event, newYear, newWeek)) {
 				@Suppress("UNCHECKED_CAST")
 				matchedEvents.add(event as WeekViewDisplayable<TimegridItem>)
 			}
@@ -374,17 +374,17 @@ class MainActivity :
 	}
 
 	/**
-	 * Checks if an event falls into a specific year and month.
+	 * Checks if an event falls into a specific year and week.
 	 * @param event The event to check for.
 	 * @param year The year.
-	 * @param month The month.
-	 * @return True if the event matches the year and month.
+	 * @param week The week.
+	 * @return True if the event matches the year and week.
 	 */
-	private fun eventMatches(event: WeekViewEvent<*>, year: Int, month: Int): Boolean {
+	private fun eventMatches(event: WeekViewEvent<*>, year: Int, week: Int): Boolean {
 		return event.startTime.get(Calendar.YEAR) == year
-				&& event.startTime.get(Calendar.MONTH) == month
+				&& event.startTime.get(Calendar.WEEK_OF_YEAR) == week
 				|| event.endTime.get(Calendar.YEAR) == year
-				&& event.endTime.get(Calendar.MONTH) == month
+				&& event.endTime.get(Calendar.WEEK_OF_YEAR) == week
 	}
 
 
@@ -646,7 +646,7 @@ class MainActivity :
 
 			displayedElement = null
 
-			loadedMonths.clear()
+			loadedWeeks.clear()
 			items.clear()
 			weekView.notifyDataSetChanged()
 
@@ -661,7 +661,7 @@ class MainActivity :
 		setTarget(anonymous = false)
 
 		displayedElement = PeriodElement(type, id, id)
-		loadedMonths.clear()
+		loadedWeeks.clear()
 		items.clear()
 		weekView.notifyDataSetChanged()
 		supportActionBar?.title = displayName ?: getString(R.string.app_name)

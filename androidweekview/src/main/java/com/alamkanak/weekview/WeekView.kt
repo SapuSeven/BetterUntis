@@ -12,6 +12,9 @@ import android.view.View
 import com.alamkanak.weekview.config.WeekViewConfig
 import com.alamkanak.weekview.drawers.*
 import com.alamkanak.weekview.listeners.*
+import com.alamkanak.weekview.loaders.MonthLoader
+import com.alamkanak.weekview.loaders.WeekLoader
+import com.alamkanak.weekview.loaders.WeekViewLoader
 import org.joda.time.LocalDate
 import java.lang.Math.ceil
 import java.lang.Math.min
@@ -439,6 +442,12 @@ class WeekView<T>(
 	}
 
 	//  Listeners
+
+	fun setWeekChangeListener(weekChangeListener: WeekLoader.WeekChangeListener<T>) {
+		val weekViewLoader = WeekLoader(weekChangeListener)
+		gestureHandler.weekViewLoader = weekViewLoader
+		eventChipsProvider.weekViewLoader = weekViewLoader
+	}
 
 	fun setMonthChangeListener(monthChangeListener: MonthLoader.MonthChangeListener<T>) {
 		val weekViewLoader = MonthLoader(monthChangeListener)

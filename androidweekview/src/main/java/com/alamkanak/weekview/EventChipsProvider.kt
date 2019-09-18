@@ -2,6 +2,7 @@ package com.alamkanak.weekview
 
 import android.view.View
 import com.alamkanak.weekview.config.WeekViewConfig
+import com.alamkanak.weekview.loaders.WeekViewLoader
 import java.lang.Math.abs
 import java.util.*
 import java.util.Calendar.HOUR_OF_DAY
