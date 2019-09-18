@@ -84,6 +84,12 @@
 	<string name="notifications_channel_lessoninfo_desc">Shows information about the ongoing lesson</string>
 	<string name="notifications_channel_breakinfo">Break info</string>
 	<string name="notifications_channel_breakinfo_desc">Shows information about the current break and the following lesson</string>
+	<string name="notifications_text_title">Break until %1$s</string>
+	<string name="notifications_text_message_subjects">Next lesson: %1$s</string>
+	<string name="notifications_text_message_rooms">Room: %1$s</string>
+	<string name="notifications_text_message_teachers">Teacher: %1$s</string>
+	<string name="notifications_text_message_classes">Class: %1$s</string>
+	<string name="notifications_text_message_separator"> / </string>
 
 	<plurals name="main_time_diff_minutes">
 		<item quantity="one">a minute ago</item>
@@ -184,11 +190,6 @@
 	<string name="preference_notifications_multiple">Enable in multiple-hour lesson</string>
 	<string name="preference_notifications_multiple_desc">Notifications will be shown in breaks within multiple-hour lessons.</string>
 	<string name="give_feedback">Give Feedback</string>
-	<string name="notification_title">Break until %1$d:%2$d</string>
-	<string name="notification_subjects">Next lesson: %1$s</string>
-	<string name="notification_rooms">Room: %1$s</string>
-	<string name="notification_teachers">Teacher: %1$s</string>
-	<string name="notification_classes">Class: %1$s</string>
 	<string name="close">Close</string>
 	<string name="preference_account_access_key">Access key</string>
 	<string name="firebase_key">Firebase key</string>

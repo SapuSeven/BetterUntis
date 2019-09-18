@@ -48,8 +48,8 @@ class NotificationReceiver : BroadcastReceiver() {
 			val pendingIntent = PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), 0)
 			val breakEndTime = intent.getStringExtra(EXTRA_STRING_BREAK_END_TIME)
 
-			val title = "Break until $breakEndTime" // TODO: Extract string
-			val message = buildMessage(context, intent, preferenceManager, " / ") // TODO: Extract string
+			val title = context.getString(R.string.notifications_text_title, breakEndTime)
+			val message = buildMessage(context, intent, preferenceManager, context.getString(R.string.notifications_text_message_separator))
 			val longMessage = buildMessage(context, intent, preferenceManager, "\n")
 
 			val builder = NotificationCompat.Builder(context, CHANNEL_ID_BREAKINFO)
@@ -74,29 +74,32 @@ class NotificationReceiver : BroadcastReceiver() {
 		}
 	}
 
-	// TODO: Find a way to deal with empty values
 	// TODO: Add parameter to optionally only include the raw values instead of the string templates (for the short message)
 	private fun buildMessage(context: Context, intent: Intent, preferenceManager: PreferenceManager, separator: String) = listOfNotNull(
-			when (PreferenceUtils.getPrefString(preferenceManager, "preference_notifications_visibility_subjects")) {
-				"short" -> context.getString(R.string.notification_subjects, intent.getStringExtra(EXTRA_STRING_NEXT_SUBJECT))
-				"long" -> context.getString(R.string.notification_subjects, intent.getStringExtra(EXTRA_STRING_NEXT_SUBJECT_LONG))
-				else -> null
-			},
-			when (PreferenceUtils.getPrefString(preferenceManager, "preference_notifications_visibility_rooms")) {
-				"short" -> context.getString(R.string.notification_rooms, intent.getStringExtra(EXTRA_STRING_NEXT_ROOM))
-				"long" -> context.getString(R.string.notification_rooms, intent.getStringExtra(EXTRA_STRING_NEXT_ROOM_LONG))
-				else -> null
-			},
-			when (PreferenceUtils.getPrefString(preferenceManager, "preference_notifications_visibility_teachers")) {
-				"short" -> context.getString(R.string.notification_teachers, intent.getStringExtra(EXTRA_STRING_NEXT_TEACHER))
-				"long" -> context.getString(R.string.notification_teachers, intent.getStringExtra(EXTRA_STRING_NEXT_TEACHER_LONG))
-				else -> null
-			},
-			when (PreferenceUtils.getPrefString(preferenceManager, "preference_notifications_visibility_classes")) {
-				"short" -> context.getString(R.string.notification_classes, intent.getStringExtra(EXTRA_STRING_NEXT_CLASS))
-				"long" -> context.getString(R.string.notification_classes, intent.getStringExtra(EXTRA_STRING_NEXT_CLASS_LONG))
-				else -> null
-			}
+			if (intent.getStringExtra(EXTRA_STRING_NEXT_SUBJECT).isBlank()) null else
+				when (PreferenceUtils.getPrefString(preferenceManager, "preference_notifications_visibility_subjects")) {
+					"short" -> context.getString(R.string.notifications_text_message_subjects, intent.getStringExtra(EXTRA_STRING_NEXT_SUBJECT))
+					"long" -> context.getString(R.string.notifications_text_message_subjects, intent.getStringExtra(EXTRA_STRING_NEXT_SUBJECT_LONG))
+					else -> null
+				},
+			if (intent.getStringExtra(EXTRA_STRING_NEXT_ROOM).isBlank()) null else
+				when (PreferenceUtils.getPrefString(preferenceManager, "preference_notifications_visibility_rooms")) {
+					"short" -> context.getString(R.string.notifications_text_message_rooms, intent.getStringExtra(EXTRA_STRING_NEXT_ROOM))
+					"long" -> context.getString(R.string.notifications_text_message_rooms, intent.getStringExtra(EXTRA_STRING_NEXT_ROOM_LONG))
+					else -> null
+				},
+			if (intent.getStringExtra(EXTRA_STRING_NEXT_TEACHER).isBlank()) null else
+				when (PreferenceUtils.getPrefString(preferenceManager, "preference_notifications_visibility_teachers")) {
+					"short" -> context.getString(R.string.notifications_text_message_teachers, intent.getStringExtra(EXTRA_STRING_NEXT_TEACHER))
+					"long" -> context.getString(R.string.notifications_text_message_teachers, intent.getStringExtra(EXTRA_STRING_NEXT_TEACHER_LONG))
+					else -> null
+				},
+			if (intent.getStringExtra(EXTRA_STRING_NEXT_CLASS).isBlank()) null else
+				when (PreferenceUtils.getPrefString(preferenceManager, "preference_notifications_visibility_classes")) {
+					"short" -> context.getString(R.string.notifications_text_message_classes, intent.getStringExtra(EXTRA_STRING_NEXT_CLASS))
+					"long" -> context.getString(R.string.notifications_text_message_classes, intent.getStringExtra(EXTRA_STRING_NEXT_CLASS_LONG))
+					else -> null
+				}
 	).joinToString(separator)
 
 	private fun createNotificationChannel(context: Context) {
