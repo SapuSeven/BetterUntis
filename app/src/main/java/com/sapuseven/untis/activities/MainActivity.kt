@@ -27,7 +27,7 @@ import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.WeekViewEvent
 import com.alamkanak.weekview.listeners.EventClickListener
 import com.alamkanak.weekview.listeners.TopLeftCornerClickListener
-import com.alamkanak.weekview.loaders.WeekLoader
+import com.alamkanak.weekview.loaders.WeekViewLoader
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.sapuseven.untis.R
@@ -60,7 +60,7 @@ import kotlin.collections.ArrayList
 class MainActivity :
 		BaseActivity(),
 		NavigationView.OnNavigationItemSelectedListener,
-		WeekLoader.WeekChangeListener<TimegridItem>,
+		WeekViewLoader.PeriodChangeListener<TimegridItem>,
 		EventClickListener<TimegridItem>,
 		TopLeftCornerClickListener,
 		TimetableDisplay,
@@ -330,7 +330,7 @@ class MainActivity :
 		weekView = findViewById(R.id.weekview_main_timetable)
 		weekView.setOnEventClickListener(this)
 		weekView.setOnCornerClickListener(this)
-		weekView.setWeekChangeListener(this)
+		weekView.setPeriodChangeListener(this)
 		setupWeekViewConfig()
 	}
 
@@ -349,7 +349,7 @@ class MainActivity :
 		weekView.nowLineColor = PreferenceUtils.getPrefInt(preferences, "preference_marker")
 	}
 
-	override fun onWeekChange(startDate: Calendar, endDate: Calendar): List<WeekViewDisplayable<TimegridItem>> {
+	override fun onPeriodChange(startDate: Calendar, endDate: Calendar): List<WeekViewDisplayable<TimegridItem>> {
 		val newYear = startDate.get(Calendar.YEAR)
 		val newWeek = startDate.get(Calendar.WEEK_OF_YEAR)
 

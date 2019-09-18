@@ -12,7 +12,6 @@ import android.view.View
 import com.alamkanak.weekview.config.WeekViewConfig
 import com.alamkanak.weekview.drawers.*
 import com.alamkanak.weekview.listeners.*
-import com.alamkanak.weekview.loaders.MonthLoader
 import com.alamkanak.weekview.loaders.WeekLoader
 import com.alamkanak.weekview.loaders.WeekViewLoader
 import org.joda.time.LocalDate
@@ -44,7 +43,7 @@ class WeekView<T>(
 	private val nowLineDrawer: NowLineDrawer
 	private val topLeftCornerDrawer: TopLeftCornerDrawer
 
-	private val eventChipsProvider: EventChipsProvider<T>
+	private val eventChipsProvider: EventChipProvider<T>
 
 	// TODO: Move these setters entirely to WeekViewConfig
 	var eventCornerRadius: Int
@@ -126,11 +125,6 @@ class WeekView<T>(
 	fun setOnCornerClickListener(listener: TopLeftCornerClickListener) {
 		gestureHandler.topLeftCornerClickListener = listener
 	}
-
-	fun monthChangeListener(): MonthLoader.MonthChangeListener<*>? =
-			if (gestureHandler.weekViewLoader is MonthLoader<*>)
-				(gestureHandler.weekViewLoader as MonthLoader<*>).onMonthChangeListener
-			else null
 
 	/**
 	 * Event loaders define the interval after which the events are loaded in week view.
@@ -219,7 +213,7 @@ class WeekView<T>(
 		nowLineDrawer = NowLineDrawer(config)
 		topLeftCornerDrawer = TopLeftCornerDrawer(config)
 
-		eventChipsProvider = EventChipsProvider(config, data, viewState)
+		eventChipsProvider = EventChipProvider(config, data, viewState)
 		eventChipsProvider.weekViewLoader = weekViewLoader
 	}
 
@@ -315,11 +309,8 @@ class WeekView<T>(
 	}
 
 	private fun clipEventsRect(canvas: Canvas) {
-		val width = viewWidth
-		val height = viewHeight
-
-		// Clip to paint events only.
-		//canvas.clipRect(config.drawConfig.timeColumnWidth, config.drawConfig.headerHeight, width.toFloat(), height.toFloat())
+		// Clip to event area.
+		canvas.clipRect(config.drawConfig.timeColumnWidth, config.drawConfig.headerHeight, viewWidth.toFloat(), viewHeight.toFloat())
 	}
 
 	override fun onScaled() {
@@ -443,14 +434,8 @@ class WeekView<T>(
 
 	//  Listeners
 
-	fun setWeekChangeListener(weekChangeListener: WeekLoader.WeekChangeListener<T>) {
+	fun setPeriodChangeListener(weekChangeListener: WeekViewLoader.PeriodChangeListener<T>) {
 		val weekViewLoader = WeekLoader(weekChangeListener)
-		gestureHandler.weekViewLoader = weekViewLoader
-		eventChipsProvider.weekViewLoader = weekViewLoader
-	}
-
-	fun setMonthChangeListener(monthChangeListener: MonthLoader.MonthChangeListener<T>) {
-		val weekViewLoader = MonthLoader(monthChangeListener)
 		gestureHandler.weekViewLoader = weekViewLoader
 		eventChipsProvider.weekViewLoader = weekViewLoader
 	}

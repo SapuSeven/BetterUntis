@@ -13,7 +13,7 @@ import java.util.*
  * an interface that can be implemented in one's actual data class and handles the conversion to a
  * [WeekViewEvent].
  */
-class MonthLoader<T> internal constructor(var onMonthChangeListener: MonthChangeListener<T>) : WeekViewLoader<T> {
+class MonthLoader<T> internal constructor(var onMonthChangeListener: WeekViewLoader.PeriodChangeListener<T>) : WeekViewLoader<T> {
 	override fun toWeekViewPeriodIndex(instance: Calendar): Double {
 		return ((instance.get(Calendar.YEAR) * 12).toDouble()
 				+ instance.get(Calendar.MONTH).toDouble()
@@ -22,7 +22,7 @@ class MonthLoader<T> internal constructor(var onMonthChangeListener: MonthChange
 
 	override fun onLoad(periodIndex: Int): List<WeekViewEvent<T>> {
 		val year = periodIndex / 12
-		val month = periodIndex % 12
+		val month = periodIndex % 12 - 1
 
 		val startDate = DateUtils.withTimeAtStartOfDay(today())
 		startDate.set(Calendar.YEAR, year)
@@ -36,7 +36,7 @@ class MonthLoader<T> internal constructor(var onMonthChangeListener: MonthChange
 		endDate.set(Calendar.MONTH, month)
 		endDate.set(Calendar.DAY_OF_MONTH, maxDays)
 
-		val displayableItems = onMonthChangeListener.onMonthChange(startDate, endDate)
+		val displayableItems = onMonthChangeListener.onPeriodChange(startDate, endDate)
 
 		val events = ArrayList<WeekViewEvent<T>>()
 		for (displayableItem in displayableItems) {
@@ -44,16 +44,5 @@ class MonthLoader<T> internal constructor(var onMonthChangeListener: MonthChange
 		}
 
 		return events
-	}
-
-	interface MonthChangeListener<T> {
-
-		/**
-		 * Called when the month displayed in the [WeekView] changes.
-		 * @param startDate A [Calendar] representing the start date of the month
-		 * @param endDate A [Calendar] representing the end date of the month
-		 * @return The list of [WeekViewDisplayable] of the provided month
-		 */
-		fun onMonthChange(startDate: Calendar, endDate: Calendar): List<WeekViewDisplayable<T>>
 	}
 }

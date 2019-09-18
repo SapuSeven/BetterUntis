@@ -1,5 +1,7 @@
 package com.alamkanak.weekview.loaders
 
+import com.alamkanak.weekview.WeekView
+import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.WeekViewEvent
 import java.util.*
 
@@ -22,4 +24,15 @@ interface WeekViewLoader<T> {
 	 * @return A list with the events of this period
 	 */
 	fun onLoad(periodIndex: Int): List<WeekViewEvent<T>>
+
+	interface PeriodChangeListener<T> {
+
+		/**
+		 * Called when the period displayed in the [WeekView] changes.
+		 * @param startDate A [Calendar] representing the start date of the period
+		 * @param endDate A [Calendar] representing the end date of the period
+		 * @return The list of [WeekViewDisplayable] of the provided period
+		 */
+		fun onPeriodChange(startDate: Calendar, endDate: Calendar): List<WeekViewDisplayable<T>>
+	}
 }
