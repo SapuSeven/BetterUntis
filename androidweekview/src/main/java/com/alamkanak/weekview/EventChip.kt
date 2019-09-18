@@ -31,10 +31,10 @@ class EventChip<T>
  * @param rect          The rectangle.
  */
 internal constructor(var event: WeekViewEvent<T>, var originalEvent: WeekViewEvent<T>, var rect: SplitRect?) {
-	internal var left: Float = 0.toFloat()
-	internal var width: Float = 0.toFloat()
-	internal var top: Float = 0.toFloat()
-	internal var bottom: Float = 0.toFloat()
+	internal var left: Float = 0.0f
+	internal var width: Float = 0.0f
+	internal var top: Float = 0.0f
+	internal var bottom: Float = 0.0f
 
 	private val backgroundPaint: Paint
 		get() {

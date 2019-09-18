@@ -4,8 +4,16 @@ import android.graphics.RectF
 
 import com.alamkanak.weekview.config.WeekViewConfig
 
-class EventChipRectCalculator internal constructor(private val config: WeekViewConfig) {
-	fun calculateSingleEvent(eventChip: EventChip<*>, startFromPixel: Float): RectF {
+internal class EventChipRectCalculator internal constructor(private val config: WeekViewConfig) {
+	/**
+	 * Calculates the exact position and dimensions of an EventChip in the WeekView.
+	 *
+	 * @param eventChip An EventChip which contains position and dimensions as calculated by [EventChipProvider]
+	 * @param startFromPixel Absolute x position of the first pixel of the day column to draw in
+	 *
+	 * @return A [RectF] at the absolute location and size of the EventChip's final position in the WeekView
+	 */
+	internal fun calculateEventRect(eventChip: EventChip<*>, startFromPixel: Float): RectF {
 		val eventMargin = config.eventMarginVertical.toFloat()
 
 		val verticalOrigin = config.drawConfig.currentOrigin.y
@@ -19,25 +27,18 @@ class EventChipRectCalculator internal constructor(private val config: WeekViewC
 		val verticalDistanceFromBottom = config.hourHeight.toFloat() * config.hoursPerDay() * eventChip.bottom / config.minutesPerDay()
 		val bottom = verticalDistanceFromBottom + verticalOrigin + config.drawConfig.headerHeight - eventMargin
 
+		val columns = 1 / eventChip.width // Determine the number of columns
+
 		// Calculate left
-		var left = startFromPixel + eventChip.left * widthPerDay
-		if (eventChip.left > 0)
-		// all except first element
-			left += config.overlappingEventGap / 2.0f
-		left += config.columnGap / 2.0f
+		var left = startFromPixel
+		left += config.columnGap / 2.0f // Start at offset to create column gap
+		left += eventChip.left * widthPerDay // Add unnormalized x position
+		left += eventChip.left * config.overlappingEventGap // Adjustment if overlapping (evaluates to 0 for single elements)
 
 		// Calculate right
-		var right = left + eventChip.width * widthPerDay
-		if (right < startFromPixel + widthPerDay)
-		// all except last element
-			right -= config.overlappingEventGap / 2.0f
-		if (eventChip.left > 0)
-		// all except first element
-			right -= config.overlappingEventGap / 2.0f
-
-		// this calculation is fast and simple, but suboptimal, as the first and last element
-		// will be bigger (by overlappingEventGap/2). But most of the time there are a maximum
-		// of two simultaneous lessons, so this is acceptable.
+		var right = left // Start at calculated x position
+		right += eventChip.width * widthPerDay // Add unnormalized width
+		right -= config.overlappingEventGap * (columns - 1) / columns // Adjustment if overlapping (evaluates to 0 for single elements)
 
 		return RectF(left, top, right, bottom)
 	}

@@ -7,8 +7,9 @@ import java.lang.Math.abs
 import java.util.*
 import java.util.Calendar.HOUR_OF_DAY
 import java.util.Calendar.MINUTE
+import kotlin.math.max
 
-internal class EventChipsProvider<T>(
+internal class EventChipProvider<T>(
 		private val config: WeekViewConfig,
 		private val data: WeekViewData<T>,
 		private val viewState: WeekViewViewState
@@ -50,7 +51,7 @@ internal class EventChipsProvider<T>(
 			loadEvents(day)
 
 		// Prepare to calculate positions of each events.
-		calculateEventChipPositions()
+		computePositionOfEvents(data.eventChips)
 	}
 
 	private fun loadEvents(day: Calendar) {
@@ -104,41 +105,8 @@ internal class EventChipsProvider<T>(
 		data.fetchedPeriod = periodToFetch
 	}
 
-	private fun calculateEventChipPositions() {
-		// Prepare to calculate positions of each events.
-		val tempEvents = data.eventChips
-		val results = ArrayList<EventChip<T>>()
-
-		// Iterate through each day with events to calculate the position of the events.
-		while (tempEvents.isNotEmpty()) {
-			val eventChips = ArrayList<EventChip<T>>()
-
-			val firstRect = tempEvents.removeAt(0)
-			eventChips.add(firstRect)
-
-			var i = 0
-			while (i < tempEvents.size) {
-				// Collect all other events for same day.
-				val eventChip = tempEvents[i]
-				val event = eventChip.event
-
-				if (firstRect.event.isSameDay(event)) {
-					tempEvents.removeAt(i)
-					eventChips.add(eventChip)
-				} else {
-					i++
-				}
-			}
-
-			computePositionOfEvents(eventChips)
-			results.addAll(eventChips)
-		}
-
-		data.eventChips = results
-	}
-
 	/**
-	 * Calculates the left and right positions of each events. This comes handy specially if events
+	 * Calculates the left and right positions of each events. This comes handy especially if events
 	 * are overlapping.
 	 *
 	 * @param eventChips The events along with their wrapper class.
@@ -207,7 +175,7 @@ internal class EventChipsProvider<T>(
 		// Get the maxRowCount by looking in all columns.
 		var maxRowCount = 0
 		for (column in columns) {
-			maxRowCount = Math.max(maxRowCount, column.size)
+			maxRowCount = max(maxRowCount, column.size)
 		}
 
 		for (i in 0 until maxRowCount) {

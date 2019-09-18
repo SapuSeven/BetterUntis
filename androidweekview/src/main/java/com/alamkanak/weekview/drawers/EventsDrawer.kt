@@ -34,7 +34,7 @@ class EventsDrawer<T>(private val config: WeekViewConfig) {
 			if (!event.isSameDay(date)) return@forEach
 
 			val chipRect = SplitRect(
-					rectCalculator.calculateSingleEvent(eventChip, startFromPixel),
+					rectCalculator.calculateEventRect(eventChip, startFromPixel),
 					calculateDivision(event, nowMillis)
 			)
 			if (isValidEventRect(chipRect)) {
