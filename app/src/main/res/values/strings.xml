@@ -91,6 +91,8 @@
 	<string name="notifications_text_message_classes">Class: %1$s</string>
 	<string name="notifications_text_message_separator"> / </string>
 
+	<string name="homeworks_until">until %1$s</string>
+
 	<plurals name="main_time_diff_minutes">
 		<item quantity="one">a minute ago</item>
 		<item quantity="other">%d minutes ago</item>

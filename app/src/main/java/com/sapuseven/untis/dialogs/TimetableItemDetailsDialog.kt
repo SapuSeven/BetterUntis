@@ -19,12 +19,28 @@ import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.KotlinUtils.safeLet
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.DateTimeFormatter
+import org.joda.time.format.ISODateTimeFormat
+
 
 class TimetableItemDetailsDialog : DialogFragment() {
 	private var item: TimegridItem? = null
 	private var timetableDatabaseInterface: TimetableDatabaseInterface? = null
 
 	private lateinit var listener: TimetableItemDetailsDialogListener
+
+	companion object {
+		val HOMEWORK_DUE_TIME_FORMAT: DateTimeFormatter = ISODateTimeFormat.date()
+		val HOMEWORK_DUE_TIME_DISPLAY_FORMAT: DateTimeFormatter = DateTimeFormat.forPattern("EEE, dd. MMM")
+
+		fun createInstance(item: TimegridItem, timetableDatabaseInterface: TimetableDatabaseInterface?): TimetableItemDetailsDialog {
+			val fragment = TimetableItemDetailsDialog()
+			fragment.item = item
+			fragment.timetableDatabaseInterface = timetableDatabaseInterface
+			return fragment
+		}
+	}
 
 	interface TimetableItemDetailsDialogListener {
 		fun onPeriodElementClick(dialog: DialogFragment, element: PeriodElement?, useOrgId: Boolean)
@@ -86,11 +102,12 @@ class TimetableItemDetailsDialog : DialogFragment() {
 			}
 		}
 
-		// TODO: Fix homework display
 		item.periodData.element.homeWorks?.forEach {
+			val endDate = HOMEWORK_DUE_TIME_FORMAT.parseDateTime(it.endDate)
+
 			val infoView = activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_homework, null)
 			(infoView.findViewById<TextView>(R.id.textview_roomfinder_name)).text = it.text
-			(infoView.findViewById<TextView>(R.id.tvDate)).text = "from " + it.startDate + " to " + it.endDate // TODO: Localize
+			(infoView.findViewById<TextView>(R.id.tvDate)).text = getString(R.string.homeworks_until, HOMEWORK_DUE_TIME_DISPLAY_FORMAT.print(endDate))
 			root.addView(infoView)
 		}
 
@@ -153,14 +170,5 @@ class TimetableItemDetailsDialog : DialogFragment() {
 			dismiss()
 		}
 		return tv
-	}
-
-	companion object {
-		fun createInstance(item: TimegridItem, timetableDatabaseInterface: TimetableDatabaseInterface?): TimetableItemDetailsDialog {
-			val fragment = TimetableItemDetailsDialog()
-			fragment.item = item
-			fragment.timetableDatabaseInterface = timetableDatabaseInterface
-			return fragment
-		}
 	}
 }
