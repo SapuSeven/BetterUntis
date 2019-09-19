@@ -22,6 +22,7 @@ import com.sapuseven.untis.data.databases.RoomfinderDatabase
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.dialogs.ElementPickerDialog
+import com.sapuseven.untis.dialogs.ErrorReportingDialog
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
@@ -258,8 +259,8 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 						refreshRoomList()
 						Snackbar.make(content_roomfinder, if (code != null) ErrorMessageDictionary.getErrorMessage(resources, code) else message
 								?: getString(R.string.error), Snackbar.LENGTH_INDEFINITE)
+								.setAction("Show") { ErrorReportingDialog(this@RoomFinderActivity).showRequestErrorDialog(requestId, code, message) }
 								.show()
-						// TODO: Show a button for more info and possibly bug reports
 					}
 				}, user, timetableDatabaseInterface).load(TimetableLoader.TimetableLoaderTarget(startDate, endDate, room.id, room.type), TimetableLoader.FLAG_LOAD_SERVER)
 			}

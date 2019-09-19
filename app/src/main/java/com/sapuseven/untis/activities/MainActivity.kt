@@ -750,23 +750,10 @@ class MainActivity :
 				showLoading(false)
 				Snackbar.make(content_main, if (code != null) ErrorMessageDictionary.getErrorMessage(resources, code) else message
 						?: getString(R.string.error), Snackbar.LENGTH_INDEFINITE)
-						.setAction("Show") { showErrorDialog(requestId, code, message) }
+						.setAction("Show") { ErrorReportingDialog(this).showRequestErrorDialog(requestId, code, message) }
 						.show()
 			}
 		}
-	}
-
-	private fun showErrorDialog(requestId: Int, code: Int?, message: String?) {
-		val dialog = AlertDialog.Builder(this)
-				.setTitle("Error Information")
-				.setMessage("Request ID: $requestId\nError code: $code\nError message: $message")
-				.setPositiveButton(R.string.ok) { dialog, _ ->
-					dialog.dismiss()
-				}
-				.create()
-
-		// TODO: Add button to create a GitHub issue
-		dialog.show()
 	}
 
 	private fun showLoading(loading: Boolean) {
