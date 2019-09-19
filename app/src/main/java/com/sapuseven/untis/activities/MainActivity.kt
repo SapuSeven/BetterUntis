@@ -2,7 +2,6 @@ package com.sapuseven.untis.activities
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
@@ -36,6 +35,7 @@ import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.dialogs.DatePickerDialog
 import com.sapuseven.untis.dialogs.ElementPickerDialog
+import com.sapuseven.untis.dialogs.ErrorReportingDialog
 import com.sapuseven.untis.dialogs.TimetableItemDetailsDialog
 import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.DateTimeUtils
@@ -49,10 +49,10 @@ import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.notifications.StartupReceiver
 import com.sapuseven.untis.preferences.ElementPickerPreference
 import kotlinx.android.synthetic.main.activity_main_content.*
-import org.joda.time.DateTimeConstants
 import org.joda.time.Instant
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
+import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.collections.ArrayList
@@ -423,23 +423,23 @@ class MainActivity :
 	}
 
 	private fun prepareItems(items: List<TimegridItem>): List<TimegridItem> {
-		// TODO: There may be a better way for this
+		val newItems = mergeItems(items)
+		colorItems(newItems)
+		return newItems
+	}
 
-		val timer = System.nanoTime()
-
+	private fun mergeItems(items: List<TimegridItem>): List<TimegridItem> {
 		val days = profileUser.timeGrid.days
+		val itemGrid: Array<Array<MutableList<TimegridItem>>> = Array(days.size) { Array(days.maxBy { it.units.size }!!.units.size) { mutableListOf<TimegridItem>() } }
 
-		val itemGrid: Array<Array<MutableList<TimegridItem>>> = Array(days.size) { Array(days[0].units.size) { mutableListOf<TimegridItem>() } }
+		val firstDayOfWeek = DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(days.first().day).dayOfWeek
 
-		val newItems = mutableListOf<TimegridItem>()
-
+		// Put all items into a two dimensional array depending on day and hour
 		items.forEach { item ->
 			val startDateTime = DateTimeUtils.isoDateTimeNoSeconds().parseLocalDateTime(item.periodData.element.startDateTime)
 			val endDateTime = DateTimeUtils.isoDateTimeNoSeconds().parseLocalDateTime(item.periodData.element.endDateTime)
 
-			val day = endDateTime.dayOfWeek - DateTimeConstants.MONDAY
-
-			if (day < 0 || day >= days.size) return@forEach
+			val day = endDateTime.dayOfWeek - firstDayOfWeek
 
 			val thisUnitStartIndex = days[day].units.indexOfFirst {
 				it.startTime == startDateTime.toString(DateTimeUtils.tTimeNoSeconds())
@@ -449,61 +449,25 @@ class MainActivity :
 				it.endTime == endDateTime.toString(DateTimeUtils.tTimeNoSeconds())
 			}
 
-			item.periodData.durationInHours = thisUnitEndIndex + 1 - thisUnitStartIndex
-
-			if (thisUnitStartIndex != -1)
+			if (thisUnitStartIndex != -1 && thisUnitEndIndex != -1)
 				itemGrid[day][thisUnitStartIndex].add(item)
-			else
-				newItems.add(item)
 		}
 
-		itemGrid.forEach { units: Array<MutableList<TimegridItem>> ->
-			units.forEachIndexed { unit, items ->
-				if (unit == units.size - 1)
-					return@forEachIndexed
-
-				items.forEach { item ->
+		val newItems = mutableListOf<TimegridItem>()
+		itemGrid.forEach { unitsOfDay ->
+			unitsOfDay.forEachIndexed { unitIndex, items ->
+				items.forEach {
 					var i = 1
-					while (unit + i < units.size && item.mergeWith(units[unit + i]))
-						i++
+					while (it.mergeWith(unitsOfDay[unitIndex + i])) i++
 				}
+
+				newItems.addAll(items)
 			}
 		}
-
-		days.forEachIndexed { dayIndex, _ ->
-			// TODO: Support holidays
-
-			days[dayIndex].units.forEachIndexed { hourIndex, _ ->
-				val allItems = itemGrid[dayIndex][hourIndex].toList()
-
-				allItems.forEach { item ->
-					//if (item.isHidden())
-					//continue
-
-					var rowSpan = item.periodData.durationInHours
-
-					while (hourIndex + rowSpan < days.size) {
-						val nextItems = itemGrid[dayIndex][hourIndex + rowSpan]
-						if (item.mergeWith(nextItems)) {
-							rowSpan++
-							//timetable[0].addOffset(day, hour + rowSpan - 1);
-						} else {
-							break
-						}
-					}
-
-					newItems.add(item)
-				}
-			}
-		}
-
-		setupColors(newItems)
-
-		Log.d("prepareItems Timer", "prepareItems took ${(System.nanoTime() - timer) / 1000000.0}ms")
 		return newItems
 	}
 
-	private fun setupColors(items: List<TimegridItem>) {
+	private fun colorItems(items: List<TimegridItem>) {
 		val regularColor = PreferenceUtils.getPrefInt(preferences, "preference_background_regular")
 		val examColor = PreferenceUtils.getPrefInt(preferences, "preference_background_exam")
 		val cancelledColor = PreferenceUtils.getPrefInt(preferences, "preference_background_cancelled")
@@ -525,7 +489,6 @@ class MainActivity :
 				useDefault -> Color.parseColor(item.periodData.element.backColor)
 				useTheme -> getAttr(R.attr.colorPrimary)
 				else -> regularColor
-
 			}
 
 			item.pastColor = when {
@@ -540,17 +503,6 @@ class MainActivity :
 	}
 
 	override fun onNavigationItemSelected(item: MenuItem): Boolean {
-		/*when (displayedElement.getElemType()) {
-			"CLASS" -> (findViewById<View>(R.id.nav_view) as NavigationView)
-					.setCheckedItem(R.id.nav_show_classes)
-			"TEACHER" -> (findViewById<View>(R.id.nav_view) as NavigationView)
-					.setCheckedItem(R.id.nav_show_teachers)
-			"ROOM" -> (findViewById<View>(R.id.nav_view) as NavigationView)
-					.setCheckedItem(R.id.nav_show_rooms)
-			else -> (findViewById<View>(R.id.nav_view) as NavigationView)
-					.setCheckedItem(R.id.nav_show_personal)
-		}*/
-
 		when (item.itemId) {
 			R.id.nav_show_personal -> {
 				showPersonalTimetable()
@@ -691,11 +643,11 @@ class MainActivity :
 
 	private fun refreshNavigationViewSelection() {
 		when (displayedElement?.type) {
-			"CLASS" -> (findViewById<View>(R.id.navigationview_main) as NavigationView)
+			TimetableDatabaseInterface.Type.CLASS.name -> (findViewById<View>(R.id.navigationview_main) as NavigationView)
 					.setCheckedItem(R.id.nav_show_classes)
-			"TEACHER" -> (findViewById<View>(R.id.navigationview_main) as NavigationView)
+			TimetableDatabaseInterface.Type.TEACHER.name -> (findViewById<View>(R.id.navigationview_main) as NavigationView)
 					.setCheckedItem(R.id.nav_show_teachers)
-			"ROOM" -> (findViewById<View>(R.id.navigationview_main) as NavigationView)
+			TimetableDatabaseInterface.Type.ROOM.name -> (findViewById<View>(R.id.navigationview_main) as NavigationView)
 					.setCheckedItem(R.id.nav_show_rooms)
 			else -> (findViewById<View>(R.id.navigationview_main) as NavigationView)
 					.setCheckedItem(R.id.nav_show_personal)
