@@ -53,7 +53,7 @@ class NotificationSetup : BroadcastReceiver() {
 		if (!PreferenceUtils.getPrefBool(preferenceManager, "preference_notifications_enable"))
 			return
 
-		loadDatabase(context, intent.getLongExtra(EXTRA_LONG_PROFILE_ID, 0)) // TODO: Add setting to select user
+		loadDatabase(context, intent.getLongExtra(EXTRA_LONG_PROFILE_ID, 0))
 		if (::profileUser.isInitialized) loadTimetable(context)
 	}
 
@@ -69,7 +69,6 @@ class NotificationSetup : BroadcastReceiver() {
 		Log.d("NotificationSetup", "loadTimetable for user ${profileUser.id}")
 
 		val currentDate = UntisDate.fromLocalDate(LocalDate.now())
-
 
 		val targetTimetable = createPersonalTimetable()
 		targetTimetable?.let {

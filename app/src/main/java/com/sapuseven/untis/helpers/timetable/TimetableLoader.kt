@@ -21,10 +21,12 @@ import kotlinx.coroutines.launch
 import org.joda.time.Instant
 import java.lang.ref.WeakReference
 
-class TimetableLoader(private val context: WeakReference<Context>,
-                      private val timetableDisplay: TimetableDisplay,
-                      private val user: UserDatabase.User,
-                      private val timetableDatabaseInterface: TimetableDatabaseInterface) {
+class TimetableLoader(
+		private val context: WeakReference<Context>,
+		private val timetableDisplay: TimetableDisplay,
+		private val user: UserDatabase.User,
+		private val timetableDatabaseInterface: TimetableDatabaseInterface
+) {
 	companion object {
 		const val FLAG_LOAD_CACHE = 0b00000001
 		const val FLAG_LOAD_SERVER = 0b00000010

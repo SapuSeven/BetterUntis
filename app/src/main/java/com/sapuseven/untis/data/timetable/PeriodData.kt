@@ -3,17 +3,10 @@ package com.sapuseven.untis.data.timetable
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.Period
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
-@Serializable
 class PeriodData(
-		@Transient private var timetableDatabaseInterface: TimetableDatabaseInterface? = null, // TODO: Better error handling if this is null, for example after deserialization
-		var element: Period,
-		var cutOff: Boolean = false,
-		var coveringElements: Boolean = false,
-		var visible: Boolean = true,
-		var durationInHours: Int = 0
+		private var timetableDatabaseInterface: TimetableDatabaseInterface? = null,
+		var element: Period
 ) {
 	val classes = ArrayList<PeriodElement>()
 	val teachers = ArrayList<PeriodElement>()
@@ -28,12 +21,11 @@ class PeriodData(
 
 	private fun parseElements() {
 		element.elements.forEach { element ->
-			// TODO: Don't hard-code these values
 			when (element.type) {
-				"CLASS" -> addClass(element)
-				"TEACHER" -> addTeacher(element)
-				"SUBJECT" -> addSubject(element)
-				"ROOM" -> addRoom(element)
+				TimetableDatabaseInterface.Type.CLASS.name -> addClass(element)
+				TimetableDatabaseInterface.Type.TEACHER.name -> addTeacher(element)
+				TimetableDatabaseInterface.Type.SUBJECT.name -> addSubject(element)
+				TimetableDatabaseInterface.Type.ROOM.name -> addRoom(element)
 			}
 		}
 	}

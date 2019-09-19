@@ -59,9 +59,8 @@ class TimetableItemDetailsDialog : DialogFragment() {
 			val builder = AlertDialog.Builder(activity)
 
 			if (item == null || timetableDatabaseInterface == null) {
-				// TODO: Refactor hard-coded strings
-				builder.setMessage("Item not found")
-						.setNeutralButton("Close") { dialog, _ ->
+				builder.setMessage(getString(R.string.error_item_not_found))
+						.setNeutralButton(getString(R.string.close)) { dialog, _ ->
 							dialog.dismiss()
 						}
 			} else {

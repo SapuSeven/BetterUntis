@@ -54,6 +54,8 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 	companion object {
 		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileid"
 		const val EXTRA_INT_ROOM_ID = "com.sapuseven.untis.activities.roomid"
+
+		const val EVENT_PICKER_TAG = "com.sapuseven.untis.activities.elementPicker"
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -288,7 +290,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 						multiSelect = true,
 						hideTypeSelection = true,
 						positiveButtonText = getString(R.string.add))
-		).show(supportFragmentManager, "elementPicker") // TODO: Do not hard-code the tag
+		).show(supportFragmentManager, EVENT_PICKER_TAG)
 	}
 
 	private fun showDeleteItemDialog(position: Int) {

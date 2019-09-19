@@ -20,7 +20,7 @@ class UntisDate(
 		}
 
 		fun fromLocalDate(localDate: LocalDate): UntisDate {
-			return UntisDate(LocalDate(localDate).toString(ISODateTimeFormat.date()))
+			return UntisDate(localDate.toString(ISODateTimeFormat.date()))
 		}
 	}
 
