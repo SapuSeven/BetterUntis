@@ -391,8 +391,7 @@ class MainActivity :
 	private fun setupHours() {
 		val lines = MutableList(0) { return@MutableList 0 }
 
-		// TODO: Replace the fixed day index AND/OR display a warning at login if the days are not equal AND/OR support inequal days
-		profileUser.timeGrid.days[0].units.forEach { hour ->
+		profileUser.timeGrid.days.maxBy { it.units.size }?.units?.forEach { hour ->
 			val startTime = DateTimeUtils.tTimeNoSeconds().parseLocalTime(hour.startTime).toString(DateTimeUtils.shortDisplayableTime())
 			val endTime = DateTimeUtils.tTimeNoSeconds().parseLocalTime(hour.endTime).toString(DateTimeUtils.shortDisplayableTime())
 
@@ -409,7 +408,7 @@ class MainActivity :
 		weekView.hourLines = lines.toIntArray()
 
 		weekView.startTime = lines[0]
-		weekView.endTime = lines[lines.size - 1] + 30
+		weekView.endTime = lines[lines.size - 1] + 30 // TODO: Don't hard-code this offset
 	}
 
 	private fun setupActionBar() {
