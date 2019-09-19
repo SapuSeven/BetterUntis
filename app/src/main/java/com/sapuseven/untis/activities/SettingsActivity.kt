@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceScreen
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.dialogs.ElementPickerDialog
@@ -106,19 +107,27 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 
 		override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
 			profileId = arguments?.getLong(EXTRA_LONG_PROFILE_ID) ?: 0
-			// TODO: Show error if profileId == 0
-			preferenceManager.sharedPreferencesName = "preferences_$profileId"
-
-			setPreferencesFromResource(R.xml.preferences, rootKey)
-
-			when (rootKey) {
-				"preferences_styling" ->
-					listOf("preference_theme", "preference_dark_theme", "preference_dark_theme_oled").forEach { key ->
-						findPreference(key)?.setOnPreferenceChangeListener { _, _ ->
-							activity?.recreate()
-							true
+			if (profileId == 0L) {
+				MaterialAlertDialogBuilder(context)
+						.setMessage("Invalid profile ID")
+						.setPositiveButton("Exit") { _, _ ->
+							activity?.finish()
 						}
-					}
+						.show()
+			} else {
+				preferenceManager.sharedPreferencesName = "preferences_$profileId"
+
+				setPreferencesFromResource(R.xml.preferences, rootKey)
+
+				when (rootKey) {
+					"preferences_styling" ->
+						listOf("preference_theme", "preference_dark_theme", "preference_dark_theme_oled").forEach { key ->
+							findPreference(key)?.setOnPreferenceChangeListener { _, _ ->
+								activity?.recreate()
+								true
+							}
+						}
+				}
 			}
 		}
 
