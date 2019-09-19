@@ -3,7 +3,6 @@ package com.alamkanak.weekview
 import android.view.View
 import com.alamkanak.weekview.config.WeekViewConfig
 import com.alamkanak.weekview.loaders.WeekViewLoader
-import java.lang.Math.abs
 import java.util.*
 import java.util.Calendar.HOUR_OF_DAY
 import java.util.Calendar.MINUTE
@@ -20,9 +19,7 @@ internal class EventChipProvider<T>(
 		if (view.isInEditMode) return
 
 		for (day in dayRange) {
-			val needsToFetchPeriod = data.fetchedPeriod.toDouble() != weekViewLoader?.toWeekViewPeriodIndex(day)
-					&& abs(data.fetchedPeriod - (weekViewLoader?.toWeekViewPeriodIndex(day)
-					?: 0.0)) > 0.5
+			val needsToFetchPeriod = data.fetchedPeriod.toLong() != weekViewLoader?.toWeekViewPeriodIndex(day)
 
 			// Check if this particular day has been fetched
 			if (viewState.shouldRefreshEvents || needsToFetchPeriod) {
