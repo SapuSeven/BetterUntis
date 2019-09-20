@@ -122,7 +122,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 				when (rootKey) {
 					"preferences_styling" ->
 						listOf("preference_theme", "preference_dark_theme", "preference_dark_theme_oled").forEach { key ->
-							findPreference(key)?.setOnPreferenceChangeListener { _, _ ->
+							findPreference<Preference>(key)?.setOnPreferenceChangeListener { _, _ ->
 								activity?.recreate()
 								true
 							}
