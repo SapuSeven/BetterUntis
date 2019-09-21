@@ -24,7 +24,6 @@ Another major change is the use of a custom WeekView (based on [Till Hellmund](h
 - Support for multiple accounts
 
 ## Missing features
-- No holiday or free day indicators
 - No translations, as of now the app is only available in English
 - No in-timetable room availability indicator
 - No 'last updated'-indicator
