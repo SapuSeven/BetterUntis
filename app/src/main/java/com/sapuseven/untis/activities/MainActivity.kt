@@ -452,6 +452,8 @@ class MainActivity :
 
 			val day = endDateTime.dayOfWeek - firstDayOfWeek
 
+			if (day < 0 || day >= days.size) return@forEach
+
 			val thisUnitStartIndex = days[day].units.indexOfFirst {
 				it.startTime == startDateTime.toString(DateTimeUtils.tTimeNoSeconds())
 			}
@@ -469,7 +471,7 @@ class MainActivity :
 			unitsOfDay.forEachIndexed { unitIndex, items ->
 				items.forEach {
 					var i = 1
-					while (it.mergeWith(unitsOfDay[unitIndex + i])) i++
+					while (unitIndex + i < unitsOfDay.size && it.mergeWith(unitsOfDay[unitIndex + i])) i++
 				}
 
 				newItems.addAll(items)
