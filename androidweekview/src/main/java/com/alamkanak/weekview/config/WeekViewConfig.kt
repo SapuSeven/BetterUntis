@@ -131,6 +131,7 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 	var eventTextSize: Float
 		get() = drawConfig.eventTextPaint.textSize
 		set(value) {
+			drawConfig.holidayTextPaint.textSize = value
 			drawConfig.eventTextPaint.textSize = value
 			drawConfig.calculateTimeTextHeight()
 		}
@@ -149,6 +150,7 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 	var eventTextColor: Int
 		get() = drawConfig.eventTextPaint.color
 		set(value) {
+			drawConfig.holidayTextPaint.color = value
 			drawConfig.eventTextPaint.color = value
 			drawConfig.eventTopPaint.color = value
 			drawConfig.eventBottomPaint.color = value

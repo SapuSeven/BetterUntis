@@ -42,6 +42,7 @@ class WeekViewDrawConfig(context: Context) {
 	val nowLinePaint: Paint = Paint()
 	val todayHeaderTextPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 	val todayHeaderSecondaryTextPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
+	val holidayTextPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 	val eventTextPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 	val eventTopPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 	val eventBottomPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
@@ -75,8 +76,9 @@ class WeekViewDrawConfig(context: Context) {
 		todayHeaderSecondaryTextPaint.textAlign = Paint.Align.CENTER
 		todayHeaderSecondaryTextPaint.typeface = Typeface.DEFAULT
 
+		holidayTextPaint.typeface = Typeface.DEFAULT_BOLD
+
 		eventTextPaint.textAlign = Paint.Align.CENTER
-		eventTextPaint.style = Paint.Style.FILL
 		eventTextPaint.typeface = Typeface.DEFAULT_BOLD
 
 		eventTopPaint.style = Paint.Style.FILL

@@ -4,18 +4,18 @@ import android.content.ContentValues
 import android.database.Cursor
 import com.sapuseven.untis.annotations.Table
 import com.sapuseven.untis.annotations.TableColumn
-import com.sapuseven.untis.interfaces.TableModel
 import com.sapuseven.untis.data.databases.TABLE_NAME_HOLIDAYS
+import com.sapuseven.untis.interfaces.TableModel
 import kotlinx.serialization.Serializable
 
 @Serializable
 @Table(TABLE_NAME_HOLIDAYS)
 data class Holiday(
-		@field:TableColumn("INTEGER NOT NULL") val id: Int,
-		@field:TableColumn("VARCHAR(255) NOT NULL") val name: String,
-		@field:TableColumn("VARCHAR(255) NOT NULL") val longName: String,
-		@field:TableColumn("VARCHAR(255) NOT NULL") val startDate: String,
-		@field:TableColumn("VARCHAR(255) NOT NULL") val endDate: String
+		@field:TableColumn("INTEGER NOT NULL") val id: Int = 0,
+		@field:TableColumn("VARCHAR(255) NOT NULL") val name: String = "",
+		@field:TableColumn("VARCHAR(255) NOT NULL") val longName: String = "",
+		@field:TableColumn("VARCHAR(255) NOT NULL") val startDate: String = "",
+		@field:TableColumn("VARCHAR(255) NOT NULL") val endDate: String = ""
 ) : TableModel {
 	companion object {
 		const val TABLE_NAME = TABLE_NAME_HOLIDAYS

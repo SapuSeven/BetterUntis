@@ -21,6 +21,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.alamkanak.weekview.HolidayChip
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.WeekViewEvent
@@ -45,6 +46,7 @@ import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
+import com.sapuseven.untis.models.untis.masterdata.Holiday
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.notifications.StartupReceiver
 import com.sapuseven.untis.preferences.ElementPickerPreference
@@ -115,6 +117,7 @@ class MainActivity :
 
 		setupViews()
 		setupHours()
+		setupHolidays()
 
 		setupTimetableLoader()
 		showPersonalTimetable()
@@ -409,6 +412,14 @@ class MainActivity :
 
 		weekView.startTime = lines[0]
 		weekView.endTime = lines[lines.size - 1] + 30 // TODO: Don't hard-code this offset
+	}
+
+	private fun setupHolidays() {
+		userDatabase.getAdditionalUserData<Holiday>(profileUser.id!!, Holiday())?.let { item ->
+			weekView.addHolidays(item.map {
+				HolidayChip(text = it.value.longName, startDate = it.value.startDate, endDate = it.value.endDate)
+			})
+		}
 	}
 
 	private fun setupActionBar() {

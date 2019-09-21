@@ -37,6 +37,7 @@ class WeekView<T>(
 	private val headerRowDrawer: HeaderRowDrawer
 	private val dayLabelDrawer: DayLabelDrawer
 	private val eventsDrawer: EventsDrawer<T>
+	private val holidayDrawer: HolidayDrawer
 	private val timeColumnDrawer: TimeColumnDrawer
 	private val dayBackgroundDrawer: DayBackgroundDrawer
 	private val backgroundGridDrawer: BackgroundGridDrawer
@@ -203,6 +204,7 @@ class WeekView<T>(
 		gestureHandler = WeekViewGestureHandler(context, this, config, data)
 
 		eventsDrawer = EventsDrawer(config)
+		holidayDrawer = HolidayDrawer(config)
 		timeColumnDrawer = TimeColumnDrawer(config)
 
 		headerRowDrawer = HeaderRowDrawer(config)
@@ -261,6 +263,7 @@ class WeekView<T>(
 		backgroundGridDrawer.draw(drawingContext, canvas)
 
 		eventsDrawer.drawEvents(data.eventChips, drawingContext, canvas)
+		holidayDrawer.draw(drawingContext, canvas)
 		nowLineDrawer.draw(drawingContext, canvas)
 
 		headerRowDrawer.draw(drawingContext, canvas)
@@ -444,6 +447,10 @@ class WeekView<T>(
 		return (gestureHandler.currentFlingDirection == WeekViewGestureHandler.Direction.NONE
 				&& gestureHandler.currentScrollDirection == WeekViewGestureHandler.Direction.NONE
 				&& config.drawConfig.currentOrigin.y == 0f)
+	}
+
+	fun addHolidays(holidays: List<HolidayChip>) {
+		holidayDrawer.holidayChips = holidays
 	}
 
 	class SavedState : BaseSavedState {

@@ -27,9 +27,8 @@ class DrawingContext private constructor(val dayRange: List<Calendar>, val start
 					offset = today - Calendar.MONDAY + 1
 
 				val start = leftDaysWithGaps + 1 - offset + days(-offset, leftDaysWithGaps - offset)
-				val size = config.numberOfVisibleDays + 1
 				// TODO: Dynamic week length
-				dayRange.addAll(DateUtils.getDateRange(start, size, Calendar.MONDAY, Calendar.FRIDAY))
+				dayRange.addAll(DateUtils.getDateRange(start, config.numberOfVisibleDays, Calendar.MONDAY, Calendar.FRIDAY))
 			}
 
 			return DrawingContext(dayRange, startPixel)

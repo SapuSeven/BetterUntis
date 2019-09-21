@@ -233,7 +233,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		val db = writableDatabase
 		db.beginTransaction()
 
-		val data = listOf(
+		listOf(
 				AbsenceReason.TABLE_NAME to masterData.absenceReasons,
 				Department.TABLE_NAME to masterData.departments,
 				Duty.TABLE_NAME to masterData.duties,
@@ -247,9 +247,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 				Teacher.TABLE_NAME to masterData.teachers,
 				TeachingMethod.TABLE_NAME to masterData.teachingMethods,
 				SchoolYear.TABLE_NAME to masterData.schoolyears
-		)
-
-		data.forEach { refreshAdditionalUserData(db, userId, it.first, it.second) }
+		).forEach { refreshAdditionalUserData(db, userId, it.first, it.second) }
 
 		val values = ContentValues()
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP, masterData.timeStamp)
