@@ -26,19 +26,18 @@ class DrawingContext private constructor(val dayRange: List<Calendar>, val start
 				if (today - Calendar.MONDAY + 1 < config.numberOfVisibleDays)
 					offset = today - Calendar.MONDAY + 1
 
-				val start = leftDaysWithGaps + 1 - offset + days(-offset, leftDaysWithGaps - offset)
-				// TODO: Dynamic week length
-				dayRange.addAll(DateUtils.getDateRange(start, config.numberOfVisibleDays, Calendar.MONDAY, Calendar.FRIDAY))
+				val start = leftDaysWithGaps + 1 - offset + days(-offset, leftDaysWithGaps - offset, config.numberOfVisibleDays)
+				dayRange.addAll(DateUtils.getDateRange(start, config.numberOfVisibleDays, Calendar.MONDAY, Calendar.MONDAY + config.numberOfVisibleDays - 1))
 			}
 
 			return DrawingContext(dayRange, startPixel)
 		}
 
-		private fun days(start: Int, end: Int): Int {
-			var days = (end - start) / 5 * 2
+		private fun days(start: Int, end: Int, weekLength: Int): Int {
+			var days = (end - start) / weekLength * (7 - weekLength)
 
 			if (start > end)
-				days -= 2
+				days -= 7 - weekLength
 
 			return days
 		}

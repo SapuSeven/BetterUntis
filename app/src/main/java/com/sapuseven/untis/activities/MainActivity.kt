@@ -287,8 +287,7 @@ class MainActivity :
 
 	private fun getDisplayedMonths(): List<Pair<UntisDate, UntisDate>> {
 		val displayedWeekStartDate = weekView.currentDate
-		// TODO: Dynamic week length
-		val displayedWeekEndDate = displayedWeekStartDate.plusDays(5)
+		val displayedWeekEndDate = displayedWeekStartDate.plusDays(profileUser.timeGrid.days.size)
 
 		return if (displayedWeekStartDate.monthOfYear == displayedWeekEndDate.monthOfYear)
 			listOf(Pair(
@@ -338,6 +337,8 @@ class MainActivity :
 	}
 
 	private fun setupWeekViewConfig() {
+		weekView.numberOfVisibleDays = profileUser.timeGrid.days.size
+
 		// Customization
 
 		// Timetable

@@ -117,6 +117,12 @@ class WeekView<T>(
 			invalidate()
 		}
 
+	var numberOfVisibleDays: Int
+		get() = config.numberOfVisibleDays
+		set(value) {
+			config.numberOfVisibleDays = value
+		}
+
 	//  Public methods
 
 	fun setOnEventClickListener(listener: EventClickListener<T>) {
@@ -372,8 +378,7 @@ class WeekView<T>(
 		}
 
 		val diff = DateUtils.getDaysUntilDate(date)
-		// TODO: Dynamic week length
-		var actualDiff = DateUtils.getDisplayedDays(DateUtils.today(), diff, Calendar.MONDAY, Calendar.FRIDAY).toDouble()
+		var actualDiff = DateUtils.getDisplayedDays(DateUtils.today(), diff, Calendar.MONDAY, Calendar.MONDAY + config.numberOfVisibleDays - 1).toDouble()
 
 		val totalDayWidth = config.totalDayWidth
 
@@ -383,10 +388,10 @@ class WeekView<T>(
 		val leftOriginCount = Math.floor(actualDiff).toInt()
 
 		var nearestOrigin = 0
-		if (config.startOnFirstDay)
-			nearestOrigin -= (leftOriginCount.toFloat() * totalDayWidth * config.numberOfVisibleDays.toFloat()).toInt()
+		nearestOrigin -= if (config.startOnFirstDay)
+			(leftOriginCount.toFloat() * totalDayWidth * config.numberOfVisibleDays.toFloat()).toInt()
 		else
-			nearestOrigin -= (leftOriginCount * totalDayWidth).toInt()
+			(leftOriginCount * totalDayWidth).toInt()
 
 		if (nearestOrigin - config.drawConfig.currentOrigin.x != 0f) {
 			gestureHandler.scroller.forceFinished(true)
