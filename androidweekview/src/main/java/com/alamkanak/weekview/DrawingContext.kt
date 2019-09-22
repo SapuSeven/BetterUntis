@@ -2,18 +2,22 @@ package com.alamkanak.weekview
 
 import com.alamkanak.weekview.config.WeekViewConfig
 import java.util.*
+import kotlin.math.ceil
 
-class DrawingContext private constructor(val dayRange: List<Calendar>, val startPixel: Float) {
+class DrawingContext(val startPixel: Float) {
+	var dayRange: List<Calendar> = emptyList()
+	var freeDays: List<Pair<Calendar, Float>> = emptyList()
+
 	companion object {
 		internal fun create(config: WeekViewConfig, viewState: WeekViewViewState): DrawingContext {
 			val drawConfig = config.drawConfig
 			val totalDayWidth = config.totalDayWidth
-			val leftDaysWithGaps = (Math.ceil((drawConfig.currentOrigin.x / totalDayWidth).toDouble()) * -1).toInt()
+			val leftDaysWithGaps = (ceil((drawConfig.currentOrigin.x / totalDayWidth).toDouble()) * -1).toInt()
 			val startPixel = (drawConfig.currentOrigin.x
 					+ totalDayWidth * leftDaysWithGaps
 					+ drawConfig.timeColumnWidth)
 
-			val dayRange = ArrayList<Calendar>()
+			val dayRange = mutableListOf<Calendar>()
 			if (config.isSingleDay) {
 				val day = viewState.firstVisibleDay?.clone() as Calendar
 				dayRange.add(day)
@@ -30,7 +34,7 @@ class DrawingContext private constructor(val dayRange: List<Calendar>, val start
 				dayRange.addAll(DateUtils.getDateRange(start, config.numberOfVisibleDays, Calendar.MONDAY, Calendar.MONDAY + config.numberOfVisibleDays - 1))
 			}
 
-			return DrawingContext(dayRange, startPixel)
+			return DrawingContext(startPixel).apply { this.dayRange = dayRange }
 		}
 
 		private fun days(start: Int, end: Int, weekLength: Int): Int {

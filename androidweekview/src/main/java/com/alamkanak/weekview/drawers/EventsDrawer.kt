@@ -2,7 +2,6 @@ package com.alamkanak.weekview.drawers
 
 import android.graphics.Canvas
 import android.graphics.RectF
-import android.util.Log
 import com.alamkanak.weekview.*
 import com.alamkanak.weekview.config.WeekViewConfig
 import java.util.*
@@ -14,14 +13,16 @@ class EventsDrawer<T>(private val config: WeekViewConfig) {
 		var startPixel = drawingContext.startPixel
 		val now = Calendar.getInstance().timeInMillis
 
-		for (day in drawingContext.dayRange) {
+		val freeDays = mutableListOf<Pair<Calendar, Float>>()
+		drawingContext.dayRange.forEach { day ->
 			if (config.isSingleDay)
 				startPixel += config.eventMarginHorizontal
 
-			drawEventsForDate(eventChips, day, now, startPixel, canvas)
+			if (drawEventsForDate(eventChips, day, now, startPixel, canvas)) freeDays.add(day to startPixel)
 
 			startPixel += config.totalDayWidth
 		}
+		drawingContext.freeDays = freeDays
 	}
 
 	private fun drawEventsForDate(eventChips: List<EventChip<T>>, date: Calendar, nowMillis: Long, startFromPixel: Float, canvas: Canvas): Boolean {

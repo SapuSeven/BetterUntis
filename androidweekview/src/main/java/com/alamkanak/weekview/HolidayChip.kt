@@ -18,5 +18,5 @@ data class HolidayChip(val text: String = "Test", val startDate: String, val end
 					&& day.get(Calendar.YEAR) <= endDateCalendar.year().get()
 					&& day.get(Calendar.DAY_OF_YEAR) <= endDateCalendar.dayOfYear().get()
 
-	private fun parseDate(date: String) = ISODateTimeFormat.date().parseDateTime(date)
+	private fun parseDate(date: String) = DATE_FORMAT.parseDateTime(date)
 }

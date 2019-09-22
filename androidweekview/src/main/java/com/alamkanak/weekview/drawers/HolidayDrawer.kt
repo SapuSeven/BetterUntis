@@ -11,25 +11,20 @@ class HolidayDrawer(private val config: WeekViewConfig) : BaseDrawer {
 	var holidayChips = emptyList<HolidayChip>()
 
 	override fun draw(drawingContext: DrawingContext, canvas: Canvas) {
-		var startPixel = drawingContext.startPixel
-
 		val text = mutableListOf<String>()
-		for (day in drawingContext.dayRange) {
+		drawingContext.freeDays.forEach { day ->
 			holidayChips.forEach {
-				if (it.isOnDay(day))
+				if (it.isOnDay(day.first))
 					text.add(it.text)
 			}
-			drawHoliday(text.joinToString(" / "), startPixel, canvas)
+			drawHoliday(text.joinToString(" / "), day.second, canvas)
 			text.clear()
-
-			if (config.isSingleDay)
-				startPixel += config.eventMarginHorizontal
-
-			startPixel += config.totalDayWidth
 		}
 	}
 
 	private fun drawHoliday(text: String, startFromPixel: Float, canvas: Canvas) {
+		if (text.isBlank()) return
+
 		val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 		paint.strokeWidth = 5f
 		paint.color = config.defaultEventColor

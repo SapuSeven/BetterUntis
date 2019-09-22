@@ -15,11 +15,11 @@ import com.alamkanak.weekview.listeners.*
 import com.alamkanak.weekview.loaders.WeekLoader
 import com.alamkanak.weekview.loaders.WeekViewLoader
 import org.joda.time.LocalDate
-import java.lang.Math.ceil
-import java.lang.Math.min
 import java.util.*
 import java.util.Calendar.DATE
 import java.util.Calendar.HOUR_OF_DAY
+import kotlin.math.ceil
+import kotlin.math.min
 
 class WeekView<T>(
 		context: Context,
