@@ -73,18 +73,22 @@ class NotificationSetup : BroadcastReceiver() {
 		val targetTimetable = createPersonalTimetable()
 		targetTimetable?.let {
 			val target = TimetableLoader.TimetableLoaderTarget(currentDate, currentDate, it.second, it.first)
-
-			TimetableLoader(WeakReference(context), object : TimetableDisplay {
+			lateinit var timetableLoader: TimetableLoader
+			timetableLoader = TimetableLoader(WeakReference(context), object : TimetableDisplay {
 				override fun addData(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
 					setupNotifications(context, items)
 				}
 
 				override fun onError(requestId: Int, code: Int?, message: String?) {
-					// TODO: Handle error
-					Log.d("NotificationSetup", "loadTimetable error $code for $requestId: $message")
+					when (code) {
+						TimetableLoader.CODE_CACHE_MISSING -> timetableLoader.repeat(requestId, TimetableLoader.FLAG_LOAD_SERVER)
+						else -> {
+							// TODO: Show error notification
+						}
+					}
 				}
 			}, profileUser, timetableDatabaseInterface)
-					.load(target, TimetableLoader.FLAG_LOAD_SERVER)
+			timetableLoader.load(target, TimetableLoader.FLAG_LOAD_CACHE)
 		}
 	}
 
