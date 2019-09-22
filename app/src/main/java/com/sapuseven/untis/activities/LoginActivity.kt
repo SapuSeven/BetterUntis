@@ -54,7 +54,6 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 
 	private var api: UntisRequest = UntisRequest()
 	private var query: UntisRequest.UntisRequestQuery = UntisRequest.UntisRequestQuery()
-	//private var handler: UntisRequest.ResponseHandler? = null
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -161,7 +160,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 	}
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-		super.onActivityResult(requestCode, resultCode, intent);
+		super.onActivityResult(requestCode, resultCode, intent)
 
 		when (requestCode) {
 			REQUEST_SCAN_CODE -> if (resultCode == Activity.RESULT_OK) {

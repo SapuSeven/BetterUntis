@@ -31,6 +31,9 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileId"
 
 		private const val DIALOG_DESIGNING_HIDE = "preferences_dialog_designing_hide"
+
+		private const val WIKI_URL_DESIGNING = "https://github.com/SapuSeven/BetterUntis/wiki/Designing"
+		private const val WIKI_URL_PROXY = "https://github.com/SapuSeven/BetterUntis/wiki/Proxy"
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,7 +75,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 			editor.apply()
 		}
 		banner_settings_designing.setRightButtonAction {
-			startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/SapuSeven/BetterUntis/wiki/Designing"))) // TODO: Move this to a common constants class
+			startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(WIKI_URL_DESIGNING)))
 		}
 	}
 
@@ -122,10 +125,17 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 				when (rootKey) {
 					"preferences_styling" ->
 						listOf("preference_theme", "preference_dark_theme", "preference_dark_theme_oled").forEach { key ->
+							@Suppress("RemoveExplicitTypeArguments")
 							findPreference<Preference>(key)?.setOnPreferenceChangeListener { _, _ ->
 								activity?.recreate()
 								true
 							}
+						}
+					"preferences_connectivity" ->
+						@Suppress("RemoveExplicitTypeArguments")
+						findPreference<Preference>("preference_connectivity_proxy_about")?.setOnPreferenceClickListener {
+							startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(WIKI_URL_PROXY)))
+							true
 						}
 				}
 			}

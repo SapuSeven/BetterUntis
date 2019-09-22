@@ -12,6 +12,7 @@ import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_WEBUNTIS_HOST
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_WEBUNTIS_PATH
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL
+import com.sapuseven.untis.data.connectivity.UntisApiConstants.SCHOOL_SEARCH_URL
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
@@ -91,7 +92,7 @@ class LoginDataInputActivity : BaseActivity() {
 
 		if (appLinkData?.isHierarchical == true) {
 			if (appLinkData.scheme == "untis" && appLinkData.host == "setschool") {
-				edittext_logindatainput_school?.setText(appLinkData.getQueryParameter("schoolId"))
+				edittext_logindatainput_school?.setText(appLinkData.getQueryParameter("school"))
 				edittext_logindatainput_user?.setText(appLinkData.getQueryParameter("user"))
 				edittext_logindatainput_key?.setText(appLinkData.getQueryParameter("key"))
 			} else {
@@ -157,7 +158,7 @@ class LoginDataInputActivity : BaseActivity() {
 	}
 
 	private fun restoreInput(user: UserDatabase.User) {
-		edittext_logindatainput_school?.setText(user.schoolId)
+		edittext_logindatainput_school?.setText(user.schoolId.toString())
 		anonymous = user.anonymous
 		switch_logindatainput_anonymouslogin?.isChecked = anonymous
 		edittext_logindatainput_user?.setText(user.user)
@@ -175,12 +176,13 @@ class LoginDataInputActivity : BaseActivity() {
 	}
 
 	private suspend fun acquireSchoolId(): Int? {
-		updateLoadingStatus("Loading schoolId...")
+		updateLoadingStatus(getString(R.string.logindatainput_aquiring_schoolid))
 
 		val query = UntisRequest.UntisRequestQuery()
 
 		query.data.method = UntisApiConstants.METHOD_SEARCH_SCHOOLS
-		query.url = UntisApiConstants.SCHOOL_SEARCH_URL
+		query.url = SCHOOL_SEARCH_URL
+		query.proxyHost = edittext_logindatainput_proxy_host?.text.toString()
 		query.data.params = listOf(SchoolSearchParams(edittext_logindatainput_school?.text.toString()))
 
 		val result = api.request(query)
@@ -209,6 +211,7 @@ class LoginDataInputActivity : BaseActivity() {
 		} ?: (DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + DEFAULT_WEBUNTIS_PATH)
 
 		query.schoolId = schoolId
+		query.proxyHost = edittext_logindatainput_proxy_host?.text.toString()
 		query.data.method = UntisApiConstants.METHOD_GET_APP_SHARED_SECRET
 		query.data.params = listOf(AppSharedSecretParams(user, password))
 
@@ -246,6 +249,7 @@ class LoginDataInputActivity : BaseActivity() {
 			else null
 		} ?: (DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + DEFAULT_WEBUNTIS_PATH)
 		query.schoolId = schoolId
+		query.proxyHost = edittext_logindatainput_proxy_host?.text.toString()
 		query.data.method = UntisApiConstants.METHOD_GET_USER_DATA
 
 		if (anonymous)
@@ -281,7 +285,7 @@ class LoginDataInputActivity : BaseActivity() {
 	}
 
 	private fun sendRequest() = GlobalScope.launch(Dispatchers.Main) {
-		val schoolId: Int = acquireSchoolId() ?: return@launch
+		val schoolId: Int = (if (!anonymous) acquireSchoolId() else null) ?: return@launch
 		val username = edittext_logindatainput_user?.text.toString()
 		val password = edittext_logindatainput_key?.text.toString()
 		val appSharedSecret: String? = if (anonymous) null else acquireAppSharedSecret(schoolId, username, password)
@@ -310,6 +314,11 @@ class LoginDataInputActivity : BaseActivity() {
 				textview_logindatainput_loadingstatus?.text = getString(R.string.logindatainput_data_loaded)
 
 				preferences.saveProfileId(userId.toLong())
+
+				with(preferences.defaultPrefs.edit()) {
+					putString("preference_connectivity_proxy_host", edittext_logindatainput_proxy_host?.text.toString())
+					apply()
+				}
 
 				setResult(Activity.RESULT_OK)
 				finish()

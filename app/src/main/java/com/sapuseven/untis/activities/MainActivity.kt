@@ -90,6 +90,7 @@ class MainActivity :
 	private val loadedWeeks = mutableListOf<Int>()
 	private var displayedElement: PeriodElement? = null
 	private var lastPickedDate: Calendar? = null
+	private var proxyHost: String? = null
 	private lateinit var profileUser: UserDatabase.User
 	private lateinit var profileListAdapter: ProfileListAdapter
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
@@ -246,6 +247,7 @@ class MainActivity :
 	override fun onResume() {
 		super.onResume()
 		preferences.reload()
+		proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
 		setupWeekViewConfig()
 		items.clear()
 		loadedWeeks.clear()
@@ -309,7 +311,7 @@ class MainActivity :
 
 		val alwaysLoad = PreferenceUtils.getPrefBool(preferences, "preference_timetable_refresh_in_background")
 		val flags = (if (!forceRefresh) TimetableLoader.FLAG_LOAD_CACHE else 0) or (if (alwaysLoad || forceRefresh) TimetableLoader.FLAG_LOAD_SERVER else 0)
-		timetableLoader.load(target, flags)
+		timetableLoader.load(target, flags, proxyHost)
 	}
 
 	private fun loadProfile(): Boolean {
@@ -710,7 +712,7 @@ class MainActivity :
 
 	override fun onError(requestId: Int, code: Int?, message: String?) {
 		when (code) {
-			TimetableLoader.CODE_CACHE_MISSING -> timetableLoader.repeat(requestId, TimetableLoader.FLAG_LOAD_SERVER)
+			TimetableLoader.CODE_CACHE_MISSING -> timetableLoader.repeat(requestId, TimetableLoader.FLAG_LOAD_SERVER, proxyHost)
 			else -> {
 				showLoading(false)
 				Snackbar.make(content_main, if (code != null) ErrorMessageDictionary.getErrorMessage(resources, code) else message

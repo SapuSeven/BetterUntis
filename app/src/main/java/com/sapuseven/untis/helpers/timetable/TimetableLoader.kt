@@ -43,13 +43,13 @@ class TimetableLoader(
 	private var api: UntisRequest = UntisRequest()
 	private var query: UntisRequest.UntisRequestQuery = UntisRequest.UntisRequestQuery()
 
-	fun load(target: TimetableLoaderTarget, flags: Int = 0) = GlobalScope.launch(Dispatchers.Main) {
+	fun load(target: TimetableLoaderTarget, flags: Int = 0, proxyHost: String? = null) = GlobalScope.launch(Dispatchers.Main) {
 		requestList.add(target)
 
 		if (flags and FLAG_LOAD_CACHE > 0)
 			loadFromCache(target, requestList.size - 1)
 		if (flags and FLAG_LOAD_SERVER > 0)
-			loadFromServer(target, requestList.size - 1)
+			loadFromServer(target, requestList.size - 1, proxyHost)
 	}
 
 	private fun loadFromCache(target: TimetableLoaderTarget, requestId: Int) {
@@ -66,13 +66,14 @@ class TimetableLoader(
 		}
 	}
 
-	private suspend fun loadFromServer(target: TimetableLoaderTarget, requestId: Int) {
+	private suspend fun loadFromServer(target: TimetableLoaderTarget, requestId: Int, proxyHost: String? = null) {
 		val cache = TimetableCache(context)
 		cache.setTarget(target.startDate, target.endDate, target.id, target.type)
 
 		query.url = user.apiUrl
 				?: (DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + DEFAULT_WEBUNTIS_PATH)
 		query.schoolId = user.schoolId
+		query.proxyHost = proxyHost
 
 		val params = TimetableParams(
 				target.startDate,
@@ -109,7 +110,7 @@ class TimetableLoader(
 			}
 		}, { error ->
 			Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): network request failed at OS level")
-			timetableDisplay.onError(requestId, CODE_REQUEST_FAILED, error.exception.toString())
+			timetableDisplay.onError(requestId, CODE_REQUEST_FAILED, error.message)
 		})
 	}
 
@@ -123,9 +124,9 @@ class TimetableLoader(
 		)
 	}
 
-	fun repeat(requestId: Int, flags: Int = 0) {
+	fun repeat(requestId: Int, flags: Int = 0, proxyHost: String? = null) {
 		Log.d("TimetableLoaderDebug", "target ${requestList[requestId]} (requestId $requestId): repeat")
-		load(requestList[requestId], flags)
+		load(requestList[requestId], flags, proxyHost)
 	}
 
 	data class TimetableLoaderTarget(

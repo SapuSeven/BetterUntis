@@ -4,6 +4,7 @@ import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.coroutines.awaitStringResult
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
+import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_WEBUNTIS_HOST
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.TextUtils
 import com.sapuseven.untis.models.untis.params.BaseParams
@@ -26,14 +27,17 @@ class UntisRequest {
 		var url = ""
 		var schoolId: Int? = null
 		var data: UntisRequestData = UntisRequestData()
+		var proxyHost: String? = null
 
 		@Throws(URISyntaxException::class, UnsupportedEncodingException::class)
 		internal fun getURI(encoding: String): URI {
 			return if (!TextUtils.isNullOrEmpty(data.method))
-				URI(url + schoolId?.toString().orEmpty() + "?m=" + URLEncoder.encode(data.method, encoding))
+				URI(proxiedUrl() + schoolId?.toString().orEmpty() + "?m=" + URLEncoder.encode(data.method, encoding))
 			else
-				URI(url + schoolId?.toString().orEmpty())
+				URI(proxiedUrl() + schoolId?.toString().orEmpty())
 		}
+
+		private fun proxiedUrl() = if (proxyHost.isNullOrBlank()) url else url.replace(DEFAULT_WEBUNTIS_HOST, proxyHost.toString())
 	}
 
 	@Serializable

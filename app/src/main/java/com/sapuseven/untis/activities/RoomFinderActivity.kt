@@ -216,6 +216,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 				val endDate = UntisDate.fromLocalDate(LocalDate.now().withDayOfWeek(
 						DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(user.timeGrid.days.last().day).dayOfWeek
 				))
+				val proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
 
 				TimetableLoader(WeakReference(this), object : TimetableDisplay {
 					override fun addData(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
@@ -264,7 +265,8 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 								.setAction("Show") { ErrorReportingDialog(this@RoomFinderActivity).showRequestErrorDialog(requestId, code, message) }
 								.show()
 					}
-				}, user, timetableDatabaseInterface).load(TimetableLoader.TimetableLoaderTarget(startDate, endDate, room.id, room.type), TimetableLoader.FLAG_LOAD_SERVER)
+				}, user, timetableDatabaseInterface)
+						.load(TimetableLoader.TimetableLoaderTarget(startDate, endDate, room.id, room.type), TimetableLoader.FLAG_LOAD_SERVER, proxyHost)
 			}
 		}
 
