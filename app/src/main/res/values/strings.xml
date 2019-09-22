@@ -31,8 +31,7 @@
 	<string name="login_search_by_school_name_or_address">Search by school name or address</string>
 	<string name="login_manual_data_input">Manual data input</string>
 
-	<string name="logindatainput_url">Server URL</string>
-	<string name="logindatainput_schoolname">School name</string>
+	<string name="logindatainput_school">School name or ID</string>
 	<string name="logindatainput_username">Username</string>
 	<string name="logindatainput_key">Key or Password</string>
 	<string name="logindatainput_connecting">Connecting…</string>

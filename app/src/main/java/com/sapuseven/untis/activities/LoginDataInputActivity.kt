@@ -4,24 +4,26 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Patterns
 import android.view.View
-import android.widget.ArrayAdapter
 import android.widget.EditText
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
-import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_PROTOCOL
+import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_WEBUNTIS_HOST
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_WEBUNTIS_PATH
+import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.models.UntisSchoolInfo
+import com.sapuseven.untis.models.UntisUserData
 import com.sapuseven.untis.models.untis.params.AppSharedSecretParams
+import com.sapuseven.untis.models.untis.params.SchoolSearchParams
 import com.sapuseven.untis.models.untis.params.UserDataParams
 import com.sapuseven.untis.models.untis.response.AppSharedSecretResponse
+import com.sapuseven.untis.models.untis.response.SchoolSearchResponse
 import com.sapuseven.untis.models.untis.response.UserDataResponse
 import kotlinx.android.synthetic.main.activity_logindatainput.*
 import kotlinx.coroutines.Dispatchers
@@ -85,23 +87,17 @@ class LoginDataInputActivity : BaseActivity() {
 			textinputlayout_logindatainput_key?.isEnabled = !isChecked
 		}
 
-		val servers = resources.getStringArray(R.array.logindatainput_webuntis_servers)
-		val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, servers)
-		edittext_logindatainput_url?.setAdapter(adapter)
-
 		val appLinkData = intent.data
 
 		if (appLinkData?.isHierarchical == true) {
 			if (appLinkData.scheme == "untis" && appLinkData.host == "setschool") {
-				edittext_logindatainput_url?.setText(appLinkData.getQueryParameter("url"))
-				edittext_logindatainput_school?.setText(appLinkData.getQueryParameter("school"))
+				edittext_logindatainput_school?.setText(appLinkData.getQueryParameter("schoolId"))
 				edittext_logindatainput_user?.setText(appLinkData.getQueryParameter("user"))
 				edittext_logindatainput_key?.setText(appLinkData.getQueryParameter("key"))
 			} else {
 				appLinkData.getQueryParameter("schoolInfo")?.let { schoolInfo = getJSON().parse(UntisSchoolInfo.serializer(), it) }
 
-				edittext_logindatainput_url?.setText(schoolInfo?.server)
-				edittext_logindatainput_school?.setText(schoolInfo?.loginName)
+				edittext_logindatainput_school?.setText(schoolInfo?.schoolId.toString())
 			}
 		}
 
@@ -119,19 +115,11 @@ class LoginDataInputActivity : BaseActivity() {
 			edittext_logindatainput_school?.error = getString(R.string.logindatainput_error_field_empty)
 			return edittext_logindatainput_school
 		}
-		if (edittext_logindatainput_url?.text?.isEmpty() == true) {
-			edittext_logindatainput_url?.error = getString(R.string.logindatainput_error_field_empty)
-			return edittext_logindatainput_url
-		} else if (!Patterns.DOMAIN_NAME.matcher(edittext_logindatainput_url?.text).matches()) {
-			edittext_logindatainput_url?.error = getString(R.string.logindatainput_error_invalid_url)
-			return edittext_logindatainput_url
-		}
 		return null
 	}
 
 	private fun focusFirstFreeField() {
 		when {
-			edittext_logindatainput_url?.text?.isEmpty() == true -> edittext_logindatainput_url as EditText
 			edittext_logindatainput_school?.text?.isEmpty() == true -> edittext_logindatainput_school as EditText
 			edittext_logindatainput_user?.text?.isEmpty() == true -> edittext_logindatainput_user as EditText
 			edittext_logindatainput_key?.text?.isEmpty() == true -> edittext_logindatainput_key as EditText
@@ -151,7 +139,6 @@ class LoginDataInputActivity : BaseActivity() {
 
 	private fun backupInput(prefs: SharedPreferences) {
 		val editor = prefs.edit()
-		editor.putString("edittext_logindatainput_url", edittext_logindatainput_url?.text.toString())
 		editor.putString("edittext_logindatainput_school", edittext_logindatainput_school?.text.toString())
 		editor.putBoolean("switch_logindatainput_anonymouslogin", switch_logindatainput_anonymouslogin.isChecked)
 		editor.putString("edittext_logindatainput_user", edittext_logindatainput_user?.text.toString())
@@ -160,7 +147,6 @@ class LoginDataInputActivity : BaseActivity() {
 	}
 
 	private fun restoreInput(prefs: SharedPreferences) {
-		edittext_logindatainput_url?.setText(prefs.getString("edittext_logindatainput_url", ""))
 		edittext_logindatainput_school?.setText(prefs.getString("edittext_logindatainput_school", ""))
 		anonymous = prefs.getBoolean("switch_logindatainput_anonymouslogin", false)
 		switch_logindatainput_anonymouslogin?.isChecked = anonymous
@@ -171,8 +157,7 @@ class LoginDataInputActivity : BaseActivity() {
 	}
 
 	private fun restoreInput(user: UserDatabase.User) {
-		edittext_logindatainput_url?.setText(user.url)
-		edittext_logindatainput_school?.setText(user.school)
+		edittext_logindatainput_school?.setText(user.schoolId)
 		anonymous = user.anonymous
 		switch_logindatainput_anonymouslogin?.isChecked = anonymous
 		edittext_logindatainput_user?.setText(user.user)
@@ -185,22 +170,47 @@ class LoginDataInputActivity : BaseActivity() {
 		progressbar_logindatainput_loadingstatus?.visibility = View.VISIBLE
 		textview_logindatainput_loadingstatus?.visibility = View.VISIBLE
 
+		setElementsEnabled(false)
 		sendRequest()
 	}
 
-	private suspend fun acquireAppSharedSecret(): String? {
+	private suspend fun acquireSchoolId(): Int? {
+		updateLoadingStatus("Loading schoolId...")
+
+		val query = UntisRequest.UntisRequestQuery()
+
+		query.data.method = UntisApiConstants.METHOD_SEARCH_SCHOOLS
+		query.url = UntisApiConstants.SCHOOL_SEARCH_URL
+		query.data.params = listOf(SchoolSearchParams(edittext_logindatainput_school?.text.toString()))
+
+		val result = api.request(query)
+		result.fold({ data ->
+			val untisResponse = getJSON().parse(SchoolSearchResponse.serializer(), data)
+
+			untisResponse.result?.let { return it.schools[0].schoolId /* TODO: Show selection dialog if multiple schools are returned */ }
+					?: run {
+						stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code, untisResponse.error?.message.orEmpty()))
+					}
+		}, { error ->
+			stopLoadingAndShowError(getString(R.string.logindatainput_error_generic, error.message))
+		})
+
+		return null
+	}
+
+	private suspend fun acquireAppSharedSecret(schoolId: Int, user: String, password: String): String? {
 		updateLoadingStatus(getString(R.string.logindatainput_aquiring_app_secret))
 
 		val query = UntisRequest.UntisRequestQuery()
 
-		val user = edittext_logindatainput_user?.text.toString()
-		val key = edittext_logindatainput_key?.text.toString()
+		query.url = schoolInfo?.let {
+			if (it.useMobileServiceUrlAndroid) it.mobileServiceUrl
+			else null
+		} ?: (DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + DEFAULT_WEBUNTIS_PATH)
 
-		query.url = schoolInfo?.mobileServiceUrl
-				?: (DEFAULT_PROTOCOL + edittext_logindatainput_url?.text.toString() + DEFAULT_WEBUNTIS_PATH)
-		query.school = schoolInfo?.loginName ?: edittext_logindatainput_school?.text.toString()
+		query.schoolId = schoolId
 		query.data.method = UntisApiConstants.METHOD_GET_APP_SHARED_SECRET
-		query.data.params = listOf(AppSharedSecretParams(user, key))
+		query.data.params = listOf(AppSharedSecretParams(user, password))
 
 		val appSharedSecretResult = api.request(query)
 
@@ -224,80 +234,88 @@ class LoginDataInputActivity : BaseActivity() {
 		return null
 	}
 
-	private fun sendRequest() {
-		GlobalScope.launch(Dispatchers.Main) {
-			setElementsEnabled(false)
+	private suspend fun acquireUserData(schoolId: Int, user: String, key: String?): UntisUserData? {
+		updateLoadingStatus(getString(R.string.logindatainput_loading_user_data))
 
-			val query = UntisRequest.UntisRequestQuery()
+		val query = UntisRequest.UntisRequestQuery()
 
-			var appSharedSecret: String? = null
-			val username = edittext_logindatainput_user?.text.toString()
-			val url = edittext_logindatainput_url?.text.toString()
+		var appSharedSecret = key
 
-			query.url = schoolInfo?.mobileServiceUrl
-					?: (DEFAULT_PROTOCOL + url + DEFAULT_WEBUNTIS_PATH)
-			query.school = schoolInfo?.loginName ?: edittext_logindatainput_school?.text.toString()
-			query.data.method = UntisApiConstants.METHOD_GET_USER_DATA
+		query.url = schoolInfo?.let {
+			if (it.useMobileServiceUrlAndroid) it.mobileServiceUrl
+			else null
+		} ?: (DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + DEFAULT_WEBUNTIS_PATH)
+		query.schoolId = schoolId
+		query.data.method = UntisApiConstants.METHOD_GET_USER_DATA
 
-			if (anonymous)
-				query.data.params = listOf(UserDataParams(UntisAuthentication.getAnonymousAuthObject()))
-			else {
-				//appSharedSecret = edittext_logindatainput_key?.text.toString()
-				// TODO: Skip this step and try the input directly if it matches the pattern of a key
-				appSharedSecret = acquireAppSharedSecret()
-				if (appSharedSecret == null)
-					return@launch
-				if (appSharedSecret.isEmpty())
-					appSharedSecret = edittext_logindatainput_key?.text.toString()
-				query.data.params = listOf(UserDataParams(UntisAuthentication.getAuthObject(username, appSharedSecret)))
+		if (anonymous)
+			query.data.params = listOf(UserDataParams(UntisAuthentication.getAnonymousAuthObject()))
+		else {
+			if (appSharedSecret == null) {
+				stopLoadingAndShowError(getString(R.string.logindatainput_adding_user_unknown_error))
+				return null
+			}
+			if (appSharedSecret.isEmpty())
+				appSharedSecret = edittext_logindatainput_key?.text.toString()
+			query.data.params = listOf(UserDataParams(UntisAuthentication.getAuthObject(user, appSharedSecret)))
+		}
+
+
+		val userDataResult = api.request(query)
+
+		userDataResult.fold({ data ->
+			val untisResponse = getJSON().parse(UserDataResponse.serializer(), data)
+
+			if (untisResponse.result != null) {
+				return untisResponse.result
+			} else {
+				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code))
 			}
 
-			updateLoadingStatus(getString(R.string.logindatainput_loading_user_data))
+			setElementsEnabled(true)
+		}, { error ->
+			stopLoadingAndShowError(getString(R.string.logindatainput_error_generic, error.message))
+		})
 
-			val userDataResult = api.request(query)
+		return null
+	}
 
-			userDataResult.fold({ data ->
-				val untisResponse = getJSON().parse(UserDataResponse.serializer(), data)
+	private fun sendRequest() = GlobalScope.launch(Dispatchers.Main) {
+		val schoolId: Int = acquireSchoolId() ?: return@launch
+		val username = edittext_logindatainput_user?.text.toString()
+		val password = edittext_logindatainput_key?.text.toString()
+		val appSharedSecret: String? = if (anonymous) null else acquireAppSharedSecret(schoolId, username, password)
 
-				if (untisResponse.result != null) {
-					val user = UserDatabase.User(
-							existingUserId,
-							url,
-							schoolInfo?.mobileServiceUrl,
-							query.school,
-							username,
-							appSharedSecret,
-							anonymous,
-							untisResponse.result.masterData.timeGrid,
-							untisResponse.result.masterData.timeStamp,
-							untisResponse.result.userData,
-							untisResponse.result.settings
-					)
+		acquireUserData(schoolId, username, appSharedSecret)?.let { response ->
+			val user = UserDatabase.User(
+					existingUserId,
+					if (schoolInfo?.useMobileServiceUrlAndroid == true) schoolInfo?.mobileServiceUrl else null,
+					schoolId,
+					username,
+					appSharedSecret,
+					anonymous,
+					response.masterData.timeGrid,
+					response.masterData.timeStamp,
+					response.userData,
+					response.settings
+			)
 
-					val userId = if (existingUserId == null) userDatabase.addUser(user) else userDatabase.editUser(user)
+			val userId = if (existingUserId == null) userDatabase.addUser(user) else userDatabase.editUser(user)
 
-					userId?.let {
-						userDatabase.setAdditionalUserData(userId, untisResponse.result.masterData)
+			userId?.let {
+				userDatabase.setAdditionalUserData(userId, response.masterData)
 
-						progressbar_logindatainput_loadingstatus?.visibility = View.GONE
-						imageview_logindatainput_loadingstatussuccess?.visibility = View.VISIBLE
-						textview_logindatainput_loadingstatus?.text = getString(R.string.logindatainput_data_loaded)
+				progressbar_logindatainput_loadingstatus?.visibility = View.GONE
+				imageview_logindatainput_loadingstatussuccess?.visibility = View.VISIBLE
+				textview_logindatainput_loadingstatus?.text = getString(R.string.logindatainput_data_loaded)
 
-						preferences.saveProfileId(userId.toLong())
+				preferences.saveProfileId(userId.toLong())
 
-						setResult(Activity.RESULT_OK)
-						finish()
-					} ?: run {
-						stopLoadingAndShowError(String.format(getString(R.string.logindatainput_adding_user_unknown_error)))
-					}
-				} else {
-					stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code))
-				}
-
-				setElementsEnabled(true)
-			}, { error ->
-				stopLoadingAndShowError(getString(R.string.logindatainput_error_generic, error.exception))
-			})
+				setResult(Activity.RESULT_OK)
+				finish()
+			} ?: run {
+				stopLoadingAndShowError(getString(R.string.logindatainput_adding_user_unknown_error))
+			}
 		}
 	}
 
@@ -331,7 +349,6 @@ class LoginDataInputActivity : BaseActivity() {
 	}
 
 	private fun setElementsEnabled(enabled: Boolean) {
-		textinputlayout_logindatainput_url?.isEnabled = enabled && schoolInfo == null
 		textinputlayout_logindatainput_school?.isEnabled = enabled && schoolInfo == null
 		textinputlayout_logindatainput_user?.isEnabled = enabled && switch_logindatainput_anonymouslogin?.isChecked == false
 		textinputlayout_logindatainput_key?.isEnabled = enabled && switch_logindatainput_anonymouslogin?.isChecked == false

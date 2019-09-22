@@ -72,9 +72,8 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		val db = writableDatabase
 
 		val values = ContentValues()
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_URL, user.url)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_APIURL, user.apiUrl)
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL, user.school)
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID, user.schoolId)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USER, user.user)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_KEY, user.key)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS, user.anonymous)
@@ -97,9 +96,8 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		val db = writableDatabase
 
 		val values = ContentValues()
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_URL, user.url)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_APIURL, user.apiUrl)
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL, user.school)
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID, user.schoolId)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USER, user.user)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_KEY, user.key)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS, user.anonymous)
@@ -127,9 +125,8 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		val cursor = db.query(
 				UserDatabaseContract.Users.TABLE_NAME,
 				arrayOf(
-						UserDatabaseContract.Users.COLUMN_NAME_URL,
 						UserDatabaseContract.Users.COLUMN_NAME_APIURL,
-						UserDatabaseContract.Users.COLUMN_NAME_SCHOOL,
+						UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID,
 						UserDatabaseContract.Users.COLUMN_NAME_USER,
 						UserDatabaseContract.Users.COLUMN_NAME_KEY,
 						UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS,
@@ -147,9 +144,8 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 
 		val user = User(
 				id,
-				cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_URL)),
 				cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_APIURL)),
-				cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL)),
+				cursor.getInt(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID)),
 				cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USER)),
 				cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_KEY)),
 				cursor.getInt(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS)) == 1,
@@ -174,9 +170,8 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 				UserDatabaseContract.Users.TABLE_NAME,
 				arrayOf(
 						BaseColumns._ID,
-						UserDatabaseContract.Users.COLUMN_NAME_URL,
 						UserDatabaseContract.Users.COLUMN_NAME_APIURL,
-						UserDatabaseContract.Users.COLUMN_NAME_SCHOOL,
+						UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID,
 						UserDatabaseContract.Users.COLUMN_NAME_USER,
 						UserDatabaseContract.Users.COLUMN_NAME_KEY,
 						UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS,
@@ -191,9 +186,8 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 			do {
 				users.add(User(
 						cursor.getLong(cursor.getColumnIndex(BaseColumns._ID)),
-						cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_URL)),
 						cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_APIURL)),
-						cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL)),
+						cursor.getInt(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID)),
 						cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USER)),
 						cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_KEY)),
 						cursor.getInt(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS)) == 1,
@@ -296,9 +290,8 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 
 	class User(
 			val id: Long? = null,
-			val url: String? = null,
 			val apiUrl: String? = null,
-			val school: String,
+			val schoolId: Int,
 			val user: String? = null,
 			val key: String? = null,
 			val anonymous: Boolean = false,

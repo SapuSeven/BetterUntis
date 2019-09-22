@@ -24,19 +24,15 @@ class UntisRequest {
 
 	class UntisRequestQuery {
 		var url = ""
-		var school = ""
+		var schoolId: Int? = null
 		var data: UntisRequestData = UntisRequestData()
 
 		@Throws(URISyntaxException::class, UnsupportedEncodingException::class)
 		internal fun getURI(encoding: String): URI {
-			return if (!TextUtils.isNullOrEmpty(school) && !TextUtils.isNullOrEmpty(data.method))
-				URI(url + "?school=" + URLEncoder.encode(school, encoding) + "&m=" + URLEncoder.encode(data.method, encoding))
-			else if (!TextUtils.isNullOrEmpty(school))
-				URI(url + "?school=" + URLEncoder.encode(school, encoding))
-			else if (!TextUtils.isNullOrEmpty(data.method))
-				URI(url + "?m=" + URLEncoder.encode(data.method, encoding))
+			return if (!TextUtils.isNullOrEmpty(data.method))
+				URI(url + schoolId?.toString().orEmpty() + "?m=" + URLEncoder.encode(data.method, encoding))
 			else
-				URI(url)
+				URI(url + schoolId?.toString().orEmpty())
 		}
 	}
 

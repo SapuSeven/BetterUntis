@@ -20,26 +20,6 @@
 			android:orientation="vertical">
 
 			<com.google.android.material.textfield.TextInputLayout
-				android:id="@+id/textinputlayout_logindatainput_url"
-				style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginStart="16dp"
-				android:layout_marginTop="16dp"
-				android:layout_marginEnd="16dp"
-				android:hint="@string/logindatainput_url">
-
-				<androidx.appcompat.widget.AppCompatAutoCompleteTextView
-					android:id="@+id/edittext_logindatainput_url"
-					style="@style/Widget.MaterialComponents.TextInputEditText.OutlinedBox"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:completionThreshold="1"
-					android:inputType="textUri" />
-
-			</com.google.android.material.textfield.TextInputLayout>
-
-			<com.google.android.material.textfield.TextInputLayout
 				android:id="@+id/textinputlayout_logindatainput_school"
 				style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
 				android:layout_width="match_parent"
@@ -47,7 +27,7 @@
 				android:layout_marginStart="16dp"
 				android:layout_marginTop="16dp"
 				android:layout_marginEnd="16dp"
-				android:hint="@string/logindatainput_schoolname">
+				android:hint="@string/logindatainput_school">
 
 				<com.google.android.material.textfield.TextInputEditText
 					android:id="@+id/edittext_logindatainput_school"

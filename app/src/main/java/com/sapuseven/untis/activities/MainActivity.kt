@@ -304,7 +304,6 @@ class MainActivity :
 	}
 
 	private fun loadTimetable(target: TimetableLoader.TimetableLoaderTarget, forceRefresh: Boolean = false) {
-		Log.d("MainActivityDebug", "loadTimetable called for target $target")
 		weekView.notifyDataSetChanged()
 		showLoading(!forceRefresh)
 

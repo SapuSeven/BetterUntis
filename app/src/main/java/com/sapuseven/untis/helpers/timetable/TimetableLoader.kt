@@ -3,6 +3,9 @@ package com.sapuseven.untis.helpers.timetable
 import android.content.Context
 import android.util.Log
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
+import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_WEBUNTIS_HOST
+import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_WEBUNTIS_PATH
+import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
@@ -68,8 +71,8 @@ class TimetableLoader(
 		cache.setTarget(target.startDate, target.endDate, target.id, target.type)
 
 		query.url = user.apiUrl
-				?: (UntisApiConstants.DEFAULT_PROTOCOL + user.url + UntisApiConstants.DEFAULT_WEBUNTIS_PATH)
-		query.school = user.school
+				?: (DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + DEFAULT_WEBUNTIS_PATH)
+		query.schoolId = user.schoolId
 
 		val params = TimetableParams(
 				target.startDate,

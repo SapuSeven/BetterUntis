@@ -6,9 +6,8 @@ import android.provider.BaseColumns
 object UserDatabaseContract {
 	object Users : BaseColumns {
 		const val TABLE_NAME = "users"
-		const val COLUMN_NAME_URL = "url"
 		const val COLUMN_NAME_APIURL = "apiUrl"
-		const val COLUMN_NAME_SCHOOL = "school"
+		const val COLUMN_NAME_SCHOOL_ID = "schoolId"
 		const val COLUMN_NAME_USER = "user"
 		const val COLUMN_NAME_KEY = "key"
 		const val COLUMN_NAME_ANONYMOUS = "anonymous"
@@ -21,9 +20,8 @@ object UserDatabaseContract {
 		const val SQL_CREATE_ENTRIES =
 				"CREATE TABLE $TABLE_NAME (" +
 						"${BaseColumns._ID} INTEGER PRIMARY KEY," +
-						"$COLUMN_NAME_URL VARCHAR(128)," +
 						"$COLUMN_NAME_APIURL VARCHAR(128)," +
-						"$COLUMN_NAME_SCHOOL VARCHAR(64) NOT NULL," +
+						"$COLUMN_NAME_SCHOOL_ID VARCHAR(64) NOT NULL," +
 						"$COLUMN_NAME_USER VARCHAR(64)," +
 						"$COLUMN_NAME_KEY VARCHAR(16)," +
 						"$COLUMN_NAME_ANONYMOUS INT(1) NOT NULL," +
