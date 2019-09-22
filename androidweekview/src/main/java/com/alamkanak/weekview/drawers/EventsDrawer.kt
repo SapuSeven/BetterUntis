@@ -24,14 +24,11 @@ class EventsDrawer<T>(private val config: WeekViewConfig) {
 		}
 	}
 
-	private fun drawEventsForDate(eventChips: List<EventChip<T>>, date: Calendar, nowMillis: Long, startFromPixel: Float, canvas: Canvas) {
-		val dateString = date.get(Calendar.DAY_OF_MONTH).toString() + "." + date.get(Calendar.MONTH).toString()
-
+	private fun drawEventsForDate(eventChips: List<EventChip<T>>, date: Calendar, nowMillis: Long, startFromPixel: Float, canvas: Canvas): Boolean {
+		var freeDays = true
 		eventChips.forEach { eventChip ->
 			val event = eventChip.event
-			if (date.get(Calendar.DAY_OF_MONTH) == 13)
-				Log.d("EventsDrawer", "Drawing event ${eventChip.event.title} for date $dateString, item at ${eventChip.event.startTime.get(Calendar.DAY_OF_MONTH)}")
-			if (!event.isSameDay(date)) return@forEach
+			if (!event.isSameDay(date)) return@forEach else freeDays = false
 
 			val chipRect = SplitRect(
 					rectCalculator.calculateEventRect(eventChip, startFromPixel),
@@ -44,8 +41,7 @@ class EventsDrawer<T>(private val config: WeekViewConfig) {
 				eventChip.rect = null
 			}
 		}
-		if (date.get(Calendar.DAY_OF_MONTH) == 13)
-			Log.d("EventsDrawer", "Drawing cycle finished")
+		return freeDays
 	}
 
 	private fun calculateDivision(event: WeekViewEvent<*>, nowMillis: Long): Float {
