@@ -60,6 +60,10 @@
         <attr name="eventMarginVertical" format="dimension" />
         <attr name="singleDayHorizontalMargin" format="dimension" />
 
+        <!-- Holidays and free days -->
+        <attr name="holidayTextSize" format="dimension" />
+        <attr name="holidayTextColor" format="color" />
+
         <!-- Colors -->
         <attr name="dayBackgroundColor" format="color" />
         <attr name="todayBackgroundColor" format="color" />

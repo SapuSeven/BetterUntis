@@ -36,6 +36,8 @@
 			app:eventSecondaryTextSize="10sp"
 			app:eventTextColor="@android:color/white"
 			app:eventTextSize="16sp"
+			app:holidayTextColor="?android:textColorPrimary"
+			app:holidayTextSize="16sp"
 			app:hourHeight="72dp"
 			app:nowLineColor="@color/white"
 			app:nowLineStrokeWidth="2dp"

@@ -131,7 +131,6 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 	var eventTextSize: Float
 		get() = drawConfig.eventTextPaint.textSize
 		set(value) {
-			drawConfig.holidayTextPaint.textSize = value
 			drawConfig.eventTextPaint.textSize = value
 			drawConfig.calculateTimeTextHeight()
 		}
@@ -150,13 +149,24 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 	var eventTextColor: Int
 		get() = drawConfig.eventTextPaint.color
 		set(value) {
-			drawConfig.holidayTextPaint.color = value
 			drawConfig.eventTextPaint.color = value
 			drawConfig.eventTopPaint.color = value
 			drawConfig.eventBottomPaint.color = value
 		}
 	var eventPadding: Int
 	var defaultEventColor: Int
+
+	// Holidays and free days
+	var holidayTextColor: Int
+		get() = drawConfig.holidayTextPaint.color
+		set(value) {
+			drawConfig.holidayTextPaint.color = value
+		}
+	var holidayTextSize: Float
+		get() = drawConfig.holidayTextPaint.textSize
+		set(value) {
+			drawConfig.holidayTextPaint.textSize = value
+		}
 
 	// Event margins
 	var columnGap: Int
@@ -319,6 +329,10 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 			overlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, 4)
 			eventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, 4)
 			eventMarginHorizontal = a.getDimensionPixelSize(R.styleable.WeekView_singleDayHorizontalMargin, 4)
+
+			// Holidays and free days
+			holidayTextColor = a.getColor(R.styleable.WeekView_holidayTextColor, Color.BLACK)
+			holidayTextSize = a.getDimensionPixelSize(R.styleable.WeekView_holidayTextSize, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12.0f, context.resources.displayMetrics).toInt()).toFloat()
 
 			// Colors
 			dayBackgroundColor = a.getColor(R.styleable.WeekView_dayBackgroundColor, Color.WHITE)
