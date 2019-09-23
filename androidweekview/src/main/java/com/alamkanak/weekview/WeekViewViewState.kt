@@ -12,7 +12,6 @@ class WeekViewViewState {
 	internal var areDimensionsInvalid = true
 
 	var firstVisibleDay: Calendar? = null
-	internal var lastVisibleDay: Calendar? = null
 
 	internal var shouldRefreshEvents: Boolean = false
 

@@ -16,8 +16,7 @@ import com.alamkanak.weekview.loaders.WeekLoader
 import com.alamkanak.weekview.loaders.WeekViewLoader
 import org.joda.time.LocalDate
 import java.util.*
-import java.util.Calendar.DATE
-import java.util.Calendar.HOUR_OF_DAY
+import java.util.Calendar.*
 import kotlin.math.ceil
 import kotlin.math.min
 
@@ -194,16 +193,14 @@ class WeekView<T>(
 		get() {
 			val weekOffset = (-config.drawConfig.currentOrigin.x / config.drawConfig.widthPerDay / config.numberOfVisibleDays.toFloat()).toInt()
 			var offset = 0
-			var today = DateUtils.today().get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY
+			var today = DateUtils.today().get(DAY_OF_WEEK) - SUNDAY
 			if (today == 0)
 				today = 7
 
-			if (today - Calendar.MONDAY + 1 < config.numberOfVisibleDays)
-				offset = today - Calendar.MONDAY + 1
+			if (today - MONDAY + 1 < config.numberOfVisibleDays)
+				offset = today - MONDAY + 1
 
-			val localDate = LocalDate.now().plusWeeks(weekOffset).minusDays(offset)
-
-			return localDate
+			return LocalDate.now().plusWeeks(weekOffset).minusDays(offset)
 		}
 
 	init {
@@ -263,7 +260,7 @@ class WeekView<T>(
 		prepareEventDrawing(canvas)
 
 		val drawingContext = DrawingContext.create(config, viewState)
-		eventChipsProvider.loadEventsIfNecessary(this, drawingContext.dayRange)
+		eventChipsProvider.loadEventsIfNecessary(this, drawingContext.dayRange[drawingContext.dayRange.size / 2])
 
 		dayBackgroundDrawer.draw(drawingContext, canvas)
 		backgroundGridDrawer.draw(drawingContext, canvas)
@@ -357,7 +354,7 @@ class WeekView<T>(
 	}
 
 	fun goToCurrentTime() {
-		val today = Calendar.getInstance()
+		val today = getInstance()
 		val hour = today.get(HOUR_OF_DAY)
 		goToDate(today)
 		goToHour(hour)
@@ -378,7 +375,7 @@ class WeekView<T>(
 		}
 
 		val diff = DateUtils.getDaysUntilDate(date)
-		var actualDiff = DateUtils.getDisplayedDays(DateUtils.today(), diff, Calendar.MONDAY, Calendar.MONDAY + config.numberOfVisibleDays - 1).toDouble()
+		var actualDiff = DateUtils.getDisplayedDays(DateUtils.today(), diff, MONDAY, MONDAY + config.numberOfVisibleDays - 1).toDouble()
 
 		val totalDayWidth = config.totalDayWidth
 
@@ -412,6 +409,7 @@ class WeekView<T>(
 	/**
 	 * Refreshes the view and loads the events again.
 	 */
+	// TODO: Reduce calls to this function to display the timetable faster
 	fun notifyDataSetChanged() {
 		viewState.shouldRefreshEvents = true
 		invalidate()

@@ -15,58 +15,36 @@ internal class EventChipProvider<T>(
 ) {
 	var weekViewLoader: WeekViewLoader<T>? = null
 
-	fun loadEventsIfNecessary(view: View, dayRange: List<Calendar>) {
+	fun loadEventsIfNecessary(view: View, day: Calendar) {
 		if (view.isInEditMode) return
 
-		for (day in dayRange) {
-			val needsToFetchPeriod = data.fetchedPeriod.toLong() != weekViewLoader?.toWeekViewPeriodIndex(day)
-
-			// Check if this particular day has been fetched
-			if (viewState.shouldRefreshEvents || needsToFetchPeriod) {
-				loadEventsAndCalculateEventChipPositions(view, day)
-				viewState.shouldRefreshEvents = false
-			}
+		weekViewLoader?.toWeekViewPeriodIndex(day)?.toInt()?.let { periodIndexToLoad ->
+			if (data.fetchedPeriod != periodIndexToLoad || viewState.shouldRefreshEvents)
+				loadEventsAndCalculateEventChipPositions(view, periodIndexToLoad)
+			viewState.shouldRefreshEvents = false
 		}
 	}
 
-	/**
-	 * Gets more events of one/more month(s) if necessary. This method is called when the user is
-	 * scrolling the week view. The week view stores the events of three months: the visible month,
-	 * the previous month, the next month.
-	 *
-	 * @param day The day the user is currently in.
-	 */
-	private fun loadEventsAndCalculateEventChipPositions(view: View, day: Calendar) {
-		if (weekViewLoader == null && !view.isInEditMode) {
-			throw IllegalStateException("You must provide a MonthChangeListener")
-		}
+	private fun loadEventsAndCalculateEventChipPositions(view: View, periodIndex: Int) {
+		if (weekViewLoader == null && !view.isInEditMode) throw IllegalStateException("You must provide a PeriodChangeListener")
 
 		if (viewState.shouldRefreshEvents)
 			data.clear()
 
-		if (weekViewLoader != null)
-			loadEvents(day)
+		loadEvents(periodIndex)
 
-		// Prepare to calculate positions of each events.
 		computePositionOfEvents(data.eventChips)
 	}
 
-	private fun loadEvents(day: Calendar) {
-		val periodToFetch = weekViewLoader!!.toWeekViewPeriodIndex(day).toInt()
-		val isRefreshEligible = (data.fetchedPeriod < 0
-				|| data.fetchedPeriod != periodToFetch
-				|| viewState.shouldRefreshEvents)
-
-		if (!isRefreshEligible) {
-			return
-		}
-
+	private fun loadEvents(periodToFetch: Int) {
 		var previousPeriodEvents: List<WeekViewEvent<T>>? = null
 		var currentPeriodEvents: List<WeekViewEvent<T>>? = null
 		var nextPeriodEvents: List<WeekViewEvent<T>>? = null
 
+		// Check if periods are already fetched and skip them
 		if (data.previousPeriodEvents != null
-				&& data.currentPeriodEvents != null && data.nextPeriodEvents != null) {
+				&& data.currentPeriodEvents != null
+				&& data.nextPeriodEvents != null) {
 			when (periodToFetch) {
 				data.fetchedPeriod - 1 -> {
 					currentPeriodEvents = data.previousPeriodEvents
@@ -85,9 +63,7 @@ internal class EventChipProvider<T>(
 		}
 
 		if (currentPeriodEvents == null) currentPeriodEvents = weekViewLoader?.onLoad(periodToFetch)?.sorted()
-
 		if (previousPeriodEvents == null) previousPeriodEvents = weekViewLoader?.onLoad(periodToFetch - 1)?.sorted()
-
 		if (nextPeriodEvents == null) nextPeriodEvents = weekViewLoader?.onLoad(periodToFetch + 1)?.sorted()
 
 		// Clear events.

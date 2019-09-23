@@ -14,11 +14,9 @@ import java.util.*
  * [WeekViewEvent].
  */
 class WeekLoader<T> internal constructor(private var onWeekChangeListener: WeekViewLoader.PeriodChangeListener<T>) : WeekViewLoader<T> {
-	override fun toWeekViewPeriodIndex(instance: Calendar) = instance.timeInMillis / MILLIS_PER_WEEK
+	override fun toWeekViewPeriodIndex(instance: Calendar) = instance.timeInMillis / MILLIS_PER_WEEK + 1
 
 	override fun onLoad(periodIndex: Int): List<WeekViewEvent<T>> {
-		Log.d("WeekLoader", "onLoad for $periodIndex")
-
 		val millis = periodIndex * MILLIS_PER_WEEK.toLong()
 
 		val startDate = Calendar.getInstance()
@@ -28,6 +26,8 @@ class WeekLoader<T> internal constructor(private var onWeekChangeListener: WeekV
 		val endDate = Calendar.getInstance()
 		endDate.timeInMillis = millis
 		endDate.set(Calendar.DAY_OF_WEEK, startDate.getMaximum(Calendar.DAY_OF_WEEK))
+
+		Log.d("WeekLoader", "onLoad for $periodIndex, Week start on ${startDate.get(Calendar.DAY_OF_MONTH)}.${startDate.get(Calendar.MONTH)}")
 
 		val displayableItems = onWeekChangeListener.onPeriodChange(startDate, endDate)
 
