@@ -158,7 +158,10 @@ class LoginDataInputActivity : BaseActivity() {
 	}
 
 	private fun restoreInput(user: UserDatabase.User) {
-		edittext_logindatainput_school?.setText(user.schoolId.toString())
+		user.schoolId.let {
+			if (it > 0) edittext_logindatainput_school?.setText(it.toString())
+		}
+
 		anonymous = user.anonymous
 		switch_logindatainput_anonymouslogin?.isChecked = anonymous
 		edittext_logindatainput_user?.setText(user.user)
@@ -176,6 +179,8 @@ class LoginDataInputActivity : BaseActivity() {
 	}
 
 	private suspend fun acquireSchoolId(): Int? {
+		edittext_logindatainput_school?.text.toString().toIntOrNull()?.let { return it }
+
 		updateLoadingStatus(getString(R.string.logindatainput_aquiring_schoolid))
 
 		val query = UntisRequest.UntisRequestQuery()
@@ -208,9 +213,8 @@ class LoginDataInputActivity : BaseActivity() {
 		query.url = schoolInfo?.let {
 			if (it.useMobileServiceUrlAndroid) it.mobileServiceUrl
 			else null
-		} ?: (DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + DEFAULT_WEBUNTIS_PATH)
+		} ?: (DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + DEFAULT_WEBUNTIS_PATH + schoolId)
 
-		query.schoolId = schoolId
 		query.proxyHost = edittext_logindatainput_proxy_host?.text.toString()
 		query.data.method = UntisApiConstants.METHOD_GET_APP_SHARED_SECRET
 		query.data.params = listOf(AppSharedSecretParams(user, password))
@@ -221,7 +225,7 @@ class LoginDataInputActivity : BaseActivity() {
 			val untisResponse = getJSON().parse(AppSharedSecretResponse.serializer(), data)
 
 			if (untisResponse.error?.code == ErrorMessageDictionary.ERROR_CODE_INVALID_CREDENTIALS)
-				return ""
+				return edittext_logindatainput_key?.text.toString()
 			if (untisResponse.result.isNullOrEmpty())
 				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code))
 			else
@@ -242,26 +246,21 @@ class LoginDataInputActivity : BaseActivity() {
 
 		val query = UntisRequest.UntisRequestQuery()
 
-		var appSharedSecret = key
-
 		query.url = schoolInfo?.let {
 			if (it.useMobileServiceUrlAndroid) it.mobileServiceUrl
 			else null
-		} ?: (DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + DEFAULT_WEBUNTIS_PATH)
-		query.schoolId = schoolId
+		} ?: (DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + DEFAULT_WEBUNTIS_PATH + schoolId)
 		query.proxyHost = edittext_logindatainput_proxy_host?.text.toString()
 		query.data.method = UntisApiConstants.METHOD_GET_USER_DATA
 
 		if (anonymous)
 			query.data.params = listOf(UserDataParams(UntisAuthentication.getAnonymousAuthObject()))
 		else {
-			if (appSharedSecret == null) {
+			if (key == null) {
 				stopLoadingAndShowError(getString(R.string.logindatainput_adding_user_unknown_error))
 				return null
 			}
-			if (appSharedSecret.isEmpty())
-				appSharedSecret = edittext_logindatainput_key?.text.toString()
-			query.data.params = listOf(UserDataParams(UntisAuthentication.getAuthObject(user, appSharedSecret)))
+			query.data.params = listOf(UserDataParams(UntisAuthentication.getAuthObject(user, key)))
 		}
 
 

@@ -25,16 +25,15 @@ class UntisRequest {
 
 	class UntisRequestQuery {
 		var url = ""
-		var schoolId: Int? = null
 		var data: UntisRequestData = UntisRequestData()
 		var proxyHost: String? = null
 
 		@Throws(URISyntaxException::class, UnsupportedEncodingException::class)
 		internal fun getURI(encoding: String): URI {
 			return if (!TextUtils.isNullOrEmpty(data.method))
-				URI(proxiedUrl() + schoolId?.toString().orEmpty() + "?m=" + URLEncoder.encode(data.method, encoding))
+				URI(proxiedUrl() + "?m=" + URLEncoder.encode(data.method, encoding))
 			else
-				URI(proxiedUrl() + schoolId?.toString().orEmpty())
+				URI(proxiedUrl())
 		}
 
 		private fun proxiedUrl() = if (proxyHost.isNullOrBlank()) url else url.replace(DEFAULT_WEBUNTIS_HOST, proxyHost.toString())

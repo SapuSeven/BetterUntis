@@ -71,8 +71,7 @@ class TimetableLoader(
 		cache.setTarget(target.startDate, target.endDate, target.id, target.type)
 
 		query.url = user.apiUrl
-				?: (DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + DEFAULT_WEBUNTIS_PATH)
-		query.schoolId = user.schoolId
+				?: (DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + DEFAULT_WEBUNTIS_PATH + user.schoolId)
 		query.proxyHost = proxyHost
 
 		val params = TimetableParams(

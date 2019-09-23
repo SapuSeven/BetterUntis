@@ -15,7 +15,7 @@ import com.sapuseven.untis.models.untis.Settings
 import com.sapuseven.untis.models.untis.UserData
 import com.sapuseven.untis.models.untis.masterdata.*
 
-private const val DATABASE_VERSION = 1
+private const val DATABASE_VERSION = 2
 private const val DATABASE_NAME = "userdata.db"
 
 class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -30,7 +30,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 	}
 
 	override fun onCreate(db: SQLiteDatabase) {
-		db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES)
+		db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V2)
 
 		db.execSQL(generateCreateTable<AbsenceReason>())
 		db.execSQL(generateCreateTable<Department>())
@@ -48,7 +48,23 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 	}
 
 	override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-		// If you change the DATABASE_VERSION, insert logic to migrate the data
+		var currentVersion = oldVersion
+
+		while (currentVersion < newVersion) {
+			when (currentVersion) {
+				1 -> {
+					db.execSQL("ALTER TABLE ${UserDatabaseContract.Users.TABLE_NAME} RENAME TO ${UserDatabaseContract.Users.TABLE_NAME}_v1")
+					db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V2)
+					db.execSQL("INSERT INTO ${UserDatabaseContract.Users.TABLE_NAME} SELECT _id, apiUrl, NULL, user, ${UserDatabaseContract.Users.TABLE_NAME}_v1.\"key\", anonymous, timeGrid, masterDataTimestamp, userData, settings, time_created FROM ${UserDatabaseContract.Users.TABLE_NAME}_v1;")
+					db.execSQL("DROP TABLE ${UserDatabaseContract.Users.TABLE_NAME}_v1")
+				}
+			}
+
+			currentVersion++
+		}
+	}
+
+	fun resetDatabase(db: SQLiteDatabase) {
 		db.execSQL(UserDatabaseContract.Users.SQL_DELETE_ENTRIES)
 
 		db.execSQL(generateDropTable<AbsenceReason>())
@@ -64,8 +80,6 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		db.execSQL(generateDropTable<Teacher>())
 		db.execSQL(generateDropTable<TeachingMethod>())
 		db.execSQL(generateDropTable<SchoolYear>())
-
-		onCreate(db)
 	}
 
 	fun addUser(user: User): Long? {
@@ -107,7 +121,6 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().stringify(Settings.serializer(), user.settings))
 
 		db.update(UserDatabaseContract.Users.TABLE_NAME, values, BaseColumns._ID + "=?", arrayOf(user.id.toString()))
-
 		db.close()
 
 		return user.id

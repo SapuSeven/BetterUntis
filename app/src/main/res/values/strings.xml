@@ -23,6 +23,9 @@
 
 	<string name="main_dialog_delete_profile_title">Delete profile?</string>
 	<string name="main_dialog_delete_profile_message">This will delete your profile with user %1$s at school %2$s.</string>
+	<string name="main_dialog_update_profile_title">Profile update required</string>
+	<string name="main_dialog_update_profile_message">A recent app update has changed the way user data is saved. Please update your current profile to continue using the app.</string>
+	<string name="main_dialog_update_profile_button">Update profile</string>
 
 	<string name="login_scan_code">Scan QR Code</string>
 	<string name="login_welcome">Welcome to BetterUntis!</string>

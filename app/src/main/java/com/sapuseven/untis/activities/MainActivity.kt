@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.ColorUtils
@@ -28,6 +29,7 @@ import com.alamkanak.weekview.WeekViewEvent
 import com.alamkanak.weekview.listeners.EventClickListener
 import com.alamkanak.weekview.listeners.TopLeftCornerClickListener
 import com.alamkanak.weekview.loaders.WeekViewLoader
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.sapuseven.untis.R
@@ -91,6 +93,7 @@ class MainActivity :
 	private var displayedElement: PeriodElement? = null
 	private var lastPickedDate: Calendar? = null
 	private var proxyHost: String? = null
+	private var profileUpdateDialog: AlertDialog? = null
 	private lateinit var profileUser: UserDatabase.User
 	private lateinit var profileListAdapter: ProfileListAdapter
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
@@ -120,8 +123,34 @@ class MainActivity :
 		setupHours()
 		setupHolidays()
 
+		if (profileUser.schoolId <= 0) return
+
 		setupTimetableLoader()
 		showPersonalTimetable()
+	}
+
+	override fun onResume() {
+		super.onResume()
+		preferences.reload()
+		proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
+		setupWeekViewConfig()
+		items.clear()
+		loadedWeeks.clear()
+		weekView.invalidate()
+
+		if (profileUser.schoolId <= 0 && profileUpdateDialog == null)
+			showProfileUpdateRequired()
+	}
+
+	private fun showProfileUpdateRequired() {
+		profileUpdateDialog = MaterialAlertDialogBuilder(this)
+				.setTitle(getString(R.string.main_dialog_update_profile_title))
+				.setMessage(getString(R.string.main_dialog_update_profile_message))
+				.setPositiveButton(getString(R.string.main_dialog_update_profile_button)) { _, _ ->
+					editProfile(profileUser)
+				}
+				.setCancelable(false)
+				.show()
 	}
 
 	private fun login() {
@@ -242,16 +271,6 @@ class MainActivity :
 
 			recreate()
 		}
-	}
-
-	override fun onResume() {
-		super.onResume()
-		preferences.reload()
-		proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
-		setupWeekViewConfig()
-		items.clear()
-		loadedWeeks.clear()
-		weekView.invalidate()
 	}
 
 	private fun setupViews() {
