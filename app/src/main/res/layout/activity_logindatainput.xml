@@ -20,24 +20,6 @@
 			android:orientation="vertical">
 
 			<com.google.android.material.textfield.TextInputLayout
-				android:id="@+id/textinputlayout_logindatainput_proxy_host"
-				style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginStart="16dp"
-				android:layout_marginTop="16dp"
-				android:layout_marginEnd="16dp"
-				android:hint="@string/logindatainput_proxy_host">
-
-				<com.google.android.material.textfield.TextInputEditText
-					android:id="@+id/edittext_logindatainput_proxy_host"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:inputType="textUri" />
-
-			</com.google.android.material.textfield.TextInputLayout>
-
-			<com.google.android.material.textfield.TextInputLayout
 				android:id="@+id/textinputlayout_logindatainput_school"
 				style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
 				android:layout_width="match_parent"
@@ -108,6 +90,49 @@
 					android:inputType="textPassword" />
 
 			</com.google.android.material.textfield.TextInputLayout>
+
+			<View
+				android:layout_width="match_parent"
+				android:layout_height="1dp"
+				android:layout_marginStart="16dp"
+				android:layout_marginTop="16dp"
+				android:layout_marginEnd="16dp"
+				android:background="?android:attr/listDivider"/>
+
+			<Switch
+				android:id="@+id/switch_logindatainput_advanced"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginStart="16dp"
+				android:layout_marginTop="16dp"
+				android:layout_marginEnd="16dp"
+				android:text="@string/logindatainput_show_advanced"/>
+
+			<LinearLayout
+				android:id="@+id/linearlayout_logindatainput_advanced"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:orientation="vertical"
+				android:visibility="gone">
+
+				<com.google.android.material.textfield.TextInputLayout
+					android:id="@+id/textinputlayout_logindatainput_proxy_host"
+					style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginStart="16dp"
+					android:layout_marginTop="16dp"
+					android:layout_marginEnd="16dp"
+					android:hint="@string/logindatainput_proxy_host">
+
+					<com.google.android.material.textfield.TextInputEditText
+						android:id="@+id/edittext_logindatainput_proxy_host"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:inputType="textUri"/>
+
+				</com.google.android.material.textfield.TextInputLayout>
+			</LinearLayout>
 
 			<LinearLayout
 				android:layout_width="match_parent"

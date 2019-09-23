@@ -299,4 +299,5 @@
 	<string name="logindatainput_title_edit">Edit Profile</string>
 	<string name="logindatainput_delete">Delete Profile</string>
 	<string name="logindatainput_proxy_host">Proxy server (optional)</string>
+	<string name="logindatainput_show_advanced">Show advanced settings</string>
 </resources>

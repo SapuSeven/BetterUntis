@@ -88,6 +88,10 @@ class LoginDataInputActivity : BaseActivity() {
 			textinputlayout_logindatainput_key?.isEnabled = !isChecked
 		}
 
+		switch_logindatainput_advanced?.setOnCheckedChangeListener { _, isChecked ->
+			linearlayout_logindatainput_advanced?.visibility = if (isChecked) View.VISIBLE else View.GONE
+		}
+
 		val appLinkData = intent.data
 
 		if (appLinkData?.isHierarchical == true) {
@@ -144,11 +148,13 @@ class LoginDataInputActivity : BaseActivity() {
 		editor.putBoolean("switch_logindatainput_anonymouslogin", switch_logindatainput_anonymouslogin.isChecked)
 		editor.putString("edittext_logindatainput_user", edittext_logindatainput_user?.text.toString())
 		editor.putString("edittext_logindatainput_key", edittext_logindatainput_key?.text.toString())
+		editor.putString("edittext_logindatainput_proxy_host", edittext_logindatainput_proxy_host?.text.toString())
 		editor.apply()
 	}
 
 	private fun restoreInput(prefs: SharedPreferences) {
 		edittext_logindatainput_school?.setText(prefs.getString("edittext_logindatainput_school", ""))
+		edittext_logindatainput_proxy_host?.setText(prefs.getString("edittext_logindatainput_proxy_host", ""))
 		anonymous = prefs.getBoolean("switch_logindatainput_anonymouslogin", false)
 		switch_logindatainput_anonymouslogin?.isChecked = anonymous
 		if (!anonymous) {
@@ -161,6 +167,9 @@ class LoginDataInputActivity : BaseActivity() {
 		user.schoolId.let {
 			if (it > 0) edittext_logindatainput_school?.setText(it.toString())
 		}
+
+		preferences.profileId = user.id ?: 0
+		edittext_logindatainput_proxy_host?.setText(preferences.defaultPrefs.getString("preference_connectivity_proxy_host", ""))
 
 		anonymous = user.anonymous
 		switch_logindatainput_anonymouslogin?.isChecked = anonymous
@@ -360,6 +369,7 @@ class LoginDataInputActivity : BaseActivity() {
 		textinputlayout_logindatainput_school?.isEnabled = enabled && schoolInfo == null
 		textinputlayout_logindatainput_user?.isEnabled = enabled && switch_logindatainput_anonymouslogin?.isChecked == false
 		textinputlayout_logindatainput_key?.isEnabled = enabled && switch_logindatainput_anonymouslogin?.isChecked == false
+		textinputlayout_logindatainput_proxy_host?.isEnabled = enabled
 		button_logindatainput_login?.isEnabled = enabled
 		button_logindatainput_delete?.isEnabled = enabled
 		switch_logindatainput_anonymouslogin?.isEnabled = enabled
