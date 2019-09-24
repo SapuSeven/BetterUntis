@@ -188,8 +188,7 @@ class WeekView<T>(
 			invalidate()
 		}
 
-	// TODO: Re-do day offset calculation
-	val currentDate: LocalDate
+	val currentWeekStartDate: LocalDate
 		get() {
 			val weekOffset = (-config.drawConfig.currentOrigin.x / config.drawConfig.widthPerDay / config.numberOfVisibleDays.toFloat()).toInt()
 			var offset = 0
@@ -285,18 +284,23 @@ class WeekView<T>(
 	private fun notifyScrollListeners() {
 		// Iterate through each day.
 		val oldFirstVisibleDay = viewState.firstVisibleDay
-		val today = DateUtils.today()
 
-		(today.clone() as Calendar).let { firstVisibleDay ->
-			viewState.firstVisibleDay = firstVisibleDay
-			val totalDayWidth = config.totalDayWidth
-			val delta = ceil((config.drawConfig.currentOrigin.x / totalDayWidth).toDouble()).toInt() * -1
-			viewState.firstVisibleDay?.add(DATE, delta)
+		val totalDayWidth = config.totalDayWidth
+		val leftDaysWithGaps = (ceil((config.drawConfig.currentOrigin.x / totalDayWidth).toDouble()) * -1).toInt()
+		var offset = 0
+		var today = DateUtils.today().get(DAY_OF_WEEK) - SUNDAY
+		if (today == 0)
+			today = 7
 
-			val hasFirstVisibleDayChanged = viewState.firstVisibleDay != oldFirstVisibleDay
-			if (hasFirstVisibleDayChanged) {
-				scrollListener?.onFirstVisibleDayChanged(firstVisibleDay, oldFirstVisibleDay)
-			}
+		if (today - MONDAY + 1 < config.numberOfVisibleDays)
+			offset = today - MONDAY + 1
+		val deltaDays = leftDaysWithGaps - offset + DrawingContext.days(-offset, leftDaysWithGaps - offset, config.numberOfVisibleDays)
+		viewState.firstVisibleDay = DateUtils.today()
+		viewState.firstVisibleDay?.add(DATE, deltaDays)
+
+		val hasFirstVisibleDayChanged = viewState.firstVisibleDay != oldFirstVisibleDay
+		if (hasFirstVisibleDayChanged) {
+			scrollListener?.onFirstVisibleDayChanged(viewState.firstVisibleDay!!, oldFirstVisibleDay)
 		}
 	}
 

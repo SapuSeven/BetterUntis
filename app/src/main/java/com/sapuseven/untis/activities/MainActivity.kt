@@ -27,6 +27,7 @@ import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.WeekViewEvent
 import com.alamkanak.weekview.listeners.EventClickListener
+import com.alamkanak.weekview.listeners.ScrollListener
 import com.alamkanak.weekview.listeners.TopLeftCornerClickListener
 import com.alamkanak.weekview.loaders.WeekViewLoader
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -307,7 +308,7 @@ class MainActivity :
 	}
 
 	private fun getDisplayedMonths(): List<Pair<UntisDate, UntisDate>> {
-		val displayedWeekStartDate = weekView.currentDate
+		val displayedWeekStartDate = weekView.currentWeekStartDate
 		val displayedWeekEndDate = displayedWeekStartDate.plusDays(profileUser.timeGrid.days.size)
 
 		return if (displayedWeekStartDate.monthOfYear == displayedWeekEndDate.monthOfYear)
@@ -353,6 +354,11 @@ class MainActivity :
 		weekView.setOnEventClickListener(this)
 		weekView.setOnCornerClickListener(this)
 		weekView.setPeriodChangeListener(this)
+		weekView.scrollListener = object : ScrollListener {
+			override fun onFirstVisibleDayChanged(newFirstVisibleDay: Calendar, oldFirstVisibleDay: Calendar?) {
+				Log.d("onScroll", "Scrolled to ${newFirstVisibleDay.get(Calendar.DAY_OF_MONTH)}.${newFirstVisibleDay.get(Calendar.MONTH)}")
+			}
+		}
 		setupWeekViewConfig()
 	}
 

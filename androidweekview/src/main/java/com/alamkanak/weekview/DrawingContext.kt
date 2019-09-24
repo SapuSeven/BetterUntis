@@ -37,7 +37,7 @@ class DrawingContext(val startPixel: Float) {
 			return DrawingContext(startPixel).apply { this.dayRange = dayRange }
 		}
 
-		private fun days(start: Int, end: Int, weekLength: Int): Int {
+		fun days(start: Int, end: Int, weekLength: Int): Int {
 			var days = (end - start) / weekLength * (7 - weekLength)
 
 			if (start > end)
