@@ -22,8 +22,8 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 	var startOnFirstDay: Boolean
 	var numberOfVisibleDays: Int = 0
 		set(value) {
+			if (field != value) drawConfig.resetOrigin()
 			field = value
-			drawConfig.resetOrigin()
 		}
 	var showFirstDayOfWeekFirst: Boolean
 

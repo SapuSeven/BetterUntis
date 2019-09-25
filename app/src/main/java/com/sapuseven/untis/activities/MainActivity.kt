@@ -131,7 +131,6 @@ class MainActivity :
 		preferences.reload()
 		proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
 		setupWeekViewConfig()
-		weeklyTimetableItems.clear()
 		weekView.invalidate()
 
 		if (profileUser.schoolId <= 0 && profileUpdateDialog == null)
