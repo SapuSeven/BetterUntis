@@ -14,7 +14,7 @@ import com.alamkanak.weekview.drawers.*
 import com.alamkanak.weekview.listeners.*
 import com.alamkanak.weekview.loaders.WeekLoader
 import com.alamkanak.weekview.loaders.WeekViewLoader
-import org.joda.time.LocalDate
+import org.joda.time.DateTime
 import java.util.*
 import java.util.Calendar.*
 import kotlin.math.ceil
@@ -189,20 +189,6 @@ class WeekView<T>(
 			invalidate()
 		}
 
-	val currentWeekStartDate: LocalDate
-		get() {
-			val weekOffset = (-config.drawConfig.currentOrigin.x / config.drawConfig.widthPerDay / config.numberOfVisibleDays.toFloat()).toInt()
-			var offset = 0
-			var today = DateUtils.today().get(DAY_OF_WEEK) - SUNDAY
-			if (today == 0)
-				today = 7
-
-			if (today - MONDAY + 1 < config.numberOfVisibleDays)
-				offset = today - MONDAY + 1
-
-			return LocalDate.now().plusWeeks(weekOffset).minusDays(offset)
-		}
-
 	init {
 		gestureHandler = WeekViewGestureHandler(context, this, config, data)
 
@@ -284,14 +270,13 @@ class WeekView<T>(
 
 	private fun notifyScrollListeners() {
 		val oldFirstVisibleDay = viewState.firstVisibleDay
+		val today = DateTime.now()
 
-		val newFirstVisibleDay = DateUtils.today()
-
-		val offset = DateUtils.offsetInWeek(newFirstVisibleDay, config.firstDayOfWeek, config.numberOfVisibleDays)
+		val offset = DateUtils.offsetInWeek(today, config.firstDayOfWeek, config.numberOfVisibleDays)
 		val daysScrolled = (ceil((config.drawConfig.currentOrigin.x / config.totalDayWidth).toDouble()) * -1).toInt()
-		newFirstVisibleDay.add(DATE, DateUtils.actualDays(daysScrolled, config.numberOfVisibleDays) - offset)
+		val newFirstVisibleDay = today.plusDays(DateUtils.actualDays(daysScrolled, config.numberOfVisibleDays) - offset)
 
-		if (oldFirstVisibleDay != newFirstVisibleDay) {
+		if (viewState.shouldRefreshEvents || oldFirstVisibleDay != newFirstVisibleDay) {
 			viewState.firstVisibleDay = newFirstVisibleDay
 			scrollListener?.onFirstVisibleDayChanged(newFirstVisibleDay, oldFirstVisibleDay)
 		}

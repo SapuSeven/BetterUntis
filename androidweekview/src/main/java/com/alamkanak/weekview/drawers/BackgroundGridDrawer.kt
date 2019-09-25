@@ -59,10 +59,10 @@ class BackgroundGridDrawer(private val config: WeekViewConfig) : BaseDrawer {
 		val height = WeekView.viewHeight
 
 		var i = 0
-		for (hour in 1 until config.hourLines!!.size) {
-			if (config.hourLines!![hour] == config.hourLines!![hour - 1]) continue
+		for (hour in 1 until config.hourLines.size) {
+			if (config.hourLines[hour] == config.hourLines[hour - 1]) continue
 
-			val heightOfHour = config.hourHeight * (config.hourLines!![hour] - config.startTime) / 60.0f
+			val heightOfHour = config.hourHeight * (config.hourLines[hour] - config.startTime) / 60.0f
 			val top = config.drawConfig.headerHeight + config.drawConfig.currentOrigin.y + heightOfHour
 
 			val widthPerDay = config.totalDayWidth

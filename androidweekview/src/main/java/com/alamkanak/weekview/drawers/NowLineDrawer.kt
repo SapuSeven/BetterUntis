@@ -2,10 +2,10 @@ package com.alamkanak.weekview.drawers
 
 import android.graphics.Canvas
 import com.alamkanak.weekview.DateUtils.isSameDay
-import com.alamkanak.weekview.DateUtils.today
 import com.alamkanak.weekview.DrawingContext
 import com.alamkanak.weekview.config.WeekViewConfig
 import com.alamkanak.weekview.config.WeekViewDrawConfig
+import org.joda.time.DateTime
 import java.lang.Math.max
 import java.util.*
 import java.util.Calendar.HOUR_OF_DAY
@@ -17,12 +17,10 @@ class NowLineDrawer(private val config: WeekViewConfig) : BaseDrawer {
 	override fun draw(drawingContext: DrawingContext, canvas: Canvas) {
 		if (!config.showNowLine) return
 
-		val today = today()
-
 		var startPixel = drawingContext.startPixel
 
 		for (day in drawingContext.dayRange) {
-			val isSameDay = isSameDay(day, today)
+			val isSameDay = isSameDay(day, DateTime.now())
 			val startX = max(startPixel, drawConfig.timeColumnWidth)
 
 			if (config.isSingleDay) {

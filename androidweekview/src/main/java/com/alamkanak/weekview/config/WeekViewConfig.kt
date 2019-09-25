@@ -7,7 +7,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
 import com.alamkanak.weekview.R
-import java.util.*
+import org.joda.time.DateTimeConstants
 
 /**
  * This class contains all attributes that can be specified using XML.
@@ -281,7 +281,7 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 		val a = context.theme.obtainStyledAttributes(attrs, R.styleable.WeekView, 0, 0)
 		try {
 			// Calendar configuration
-			firstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, Calendar.MONDAY)
+			firstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, DateTimeConstants.MONDAY)
 			startOnFirstDay = a.getBoolean(R.styleable.WeekView_startOnFirstDay, false)
 			numberOfVisibleDays = a.getInteger(R.styleable.WeekView_numberOfVisibleDays, 3)
 			showFirstDayOfWeekFirst = a.getBoolean(R.styleable.WeekView_showFirstDayOfWeekFirst, false)

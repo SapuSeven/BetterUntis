@@ -2,11 +2,10 @@ package com.alamkanak.weekview.drawers
 
 import android.graphics.Canvas
 import com.alamkanak.weekview.DateUtils.isSameDay
-import com.alamkanak.weekview.DateUtils.today
 import com.alamkanak.weekview.DrawingContext
 import com.alamkanak.weekview.config.WeekViewConfig
 import com.alamkanak.weekview.config.WeekViewDrawConfig
-import java.util.*
+import org.joda.time.DateTime
 
 class DayLabelDrawer(private val config: WeekViewConfig) : BaseDrawer {
 	private val drawConfig: WeekViewDrawConfig = config.drawConfig
@@ -29,9 +28,8 @@ class DayLabelDrawer(private val config: WeekViewConfig) : BaseDrawer {
 		canvas.restore()
 	}
 
-	private fun drawLabel(day: Calendar, startPixel: Float, canvas: Canvas) {
-		val today = today()
-		val isSameDay = isSameDay(day, today)
+	private fun drawLabel(day: DateTime, startPixel: Float, canvas: Canvas) {
+		val isSameDay = isSameDay(day, DateTime.now())
 
 		// Draw the day labels.
 		val dayLabel = drawConfig.dateTimeInterpreter.interpretDate(day)

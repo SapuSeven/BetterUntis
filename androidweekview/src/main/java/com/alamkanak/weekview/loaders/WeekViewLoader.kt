@@ -3,7 +3,7 @@ package com.alamkanak.weekview.loaders
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.WeekViewEvent
-import java.util.*
+import org.joda.time.DateTime
 
 interface WeekViewLoader<T> {
 
@@ -16,7 +16,7 @@ interface WeekViewLoader<T> {
 	 * @param instance the date
 	 * @return The period index in which the date falls (floating point number).
 	 */
-	fun toWeekViewPeriodIndex(instance: Calendar): Long
+	fun toWeekViewPeriodIndex(instance: DateTime): Long
 
 	/**
 	 * Load the events within the period
@@ -29,10 +29,10 @@ interface WeekViewLoader<T> {
 
 		/**
 		 * Called when the period displayed in the [WeekView] changes.
-		 * @param startDate A [Calendar] representing the start date of the period
-		 * @param endDate A [Calendar] representing the end date of the period
+		 * @param startDate A [DateTime] representing the start date of the period
+		 * @param endDate A [DateTime] representing the end date of the period
 		 * @return The list of [WeekViewDisplayable] of the provided period
 		 */
-		fun onPeriodChange(startDate: Calendar, endDate: Calendar): List<WeekViewDisplayable<T>>
+		fun onPeriodChange(startDate: DateTime, endDate: DateTime): List<WeekViewDisplayable<T>>
 	}
 }

@@ -1,11 +1,11 @@
 package com.alamkanak.weekview.drawers
 
 import android.graphics.Canvas
-import com.alamkanak.weekview.DateUtils
 import com.alamkanak.weekview.DateUtils.isSameDay
 import com.alamkanak.weekview.DrawingContext
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.config.WeekViewConfig
+import org.joda.time.DateTime
 import java.lang.Math.max
 import java.util.*
 import java.util.Calendar.HOUR_OF_DAY
@@ -30,8 +30,8 @@ class DayBackgroundDrawer(private val config: WeekViewConfig) {
 		}
 	}
 
-	private fun drawDayBackground(day: Calendar, startX: Float, startPixel: Float, canvas: Canvas) {
-		val today = DateUtils.today()
+	private fun drawDayBackground(day: DateTime, startX: Float, startPixel: Float, canvas: Canvas) {
+		val today = DateTime.now()
 		val isToday = isSameDay(day, today)
 
 		if (config.drawConfig.widthPerDay + startPixel - startX <= 0) return
@@ -52,7 +52,7 @@ class DayBackgroundDrawer(private val config: WeekViewConfig) {
 					canvas.drawRect(startX, startY, endX, startY + minutesUntilNow / 60.0f * config.hourHeight, pastPaint)
 					canvas.drawRect(startX, startY + minutesUntilNow, endX, height.toFloat(), futurePaint)
 				}
-				day.before(today) -> canvas.drawRect(startX, startY, endX, height.toFloat(), pastPaint)
+				day < today -> canvas.drawRect(startX, startY, endX, height.toFloat(), pastPaint)
 				else -> canvas.drawRect(startX, startY, endX, height.toFloat(), futurePaint)
 			}
 		} else {

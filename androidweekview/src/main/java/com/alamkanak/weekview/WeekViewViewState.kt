@@ -1,6 +1,7 @@
 package com.alamkanak.weekview
 
 import com.alamkanak.weekview.config.WeekViewConfig
+import org.joda.time.DateTime
 import java.lang.Math.max
 import java.util.*
 
@@ -11,14 +12,12 @@ class WeekViewViewState {
 	internal var isFirstDraw = true
 	internal var areDimensionsInvalid = true
 
-	var firstVisibleDay: Calendar? = null
+	var firstVisibleDay: DateTime? = null
 
 	internal var shouldRefreshEvents: Boolean = false
 
 	internal fun update(config: WeekViewConfig, listener: UpdateListener) {
-		if (!areDimensionsInvalid) {
-			return
-		}
+		if (!areDimensionsInvalid) return
 
 		val height = WeekView.viewHeight
 
@@ -43,7 +42,7 @@ class WeekViewViewState {
 	}
 
 	internal fun invalidate() {
-		areDimensionsInvalid = false
+		areDimensionsInvalid = true
 	}
 
 	internal interface UpdateListener {

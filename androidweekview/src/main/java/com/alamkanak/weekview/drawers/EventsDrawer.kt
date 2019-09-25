@@ -4,16 +4,16 @@ import android.graphics.Canvas
 import android.graphics.RectF
 import com.alamkanak.weekview.*
 import com.alamkanak.weekview.config.WeekViewConfig
-import java.util.*
+import org.joda.time.DateTime
 
 class EventsDrawer<T>(private val config: WeekViewConfig) {
 	private val rectCalculator: EventChipRectCalculator = EventChipRectCalculator(config)
 
 	internal fun drawEvents(eventChips: List<EventChip<T>>, drawingContext: DrawingContext, canvas: Canvas) {
 		var startPixel = drawingContext.startPixel
-		val now = Calendar.getInstance().timeInMillis
+		val now = DateTime.now().millis
 
-		val freeDays = mutableListOf<Pair<Calendar, Float>>()
+		val freeDays = mutableListOf<Pair<DateTime, Float>>()
 		drawingContext.dayRange.forEach { day ->
 			if (config.isSingleDay)
 				startPixel += config.eventMarginHorizontal
@@ -25,7 +25,7 @@ class EventsDrawer<T>(private val config: WeekViewConfig) {
 		drawingContext.freeDays = freeDays
 	}
 
-	private fun drawEventsForDate(eventChips: List<EventChip<T>>, date: Calendar, nowMillis: Long, startFromPixel: Float, canvas: Canvas): Boolean {
+	private fun drawEventsForDate(eventChips: List<EventChip<T>>, date: DateTime, nowMillis: Long, startFromPixel: Float, canvas: Canvas): Boolean {
 		var freeDays = true
 		eventChips.forEach { eventChip ->
 			val event = eventChip.event
@@ -46,8 +46,8 @@ class EventsDrawer<T>(private val config: WeekViewConfig) {
 	}
 
 	private fun calculateDivision(event: WeekViewEvent<*>, nowMillis: Long): Float {
-		val eventStartMillis = event.startTime.timeInMillis
-		val eventEndMillis = event.endTime.timeInMillis
+		val eventStartMillis = event.startTime.millis
+		val eventEndMillis = event.endTime.millis
 
 		return when {
 			nowMillis <= eventStartMillis -> 0f

@@ -1,6 +1,6 @@
 package com.alamkanak.weekview.listeners
 
-import java.util.*
+import org.joda.time.DateTime
 
 interface ScrollListener {
 	/**
@@ -12,5 +12,5 @@ interface ScrollListener {
 	 * @param newFirstVisibleDay The new first visible day
 	 * @param oldFirstVisibleDay The old first visible day (is null on the first call).
 	 */
-	fun onFirstVisibleDayChanged(newFirstVisibleDay: Calendar, oldFirstVisibleDay: Calendar?)
+	fun onFirstVisibleDayChanged(newFirstVisibleDay: DateTime, oldFirstVisibleDay: DateTime?)
 }

@@ -9,9 +9,10 @@ import android.text.TextPaint
 import com.alamkanak.weekview.DateTimeInterpreter
 import com.alamkanak.weekview.DateUtils
 import com.alamkanak.weekview.WeekView
+import org.joda.time.DateTime
+import org.joda.time.DateTimeConstants
 import java.lang.Math.max
 import java.lang.Math.min
-import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Calendar.DAY_OF_WEEK
 
@@ -132,42 +133,18 @@ class WeekViewDrawConfig(context: Context) {
 
 	private fun buildDefaultDateTimeInterpreter(context: Context): DateTimeInterpreter {
 		return object : DateTimeInterpreter {
-			private val sdfDate = SimpleDateFormat("EEE", Locale.getDefault())
-			private val sdfSecondaryDate = SimpleDateFormat("d. MMM", Locale.getDefault())
-			private val sdfTime = DateUtils.getTimeFormat(context)
-			private val calendar = Calendar.getInstance()
+			private val datePattern = "EEE"
+			private val secondaryDatePattern = "d. MMM"
+			private val timePattern = DateUtils.getTimeFormat(context).toPattern()
 
-			override fun interpretDate(date: Calendar): String {
-				return try {
-					sdfDate.format(date.time).toUpperCase()
-				} catch (e: Exception) {
-					e.printStackTrace()
-					""
-				}
+			override fun interpretDate(date: DateTime) = date.toString(datePattern, Locale.getDefault()).toUpperCase(Locale.getDefault())
 
-			}
+			override fun interpretSecondaryDate(date: DateTime) = date.toString(secondaryDatePattern, Locale.getDefault()).toUpperCase(Locale.getDefault())
 
-			override fun interpretSecondaryDate(date: Calendar): String {
-				return try {
-					sdfSecondaryDate.format(date.time).toUpperCase()
-				} catch (e: Exception) {
-					e.printStackTrace()
-					""
-				}
-
-			}
-
-			override fun interpretTime(minutes: Int): String {
-				calendar.clear()
-				calendar.add(Calendar.MINUTE, minutes)
-
-				return try {
-					sdfTime.format(calendar.time)
-				} catch (e: Exception) {
-					e.printStackTrace()
-					""
-				}
-			}
+			override fun interpretTime(minutes: Int) = DateTime()
+					.withHourOfDay(minutes / DateTimeConstants.MINUTES_PER_HOUR)
+					.withMinuteOfHour(minutes % DateTimeConstants.MINUTES_PER_HOUR)
+					.toString(timePattern)
 		}
 	}
 

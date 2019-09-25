@@ -1,11 +1,11 @@
 package com.alamkanak.weekview
 
-import java.util.*
+import org.joda.time.DateTime
 
 interface DateTimeInterpreter {
-	fun interpretDate(date: Calendar): String
+	fun interpretDate(date: DateTime): String
 
-	fun interpretSecondaryDate(date: Calendar): String
+	fun interpretSecondaryDate(date: DateTime): String
 
 	fun interpretTime(minutes: Int): String
 }

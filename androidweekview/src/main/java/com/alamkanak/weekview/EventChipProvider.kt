@@ -3,9 +3,8 @@ package com.alamkanak.weekview
 import android.view.View
 import com.alamkanak.weekview.config.WeekViewConfig
 import com.alamkanak.weekview.loaders.WeekViewLoader
+import org.joda.time.DateTime
 import java.util.*
-import java.util.Calendar.HOUR_OF_DAY
-import java.util.Calendar.MINUTE
 import kotlin.math.max
 
 internal class EventChipProvider<T>(
@@ -15,7 +14,7 @@ internal class EventChipProvider<T>(
 ) {
 	var weekViewLoader: WeekViewLoader<T>? = null
 
-	fun loadEventsIfNecessary(view: View, day: Calendar) {
+	fun loadEventsIfNecessary(view: View, day: DateTime) {
 		if (view.isInEditMode) return
 
 		weekViewLoader?.toWeekViewPeriodIndex(day)?.toInt()?.let { periodIndexToLoad ->
@@ -160,8 +159,8 @@ internal class EventChipProvider<T>(
 					eventChip.width = 1.0f / columns.size
 					eventChip.left = j / columns.size
 
-					eventChip.top = (eventChip.event.startTime.get(HOUR_OF_DAY) * 60 + eventChip.event.startTime.get(MINUTE) - config.startTime).toFloat()
-					eventChip.bottom = (eventChip.event.endTime.get(HOUR_OF_DAY) * 60 + eventChip.event.endTime.get(MINUTE) - config.startTime).toFloat()
+					eventChip.top = (eventChip.event.startTime.hourOfDay * 60 + eventChip.event.startTime.minuteOfHour - config.startTime).toFloat()
+					eventChip.bottom = (eventChip.event.endTime.hourOfDay * 60 + eventChip.event.endTime.minuteOfHour - config.startTime).toFloat()
 				}
 				j++
 			}

@@ -1,6 +1,5 @@
 package com.sapuseven.untis.helpers
 
-import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.DateTimeFormatterBuilder
 import org.joda.time.format.ISODateTimeFormat
@@ -26,11 +25,13 @@ object DateTimeUtils {
 				.appendLiteral(':')
 				.appendMinuteOfHour(2)
 				.toFormatter()
+				.withOffsetParsed()
 
 		internal val ttxx = DateTimeFormatterBuilder()
 				.appendLiteral('T')
 				.append(ISODateTimeFormat.hourMinute())
 				.toFormatter()
+				.withOffsetParsed()
 
 		internal val idtxx = DateTimeFormatterBuilder()
 				.append(date())
@@ -40,12 +41,7 @@ object DateTimeUtils {
 				.appendMinuteOfHour(2)
 				.appendTimeZoneOffset("Z", true, 2, 4)
 				.toFormatter()
-	}
-
-	fun toCalendar(localDateTime: LocalDateTime): Calendar {
-		val cal = Calendar.getInstance()
-		cal.time = localDateTime.toDate()
-		return cal
+				.withOffsetParsed()
 	}
 
 	fun today(): Calendar {

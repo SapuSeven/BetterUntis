@@ -59,10 +59,10 @@ class TimetableLoader(
 		if (cache.exists()) {
 			Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): cached file found, returning")
 			val cached = cache.load()
-			timetableDisplay.addData(cached.items.map { periodToTimegridItem(it, target.type) }, target.startDate, target.endDate, cached.timestamp)
+			timetableDisplay.addTimetableItems(cached.items.map { periodToTimegridItem(it, target.type) }, target.startDate, target.endDate, cached.timestamp)
 		} else {
 			Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): cached file missing")
-			timetableDisplay.onError(requestId, CODE_CACHE_MISSING, "no cached timetable found")
+			timetableDisplay.onTimetableLoadingError(requestId, CODE_CACHE_MISSING, "no cached timetable found")
 		}
 	}
 
@@ -98,26 +98,26 @@ class TimetableLoader(
 
 				val items = untisResponse.result.timetable.periods
 				val timestamp = Instant.now().millis
-				timetableDisplay.addData(items.map { periodToTimegridItem(it, target.type) }, target.startDate, target.endDate, timestamp)
+				timetableDisplay.addTimetableItems(items.map { periodToTimegridItem(it, target.type) }, target.startDate, target.endDate, timestamp)
 				Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): saving to cache: $cache")
 				cache.save(TimetableCache.CacheObject(timestamp, items))
 
 				// TODO: Interpret masterData in the response
 			} else {
 				Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): network request failed at Untis API level")
-				timetableDisplay.onError(requestId, untisResponse.error?.code, untisResponse.error?.message)
+				timetableDisplay.onTimetableLoadingError(requestId, untisResponse.error?.code, untisResponse.error?.message)
 			}
 		}, { error ->
 			Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): network request failed at OS level")
-			timetableDisplay.onError(requestId, CODE_REQUEST_FAILED, error.message)
+			timetableDisplay.onTimetableLoadingError(requestId, CODE_REQUEST_FAILED, error.message)
 		})
 	}
 
 	private fun periodToTimegridItem(period: Period, type: String): TimegridItem {
 		return TimegridItem(
 				period.id.toLong(),
-				DateTimeUtils.isoDateTimeNoSeconds().parseLocalDateTime(period.startDateTime),
-				DateTimeUtils.isoDateTimeNoSeconds().parseLocalDateTime(period.endDateTime),
+				DateTimeUtils.isoDateTimeNoSeconds().parseDateTime(period.startDateTime),
+				DateTimeUtils.isoDateTimeNoSeconds().parseDateTime(period.endDateTime),
 				type,
 				PeriodData(timetableDatabaseInterface, period)
 		)

@@ -7,11 +7,13 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.RectF
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
@@ -54,13 +56,12 @@ import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.notifications.StartupReceiver
 import com.sapuseven.untis.preferences.ElementPickerPreference
 import kotlinx.android.synthetic.main.activity_main_content.*
+import org.joda.time.DateTime
+import org.joda.time.DateTimeConstants
 import org.joda.time.Instant
 import org.joda.time.LocalDate
-import org.joda.time.LocalDateTime
-import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
 import java.util.*
-import kotlin.collections.ArrayList
 
 class MainActivity :
 		BaseActivity(),
@@ -84,24 +85,19 @@ class MainActivity :
 	}
 
 	private val userDatabase = UserDatabase.createInstance(this)
-
-	private var lastRefresh: TextView? = null
-
 	private var lastBackPress: Long = 0
 	private var profileId: Long = -1
-	private val items: ArrayList<WeekViewEvent<TimegridItem>> = ArrayList()
-	private val loadedWeeks = mutableListOf<Int>()
+	private val weeklyTimetableItems: MutableMap<Int, WeeklyTimetableItems?> = mutableMapOf()
 	private var displayedElement: PeriodElement? = null
 	private var lastPickedDate: Calendar? = null
 	private var proxyHost: String? = null
 	private var profileUpdateDialog: AlertDialog? = null
+	private var currentWeekIndex = 0
 	private lateinit var profileUser: UserDatabase.User
 	private lateinit var profileListAdapter: ProfileListAdapter
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 	private lateinit var timetableLoader: TimetableLoader
 	private lateinit var weekView: WeekView<TimegridItem>
-
-	private var pbLoadingIndicator: ProgressBar? = null
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		hasOwnToolbar = true
@@ -135,8 +131,7 @@ class MainActivity :
 		preferences.reload()
 		proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
 		setupWeekViewConfig()
-		items.clear()
-		loadedWeeks.clear()
+		weeklyTimetableItems.clear()
 		weekView.invalidate()
 
 		if (profileUser.schoolId <= 0 && profileUpdateDialog == null)
@@ -277,10 +272,7 @@ class MainActivity :
 	private fun setupViews() {
 		setupWeekView()
 
-		pbLoadingIndicator = findViewById(R.id.progressbar_main_loading)
-
-		lastRefresh = findViewById(R.id.textview_main_lastrefresh)
-		lastRefresh?.text = getString(R.string.last_refreshed, getString(R.string.never))
+		textview_main_lastrefresh?.text = getString(R.string.last_refreshed, getString(R.string.never))
 
 		findViewById<Button>(R.id.button_main_settings).setOnClickListener {
 			val intent = Intent(this@MainActivity, SettingsActivity::class.java)
@@ -294,35 +286,12 @@ class MainActivity :
 
 	private fun setupSwipeRefresh() {
 		swiperefreshlayout_main_timetable.setOnRefreshListener {
-			displayedElement?.let {
-				Log.d("MainActivityDebug", "onRefresh called for months ${getDisplayedMonths()}")
-				getDisplayedMonths().forEach { date ->
-					loadTimetable(TimetableLoader.TimetableLoaderTarget(
-							date.first,
-							date.second,
-							it.id, it.type),
-							true)
+			displayedElement?.let { element ->
+				weeklyTimetableItems[currentWeekIndex]?.dateRange?.let { dateRange ->
+					loadTimetable(TimetableLoader.TimetableLoaderTarget(dateRange.first, dateRange.second, element.id, element.type), true)
 				}
 			}
 		}
-	}
-
-	private fun getDisplayedMonths(): List<Pair<UntisDate, UntisDate>> {
-		val displayedWeekStartDate = weekView.currentWeekStartDate
-		val displayedWeekEndDate = displayedWeekStartDate.plusDays(profileUser.timeGrid.days.size)
-
-		return if (displayedWeekStartDate.monthOfYear == displayedWeekEndDate.monthOfYear)
-			listOf(Pair(
-					UntisDate.fromLocalDate(displayedWeekStartDate.dayOfMonth().withMinimumValue()),
-					UntisDate.fromLocalDate(displayedWeekStartDate.dayOfMonth().withMaximumValue())
-			))
-		else
-			listOf(
-					Pair(UntisDate.fromLocalDate(displayedWeekStartDate.dayOfMonth().withMinimumValue()),
-							UntisDate.fromLocalDate(displayedWeekStartDate.dayOfMonth().withMaximumValue())),
-					Pair(UntisDate.fromLocalDate(displayedWeekEndDate.dayOfMonth().withMinimumValue()),
-							UntisDate.fromLocalDate(displayedWeekEndDate.dayOfMonth().withMaximumValue()))
-			)
 	}
 
 	private fun loadTimetable(target: TimetableLoader.TimetableLoaderTarget, forceRefresh: Boolean = false) {
@@ -355,8 +324,10 @@ class MainActivity :
 		weekView.setOnCornerClickListener(this)
 		weekView.setPeriodChangeListener(this)
 		weekView.scrollListener = object : ScrollListener {
-			override fun onFirstVisibleDayChanged(newFirstVisibleDay: Calendar, oldFirstVisibleDay: Calendar?) {
-				Log.d("onScroll", "Scrolled to ${newFirstVisibleDay.get(Calendar.DAY_OF_MONTH)}.${newFirstVisibleDay.get(Calendar.MONTH)}")
+			override fun onFirstVisibleDayChanged(newFirstVisibleDay: DateTime, oldFirstVisibleDay: DateTime?) {
+				currentWeekIndex = convertDateTimeToWeekIndex(newFirstVisibleDay)
+				setLastRefresh(weeklyTimetableItems[currentWeekIndex]?.lastUpdated
+						?: 0)
 			}
 		}
 		setupWeekViewConfig()
@@ -379,44 +350,21 @@ class MainActivity :
 		weekView.nowLineColor = PreferenceUtils.getPrefInt(preferences, "preference_marker")
 	}
 
-	override fun onPeriodChange(startDate: Calendar, endDate: Calendar): List<WeekViewDisplayable<TimegridItem>> {
-		val newYear = startDate.get(Calendar.YEAR)
-		val newWeek = startDate.get(Calendar.WEEK_OF_YEAR)
-
-		if (!loadedWeeks.contains(newYear * 100 + newWeek)) {
-			displayedElement?.let {
-				loadedWeeks.add(newYear * 100 + newWeek)
-				loadTimetable(TimetableLoader.TimetableLoaderTarget(
-						UntisDate.fromLocalDate(LocalDate(startDate)),
-						UntisDate.fromLocalDate(LocalDate(endDate)),
-						it.id, it.type))
+	override fun onPeriodChange(startDate: DateTime, endDate: DateTime): List<WeekViewDisplayable<TimegridItem>> {
+		val weekIndex = convertDateTimeToWeekIndex(startDate)
+		return weeklyTimetableItems[weekIndex]?.items ?: run {
+			displayedElement?.let { displayedElement ->
+				weeklyTimetableItems[weekIndex] = WeeklyTimetableItems().apply {
+					dateRange = (UntisDate.fromLocalDate(LocalDate(startDate)) to UntisDate.fromLocalDate(LocalDate(endDate))).also { dateRange ->
+						loadTimetable(TimetableLoader.TimetableLoaderTarget(dateRange.first, dateRange.second, displayedElement.id, displayedElement.type))
+					}
+				}
 			}
+			emptyList<WeekViewDisplayable<TimegridItem>>()
 		}
-
-		val matchedEvents = ArrayList<WeekViewDisplayable<TimegridItem>>()
-		for (event in items) {
-			if (eventMatches(event, newYear, newWeek)) {
-				@Suppress("UNCHECKED_CAST")
-				matchedEvents.add(event as WeekViewDisplayable<TimegridItem>)
-			}
-		}
-		return matchedEvents
 	}
 
-	/**
-	 * Checks if an event falls into a specific year and week.
-	 * @param event The event to check for.
-	 * @param year The year.
-	 * @param week The week.
-	 * @return True if the event matches the year and week.
-	 */
-	private fun eventMatches(event: WeekViewEvent<*>, year: Int, week: Int): Boolean {
-		return event.startTime.get(Calendar.YEAR) == year
-				&& event.startTime.get(Calendar.WEEK_OF_YEAR) == week
-				|| event.endTime.get(Calendar.YEAR) == year
-				&& event.endTime.get(Calendar.WEEK_OF_YEAR) == week
-	}
-
+	private fun convertDateTimeToWeekIndex(date: DateTime) = date.year * 100 + date.dayOfYear / 7
 
 	private fun setupHours() {
 		val lines = MutableList(0) { return@MutableList 0 }
@@ -470,7 +418,8 @@ class MainActivity :
 		val days = profileUser.timeGrid.days
 		val itemGrid: Array<Array<MutableList<TimegridItem>>> = Array(days.size) { Array(days.maxBy { it.units.size }!!.units.size) { mutableListOf<TimegridItem>() } }
 
-		val firstDayOfWeek = DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(days.first().day).dayOfWeek
+		// TODO: Check if the day from the untis API is always an english string
+		val firstDayOfWeek = DateTimeConstants.MONDAY //DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(days.first().day).dayOfWeek
 
 		// Put all items into a two dimensional array depending on day and hour
 		items.forEach { item ->
@@ -637,8 +586,7 @@ class MainActivity :
 
 			displayedElement = null
 
-			loadedWeeks.clear()
-			items.clear()
+			weeklyTimetableItems.clear()
 			weekView.notifyDataSetChanged()
 
 			supportActionBar?.title = getString(R.string.anonymous_name)
@@ -652,8 +600,7 @@ class MainActivity :
 		setTarget(anonymous = false)
 
 		displayedElement = PeriodElement(type, id, id)
-		loadedWeeks.clear()
-		items.clear()
+		weeklyTimetableItems.clear()
 		weekView.notifyDataSetChanged()
 		supportActionBar?.title = displayName ?: getString(R.string.app_name)
 	}
@@ -698,16 +645,14 @@ class MainActivity :
 		TimetableItemDetailsDialog.createInstance(item, timetableDatabaseInterface).show(supportFragmentManager, "itemDetails") // TODO: Remove hard-coded tag
 	}
 
-	// TODO: Implement this properly and re-enable the view in XML
 	private fun setLastRefresh(timestamp: Long) {
-		if (timestamp == -1L)
-			lastRefresh?.text = getString(R.string.last_refreshed, getString(R.string.never))
+		textview_main_lastrefresh?.text = if (timestamp > 0L)
+			getString(R.string.last_refreshed, formatTimeDiff(Instant.now().millis - timestamp))
 		else
-			lastRefresh?.text = getString(R.string.last_refreshed, formatTimeDiff(Instant.now().millis - timestamp))
+			getString(R.string.last_refreshed, getString(R.string.never))
 	}
 
 	private fun formatTimeDiff(diff: Long): String {
-		// TODO: Great candidate for unit tests
 		return when {
 			diff < MINUTE_MILLIS -> getString(R.string.time_diff_just_now)
 			diff < HOUR_MILLIS -> resources.getQuantityString(R.plurals.main_time_diff_minutes, ((diff / MINUTE_MILLIS).toInt()), diff / MINUTE_MILLIS)
@@ -716,26 +661,18 @@ class MainActivity :
 		}
 	}
 
-	override fun addData(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
-		Log.d("MainActivityDebug", "addData received ${items.size} items from $startDate until $endDate")
-		this.items.removeAll(this.items.filter {
-			// TODO: Look at the timetable htl-salzburg:4CHEL between February and March: Fix multi-day lessons over multiple months disappearing when refreshing
-			LocalDateTime(it.startTime).isBetween(startDate.toLocalDateTime(), endDate.toLocalDateTime())
-					|| LocalDateTime(it.endTime).isBetween(startDate.toLocalDateTime(), endDate.toLocalDateTime())
-		})
-
-		val preparedItems = prepareItems(items)
-		this.items.addAll(preparedItems)
+	override fun addTimetableItems(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
+		weeklyTimetableItems[convertDateTimeToWeekIndex(startDate.toDateTime())]?.apply {
+			this.items = prepareItems(items).map { it.toWeekViewEvent() }
+			lastUpdated = timestamp
+		}
 		weekView.notifyDataSetChanged()
 
 		// TODO: Only disable these loading indicators when everything finished loading
-		swiperefreshlayout_main_timetable.isRefreshing = false
 		showLoading(false)
-
-		setLastRefresh(timestamp)
 	}
 
-	override fun onError(requestId: Int, code: Int?, message: String?) {
+	override fun onTimetableLoadingError(requestId: Int, code: Int?, message: String?) {
 		when (code) {
 			TimetableLoader.CODE_CACHE_MISSING -> timetableLoader.repeat(requestId, TimetableLoader.FLAG_LOAD_SERVER, proxyHost)
 			else -> {
@@ -749,7 +686,8 @@ class MainActivity :
 	}
 
 	private fun showLoading(loading: Boolean) {
-		pbLoadingIndicator?.visibility = if (loading) View.VISIBLE else View.GONE
+		if (!loading) swiperefreshlayout_main_timetable.isRefreshing = false
+		progressbar_main_loading?.visibility = if (loading) View.VISIBLE else View.GONE
 	}
 
 	override fun onCornerClick() {
@@ -777,11 +715,11 @@ class MainActivity :
 
 	private fun closeDrawer(drawer: DrawerLayout = findViewById(R.id.drawer_layout)) = drawer.closeDrawer(GravityCompat.START)
 
-	private fun Int.darken(ratio: Float): Int {
-		return ColorUtils.blendARGB(this, Color.BLACK, ratio)
-	}
+	private fun Int.darken(ratio: Float) = ColorUtils.blendARGB(this, Color.BLACK, ratio)
 
-	private fun <T> Comparable<T>.isBetween(start: T, end: T): Boolean {
-		return this >= start && this <= end
+	internal class WeeklyTimetableItems {
+		var items: List<WeekViewEvent<TimegridItem>> = emptyList()
+		var lastUpdated: Long = 0
+		var dateRange: Pair<UntisDate, UntisDate>? = null
 	}
 }

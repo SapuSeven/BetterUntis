@@ -219,7 +219,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 				val proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
 
 				TimetableLoader(WeakReference(this), object : TimetableDisplay {
-					override fun addData(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
+					override fun addTimetableItems(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
 						val states = mutableListOf<Boolean>()
 
 						profileUser?.let {
@@ -257,7 +257,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 						))
 					}
 
-					override fun onError(requestId: Int, code: Int?, message: String?) {
+					override fun onTimetableLoadingError(requestId: Int, code: Int?, message: String?) {
 						roomList.remove(item)
 						refreshRoomList()
 						Snackbar.make(content_roomfinder, if (code != null) ErrorMessageDictionary.getErrorMessage(resources, code) else message

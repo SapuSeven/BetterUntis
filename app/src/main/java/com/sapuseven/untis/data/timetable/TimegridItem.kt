@@ -1,18 +1,16 @@
 package com.sapuseven.untis.data.timetable
 
 import com.alamkanak.weekview.WeekViewEvent
-import com.sapuseven.untis.helpers.DateTimeUtils.toCalendar
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import org.joda.time.LocalDateTime
-import java.util.*
+import org.joda.time.DateTime
 
 class TimegridItem(
 		id: Long,
-		val startDateTime: LocalDateTime,
-		val endDateTime: LocalDateTime,
+		val startDateTime: DateTime,
+		val endDateTime: DateTime,
 		contextType: String,
 		val periodData: PeriodData
-) : WeekViewEvent<TimegridItem>(id, startTime = toCalendar(startDateTime), endTime = toCalendar(endDateTime)) {
+) : WeekViewEvent<TimegridItem>(id, startTime = startDateTime, endTime = endDateTime) {
 
 	init {
 		periodData.setup()
@@ -32,7 +30,7 @@ class TimegridItem(
 
 			val candidate = items[i]
 
-			if (candidate.startTime.get(Calendar.DAY_OF_YEAR) != startTime.get(Calendar.DAY_OF_YEAR)) return@forEachIndexed
+			if (candidate.startTime.dayOfYear != startTime.dayOfYear) return@forEachIndexed
 
 			if (this.equalsIgnoreTime(candidate)) {
 				endTime = candidate.endTime

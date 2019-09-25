@@ -76,11 +76,11 @@ class NotificationSetup : BroadcastReceiver() {
 			val proxyHost = preferenceManager.defaultPrefs.getString("preference_connectivity_proxy_host", null)
 			lateinit var timetableLoader: TimetableLoader
 			timetableLoader = TimetableLoader(WeakReference(context), object : TimetableDisplay {
-				override fun addData(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
+				override fun addTimetableItems(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
 					setupNotifications(context, items)
 				}
 
-				override fun onError(requestId: Int, code: Int?, message: String?) {
+				override fun onTimetableLoadingError(requestId: Int, code: Int?, message: String?) {
 					when (code) {
 						TimetableLoader.CODE_CACHE_MISSING -> timetableLoader.repeat(requestId, TimetableLoader.FLAG_LOAD_SERVER, proxyHost)
 						else -> {
