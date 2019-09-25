@@ -4,17 +4,36 @@
 	<PreferenceScreen
 		android:icon="@drawable/settings_styling"
 		android:key="preferences_styling"
-		android:title="@string/pref_styling">
+		android:title="@string/preferences_styling">
 
-		<PreferenceCategory android:title="@string/preference_category_colors">
+		<PreferenceCategory android:title="@string/preference_category_styling_colors">
 			<CheckBoxPreference
 				android:defaultValue="@bool/preference_timetable_item_text_light_default"
 				android:key="preference_timetable_item_text_light"
 				android:title="@string/preference_timetable_item_text_light" />
 
+			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
+				android:defaultValue="@integer/preference_background_future_default"
+				android:key="preference_background_future"
+				android:title="Future day background"
+				app:cpv_showAlphaSlider="true"
+				app:cpv_showColorShades="false" />
+
+			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
+				android:defaultValue="@integer/preference_background_past_default"
+				android:key="preference_background"
+				android:title="Past day background"
+				app:cpv_showAlphaSlider="true"
+				app:cpv_showColorShades="false" />
+
+			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
+				android:defaultValue="@integer/preference_marker_default"
+				android:key="preference_marker"
+				android:title="@string/preference_marker" />
+
 		</PreferenceCategory>
 
-		<PreferenceCategory android:title="@string/preference_category_backgrounds">
+		<PreferenceCategory android:title="@string/preference_category_styling_backgrounds">
 
 			<CheckBoxPreference
 				android:defaultValue="@bool/preference_use_default_background_default"
@@ -79,25 +98,6 @@
 				android:key="preference_background_cancelled_past"
 				android:title="@string/preference_background_cancelled_past" />
 
-			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
-				android:defaultValue="@integer/preference_background_future_default"
-				android:key="preference_background_future"
-				android:title="Future day background"
-				app:cpv_showAlphaSlider="true"
-				app:cpv_showColorShades="false" />
-
-			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
-				android:defaultValue="@integer/preference_background_past_default"
-				android:key="preference_background"
-				android:title="Past day background"
-				app:cpv_showAlphaSlider="true"
-				app:cpv_showColorShades="false" />
-
-			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
-				android:defaultValue="@integer/preference_marker_default"
-				android:key="preference_marker"
-				android:title="@string/preference_marker" />
-
 			<Preference
 				android:enabled="false"
 				android:key="preference_timetable_colors_reset"
@@ -105,22 +105,12 @@
 
 		</PreferenceCategory>
 
-		<PreferenceCategory android:title="@string/preferences_timetable_others">
-
-			<CheckBoxPreference
-				android:defaultValue="@bool/preference_timetable_hide_cancelled_default"
-				android:enabled="false"
-				android:key="preference_timetable_hide_cancelled"
-				android:title="@string/preference_timetable_hide_cancelled" />
-
-		</PreferenceCategory>
-
-		<PreferenceCategory android:title="@string/preference_category_themes">
+		<PreferenceCategory android:title="@string/preference_category_styling_themes">
 
 			<ListPreference
 				android:defaultValue="@string/preference_theme_default"
-				android:entries="@array/preferences_themes"
-				android:entryValues="@array/preferences_theme_values"
+				android:entries="@array/preference_themes"
+				android:entryValues="@array/preference_theme_values"
 				android:icon="@drawable/settings_timetable_format_paint"
 				android:key="preference_theme"
 				android:summary="%s"
@@ -128,8 +118,8 @@
 
 			<com.sapuseven.untis.preferences.DependentListPreference
 				android:defaultValue="@string/preference_dark_theme_default"
-				android:entries="@array/preferences_dark_theme"
-				android:entryValues="@array/preferences_dark_theme_values"
+				android:entries="@array/preference_dark_theme"
+				android:entryValues="@array/preference_dark_theme_values"
 				android:icon="@drawable/settings_timetable_brightness_medium"
 				android:key="preference_dark_theme"
 				android:summary="%s"
@@ -149,7 +139,7 @@
 	<PreferenceScreen
 		android:icon="@drawable/settings_notifications"
 		android:key="preferences_notifications"
-		android:title="@string/pref_notifications">
+		android:title="@string/preferences_notifications">
 
 		<CheckBoxPreference
 			android:defaultValue="@bool/preference_notifications_enable_default"
@@ -170,13 +160,13 @@
 			android:key="preference_notifications_clear"
 			android:title="@string/preference_notifications_clear" />
 
-		<PreferenceCategory android:title="@string/preference_notifications_group_visible_fields">
+		<PreferenceCategory android:title="@string/preference_category_notifications_visible_fields">
 
 			<ListPreference
 				android:defaultValue="@string/preference_notifications_visibility_subjects_default"
 				android:dependency="preference_notifications_enable"
-				android:entries="@array/preferences_notifications_visibility"
-				android:entryValues="@array/preferences_notifications_visibility_values"
+				android:entries="@array/preference_notifications_visibility"
+				android:entryValues="@array/preference_notifications_visibility_values"
 				android:key="preference_notifications_visibility_subjects"
 				android:summary="%s"
 				android:title="@string/subjects" />
@@ -184,8 +174,8 @@
 			<ListPreference
 				android:defaultValue="@string/preference_notifications_visibility_rooms_default"
 				android:dependency="preference_notifications_enable"
-				android:entries="@array/preferences_notifications_visibility"
-				android:entryValues="@array/preferences_notifications_visibility_values"
+				android:entries="@array/preference_notifications_visibility"
+				android:entryValues="@array/preference_notifications_visibility_values"
 				android:icon="@drawable/all_rooms"
 				android:key="preference_notifications_visibility_rooms"
 				android:summary="%s"
@@ -194,8 +184,8 @@
 			<ListPreference
 				android:defaultValue="@string/preference_notifications_visibility_teachers_default"
 				android:dependency="preference_notifications_enable"
-				android:entries="@array/preferences_notifications_visibility"
-				android:entryValues="@array/preferences_notifications_visibility_values"
+				android:entries="@array/preference_notifications_visibility"
+				android:entryValues="@array/preference_notifications_visibility_values"
 				android:icon="@drawable/all_teacher"
 				android:key="preference_notifications_visibility_teachers"
 				android:summary="%s"
@@ -204,8 +194,8 @@
 			<ListPreference
 				android:defaultValue="@string/preference_notifications_visibility_classes_default"
 				android:dependency="preference_notifications_enable"
-				android:entries="@array/preferences_notifications_visibility"
-				android:entryValues="@array/preferences_notifications_visibility_values"
+				android:entries="@array/preference_notifications_visibility"
+				android:entryValues="@array/preference_notifications_visibility_values"
 				android:icon="@drawable/all_classes"
 				android:key="preference_notifications_visibility_classes"
 				android:summary="%s"
@@ -218,20 +208,19 @@
 	<PreferenceScreen
 		android:icon="@drawable/settings_timetable"
 		android:key="preferences_timetable"
-		android:title="@string/pref_timetable">
+		android:title="@string/preferences_timetable">
 
 		<com.sapuseven.untis.preferences.ElementPickerPreference
 			android:key="preference_timetable_personal_timetable"
 			android:title="@string/preference_timetable_personal_timetable" />
 
-
 		<CheckBoxPreference
-			android:defaultValue="@bool/preference_timetable_refresh_in_background_default"
-			android:key="preference_timetable_refresh_in_background"
-			android:summary="@string/preference_timetable_refresh_in_background_desc"
-			android:title="@string/preference_timetable_refresh_in_background" />
+			android:defaultValue="@bool/preference_timetable_hide_cancelled_default"
+			android:enabled="false"
+			android:key="preference_timetable_hide_cancelled"
+			android:title="@string/preference_timetable_hide_cancelled" />
 
-		<PreferenceCategory android:title="@string/preference_category_item_appearance">
+		<PreferenceCategory android:title="@string/preference_category_timetable_item_appearance">
 
 			<com.sapuseven.untis.preferences.UnitPreference
 				android:defaultValue="@integer/preference_timetable_item_padding_overlap_default"
@@ -253,7 +242,7 @@
 				app:unit="dp" />
 		</PreferenceCategory>
 
-		<PreferenceCategory android:title="@string/preference_category_lesson_text">
+		<PreferenceCategory android:title="@string/preference_category_timetable_lesson_text">
 
 			<CheckBoxPreference
 				android:defaultValue="@bool/preference_timetable_centered_lesson_info_default"
@@ -284,27 +273,33 @@
 	<PreferenceScreen
 		android:icon="@drawable/settings_connectivity"
 		android:key="preferences_connectivity"
-		android:title="Connectivity">
+		android:title="@string/preferences_connectivity">
 
-		<PreferenceCategory android:title="WebUntis proxy">
+		<CheckBoxPreference
+			android:defaultValue="@bool/preference_connectivity_refresh_in_background_default"
+			android:key="preference_connectivity_refresh_in_background"
+			android:summary="@string/preference_connectivity_refresh_in_background_desc"
+			android:title="@string/preference_connectivity_refresh_in_background" />
+
+		<PreferenceCategory android:title="@string/preference_category_connectivity_proxy">
 
 			<EditTextPreference
 				android:icon="@drawable/settings_connectivity_proxy"
 				android:key="preference_connectivity_proxy_host"
-				android:title="@string/preferences_connectivity_proxy_host"
+				android:title="@string/preference_connectivity_proxy_host"
 				app:useSimpleSummaryProvider="true" />
 
 			<Preference
 				android:icon="@drawable/settings_info"
 				android:key="preference_connectivity_proxy_about"
-				android:title="@string/preferences_connectivity_proxy_about" />
+				android:title="@string/preference_connectivity_proxy_about" />
 		</PreferenceCategory>
 	</PreferenceScreen>
 
 	<PreferenceScreen
 		android:icon="@drawable/settings_info"
 		android:key="preferences_info"
-		android:title="@string/pref_infos">
+		android:title="@string/preferences_infos">
 
 		<com.sapuseven.untis.preferences.AlertPreference
 			android:dialogMessage="Some preferences are not implemented yet, so they are disabled until development is finished."
@@ -318,19 +313,19 @@
 		<Preference
 			android:enabled="false"
 			android:key="preference_info_app_version"
-			android:title="@string/preferences_info_app_version" />
+			android:title="@string/preference_info_app_version" />
 
 		<Preference
 			android:enabled="false"
 			android:icon="@drawable/settings_info_list_bulleted"
 			android:key="preference_info_changelog"
-			android:title="@string/preferences_info_changelog" />
+			android:title="@string/preference_info_changelog" />
 
 		<Preference
 			android:enabled="false"
 			android:icon="@drawable/settings_info_message"
 			android:key="preference_info_contact_email"
 			android:summary="@string/all_contact_email"
-			android:title="@string/preferences_info_contact" />
+			android:title="@string/preference_info_contact" />
 	</PreferenceScreen>
 </androidx.preference.PreferenceScreen>

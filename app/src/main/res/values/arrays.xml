@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string-array name="preferences_themes">
-		<item>@string/preferences_theme_default</item>
-		<item>@string/preferences_theme_untis</item>
-		<item>@string/preferences_theme_blue</item>
-		<item>@string/preferences_theme_green</item>
-		<item>@string/preferences_theme_pink</item>
-		<item>@string/preferences_theme_cyan</item>
+	<string-array name="preference_themes">
+		<item>@string/preference_theme_stock</item>
+		<item>@string/preference_theme_untis</item>
+		<item>@string/preference_theme_blue</item>
+		<item>@string/preference_theme_green</item>
+		<item>@string/preference_theme_pink</item>
+		<item>@string/preference_theme_cyan</item>
 	</string-array>
 
-	<string-array name="preferences_theme_values" translatable="false">
+	<string-array name="preference_theme_values" translatable="false">
 		<item>default</item>
 		<item>untis</item>
 		<item>blue</item>
@@ -18,25 +18,25 @@
 		<item>cyan</item>
 	</string-array>
 
-	<string-array name="preferences_dark_theme">
-		<item>@string/preferences_dark_theme_auto</item>
-		<item>@string/preferences_dark_theme_on</item>
-		<item>@string/preferences_dark_theme_off</item>
+	<string-array name="preference_dark_theme">
+		<item>@string/preference_dark_theme_auto</item>
+		<item>@string/preference_dark_theme_on</item>
+		<item>@string/preference_dark_theme_off</item>
 	</string-array>
 
-	<string-array name="preferences_dark_theme_values" translatable="false">
+	<string-array name="preference_dark_theme_values" translatable="false">
 		<item>auto</item>
 		<item>on</item>
 		<item>off</item>
 	</string-array>
 
-	<string-array name="preferences_notifications_visibility">
-		<item>@string/preferences_notifications_visibility_hidden</item>
-		<item>@string/preferences_notifications_visibility_short</item>
-		<item>@string/preferences_notifications_visibility_long</item>
+	<string-array name="preference_notifications_visibility">
+		<item>@string/preference_notifications_visibility_hidden</item>
+		<item>@string/preference_notifications_visibility_short</item>
+		<item>@string/preference_notifications_visibility_long</item>
 	</string-array>
 
-	<string-array name="preferences_notifications_visibility_values" translatable="false">
+	<string-array name="preference_notifications_visibility_values" translatable="false">
 		<item>hidden</item>
 		<item>short</item>
 		<item>long</item>

@@ -30,7 +30,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 	companion object {
 		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileId"
 
-		private const val DIALOG_DESIGNING_HIDE = "preferences_dialog_designing_hide"
+		private const val DIALOG_DESIGNING_HIDE = "preference_dialog_designing_hide"
 
 		private const val WIKI_URL_DESIGNING = "https://github.com/SapuSeven/BetterUntis/wiki/Designing"
 		private const val WIKI_URL_PROXY = "https://github.com/SapuSeven/BetterUntis/wiki/Proxy"
