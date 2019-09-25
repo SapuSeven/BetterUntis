@@ -295,7 +295,7 @@ class MainActivity :
 
 	private fun loadTimetable(target: TimetableLoader.TimetableLoaderTarget, forceRefresh: Boolean = false) {
 		weekView.notifyDataSetChanged()
-		showLoading(!forceRefresh)
+		if (!forceRefresh) showLoading(true)
 
 		val alwaysLoad = PreferenceUtils.getPrefBool(preferences, "preference_connectivity_refresh_in_background")
 		val flags = (if (!forceRefresh) TimetableLoader.FLAG_LOAD_CACHE else 0) or (if (alwaysLoad || forceRefresh) TimetableLoader.FLAG_LOAD_SERVER else 0)
