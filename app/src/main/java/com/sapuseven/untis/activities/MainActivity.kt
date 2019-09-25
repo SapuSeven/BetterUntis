@@ -408,12 +408,12 @@ class MainActivity :
 	}
 
 	private fun prepareItems(items: List<TimegridItem>): List<TimegridItem> {
-		val newItems = mergeItems(items)
+		val newItems = mergeItems(items, PreferenceUtils.getPrefBool(preferences, "preference_timetable_hide_cancelled"))
 		colorItems(newItems)
 		return newItems
 	}
 
-	private fun mergeItems(items: List<TimegridItem>): List<TimegridItem> {
+	private fun mergeItems(items: List<TimegridItem>, hideCancelled: Boolean): List<TimegridItem> {
 		val days = profileUser.timeGrid.days
 		val itemGrid: Array<Array<MutableList<TimegridItem>>> = Array(days.size) { Array(days.maxBy { it.units.size }!!.units.size) { mutableListOf<TimegridItem>() } }
 
@@ -422,6 +422,8 @@ class MainActivity :
 
 		// Put all items into a two dimensional array depending on day and hour
 		items.forEach { item ->
+			if (hideCancelled && item.periodData.isCancelled()) return@forEach
+
 			val startDateTime = DateTimeUtils.isoDateTimeNoSeconds().parseLocalDateTime(item.periodData.element.startDateTime)
 			val endDateTime = DateTimeUtils.isoDateTimeNoSeconds().parseLocalDateTime(item.periodData.element.endDateTime)
 

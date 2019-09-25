@@ -216,8 +216,8 @@
 
 		<CheckBoxPreference
 			android:defaultValue="@bool/preference_timetable_hide_cancelled_default"
-			android:enabled="false"
 			android:key="preference_timetable_hide_cancelled"
+			android:summary="@string/preference_timetable_hide_cancelled_desc"
 			android:title="@string/preference_timetable_hide_cancelled" />
 
 		<PreferenceCategory android:title="@string/preference_category_timetable_item_appearance">
