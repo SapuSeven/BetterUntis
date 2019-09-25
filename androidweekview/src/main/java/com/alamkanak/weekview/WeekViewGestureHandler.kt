@@ -9,7 +9,7 @@ import com.alamkanak.weekview.config.WeekViewConfig
 import com.alamkanak.weekview.config.WeekViewDrawConfig
 import com.alamkanak.weekview.listeners.*
 import com.alamkanak.weekview.loaders.WeekViewLoader
-import java.lang.Math.*
+import kotlin.math.*
 
 internal class WeekViewGestureHandler<T>(
 		context: Context,
@@ -61,7 +61,7 @@ internal class WeekViewGestureHandler<T>(
 
 			override fun onScale(detector: ScaleGestureDetector): Boolean {
 				val hourHeight = this@WeekViewGestureHandler.config.hourHeight.toFloat()
-				drawConfig.newHourHeight = round(hourHeight * detector.scaleFactor)
+				drawConfig.newHourHeight = (hourHeight * detector.scaleFactor).roundToInt()
 				listener.onScaled()
 				return true
 			}
@@ -132,17 +132,14 @@ internal class WeekViewGestureHandler<T>(
 	}
 
 	override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-		if (isZooming) {
-			return true
-		}
+		if (isZooming) return true
 
 		if (currentFlingDirection == Direction.LEFT && !config.horizontalFlingEnabled ||
 				currentFlingDirection == Direction.RIGHT && !config.horizontalFlingEnabled ||
-				currentFlingDirection == Direction.VERTICAL && !config.verticalFlingEnabled) {
+				currentFlingDirection == Direction.VERTICAL && !config.verticalFlingEnabled)
 			return true
-		}
 
-		scroller.forceFinished(true)
+		//scroller.forceFinished(true)
 
 		currentFlingDirection = currentScrollDirection
 		when (currentFlingDirection) {
@@ -272,15 +269,13 @@ internal class WeekViewGestureHandler<T>(
 		else
 			totalDayWidth.toDouble()
 
-		leftDays = when {
-			currentFlingDirection != Direction.NONE -> // snap to nearest day
-				round(leftDays).toDouble()
-			currentScrollDirection == Direction.LEFT -> // snap to last day
+		leftDays = when (currentScrollDirection) {
+			Direction.LEFT -> // snap to last day
 				floor(leftDays)
-			currentScrollDirection == Direction.RIGHT -> // snap to next day
+			Direction.RIGHT -> // snap to next day
 				ceil(leftDays)
 			else -> // snap to nearest day
-				round(leftDays).toDouble()
+				round(leftDays)
 		}
 
 		var nearestOrigin = drawConfig.currentOrigin.x.toInt()
@@ -290,20 +285,15 @@ internal class WeekViewGestureHandler<T>(
 			(leftDays * totalDayWidth).toInt()
 
 		if (nearestOrigin != 0) {
-			// Stop current animation
 			scroller.forceFinished(true)
 
-			// Snap to date
-			val startX = drawConfig.currentOrigin.x.toInt()
-			val startY = drawConfig.currentOrigin.y.toInt()
+			scroller.startScroll(
+					drawConfig.currentOrigin.x.toInt(),
+					drawConfig.currentOrigin.y.toInt(),
+					-nearestOrigin,
+					0,
+					(abs(nearestOrigin) / drawConfig.widthPerDay * config.scrollDuration).toInt())
 
-			val distanceX = -nearestOrigin
-			val distanceY = 0
-
-			val daysScrolled = abs(nearestOrigin) / drawConfig.widthPerDay
-			val duration = (daysScrolled * config.scrollDuration).toInt()
-
-			scroller.startScroll(startX, startY, distanceX, distanceY, duration)
 			listener.onScrolled()
 		}
 
@@ -314,9 +304,8 @@ internal class WeekViewGestureHandler<T>(
 
 	fun onTouchEvent(event: MotionEvent): Boolean {
 		scaleDetector.onTouchEvent(event)
-		val `val` = gestureDetector.onTouchEvent(event)
+		val value = gestureDetector.onTouchEvent(event)
 
-		// Check after call of gestureDetector, so currentFlingDirection and currentScrollDirection are set
 		if (event.action == ACTION_UP && !isZooming && currentFlingDirection == Direction.NONE) {
 			if (currentScrollDirection == Direction.RIGHT || currentScrollDirection == Direction.LEFT) {
 				goToNearestOrigin()
@@ -324,7 +313,7 @@ internal class WeekViewGestureHandler<T>(
 			currentScrollDirection = Direction.NONE
 		}
 
-		return `val`
+		return value
 	}
 
 	fun forceScrollFinished() {
@@ -335,7 +324,6 @@ internal class WeekViewGestureHandler<T>(
 
 	fun computeScroll() {
 		if (scroller.isFinished && currentFlingDirection != Direction.NONE) {
-			// Snap to day after fling is finished
 			goToNearestOrigin()
 		} else {
 			if (currentFlingDirection != Direction.NONE && shouldForceFinishScroll()) {
@@ -353,9 +341,7 @@ internal class WeekViewGestureHandler<T>(
 	 *
 	 * @return true if scrolling should be stopped before reaching the end of animation.
 	 */
-	private fun shouldForceFinishScroll(): Boolean {
-		return scroller.currVelocity <= minimumFlingVelocity
-	}
+	private fun shouldForceFinishScroll() = scroller.currVelocity <= minimumFlingVelocity
 
 	internal enum class Direction {
 		NONE, LEFT, RIGHT, VERTICAL
