@@ -10,40 +10,25 @@ class DrawingContext(val startPixel: Float) {
 
 	companion object {
 		internal fun create(config: WeekViewConfig, viewState: WeekViewViewState): DrawingContext {
-			val drawConfig = config.drawConfig
-			val totalDayWidth = config.totalDayWidth
-			val leftDaysWithGaps = (ceil((drawConfig.currentOrigin.x / totalDayWidth).toDouble()) * -1).toInt()
-			val startPixel = (drawConfig.currentOrigin.x
-					+ totalDayWidth * leftDaysWithGaps
-					+ drawConfig.timeColumnWidth)
+			val today = DateUtils.today()
+			val daysScrolled = (ceil((config.drawConfig.currentOrigin.x / config.totalDayWidth).toDouble()) * -1).toInt()
+			val startPixel = (config.drawConfig.currentOrigin.x
+					+ config.totalDayWidth * daysScrolled
+					+ config.drawConfig.timeColumnWidth)
 
 			val dayRange = mutableListOf<Calendar>()
 			if (config.isSingleDay) {
 				val day = viewState.firstVisibleDay?.clone() as Calendar
 				dayRange.add(day)
 			} else {
-				var offset = 0
-				var today = DateUtils.today().get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY
-				if (today == 0)
-					today = 7
+				val offset = DateUtils.offsetInWeek(today, config.firstDayOfWeek, config.numberOfVisibleDays)
+				val startDay = today.clone() as Calendar
+				startDay.add(Calendar.DATE, DateUtils.actualDays(daysScrolled, config.numberOfVisibleDays) - offset)
 
-				if (today - Calendar.MONDAY + 1 < config.numberOfVisibleDays)
-					offset = today - Calendar.MONDAY + 1
-
-				val start = leftDaysWithGaps + 1 - offset + days(-offset, leftDaysWithGaps - offset, config.numberOfVisibleDays)
-				dayRange.addAll(DateUtils.getDateRange(start, config.numberOfVisibleDays, Calendar.MONDAY, Calendar.MONDAY + config.numberOfVisibleDays - 1))
+				dayRange.addAll(DateUtils.getDateRange(startDay, config.numberOfVisibleDays, config.firstDayOfWeek, config.numberOfVisibleDays))
 			}
 
 			return DrawingContext(startPixel).apply { this.dayRange = dayRange }
-		}
-
-		fun days(start: Int, end: Int, weekLength: Int): Int {
-			var days = (end - start) / weekLength * (7 - weekLength)
-
-			if (start > end)
-				days -= 7 - weekLength
-
-			return days
 		}
 	}
 }

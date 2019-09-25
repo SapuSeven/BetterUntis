@@ -4,21 +4,31 @@ import android.content.Context
 import android.text.format.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.math.abs
 
 internal object DateUtils {
-	fun getDateRange(daysSinceToday: Int, size: Int, weekStart: Int, weekEnd: Int): List<Calendar> {
+	/**
+	 * Returns a list of days starting at [startDay] with a length of [size] taking into account
+	 * the week start day and length to exclude all weekend days.
+	 *
+	 * @param startDay the first day that should be in the returned list
+	 * @param size The number of days to be returned
+	 * @param weekStart The day index of the first day of the visible week. Example: [Calendar.MONDAY]
+	 * @param weekLength The length of the displayed week. Example: `5` for a week from [Calendar.MONDAY] until [Calendar.FRIDAY]
+	 *
+	 * @return A list with all days that are within the visible week, starting with [startDay]
+	 */
+	fun getDateRange(startDay: Calendar, size: Int, weekStart: Int, weekLength: Int): List<Calendar> {
 		val days = ArrayList<Calendar>()
 		var day: Calendar
+		var dayNumber = 0
 
-		var today = today().get(Calendar.DAY_OF_WEEK)
-		if (today > weekEnd) today -= 7
-		val offset = if (today < weekStart) weekStart - today else 0
-		var dayNumber = daysSinceToday
 		while (days.size <= size) {
-			day = today()
-			day.add(Calendar.DATE, dayNumber - 1 + offset)
+			day = startDay.clone() as Calendar
+			day.add(Calendar.DATE, dayNumber)
 
-			if (day.get(Calendar.DAY_OF_WEEK) in weekStart..weekEnd)
+			if (day.get(Calendar.DAY_OF_WEEK) in weekStart until weekStart + weekLength)
 				days.add(day)
 			dayNumber++
 		}
@@ -26,6 +36,40 @@ internal object DateUtils {
 		return days
 	}
 
+	/**
+	 * Calculates the offset of a day relative to the specified week start.
+	 *
+	 * If the day is not within the specified week start and end dates, an offset of `0` is returned instead.
+	 *
+	 * @param day The day to calculate the offset for
+	 * @param weekStart The day index of the first day of the visible week. Example: [Calendar.MONDAY]
+	 * @param weekLength The length of the displayed week. Example: `5` for a week from [Calendar.MONDAY] until [Calendar.FRIDAY]
+	 *
+	 * @return The offset of [day] relative to the specified [weekStart]. Never negative.
+	 */
+	fun offsetInWeek(day: Calendar, weekStart: Int, weekLength: Int): Int {
+		val offset = day.get(Calendar.DAY_OF_WEEK) - weekStart
+		return if (offset in 0 until weekStart + weekLength - 1) offset else 0
+	}
+
+	/**
+	 * Converts between displayed days and actual days, accounting for skipped days (if [weekLength] < `7`).
+	 *
+	 * @param displayedDays The amount of displayed days, starting at the first visible day of the week.
+	 * @param weekLength The length of the displayed week. Example: `5` for a week from [Calendar.MONDAY] until [Calendar.FRIDAY]
+	 *
+	 * @return The amount of actual days.
+	 */
+	fun actualDays(displayedDays: Int, weekLength: Int): Int {
+		val skippedDays = if (displayedDays < 0)
+			(displayedDays + 1) / weekLength * (7 - weekLength) - (7 - weekLength)
+		else
+			displayedDays / weekLength * (7 - weekLength)
+
+		return displayedDays + skippedDays
+	}
+
+	@Deprecated("Replace all calls to this with logic that uses the other functions of this class")
 	fun getDaysUntilDate(date: Calendar): Int {
 		val dateInMillis = date.timeInMillis
 		val todayInMillis = today().timeInMillis
@@ -33,6 +77,7 @@ internal object DateUtils {
 		return (diff / (1000L * 60L * 60L * 24L)).toInt()
 	}
 
+	@Deprecated("Replace all calls to this with logic that uses the other functions of this class")
 	fun getDisplayedDays(startDay: Calendar, size: Int, weekStart: Int, weekEnd: Int): Int {
 		var startDayIndex = startDay.get(Calendar.DAY_OF_WEEK)
 		if (startDayIndex > weekEnd) startDayIndex -= 7 // TODO: Is this line correct?
@@ -40,7 +85,7 @@ internal object DateUtils {
 
 		var days = 0
 
-		for (i in 0 until Math.abs(size)) {
+		for (i in 0 until abs(size)) {
 			startDay.add(Calendar.DATE, if (size > 0) 1 else -1)
 			if (startDay.get(Calendar.DAY_OF_WEEK) in weekStart..weekEnd)
 				days += if (size > 0) 1 else -1

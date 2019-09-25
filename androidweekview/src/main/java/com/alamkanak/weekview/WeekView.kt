@@ -18,6 +18,7 @@ import org.joda.time.LocalDate
 import java.util.*
 import java.util.Calendar.*
 import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.min
 
 class WeekView<T>(
@@ -282,25 +283,17 @@ class WeekView<T>(
 	}
 
 	private fun notifyScrollListeners() {
-		// Iterate through each day.
 		val oldFirstVisibleDay = viewState.firstVisibleDay
 
-		val totalDayWidth = config.totalDayWidth
-		val leftDaysWithGaps = (ceil((config.drawConfig.currentOrigin.x / totalDayWidth).toDouble()) * -1).toInt()
-		var offset = 0
-		var today = DateUtils.today().get(DAY_OF_WEEK) - SUNDAY
-		if (today == 0)
-			today = 7
+		val newFirstVisibleDay = DateUtils.today()
 
-		if (today - MONDAY + 1 < config.numberOfVisibleDays)
-			offset = today - MONDAY + 1
-		val deltaDays = leftDaysWithGaps - offset + DrawingContext.days(-offset, leftDaysWithGaps - offset, config.numberOfVisibleDays)
-		viewState.firstVisibleDay = DateUtils.today()
-		viewState.firstVisibleDay?.add(DATE, deltaDays)
+		val offset = DateUtils.offsetInWeek(newFirstVisibleDay, config.firstDayOfWeek, config.numberOfVisibleDays)
+		val daysScrolled = (ceil((config.drawConfig.currentOrigin.x / config.totalDayWidth).toDouble()) * -1).toInt()
+		newFirstVisibleDay.add(DATE, DateUtils.actualDays(daysScrolled, config.numberOfVisibleDays) - offset)
 
-		val hasFirstVisibleDayChanged = viewState.firstVisibleDay != oldFirstVisibleDay
-		if (hasFirstVisibleDayChanged) {
-			scrollListener?.onFirstVisibleDayChanged(viewState.firstVisibleDay!!, oldFirstVisibleDay)
+		if (oldFirstVisibleDay != newFirstVisibleDay) {
+			viewState.firstVisibleDay = newFirstVisibleDay
+			scrollListener?.onFirstVisibleDayChanged(newFirstVisibleDay, oldFirstVisibleDay)
 		}
 	}
 
@@ -386,7 +379,7 @@ class WeekView<T>(
 		if (config.startOnFirstDay)
 			actualDiff /= config.numberOfVisibleDays.toDouble()
 
-		val leftOriginCount = Math.floor(actualDiff).toInt()
+		val leftOriginCount = floor(actualDiff).toInt()
 
 		var nearestOrigin = 0
 		nearestOrigin -= if (config.startOnFirstDay)
