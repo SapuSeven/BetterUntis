@@ -80,9 +80,7 @@ internal class WeekViewGestureHandler<T>(
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
 	override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
-		if (isZooming) {
-			return true
-		}
+		if (isZooming) return true
 
 		val absDistanceX = abs(distanceX)
 		val absDistanceY = abs(distanceY)
@@ -242,19 +240,16 @@ internal class WeekViewGestureHandler<T>(
 		if (emptyViewLongPressListener != null
 				&& e.x > timeColumnWidth && e.y > drawConfig.headerHeight) {
 			val selectedTime = touchHandler.getTimeFromPoint(e)
-			if (selectedTime != null) {
+			if (selectedTime != null)
 				emptyViewLongPressListener!!.onEmptyViewLongPress(selectedTime)
-			}
 		}
 
-		if (topLeftCornerLongPressListener != null
-				&& e.x <= timeColumnWidth && e.y <= drawConfig.headerHeight) {
-			topLeftCornerLongPressListener!!.onCornerLongPress()
-		}
+		if (e.x <= timeColumnWidth && e.y <= drawConfig.headerHeight)
+			topLeftCornerLongPressListener?.onCornerLongPress()
 	}
 
 	private fun findHitEvent(e: MotionEvent): EventChip<T>? {
-		data.eventChips?.forEach {
+		data.eventChips.forEach {
 			if (it.isHit(e))
 				return it
 		}

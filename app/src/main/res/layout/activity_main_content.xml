@@ -43,7 +43,7 @@
 			app:nowLineStrokeWidth="2dp"
 			app:numberOfVisibleDays="5"
 			app:overlappingEventGap="16dp"
-			app:scrollDuration="150"
+			app:scrollDuration="100"
 			app:showDistinctPastFutureColor="true"
 			app:showHourSeparator="true"
 			app:showNowLine="true"
