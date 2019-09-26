@@ -25,13 +25,13 @@ object DateTimeUtils {
 				.appendLiteral(':')
 				.appendMinuteOfHour(2)
 				.toFormatter()
-				.withOffsetParsed()
+				.withZoneUTC()
 
 		internal val ttxx = DateTimeFormatterBuilder()
 				.appendLiteral('T')
 				.append(ISODateTimeFormat.hourMinute())
 				.toFormatter()
-				.withOffsetParsed()
+				.withZoneUTC()
 
 		internal val idtxx = DateTimeFormatterBuilder()
 				.append(date())
@@ -41,7 +41,7 @@ object DateTimeUtils {
 				.appendMinuteOfHour(2)
 				.appendTimeZoneOffset("Z", true, 2, 4)
 				.toFormatter()
-				.withOffsetParsed()
+				.withZoneUTC()
 	}
 
 	fun today(): Calendar {

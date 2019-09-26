@@ -29,7 +29,6 @@ import com.sapuseven.untis.notifications.NotificationReceiver.Companion.EXTRA_ST
 import com.sapuseven.untis.notifications.NotificationReceiver.Companion.EXTRA_STRING_NEXT_TEACHER
 import com.sapuseven.untis.notifications.NotificationReceiver.Companion.EXTRA_STRING_NEXT_TEACHER_LONG
 import com.sapuseven.untis.preferences.ElementPickerPreference
-import org.joda.time.DateTimeZone
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
 import java.lang.ref.WeakReference
@@ -150,6 +149,3 @@ class NotificationSetup : BroadcastReceiver() {
 		}
 	}
 }
-
-private val LocalDateTime.millis: Long
-	get() = this.toDateTime(DateTimeZone.getDefault()).toInstant().millis
