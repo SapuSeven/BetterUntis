@@ -240,10 +240,9 @@ class LoginDataInputActivity : BaseActivity() {
 			else
 				return untisResponse.result
 		}, { error ->
-			updateLoadingStatus(error.toString())
 			stopLoadingAndShowError(when (error.exception) {
 				is UnknownHostException -> ErrorMessageDictionary.getErrorMessage(resources, ErrorMessageDictionary.ERROR_CODE_NO_SERVER_FOUND)
-				else -> ErrorMessageDictionary.getErrorMessage(resources, null)
+				else -> error.message ?: ErrorMessageDictionary.getErrorMessage(resources, null)
 			})
 		})
 
@@ -265,10 +264,7 @@ class LoginDataInputActivity : BaseActivity() {
 		if (anonymous)
 			query.data.params = listOf(UserDataParams(UntisAuthentication.getAnonymousAuthObject()))
 		else {
-			if (key == null) {
-				stopLoadingAndShowError(getString(R.string.logindatainput_adding_user_unknown_error))
-				return null
-			}
+			if (key == null) return null
 			query.data.params = listOf(UserDataParams(UntisAuthentication.getAuthObject(user, key)))
 		}
 
@@ -293,10 +289,14 @@ class LoginDataInputActivity : BaseActivity() {
 	}
 
 	private fun sendRequest() = GlobalScope.launch(Dispatchers.Main) {
-		val schoolId: Int = (if (!anonymous) acquireSchoolId() else null) ?: return@launch
+		updateLoadingStatus(getString(R.string.logindatainput_connecting))
+
+		val schoolId: Int = acquireSchoolId() ?: return@launch
 		val username = edittext_logindatainput_user?.text.toString()
 		val password = edittext_logindatainput_key?.text.toString()
 		val appSharedSecret: String? = if (anonymous) null else acquireAppSharedSecret(schoolId, username, password)
+
+		if (!anonymous && appSharedSecret == null) return@launch
 
 		acquireUserData(schoolId, username, appSharedSecret)?.let { response ->
 			val user = UserDatabase.User(
@@ -373,5 +373,6 @@ class LoginDataInputActivity : BaseActivity() {
 		button_logindatainput_login?.isEnabled = enabled
 		button_logindatainput_delete?.isEnabled = enabled
 		switch_logindatainput_anonymouslogin?.isEnabled = enabled
+		switch_logindatainput_advanced?.isEnabled = enabled
 	}
 }
