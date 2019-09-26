@@ -714,6 +714,10 @@ class MainActivity :
 				supportFragmentManager, "datePicker")
 	}
 
+	override fun onCornerLongClick() {
+		weekView.goToToday()
+	}
+
 	private fun closeDrawer(drawer: DrawerLayout = findViewById(R.id.drawer_layout)) = drawer.closeDrawer(GravityCompat.START)
 
 	private fun Int.darken(ratio: Float) = ColorUtils.blendARGB(this, Color.BLACK, ratio)

@@ -33,7 +33,6 @@ internal class WeekViewGestureHandler<T>(
 	var emptyViewClickListener: EmptyViewClickListener? = null
 	var emptyViewLongPressListener: EmptyViewLongPressListener? = null
 	var topLeftCornerClickListener: TopLeftCornerClickListener? = null
-	var topLeftCornerLongPressListener: TopLeftCornerLongPressListener? = null
 	var weekViewLoader: WeekViewLoader<T>? = null
 	var scrollListener: ScrollListener? = null
 
@@ -245,7 +244,7 @@ internal class WeekViewGestureHandler<T>(
 		}
 
 		if (e.x <= timeColumnWidth && e.y <= drawConfig.headerHeight)
-			topLeftCornerLongPressListener?.onCornerLongPress()
+			topLeftCornerClickListener?.onCornerLongClick()
 	}
 
 	private fun findHitEvent(e: MotionEvent): EventChip<T>? {
