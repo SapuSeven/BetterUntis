@@ -61,7 +61,6 @@ import org.joda.time.DateTimeConstants
 import org.joda.time.Instant
 import org.joda.time.LocalDate
 import java.lang.ref.WeakReference
-import java.util.*
 
 class MainActivity :
 		BaseActivity(),
@@ -89,7 +88,7 @@ class MainActivity :
 	private var profileId: Long = -1
 	private val weeklyTimetableItems: MutableMap<Int, WeeklyTimetableItems?> = mutableMapOf()
 	private var displayedElement: PeriodElement? = null
-	private var lastPickedDate: Calendar? = null
+	private var lastPickedDate: DateTime? = null
 	private var proxyHost: String? = null
 	private var profileUpdateDialog: AlertDialog? = null
 	private var currentWeekIndex = 0
@@ -696,27 +695,22 @@ class MainActivity :
 
 		lastPickedDate?.let {
 			val args = Bundle()
-			args.putInt("year", it.get(Calendar.YEAR))
-			args.putInt("month", it.get(Calendar.MONTH))
-			args.putInt("day", it.get(Calendar.DAY_OF_MONTH))
+			args.putInt("year", it.year)
+			args.putInt("month", it.monthOfYear)
+			args.putInt("day", it.dayOfMonth)
 			fragment.arguments = args
 		}
-		fragment.setOnDateSetListener(android.app.DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-			val c = DateTimeUtils.today()
-			c.set(Calendar.YEAR, year)
-			c.set(Calendar.MONTH, month)
-			c.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-			weekView.goToDate(c)
-
-			lastPickedDate = c
-		})
-		fragment.show(
-				supportFragmentManager, "datePicker")
+		fragment.dateSetListener = android.app.DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
+			DateTime().withDate(year, month + 1, dayOfMonth).let {
+				// Compensate for conversion from Calendar to DateTime
+				weekView.goToDate(it)
+				lastPickedDate = it
+			}
+		}
+		fragment.show(supportFragmentManager, "datePicker")
 	}
 
-	override fun onCornerLongClick() {
-		weekView.goToToday()
-	}
+	override fun onCornerLongClick() = weekView.goToToday()
 
 	private fun closeDrawer(drawer: DrawerLayout = findViewById(R.id.drawer_layout)) = drawer.closeDrawer(GravityCompat.START)
 

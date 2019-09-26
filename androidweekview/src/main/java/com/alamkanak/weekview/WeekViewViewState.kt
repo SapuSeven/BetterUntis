@@ -3,10 +3,9 @@ package com.alamkanak.weekview
 import com.alamkanak.weekview.config.WeekViewConfig
 import org.joda.time.DateTime
 import java.lang.Math.max
-import java.util.*
 
 class WeekViewViewState {
-	internal var scrollToDay: Calendar? = null
+	internal var scrollToDay: DateTime? = null
 	internal var scrollToHour = -1
 
 	internal var isFirstDraw = true
@@ -46,7 +45,7 @@ class WeekViewViewState {
 	}
 
 	internal interface UpdateListener {
-		fun goToDate(date: Calendar)
+		fun goToDate(date: DateTime)
 		fun goToHour(hour: Int)
 	}
 }

@@ -71,8 +71,8 @@ internal object DateUtils {
 	}
 
 	@Deprecated("Replace all calls to this with logic that uses the other functions of this class")
-	fun getDaysUntilDate(date: Calendar): Int {
-		val dateInMillis = date.timeInMillis
+	fun getDaysUntilDate(date: DateTime): Int {
+		val dateInMillis = date.millis
 		val todayInMillis = today().timeInMillis
 		val diff = dateInMillis - todayInMillis
 		return (diff / (1000L * 60L * 60L * 24L)).toInt()

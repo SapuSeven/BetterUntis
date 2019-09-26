@@ -15,8 +15,7 @@ import com.alamkanak.weekview.listeners.*
 import com.alamkanak.weekview.loaders.WeekLoader
 import com.alamkanak.weekview.loaders.WeekViewLoader
 import org.joda.time.DateTime
-import java.util.*
-import java.util.Calendar.*
+import org.joda.time.DateTimeConstants
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.min
@@ -331,23 +330,14 @@ class WeekView<T>(
 	/**
 	 * Show today on the week view.
 	 */
-	fun goToToday() {
-		goToDate(DateUtils.today())
-	}
-
-	fun goToCurrentTime() {
-		val today = getInstance()
-		val hour = today.get(HOUR_OF_DAY)
-		goToDate(today)
-		goToHour(hour)
-	}
+	fun goToToday() = goToDate(DateTime.now())
 
 	/**
 	 * Show a specific day on the week view.
 	 *
 	 * @param date The date to show.
 	 */
-	override fun goToDate(date: Calendar) {
+	override fun goToDate(date: DateTime) {
 		// TODO: If the date is in the future, selecting a weekend day will jump to the previous week. It works for past dates. This should be fixed to always jump to the next week when selecting a weekend.
 		gestureHandler.forceScrollFinished()
 
@@ -357,7 +347,7 @@ class WeekView<T>(
 		}
 
 		val diff = DateUtils.getDaysUntilDate(date)
-		var actualDiff = DateUtils.getDisplayedDays(DateUtils.today(), diff, MONDAY, MONDAY + config.numberOfVisibleDays - 1).toDouble()
+		var actualDiff = DateUtils.getDisplayedDays(DateUtils.today(), diff, DateTimeConstants.MONDAY, DateTimeConstants.MONDAY + config.numberOfVisibleDays - 1).toDouble()
 
 		val totalDayWidth = config.totalDayWidth
 
