@@ -12,6 +12,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.TypedValue
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.GridView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -39,6 +40,8 @@ class ElementPickerDialog : DialogFragment() {
 	private lateinit var holder: Holder
 
 	private lateinit var listener: ElementPickerDialogListener
+
+	private lateinit var searchField: TextInputEditText
 
 	interface ElementPickerDialogListener {
 		fun onDialogDismissed(dialog: DialogInterface?)
@@ -124,21 +127,22 @@ class ElementPickerDialog : DialogFragment() {
 			}
 		}
 
-		select(getTextViewFromElemType(type))
-
 		if (config?.hideTypeSelection == true)
 			root.findViewById<ConstraintLayout>(R.id.constraintlayout_elementpicker_typeselect).visibility = View.GONE
 
-		val searchField = root.findViewById<TextInputEditText>(R.id.textinputedittext_elementpicker_search)
+		searchField = root.findViewById(R.id.textinputedittext_elementpicker_search)
 		searchField.addTextChangedListener(object : TextWatcher {
 			override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-				adapter.filter.filter(s.toString())
+				if (searchField.isFocused)
+					adapter.filter.filter(s.toString())
 			}
 
 			override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
 			override fun afterTextChanged(s: Editable) {}
 		})
+
+		select(getTextViewFromElemType(type))
 
 		return root
 	}
@@ -164,11 +168,18 @@ class ElementPickerDialog : DialogFragment() {
 				tv.compoundDrawables[1 /* TOP */].setTint(getAttrColor(R.attr.colorPrimary))
 		}
 
+		searchField.clearFocus()
+		hideKeyboard(context)
+		searchField.setText("")
 		holder.etSearch.hint = getHint()
 
 		adapter.type = type
 		adapter.notifyDataSetChanged()
 	}
+
+	private fun hideKeyboard(context: Context?) =
+			(context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)
+					?.hideSoftInputFromWindow(searchField.windowToken, 0)
 
 	private fun deselect(tv: TextView) {
 		tv.setTextColor(defaultTextColor)
