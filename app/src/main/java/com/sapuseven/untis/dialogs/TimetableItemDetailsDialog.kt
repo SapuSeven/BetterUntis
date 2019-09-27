@@ -19,7 +19,6 @@ import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.KotlinUtils.safeLet
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.ISODateTimeFormat
 
@@ -32,7 +31,7 @@ class TimetableItemDetailsDialog : DialogFragment() {
 
 	companion object {
 		val HOMEWORK_DUE_TIME_FORMAT: DateTimeFormatter = ISODateTimeFormat.date()
-		val HOMEWORK_DUE_TIME_DISPLAY_FORMAT: DateTimeFormatter = DateTimeFormat.forPattern("EEE, dd. MMM")
+		const val HOMEWORK_DUE_TIME_DISPLAY_FORMAT = "EEE, dd. MMM"
 
 		fun createInstance(item: TimegridItem, timetableDatabaseInterface: TimetableDatabaseInterface?): TimetableItemDetailsDialog {
 			val fragment = TimetableItemDetailsDialog()
@@ -99,7 +98,7 @@ class TimetableItemDetailsDialog : DialogFragment() {
 
 			val infoView = activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_homework, null)
 			(infoView.findViewById<TextView>(R.id.textview_roomfinder_name)).text = it.text
-			(infoView.findViewById<TextView>(R.id.tvDate)).text = getString(R.string.homeworks_until, HOMEWORK_DUE_TIME_DISPLAY_FORMAT.print(endDate))
+			(infoView.findViewById<TextView>(R.id.tvDate)).text = getString(R.string.homeworks_until, endDate.toString(HOMEWORK_DUE_TIME_DISPLAY_FORMAT))
 			root.addView(infoView)
 		}
 
