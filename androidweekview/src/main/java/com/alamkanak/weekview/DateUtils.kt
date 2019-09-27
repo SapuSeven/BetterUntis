@@ -53,7 +53,7 @@ internal object DateUtils {
 	}
 
 	/**
-	 * Converts between displayed days and actual days, accounting for skipped days (if [weekLength] < `7`).
+	 * Converts between from displayed days to actual days, accounting for skipped days (if [weekLength] < `7`).
 	 *
 	 * @param displayedDays The amount of displayed days, starting at the first visible day of the week.
 	 * @param weekLength The length of the displayed week. Example: `5` for a week from [DateTimeConstants.MONDAY] until [DateTimeConstants.FRIDAY]
@@ -69,11 +69,21 @@ internal object DateUtils {
 		return displayedDays + skippedDays
 	}
 
-	fun getDaysUntilDate(date: DateTime): Int {
-		val dateInMillis = date.millis
-		val todayInMillis = today().timeInMillis
-		val diff = dateInMillis - todayInMillis
-		return (diff / (1000L * 60L * 60L * 24L)).toInt()
+	/**
+	 * Converts from actual days to displayed days, accounting for skipped days (if [weekLength] < `7`).
+	 *
+	 * @param actualDays The amount of actual days, starting at the first visible day of the week.
+	 * @param weekLength The length of the displayed week. Example: `5` for a week from [DateTimeConstants.MONDAY] until [DateTimeConstants.FRIDAY]
+	 *
+	 * @return The amount of actual days.
+	 */
+	fun displayedDays(actualDays: Int, weekLength: Int): Int {
+		val skippedDays = if (actualDays < 0)
+			(actualDays + 1) / 7 * (7 - weekLength) - (7 - weekLength)
+		else
+			actualDays / 7 * (7 - weekLength)
+
+		return actualDays - skippedDays
 	}
 
 	fun isSameDay(dayOne: DateTime, dayTwo: DateTime) = dayOne.year == dayTwo.year && dayOne.dayOfYear == dayTwo.dayOfYear

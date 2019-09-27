@@ -204,18 +204,13 @@ internal class WeekViewGestureHandler<T>(
 		// If the tap was on in an empty space, then trigger the callback.
 		val timeColumnWidth = drawConfig.timeColumnWidth
 
-		if (emptyViewClickListener != null
-				&& e.x > timeColumnWidth && e.y > drawConfig.headerHeight) {
-			val selectedTime = touchHandler.getTimeFromPoint(e)
-			if (selectedTime != null) {
-				emptyViewClickListener!!.onEmptyViewClicked(selectedTime)
+		if (e.x > timeColumnWidth && e.y > drawConfig.headerHeight)
+			emptyViewClickListener?.let { listener ->
+				touchHandler.getTimeFromPoint(e)?.let { listener.onEmptyViewClicked(it) }
 			}
-		}
 
-		if (topLeftCornerClickListener != null
-				&& e.x <= timeColumnWidth && e.y <= drawConfig.headerHeight) {
-			topLeftCornerClickListener!!.onCornerClick()
-		}
+		if (e.x <= timeColumnWidth && e.y <= drawConfig.headerHeight)
+			topLeftCornerClickListener?.onCornerClick()
 
 		return super.onSingleTapUp(e)
 	}
@@ -235,13 +230,12 @@ internal class WeekViewGestureHandler<T>(
 
 		val timeColumnWidth = drawConfig.timeColumnWidth
 
-		// If the tap was on in an empty space, then trigger the callback.
-		if (emptyViewLongPressListener != null
-				&& e.x > timeColumnWidth && e.y > drawConfig.headerHeight) {
-			val selectedTime = touchHandler.getTimeFromPoint(e)
-			if (selectedTime != null)
-				emptyViewLongPressListener!!.onEmptyViewLongPress(selectedTime)
-		}
+		if (e.x > timeColumnWidth && e.y > drawConfig.headerHeight)
+			emptyViewLongPressListener?.let { listener ->
+				touchHandler.getTimeFromPoint(e)?.let {
+					listener.onEmptyViewLongPress(it)
+				}
+			}
 
 		if (e.x <= timeColumnWidth && e.y <= drawConfig.headerHeight)
 			topLeftCornerClickListener?.onCornerLongClick()

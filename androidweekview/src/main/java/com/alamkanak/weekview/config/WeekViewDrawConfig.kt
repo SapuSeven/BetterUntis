@@ -14,7 +14,6 @@ import org.joda.time.DateTimeConstants
 import java.lang.Math.max
 import java.lang.Math.min
 import java.util.*
-import java.util.Calendar.DAY_OF_WEEK
 
 class WeekViewDrawConfig(context: Context) {
 	val timeTextTopPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
@@ -89,11 +88,11 @@ class WeekViewDrawConfig(context: Context) {
 
 	fun moveCurrentOriginIfFirstDraw(config: WeekViewConfig) {
 		// If the week view is being drawn for the first time, then consider the first day of the week.
-		val today = DateUtils.today()
+		val today = DateTime.now()
 		val isWeekView = config.numberOfVisibleDays >= 7
-		val currentDayIsNotToday = today.get(DAY_OF_WEEK) != config.firstDayOfWeek
+		val currentDayIsNotToday = today.dayOfWeek != config.firstDayOfWeek
 		if (isWeekView && currentDayIsNotToday && config.showFirstDayOfWeekFirst) {
-			val difference = today.get(DAY_OF_WEEK) - config.firstDayOfWeek
+			val difference = today.dayOfWeek - config.firstDayOfWeek
 			currentOrigin.x += widthPerDay/* + config.columnGap*/ * difference
 		}
 	}

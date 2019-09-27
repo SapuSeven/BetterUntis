@@ -1,11 +1,10 @@
 package com.alamkanak.weekview
 
 import android.view.MotionEvent
-import com.alamkanak.weekview.DateUtils.today
 import com.alamkanak.weekview.config.WeekViewConfig
 import com.alamkanak.weekview.config.WeekViewDrawConfig
+import org.joda.time.DateTime
 import java.lang.Math.max
-import java.util.*
 
 internal class WeekViewTouchHandler(private val config: WeekViewConfig) {
 	private val drawConfig: WeekViewDrawConfig = config.drawConfig
@@ -16,7 +15,7 @@ internal class WeekViewTouchHandler(private val config: WeekViewConfig) {
 	 * @param event The [MotionEvent] of the touch event.
 	 * @return The time and date at the clicked position.
 	 */
-	fun getTimeFromPoint(event: MotionEvent): Calendar? {
+	fun getTimeFromPoint(event: MotionEvent): DateTime? {
 		val touchX = event.x
 		val touchY = event.y
 
@@ -37,8 +36,7 @@ internal class WeekViewTouchHandler(private val config: WeekViewConfig) {
 			val isWithinDay = (touchX > start) and (touchX < startPixel + widthPerDay)
 
 			if (isVisibleHorizontally && isWithinDay) {
-				val day = today()
-				day.add(Calendar.DATE, dayNumber - 1)
+				val day = DateTime.now().plusDays(dayNumber - 1)
 
 				val originY = drawConfig.currentOrigin.y
 				val hourHeight = config.hourHeight.toFloat()
@@ -46,9 +44,7 @@ internal class WeekViewTouchHandler(private val config: WeekViewConfig) {
 				val pixelsFromZero = touchY - originY - drawConfig.headerHeight
 				val hour = (pixelsFromZero / hourHeight).toInt()
 				val minute = (60 * (pixelsFromZero - hour * hourHeight) / hourHeight).toInt()
-				day.add(Calendar.HOUR, hour)
-				day.set(Calendar.MINUTE, minute)
-				return day
+				return day.plusHours(hour).withMinuteOfHour(minute)
 			}
 
 			startPixel += widthPerDay

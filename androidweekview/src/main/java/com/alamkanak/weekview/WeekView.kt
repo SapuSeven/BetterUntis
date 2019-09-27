@@ -345,20 +345,16 @@ class WeekView<T>(
 			return
 		}
 
-		var diff = DateUtils.actualDays(DateUtils.getDaysUntilDate(date), config.numberOfVisibleDays).toDouble()
+		val today = DateTime.now()
+		val offset = DateUtils.offsetInWeek(today, config.firstDayOfWeek, config.numberOfVisibleDays)
+		val firstDayOfCurrentWeek = today.minusDays(offset)
 
-		val totalDayWidth = config.totalDayWidth
-
-		if (config.startOnFirstDay)
-			diff /= config.numberOfVisibleDays.toDouble()
+		val dayDiff = DateUtils.displayedDays(((date.millis - firstDayOfCurrentWeek.millis) / 1000 / 60 / 60 / 24).toInt(), config.numberOfVisibleDays).toDouble()
+		val diff = dayDiff / config.numberOfVisibleDays.toDouble()
 
 		val leftOriginCount = floor(diff).toInt()
 
-		var nearestOrigin = 0
-		nearestOrigin -= if (config.startOnFirstDay)
-			(leftOriginCount.toFloat() * totalDayWidth * config.numberOfVisibleDays.toFloat()).toInt()
-		else
-			(leftOriginCount * totalDayWidth).toInt()
+		val nearestOrigin = -(leftOriginCount.toFloat() * config.totalDayWidth * config.numberOfVisibleDays.toFloat()).toInt()
 
 		if (nearestOrigin - config.drawConfig.currentOrigin.x != 0f) {
 			gestureHandler.scroller.forceFinished(true)

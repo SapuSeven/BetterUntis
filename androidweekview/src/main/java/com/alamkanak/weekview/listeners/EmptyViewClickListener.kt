@@ -1,13 +1,13 @@
 package com.alamkanak.weekview.listeners
 
-import java.util.*
+import org.joda.time.DateTime
 
 interface EmptyViewClickListener {
 
 	/**
 	 * Triggered when the users clicks on a empty space of the calendar.
 	 *
-	 * @param time: [Calendar] object set with the date and time of the clicked position on the view.
+	 * @param time A [DateTime] object set with the date and time of the clicked position on the view.
 	 */
-	fun onEmptyViewClicked(time: Calendar)
+	fun onEmptyViewClicked(time: DateTime)
 }
