@@ -137,75 +137,6 @@
 	</PreferenceScreen>
 
 	<PreferenceScreen
-		android:icon="@drawable/settings_notifications"
-		android:key="preferences_notifications"
-		android:title="@string/preferences_notifications">
-
-		<CheckBoxPreference
-			android:defaultValue="@bool/preference_notifications_enable_default"
-			android:icon="@drawable/settings_notifications_active"
-			android:key="preference_notifications_enable"
-			android:summary="@string/preference_notifications_enable_desc"
-			android:title="@string/preference_notifications_enable" />
-
-		<CheckBoxPreference
-			android:defaultValue="@bool/preference_notifications_in_multiple_default"
-			android:dependency="preference_notifications_enable"
-			android:key="preference_notifications_in_multiple"
-			android:summary="@string/preference_notifications_multiple_desc"
-			android:title="@string/preference_notifications_multiple" />
-
-		<com.sapuseven.untis.preferences.NotificationClearPreference
-			android:icon="@drawable/settings_notifications_clear_all"
-			android:key="preference_notifications_clear"
-			android:title="@string/preference_notifications_clear" />
-
-		<PreferenceCategory android:title="@string/preference_category_notifications_visible_fields">
-
-			<ListPreference
-				android:defaultValue="@string/preference_notifications_visibility_subjects_default"
-				android:dependency="preference_notifications_enable"
-				android:entries="@array/preference_notifications_visibility"
-				android:entryValues="@array/preference_notifications_visibility_values"
-				android:key="preference_notifications_visibility_subjects"
-				android:summary="%s"
-				android:title="@string/subjects" />
-
-			<ListPreference
-				android:defaultValue="@string/preference_notifications_visibility_rooms_default"
-				android:dependency="preference_notifications_enable"
-				android:entries="@array/preference_notifications_visibility"
-				android:entryValues="@array/preference_notifications_visibility_values"
-				android:icon="@drawable/all_rooms"
-				android:key="preference_notifications_visibility_rooms"
-				android:summary="%s"
-				android:title="@string/all_rooms" />
-
-			<ListPreference
-				android:defaultValue="@string/preference_notifications_visibility_teachers_default"
-				android:dependency="preference_notifications_enable"
-				android:entries="@array/preference_notifications_visibility"
-				android:entryValues="@array/preference_notifications_visibility_values"
-				android:icon="@drawable/all_teacher"
-				android:key="preference_notifications_visibility_teachers"
-				android:summary="%s"
-				android:title="@string/all_teachers" />
-
-			<ListPreference
-				android:defaultValue="@string/preference_notifications_visibility_classes_default"
-				android:dependency="preference_notifications_enable"
-				android:entries="@array/preference_notifications_visibility"
-				android:entryValues="@array/preference_notifications_visibility_values"
-				android:icon="@drawable/all_classes"
-				android:key="preference_notifications_visibility_classes"
-				android:summary="%s"
-				android:title="@string/all_classes" />
-
-		</PreferenceCategory>
-
-	</PreferenceScreen>
-
-	<PreferenceScreen
 		android:icon="@drawable/settings_timetable"
 		android:key="preferences_timetable"
 		android:title="@string/preferences_timetable">
@@ -268,6 +199,75 @@
 				android:title="@string/preference_timetable_lesson_info_font_size"
 				app:unit="sp" />
 		</PreferenceCategory>
+	</PreferenceScreen>
+
+	<PreferenceScreen
+		android:icon="@drawable/settings_notifications"
+		android:key="preferences_notifications"
+		android:title="@string/preferences_notifications">
+
+		<CheckBoxPreference
+			android:defaultValue="@bool/preference_notifications_enable_default"
+			android:icon="@drawable/settings_notifications_active"
+			android:key="preference_notifications_enable"
+			android:summary="@string/preference_notifications_enable_desc"
+			android:title="@string/preference_notifications_enable"/>
+
+		<CheckBoxPreference
+			android:defaultValue="@bool/preference_notifications_in_multiple_default"
+			android:dependency="preference_notifications_enable"
+			android:key="preference_notifications_in_multiple"
+			android:summary="@string/preference_notifications_multiple_desc"
+			android:title="@string/preference_notifications_multiple"/>
+
+		<com.sapuseven.untis.preferences.NotificationClearPreference
+			android:icon="@drawable/settings_notifications_clear_all"
+			android:key="preference_notifications_clear"
+			android:title="@string/preference_notifications_clear"/>
+
+		<PreferenceCategory android:title="@string/preference_category_notifications_visible_fields">
+
+			<ListPreference
+				android:defaultValue="@string/preference_notifications_visibility_subjects_default"
+				android:dependency="preference_notifications_enable"
+				android:entries="@array/preference_notifications_visibility"
+				android:entryValues="@array/preference_notifications_visibility_values"
+				android:key="preference_notifications_visibility_subjects"
+				android:summary="%s"
+				android:title="@string/subjects"/>
+
+			<ListPreference
+				android:defaultValue="@string/preference_notifications_visibility_rooms_default"
+				android:dependency="preference_notifications_enable"
+				android:entries="@array/preference_notifications_visibility"
+				android:entryValues="@array/preference_notifications_visibility_values"
+				android:icon="@drawable/all_rooms"
+				android:key="preference_notifications_visibility_rooms"
+				android:summary="%s"
+				android:title="@string/all_rooms"/>
+
+			<ListPreference
+				android:defaultValue="@string/preference_notifications_visibility_teachers_default"
+				android:dependency="preference_notifications_enable"
+				android:entries="@array/preference_notifications_visibility"
+				android:entryValues="@array/preference_notifications_visibility_values"
+				android:icon="@drawable/all_teacher"
+				android:key="preference_notifications_visibility_teachers"
+				android:summary="%s"
+				android:title="@string/all_teachers"/>
+
+			<ListPreference
+				android:defaultValue="@string/preference_notifications_visibility_classes_default"
+				android:dependency="preference_notifications_enable"
+				android:entries="@array/preference_notifications_visibility"
+				android:entryValues="@array/preference_notifications_visibility_values"
+				android:icon="@drawable/all_classes"
+				android:key="preference_notifications_visibility_classes"
+				android:summary="%s"
+				android:title="@string/all_classes"/>
+
+		</PreferenceCategory>
+
 	</PreferenceScreen>
 
 	<PreferenceScreen
