@@ -4,8 +4,8 @@ import android.content.ContentValues
 import android.database.Cursor
 import com.sapuseven.untis.annotations.Table
 import com.sapuseven.untis.annotations.TableColumn
-import com.sapuseven.untis.interfaces.TableModel
 import com.sapuseven.untis.data.databases.TABLE_NAME_EXCUSE_STATUSES
+import com.sapuseven.untis.interfaces.TableModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -21,9 +21,8 @@ data class ExcuseStatus(
 		const val TABLE_NAME = TABLE_NAME_EXCUSE_STATUSES
 	}
 
-	override fun getTableName(): String {
-		return TABLE_NAME
-	}
+	override val tableName = TABLE_NAME
+	override val elementId = id
 
 	override fun generateValues(): ContentValues {
 		val values = ContentValues()
@@ -45,9 +44,5 @@ data class ExcuseStatus(
 				cursor.getInt(cursor.getColumnIndex("excused")) != 0,
 				cursor.getInt(cursor.getColumnIndex("active")) != 0
 		)
-	}
-
-	override fun getElementId(): Int {
-		return id
 	}
 }

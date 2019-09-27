@@ -21,9 +21,8 @@ data class Holiday(
 		const val TABLE_NAME = TABLE_NAME_HOLIDAYS
 	}
 
-	override fun getTableName(): String {
-		return TABLE_NAME
-	}
+	override val tableName = TABLE_NAME
+	override val elementId = id
 
 	override fun generateValues(): ContentValues {
 		val values = ContentValues()
@@ -45,9 +44,5 @@ data class Holiday(
 				cursor.getString(cursor.getColumnIndex("startDate")),
 				cursor.getString(cursor.getColumnIndex("endDate"))
 		)
-	}
-
-	override fun getElementId(): Int {
-		return id
 	}
 }

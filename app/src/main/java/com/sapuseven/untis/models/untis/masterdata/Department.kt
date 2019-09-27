@@ -19,9 +19,8 @@ data class Department(
 		const val TABLE_NAME = TABLE_NAME_DEPARTMENTS
 	}
 
-	override fun getTableName(): String {
-		return TABLE_NAME
-	}
+	override val tableName = TABLE_NAME
+	override val elementId = id
 
 	override fun generateValues(): ContentValues {
 		val values = ContentValues()
@@ -39,9 +38,5 @@ data class Department(
 				cursor.getString(cursor.getColumnIndex("name")),
 				cursor.getString(cursor.getColumnIndex("longName"))
 		)
-	}
-
-	override fun getElementId(): Int {
-		return id
 	}
 }

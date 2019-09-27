@@ -16,10 +16,12 @@ data class AbsenceReason(
 		@field:TableColumn("VARCHAR(255) NOT NULL") val longName: String,
 		@field:TableColumn("BOOLEAN NOT NULL") val active: Boolean
 ) : TableModel {
-
 	companion object {
 		const val TABLE_NAME = TABLE_NAME_ABSENCE_REASONS
 	}
+
+	override val tableName = TABLE_NAME
+	override val elementId = id
 
 	override fun generateValues(): ContentValues {
 		val values = ContentValues()
@@ -32,10 +34,6 @@ data class AbsenceReason(
 		return values
 	}
 
-	override fun getTableName(): String {
-		return TABLE_NAME
-	}
-
 	override fun parseCursor(cursor: Cursor): TableModel {
 		return AbsenceReason(
 				cursor.getInt(cursor.getColumnIndex("id")),
@@ -43,9 +41,5 @@ data class AbsenceReason(
 				cursor.getString(cursor.getColumnIndex("longName")),
 				cursor.getInt(cursor.getColumnIndex("active")) != 0
 		)
-	}
-
-	override fun getElementId(): Int {
-		return id
 	}
 }

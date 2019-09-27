@@ -59,14 +59,13 @@ class TimetableDatabaseInterface(val database: UserDatabase, id: Long) {
 		}
 	}
 
-	fun elementContains(element: PeriodElement, other: String, ignoreCase: Boolean): Boolean {
-		// TODO: Maybe compare other fields as well
+	fun elementContains(element: PeriodElement, other: String): Boolean {
 		return when (Type.valueOf(element.type)) {
-			Type.CLASS -> allClasses[element.id]?.name?.contains(other, ignoreCase)
-			Type.TEACHER -> allTeachers[element.id]?.name?.contains(other, ignoreCase)
-			Type.SUBJECT -> allSubjects[element.id]?.name?.contains(other, ignoreCase)
-			Type.ROOM -> allRooms[element.id]?.name?.contains(other, ignoreCase)
-		} == true
+			Type.CLASS -> allClasses[element.id]?.compareTo(other)
+			Type.TEACHER -> allTeachers[element.id]?.compareTo(other)
+			Type.SUBJECT -> allSubjects[element.id]?.compareTo(other)
+			Type.ROOM -> allRooms[element.id]?.compareTo(other)
+		} == 0
 	}
 
 	fun getElements(type: Type?): List<PeriodElement> {

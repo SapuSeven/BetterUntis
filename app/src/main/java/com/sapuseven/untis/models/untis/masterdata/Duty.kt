@@ -20,9 +20,8 @@ data class Duty(
 		const val TABLE_NAME = TABLE_NAME_DUTIES
 	}
 
-	override fun getTableName(): String {
-		return TABLE_NAME
-	}
+	override val tableName = TABLE_NAME
+	override val elementId = id
 
 	override fun generateValues(): ContentValues {
 		val values = ContentValues()
@@ -42,9 +41,5 @@ data class Duty(
 				cursor.getString(cursor.getColumnIndex("longName")),
 				cursor.getString(cursor.getColumnIndex("type"))
 		)
-	}
-
-	override fun getElementId(): Int {
-		return id
 	}
 }

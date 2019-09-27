@@ -60,7 +60,7 @@ open class GridViewDatabaseItemAdapter(context: Context)
 			} else {
 				for (i in originalItems.indices) {
 					val data = originalItems[i]
-					if (timetableDatabaseInterface?.elementContains(data, constraint.toString().toLowerCase(Locale.getDefault()), true) == true)
+					if (timetableDatabaseInterface?.elementContains(data, constraint.toString().toLowerCase(Locale.getDefault())) == true)
 						filteredList.add(data)
 
 				}

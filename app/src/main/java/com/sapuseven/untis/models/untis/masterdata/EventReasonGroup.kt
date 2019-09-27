@@ -21,9 +21,8 @@ data class EventReasonGroup(
 		const val TABLE_NAME = TABLE_NAME_EVENT_REASON_GROUPS
 	}
 
-	override fun getTableName(): String {
-		return TABLE_NAME
-	}
+	override val tableName = TABLE_NAME
+	override val elementId = id
 
 	override fun generateValues(): ContentValues {
 		val values = ContentValues()
@@ -43,9 +42,5 @@ data class EventReasonGroup(
 				cursor.getString(cursor.getColumnIndex("longName")),
 				cursor.getInt(cursor.getColumnIndex("active")) != 0
 		)
-	}
-
-	override fun getElementId(): Int {
-		return id
 	}
 }

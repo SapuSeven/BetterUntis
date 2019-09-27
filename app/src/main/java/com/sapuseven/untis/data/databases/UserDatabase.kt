@@ -279,7 +279,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		val db = readableDatabase
 
 		val cursor = db.query(
-				table.getTableName(),
+				table.tableName,
 				table.generateValues().keySet().toTypedArray(), "$COLUMN_NAME_USER_ID=?",
 				arrayOf(userId.toString()), null, null, "id DESC")
 
@@ -291,7 +291,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		if (cursor.moveToFirst()) {
 			do {
 				val data = table.parseCursor(cursor) as T
-				result[(data as TableModel).getElementId()] = data
+				result[(data as TableModel).elementId] = data
 			} while (cursor.moveToNext())
 		}
 

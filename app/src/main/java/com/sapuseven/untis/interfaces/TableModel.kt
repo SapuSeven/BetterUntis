@@ -4,11 +4,10 @@ import android.content.ContentValues
 import android.database.Cursor
 
 interface TableModel {
+	val elementId: Int
+	val tableName: String
+
 	fun generateValues(): ContentValues
 
-	fun getTableName(): String
-
 	fun parseCursor(cursor: Cursor): TableModel
-
-	fun getElementId(): Int
 }

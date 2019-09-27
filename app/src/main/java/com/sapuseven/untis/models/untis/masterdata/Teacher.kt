@@ -22,14 +22,13 @@ data class Teacher(
 		@field:TableColumn("VARCHAR(255)") val exitDate: String? = null,
 		@field:TableColumn("BOOLEAN NOT NULL") val active: Boolean = false,
 		@field:TableColumn("BOOLEAN NOT NULL") val displayAllowed: Boolean = false
-) : TableModel {
+) : Comparable<String>, TableModel {
 	companion object {
 		const val TABLE_NAME = TABLE_NAME_TEACHERS
 	}
 
-	override fun getTableName(): String {
-		return TABLE_NAME
-	}
+	override val tableName = TABLE_NAME
+	override val elementId = id
 
 	override fun generateValues(): ContentValues {
 		val values = ContentValues()
@@ -49,23 +48,23 @@ data class Teacher(
 		return values
 	}
 
-	override fun parseCursor(cursor: Cursor): TableModel {
-		return Teacher(
-				cursor.getInt(cursor.getColumnIndex("id")),
-				cursor.getString(cursor.getColumnIndex("name")),
-				cursor.getString(cursor.getColumnIndex("firstName")),
-				cursor.getString(cursor.getColumnIndex("lastName")),
-				listOf(cursor.getInt(cursor.getColumnIndex("departmentIds"))), // TODO: Probably doesn't work, but this value is always empty anyway (see TODO-Item above)
-				cursor.getString(cursor.getColumnIndex("foreColor")),
-				cursor.getString(cursor.getColumnIndex("backColor")),
-				cursor.getString(cursor.getColumnIndex("entryDate")),
-				cursor.getString(cursor.getColumnIndex("exitDate")),
-				cursor.getInt(cursor.getColumnIndex("active")) != 0,
-				cursor.getInt(cursor.getColumnIndex("displayAllowed")) != 0
-		)
-	}
+	override fun parseCursor(cursor: Cursor) = Teacher(
+			cursor.getInt(cursor.getColumnIndex("id")),
+			cursor.getString(cursor.getColumnIndex("name")),
+			cursor.getString(cursor.getColumnIndex("firstName")),
+			cursor.getString(cursor.getColumnIndex("lastName")),
+			listOf(cursor.getInt(cursor.getColumnIndex("departmentIds"))), // TODO: Probably doesn't work, but this value is always empty anyway (see TODO-Item above)
+			cursor.getString(cursor.getColumnIndex("foreColor")),
+			cursor.getString(cursor.getColumnIndex("backColor")),
+			cursor.getString(cursor.getColumnIndex("entryDate")),
+			cursor.getString(cursor.getColumnIndex("exitDate")),
+			cursor.getInt(cursor.getColumnIndex("active")) != 0,
+			cursor.getInt(cursor.getColumnIndex("displayAllowed")) != 0
+	)
 
-	override fun getElementId(): Int {
-		return id
-	}
+	override fun compareTo(other: String) = if (
+			name.contains(other, true)
+			|| firstName.contains(other, true)
+			|| lastName.contains(other, true)
+	) 0 else name.compareTo(other)
 }

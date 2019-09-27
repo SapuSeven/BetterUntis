@@ -4,8 +4,8 @@ import android.content.ContentValues
 import android.database.Cursor
 import com.sapuseven.untis.annotations.Table
 import com.sapuseven.untis.annotations.TableColumn
-import com.sapuseven.untis.interfaces.TableModel
 import com.sapuseven.untis.data.databases.TABLE_NAME_SCHOOL_YEARS
+import com.sapuseven.untis.interfaces.TableModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -20,9 +20,8 @@ data class SchoolYear(
 		const val TABLE_NAME = TABLE_NAME_SCHOOL_YEARS
 	}
 
-	override fun getTableName(): String {
-		return TABLE_NAME
-	}
+	override val tableName = TABLE_NAME
+	override val elementId = id
 
 	override fun generateValues(): ContentValues {
 		val values = ContentValues()
@@ -42,9 +41,5 @@ data class SchoolYear(
 				cursor.getString(cursor.getColumnIndex("startDate")),
 				cursor.getString(cursor.getColumnIndex("endDate"))
 		)
-	}
-
-	override fun getElementId(): Int {
-		return id
 	}
 }

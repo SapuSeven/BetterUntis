@@ -4,8 +4,8 @@ import android.content.ContentValues
 import android.database.Cursor
 import com.sapuseven.untis.annotations.Table
 import com.sapuseven.untis.annotations.TableColumn
-import com.sapuseven.untis.interfaces.TableModel
 import com.sapuseven.untis.data.databases.TABLE_NAME_ROOMS
+import com.sapuseven.untis.interfaces.TableModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -19,14 +19,13 @@ data class Room(
 		@field:TableColumn("VARCHAR(255)") val backColor: String? = null,
 		@field:TableColumn("BOOLEAN NOT NULL") val active: Boolean = false,
 		@field:TableColumn("BOOLEAN NOT NULL") val displayAllowed: Boolean = false
-) : TableModel {
+) : Comparable<String>, TableModel {
 	companion object {
 		const val TABLE_NAME = TABLE_NAME_ROOMS
 	}
 
-	override fun getTableName(): String {
-		return TABLE_NAME
-	}
+	override val tableName = TABLE_NAME
+	override val elementId = id
 
 	override fun generateValues(): ContentValues {
 		val values = ContentValues()
@@ -43,20 +42,19 @@ data class Room(
 		return values
 	}
 
-	override fun parseCursor(cursor: Cursor): TableModel {
-		return Room(
-				cursor.getInt(cursor.getColumnIndex("id")),
-				cursor.getString(cursor.getColumnIndex("name")),
-				cursor.getString(cursor.getColumnIndex("longName")),
-				cursor.getInt(cursor.getColumnIndex("departmentId")),
-				cursor.getString(cursor.getColumnIndex("foreColor")),
-				cursor.getString(cursor.getColumnIndex("backColor")),
-				cursor.getInt(cursor.getColumnIndex("active")) != 0,
-				cursor.getInt(cursor.getColumnIndex("displayAllowed")) != 0
-		)
-	}
+	override fun parseCursor(cursor: Cursor) = Room(
+			cursor.getInt(cursor.getColumnIndex("id")),
+			cursor.getString(cursor.getColumnIndex("name")),
+			cursor.getString(cursor.getColumnIndex("longName")),
+			cursor.getInt(cursor.getColumnIndex("departmentId")),
+			cursor.getString(cursor.getColumnIndex("foreColor")),
+			cursor.getString(cursor.getColumnIndex("backColor")),
+			cursor.getInt(cursor.getColumnIndex("active")) != 0,
+			cursor.getInt(cursor.getColumnIndex("displayAllowed")) != 0
+	)
 
-	override fun getElementId(): Int {
-		return id
-	}
+	override fun compareTo(other: String) = if (
+			name.contains(other, true)
+			|| longName.contains(other, true)
+	) 0 else name.compareTo(other)
 }
