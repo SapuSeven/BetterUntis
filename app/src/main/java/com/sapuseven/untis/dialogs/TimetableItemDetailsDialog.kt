@@ -77,13 +77,6 @@ class TimetableItemDetailsDialog : DialogFragment() {
 	private fun generateView(activity: FragmentActivity, item: TimegridItem, timetableDatabaseInterface: TimetableDatabaseInterface): View {
 		val root = activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page, null) as LinearLayout
 
-		if (item.periodData.teachers.isEmpty())
-			root.findViewById<View>(R.id.llTeachers).visibility = View.GONE
-		if (item.periodData.classes.isEmpty())
-			root.findViewById<View>(R.id.llClasses).visibility = View.GONE
-		if (item.periodData.rooms.isEmpty())
-			root.findViewById<View>(R.id.llRooms).visibility = View.GONE
-
 		val attrs = intArrayOf(android.R.attr.textColorPrimary)
 		val ta = context?.obtainStyledAttributes(attrs)
 		val color = ta?.getColor(0, 0)
@@ -114,9 +107,12 @@ class TimetableItemDetailsDialog : DialogFragment() {
 		val klassenList = root.findViewById<LinearLayout>(R.id.llClassList)
 		val roomList = root.findViewById<LinearLayout>(R.id.llRoomList)
 
-		populateList(timetableDatabaseInterface, teacherList, item.periodData.teachers, TimetableDatabaseInterface.Type.TEACHER, color)
-		populateList(timetableDatabaseInterface, klassenList, item.periodData.classes, TimetableDatabaseInterface.Type.CLASS, color)
-		populateList(timetableDatabaseInterface, roomList, item.periodData.rooms, TimetableDatabaseInterface.Type.ROOM, color)
+		if (populateList(timetableDatabaseInterface, teacherList, item.periodData.teachers, TimetableDatabaseInterface.Type.TEACHER, color))
+			root.findViewById<View>(R.id.llTeachers).visibility = View.GONE
+		if (populateList(timetableDatabaseInterface, klassenList, item.periodData.classes, TimetableDatabaseInterface.Type.CLASS, color))
+			root.findViewById<View>(R.id.llClasses).visibility = View.GONE
+		if (populateList(timetableDatabaseInterface, roomList, item.periodData.rooms, TimetableDatabaseInterface.Type.ROOM, color))
+			root.findViewById<View>(R.id.llRooms).visibility = View.GONE
 
 		if (item.periodData.subjects.size > 0) {
 			var title = item.periodData.getLongTitle()
@@ -138,26 +134,27 @@ class TimetableItemDetailsDialog : DialogFragment() {
 	                         list: LinearLayout,
 	                         data: List<PeriodElement>,
 	                         type: TimetableDatabaseInterface.Type,
-	                         textColor: Int?) {
+	                         textColor: Int?): Boolean {
+		if (data.isEmpty()) return true
 		data.forEach { element ->
-			if (element.id > 0)
-				list.addView(generateTextViewForElement(element, type, timetableDatabaseInterface, textColor))
-			if (element.id != element.orgId)
-				list.addView(generateTextViewForElement(element, type, timetableDatabaseInterface, textColor, true))
+			generateTextViewForElement(element, type, timetableDatabaseInterface, textColor, element.id != element.orgId)?.let { list.addView(it) }
+					?: return true
 		}
+		return false
 	}
 
 	private fun generateTextViewForElement(element: PeriodElement,
 	                                       type: TimetableDatabaseInterface.Type,
 	                                       timetableDatabaseInterface: TimetableDatabaseInterface,
 	                                       textColor: Int?,
-	                                       useOrgId: Boolean = false): TextView {
+	                                       useOrgId: Boolean = false): TextView? {
 		val tv = TextView(requireContext())
 		val params = LinearLayout.LayoutParams(
 				ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.MATCH_PARENT)
 		params.setMargins(0, 0, ConversionUtils.dpToPx(12.0f, requireContext()).toInt(), 0)
 		tv.text = timetableDatabaseInterface.getShortName(if (useOrgId) element.orgId else element.id, type)
+		if (tv.text.isBlank()) return null
 		tv.layoutParams = params
 		textColor?.let { tv.setTextColor(it) }
 		tv.gravity = Gravity.CENTER_VERTICAL
