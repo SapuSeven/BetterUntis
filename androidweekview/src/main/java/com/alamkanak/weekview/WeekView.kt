@@ -15,7 +15,6 @@ import com.alamkanak.weekview.listeners.*
 import com.alamkanak.weekview.loaders.WeekLoader
 import com.alamkanak.weekview.loaders.WeekViewLoader
 import org.joda.time.DateTime
-import org.joda.time.DateTimeConstants
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.min
@@ -346,15 +345,14 @@ class WeekView<T>(
 			return
 		}
 
-		val diff = DateUtils.getDaysUntilDate(date)
-		var actualDiff = DateUtils.getDisplayedDays(DateUtils.today(), diff, DateTimeConstants.MONDAY, DateTimeConstants.MONDAY + config.numberOfVisibleDays - 1).toDouble()
+		var diff = DateUtils.actualDays(DateUtils.getDaysUntilDate(date), config.numberOfVisibleDays).toDouble()
 
 		val totalDayWidth = config.totalDayWidth
 
 		if (config.startOnFirstDay)
-			actualDiff /= config.numberOfVisibleDays.toDouble()
+			diff /= config.numberOfVisibleDays.toDouble()
 
-		val leftOriginCount = floor(actualDiff).toInt()
+		val leftOriginCount = floor(diff).toInt()
 
 		var nearestOrigin = 0
 		nearestOrigin -= if (config.startOnFirstDay)

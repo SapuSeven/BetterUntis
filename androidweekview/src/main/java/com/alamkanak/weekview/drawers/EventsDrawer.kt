@@ -5,14 +5,13 @@ import android.graphics.RectF
 import com.alamkanak.weekview.*
 import com.alamkanak.weekview.config.WeekViewConfig
 import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
 
 class EventsDrawer<T>(private val config: WeekViewConfig) {
 	private val rectCalculator: EventChipRectCalculator = EventChipRectCalculator(config)
 
 	internal fun drawEvents(eventChips: List<EventChip<T>>, drawingContext: DrawingContext, canvas: Canvas) {
 		var startPixel = drawingContext.startPixel
-		val now = DateTime.now().withZone(DateTimeZone.getDefault()).toLocalDateTime().toDateTime(DateTimeZone.UTC).millis
+		val now = DateTime.now().millis
 
 		val freeDays = mutableListOf<Pair<DateTime, Float>>()
 		drawingContext.dayRange.forEach { day ->

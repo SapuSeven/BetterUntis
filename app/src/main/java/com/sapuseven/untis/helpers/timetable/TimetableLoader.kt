@@ -21,6 +21,7 @@ import com.sapuseven.untis.models.untis.timetable.Period
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.joda.time.DateTimeZone
 import org.joda.time.Instant
 import java.lang.ref.WeakReference
 
@@ -116,8 +117,8 @@ class TimetableLoader(
 	private fun periodToTimegridItem(period: Period, type: String): TimegridItem {
 		return TimegridItem(
 				period.id.toLong(),
-				DateTimeUtils.isoDateTimeNoSeconds().parseDateTime(period.startDateTime),
-				DateTimeUtils.isoDateTimeNoSeconds().parseDateTime(period.endDateTime),
+				DateTimeUtils.isoDateTimeNoSeconds().withZone(DateTimeZone.getDefault()).parseLocalDateTime(period.startDateTime).toDateTime(),
+				DateTimeUtils.isoDateTimeNoSeconds().withZone(DateTimeZone.getDefault()).parseLocalDateTime(period.endDateTime).toDateTime(),
 				type,
 				PeriodData(timetableDatabaseInterface, period)
 		)

@@ -7,7 +7,6 @@ import org.joda.time.DateTimeConstants
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.math.abs
 
 internal object DateUtils {
 	/**
@@ -70,29 +69,11 @@ internal object DateUtils {
 		return displayedDays + skippedDays
 	}
 
-	@Deprecated("Replace all calls to this with logic that uses the other functions of this class")
 	fun getDaysUntilDate(date: DateTime): Int {
 		val dateInMillis = date.millis
 		val todayInMillis = today().timeInMillis
 		val diff = dateInMillis - todayInMillis
 		return (diff / (1000L * 60L * 60L * 24L)).toInt()
-	}
-
-	@Deprecated("Replace all calls to this with logic that uses the other functions of this class")
-	fun getDisplayedDays(startDay: Calendar, size: Int, weekStart: Int, weekEnd: Int): Int {
-		var startDayIndex = startDay.get(Calendar.DAY_OF_WEEK)
-		if (startDayIndex > weekEnd) startDayIndex -= 7 // TODO: Is this line correct?
-		val offsetForWeekStart = if (startDayIndex > weekStart) startDayIndex - weekStart else 0
-
-		var days = 0
-
-		for (i in 0 until abs(size)) {
-			startDay.add(Calendar.DATE, if (size > 0) 1 else -1)
-			if (startDay.get(Calendar.DAY_OF_WEEK) in weekStart..weekEnd)
-				days += if (size > 0) 1 else -1
-		}
-
-		return days + offsetForWeekStart
 	}
 
 	fun isSameDay(dayOne: DateTime, dayTwo: DateTime) = dayOne.year == dayTwo.year && dayOne.dayOfYear == dayTwo.dayOfYear
