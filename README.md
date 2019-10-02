@@ -12,7 +12,7 @@ Kotlin has many features and libraries that immensly help to communicate with th
 Another major change is the use of a custom WeekView (based on [Till Hellmund](https://github.com/thellmund)'s fork of [Android-Week-View](https://github.com/alamkanak/Android-Week-View)) for the timetable display. This also improved performance by a lot.
 
 ## New features
-- Select your school by searching the name instead of providing a URL
+- Select your school by name or ID, no URL needed
 - Login by optionally using your password instead of app key
 - Zoomable timetable view
 - Improved overall design
@@ -22,12 +22,11 @@ Another major change is the use of a custom WeekView (based on [Till Hellmund](h
 - Lag-free timetable scrolling
 - Flexible timegrid allows to display hours outside the regular timetable (like consultation times with teachers)
 - Support for multiple accounts
+- Support for using a custom proxy server for increased privacy
 
 ## Missing features
-- No holiday or free day indicators
 - No translations, as of now the app is only available in English
 - No in-timetable room availability indicator
-- No 'last updated'-indicator
 - Almost no unit and integration tests
 
 ## Project Git Structure
