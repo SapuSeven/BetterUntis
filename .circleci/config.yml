@@ -17,12 +17,26 @@ jobs:
           paths:
             - ~/.gradle
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
-          #- run:
-          #name: Run Tests
-          #command: ./gradlew lint test
-      - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
-          path: app/build/reports
-          destination: reports
-          #- store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
-          #path: app/build/test-results
-      # See https://circleci.com/docs/2.0/deployment-integrations/ for deploy examples
+      # TODO: Run tests
+      - run:
+          name: Initial build
+          command: ./gradlew clean assembleDebug # Can be changed later to assembleRelease after signing has been configured properly
+      - store_artifacts:
+          path: app/build/outputs/apk
+          destination: apks
+
+  deploy:
+    working_directory: ~/code
+    steps:
+      - run:
+          name: Upload to server (WIP)
+          command: ls -lA
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
