@@ -10,7 +10,7 @@ import android.util.Log
 import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.helpers.config.PreferenceUtils
 import com.sapuseven.untis.notifications.NotificationSetup.Companion.EXTRA_LONG_PROFILE_ID
-import java.util.*
+import org.joda.time.DateTime
 
 class StartupReceiver : BroadcastReceiver() {
 	// TODO: This gets called twice on starting the app. While this doesn't impair functionality, it is still unwanted behaviour.
@@ -21,15 +21,12 @@ class StartupReceiver : BroadcastReceiver() {
 		if (!PreferenceUtils.getPrefBool(preferenceManager, "preference_notifications_enable"))
 			return
 
-		val calendar = Calendar.getInstance()
-		calendar.set(Calendar.HOUR_OF_DAY, 2)
-		calendar.set(Calendar.MINUTE, 0)
-		calendar.set(Calendar.SECOND, 0)
+		val dateTime = DateTime().withTime(2, 0, 0, 0)
 		val newIntent = Intent(context, NotificationSetup::class.java)
 		newIntent.putExtra(EXTRA_LONG_PROFILE_ID, preferenceManager.profileId)
 		val pendingIntent = PendingIntent.getBroadcast(context, 0, newIntent, 0)
 		val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-		am.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, AlarmManager.INTERVAL_DAY, pendingIntent)
+		am.setInexactRepeating(AlarmManager.RTC_WAKEUP, dateTime.millis, AlarmManager.INTERVAL_DAY, pendingIntent)
 
 		context.sendBroadcast(newIntent)
 	}

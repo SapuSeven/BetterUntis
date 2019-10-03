@@ -88,22 +88,6 @@ internal object DateUtils {
 
 	fun isSameDay(dayOne: DateTime, dayTwo: DateTime) = dayOne.year == dayTwo.year && dayOne.dayOfYear == dayTwo.dayOfYear
 
-	/**
-	 * Returns a calendar instance at the start of today with an optional offset
-	 *
-	 * @param offset the days to add to today
-	 * @return the calendar instance
-	 */
-	fun today(offset: Int = 0): Calendar {
-		val today = Calendar.getInstance()
-		today.set(Calendar.HOUR_OF_DAY, 0)
-		today.set(Calendar.MINUTE, 0)
-		today.set(Calendar.SECOND, 0)
-		today.set(Calendar.MILLISECOND, 0)
-		today.add(Calendar.DATE, offset)
-		return today
-	}
-
 	fun getTimeFormat(context: Context): SimpleDateFormat {
 		return if (DateFormat.is24HourFormat(context))
 			SimpleDateFormat("H:mm", Locale.getDefault())

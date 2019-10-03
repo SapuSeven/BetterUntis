@@ -7,9 +7,6 @@ import com.alamkanak.weekview.config.WeekViewConfig
 import com.alamkanak.weekview.config.WeekViewDrawConfig
 import org.joda.time.DateTime
 import java.lang.Math.max
-import java.util.*
-import java.util.Calendar.HOUR_OF_DAY
-import java.util.Calendar.MINUTE
 
 class NowLineDrawer(private val config: WeekViewConfig) : BaseDrawer {
 	private val drawConfig: WeekViewDrawConfig = config.drawConfig
@@ -40,10 +37,10 @@ class NowLineDrawer(private val config: WeekViewConfig) : BaseDrawer {
 
 	private fun drawLine(startX: Float, startPixel: Float, canvas: Canvas) {
 		val startY = drawConfig.headerHeight + drawConfig.currentOrigin.y
-		val now = Calendar.getInstance()
+		val now = DateTime.now()
 
 		// Draw line
-		val minutesUntilNow = now.get(HOUR_OF_DAY) * 60 + now.get(MINUTE) - config.startTime
+		val minutesUntilNow = now.hourOfDay * 60 + now.minuteOfHour - config.startTime
 		val lineStartY = startY + minutesUntilNow / 60.0f * config.hourHeight
 		canvas.drawLine(startX, lineStartY, startPixel + drawConfig.widthPerDay, lineStartY, drawConfig.nowLinePaint)
 	}

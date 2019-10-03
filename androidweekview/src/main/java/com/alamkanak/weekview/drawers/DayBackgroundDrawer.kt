@@ -7,9 +7,6 @@ import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.config.WeekViewConfig
 import org.joda.time.DateTime
 import java.lang.Math.max
-import java.util.*
-import java.util.Calendar.HOUR_OF_DAY
-import java.util.Calendar.MINUTE
 
 class DayBackgroundDrawer(private val config: WeekViewConfig) {
 	internal fun draw(drawingContext: DrawingContext, canvas: Canvas) {
@@ -47,8 +44,8 @@ class DayBackgroundDrawer(private val config: WeekViewConfig) {
 
 			when {
 				isToday -> {
-					val now = Calendar.getInstance()
-					val minutesUntilNow = now.get(HOUR_OF_DAY) * 60 + now.get(MINUTE) - config.startTime
+					val now = DateTime.now()
+					val minutesUntilNow = now.hourOfDay * 60 + now.minuteOfHour - config.startTime
 					canvas.drawRect(startX, startY, endX, startY + minutesUntilNow / 60.0f * config.hourHeight, pastPaint)
 					canvas.drawRect(startX, startY + minutesUntilNow, endX, height.toFloat(), futurePaint)
 				}
