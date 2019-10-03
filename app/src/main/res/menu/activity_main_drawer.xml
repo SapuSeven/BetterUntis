@@ -36,17 +36,4 @@
 			android:title="@string/menu_settings">
 		</item>
 	</group>
-
-	<group
-		android:checkableBehavior="none"
-		android:visible="false">
-		<item
-			android:icon="@drawable/all_share"
-			android:title="@string/menu_share">
-		</item>
-		<item
-			android:icon="@drawable/all_gift"
-			android:title="@string/menu_donations">
-		</item>
-	</group>
 </menu>

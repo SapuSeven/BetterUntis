@@ -31,7 +31,6 @@
 	<string name="menu_free_rooms">Free Rooms</string>
 	<string name="menu_settings">Settings</string>
 	<string name="menu_share">Share</string>
-	<string name="menu_donations">Donations</string>
 
 	<string name="mainactivitydrawer_dropdown_show">Show profile list</string>
 	<string name="mainactivitydrawer_profile_add">Add a profile…</string>
@@ -138,7 +137,7 @@
 	<string name="preference_dark_theme_auto">Enable on low battery</string>
 	<string name="preference_dark_theme_off">Always off</string>
 	<string name="preference_dark_theme_oled">Use total black background</string>
-	<string name="preference_dark_theme_oled_desc">Useful for OLED-screens.</string>
+	<string name="preference_dark_theme_oled_desc">Useful for OLED-screens</string>
 	<string name="preference_dark_theme_on">Always on</string>
 	<string name="preference_info_app_version">App version</string>
 	<string name="preference_info_changelog">Change Log</string>
