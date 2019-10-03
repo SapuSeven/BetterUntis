@@ -13,7 +13,7 @@
 		android:layout_marginEnd="24dp"
 		android:layout_marginStart="12dp"
 		android:layout_marginTop="12dp"
-		android:contentDescription="@string/infos"
+		android:contentDescription="@string/main_dialog_itemdetails_image_infos"
 		android:tint="?android:attr/textColorPrimary"
 		app:srcCompat="@drawable/all_info"/>
 

@@ -261,7 +261,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 						roomList.remove(item)
 						refreshRoomList()
 						Snackbar.make(content_roomfinder, if (code != null) ErrorMessageDictionary.getErrorMessage(resources, code) else message
-								?: getString(R.string.error), Snackbar.LENGTH_INDEFINITE)
+								?: getString(R.string.all_error), Snackbar.LENGTH_INDEFINITE)
 								.setAction("Show") { ErrorReportingDialog(this@RoomFinderActivity).showRequestErrorDialog(requestId, code, message) }
 								.show()
 					}
@@ -291,22 +291,22 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 						TimetableDatabaseInterface.Type.ROOM,
 						multiSelect = true,
 						hideTypeSelection = true,
-						positiveButtonText = getString(R.string.add))
+						positiveButtonText = getString(R.string.all_add))
 		).show(supportFragmentManager, EVENT_PICKER_TAG)
 	}
 
 	private fun showDeleteItemDialog(position: Int) {
 		AlertDialog.Builder(this)
-				.setTitle(getString(R.string.delete_item_title, roomList[position]))
-				.setMessage(R.string.delete_item_text)
-				.setPositiveButton(R.string.yes) { _, _ ->
+				.setTitle(getString(R.string.roomfinder_dialog_itemdelete_title, roomList[position]))
+				.setMessage(R.string.roomfinder_dialog_itemdelete_text)
+				.setPositiveButton(R.string.all_yes) { _, _ ->
 					if (roomFinderDatabase.deleteRoom(roomList[position].id)) {
 						roomList.removeAt(position)
 						roomListAdapter.notifyItemRemoved(position)
 						refreshRoomList()
 					}
 				}
-				.setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
+				.setNegativeButton(R.string.all_no) { dialog, _ -> dialog.dismiss() }
 				.create()
 				.show()
 	}

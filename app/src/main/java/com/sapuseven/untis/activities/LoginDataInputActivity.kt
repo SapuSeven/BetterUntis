@@ -340,8 +340,8 @@ class LoginDataInputActivity : BaseActivity() {
 		MaterialAlertDialogBuilder(this)
 				.setTitle(getString(R.string.main_dialog_delete_profile_title))
 				.setMessage(getString(R.string.main_dialog_delete_profile_message, user.userData.displayName, user.userData.schoolName))
-				.setNegativeButton(getString(R.string.cancel), null)
-				.setPositiveButton(getString(R.string.delete)) { _, _ ->
+				.setNegativeButton(getString(R.string.all_cancel), null)
+				.setPositiveButton(getString(R.string.all_delete)) { _, _ ->
 					userDatabase.deleteUser(user.id!!)
 					setResult(RESULT_OK)
 					finish()

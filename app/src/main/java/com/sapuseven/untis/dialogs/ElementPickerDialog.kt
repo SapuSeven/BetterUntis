@@ -149,10 +149,10 @@ class ElementPickerDialog : DialogFragment() {
 
 	private fun getHint(): String {
 		return getString(when (type) {
-			TimetableDatabaseInterface.Type.CLASS -> R.string.hint_search_classes
-			TimetableDatabaseInterface.Type.TEACHER -> R.string.hint_search_teachers
-			TimetableDatabaseInterface.Type.ROOM -> R.string.hint_search_rooms
-			else -> R.string.hint_search
+			TimetableDatabaseInterface.Type.CLASS -> R.string.elementpicker_hint_search_classes
+			TimetableDatabaseInterface.Type.TEACHER -> R.string.elementpicker_hint_search_teachers
+			TimetableDatabaseInterface.Type.ROOM -> R.string.elementpicker_hint_search_rooms
+			else -> R.string.elementpicker_hint_search
 		})
 	}
 

@@ -31,7 +31,6 @@ class TimetableItemDetailsDialog : DialogFragment() {
 
 	companion object {
 		val HOMEWORK_DUE_TIME_FORMAT: DateTimeFormatter = ISODateTimeFormat.date()
-		const val HOMEWORK_DUE_TIME_DISPLAY_FORMAT = "EEE, dd. MMM"
 
 		fun createInstance(item: TimegridItem, timetableDatabaseInterface: TimetableDatabaseInterface?): TimetableItemDetailsDialog {
 			val fragment = TimetableItemDetailsDialog()
@@ -55,20 +54,16 @@ class TimetableItemDetailsDialog : DialogFragment() {
 
 	override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 		return activity?.let { activity ->
-			val builder = AlertDialog.Builder(activity)
-
-			if (item == null || timetableDatabaseInterface == null) {
-				builder.setMessage(getString(R.string.error_item_not_found))
-						.setNeutralButton(getString(R.string.close)) { dialog, _ ->
-							dialog.dismiss()
-						}
-			} else {
+			return AlertDialog.Builder(activity).apply {
 				safeLet(item, timetableDatabaseInterface) { item, timetableDatabaseInterface ->
-					builder.setView(generateView(activity, item, timetableDatabaseInterface))
+					setView(generateView(activity, item, timetableDatabaseInterface))
+				} ?: run {
+					setMessage(getString(R.string.main_dialog_itemdetails_error_not_found))
+							.setNeutralButton(getString(R.string.all_close)) { dialog, _ ->
+								dialog.dismiss()
+							}
 				}
-			}
-
-			builder.create()
+			}.create()
 		} ?: throw IllegalStateException("Activity cannot be null")
 	}
 
@@ -98,7 +93,7 @@ class TimetableItemDetailsDialog : DialogFragment() {
 
 			val infoView = activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_homework, null)
 			(infoView.findViewById<TextView>(R.id.textview_roomfinder_name)).text = it.text
-			(infoView.findViewById<TextView>(R.id.tvDate)).text = getString(R.string.homeworks_until, endDate.toString(HOMEWORK_DUE_TIME_DISPLAY_FORMAT))
+			(infoView.findViewById<TextView>(R.id.tvDate)).text = getString(R.string.homeworks_due_time, endDate.toString(getString(R.string.homeworks_due_time_format)))
 			root.addView(infoView)
 		}
 
@@ -116,11 +111,11 @@ class TimetableItemDetailsDialog : DialogFragment() {
 		if (item.periodData.subjects.size > 0) {
 			var title = item.periodData.getLongTitle()
 			if (item.periodData.isCancelled())
-				title = getString(R.string.lesson_cancelled, title)
+				title = getString(R.string.all_lesson_cancelled, title)
 			if (item.periodData.isIrregular())
-				title = getString(R.string.lesson_irregular, title)
+				title = getString(R.string.all_lesson_irregular, title)
 			if (item.periodData.isExam())
-				title = getString(R.string.lesson_exam, title)
+				title = getString(R.string.all_lesson_exam, title)
 
 			(root.findViewById(R.id.title) as TextView).text = title
 		} else {

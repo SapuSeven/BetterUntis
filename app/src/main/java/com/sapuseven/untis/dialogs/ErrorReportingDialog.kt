@@ -9,7 +9,7 @@ class ErrorReportingDialog(val context: Context) {
 		val dialog = android.app.AlertDialog.Builder(context)
 				.setTitle("Error Information")
 				.setMessage("Request ID: $requestId\nError code: $code\nError message: $message")
-				.setPositiveButton(R.string.ok) { dialog, _ ->
+				.setPositiveButton(R.string.all_ok) { dialog, _ ->
 					dialog.dismiss()
 				}
 				.create()

@@ -234,7 +234,7 @@
 				android:entryValues="@array/preference_notifications_visibility_values"
 				android:key="preference_notifications_visibility_subjects"
 				android:summary="%s"
-				android:title="@string/subjects"/>
+				android:title="@string/all_subjects"/>
 
 			<ListPreference
 				android:defaultValue="@string/preference_notifications_visibility_rooms_default"

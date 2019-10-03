@@ -22,7 +22,7 @@ class DatePickerDialog : DialogFragment() {
 			val day = now.dayOfMonth
 			android.app.DatePickerDialog(context!!, dateSetListener, year, month, day)
 		}
-		dialog.setButton(android.app.DatePickerDialog.BUTTON_NEUTRAL, getString(R.string.today)) { _, _ ->
+		dialog.setButton(android.app.DatePickerDialog.BUTTON_NEUTRAL, getString(R.string.all_dialog_datepicker_button_today)) { _, _ ->
 			val dateTime = DateTime.now()
 			dateSetListener?.onDateSet(dialog.datePicker, dateTime.year, dateTime.monthOfYear, dateTime.dayOfMonth)
 		}

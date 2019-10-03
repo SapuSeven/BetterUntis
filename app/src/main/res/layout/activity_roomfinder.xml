@@ -19,7 +19,7 @@
 		android:layout_height="wrap_content"
 		android:layout_gravity="center"
 		android:gravity="center_horizontal"
-		android:text="@string/no_rooms_to_display"
+		android:text="@string/roomfinder_no_rooms"
 		android:visibility="gone" />
 
 	<androidx.constraintlayout.widget.ConstraintLayout
@@ -35,7 +35,7 @@
 			android:layout_height="40dp"
 			android:layout_marginStart="8dp"
 			android:background="?attr/selectableItemBackgroundBorderless"
-			android:contentDescription="@string/previous_hour"
+			android:contentDescription="@string/roomfinder_image_previous_hour"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent"
@@ -76,7 +76,7 @@
 			android:layout_height="40dp"
 			android:layout_marginEnd="8dp"
 			android:background="?attr/selectableItemBackgroundBorderless"
-			android:contentDescription="@string/next_hour"
+			android:contentDescription="@string/roomfinder_image_next_hour"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintTop_toTopOf="parent"

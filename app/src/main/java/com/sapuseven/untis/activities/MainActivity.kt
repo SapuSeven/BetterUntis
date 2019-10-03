@@ -218,7 +218,7 @@ class MainActivity :
 	}
 
 	private fun setupNavDrawerHeader(navigationView: NavigationView) {
-		val line1 = if (profileUser.anonymous) getString(R.string.anonymous_name) else profileUser.userData.displayName
+		val line1 = if (profileUser.anonymous) getString(R.string.all_anonymous) else profileUser.userData.displayName
 		val line2 = profileUser.userData.schoolName
 		(navigationView.getHeaderView(0).findViewById<View>(R.id.textview_mainactivtydrawer_line1) as TextView).text =
 				if (line1.isNullOrBlank()) getString(R.string.app_name) else line1
@@ -270,7 +270,7 @@ class MainActivity :
 	private fun setupViews() {
 		setupWeekView()
 
-		textview_main_lastrefresh?.text = getString(R.string.last_refreshed, getString(R.string.never))
+		textview_main_lastrefresh?.text = getString(R.string.main_last_refreshed, getString(R.string.main_last_refreshed_never))
 
 		findViewById<Button>(R.id.button_main_settings).setOnClickListener {
 			val intent = Intent(this@MainActivity, SettingsActivity::class.java)
@@ -399,9 +399,7 @@ class MainActivity :
 		val toolbar: Toolbar = findViewById(R.id.toolbar_main)
 		setSupportActionBar(toolbar)
 		val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-		val toggle = ActionBarDrawerToggle(
-				this, drawer, toolbar, R.string.navigation_drawer_open,
-				R.string.navigation_drawer_close)
+		val toggle = ActionBarDrawerToggle(this, drawer, toolbar, R.string.main_drawer_open, R.string.main_drawer_close)
 		drawer.addDrawerListener(toggle)
 		toggle.syncState()
 	}
@@ -571,7 +569,7 @@ class MainActivity :
 			} else {
 				if (System.currentTimeMillis() - 2000 > lastBackPress) {
 					Snackbar.make(findViewById<ConstraintLayout>(R.id.content_main),
-							R.string.snackbar_press_back_double, 2000).show()
+							R.string.main_press_back_double, 2000).show()
 					lastBackPress = System.currentTimeMillis()
 				} else {
 					super.onBackPressed()
@@ -589,7 +587,7 @@ class MainActivity :
 			weeklyTimetableItems.clear()
 			weekView.notifyDataSetChanged()
 
-			supportActionBar?.title = getString(R.string.anonymous_name)
+			supportActionBar?.title = getString(R.string.all_anonymous)
 			constraintlayout_main_anonymouslogininfo.visibility = View.VISIBLE
 		} else {
 			constraintlayout_main_anonymouslogininfo.visibility = View.GONE
@@ -647,14 +645,14 @@ class MainActivity :
 
 	private fun setLastRefresh(timestamp: Long) {
 		textview_main_lastrefresh?.text = if (timestamp > 0L)
-			getString(R.string.last_refreshed, formatTimeDiff(Instant.now().millis - timestamp))
+			getString(R.string.main_last_refreshed, formatTimeDiff(Instant.now().millis - timestamp))
 		else
-			getString(R.string.last_refreshed, getString(R.string.never))
+			getString(R.string.main_last_refreshed, getString(R.string.main_last_refreshed_never))
 	}
 
 	private fun formatTimeDiff(diff: Long): String {
 		return when {
-			diff < MINUTE_MILLIS -> getString(R.string.time_diff_just_now)
+			diff < MINUTE_MILLIS -> getString(R.string.main_time_diff_just_now)
 			diff < HOUR_MILLIS -> resources.getQuantityString(R.plurals.main_time_diff_minutes, ((diff / MINUTE_MILLIS).toInt()), diff / MINUTE_MILLIS)
 			diff < DAY_MILLIS -> resources.getQuantityString(R.plurals.main_time_diff_hours, ((diff / HOUR_MILLIS).toInt()), diff / HOUR_MILLIS)
 			else -> resources.getQuantityString(R.plurals.main_time_diff_days, ((diff / DAY_MILLIS).toInt()), diff / DAY_MILLIS)
@@ -678,7 +676,7 @@ class MainActivity :
 			else -> {
 				showLoading(false)
 				Snackbar.make(content_main, if (code != null) ErrorMessageDictionary.getErrorMessage(resources, code) else message
-						?: getString(R.string.error), Snackbar.LENGTH_INDEFINITE)
+						?: getString(R.string.all_error), Snackbar.LENGTH_INDEFINITE)
 						.setAction("Show") { ErrorReportingDialog(this).showRequestErrorDialog(requestId, code, message) }
 						.show()
 			}

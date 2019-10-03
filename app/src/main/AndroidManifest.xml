@@ -33,7 +33,7 @@
 
 		<activity
 			android:name=".activities.RoomFinderActivity"
-			android:label="@string/title_free_rooms"
+			android:label="@string/activity_title_free_rooms"
 			android:parentActivityName=".activities.MainActivity">
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
@@ -62,7 +62,7 @@
 
 		<activity
 			android:name=".activities.SettingsActivity"
-			android:label="@string/settings"
+			android:label="@string/activity_title_settings"
 			android:parentActivityName=".activities.MainActivity">
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"

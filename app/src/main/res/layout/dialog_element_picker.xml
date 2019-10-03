@@ -21,7 +21,7 @@
 			android:clickable="true"
 			android:drawableTop="@drawable/all_prefs_personal"
 			android:focusable="true"
-			android:text="@string/personal"
+			android:text="@string/all_personal"
 			android:tint="?android:attr/textColorPrimary"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintEnd_toStartOf="@+id/textview_elementpicker_classes"

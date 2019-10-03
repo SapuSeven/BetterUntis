@@ -5,6 +5,6 @@
 	<item
 		android:id="@+id/item_roomfinder_add"
 		android:icon="@drawable/all_add"
-		android:title="@string/add"
+		android:title="@string/all_add"
 		app:showAsAction="always" />
 </menu>

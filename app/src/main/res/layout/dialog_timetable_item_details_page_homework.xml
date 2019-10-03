@@ -12,7 +12,7 @@
 		android:layout_marginStart="12dp"
 		android:layout_marginTop="8dp"
 		android:layout_marginBottom="8dp"
-		android:contentDescription="@string/infos"
+		android:contentDescription="@string/main_dialog_itemdetails_image_homeworks"
 		android:tint="?android:attr/textColorPrimary"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintStart_toStartOf="parent"

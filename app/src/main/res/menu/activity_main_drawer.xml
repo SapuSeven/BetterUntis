@@ -41,12 +41,10 @@
 		android:checkableBehavior="none"
 		android:visible="false">
 		<item
-			android:id="@+id/nav_share"
 			android:icon="@drawable/all_share"
 			android:title="@string/menu_share">
 		</item>
 		<item
-			android:id="@+id/nav_donations"
 			android:icon="@drawable/all_gift"
 			android:title="@string/menu_donations">
 		</item>

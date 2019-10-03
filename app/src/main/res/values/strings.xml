@@ -3,21 +3,37 @@
 
 	<string name="all_success">success</string>
 	<string name="all_failed">failed</string>
+	<string name="all_personal">Personal</string>
+	<string name="all_subjects">Subjects</string>
 	<string name="all_teachers">Teachers</string>
 	<string name="all_classes">Classes</string>
 	<string name="all_rooms">Rooms</string>
+	<string name="all_anonymous">Anonymous</string>
 	<string name="all_personal_timetable">Personal Timetable</string>
 	<string name="all_contact_email">betteruntis@sapuseven.com</string>
+	<string name="all_ok">OK</string>
+	<string name="all_yes">Yes</string>
+	<string name="all_no">No</string>
+	<string name="all_close">Close</string>
+	<string name="all_cancel">Cancel</string>
+	<string name="all_error">Error</string>
+	<string name="all_add">Add</string>
+	<string name="all_delete">Delete</string>
+	<string name="all_lesson_cancelled">%1$s (cancelled)</string>
+	<string name="all_lesson_irregular">%1$s (irregular)</string>
+	<string name="all_lesson_exam">%1$s (exam!)</string>
+	<string name="all_dialog_datepicker_button_today">Today</string>
+
+	<string name="activity_title_free_rooms">Free Rooms</string>
+	<string name="activity_title_settings">Settings</string>
 
 	<string name="menu_nav_timetables">Timetables</string>
 	<string name="menu_free_rooms">Free Rooms</string>
 	<string name="menu_settings">Settings</string>
-	<string name="menu_refresh">Re-render timetable</string>
 	<string name="menu_share">Share</string>
 	<string name="menu_donations">Donations</string>
 
 	<string name="mainactivitydrawer_dropdown_show">Show profile list</string>
-	<string name="mainactivitydrawer_dropdown_hide">Hide profile list</string>
 	<string name="mainactivitydrawer_profile_add">Add a profile…</string>
 	<string name="mainactivitydrawer_profile_delete_hint">Long-press a profile to edit</string>
 
@@ -26,6 +42,18 @@
 	<string name="main_dialog_update_profile_title">Profile update required</string>
 	<string name="main_dialog_update_profile_message">A recent app update has changed the way user data is saved. Please update your current profile to continue using the app.</string>
 	<string name="main_dialog_update_profile_button">Update profile</string>
+	<string name="main_dialog_itemdetails_error_not_found">Item not found</string>
+	<string name="main_dialog_itemdetails_image_infos">Info</string>
+	<string name="main_dialog_itemdetails_image_homeworks">Homework</string>
+	<string name="main_last_refreshed">Last refreshed: %1$s</string>
+	<string name="main_last_refreshed_never">never</string>
+	<string name="main_anonymous_login_info_text">You have to setup a personal timetable if you are logged in as an anonymous user.</string>
+	<string name="main_go_to_settings">Go to settings</string>
+	<string name="main_drawer_open">Open navigation drawer</string>
+	<string name="main_drawer_close">Close navigation drawer</string>
+	<string name="main_drawer_image_logo">BetterUntis Logo</string>
+	<string name="main_press_back_double">Press BACK twice to exit</string>
+	<string name="main_time_diff_just_now">just now</string>
 
 	<string name="login_scan_code">Scan QR Code</string>
 	<string name="login_welcome">Welcome to BetterUntis!</string>
@@ -41,13 +69,17 @@
 	<string name="logindatainput_login">Login</string>
 	<string name="logindatainput_anonymous_login">Anonymous login</string>
 	<string name="logindatainput_error_field_empty">This field cannot be empty!</string>
-	<string name="logindatainput_error_invalid_url">Invalid URL!</string>
+	<string name="logindatainput_error_generic">Error: %1$s</string>
 	<string name="logindatainput_data_loaded">Data loaded.</string>
 	<string name="logindatainput_aquiring_app_secret">Acquiring app secret…</string>
 	<string name="logindatainput_aquiring_schoolid">Loading school…</string>
 	<string name="logindatainput_loading_user_data">Loading user data…</string>
 	<string name="logindatainput_adding_user_unknown_error">An unknown error happened while adding the user.</string>
-	<string name="logindatainput_error_generic">Error: %1$s</string>
+	<string name="logindatainput_title_add">Add Profile</string>
+	<string name="logindatainput_title_edit">Edit Profile</string>
+	<string name="logindatainput_delete">Delete Profile</string>
+	<string name="logindatainput_proxy_host">Proxy server (optional)</string>
+	<string name="logindatainput_show_advanced">Show advanced settings</string>
 
 	<string name="errormessagedictionary_generic">Unknown error</string>
 	<string name="errormessagedictionary_too_many_results">Too many results</string>
@@ -57,11 +89,27 @@
 	<string name="errormessagedictionary_invalid_credentials">Wrong username or key!</string>
 	<string name="errormessagedictionary_no_public_access">Anonymous access is disabled.</string>
 	<string name="errormessagedictionary_invalid_time_settings">Invalid date and/or time settings!</string>
+	<string name="errormessagedictionary_user_locked">User locked!</string>
+	<string name="errormessagedictionary_no_right">No right for timetable</string>
 
 	<string name="roomfinder_current_hour">%1$s, %2$d. Lesson</string>
 	<string name="roomfinder_current_hour_time">%1$s - %2$s</string>
+	<string name="roomfinder_delete_item">Delete item</string>
+	<string name="roomfinder_image_availability_indicator">Room availability indicator</string>
+	<string name="roomfinder_item_desc_occupied">This Room is occupied.</string>
+	<string name="roomfinder_no_rooms">No rooms to display.\nTap + to add one!</string>
+	<string name="roomfinder_room_expired">Room data expired</string>
+	<string name="roomfinder_dialog_itemdelete_title">Delete %1$s</string>
+	<string name="roomfinder_dialog_itemdelete_text">Are you sure you want to remove this room from the list?</string>
+	<string name="roomfinder_image_previous_hour">previous hour</string>
+	<string name="roomfinder_image_next_hour">next hour</string>
+	<string name="roomfinder_loading_data">Loading data…</string>
 
-	<string name="preferences_account">Account</string>
+	<string name="elementpicker_hint_search">Search…</string>
+	<string name="elementpicker_hint_search_classes">Search for classes…</string>
+	<string name="elementpicker_hint_search_teachers">Search for teachers…</string>
+	<string name="elementpicker_hint_search_rooms">Search for rooms…</string>
+
 	<string name="preferences_connectivity">Connectivity</string>
 	<string name="preferences_infos">About</string>
 	<string name="preferences_notifications">Notifications</string>
@@ -71,25 +119,13 @@
 	<string name="preference_category_notifications_visible_fields">Visible fields</string>
 	<string name="preference_category_styling_backgrounds">Item Colors</string>
 	<string name="preference_category_styling_colors">Colors</string>
-	<string name="preference_category_styling_others">Other item options</string>
 	<string name="preference_category_styling_themes">Themes</string>
 	<string name="preference_category_timetable_item_appearance">Item appearance</string>
 	<string name="preference_category_timetable_lesson_text">Lesson text</string>
-	<string name="preference_account_access_key">Access key</string>
-	<string name="preference_account_firebase_key">Firebase key</string>
-	<string name="preference_alternating_color">Custom background color</string>
-	<string name="preference_alternating_color_desc">Choose a custom background color for alternating days/hours</string>
-	<string name="preference_alternating_colors_use_custom">Custom background</string>
-	<string name="preference_alternating_colors_use_custom_desc">Use a custom background color for alternating days/hours</string>
-	<string name="preference_alternating_days">Alternating days</string>
-	<string name="preference_alternating_days_desc">Use an alternating background color for days</string>
-	<string name="preference_alternating_hours">Alternating hours</string>
-	<string name="preference_alternating_hours_desc">Use an alternating background color for hours</string>
 	<string name="preference_background_cancelled">Cancelled lessons</string>
 	<string name="preference_background_cancelled_past">Past cancelled lessons</string>
 	<string name="preference_background_exam">Lessons with tests</string>
 	<string name="preference_background_exam_past">Past lessons with tests</string>
-	<string name="preference_background_free">Free days</string>
 	<string name="preference_background_irregular">Irregular lessons</string>
 	<string name="preference_background_irregular_past">Past irregular lessons</string>
 	<string name="preference_background_regular">Regular lessons</string>
@@ -105,16 +141,9 @@
 	<string name="preference_dark_theme_oled_desc">Useful for OLED-screens.</string>
 	<string name="preference_dark_theme_on">Always on</string>
 	<string name="preference_info_app_version">App version</string>
-	<string name="preference_info_app_version_desc">%1$s (%2$d)</string>
-	<string name="preference_info_category_coming_soon">Coming soon</string>
 	<string name="preference_info_changelog">Change Log</string>
 	<string name="preference_info_contact">Contact</string>
-	<string name="preference_info_send_stats">Send anonymous usage stats</string>
-	<string name="preference_info_send_stats_desc">Crash reports will always be sent.</string>
-	<string name="preference_info_stats_details">About data collection</string>
-	<string name="preference_info_stats_details_desc">Tap to view what data this app is collecting and sending to a server.</string>
 	<string name="preference_marker">Time indicator</string>
-	<string name="preference_note_disable">(disable)</string>
 	<string name="preference_notifications_clear">Clear all notifications</string>
 	<string name="preference_notifications_enable">Enable Notification</string>
 	<string name="preference_notifications_enable_desc">Displays a notification with information about the next lesson while you have break.</string>
@@ -123,9 +152,6 @@
 	<string name="preference_notifications_visibility_hidden">Hidden</string>
 	<string name="preference_notifications_visibility_long">Long name</string>
 	<string name="preference_notifications_visibility_short">Short name</string>
-	<string name="preference_room_to_display_in_free_lessons">Room to display in free lessons</string>
-	<string name="preference_room_to_display_in_free_lessons_trim">Only display in free lessons</string>
-	<string name="preference_room_to_display_in_free_lessons_trim_desc">This will hide the indicator after the last lesson.</string>
 	<string name="preference_theme">Select a theme</string>
 	<string name="preference_theme_blue">Blue</string>
 	<string name="preference_theme_cyan">Cyan</string>
@@ -150,8 +176,10 @@
 	<string name="preference_use_theme_background">Use theme colors</string>
 	<string name="preference_use_theme_background_desc">This only applies to regular lessons.</string>
 
-	<string name="notifications_channel_lessoninfo">Lesson info</string>
-	<string name="notifications_channel_lessoninfo_desc">Shows information about the ongoing lesson</string>
+	<string name="settings_designing_message">Contribute by creating the missing settings icons!</string>
+	<string name="settings_designing_hide">Don\'t show again</string>
+	<string name="settings_designing_info">Learn more</string>
+
 	<string name="notifications_channel_breakinfo">Break info</string>
 	<string name="notifications_channel_breakinfo_desc">Shows information about the current break and the following lesson</string>
 	<string name="notifications_text_title">Break until %1$s</string>
@@ -161,7 +189,8 @@
 	<string name="notifications_text_message_classes">Class: %1$s</string>
 	<string name="notifications_text_message_separator"> / </string>
 
-	<string name="homeworks_until">until %1$s</string>
+	<string name="homeworks_due_time">until %1$s</string>
+	<string name="homeworks_due_time_format">EEE, dd. MMM</string>
 
 	<plurals name="main_time_diff_minutes">
 		<item quantity="one">a minute ago</item>
@@ -176,131 +205,8 @@
 		<item quantity="other">%d days ago</item>
 	</plurals>
 
-	<!-- TODO: Correct naming -->
-	<plurals name="room_desc">
+	<plurals name="roomfinder_item_desc">
 		<item quantity="one">This Room is free right now.</item>
 		<item quantity="other">This Room is free for %d hours.</item>
 	</plurals>
-	<plurals name="hour_index_last">
-		<item quantity="one">Last hour</item>
-		<item quantity="other">%d hours ago</item>
-	</plurals>
-	<plurals name="hour_index_next">
-		<item quantity="one">Next hour</item>
-		<item quantity="other">In %d hours</item>
-	</plurals>
-	<string name="jump_to_date">Jump to date</string>
-	<string name="last_refreshed">Last refreshed: %1$s</string>
-	<string name="anonymous_login_info_text">You have to setup a personal timetable if you are logged in as an anonymous user.</string>
-	<string name="go_to_settings">Go to settings</string>
-	<string name="navigation_drawer_open">Open navigation drawer</string>
-	<string name="navigation_drawer_close">Close navigation drawer</string>
-	<string name="today">Today</string>
-	<string name="timetable_no_time">00:00</string>
-	<string name="timetable_no_hour_index">0</string>
-	<string name="errormessagedictionary_user_locked">User locked!</string>
-	<string name="lesson_cancelled">%1$s (cancelled)</string>
-	<string name="lesson_irregular">%1$s (irregular)</string>
-	<string name="lesson_exam">%1$s (exam!)</string>
-	<string name="title_class">Class %1$s</string>
-	<string name="title_room">Room %1$s</string>
-	<string name="hint_search_classes">Search for classes…</string>
-	<string name="hint_search_teachers">Search for teachers…</string>
-	<string name="hint_search_rooms">Search for rooms…</string>
-	<string name="hint_search">Search…</string>
-	<string name="snackbar_press_back_double">Press BACK twice to exit</string>
-	<string name="settings">Settings</string>
-	<string name="title_activity_settings">Settings</string>
-	<string name="title_free_rooms">Free Rooms</string>
-	<string name="download_progress">%1$d.%2$s MB / %3$d.%4$s MB</string>
-	<string name="not_now">Not now</string>
-	<string name="autoupdate_failed">Download failed.</string>
-	<string name="autoupdate_failed_small">Please try again later.</string>
-	<string name="autoupdate_try_again">Try again</string>
-	<string name="autoupdate_manual_update">Manual update</string>
-	<string name="autoupdate_outdated">Your app-version is outdated!</string>
-	<string name="btn_update">Update</string>
-	<string name="autoupdate_downloading">Please wait while the latest version of the App is being downloaded…</string>
-	<string name="refresh">Re-render timetable</string>
-	<string name="login">Login</string>
-	<string name="title_new_features">New Features</string>
-	<string name="suggest_new_feature">Suggest new Feature</string>
-	<string name="title">Title</string>
-	<string name="description">Description</string>
-	<string name="send">Send</string>
-	<string name="new_features_header">Planned new features</string>
-	<string name="new_features_body">Use drag\'n\'drop to sort the proposals, putting them closer to the top the more you want this feature to be implemented!</string>
-	<string name="toast_colors_reset">Color settings have been reset.</string>
-	<string name="subjects">Subjects</string>
-	<string name="give_feedback">Give Feedback</string>
-	<string name="close">Close</string>
-	<string name="firebase_key">Firebase key</string>
-	<string name="key_copied">Key copied to clipboard</string>
-	<string name="toast_suggestion_submitted">Feature suggestion submitted.</string>
-	<string name="toast_error_occurred">An error occurred.</string>
-	<string name="unknown_error">An unknown error occurred.</string>
-	<string name="logout">Log out</string>
-	<string name="new_feature_planned">A new feature is planned.</string>
-	<string name="show">Show</string>
-	<string name="snackbar_error">Error: %1$s</string>
-	<string name="room_availability_indicator">Room availability indicator</string>
-	<string name="hint_add_room">Add a room…</string>
-	<string name="error">Error</string>
-	<string name="ok">OK</string>
-	<string name="room_desc_occupied">This Room is occupied.</string>
-	<string name="delete_item">delete item</string>
-	<string name="add">Add</string>
-	<string name="no_rooms_to_display">No rooms to display.\nTap + to add one!</string>
-	<string name="room_expired">Room data expired</string>
-	<string name="delete_item_title">Delete %1$s</string>
-	<string name="delete_item_text">Are you sure you want to remove this room from the list?</string>
-	<string name="yes">Yes</string>
-	<string name="no">No</string>
-	<string name="refresh_item_title">Refresh room data</string>
-	<string name="refresh_item_text">The timetable for this room is from another week.\nThis may result in inaccurate predictions.</string>
-	<string name="refresh_this_item">Refresh this room</string>
-	<string name="refresh_all_items">Refresh all rooms</string>
-	<string name="cancel">Cancel</string>
-	<string name="delete">Delete</string>
-	<string name="previous_hour">previous hour</string>
-	<string name="next_hour">next hour</string>
-	<string name="hour_index_current">This hour</string>
-	<string name="asset_statements" translatable="false">[{\n  \"relation\": [\"delegate_permission/common.handle_all_urls\"],\n  \"target\": {\n    \"namespace\": \"web\",\n    \"site\": \"http://sapuseven.com\",\n  }\n}]</string>
-	<string name="title_teacher">%1$s %2$s</string>
-	<string name="title_donations">Donations</string>
-	<string name="week_empty">No school this week :D</string>
-	<string name="never">never</string>
-	<string name="error_item_not_found">Item not found</string>
-	<string name="feature_disabled_title">Feature disabled</string>
-	<string name="feature_disabled">Sorry, this feature is currently disabled.\nPlease check back later.</string>
-	<string name="infos">Info</string>
-	<string name="time_diff_just_now">just now</string>
-	<string name="holiday_label_separator"> / </string>
-	<string name="alert">Alert</string>
-	<string name="title_share">Share</string>
-	<string name="link_sending_caption">Share the link to %1$s via…</string>
-	<string name="view_changelog">View Changelog</string>
-	<string name="current_version">Current version:</string>
-	<string name="new_version">New version:</string>
-	<string name="drag_to_sort">Drag to sort</string>
-	<string name="toast_ratings_saved">Ratings saved.</string>
-	<string name="donation">Donation</string>
-	<string name="save">Save</string>
-	<string name="key_copy_failed">Failed to copy key</string>
-	<string name="personal">Personal</string>
-	<string name="unrated_features">Unrated Features</string>
-	<string name="filter_items">Filter Items</string>
-	<string name="new_version_message">Thank you for installing the latest version of BetterUntis!</string>
-	<string name="settings_designing_message">Contribute by creating the missing settings icons!</string>
-	<string name="settings_designing_hide">Don\'t show again</string>
-	<string name="settings_designing_info">Learn more</string>
-	<string name="betteruntis_logo">BetterUntis Logo</string>
-	<string name="roomfinder_loading_data">Loading data…</string>
-	<string name="anonymous_name">Anonymous</string>
-	<string name="errormessagedictionary_no_right">No right for timetable</string>
-	<string name="logindatainput_title_add">Add Profile</string>
-	<string name="logindatainput_title_edit">Edit Profile</string>
-	<string name="logindatainput_delete">Delete Profile</string>
-	<string name="logindatainput_proxy_host">Proxy server (optional)</string>
-	<string name="logindatainput_show_advanced">Show advanced settings</string>
 </resources>

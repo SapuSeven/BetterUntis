@@ -39,8 +39,8 @@ class RoomFinderAdapter(
 		holder.tvName.text = room.name
 
 		when {
-			room.getState() == RoomFinderAdapterItem.STATE_OCCUPIED -> holder.tvDetails.text = context.resources.getString(R.string.room_desc_occupied)
-			room.getState() >= RoomFinderAdapterItem.STATE_FREE -> holder.tvDetails.text = context.resources.getQuantityString(R.plurals.room_desc, room.getState(), room.getState())
+			room.getState() == RoomFinderAdapterItem.STATE_OCCUPIED -> holder.tvDetails.text = context.resources.getString(R.string.roomfinder_item_desc_occupied)
+			room.getState() >= RoomFinderAdapterItem.STATE_FREE -> holder.tvDetails.text = context.resources.getQuantityString(R.plurals.roomfinder_item_desc, room.getState(), room.getState())
 			else -> holder.tvDetails.text = context.resources.getString(R.string.roomfinder_loading_data)
 		}
 

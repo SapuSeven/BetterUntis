@@ -42,29 +42,4 @@
 		<item>long</item>
 	</string-array>
 
-	<string-array name="logindatainput_webuntis_servers" translatable="false">
-		<item>antiope.webuntis.com</item>
-		<item>aoide.webuntis.com</item>
-		<item>arche.webuntis.com</item>
-		<item>asopo.webuntis.com</item>
-		<item>borys.webuntis.com</item>
-		<item>cissa.webuntis.com</item>
-		<item>erato.webuntis.com</item>
-		<item>euterpe.webuntis.com</item>
-		<item>hepta.webuntis.com</item>
-		<item>hypate.webuntis.com</item>
-		<item>kalliope.webuntis.com</item>
-		<item>klio.webuntis.com</item>
-		<item>melete.webuntis.com</item>
-		<item>melpomene.webuntis.com</item>
-		<item>mese.webuntis.com</item>
-		<item>neilo.webuntis.com</item>
-		<item>nete.webuntis.com</item>
-		<item>poly.webuntis.com</item>
-		<item>terpsichore.webuntis.com</item>
-		<item>thalia.webuntis.com</item>
-		<item>tipo.webuntis.com</item>
-		<item>tritone.webuntis.com</item>
-		<item>urania.webuntis.com</item>
-	</string-array>
 </resources>

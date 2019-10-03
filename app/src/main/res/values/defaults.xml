@@ -19,7 +19,6 @@
 	<integer name="preference_background_irregular_past_default">0xFF388E3C</integer>
 	<integer name="preference_background_cancelled_default">0xFF9E9E9E</integer>
 	<integer name="preference_background_cancelled_past_default">0xFF616161</integer>
-	<integer name="preference_background_free_default">0xFFFFCDD2</integer>
 	<integer name="preference_background_future_default">0x00000000</integer>
 	<integer name="preference_background_past_default">0x20FFFFFF</integer>
 	<integer name="preference_marker_default">0xFFFFFFFF</integer>
