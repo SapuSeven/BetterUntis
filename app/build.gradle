@@ -19,18 +19,23 @@ android {
 	}
 
 	signingConfigs {
+		ext.signingProperties = new Properties()
+		file("signing.properties").withInputStream {
+			stream -> signingProperties.load(stream)
+		}
+
 		release {
 			storeFile file("BetterUntis.jks")
-			storePassword System.getenv("KEYSTORE_PASSWORD")
+			storePassword signingProperties["keystorePassword"] != null ? signingProperties["keystorePassword"] : System.getenv("KEYSTORE_PASSWORD")
 			keyAlias "release"
-			keyPassword System.getenv("KEY_RELEASE_PASSWORD")
+			keyPassword signingProperties["keyReleasePassword"] != null ? signingProperties["keyReleasePassword"] : System.getenv("KEY_RELEASE_PASSWORD")
 		}
 
 		debug {
 			storeFile file("BetterUntis.jks")
-			storePassword System.getenv("KEYSTORE_PASSWORD")
+			storePassword signingProperties["keystorePassword"] != null ? signingProperties["keystorePassword"] : System.getenv("KEYSTORE_PASSWORD")
 			keyAlias "debug"
-			keyPassword System.getenv("KEY_DEBUG_PASSWORD")
+			keyPassword signingProperties["keyDebugPassword"] != null ? signingProperties["keyDebugPassword"] : System.getenv("KEY_DEBUG_PASSWORD")
 		}
 	}
 
@@ -47,7 +52,9 @@ android {
 			shrinkResources false
 			applicationIdSuffix '.debug'
 			versionNameSuffix '-DEBUG'
-			signingConfig signingConfigs.debug
+
+			if (file("BetterUntis.jks").exists())
+				signingConfig signingConfigs.debug
 		}
 	}
 
