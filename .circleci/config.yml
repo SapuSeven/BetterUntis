@@ -17,10 +17,17 @@ jobs:
           paths:
             - ~/.gradle
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
-      # TODO: Run tests
       - run:
           name: Initial build
           command: ./gradlew clean assembleDebug # Can be changed later to assembleRelease after signing has been configured properly
       - store_artifacts:
           path: app/build/outputs/apk
           destination: apks
+      - run:
+          name: Run Tests
+          command: ./gradlew lint test
+      - store_artifacts:
+          path: app/build/reports
+          destination: reports
+      - store_test_results:
+          path: app/build/test-results
