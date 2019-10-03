@@ -34,8 +34,11 @@ jobs:
           destination: reports
       - store_test_results:
           path: app/build/test-results
-      - run: mkdir -p workspace
-      - run: cp app/build/outputs/apk workspace/apks
+      - run:
+          name: Preparing workspace
+          command: |
+            mkdir -p workspace
+            cp -r app/build/outputs/apk workspace/apks
       - persist_to_workspace:
           root: workspace
           paths:
