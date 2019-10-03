@@ -21,9 +21,9 @@ jobs:
           name: Prepare signing config
           command: |
             echo $KEYSTORE_ENCODED | base64 --decode >> app/BetterUntis.jks
-            KEYSTORE_PASSWORD = KEYSTORE_PASSWORD_ENCODED | base64 --decode
-            KEY_DEBUG_PASSWORD = KEY_DEBUG_PASSWORD_ENCODED | base64 --decode
-            KEY_RELEASE_PASSWORD = KEY_RELEASE_PASSWORD_ENCODED | base64 --decode
+            echo 'export KEYSTORE_PASSWORD=$("KEYSTORE_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
+            echo 'export KEY_DEBUG_PASSWORD=$("KEY_DEBUG_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
+            echo 'export KEY_RELEASE_PASSWORD=$("KEY_RELEASE_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
       - run:
           name: Initial build
           command: ./gradlew clean assembleDebug # Can be changed later to assembleRelease after signing has been configured properly
