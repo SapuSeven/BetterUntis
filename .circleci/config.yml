@@ -1,7 +1,7 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/code
+    working_directory: ~/betteruntis
     docker:
       - image: circleci/android:api-28-alpha
     environment:
@@ -34,3 +34,23 @@ jobs:
           destination: reports
       - store_test_results:
           path: app/build/test-results
+  deploy:
+    machine:
+      enabled: true
+    working_directory: ~/betteruntis
+    steps:
+      - run:
+          name: Deploy Over SSH
+          command: |
+            pwd
+            ls -lA
+            #scp -r ~/flapweb-auth-service "$SSH_USER@$SSH_HOST:$SSH_DEPLOY_PATH"
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
