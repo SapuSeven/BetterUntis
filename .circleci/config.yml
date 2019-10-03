@@ -31,8 +31,10 @@ jobs:
           destination: reports
       - store_test_results:
           path: app/build/test-results
+      - run: mkdir -p workspace
+      - run: cp app/build/outputs/apk workspace/apks
       - persist_to_workspace:
-          root: .
+          root: workspace
           paths:
             - apks
   deploy:
@@ -41,7 +43,7 @@ jobs:
     working_directory: ~/betteruntis
     steps:
       - attach_workspace:
-          at: .
+          at: workspace
       - run:
           name: Deploy Over SSH
           command: |
