@@ -18,11 +18,28 @@ android {
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 	}
 
+	signingConfigs {
+		release {
+			storeFile file("BetterUntis.jks")
+			storePassword System.getenv("KEYSTORE_PASSWORD")
+			keyAlias "release"
+			keyPassword System.getenv("KEY_RELEASE_PASSWORD")
+		}
+
+		debug {
+			storeFile file("BetterUntis.jks")
+			storePassword System.getenv("KEYSTORE_PASSWORD")
+			keyAlias "debug"
+			keyPassword System.getenv("KEY_DEBUG_PASSWORD")
+		}
+	}
+
 	buildTypes {
 		release {
 			minifyEnabled true
 			shrinkResources true
-			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+			signingConfig signingConfigs.release
 		}
 
 		debug {
@@ -30,6 +47,7 @@ android {
 			shrinkResources false
 			applicationIdSuffix '.debug'
 			versionNameSuffix '-DEBUG'
+			signingConfig signingConfigs.debug
 		}
 	}
 

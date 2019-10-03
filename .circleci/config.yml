@@ -18,6 +18,9 @@ jobs:
             - ~/.gradle
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
       - run:
+          name: Export keystore
+          command: echo $KEYSTORE | base64 --decode >> BetterUntis.jks
+      - run:
           name: Initial build
           command: ./gradlew clean assembleDebug # Can be changed later to assembleRelease after signing has been configured properly
       - store_artifacts:
