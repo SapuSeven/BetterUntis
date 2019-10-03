@@ -53,8 +53,7 @@ jobs:
       - run:
           name: Deploy Over SSH
           command: |
-            pwd
-            ls -lA
+            ls -lAR workspace
             #scp -r ~/flapweb-auth-service "$SSH_USER@$SSH_HOST:$SSH_DEPLOY_PATH"
 
 workflows:
