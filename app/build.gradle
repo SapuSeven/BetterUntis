@@ -19,9 +19,13 @@ android {
 	}
 
 	signingConfigs {
+		def propertiesFile = file("signing.properties")
+
 		ext.signingProperties = new Properties()
-		file("signing.properties").withInputStream {
-			stream -> signingProperties.load(stream)
+		if (propertiesFile.exists()) {
+			propertiesFile.withInputStream {
+				stream -> signingProperties.load(stream)
+			}
 		}
 
 		release {
