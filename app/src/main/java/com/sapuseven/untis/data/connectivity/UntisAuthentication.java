@@ -7,6 +7,7 @@ import org.joda.time.DateTime;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Locale;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -39,7 +40,7 @@ public class UntisAuthentication {
 
 	private static long createTimeBasedCode(long timestamp, String secret) throws NoSuchAlgorithmException, InvalidKeyException {
 		if ((secret != null) && (!secret.isEmpty()))
-			return verifyCode(new Base32().decode(secret.toUpperCase().getBytes()), timestamp / 30000L); // Code will change all 30000 milliseconds
+			return verifyCode(new Base32().decode(secret.toUpperCase(Locale.ROOT).getBytes()), timestamp / 30000L); // Code will change all 30000 milliseconds
 
 		return 0L;
 	}
