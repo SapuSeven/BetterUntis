@@ -34,11 +34,17 @@ jobs:
           destination: reports
       - store_test_results:
           path: app/build/test-results
+      - persist_to_workspace:
+          root: .
+          paths:
+            - apks
   deploy:
     machine:
       enabled: true
     working_directory: ~/betteruntis
     steps:
+      - attach_workspace:
+          at: .
       - run:
           name: Deploy Over SSH
           command: |
