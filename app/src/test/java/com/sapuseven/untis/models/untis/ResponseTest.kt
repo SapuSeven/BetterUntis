@@ -134,7 +134,7 @@ class ResponseTest {
 		assertThat(userDataResponse1.error!!.message, `is`("error message"))
 		assertThat(userDataResponse1.error!!.data, nullValue())
 
-		val userDataResponse2 = getJSON().parse(UserDataResponse.serializer(), """{"id":"id","jsonrpc":"2.0","result":{"masterData":{"timeStamp":0},"userData":{"elemType":null,"elemId":0,"displayName":"","schoolName":"","departmentId":0},"settings":{"showAbsenceReason":true,"showAbsenceText":true,"absenceCheckRequired":false,"defaultAbsenceReasonId":0,"defaultLatenessReasonId":0,"defaultAbsenceEndTime":null,"customAbsenceEndTime":null}}}""")
+		val userDataResponse2 = getJSON().parse(UserDataResponse.serializer(), """{"id":"id","jsonrpc":"2.0","result":{"masterData":{"timeStamp":0,"absenceReasons":[],"departments":[],"duties":[],"eventReasons":[],"eventReasonGroups":[],"excuseStatuses":[],"holidays":[],"klassen":[],"rooms":[],"subjects":[],"teachers":[],"teachingMethods":[],"schoolyears":[],"timeGrid":{"days":[]}},"userData":{"elemType":null,"elemId":0,"displayName":"","schoolName":"","departmentId":0,"children":[],"klassenIds":[],"rights":[]},"settings":{"showAbsenceReason":true,"showAbsenceText":true,"absenceCheckRequired":false,"defaultAbsenceReasonId":0,"defaultLatenessReasonId":0,"defaultAbsenceEndTime":"","customAbsenceEndTime":null}}}""")
 		assertThat(userDataResponse2.id, `is`("id"))
 		assertThat(userDataResponse2.jsonrpc, `is`("2.0"))
 		assertThat(userDataResponse2.result, notNullValue())
