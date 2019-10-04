@@ -28,8 +28,8 @@ jobs:
           name: Initial build
           command: ./gradlew clean assemble
       - store_artifacts:
-          path: app/build/outputs/apk
-          destination: apks
+          path: app/build/outputs
+          destination: outputs
       - run:
           name: Run Tests
           command: ./gradlew lint test
@@ -42,11 +42,11 @@ jobs:
           name: Preparing workspace
           command: |
             mkdir -p workspace
-            cp -r app/build/outputs/apk workspace/apks
+            cp -r app/build/outputs workspace/outputs
       - persist_to_workspace:
           root: workspace
           paths:
-            - apks
+            - outputs
   deploy:
     machine:
       enabled: true
