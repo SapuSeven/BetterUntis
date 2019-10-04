@@ -28,15 +28,18 @@ jobs:
           name: Initial build
           command: ./gradlew clean assemble
       - store_artifacts:
+          name: Upload build artifacts
           path: app/build/outputs
           destination: outputs
       - run:
           name: Run Tests
           command: ./gradlew lint test
       - store_artifacts:
+          name: Upload test artifacts
           path: app/build/reports
           destination: reports
       - store_test_results:
+          name: Upload test results
           path: app/build/test-results
       - run:
           name: Preparing workspace
@@ -58,6 +61,7 @@ jobs:
           name: Deploy Over SSH
           command: |
             echo $SSH_DEPLOY_KEY_ENCODED | base64 --decode >> id_rsa
+            chmod 600 id_rsa
             scp -r -P $SSH_DEPLOY_PORT -i id_rsa ~/workspace/output "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/$CIRCLE_BUILD_NUM"
 
 workflows:
