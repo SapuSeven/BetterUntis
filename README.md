@@ -25,8 +25,9 @@ Another major change is the use of a custom WeekView (based on [Till Hellmund](h
 - Support for using a custom proxy server for increased privacy
 
 ## Missing features
-- No translations, as of now the app is only available in English
 - No in-timetable room availability indicator
+- No support for viewing own absences
+- No support for teacher-specific features (like editing homeworks or class management)
 - Almost no unit and integration tests
 
 ## Project Git Structure
