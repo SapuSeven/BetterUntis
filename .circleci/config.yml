@@ -57,8 +57,8 @@ jobs:
       - run:
           name: Deploy Over SSH
           command: |
-            ls -lAR workspace
-            #scp -r ~/flapweb-auth-service "$SSH_USER@$SSH_HOST:$SSH_DEPLOY_PATH"
+            echo $SSH_DEPLOY_KEY_ENCODED | base64 --decode >> id_rsa
+            scp -r -P $SSH_DEPLOY_PORT -i id_rsa ~/workspace/output "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/$CIRCLE_BUILD_NUM"
 
 workflows:
   version: 2
