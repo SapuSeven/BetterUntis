@@ -26,7 +26,7 @@ jobs:
             echo 'export KEY_RELEASE_PASSWORD=$(echo "$KEY_RELEASE_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
       - run:
           name: Initial build
-          command: ./gradlew clean assembleDebug # Can be changed later to assembleRelease after signing has been configured properly
+          command: ./gradlew clean assemble
       - store_artifacts:
           path: app/build/outputs/apk
           destination: apks
