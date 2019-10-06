@@ -1,16 +1,24 @@
 package com.sapuseven.untis.activities
 
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
+import android.widget.Toast
 import androidx.annotation.AttrRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.helpers.config.PreferenceUtils
+import java.io.File
+import java.io.PrintStream
 
 @SuppressLint("Registered") // This activity is not intended to be used directly
 open class BaseActivity : AppCompatActivity() {
@@ -22,11 +30,49 @@ open class BaseActivity : AppCompatActivity() {
 	private var themeId = -1
 
 	override fun onCreate(savedInstanceState: Bundle?) {
+		Thread.setDefaultUncaughtExceptionHandler(CrashHandler(this, Thread.getDefaultUncaughtExceptionHandler()))
+
 		preferences = PreferenceManager(this)
 		currentTheme = PreferenceUtils.getPrefString(preferences, "preference_theme")
 		currentDarkTheme = PreferenceUtils.getPrefString(preferences, "preference_dark_theme")
 		setAppTheme(hasOwnToolbar)
 		super.onCreate(savedInstanceState)
+		checkForCrashes()
+	}
+
+	private fun checkForCrashes() {
+		val crashes = File(filesDir, "crash").listFiles()
+
+		crashes.forEach { crashFile ->
+			val reader = crashFile.bufferedReader()
+
+			val stackTrace = StringBuilder()
+			val buffer = CharArray(1024)
+			var length = reader.read(buffer)
+
+			while (length != -1) {
+				stackTrace.append(String(buffer, 0, length))
+				length = reader.read(buffer)
+			}
+
+			// TODO: Localize
+			// TODO: Add button to create a GitHub issue
+			MaterialAlertDialogBuilder(this)
+					.setTitle("Crash log found")
+					.setMessage(stackTrace)
+					.setNegativeButton(getString(R.string.all_copy)) { _, _ ->
+						val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+						clipboard.primaryClip = ClipData.newPlainText("BetterUntis Crash Log", stackTrace)
+						Toast.makeText(this, "Crash log copied to clipboard.", Toast.LENGTH_SHORT).show()
+					}
+					.setPositiveButton(R.string.all_close) { dialog, _ ->
+						dialog.dismiss()
+					}
+					.setOnDismissListener {
+						crashFile.delete()
+					}
+					.show()
+		}
 	}
 
 	override fun onStart() {
@@ -83,5 +129,23 @@ open class BaseActivity : AppCompatActivity() {
 		val typedValue = TypedValue()
 		theme.resolveAttribute(attr, typedValue, true)
 		return typedValue.data
+	}
+
+	class CrashHandler(val context: Context, private val defaultUncaughtExceptionHandler: Thread.UncaughtExceptionHandler) : Thread.UncaughtExceptionHandler {
+		override fun uncaughtException(t: Thread, e: Throwable) {
+			Log.e("BetterUntis", "Application crashed!", e)
+			saveCrash(e)
+			defaultUncaughtExceptionHandler.uncaughtException(t, e)
+		}
+
+		private fun saveCrash(e: Throwable) {
+			val parent = File(context.filesDir, "crash")
+			parent.mkdir()
+
+			PrintStream(File(parent, "${System.currentTimeMillis()}.log")).use {
+				e.printStackTrace(it)
+				it.close()
+			}
+		}
 	}
 }
