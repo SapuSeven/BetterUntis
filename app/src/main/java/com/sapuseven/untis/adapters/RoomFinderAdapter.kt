@@ -48,21 +48,16 @@ class RoomFinderAdapter(
 			holder.ivState.setImageResource(R.drawable.roomfinder_available)
 			holder.ivState.visibility = View.VISIBLE
 			holder.pbLoading.visibility = View.GONE
-			holder.btnRoomExpired.visibility = if (room.isOutdated) View.VISIBLE else View.GONE
 		} else if (room.getState() == RoomFinderAdapterItem.STATE_OCCUPIED && !room.loading) {
 			holder.ivState.setImageResource(R.drawable.roomfinder_occupied)
 			holder.ivState.visibility = View.VISIBLE
 			holder.pbLoading.visibility = View.GONE
-			holder.btnRoomExpired.visibility = if (room.isOutdated) View.VISIBLE else View.GONE
 		} else {
 			holder.ivState.visibility = View.GONE
 			holder.pbLoading.visibility = View.VISIBLE
-			holder.btnRoomExpired.visibility = View.GONE
 		}
 
 		holder.btnDelete.setOnClickListener { onClickListener.onDeleteClick(holder.adapterPosition) }
-
-		holder.btnRoomExpired.setOnClickListener { onClickListener.onExpiredClick(holder.adapterPosition) }
 	}
 
 	override fun getItemCount(): Int {
@@ -79,11 +74,9 @@ class RoomFinderAdapter(
 		val ivState: AppCompatImageView = rootView.findViewById(R.id.imageview_roomfinder_state)
 		val pbLoading: ProgressBar = rootView.findViewById(R.id.progressbar_roomfinder_loading)
 		val btnDelete: ImageButton = rootView.findViewById(R.id.button_roomfinder_delete)
-		val btnRoomExpired: ImageButton = rootView.findViewById(R.id.button_roomfinder_expired)
 	}
 
 	interface RoomFinderClickListener : View.OnClickListener {
 		fun onDeleteClick(position: Int)
-		fun onExpiredClick(position: Int)
 	}
 }

@@ -27,18 +27,6 @@
 		android:layout_marginStart="16dp"
 		android:visibility="gone"/>
 
-	<ImageButton
-		android:id="@+id/button_roomfinder_expired"
-		android:layout_width="32dp"
-		android:layout_height="32dp"
-		android:layout_marginStart="26dp"
-		android:layout_marginTop="26dp"
-		android:background="?attr/selectableItemBackgroundBorderless"
-		android:contentDescription="@string/roomfinder_room_expired"
-		android:padding="4dp"
-		android:visibility="gone"
-		app:srcCompat="@drawable/roomfinder_error"/>
-
 	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"

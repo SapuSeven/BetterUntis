@@ -4,9 +4,6 @@ class RoomFinderAdapterItem(val name: String, val id: Int, var loading: Boolean,
 	//private var startDate: LocalDate = LocalDate.now()
 	var hourIndex: Int = 0
 
-	val isOutdated: Boolean
-		get() = false // Days.daysBetween(startDate, LocalDate.now().withDayOfWeek(DateTimeConstants.MONDAY)).days != 0 // TODO: Rework this function
-
 	fun getState(): Int {
 		if (loading)
 			return STATE_LOADING

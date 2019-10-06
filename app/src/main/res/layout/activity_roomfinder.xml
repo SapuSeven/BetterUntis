@@ -7,11 +7,17 @@
 	android:layout_height="match_parent"
 	android:animateLayoutChanges="true">
 
-	<androidx.recyclerview.widget.RecyclerView
-		android:id="@+id/recyclerview_roomfinder_roomlist"
+	<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+		android:id="@+id/swiperefreshlayout_roomfinder_roomlist"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:layout_marginBottom="56dp" />
+		android:layout_marginBottom="56dp">
+
+		<androidx.recyclerview.widget.RecyclerView
+			android:id="@+id/recyclerview_roomfinder_roomlist"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent" />
+	</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 	<TextView
 		android:id="@+id/textview_roomfinder_roomlistempty"
@@ -39,7 +45,7 @@
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent"
-			app:srcCompat="@drawable/roomfinder_previous"/>
+			app:srcCompat="@drawable/roomfinder_previous" />
 
 		<TextView
 			android:id="@+id/textview_roomfinder_currenthourtime"
@@ -52,7 +58,7 @@
 			android:textSize="14sp"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintEnd_toStartOf="@+id/button_roomfinder_next"
-			app:layout_constraintStart_toEndOf="@+id/button_roomfinder_previous"/>
+			app:layout_constraintStart_toEndOf="@+id/button_roomfinder_previous" />
 
 		<TextView
 			android:id="@+id/textview_roomfinder_currenthour"
@@ -68,7 +74,7 @@
 			android:textSize="16sp"
 			app:layout_constraintEnd_toStartOf="@+id/button_roomfinder_next"
 			app:layout_constraintStart_toEndOf="@+id/button_roomfinder_previous"
-			app:layout_constraintTop_toTopOf="parent"/>
+			app:layout_constraintTop_toTopOf="parent" />
 
 		<ImageButton
 			android:id="@+id/button_roomfinder_next"
@@ -80,7 +86,7 @@
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintTop_toTopOf="parent"
-			app:srcCompat="@drawable/roomfinder_next"/>
+			app:srcCompat="@drawable/roomfinder_next" />
 	</androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -70,6 +70,17 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		setupHourSelector()
 		setupRoomList()
 		refreshRoomList()
+
+		swiperefreshlayout_roomfinder_roomlist.setOnRefreshListener {
+			updateRooms()
+		}
+	}
+
+	private fun updateRooms() {
+		val roomsToLoad = roomList.map { PeriodElement(TimetableDatabaseInterface.Type.ROOM.toString(), it.id, it.id) }
+		roomList.clear()
+		roomListAdapter.notifyDataSetChanged()
+		addRooms(roomsToLoad)
 	}
 
 	override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -197,10 +208,6 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		showDeleteItemDialog(position)
 	}
 
-	override fun onExpiredClick(position: Int) {
-		// TODO: Refresh item
-	}
-
 	private fun addRooms(rooms: List<PeriodElement>) {
 		rooms.forEach { room ->
 			val roomName = timetableDatabaseInterface.getShortName(room.id, TimetableDatabaseInterface.Type.ROOM)
@@ -278,6 +285,8 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 			textview_roomfinder_roomlistempty.visibility = View.GONE
 		else // default to visible if empty
 			textview_roomfinder_roomlistempty.visibility = View.VISIBLE
+
+		if (roomList.find { it.loading } == null) swiperefreshlayout_roomfinder_roomlist.isRefreshing = false
 
 		roomListAdapter.currentHourIndex = hourIndex
 		roomList.sort()
