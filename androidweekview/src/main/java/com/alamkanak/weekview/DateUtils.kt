@@ -86,8 +86,22 @@ internal object DateUtils {
 		return actualDays - skippedDays
 	}
 
+	/**
+	 * Checks if two [DateTime] objects are on the same day.
+	 *
+	 * @param dayOne The first day.
+	 * @param dayTwo The second day.
+	 * @return `true` if the two [DateTime] objects are in the same year and on the same day of year, `false` otherwise.
+	 */
 	fun isSameDay(dayOne: DateTime, dayTwo: DateTime) = dayOne.year == dayTwo.year && dayOne.dayOfYear == dayTwo.dayOfYear
 
+	/**
+	 * Returns a simple time format according to the current system settings
+	 * (checks if 24-hour time format is enabled).
+	 *
+	 * @param context Application context.
+	 * @return A [SimpleDateFormat] with the correct time format.
+	 */
 	fun getTimeFormat(context: Context): SimpleDateFormat {
 		return if (DateFormat.is24HourFormat(context))
 			SimpleDateFormat("H:mm", Locale.getDefault())
