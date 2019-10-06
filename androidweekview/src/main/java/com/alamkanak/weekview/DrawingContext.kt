@@ -20,9 +20,9 @@ class DrawingContext(val startPixel: Float) {
 			if (config.isSingleDay) {
 				viewState.firstVisibleDay?.let { dayRange.add(it) }
 			} else {
-				val offset = DateUtils.offsetInWeek(today, config.firstDayOfWeek, config.numberOfVisibleDays)
+				val offset = DateUtils.offsetInWeek(today, config.firstDayOfWeek)
 
-				dayRange.addAll(DateUtils.getDateRange(today.plusDays(DateUtils.actualDays(daysScrolled, config.numberOfVisibleDays) - offset), config.numberOfVisibleDays, config.firstDayOfWeek, config.numberOfVisibleDays))
+				dayRange.addAll(DateUtils.getDateRange(today.plusDays(DateUtils.actualDays(daysScrolled, config.numberOfVisibleDays) - offset), config.numberOfVisibleDays + 1, config.firstDayOfWeek, config.numberOfVisibleDays))
 			}
 
 			return DrawingContext(startPixel).apply { this.dayRange = dayRange }

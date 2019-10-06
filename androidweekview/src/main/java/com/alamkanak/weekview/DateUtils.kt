@@ -25,7 +25,7 @@ internal object DateUtils {
 		var day: DateTime
 		var dayNumber = 0
 
-		while (days.size <= size) {
+		while (days.size < size) {
 			day = startDay.plusDays(dayNumber)
 
 			if (day.dayOfWeek in weekStart until weekStart + weekLength)
@@ -39,17 +39,13 @@ internal object DateUtils {
 	/**
 	 * Calculates the offset of a day relative to the specified week start.
 	 *
-	 * If the day is not within the specified week start and end dates, an offset of `0` is returned instead.
-	 *
 	 * @param day The day to calculate the offset for
 	 * @param weekStart The day index of the first day of the visible week. Example: [DateTimeConstants.MONDAY]
-	 * @param weekLength The length of the displayed week. Example: `5` for a week from [DateTimeConstants.MONDAY] until [DateTimeConstants.FRIDAY]
 	 *
-	 * @return The offset of [day] relative to the specified [weekStart]. Never negative.
+	 * @return The offset of [day] relative to the specified [weekStart]
 	 */
-	fun offsetInWeek(day: DateTime, weekStart: Int, weekLength: Int): Int {
-		val offset = day.dayOfWeek - weekStart
-		return if (offset in 0 until weekStart + weekLength - 1) offset else 0
+	fun offsetInWeek(day: DateTime, weekStart: Int): Int {
+		return day.dayOfWeek - weekStart
 	}
 
 	/**

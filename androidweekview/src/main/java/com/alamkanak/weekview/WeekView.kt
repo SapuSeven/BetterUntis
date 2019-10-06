@@ -270,7 +270,7 @@ class WeekView<T>(
 		val oldFirstVisibleDay = viewState.firstVisibleDay
 		val today = DateTime.now()
 
-		val offset = DateUtils.offsetInWeek(today, config.firstDayOfWeek, config.numberOfVisibleDays)
+		val offset = DateUtils.offsetInWeek(today, config.firstDayOfWeek)
 		val daysScrolled = (ceil((config.drawConfig.currentOrigin.x / config.totalDayWidth).toDouble()) * -1).toInt()
 		val newFirstVisibleDay = today.plusDays(DateUtils.actualDays(daysScrolled, config.numberOfVisibleDays) - offset)
 
@@ -337,7 +337,6 @@ class WeekView<T>(
 	 * @param date The date to show.
 	 */
 	override fun goToDate(date: DateTime) {
-		// TODO: If the date is in the future, selecting a weekend day will jump to the previous week. It works for past dates. This should be fixed to always jump to the next week when selecting a weekend.
 		gestureHandler.forceScrollFinished()
 
 		if (viewState.areDimensionsInvalid) {
@@ -346,7 +345,7 @@ class WeekView<T>(
 		}
 
 		val today = DateTime.now()
-		val offset = DateUtils.offsetInWeek(today, config.firstDayOfWeek, config.numberOfVisibleDays)
+		val offset = DateUtils.offsetInWeek(today, config.firstDayOfWeek)
 		val firstDayOfCurrentWeek = today.minusDays(offset)
 
 		val dayDiff = DateUtils.displayedDays(((date.millis - firstDayOfCurrentWeek.millis) / 1000 / 60 / 60 / 24).toInt(), config.numberOfVisibleDays).toDouble()
