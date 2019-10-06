@@ -214,6 +214,8 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 			val item = RoomFinderAdapterItem(roomName, room.id, true)
 			item.hourIndex = hourIndex
 
+			if (roomList.contains(item)) return
+
 			roomList.add(item)
 
 			profileUser?.let { user ->
