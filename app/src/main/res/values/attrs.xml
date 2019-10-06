@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-	<declare-styleable name="UnitPreference">
-		<attr name="unit" format="string" />
-	</declare-styleable>
-
-	<attr name="colorDivider" format="reference"/>
-</resources>
