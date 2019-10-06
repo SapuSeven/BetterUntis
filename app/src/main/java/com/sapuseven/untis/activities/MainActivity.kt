@@ -700,7 +700,7 @@ class MainActivity :
 		}
 		fragment.dateSetListener = android.app.DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
 			DateTime().withDate(year, month + 1, dayOfMonth).let {
-				// Compensate for conversion from Calendar to DateTime
+				// +1 compensates for conversion from Calendar to DateTime
 				weekView.goToDate(it)
 				lastPickedDate = it
 			}

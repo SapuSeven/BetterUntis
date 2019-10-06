@@ -17,14 +17,11 @@ class DatePickerDialog : DialogFragment() {
 			android.app.DatePickerDialog(context!!, dateSetListener, year, month - 1, day)
 		} ?: run {
 			val now = DateTime.now()
-			val year = now.year
-			val month = now.monthOfYear
-			val day = now.dayOfMonth
-			android.app.DatePickerDialog(context!!, dateSetListener, year, month, day)
+			android.app.DatePickerDialog(context!!, dateSetListener, now.year, now.monthOfYear - 1, now.dayOfMonth)
 		}
 		dialog.setButton(android.app.DatePickerDialog.BUTTON_NEUTRAL, getString(R.string.all_dialog_datepicker_button_today)) { _, _ ->
 			val dateTime = DateTime.now()
-			dateSetListener?.onDateSet(dialog.datePicker, dateTime.year, dateTime.monthOfYear, dateTime.dayOfMonth)
+			dateSetListener?.onDateSet(dialog.datePicker, dateTime.year, dateTime.monthOfYear - 1, dateTime.dayOfMonth)
 		}
 		return dialog
 	}
