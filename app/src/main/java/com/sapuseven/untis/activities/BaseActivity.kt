@@ -41,9 +41,7 @@ open class BaseActivity : AppCompatActivity() {
 	}
 
 	private fun checkForCrashes() {
-		val crashes = File(filesDir, "crash").listFiles()
-
-		crashes.forEach { crashFile ->
+		File(filesDir, "crash").listFiles()?.forEach { crashFile ->
 			val reader = crashFile.bufferedReader()
 
 			val stackTrace = StringBuilder()
