@@ -1,12 +1,18 @@
 package com.sapuseven.untis.notifications
 
 import android.app.AlarmManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Context.ALARM_SERVICE
 import android.content.Intent
+import android.os.Build
 import android.util.Log
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.DateTimeUtils
@@ -43,6 +49,8 @@ class NotificationSetup : BroadcastReceiver() {
 
 	companion object {
 		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.notifications.profileid"
+
+		const val CHANNEL_ID_BACKGROUNDERRORS = "notifications.backgrounderrors"
 	}
 
 	override fun onReceive(context: Context, intent: Intent) {
@@ -83,7 +91,18 @@ class NotificationSetup : BroadcastReceiver() {
 					when (code) {
 						TimetableLoader.CODE_CACHE_MISSING -> timetableLoader.repeat(requestId, TimetableLoader.FLAG_LOAD_SERVER, proxyHost)
 						else -> {
-							// TODO: Show error notification
+							createNotificationChannel(context)
+
+							val builder = NotificationCompat.Builder(context, NotificationReceiver.CHANNEL_ID_BREAKINFO)
+									.setContentTitle(context.getString(R.string.notifications_text_error_title))
+									.setContentText(context.getString(R.string.notifications_text_error_message))
+									.setSmallIcon(R.drawable.notification_error)
+									.setAutoCancel(true)
+									.setCategory(NotificationCompat.CATEGORY_ERROR)
+
+							with(NotificationManagerCompat.from(context)) {
+								notify(-1, builder.build())
+							}
 						}
 					}
 				}
@@ -146,6 +165,19 @@ class NotificationSetup : BroadcastReceiver() {
 			val deletingPendingIntent = PendingIntent.getBroadcast(context, item.first.endDateTime.millisOfDay + 1, deletingIntent, 0)
 			alarmManager.setExact(AlarmManager.RTC_WAKEUP, item.second.startDateTime.millis, deletingPendingIntent)
 			Log.d("NotificationSetup", "${item.first.periodData.getShortTitle()} delete scheduled for ${item.second.startDateTime}")
+		}
+	}
+
+	private fun createNotificationChannel(context: Context) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			val name = context.getString(R.string.notifications_channel_backgrounderrors)
+			val descriptionText = context.getString(R.string.notifications_channel_backgrounderrors_desc)
+			val importance = NotificationManager.IMPORTANCE_MIN
+			val channel = NotificationChannel(CHANNEL_ID_BACKGROUNDERRORS, name, importance).apply {
+				description = descriptionText
+			}
+			val notificationManager: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+			notificationManager.createNotificationChannel(channel)
 		}
 	}
 }

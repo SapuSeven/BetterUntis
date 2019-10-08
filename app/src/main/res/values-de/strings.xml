@@ -182,6 +182,10 @@
 
 	<string name="notifications_channel_breakinfo">Pauseninfo</string>
 	<string name="notifications_channel_breakinfo_desc">Zeigt Informationen der akuellen Pause und der nächsten Stunde an</string>
+	<string name="notifications_channel_backgrounderrors">Fehler im Hintergrund</string>
+	<string name="notifications_channel_backgrounderrors_desc">Zeigt Fehlermeldungen von Hintergrundprozessen an</string>
+	<string name="notifications_text_error_title">Fehler beim Laden des Stundenplans</string>
+	<string name="notifications_text_error_message">Du wirst heute keine Benachrichtigungen erhalten.</string>
 	<string name="notifications_text_title">Pause bis %1$s</string>
 	<string name="notifications_text_message_subjects">Nächste Stunde: %1$s</string>
 	<string name="notifications_text_message_rooms">Raum: %1$s</string>

@@ -182,6 +182,10 @@
 
 	<string name="notifications_channel_breakinfo">Break info</string>
 	<string name="notifications_channel_breakinfo_desc">Shows information about the current break and the following lesson</string>
+	<string name="notifications_channel_backgrounderrors">Background errors</string>
+	<string name="notifications_channel_backgrounderrors_desc">Shows error messages of background tasks</string>
+	<string name="notifications_text_error_title">Failed to load timetable</string>
+	<string name="notifications_text_error_message">You won\'t get any notifications today.</string>
 	<string name="notifications_text_title">Break until %1$s</string>
 	<string name="notifications_text_message_subjects">Next lesson: %1$s</string>
 	<string name="notifications_text_message_rooms">Room: %1$s</string>
