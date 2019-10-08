@@ -1,6 +1,6 @@
 package com.sapuseven.untis.models.untis.timetable
 
-import kotlinx.serialization.ContextualSerialization
+import com.sapuseven.untis.models.UnknownObject
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -10,7 +10,11 @@ data class PeriodHomework(
 		val startDate: String,
 		val endDate: String,
 		val text: String,
-		@ContextualSerialization val remark: Any?, // TODO: Determine the element value
+		val remark: UnknownObject?, // TODO: Determine the element value
 		val completed: Boolean,
 		val attachments: List<PeriodHomeworkAttachment>
-)
+) {
+	init {
+		UnknownObject.validate(mapOf("remark" to remark))
+	}
+}

@@ -1,6 +1,6 @@
 package com.sapuseven.untis.models.untis.timetable
 
-import kotlinx.serialization.ContextualSerialization
+import com.sapuseven.untis.models.UnknownObject
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -19,13 +19,17 @@ data class Period(
 		val `is`: List<String>,
 		val homeWorks: List<PeriodHomework>?,
 		val exam: PeriodExam? = null,
-		@ContextualSerialization val messengerChannel: Any? = null // This is a new element with unknown usage
+		val messengerChannel: UnknownObject? = null // This is a new element with unknown usage
 ) {
 	companion object {
 		const val CODE_REGULAR = "REGULAR"
 		const val CODE_CANCELLED = "CANCELLED"
 		const val CODE_IRREGULAR = "IRREGULAR"
 		const val CODE_EXAM = "EXAM"
+	}
+
+	init {
+		UnknownObject.validate(mapOf("messengerChannel" to messengerChannel))
 	}
 
 	fun equalsIgnoreTime(second: Period): Boolean {

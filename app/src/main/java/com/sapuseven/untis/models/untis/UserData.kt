@@ -1,6 +1,6 @@
 package com.sapuseven.untis.models.untis
 
-import kotlinx.serialization.ContextualSerialization
+import com.sapuseven.untis.models.UnknownObject
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -9,8 +9,14 @@ data class UserData (
 		val elemId: Int,
 		val displayName: String,
 		val schoolName: String,
-		val departmentId: Int,
-		val children: List<@ContextualSerialization Any>, // TODO: This value type is unknown
+		val departmentId: Int, // TODO: Revert back to Int after debugging
+		val children: List<UnknownObject>, // TODO: This value type is unknown
 		val klassenIds: List<Int>,
 		val rights: List<String>
-)
+) {
+	init {
+		children.forEach {
+			UnknownObject.validate(mapOf("children" to it))
+		}
+	}
+}
