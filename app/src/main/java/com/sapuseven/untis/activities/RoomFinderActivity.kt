@@ -10,10 +10,10 @@ import android.text.style.ImageSpan
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.sapuseven.untis.R
 import com.sapuseven.untis.adapters.RoomFinderAdapter
@@ -307,7 +307,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 	}
 
 	private fun showDeleteItemDialog(position: Int) {
-		AlertDialog.Builder(this)
+		MaterialAlertDialogBuilder(this)
 				.setTitle(getString(R.string.roomfinder_dialog_itemdelete_title, roomList[position]))
 				.setMessage(R.string.roomfinder_dialog_itemdelete_text)
 				.setPositiveButton(R.string.all_yes) { _, _ ->
@@ -318,7 +318,6 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 					}
 				}
 				.setNegativeButton(R.string.all_no) { dialog, _ -> dialog.dismiss() }
-				.create()
 				.show()
 	}
 
