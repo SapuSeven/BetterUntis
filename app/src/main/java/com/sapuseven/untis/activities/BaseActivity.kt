@@ -55,6 +55,9 @@ open class BaseActivity : AppCompatActivity() {
 				length = reader.read(buffer)
 			}
 
+			reader.close()
+			crashFile.delete()
+
 			// TODO: Localize
 			MaterialAlertDialogBuilder(this)
 					.setTitle("Crash log found")
