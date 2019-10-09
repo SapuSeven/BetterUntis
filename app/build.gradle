@@ -80,7 +80,6 @@ dependencies {
 	implementation "androidx.preference:preference-ktx:1.1.0"
 	implementation "com.github.kittinunf.fuel:fuel:2.0.1"
 	implementation "com.github.kittinunf.fuel:fuel-coroutines:2.0.1"
-	implementation "commons-codec:commons-codec:1.11"
 	implementation "joda-time:joda-time:2.10"
 	implementation 'com.google.android.material:material:1.1.0-beta01'
 	implementation 'com.jaredrummler:colorpicker-compat:1.0.5'

@@ -1,8 +1,8 @@
 package com.sapuseven.untis.data.connectivity;
 
+import com.sapuseven.untis.helpers.Base32;
 import com.sapuseven.untis.models.untis.UntisAuth;
 
-import org.apache.commons.codec.binary.Base32;
 import org.joda.time.DateTime;
 
 import java.security.InvalidKeyException;
@@ -40,7 +40,7 @@ public class UntisAuthentication {
 
 	private static long createTimeBasedCode(long timestamp, String secret) throws NoSuchAlgorithmException, InvalidKeyException {
 		if ((secret != null) && (!secret.isEmpty()))
-			return verifyCode(new Base32().decode(secret.toUpperCase(Locale.ROOT).getBytes()), timestamp / 30000L); // Code will change all 30000 milliseconds
+			return verifyCode(Base32.INSTANCE.decode(secret.toUpperCase(Locale.ROOT)), timestamp / 30000L); // Code will change all 30000 milliseconds
 
 		return 0L;
 	}
