@@ -56,11 +56,9 @@ class ElementPickerDialog : DialogFragment() {
 		else if (!::listener.isInitialized)
 			throw ClassCastException("$context must implement ElementPickerDialogListener if no listener is passed to initialize()")
 
-		timetableDatabaseInterface?.let { timetableDatabaseInterface ->
-			adapter = if (config?.multiSelect == true) GridViewDatabaseItemCheckBoxAdapter(context) else GridViewDatabaseItemAdapter(context)
-			adapter.timetableDatabaseInterface = timetableDatabaseInterface
-			adapter.notifyDataSetChanged()
-		}
+		adapter = if (config?.multiSelect == true) GridViewDatabaseItemCheckBoxAdapter(context) else GridViewDatabaseItemAdapter(context)
+		adapter.timetableDatabaseInterface = timetableDatabaseInterface
+		adapter.notifyDataSetChanged()
 	}
 
 	override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
