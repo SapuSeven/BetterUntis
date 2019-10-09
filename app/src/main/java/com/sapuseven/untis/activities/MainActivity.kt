@@ -53,6 +53,7 @@ import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.Holiday
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import com.sapuseven.untis.notifications.NotificationSetup.Companion.EXTRA_BOOLEAN_MANUAL
 import com.sapuseven.untis.notifications.StartupReceiver
 import com.sapuseven.untis.preferences.ElementPickerPreference
 import kotlinx.android.synthetic.main.activity_main_content.*
@@ -177,6 +178,7 @@ class MainActivity :
 
 	private fun setupNotifications() {
 		val intent = Intent(this, StartupReceiver::class.java)
+		intent.putExtra(EXTRA_BOOLEAN_MANUAL, true)
 		sendBroadcast(intent)
 	}
 

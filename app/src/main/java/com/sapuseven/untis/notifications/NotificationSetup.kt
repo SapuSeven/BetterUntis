@@ -43,18 +43,21 @@ import java.lang.ref.WeakReference
  * This receiver is responsible for setting up alarms for every notification of the current day.
  */
 class NotificationSetup : BroadcastReceiver() {
+	private var receivedManually: Boolean = false
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 	private lateinit var preferenceManager: PreferenceManager
 	private lateinit var profileUser: UserDatabase.User
 
 	companion object {
 		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.notifications.profileid"
+		const val EXTRA_BOOLEAN_MANUAL = "com.sapuseven.untis.notifications.manual" // Describes whether the broadcast was sent manually or automatically every day
 
 		const val CHANNEL_ID_BACKGROUNDERRORS = "notifications.backgrounderrors"
 	}
 
 	override fun onReceive(context: Context, intent: Intent) {
 		Log.d("NotificationSetup", "NotificationSetup received")
+		receivedManually = intent.getBooleanExtra(EXTRA_BOOLEAN_MANUAL, false)
 
 		preferenceManager = PreferenceManager(context)
 		if (!PreferenceUtils.getPrefBool(preferenceManager, "preference_notifications_enable"))
@@ -91,6 +94,8 @@ class NotificationSetup : BroadcastReceiver() {
 					when (code) {
 						TimetableLoader.CODE_CACHE_MISSING -> timetableLoader.repeat(requestId, TimetableLoader.FLAG_LOAD_SERVER, proxyHost)
 						else -> {
+							if (receivedManually) return
+
 							createNotificationChannel(context)
 
 							val builder = NotificationCompat.Builder(context, NotificationReceiver.CHANNEL_ID_BREAKINFO)
