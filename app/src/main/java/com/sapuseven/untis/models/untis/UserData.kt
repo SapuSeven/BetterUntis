@@ -9,7 +9,7 @@ data class UserData (
 		val elemId: Int,
 		val displayName: String,
 		val schoolName: String,
-		val departmentId: Int, // TODO: Revert back to Int after debugging
+		val departmentId: Int,
 		val children: List<UnknownObject>, // TODO: This value type is unknown
 		val klassenIds: List<Int>,
 		val rights: List<String>
