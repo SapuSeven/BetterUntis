@@ -32,6 +32,10 @@ Another major change is the use of a custom WeekView (based on [Till Hellmund](h
 - No support for teacher-specific features (like editing homeworks or class management)
 - Almost no unit and integration tests
 
+## Available languages
+- English
+- German
+
 ## Project Git Structure
 I established a simple system to manage this Git repository.
 Basically, there are two main branches: **master** and **develop**. They both are permanent and can't be deleted.
