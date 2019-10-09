@@ -120,7 +120,7 @@ class NotificationSetup : BroadcastReceiver() {
 		val customType = TimetableDatabaseInterface.Type.valueOf(PreferenceUtils.getPrefString(
 				preferenceManager,
 				"preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_TYPE}",
-				toString()
+				TimetableDatabaseInterface.Type.SUBJECT.toString()
 		))
 
 		if (customType === TimetableDatabaseInterface.Type.SUBJECT) {

@@ -158,7 +158,7 @@ class MainActivity :
 		val customType = TimetableDatabaseInterface.Type.valueOf(PreferenceUtils.getPrefString(
 				preferences,
 				"preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_TYPE}",
-				toString()
+				TimetableDatabaseInterface.Type.SUBJECT.toString()
 		))
 
 		if (customType === TimetableDatabaseInterface.Type.SUBJECT) {
@@ -536,7 +536,7 @@ class MainActivity :
 				if (resultCode == Activity.RESULT_OK) {
 					val roomId = data?.getIntExtra(RoomFinderActivity.EXTRA_INT_ROOM_ID, -1) ?: -1
 					if (roomId != -1)
-						setTarget(roomId, toString(), timetableDatabaseInterface.getLongName(roomId, TimetableDatabaseInterface.Type.ROOM))
+						setTarget(roomId, TimetableDatabaseInterface.Type.ROOM.toString(), timetableDatabaseInterface.getLongName(roomId, TimetableDatabaseInterface.Type.ROOM))
 				}
 			}
 			REQUEST_CODE_SETTINGS -> {
