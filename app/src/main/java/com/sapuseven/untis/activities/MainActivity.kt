@@ -155,6 +155,7 @@ class MainActivity :
 	}
 
 	private fun showPersonalTimetable() {
+		@Suppress("RemoveRedundantQualifierName")
 		val customType = TimetableDatabaseInterface.Type.valueOf(PreferenceUtils.getPrefString(
 				preferences,
 				"preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_TYPE}",
@@ -536,6 +537,7 @@ class MainActivity :
 				if (resultCode == Activity.RESULT_OK) {
 					val roomId = data?.getIntExtra(RoomFinderActivity.EXTRA_INT_ROOM_ID, -1) ?: -1
 					if (roomId != -1)
+						@Suppress("RemoveRedundantQualifierName")
 						setTarget(roomId, TimetableDatabaseInterface.Type.ROOM.toString(), timetableDatabaseInterface.getLongName(roomId, TimetableDatabaseInterface.Type.ROOM))
 				}
 			}

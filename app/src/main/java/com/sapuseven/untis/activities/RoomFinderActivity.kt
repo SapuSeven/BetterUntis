@@ -77,7 +77,10 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 	}
 
 	private fun updateRooms() {
-		val roomsToLoad = roomList.map { PeriodElement(TimetableDatabaseInterface.Type.ROOM.toString(), it.id, it.id) }
+		val roomsToLoad = roomList.map {
+			@Suppress("RemoveRedundantQualifierName")
+			PeriodElement(TimetableDatabaseInterface.Type.ROOM.toString(), it.id, it.id)
+		}
 		roomList.clear()
 		roomListAdapter.notifyDataSetChanged()
 		addRooms(roomsToLoad)

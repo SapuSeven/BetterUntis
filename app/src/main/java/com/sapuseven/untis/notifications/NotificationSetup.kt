@@ -117,6 +117,7 @@ class NotificationSetup : BroadcastReceiver() {
 	}
 
 	private fun createPersonalTimetable(): Pair<String, Int>? {
+		@Suppress("RemoveRedundantQualifierName")
 		val customType = TimetableDatabaseInterface.Type.valueOf(PreferenceUtils.getPrefString(
 				preferenceManager,
 				"preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_TYPE}",
