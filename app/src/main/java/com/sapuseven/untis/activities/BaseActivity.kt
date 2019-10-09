@@ -17,6 +17,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.helpers.config.PreferenceUtils
+import com.sapuseven.untis.helpers.issues.GithubIssue
+import com.sapuseven.untis.helpers.issues.Issue
 import java.io.File
 import java.io.PrintStream
 
@@ -54,11 +56,10 @@ open class BaseActivity : AppCompatActivity() {
 			}
 
 			// TODO: Localize
-			// TODO: Add button to create a GitHub issue
 			MaterialAlertDialogBuilder(this)
 					.setTitle("Crash log found")
 					.setMessage(stackTrace)
-					.setNegativeButton(getString(R.string.all_copy)) { _, _ ->
+					.setNegativeButton(R.string.all_copy) { _, _ ->
 						val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 						clipboard.primaryClip = ClipData.newPlainText("BetterUntis Crash Log", stackTrace)
 						Toast.makeText(this, "Crash log copied to clipboard.", Toast.LENGTH_SHORT).show()
@@ -66,8 +67,8 @@ open class BaseActivity : AppCompatActivity() {
 					.setPositiveButton(R.string.all_close) { dialog, _ ->
 						dialog.dismiss()
 					}
-					.setOnDismissListener {
-						crashFile.delete()
+					.setNeutralButton(R.string.all_report) { _, _ ->
+						GithubIssue(Issue.Type.CRASH, stackTrace.toString()).launch(this)
 					}
 					.show()
 		}

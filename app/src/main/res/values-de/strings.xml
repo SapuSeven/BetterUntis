@@ -18,6 +18,7 @@
 	<string name="all_cancel">Abbrechen</string>
 	<string name="all_copy">Kopieren</string>
 	<string name="all_error">Fehler</string>
+	<string name="all_report">Melden</string>
 	<string name="all_add">Hinzufügen</string>
 	<string name="all_delete">Löschen</string>
 	<string name="all_lesson_cancelled">%1$s (entfallen)</string>

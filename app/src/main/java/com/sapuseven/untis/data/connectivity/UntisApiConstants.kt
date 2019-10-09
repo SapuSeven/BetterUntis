@@ -2,7 +2,7 @@ package com.sapuseven.untis.data.connectivity
 
 object UntisApiConstants {
 	const val DEFAULT_WEBUNTIS_PROTOCOL = "https://"
-	const val DEFAULT_WEBUNTIS_HOST = "mobile.webuntis.com" // TODO: Make configurable
+	const val DEFAULT_WEBUNTIS_HOST = "mobile.webuntis.com"
 	const val DEFAULT_WEBUNTIS_PATH = "/ms/app/"
 
 	const val METHOD_GET_USER_DATA = "getUserData2017"

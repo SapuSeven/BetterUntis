@@ -18,6 +18,7 @@
 	<string name="all_cancel">Cancel</string>
 	<string name="all_copy">Copy</string>
 	<string name="all_error">Error</string>
+	<string name="all_report">Report</string>
 	<string name="all_add">Add</string>
 	<string name="all_delete">Delete</string>
 	<string name="all_lesson_cancelled">%1$s (cancelled)</string>
