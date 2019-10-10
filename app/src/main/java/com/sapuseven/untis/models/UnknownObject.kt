@@ -17,7 +17,7 @@ class UnknownObject(val jsonString: String?) {
 
 		@ImplicitReflectionSerializer
 		override fun deserialize(decoder: Decoder): UnknownObject {
-			return UnknownObject((decoder as JsonInput).decodeJson().toString())
+			return UnknownObject((decoder as? JsonInput)?.decodeJson()?.toString())
 		}
 
 		fun validate(fields: Map<String, UnknownObject?>) {
