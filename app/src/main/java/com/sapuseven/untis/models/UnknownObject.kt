@@ -12,12 +12,11 @@ class UnknownObject(val jsonString: String?) {
 		override val descriptor: SerialDescriptor = StringDescriptor.withName("UnknownObject")
 
 		override fun serialize(encoder: Encoder, obj: UnknownObject) {
-			encoder.encodeString("")
+			encoder.encode(serializer(), obj)
 		}
 
-		@ImplicitReflectionSerializer
 		override fun deserialize(decoder: Decoder): UnknownObject {
-			return UnknownObject((decoder as? JsonInput)?.decodeJson()?.toString())
+			return if (decoder is JsonInput) UnknownObject(decoder.decodeJson().toString()) else decoder.decode(serializer())
 		}
 
 		fun validate(fields: Map<String, UnknownObject?>) {
