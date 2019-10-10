@@ -24,5 +24,12 @@ class GithubIssue(type: Type, log: String) : Issue(type, log) {
 		Type.OTHER -> ""
 	}
 
-	private fun generateBody() = "```\n$log\n```"
+	private fun generateBody() =
+			"<details>\n" +
+					"<summary>Crash Log</summary>\n" +
+					"\n" +
+					"```\n" +
+					"$log\n" +
+					"```\n" +
+					"</details>"
 }
