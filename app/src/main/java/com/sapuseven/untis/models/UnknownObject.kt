@@ -11,11 +11,8 @@ class UnknownObject(val jsonString: String?) {
 	companion object : KSerializer<UnknownObject> {
 		override val descriptor: SerialDescriptor = StringDescriptor.withName("UnknownObject")
 
-		override fun serialize(encoder: Encoder, obj: UnknownObject) {
-			encoder.encodeString("")
-		}
+		override fun serialize(encoder: Encoder, obj: UnknownObject) {}
 
-		@ImplicitReflectionSerializer
 		override fun deserialize(decoder: Decoder): UnknownObject {
 			return UnknownObject((decoder as? JsonInput)?.decodeJson()?.toString())
 		}
