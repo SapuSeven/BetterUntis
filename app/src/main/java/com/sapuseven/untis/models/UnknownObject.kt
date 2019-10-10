@@ -14,7 +14,7 @@ class UnknownObject(val jsonString: String?) {
 		override fun serialize(encoder: Encoder, obj: UnknownObject) {}
 
 		override fun deserialize(decoder: Decoder): UnknownObject {
-			return if (decoder is JsonInput) UnknownObject(decoder.decodeJson().toString()) else decoder.decode(serializer())
+			return UnknownObject((decoder as? JsonInput)?.decodeJson()?.toString())
 		}
 
 		fun validate(fields: Map<String, UnknownObject?>) {
