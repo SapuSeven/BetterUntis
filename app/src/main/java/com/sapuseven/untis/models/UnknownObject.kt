@@ -11,10 +11,16 @@ class UnknownObject(val jsonString: String?) {
 	companion object : KSerializer<UnknownObject> {
 		override val descriptor: SerialDescriptor = StringDescriptor.withName("UnknownObject")
 
+<<<<<<< HEAD
 		override fun serialize(encoder: Encoder, obj: UnknownObject) {}
+=======
+		override fun serialize(encoder: Encoder, obj: UnknownObject) {
+			encoder.encode(serializer(), obj)
+		}
+>>>>>>> develop
 
 		override fun deserialize(decoder: Decoder): UnknownObject {
-			return UnknownObject((decoder as? JsonInput)?.decodeJson()?.toString())
+			return if (decoder is JsonInput) UnknownObject(decoder.decodeJson().toString()) else decoder.decode(serializer())
 		}
 
 		fun validate(fields: Map<String, UnknownObject?>) {
