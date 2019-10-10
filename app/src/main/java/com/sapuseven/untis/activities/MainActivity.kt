@@ -154,7 +154,7 @@ class MainActivity :
 		finish()
 	}
 
-	private fun showPersonalTimetable() {
+	private fun showPersonalTimetable(): Boolean {
 		@Suppress("RemoveRedundantQualifierName")
 		val customType = TimetableDatabaseInterface.Type.valueOf(PreferenceUtils.getPrefString(
 				preferences,
@@ -164,16 +164,16 @@ class MainActivity :
 
 		if (customType === TimetableDatabaseInterface.Type.SUBJECT) {
 			profileUser.userData.elemType?.let { type ->
-				setTarget(
+				return setTarget(
 						profileUser.userData.elemId,
 						type,
 						profileUser.userData.displayName)
 			} ?: run {
-				setTarget(anonymous = true)
+				return setTarget(anonymous = true)
 			}
 		} else {
 			val customId = preferences.defaultPrefs.getInt("preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_ID}", -1)
-			setTarget(customId, customType.toString(), timetableDatabaseInterface.getLongName(customId, customType))
+			return setTarget(customId, customType.toString(), timetableDatabaseInterface.getLongName(customId, customType))
 		}
 	}
 
@@ -560,17 +560,7 @@ class MainActivity :
 		if (drawer.isDrawerOpen(GravityCompat.START)) {
 			closeDrawer(drawer)
 		} else {
-			if (displayedElement?.id != profileUser.userData.elemId) {
-				// Go to personal timetable
-				profileUser.userData.elemType?.let { type ->
-					setTarget(
-							profileUser.userData.elemId,
-							type,
-							profileUser.userData.displayName)
-				} ?: run {
-					setTarget(anonymous = true)
-				}
-			} else {
+			if (!showPersonalTimetable()) {
 				if (System.currentTimeMillis() - 2000 > lastBackPress) {
 					Snackbar.make(findViewById<ConstraintLayout>(R.id.content_main),
 							R.string.main_press_back_double, 2000).show()
@@ -582,8 +572,10 @@ class MainActivity :
 		}
 	}
 
-	private fun setTarget(anonymous: Boolean) {
+	private fun setTarget(anonymous: Boolean): Boolean {
 		if (anonymous) {
+			if (displayedElement == null) return false
+
 			showLoading(false)
 
 			displayedElement = null
@@ -596,15 +588,21 @@ class MainActivity :
 		} else {
 			constraintlayout_main_anonymouslogininfo.visibility = View.GONE
 		}
+		return true
 	}
 
-	private fun setTarget(id: Int, type: String, displayName: String?) {
+	private fun setTarget(id: Int, type: String, displayName: String?): Boolean {
+		PeriodElement(type, id, id).let {
+			if (it == displayedElement) return false
+			displayedElement = it
+		}
+
 		setTarget(anonymous = false)
 
-		displayedElement = PeriodElement(type, id, id)
 		weeklyTimetableItems.clear()
 		weekView.notifyDataSetChanged()
 		supportActionBar?.title = displayName ?: getString(R.string.app_name)
+		return true
 	}
 
 	override fun onEventClick(data: TimegridItem, eventRect: RectF) {
