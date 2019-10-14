@@ -26,7 +26,7 @@ class InfoCenterActivity : BaseActivity() {
 
 	private val contactAdapter = ContactAdapter(contactList)
 	private val eventAdapter = EventAdapter(eventList)
-	private val absenceAdapter = AbsenceAdapter(absenceList)
+	private val absenceAdapter = AbsenceAdapter(this, absenceList)
 
 	private var api: UntisRequest = UntisRequest()
 

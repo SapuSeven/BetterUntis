@@ -108,6 +108,9 @@
 	<string name="roomfinder_image_next_hour">next hour</string>
 	<string name="roomfinder_loading_data">Loading data…</string>
 
+	<string name="infocenter_absences_timeformat">%2$s, %1$s - %4$s, %3$s</string>
+	<string name="infocenter_absences_timeformat_sameday">%2$s - %4$s, %1$s</string>
+
 	<string name="elementpicker_hint_search">Search…</string>
 	<string name="elementpicker_hint_search_classes">Search for classes…</string>
 	<string name="elementpicker_hint_search_teachers">Search for teachers…</string>
