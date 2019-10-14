@@ -23,7 +23,7 @@ class StartupReceiver : BroadcastReceiver() {
 
 		val dateTime = DateTime().withTime(2, 0, 0, 0)
 		val newIntent = Intent(context, NotificationSetup::class.java)
-		newIntent.putExtra(EXTRA_LONG_PROFILE_ID, preferenceManager.profileId)
+		newIntent.putExtra(EXTRA_LONG_PROFILE_ID, preferenceManager.currentProfileId())
 		newIntent.putExtra(NotificationSetup.EXTRA_BOOLEAN_MANUAL, intent.getBooleanExtra(NotificationSetup.EXTRA_BOOLEAN_MANUAL, false))
 		val pendingIntent = PendingIntent.getBroadcast(context, 0, newIntent, 0)
 		val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager

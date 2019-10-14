@@ -308,7 +308,7 @@ class MainActivity :
 		if (userDatabase.getUsersCount() < 1)
 			return false
 
-		profileId = preferences.profileId
+		profileId = preferences.currentProfileId()
 		if (profileId == 0L || userDatabase.getUser(profileId) == null) profileId = userDatabase.getAllUsers()[0].id
 				?: 0 // Fall back to the first user if an invalid user id is saved
 		if (profileId == 0L) return false // No user found in database
