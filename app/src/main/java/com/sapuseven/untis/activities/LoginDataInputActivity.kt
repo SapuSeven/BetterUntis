@@ -154,7 +154,13 @@ class LoginDataInputActivity : BaseActivity() {
 
 	private fun restoreInput(prefs: SharedPreferences) {
 		edittext_logindatainput_school?.setText(prefs.getString("edittext_logindatainput_school", ""))
-		edittext_logindatainput_proxy_host?.setText(prefs.getString("edittext_logindatainput_proxy_host", ""))
+		prefs.getString("edittext_logindatainput_proxy_host", "").let {
+			edittext_logindatainput_proxy_host?.setText(it)
+			if (it?.isNotBlank() == true) {
+				switch_logindatainput_advanced?.isChecked = true
+				linearlayout_logindatainput_advanced?.visibility = View.VISIBLE
+			}
+		}
 		anonymous = prefs.getBoolean("switch_logindatainput_anonymouslogin", false)
 		switch_logindatainput_anonymouslogin?.isChecked = anonymous
 		if (!anonymous) {
@@ -164,12 +170,18 @@ class LoginDataInputActivity : BaseActivity() {
 	}
 
 	private fun restoreInput(user: UserDatabase.User) {
-		user.schoolId.let {
-			if (it > 0) edittext_logindatainput_school?.setText(it.toString())
-		}
+		if (user.schoolId > 0) edittext_logindatainput_school?.setText(user.schoolId.toString())
 
-		preferences.profileId = user.id ?: 0
-		edittext_logindatainput_proxy_host?.setText(preferences.defaultPrefs.getString("preference_connectivity_proxy_host", ""))
+		user.id?.let { profileId ->
+			preferences.reload(profileId)
+			preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)?.let {
+				edittext_logindatainput_proxy_host?.setText(it)
+				if (it.isNotBlank()) {
+					switch_logindatainput_advanced?.isChecked = true
+					linearlayout_logindatainput_advanced?.visibility = View.VISIBLE
+				}
+			}
+		}
 
 		anonymous = user.anonymous
 		switch_logindatainput_anonymouslogin?.isChecked = anonymous
