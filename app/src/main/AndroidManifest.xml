@@ -41,6 +41,15 @@
 		</activity>
 
 		<activity
+			android:name=".activities.InfoCenterActivity"
+			android:label="@string/activity_title_info_center"
+			android:parentActivityName=".activities.MainActivity">
+			<meta-data
+				android:name="android.support.PARENT_ACTIVITY"
+				android:value=".activities.MainActivity" />
+		</activity>
+
+		<activity
 			android:name=".activities.LoginDataInputActivity"
 			android:parentActivityName=".activities.LoginActivity"
 			android:windowSoftInputMode="adjustResize">
