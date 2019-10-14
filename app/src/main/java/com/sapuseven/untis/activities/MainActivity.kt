@@ -516,7 +516,7 @@ class MainActivity :
 			}
 			R.id.nav_infocenter -> {
 				val i = Intent(this@MainActivity, InfoCenterActivity::class.java)
-				i.putExtra(RoomFinderActivity.EXTRA_LONG_PROFILE_ID, profileId)
+				i.putExtra(InfoCenterActivity.EXTRA_LONG_PROFILE_ID, profileId)
 				startActivityForResult(i, REQUEST_CODE_ROOM_FINDER)
 			}
 			R.id.nav_free_rooms -> {
