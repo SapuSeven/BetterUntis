@@ -32,6 +32,9 @@
 
 	<string name="menu_nav_timetables">Timetables</string>
 	<string name="menu_share">Share</string>
+	<string name="menu_infocenter_contact">Contact Hours</string>
+	<string name="menu_infocenter_events">Events</string>
+	<string name="menu_infocenter_absences">Absences</string>
 
 	<string name="mainactivitydrawer_dropdown_show">Show profile list</string>
 	<string name="mainactivitydrawer_profile_add">Add a profile…</string>

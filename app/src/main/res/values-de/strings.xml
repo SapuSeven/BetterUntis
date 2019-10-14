@@ -32,6 +32,9 @@
 
 	<string name="menu_nav_timetables">Stundenpläne</string>
 	<string name="menu_share">Teilen</string>
+	<string name="menu_infocenter_contact">Sprechstunden</string>
+	<string name="menu_infocenter_events">Termine</string>
+	<string name="menu_infocenter_absences">Abwesenheiten</string>
 
 	<string name="mainactivitydrawer_dropdown_show">Alle Profile anzeigen</string>
 	<string name="mainactivitydrawer_profile_add">Profil hinzufügen…</string>
