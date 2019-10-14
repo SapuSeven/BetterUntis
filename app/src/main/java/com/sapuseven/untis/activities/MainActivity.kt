@@ -124,6 +124,7 @@ class MainActivity :
 
 		setupTimetableLoader()
 		showPersonalTimetable()
+		refreshNavigationViewSelection()
 	}
 
 	override fun onResume() {
@@ -265,6 +266,7 @@ class MainActivity :
 			closeDrawer()
 			setupTimetableLoader()
 			showPersonalTimetable()
+			refreshNavigationViewSelection()
 
 			recreate()
 		}
@@ -496,6 +498,7 @@ class MainActivity :
 		when (item.itemId) {
 			R.id.nav_show_personal -> {
 				showPersonalTimetable()
+				refreshNavigationViewSelection()
 			}
 			R.id.nav_show_classes -> {
 				showItemList(TimetableDatabaseInterface.Type.CLASS)
@@ -559,32 +562,31 @@ class MainActivity :
 		val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
 		if (drawer.isDrawerOpen(GravityCompat.START)) {
 			closeDrawer(drawer)
-		} else {
-			if (!showPersonalTimetable()) {
-				if (System.currentTimeMillis() - 2000 > lastBackPress) {
-					Snackbar.make(findViewById<ConstraintLayout>(R.id.content_main),
-							R.string.main_press_back_double, 2000).show()
-					lastBackPress = System.currentTimeMillis()
-				} else {
-					super.onBackPressed()
-				}
+		} else if (!showPersonalTimetable()) {
+			if (System.currentTimeMillis() - 2000 > lastBackPress) {
+				Snackbar.make(findViewById<ConstraintLayout>(R.id.content_main),
+						R.string.main_press_back_double, 2000).show()
+				lastBackPress = System.currentTimeMillis()
+			} else {
+				super.onBackPressed()
 			}
+		} else {
+			refreshNavigationViewSelection()
 		}
 	}
 
 	private fun setTarget(anonymous: Boolean): Boolean {
 		if (anonymous) {
-			if (displayedElement == null) return false
-
 			showLoading(false)
-
-			displayedElement = null
 
 			weeklyTimetableItems.clear()
 			weekView.notifyDataSetChanged()
 
 			supportActionBar?.title = getString(R.string.all_anonymous)
 			constraintlayout_main_anonymouslogininfo.visibility = View.VISIBLE
+
+			if (displayedElement == null) return false
+			displayedElement = null
 		} else {
 			constraintlayout_main_anonymouslogininfo.visibility = View.GONE
 		}
