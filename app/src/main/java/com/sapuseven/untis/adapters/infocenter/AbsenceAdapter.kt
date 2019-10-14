@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
 import com.sapuseven.untis.models.UntisAbsence
@@ -35,6 +36,13 @@ class AbsenceAdapter(
 				UntisDate(absence.endDateTime).toDateTime().withZone(DateTimeZone.UTC)
 		)
 		holder.tvTitle.text = absence.absenceReason
+
+		holder.ivExcused.setImageDrawable(
+				if (absence.excused)
+					context.getDrawable(R.drawable.infocenter_absences_excused)
+				else
+					context.getDrawable(R.drawable.infocenter_absences_unexcused)
+		)
 	}
 
 	private fun formatAbsenceTime(startDateTime: DateTime, endDateTime: DateTime): String {
@@ -53,5 +61,6 @@ class AbsenceAdapter(
 	class ViewHolder(rootView: View) : RecyclerView.ViewHolder(rootView) {
 		val tvTime: TextView = rootView.findViewById(R.id.textview_itemabsence_time)
 		val tvTitle: TextView = rootView.findViewById(R.id.textview_itemabsence_title)
+		val ivExcused: AppCompatImageView = rootView.findViewById(R.id.imageview_itemabsence_excused)
 	}
 }

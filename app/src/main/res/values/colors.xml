@@ -27,6 +27,9 @@
 	<color name="colorRoomOccupied">#fff44336</color>
 	<color name="colorRoomAvailable">#ff4caf50</color>
 
+	<color name="colorAbsenceUnexcused">#fff44336</color>
+	<color name="colorAbsenceExcused">#ff4caf50</color>
+
 	<color name="color_launcher_background">#FFFFFF</color>
 	<color name="color_anonymous_login_info_background">#44ffffff</color>
 </resources>
