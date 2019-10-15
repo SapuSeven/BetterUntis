@@ -11,7 +11,7 @@ data class UntisExam(
 		val departmentId: Int,
 		val subjectId: Int,
 		val klasseIds: List<Int>,
-		val rookIds: List<Int>,
+		val roomIds: List<Int>,
 		val teacherIds: List<Int>,
 		val invigilators: List<UntisInvigilator>,
 		val name: String,

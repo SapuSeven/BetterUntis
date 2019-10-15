@@ -11,8 +11,13 @@ import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.models.UntisAbsence
 import com.sapuseven.untis.models.untis.UntisDate
+import com.sapuseven.untis.models.untis.masterdata.SchoolYear
 import com.sapuseven.untis.models.untis.params.AbsenceParams
+import com.sapuseven.untis.models.untis.params.ExamParams
+import com.sapuseven.untis.models.untis.params.HomeworkParams
 import com.sapuseven.untis.models.untis.response.AbsenceResponse
+import com.sapuseven.untis.models.untis.response.ExamResponse
+import com.sapuseven.untis.models.untis.response.HomeworkResponse
 import kotlinx.android.synthetic.main.activity_infocenter.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -30,6 +35,8 @@ class InfoCenterActivity : BaseActivity() {
 
 	private var api: UntisRequest = UntisRequest()
 
+	private lateinit var userDatabase: UserDatabase
+
 	companion object {
 		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileid"
 	}
@@ -38,7 +45,8 @@ class InfoCenterActivity : BaseActivity() {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_infocenter)
 
-		UserDatabase.createInstance(this).getUser(intent.getLongExtra(EXTRA_LONG_PROFILE_ID, -1))?.let {
+		userDatabase = UserDatabase.createInstance(this)
+		userDatabase.getUser(intent.getLongExtra(EXTRA_LONG_PROFILE_ID, -1))?.let {
 			loadData(it)
 		}
 
@@ -65,6 +73,75 @@ class InfoCenterActivity : BaseActivity() {
 			absenceList.addAll(it)
 			absenceAdapter.notifyDataSetChanged()
 		}
+		loadEvents(user)?.let {
+			eventList.addAll(it)
+			eventAdapter.notifyDataSetChanged()
+		}
+	}
+
+	private suspend fun loadEvents(user: UserDatabase.User): List<EventAdapterItem>? {
+		val events = mutableListOf<EventAdapterItem>()
+		loadExams(user)?.let { events.addAll(it) }
+		loadHomeworks(user)?.let { events.addAll(it) }
+		return events.toList()
+	}
+
+	private suspend fun loadExams(user: UserDatabase.User): List<EventAdapterItem>? {
+		val schoolYears = userDatabase.getAdditionalUserData<SchoolYear>(user.id!!, SchoolYear())?.values
+				?: emptyList()
+		val currentSchoolYearEndDate = schoolYears.first().endDate // TODO: Find current school year
+
+		val query = UntisRequest.UntisRequestQuery()
+
+		query.data.method = UntisApiConstants.METHOD_GET_EXAMS
+		query.url = user.apiUrl
+				?: (UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL + UntisApiConstants.DEFAULT_WEBUNTIS_HOST + UntisApiConstants.DEFAULT_WEBUNTIS_PATH + user.schoolId)
+		query.proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
+		query.data.params = listOf(ExamParams(
+				user.userData.elemId,
+				user.userData.elemType ?: "",
+				UntisDate.fromLocalDate(LocalDate.now()),
+				UntisDate(currentSchoolYearEndDate),
+				auth = UntisAuthentication.getAuthObject(user.user, user.key)
+		))
+
+		val result = api.request(query)
+		result.fold({ data ->
+			val untisResponse = getJSON().parse(ExamResponse.serializer(), data)
+
+			return untisResponse.result?.exams?.map { EventAdapterItem(it, null) }
+		}, { error ->
+			return null
+		})
+	}
+
+	private suspend fun loadHomeworks(user: UserDatabase.User): List<EventAdapterItem>? {
+		val schoolYears = userDatabase.getAdditionalUserData<SchoolYear>(user.id!!, SchoolYear())?.values
+				?: emptyList()
+		val currentSchoolYearEndDate = schoolYears.first().endDate // TODO: Find current school year
+
+		val query = UntisRequest.UntisRequestQuery()
+
+		query.data.method = UntisApiConstants.METHOD_GET_HOMEWORKS
+		query.url = user.apiUrl
+				?: (UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL + UntisApiConstants.DEFAULT_WEBUNTIS_HOST + UntisApiConstants.DEFAULT_WEBUNTIS_PATH + user.schoolId)
+		query.proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
+		query.data.params = listOf(HomeworkParams(
+				user.userData.elemId,
+				user.userData.elemType ?: "",
+				UntisDate.fromLocalDate(LocalDate.now()),
+				UntisDate(currentSchoolYearEndDate),
+				auth = UntisAuthentication.getAuthObject(user.user, user.key)
+		))
+
+		val result = api.request(query)
+		result.fold({ data ->
+			val untisResponse = getJSON().parse(HomeworkResponse.serializer(), data)
+
+			return untisResponse.result?.homeWorks?.map { EventAdapterItem(null, it) }
+		}, { error ->
+			return null
+		})
 	}
 
 	private suspend fun loadAbsences(user: UserDatabase.User): List<UntisAbsence>? {

@@ -20,7 +20,7 @@ class EventAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 	companion object {
 		private const val TYPE_EXAM = 1
-		private const val TYPE_HOMEWORK = 1
+		private const val TYPE_HOMEWORK = 2
 	}
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -39,20 +39,16 @@ class EventAdapter(
 
 	override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 		val event = eventList[position]
-		if (event.exam != null) {
-			(holder as ExamViewHolder).apply {
-				tvTime.text = formatExamTime(
-						UntisDate(event.exam.startDateTime).toDateTime().withZone(DateTimeZone.UTC),
-						UntisDate(event.exam.endDateTime).toDateTime().withZone(DateTimeZone.UTC)
-				)
-				tvTitle.text = event.exam.name
-			}
-		} else if (event.homework != null) {
-			(holder as HomeworkViewHolder).apply {
-				tvTime.text = UntisDate(event.homework.endDate).toDateTime().withZone(DateTimeZone.UTC).toString(DateTimeFormat.mediumDate())
-				tvTitle.text = event.homework.lessonId.toString()
-				tvText.text = event.homework.text
-			}
+		if (holder is ExamViewHolder && event.exam != null) {
+			holder.tvTime.text = formatExamTime(
+					UntisDate(event.exam.startDateTime).toDateTime().withZone(DateTimeZone.UTC),
+					UntisDate(event.exam.endDateTime).toDateTime().withZone(DateTimeZone.UTC)
+			)
+			holder.tvTitle.text = event.exam.name
+		} else if (holder is HomeworkViewHolder && event.homework != null) {
+			holder.tvTime.text = UntisDate(event.homework.endDate).toDateTime().withZone(DateTimeZone.UTC).toString(DateTimeFormat.mediumDate())
+			holder.tvTitle.text = event.homework.lessonId.toString()
+			holder.tvText.text = event.homework.text
 		}
 	}
 
