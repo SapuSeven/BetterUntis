@@ -88,62 +88,71 @@ class InfoCenterActivity : BaseActivity() {
 		return events.toList()
 	}
 
+	private fun getCurrentYear(schoolYears: List<SchoolYear>): SchoolYear? {
+		return schoolYears.find {
+			val now = LocalDate.now()
+			now.isAfter(LocalDate(it.startDate)) && now.isBefore(LocalDate(it.endDate))
+		}
+	}
+
 	private suspend fun loadExams(user: UserDatabase.User): List<EventAdapterItem>? {
-		val schoolYears = userDatabase.getAdditionalUserData<SchoolYear>(user.id!!, SchoolYear())?.values
+		val schoolYears = userDatabase.getAdditionalUserData<SchoolYear>(user.id!!, SchoolYear())?.values?.toList()
 				?: emptyList()
-		val currentSchoolYearEndDate = schoolYears.first().endDate // TODO: Find current school year
+		getCurrentYear(schoolYears)?.endDate?.let { currentSchoolYearEndDate ->
+			val query = UntisRequest.UntisRequestQuery()
 
-		val query = UntisRequest.UntisRequestQuery()
+			query.data.method = UntisApiConstants.METHOD_GET_EXAMS
+			query.url = user.apiUrl
+					?: (UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL + UntisApiConstants.DEFAULT_WEBUNTIS_HOST + UntisApiConstants.DEFAULT_WEBUNTIS_PATH + user.schoolId)
+			query.proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
+			query.data.params = listOf(ExamParams(
+					user.userData.elemId,
+					user.userData.elemType ?: "",
+					UntisDate.fromLocalDate(LocalDate.now()),
+					UntisDate(currentSchoolYearEndDate),
+					auth = UntisAuthentication.getAuthObject(user.user, user.key)
+			))
 
-		query.data.method = UntisApiConstants.METHOD_GET_EXAMS
-		query.url = user.apiUrl
-				?: (UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL + UntisApiConstants.DEFAULT_WEBUNTIS_HOST + UntisApiConstants.DEFAULT_WEBUNTIS_PATH + user.schoolId)
-		query.proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
-		query.data.params = listOf(ExamParams(
-				user.userData.elemId,
-				user.userData.elemType ?: "",
-				UntisDate.fromLocalDate(LocalDate.now()),
-				UntisDate(currentSchoolYearEndDate),
-				auth = UntisAuthentication.getAuthObject(user.user, user.key)
-		))
+			val result = api.request(query)
+			result.fold({ data ->
+				val untisResponse = getJSON().parse(ExamResponse.serializer(), data)
 
-		val result = api.request(query)
-		result.fold({ data ->
-			val untisResponse = getJSON().parse(ExamResponse.serializer(), data)
-
-			return untisResponse.result?.exams?.map { EventAdapterItem(it, null, null) }
-		}, { error ->
-			return null
-		})
+				return untisResponse.result?.exams?.map { EventAdapterItem(it, null, null) }
+			}, { error ->
+				return null
+			})
+		}
+		return null
 	}
 
 	private suspend fun loadHomeworks(user: UserDatabase.User): List<EventAdapterItem>? {
-		val schoolYears = userDatabase.getAdditionalUserData<SchoolYear>(user.id!!, SchoolYear())?.values
+		val schoolYears = userDatabase.getAdditionalUserData<SchoolYear>(user.id!!, SchoolYear())?.values?.toList()
 				?: emptyList()
-		val currentSchoolYearEndDate = schoolYears.first().endDate // TODO: Find current school year
+		getCurrentYear(schoolYears)?.endDate?.let { currentSchoolYearEndDate ->
+			val query = UntisRequest.UntisRequestQuery()
 
-		val query = UntisRequest.UntisRequestQuery()
+			query.data.method = UntisApiConstants.METHOD_GET_HOMEWORKS
+			query.url = user.apiUrl
+					?: (UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL + UntisApiConstants.DEFAULT_WEBUNTIS_HOST + UntisApiConstants.DEFAULT_WEBUNTIS_PATH + user.schoolId)
+			query.proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
+			query.data.params = listOf(HomeworkParams(
+					user.userData.elemId,
+					user.userData.elemType ?: "",
+					UntisDate.fromLocalDate(LocalDate.now()),
+					UntisDate(currentSchoolYearEndDate),
+					auth = UntisAuthentication.getAuthObject(user.user, user.key)
+			))
 
-		query.data.method = UntisApiConstants.METHOD_GET_HOMEWORKS
-		query.url = user.apiUrl
-				?: (UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL + UntisApiConstants.DEFAULT_WEBUNTIS_HOST + UntisApiConstants.DEFAULT_WEBUNTIS_PATH + user.schoolId)
-		query.proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
-		query.data.params = listOf(HomeworkParams(
-				user.userData.elemId,
-				user.userData.elemType ?: "",
-				UntisDate.fromLocalDate(LocalDate.now()),
-				UntisDate(currentSchoolYearEndDate),
-				auth = UntisAuthentication.getAuthObject(user.user, user.key)
-		))
+			val result = api.request(query)
+			result.fold({ data ->
+				val untisResponse = getJSON().parse(HomeworkResponse.serializer(), data)
 
-		val result = api.request(query)
-		result.fold({ data ->
-			val untisResponse = getJSON().parse(HomeworkResponse.serializer(), data)
-
-			return untisResponse.result?.homeWorks?.map { EventAdapterItem(null, it, untisResponse.result.lessonsById) }
-		}, { error ->
-			return null
-		})
+				return untisResponse.result?.homeWorks?.map { EventAdapterItem(null, it, untisResponse.result.lessonsById) }
+			}, { error ->
+				return null
+			})
+		}
+		return null
 	}
 
 	private suspend fun loadAbsences(user: UserDatabase.User): List<UntisAbsence>? {
