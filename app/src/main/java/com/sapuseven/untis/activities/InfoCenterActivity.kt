@@ -85,7 +85,9 @@ class InfoCenterActivity : BaseActivity() {
 		val events = mutableListOf<EventAdapterItem>()
 		loadExams(user)?.let { events.addAll(it) }
 		loadHomeworks(user)?.let { events.addAll(it) }
-		return events.toList()
+		return events.toList().sortedBy {
+			it.exam?.startDateTime ?: it.homework?.endDate
+		}
 	}
 
 	private fun getCurrentYear(schoolYears: List<SchoolYear>): SchoolYear? {
@@ -174,7 +176,9 @@ class InfoCenterActivity : BaseActivity() {
 		result.fold({ data ->
 			val untisResponse = getJSON().parse(AbsenceResponse.serializer(), data)
 
-			return untisResponse.result?.absences
+			return untisResponse.result?.absences?.sortedBy {
+				it.excused
+			}
 		}, { error ->
 			return null
 		})
