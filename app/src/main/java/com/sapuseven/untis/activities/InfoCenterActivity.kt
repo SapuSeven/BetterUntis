@@ -72,25 +72,34 @@ class InfoCenterActivity : BaseActivity() {
 		bottomnavigationview_infocenter.setOnNavigationItemSelectedListener {
 			when (it.itemId) {
 				R.id.item_infocenter_contact -> {
-					showList(contactAdapter, contactsLoading) { user -> GlobalScope.launch(Dispatchers.Main) { refreshOfficeHours(user) } }
+					showList(contactAdapter, contactsLoading, if (contactList.isEmpty()) getString(R.string.infocenter_officehours_empty) else "") { user ->
+						GlobalScope.launch(Dispatchers.Main) { refreshOfficeHours(user) }
+					}
 				}
 				R.id.item_infocenter_events -> {
-					showList(eventAdapter, eventsLoading) { user -> GlobalScope.launch(Dispatchers.Main) { refreshEvents(user) } }
+					showList(eventAdapter, eventsLoading, if (eventList.isEmpty()) getString(R.string.infocenter_events_empty) else "") { user ->
+						GlobalScope.launch(Dispatchers.Main) { refreshEvents(user) }
+					}
 				}
 				R.id.item_infocenter_absences -> {
-					showList(absenceAdapter, absencesLoading) { user -> GlobalScope.launch(Dispatchers.Main) { refreshAbsences(user) } }
+					showList(absenceAdapter, absencesLoading, if (absenceList.isEmpty()) getString(R.string.infocenter_absences_empty) else "") { user ->
+						GlobalScope.launch(Dispatchers.Main) { refreshAbsences(user) }
+					}
 				}
 			}
 			true
 		}
 
-		showList(contactAdapter, contactsLoading) { user -> GlobalScope.launch(Dispatchers.Main) { loadOfficeHours(user) } }
+		showList(contactAdapter, contactsLoading, if (contactList.isEmpty()) getString(R.string.infocenter_officehours_empty) else "") { user ->
+			GlobalScope.launch(Dispatchers.Main) { loadOfficeHours(user) }
+		}
 	}
 
-	private fun showList(adapter: RecyclerView.Adapter<*>, refreshing: Boolean, refreshFunction: (user: UserDatabase.User) -> Unit) {
+	private fun showList(adapter: RecyclerView.Adapter<*>, refreshing: Boolean, infoString: String, refreshFunction: (user: UserDatabase.User) -> Unit) {
 		recyclerview_infocenter.adapter = adapter
 		swiperefreshlayout_infocenter.isRefreshing = refreshing
 		swiperefreshlayout_infocenter.setOnRefreshListener { user?.let { refreshFunction(it) } }
+		textview_infocenter_emptylist.text = if (refreshing) "" else infoString
 	}
 
 	private fun refreshOfficeHours(user: UserDatabase.User) = GlobalScope.launch(Dispatchers.Main) {
@@ -101,8 +110,10 @@ class InfoCenterActivity : BaseActivity() {
 			contactAdapter.notifyDataSetChanged()
 		}
 		contactsLoading = false
-		if (bottomnavigationview_infocenter.selectedItemId == R.id.item_infocenter_contact)
+		if (bottomnavigationview_infocenter.selectedItemId == R.id.item_infocenter_contact) {
 			swiperefreshlayout_infocenter.isRefreshing = false
+			textview_infocenter_emptylist.text = if (contactList.isEmpty()) getString(R.string.infocenter_officehours_empty) else ""
+		}
 	}
 
 	private fun refreshEvents(user: UserDatabase.User) = GlobalScope.launch(Dispatchers.Main) {
@@ -113,8 +124,10 @@ class InfoCenterActivity : BaseActivity() {
 			eventAdapter.notifyDataSetChanged()
 		}
 		eventsLoading = false
-		if (bottomnavigationview_infocenter.selectedItemId == R.id.item_infocenter_events)
+		if (bottomnavigationview_infocenter.selectedItemId == R.id.item_infocenter_events) {
 			swiperefreshlayout_infocenter.isRefreshing = false
+			textview_infocenter_emptylist.text = if (eventList.isEmpty()) getString(R.string.infocenter_events_empty) else ""
+		}
 	}
 
 	private fun refreshAbsences(user: UserDatabase.User) = GlobalScope.launch(Dispatchers.Main) {
@@ -125,8 +138,10 @@ class InfoCenterActivity : BaseActivity() {
 			absenceAdapter.notifyDataSetChanged()
 		}
 		absencesLoading = false
-		if (bottomnavigationview_infocenter.selectedItemId == R.id.item_infocenter_absences)
+		if (bottomnavigationview_infocenter.selectedItemId == R.id.item_infocenter_absences) {
 			swiperefreshlayout_infocenter.isRefreshing = false
+			textview_infocenter_emptylist.text = if (absenceList.isEmpty()) getString(R.string.infocenter_absences_empty) else ""
+		}
 	}
 
 	private suspend fun loadEvents(user: UserDatabase.User): List<EventAdapterItem>? {
