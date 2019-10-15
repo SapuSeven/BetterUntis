@@ -3,7 +3,10 @@ package com.sapuseven.untis.activities
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sapuseven.untis.R
-import com.sapuseven.untis.adapters.infocenter.*
+import com.sapuseven.untis.adapters.infocenter.AbsenceAdapter
+import com.sapuseven.untis.adapters.infocenter.ContactAdapter
+import com.sapuseven.untis.adapters.infocenter.EventAdapter
+import com.sapuseven.untis.adapters.infocenter.EventAdapterItem
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
@@ -11,14 +14,17 @@ import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.UntisAbsence
+import com.sapuseven.untis.models.UntisOfficeHour
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.SchoolYear
 import com.sapuseven.untis.models.untis.params.AbsenceParams
 import com.sapuseven.untis.models.untis.params.ExamParams
 import com.sapuseven.untis.models.untis.params.HomeworkParams
+import com.sapuseven.untis.models.untis.params.OfficeHoursParams
 import com.sapuseven.untis.models.untis.response.AbsenceResponse
 import com.sapuseven.untis.models.untis.response.ExamResponse
 import com.sapuseven.untis.models.untis.response.HomeworkResponse
+import com.sapuseven.untis.models.untis.response.OfficeHoursResponse
 import kotlinx.android.synthetic.main.activity_infocenter.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -26,11 +32,11 @@ import kotlinx.coroutines.launch
 import org.joda.time.LocalDate
 
 class InfoCenterActivity : BaseActivity() {
-	private val contactList = arrayListOf<ContactAdapterItem>()
+	private val contactList = arrayListOf<UntisOfficeHour>()
 	private val eventList = arrayListOf<EventAdapterItem>()
 	private val absenceList = arrayListOf<UntisAbsence>()
 
-	private val contactAdapter = ContactAdapter(contactList)
+	private val contactAdapter = ContactAdapter(this, contactList)
 	private val eventAdapter = EventAdapter(this, eventList)
 	private val absenceAdapter = AbsenceAdapter(this, absenceList)
 
@@ -79,6 +85,10 @@ class InfoCenterActivity : BaseActivity() {
 			eventList.addAll(it)
 			eventAdapter.notifyDataSetChanged()
 		}
+		loadOfficeHours(user)?.let {
+			contactList.addAll(it)
+			contactAdapter.notifyDataSetChanged()
+		}
 	}
 
 	private suspend fun loadEvents(user: UserDatabase.User): List<EventAdapterItem>? {
@@ -97,6 +107,29 @@ class InfoCenterActivity : BaseActivity() {
 		}
 	}
 
+	private suspend fun loadOfficeHours(user: UserDatabase.User): List<UntisOfficeHour>? {
+		val query = UntisRequest.UntisRequestQuery()
+
+		query.data.method = UntisApiConstants.METHOD_GET_OFFICEHOURS
+		query.url = user.apiUrl
+				?: (UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL + UntisApiConstants.DEFAULT_WEBUNTIS_HOST + UntisApiConstants.DEFAULT_WEBUNTIS_PATH + user.schoolId)
+		query.proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
+		query.data.params = listOf(OfficeHoursParams(
+				-1,
+				UntisDate.fromLocalDate(LocalDate.now()),
+				auth = UntisAuthentication.getAuthObject(user)
+		))
+
+		val result = api.request(query)
+		result.fold({ data ->
+			val untisResponse = getJSON().parse(OfficeHoursResponse.serializer(), data)
+
+			return untisResponse.result?.officeHours
+		}, { error ->
+			return null
+		})
+	}
+
 	private suspend fun loadExams(user: UserDatabase.User): List<EventAdapterItem>? {
 		val schoolYears = userDatabase.getAdditionalUserData<SchoolYear>(user.id!!, SchoolYear())?.values?.toList()
 				?: emptyList()
@@ -112,7 +145,7 @@ class InfoCenterActivity : BaseActivity() {
 					user.userData.elemType ?: "",
 					UntisDate.fromLocalDate(LocalDate.now()),
 					UntisDate(currentSchoolYearEndDate),
-					auth = UntisAuthentication.getAuthObject(user.user, user.key)
+					auth = UntisAuthentication.getAuthObject(user)
 			))
 
 			val result = api.request(query)
@@ -142,7 +175,7 @@ class InfoCenterActivity : BaseActivity() {
 					user.userData.elemType ?: "",
 					UntisDate.fromLocalDate(LocalDate.now()),
 					UntisDate(currentSchoolYearEndDate),
-					auth = UntisAuthentication.getAuthObject(user.user, user.key)
+					auth = UntisAuthentication.getAuthObject(user)
 			))
 
 			val result = api.request(query)
@@ -169,7 +202,7 @@ class InfoCenterActivity : BaseActivity() {
 				UntisDate.fromLocalDate(LocalDate.now().plusMonths(1)),
 				includeExcused = true,
 				includeUnExcused = true,
-				auth = UntisAuthentication.getAuthObject(user.user, user.key)
+				auth = UntisAuthentication.getAuthObject(user)
 		))
 
 		val result = api.request(query)

@@ -1,5 +1,6 @@
 package com.sapuseven.untis.data.connectivity;
 
+import com.sapuseven.untis.data.databases.UserDatabase;
 import com.sapuseven.untis.helpers.Base32;
 import com.sapuseven.untis.models.untis.UntisAuth;
 
@@ -52,5 +53,9 @@ public class UntisAuthentication {
 
 	public static UntisAuth getAnonymousAuthObject() {
 		return new UntisAuth("#anonymous#", 0, new DateTime().getMillis());
+	}
+
+	public static UntisAuth getAuthObject(UserDatabase.User user) throws InvalidKeyException, NoSuchAlgorithmException {
+		return user.getAnonymous() ? UntisAuthentication.getAnonymousAuthObject() : UntisAuthentication.getAuthObject(user.getUser(), user.getKey());
 	}
 }

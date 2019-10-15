@@ -65,9 +65,9 @@ class EventAdapter(
 	private fun formatExamTime(startDateTime: DateTime, endDateTime: DateTime): String {
 		return context.getString(
 				if (startDateTime.dayOfYear == endDateTime.dayOfYear)
-					R.string.infocenter_absences_timeformat_sameday
+					R.string.infocenter_timeformat_sameday
 				else
-					R.string.infocenter_absences_timeformat,
+					R.string.infocenter_timeformat,
 				startDateTime.toString(DateTimeFormat.mediumDate()),
 				startDateTime.toString(DateTimeFormat.shortTime()),
 				endDateTime.toString(DateTimeFormat.mediumDate()),
