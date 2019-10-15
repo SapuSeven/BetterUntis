@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
+import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.UntisDate
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -16,7 +17,8 @@ import org.joda.time.format.DateTimeFormat
 class EventAdapter(
 		private val context: Context,
 		//private val onClickListener: AbsenceClickListener,
-		private val eventList: List<EventAdapterItem> = ArrayList()
+		private val eventList: List<EventAdapterItem> = ArrayList(),
+		var timetableDatabaseInterface: TimetableDatabaseInterface? = null
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 	companion object {
 		private const val TYPE_EXAM = 1
@@ -47,7 +49,9 @@ class EventAdapter(
 			holder.tvTitle.text = event.exam.name
 		} else if (holder is HomeworkViewHolder && event.homework != null) {
 			holder.tvTime.text = UntisDate(event.homework.endDate).toDateTime().withZone(DateTimeZone.UTC).toString(DateTimeFormat.mediumDate())
-			holder.tvTitle.text = event.homework.lessonId.toString()
+			holder.tvTitle.text = timetableDatabaseInterface?.getLongName(event.lessonsById?.get(event.homework.lessonId.toString())?.subjectId
+					?: 0, TimetableDatabaseInterface.Type.SUBJECT)
+					?: event.homework.lessonId.toString()
 			holder.tvText.text = event.homework.text
 		}
 	}

@@ -9,6 +9,7 @@ import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
+import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.UntisAbsence
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.SchoolYear
@@ -47,6 +48,7 @@ class InfoCenterActivity : BaseActivity() {
 
 		userDatabase = UserDatabase.createInstance(this)
 		userDatabase.getUser(intent.getLongExtra(EXTRA_LONG_PROFILE_ID, -1))?.let {
+			eventAdapter.timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, it.id!!)
 			loadData(it)
 		}
 
@@ -109,7 +111,7 @@ class InfoCenterActivity : BaseActivity() {
 		result.fold({ data ->
 			val untisResponse = getJSON().parse(ExamResponse.serializer(), data)
 
-			return untisResponse.result?.exams?.map { EventAdapterItem(it, null) }
+			return untisResponse.result?.exams?.map { EventAdapterItem(it, null, null) }
 		}, { error ->
 			return null
 		})
@@ -138,7 +140,7 @@ class InfoCenterActivity : BaseActivity() {
 		result.fold({ data ->
 			val untisResponse = getJSON().parse(HomeworkResponse.serializer(), data)
 
-			return untisResponse.result?.homeWorks?.map { EventAdapterItem(null, it) }
+			return untisResponse.result?.homeWorks?.map { EventAdapterItem(null, it, untisResponse.result.lessonsById) }
 		}, { error ->
 			return null
 		})
