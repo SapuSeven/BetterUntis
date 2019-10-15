@@ -14,31 +14,31 @@ import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
 
 
-class ContactAdapter(
+class OfficeHourAdapter(
 		private val context: Context,
 		//private val onClickListener: AbsenceClickListener,
-		private val contactList: List<UntisOfficeHour> = ArrayList()
-) : RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
+		private val officeHourList: List<UntisOfficeHour> = ArrayList()
+) : RecyclerView.Adapter<OfficeHourAdapter.ViewHolder>() {
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-		val v = LayoutInflater.from(parent.context).inflate(R.layout.item_contact, parent, false)
+		val v = LayoutInflater.from(parent.context).inflate(R.layout.item_officehour, parent, false)
 		//v.setOnClickListener(onClickListener)
 		return ViewHolder(v)
 	}
 
-	override fun getItemCount() = contactList.size
+	override fun getItemCount() = officeHourList.size
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-		val contact = contactList[position]
+		val officeHour = officeHourList[position]
 		holder.tvTime.text = formatOfficeHourTime(
-				UntisDate(contact.startDateTime).toDateTime().withZone(DateTimeZone.UTC),
-				UntisDate(contact.endDateTime).toDateTime().withZone(DateTimeZone.UTC)
+				UntisDate(officeHour.startDateTime).toDateTime().withZone(DateTimeZone.UTC),
+				UntisDate(officeHour.endDateTime).toDateTime().withZone(DateTimeZone.UTC)
 		)
-		holder.tvTitle.text = contact.displayNameTeacher
+		holder.tvTitle.text = officeHour.displayNameTeacher
 
 		val text = listOfNotNull(
-				contact.displayNameRooms,
-				contact.phone,
-				contact.email
+				officeHour.displayNameRooms,
+				officeHour.phone,
+				officeHour.email
 		).joinToString("\n")
 
 		holder.tvText.visibility = if (text.isBlank()) View.GONE else View.VISIBLE
@@ -59,8 +59,8 @@ class ContactAdapter(
 	}
 
 	class ViewHolder(rootView: View) : RecyclerView.ViewHolder(rootView) {
-		val tvTime: TextView = rootView.findViewById(R.id.textview_itemcontact_time)
-		val tvTitle: TextView = rootView.findViewById(R.id.textview_itemcontact_title)
-		val tvText: TextView = rootView.findViewById(R.id.textview_itemcontact_text)
+		val tvTime: TextView = rootView.findViewById(R.id.textview_itemofficehour_time)
+		val tvTitle: TextView = rootView.findViewById(R.id.textview_itemofficehour_title)
+		val tvText: TextView = rootView.findViewById(R.id.textview_itemofficehour_text)
 	}
 }

@@ -5,9 +5,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
 import com.sapuseven.untis.adapters.infocenter.AbsenceAdapter
-import com.sapuseven.untis.adapters.infocenter.ContactAdapter
 import com.sapuseven.untis.adapters.infocenter.EventAdapter
 import com.sapuseven.untis.adapters.infocenter.EventAdapterItem
+import com.sapuseven.untis.adapters.infocenter.OfficeHourAdapter
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
@@ -33,15 +33,15 @@ import kotlinx.coroutines.launch
 import org.joda.time.LocalDate
 
 class InfoCenterActivity : BaseActivity() {
-	private val contactList = arrayListOf<UntisOfficeHour>()
+	private val officeHourList = arrayListOf<UntisOfficeHour>()
 	private val eventList = arrayListOf<EventAdapterItem>()
 	private val absenceList = arrayListOf<UntisAbsence>()
 
-	private val contactAdapter = ContactAdapter(this, contactList)
+	private val officeHourAdapter = OfficeHourAdapter(this, officeHourList)
 	private val eventAdapter = EventAdapter(this, eventList)
 	private val absenceAdapter = AbsenceAdapter(this, absenceList)
 
-	private var contactsLoading = true
+	private var officeHoursLoading = true
 	private var eventsLoading = true
 	private var absencesLoading = true
 
@@ -71,8 +71,8 @@ class InfoCenterActivity : BaseActivity() {
 
 		bottomnavigationview_infocenter.setOnNavigationItemSelectedListener {
 			when (it.itemId) {
-				R.id.item_infocenter_contact -> {
-					showList(contactAdapter, contactsLoading, if (contactList.isEmpty()) getString(R.string.infocenter_officehours_empty) else "") { user ->
+				R.id.item_infocenter_officehours -> {
+					showList(officeHourAdapter, officeHoursLoading, if (officeHourList.isEmpty()) getString(R.string.infocenter_officehours_empty) else "") { user ->
 						GlobalScope.launch(Dispatchers.Main) { refreshOfficeHours(user) }
 					}
 				}
@@ -90,7 +90,7 @@ class InfoCenterActivity : BaseActivity() {
 			true
 		}
 
-		showList(contactAdapter, contactsLoading, if (contactList.isEmpty()) getString(R.string.infocenter_officehours_empty) else "") { user ->
+		showList(officeHourAdapter, officeHoursLoading, if (officeHourList.isEmpty()) getString(R.string.infocenter_officehours_empty) else "") { user ->
 			GlobalScope.launch(Dispatchers.Main) { loadOfficeHours(user) }
 		}
 	}
@@ -103,16 +103,16 @@ class InfoCenterActivity : BaseActivity() {
 	}
 
 	private fun refreshOfficeHours(user: UserDatabase.User) = GlobalScope.launch(Dispatchers.Main) {
-		contactsLoading = true
+		officeHoursLoading = true
 		loadOfficeHours(user)?.let {
-			contactList.clear()
-			contactList.addAll(it)
-			contactAdapter.notifyDataSetChanged()
+			officeHourList.clear()
+			officeHourList.addAll(it)
+			officeHourAdapter.notifyDataSetChanged()
 		}
-		contactsLoading = false
-		if (bottomnavigationview_infocenter.selectedItemId == R.id.item_infocenter_contact) {
+		officeHoursLoading = false
+		if (bottomnavigationview_infocenter.selectedItemId == R.id.item_infocenter_officehours) {
 			swiperefreshlayout_infocenter.isRefreshing = false
-			textview_infocenter_emptylist.text = if (contactList.isEmpty()) getString(R.string.infocenter_officehours_empty) else ""
+			textview_infocenter_emptylist.text = if (officeHourList.isEmpty()) getString(R.string.infocenter_officehours_empty) else ""
 		}
 	}
 
@@ -163,7 +163,7 @@ class InfoCenterActivity : BaseActivity() {
 	}
 
 	private suspend fun loadOfficeHours(user: UserDatabase.User): List<UntisOfficeHour>? {
-		contactsLoading = true
+		officeHoursLoading = true
 
 		val query = UntisRequest.UntisRequestQuery()
 

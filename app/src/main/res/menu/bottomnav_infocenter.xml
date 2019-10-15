@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item
-		android:id="@+id/item_infocenter_contact"
+		android:id="@+id/item_infocenter_officehours"
 		android:icon="@drawable/infocenter_contact"
-		android:title="@string/menu_infocenter_contact" />
+		android:title="@string/menu_infocenter_officehours" />
 	<item
 		android:id="@+id/item_infocenter_events"
 		android:icon="@drawable/infocenter_events"

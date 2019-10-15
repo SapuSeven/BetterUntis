@@ -32,7 +32,7 @@
 
 	<string name="menu_nav_timetables">Timetables</string>
 	<string name="menu_share">Share</string>
-	<string name="menu_infocenter_contact">Contact Hours</string>
+	<string name="menu_infocenter_officehours">Office Hours</string>
 	<string name="menu_infocenter_events">Events</string>
 	<string name="menu_infocenter_absences">Absences</string>
 

@@ -8,7 +8,7 @@
 	android:paddingBottom="12dp">
 
 	<TextView
-		android:id="@+id/textview_itemcontact_time"
+		android:id="@+id/textview_itemofficehour_time"
 		style="@style/TextAppearance.MaterialComponents.Overline"
 		android:layout_width="0dp"
 		android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
 		app:layout_constraintTop_toTopOf="parent" />
 
 	<TextView
-		android:id="@+id/textview_itemcontact_title"
+		android:id="@+id/textview_itemofficehour_title"
 		android:layout_width="0dp"
 		android:layout_height="wrap_content"
 		android:layout_marginStart="16dp"
@@ -31,10 +31,10 @@
 		android:textSize="@dimen/textsize_listitem_line1"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@+id/textview_itemcontact_time" />
+		app:layout_constraintTop_toBottomOf="@+id/textview_itemofficehour_time" />
 
 	<TextView
-		android:id="@+id/textview_itemcontact_text"
+		android:id="@+id/textview_itemofficehour_text"
 		android:layout_width="0dp"
 		android:layout_height="wrap_content"
 		android:layout_marginStart="16dp"
@@ -44,5 +44,5 @@
 		android:textSize="@dimen/textsize_listitem_line2"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@+id/textview_itemcontact_title" />
+		app:layout_constraintTop_toBottomOf="@+id/textview_itemofficehour_title" />
 </androidx.constraintlayout.widget.ConstraintLayout>
