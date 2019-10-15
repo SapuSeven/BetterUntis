@@ -2,6 +2,7 @@ package com.sapuseven.untis.activities
 
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
 import com.sapuseven.untis.adapters.infocenter.AbsenceAdapter
 import com.sapuseven.untis.adapters.infocenter.ContactAdapter
@@ -40,9 +41,14 @@ class InfoCenterActivity : BaseActivity() {
 	private val eventAdapter = EventAdapter(this, eventList)
 	private val absenceAdapter = AbsenceAdapter(this, absenceList)
 
+	private var contactsLoading = true
+	private var eventsLoading = true
+	private var absencesLoading = true
+
 	private var api: UntisRequest = UntisRequest()
 
 	private lateinit var userDatabase: UserDatabase
+	private var user: UserDatabase.User? = null
 
 	companion object {
 		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileid"
@@ -53,45 +59,79 @@ class InfoCenterActivity : BaseActivity() {
 		setContentView(R.layout.activity_infocenter)
 
 		userDatabase = UserDatabase.createInstance(this)
-		userDatabase.getUser(intent.getLongExtra(EXTRA_LONG_PROFILE_ID, -1))?.let {
+		user = userDatabase.getUser(intent.getLongExtra(EXTRA_LONG_PROFILE_ID, -1))
+		user?.let {
 			eventAdapter.timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, it.id!!)
-			loadData(it)
+			refreshOfficeHours(it)
+			refreshEvents(it)
+			refreshAbsences(it)
 		}
 
-		recyclerview_infocenter?.layoutManager = LinearLayoutManager(this)
+		recyclerview_infocenter.layoutManager = LinearLayoutManager(this)
 
-		bottomnavigationview_infocenter?.setOnNavigationItemSelectedListener {
+		bottomnavigationview_infocenter.setOnNavigationItemSelectedListener {
 			when (it.itemId) {
 				R.id.item_infocenter_contact -> {
-					recyclerview_infocenter.adapter = contactAdapter
+					showList(contactAdapter, contactsLoading) { user -> GlobalScope.launch(Dispatchers.Main) { refreshOfficeHours(user) } }
 				}
 				R.id.item_infocenter_events -> {
-					recyclerview_infocenter.adapter = eventAdapter
+					showList(eventAdapter, eventsLoading) { user -> GlobalScope.launch(Dispatchers.Main) { refreshEvents(user) } }
 				}
 				R.id.item_infocenter_absences -> {
-					recyclerview_infocenter.adapter = absenceAdapter
+					showList(absenceAdapter, absencesLoading) { user -> GlobalScope.launch(Dispatchers.Main) { refreshAbsences(user) } }
 				}
 			}
 			true
 		}
+
+		showList(contactAdapter, contactsLoading) { user -> GlobalScope.launch(Dispatchers.Main) { loadOfficeHours(user) } }
 	}
 
-	private fun loadData(user: UserDatabase.User) = GlobalScope.launch(Dispatchers.Main) {
-		loadAbsences(user)?.let {
-			absenceList.addAll(it)
-			absenceAdapter.notifyDataSetChanged()
-		}
-		loadEvents(user)?.let {
-			eventList.addAll(it)
-			eventAdapter.notifyDataSetChanged()
-		}
+	private fun showList(adapter: RecyclerView.Adapter<*>, refreshing: Boolean, refreshFunction: (user: UserDatabase.User) -> Unit) {
+		recyclerview_infocenter.adapter = adapter
+		swiperefreshlayout_infocenter.isRefreshing = refreshing
+		swiperefreshlayout_infocenter.setOnRefreshListener { user?.let { refreshFunction(it) } }
+	}
+
+	private fun refreshOfficeHours(user: UserDatabase.User) = GlobalScope.launch(Dispatchers.Main) {
+		contactsLoading = true
 		loadOfficeHours(user)?.let {
+			contactsLoading = false
+			if (bottomnavigationview_infocenter.selectedItemId == R.id.item_infocenter_contact)
+				swiperefreshlayout_infocenter.isRefreshing = false
+			contactList.clear()
 			contactList.addAll(it)
 			contactAdapter.notifyDataSetChanged()
 		}
 	}
 
+	private fun refreshEvents(user: UserDatabase.User) = GlobalScope.launch(Dispatchers.Main) {
+		eventsLoading = true
+		loadEvents(user)?.let {
+			eventsLoading = false
+			if (bottomnavigationview_infocenter.selectedItemId == R.id.item_infocenter_events)
+				swiperefreshlayout_infocenter.isRefreshing = false
+			eventList.clear()
+			eventList.addAll(it)
+			eventAdapter.notifyDataSetChanged()
+		}
+	}
+
+	private fun refreshAbsences(user: UserDatabase.User) = GlobalScope.launch(Dispatchers.Main) {
+		absencesLoading = true
+		loadAbsences(user)?.let {
+			absencesLoading = false
+			if (bottomnavigationview_infocenter.selectedItemId == R.id.item_infocenter_absences)
+				swiperefreshlayout_infocenter.isRefreshing = false
+			absenceList.clear()
+			absenceList.addAll(it)
+			absenceAdapter.notifyDataSetChanged()
+		}
+	}
+
 	private suspend fun loadEvents(user: UserDatabase.User): List<EventAdapterItem>? {
+		eventsLoading = true
+
 		val events = mutableListOf<EventAdapterItem>()
 		loadExams(user)?.let { events.addAll(it) }
 		loadHomeworks(user)?.let { events.addAll(it) }
@@ -108,6 +148,8 @@ class InfoCenterActivity : BaseActivity() {
 	}
 
 	private suspend fun loadOfficeHours(user: UserDatabase.User): List<UntisOfficeHour>? {
+		contactsLoading = true
+
 		val query = UntisRequest.UntisRequestQuery()
 
 		query.data.method = UntisApiConstants.METHOD_GET_OFFICEHOURS
@@ -191,6 +233,8 @@ class InfoCenterActivity : BaseActivity() {
 	}
 
 	private suspend fun loadAbsences(user: UserDatabase.User): List<UntisAbsence>? {
+		absencesLoading = true
+
 		val query = UntisRequest.UntisRequestQuery()
 
 		query.data.method = UntisApiConstants.METHOD_GET_ABSENCES

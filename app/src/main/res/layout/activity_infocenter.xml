@@ -5,12 +5,18 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent">
 
-	<androidx.recyclerview.widget.RecyclerView
-		android:id="@+id/recyclerview_infocenter"
+	<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+		android:id="@+id/swiperefreshlayout_infocenter"
 		android:layout_width="match_parent"
 		android:layout_height="0dp"
 		app:layout_constraintBottom_toTopOf="@id/bottomnavigationview_infocenter"
-		app:layout_constraintTop_toTopOf="parent" />
+		app:layout_constraintTop_toTopOf="parent">
+
+		<androidx.recyclerview.widget.RecyclerView
+			android:id="@+id/recyclerview_infocenter"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent" />
+	</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 	<com.google.android.material.bottomnavigation.BottomNavigationView
 		android:id="@+id/bottomnavigationview_infocenter"
