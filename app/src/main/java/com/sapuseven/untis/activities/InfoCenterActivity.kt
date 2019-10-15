@@ -96,37 +96,37 @@ class InfoCenterActivity : BaseActivity() {
 	private fun refreshOfficeHours(user: UserDatabase.User) = GlobalScope.launch(Dispatchers.Main) {
 		contactsLoading = true
 		loadOfficeHours(user)?.let {
-			contactsLoading = false
-			if (bottomnavigationview_infocenter.selectedItemId == R.id.item_infocenter_contact)
-				swiperefreshlayout_infocenter.isRefreshing = false
 			contactList.clear()
 			contactList.addAll(it)
 			contactAdapter.notifyDataSetChanged()
 		}
+		contactsLoading = false
+		if (bottomnavigationview_infocenter.selectedItemId == R.id.item_infocenter_contact)
+			swiperefreshlayout_infocenter.isRefreshing = false
 	}
 
 	private fun refreshEvents(user: UserDatabase.User) = GlobalScope.launch(Dispatchers.Main) {
 		eventsLoading = true
 		loadEvents(user)?.let {
-			eventsLoading = false
-			if (bottomnavigationview_infocenter.selectedItemId == R.id.item_infocenter_events)
-				swiperefreshlayout_infocenter.isRefreshing = false
 			eventList.clear()
 			eventList.addAll(it)
 			eventAdapter.notifyDataSetChanged()
 		}
+		eventsLoading = false
+		if (bottomnavigationview_infocenter.selectedItemId == R.id.item_infocenter_events)
+			swiperefreshlayout_infocenter.isRefreshing = false
 	}
 
 	private fun refreshAbsences(user: UserDatabase.User) = GlobalScope.launch(Dispatchers.Main) {
 		absencesLoading = true
 		loadAbsences(user)?.let {
-			absencesLoading = false
-			if (bottomnavigationview_infocenter.selectedItemId == R.id.item_infocenter_absences)
-				swiperefreshlayout_infocenter.isRefreshing = false
 			absenceList.clear()
 			absenceList.addAll(it)
 			absenceAdapter.notifyDataSetChanged()
 		}
+		absencesLoading = false
+		if (bottomnavigationview_infocenter.selectedItemId == R.id.item_infocenter_absences)
+			swiperefreshlayout_infocenter.isRefreshing = false
 	}
 
 	private suspend fun loadEvents(user: UserDatabase.User): List<EventAdapterItem>? {
@@ -163,13 +163,11 @@ class InfoCenterActivity : BaseActivity() {
 		))
 
 		val result = api.request(query)
-		result.fold({ data ->
+		return result.fold({ data ->
 			val untisResponse = getJSON().parse(OfficeHoursResponse.serializer(), data)
 
-			return untisResponse.result?.officeHours
-		}, { error ->
-			return null
-		})
+			untisResponse.result?.officeHours
+		}, { null })
 	}
 
 	private suspend fun loadExams(user: UserDatabase.User): List<EventAdapterItem>? {
@@ -191,13 +189,11 @@ class InfoCenterActivity : BaseActivity() {
 			))
 
 			val result = api.request(query)
-			result.fold({ data ->
+			return result.fold({ data ->
 				val untisResponse = getJSON().parse(ExamResponse.serializer(), data)
 
-				return untisResponse.result?.exams?.map { EventAdapterItem(it, null, null) }
-			}, { error ->
-				return null
-			})
+				untisResponse.result?.exams?.map { EventAdapterItem(it, null, null) }
+			}, { null })
 		}
 		return null
 	}
@@ -221,13 +217,11 @@ class InfoCenterActivity : BaseActivity() {
 			))
 
 			val result = api.request(query)
-			result.fold({ data ->
+			return result.fold({ data ->
 				val untisResponse = getJSON().parse(HomeworkResponse.serializer(), data)
 
-				return untisResponse.result?.homeWorks?.map { EventAdapterItem(null, it, untisResponse.result.lessonsById) }
-			}, { error ->
-				return null
-			})
+				untisResponse.result?.homeWorks?.map { EventAdapterItem(null, it, untisResponse.result.lessonsById) }
+			}, { null })
 		}
 		return null
 	}
@@ -250,14 +244,10 @@ class InfoCenterActivity : BaseActivity() {
 		))
 
 		val result = api.request(query)
-		result.fold({ data ->
+		return result.fold({ data ->
 			val untisResponse = getJSON().parse(AbsenceResponse.serializer(), data)
 
-			return untisResponse.result?.absences?.sortedBy {
-				it.excused
-			}
-		}, { error ->
-			return null
-		})
+			untisResponse.result?.absences?.sortedBy { it.excused }
+		}, { null })
 	}
 }
