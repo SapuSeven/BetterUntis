@@ -48,7 +48,7 @@ class EventAdapter(
 			)
 			holder.tvTitle.text = event.exam.name
 		} else if (holder is HomeworkViewHolder && event.homework != null) {
-			holder.tvTime.text = UntisDate(event.homework.endDate).toDateTime().withZone(DateTimeZone.UTC).toString(DateTimeFormat.mediumDate())
+			holder.tvTime.text = UntisDate(event.homework.endDate).toDateTime().toString(DateTimeFormat.mediumDate())
 			holder.tvTitle.text = timetableDatabaseInterface?.getLongName(event.lessonsById?.get(event.homework.lessonId.toString())?.subjectId
 					?: 0, TimetableDatabaseInterface.Type.SUBJECT)
 					?: event.homework.lessonId.toString()
