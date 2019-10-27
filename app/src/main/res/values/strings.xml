@@ -196,6 +196,7 @@
 
 	<string name="homeworks_due_time">until %1$s</string>
 	<string name="homeworks_due_time_format">EEE, dd. MMM</string>
+    <string name="preferences_general">General</string>
 
 	<plurals name="main_time_diff_minutes">
 		<item quantity="one">a minute ago</item>
@@ -214,4 +215,6 @@
 		<item quantity="one">This Room is free right now.</item>
 		<item quantity="other">This Room is free for %d hours.</item>
 	</plurals>
+	<string name="preference_category_general_behaviour">Behaviour</string>
+	<string name="preference_double_tap_to_exit">Double tap back button to exit</string>
 </resources>

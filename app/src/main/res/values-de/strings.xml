@@ -214,4 +214,7 @@
 		<item quantity="one">Dieser Raum ist gerade frei.</item>
 		<item quantity="other">Dieser Raum ist die nächsten %d Stunden frei.</item>
 	</plurals>
+	<string name="preferences_general">Allgemein</string>
+	<string name="preference_category_general_behaviour">Verhalten</string>
+    <string name="preference_double_tap_to_exit">Zurück-Button zwei mal antippen zum Beenden</string>
 </resources>

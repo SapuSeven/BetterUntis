@@ -10,6 +10,7 @@
 	<bool name="preference_timetable_hide_cancelled_default">false</bool>
 	<bool name="preference_notifications_enable_default">true</bool>
 	<bool name="preference_notifications_in_multiple_default">true</bool>
+	<bool name="preference_double_tap_to_exit_default">true</bool>
 
 	<integer name="preference_background_regular_default">0xFFF44336</integer>
 	<integer name="preference_background_regular_past_default">0xFFD32F2F</integer>
