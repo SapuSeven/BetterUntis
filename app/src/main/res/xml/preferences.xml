@@ -2,6 +2,17 @@
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto">
 	<PreferenceScreen
+		android:key="preferences_general"
+		android:title="@string/preferences_general">
+
+		<PreferenceCategory android:title="@string/preference_category_general_behaviour">
+			<CheckBoxPreference
+				android:defaultValue="@bool/preference_double_tap_to_exit_default"
+				android:key="preference_double_tap_to_exit"
+				android:title="@string/preference_double_tap_to_exit" />
+		</PreferenceCategory>
+	</PreferenceScreen>
+	<PreferenceScreen
 		android:icon="@drawable/settings_styling"
 		android:key="preferences_styling"
 		android:title="@string/preferences_styling">

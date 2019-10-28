@@ -563,7 +563,7 @@ class MainActivity :
 		if (drawer.isDrawerOpen(GravityCompat.START)) {
 			closeDrawer(drawer)
 		} else if (!showPersonalTimetable()) {
-			if (System.currentTimeMillis() - 2000 > lastBackPress) {
+			if (System.currentTimeMillis() - 2000 > lastBackPress && PreferenceUtils.getPrefBool(preferences, "preference_double_tap_to_exit")) {
 				Snackbar.make(findViewById<ConstraintLayout>(R.id.content_main),
 						R.string.main_press_back_double, 2000).show()
 				lastBackPress = System.currentTimeMillis()
