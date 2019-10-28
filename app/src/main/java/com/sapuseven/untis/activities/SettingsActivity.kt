@@ -4,6 +4,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentTransaction
@@ -22,7 +23,6 @@ import com.sapuseven.untis.preferences.AlertPreferenceDialog
 import com.sapuseven.untis.preferences.ElementPickerPreference
 import kotlinx.android.synthetic.main.activity_settings.*
 
-// TODO: The current settings page should be displayed in the actionbar
 class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback {
 	private var profileId: Long? = null
 
@@ -100,9 +100,19 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 				.beginTransaction()
 				.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
 				.replace(R.id.framelayout_settings_content, fragment, preferenceScreen.key)
-				.addToBackStack(preferenceScreen.key)
+				.addToBackStack(preferenceScreen.title.toString())
 				.commit()
+
+		supportActionBar?.title = preferenceScreen.title
 		return true
+	}
+
+	override fun onBackPressed() {
+		super.onBackPressed()
+
+		supportFragmentManager.run {
+			supportActionBar?.title = if (backStackEntryCount > 0) getBackStackEntryAt(backStackEntryCount - 1).name else getString(R.string.activity_title_settings)
+		}
 	}
 
 	class PreferencesFragment : PreferenceFragmentCompat() {
