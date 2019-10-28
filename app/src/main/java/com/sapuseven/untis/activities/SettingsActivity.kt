@@ -22,7 +22,6 @@ import com.sapuseven.untis.preferences.AlertPreferenceDialog
 import com.sapuseven.untis.preferences.ElementPickerPreference
 import kotlinx.android.synthetic.main.activity_settings.*
 
-// TODO: The actionbar back arrow still exits the entire activity; go back on the backstack instead
 // TODO: The current settings page should be displayed in the actionbar
 class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback {
 	private var profileId: Long? = null
@@ -60,6 +59,12 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 					.replace(R.id.framelayout_settings_content, fragment, PreferencesFragment.FRAGMENT_TAG)
 					.commit()
 		}
+	}
+
+	override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+		if (item?.itemId == android.R.id.home)
+			onBackPressed()
+		return true
 	}
 
 	private fun setupDesigningDialog() {
