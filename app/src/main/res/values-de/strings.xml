@@ -174,8 +174,8 @@
 	<string name="preference_timetable_lesson_info_font_size">Schriftgröße für Stundeninfo</string>
 	<string name="preference_timetable_lesson_name_font_size">Schriftgröße für Stundenname</string>
 	<string name="preference_timetable_personal_timetable">Benutzerdefinierter persönlicher Stundenplan</string>
-	<string name="preference_use_default_background">Farben der Schule verwenden</string>
-	<string name="preference_use_default_background_desc">Manche Schulen senden eigene Hintergrundfarben</string>
+	<string name="preference_school_background">Farben der Schule verwenden</string>
+	<string name="preference_school_background_desc">Manche Schulen senden eigene Hintergrundfarben</string>
 	<string name="preference_use_theme_background">Designfarben verwenden</string>
 	<string name="preference_use_theme_background_desc">Verwendet Farben des aktuellen Designs für normale Stunden</string>
 	<string name="preference_double_tap_to_exit">Zurück-Button zwei mal antippen zum Beenden</string>

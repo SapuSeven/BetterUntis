@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-	<bool name="preference_use_default_background_default">false</bool>
 	<bool name="preference_use_theme_background_default">false</bool>
 	<bool name="preference_dark_theme_oled_default">false</bool>
 	<bool name="preference_connectivity_refresh_in_background_default">true</bool>

@@ -42,4 +42,17 @@
 		<item>long</item>
 	</string-array>
 
+	<string-array name="preference_schoolcolors">
+		<item>For regular lessons</item>
+		<item>For lessons with tests</item>
+		<item>For irregular lessons</item>
+		<item>For cancelled lessons</item>
+	</string-array>
+
+	<string-array name="preference_schoolcolors_values" translatable="false">
+		<item>regular</item>
+		<item>exam</item>
+		<item>irregular</item>
+		<item>cancelled</item>
+	</string-array>
 </resources>

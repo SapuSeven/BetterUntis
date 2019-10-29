@@ -48,16 +48,15 @@
 
 		<PreferenceCategory android:title="@string/preference_category_styling_backgrounds">
 
-			<CheckBoxPreference
-				android:defaultValue="@bool/preference_use_default_background_default"
-				android:disableDependentsState="true"
-				android:key="preference_use_default_background"
-				android:summary="@string/preference_use_default_background_desc"
-				android:title="@string/preference_use_default_background" />
+			<MultiSelectListPreference
+				android:entries="@array/preference_schoolcolors"
+				android:entryValues="@array/preference_schoolcolors_values"
+				android:key="preference_school_background"
+				android:summary="@string/preference_school_background_desc"
+				android:title="@string/preference_school_background" />
 
 			<CheckBoxPreference
 				android:defaultValue="@bool/preference_use_theme_background_default"
-				android:dependency="preference_use_default_background"
 				android:disableDependentsState="true"
 				android:key="preference_use_theme_background"
 				android:summary="@string/preference_use_theme_background_desc"
@@ -77,37 +76,31 @@
 
 			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
 				android:defaultValue="@integer/preference_background_exam_default"
-				android:dependency="preference_use_default_background"
 				android:key="preference_background_exam"
 				android:title="@string/preference_background_exam" />
 
 			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
 				android:defaultValue="@integer/preference_background_exam_past_default"
-				android:dependency="preference_use_default_background"
 				android:key="preference_background_exam_past"
 				android:title="@string/preference_background_exam_past" />
 
 			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
 				android:defaultValue="@integer/preference_background_irregular_default"
-				android:dependency="preference_use_default_background"
 				android:key="preference_background_irregular"
 				android:title="@string/preference_background_irregular" />
 
 			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
 				android:defaultValue="@integer/preference_background_irregular_past_default"
-				android:dependency="preference_use_default_background"
 				android:key="preference_background_irregular_past"
 				android:title="@string/preference_background_irregular_past" />
 
 			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
 				android:defaultValue="@integer/preference_background_cancelled_default"
-				android:dependency="preference_use_default_background"
 				android:key="preference_background_cancelled"
 				android:title="@string/preference_background_cancelled" />
 
 			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
 				android:defaultValue="@integer/preference_background_cancelled_past_default"
-				android:dependency="preference_use_default_background"
 				android:key="preference_background_cancelled_past"
 				android:title="@string/preference_background_cancelled_past" />
 

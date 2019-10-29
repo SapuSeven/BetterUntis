@@ -470,26 +470,27 @@ class MainActivity :
 		val cancelledPastColor = PreferenceUtils.getPrefInt(preferences, "preference_background_cancelled_past")
 		val irregularPastColor = PreferenceUtils.getPrefInt(preferences, "preference_background_irregular_past")
 
-		val useDefault = PreferenceUtils.getPrefBool(preferences, "preference_use_default_background")
-		val useTheme = PreferenceUtils.getPrefBool(preferences, "preference_use_theme_background")
+		val useDefault = preferences.defaultPrefs.getStringSet("preference_school_background", emptySet())
+				?: emptySet()
+		val useTheme = if (!useDefault.contains("regular")) PreferenceUtils.getPrefBool(preferences, "preference_use_theme_background") else false
 
 		items.forEach { item ->
+			val defaultColor = Color.parseColor(item.periodData.element.backColor)
+
 			item.color = when {
-				item.periodData.isExam() -> examColor
-				item.periodData.isCancelled() -> cancelledColor
-				item.periodData.isIrregular() -> irregularColor
-				useDefault -> Color.parseColor(item.periodData.element.backColor)
+				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor else examColor
+				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else cancelledColor
+				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else irregularColor
 				useTheme -> getAttr(R.attr.colorPrimary)
-				else -> regularColor
+				else -> if (useDefault.contains("regular")) defaultColor else regularColor
 			}
 
 			item.pastColor = when {
-				item.periodData.isExam() -> examPastColor
-				item.periodData.isCancelled() -> cancelledPastColor
-				item.periodData.isIrregular() -> irregularPastColor
-				useDefault -> item.color.darken(0.25f)
+				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor.darken(0.25f) else examPastColor
+				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor.darken(0.25f) else cancelledPastColor
+				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(0.25f) else irregularPastColor
 				useTheme -> getAttr(R.attr.colorPrimaryDark)
-				else -> regularPastColor
+				else -> if (useDefault.contains("regular")) defaultColor.darken(0.25f) else regularPastColor
 			}
 		}
 	}

@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.preference.MultiSelectListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceScreen
@@ -138,22 +139,45 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 				setPreferencesFromResource(R.xml.preferences, rootKey)
 
 				when (rootKey) {
-					"preferences_styling" ->
+					"preferences_styling" -> {
+						findPreference<MultiSelectListPreference>("preference_school_background")?.apply {
+							setOnPreferenceChangeListener { _, newValue ->
+								if (newValue !is Set<*>) return@setOnPreferenceChangeListener false
+
+								refreshColorPreferences(newValue)
+
+								true
+							}
+
+							refreshColorPreferences(values)
+						}
+
 						listOf("preference_theme", "preference_dark_theme", "preference_dark_theme_oled").forEach { key ->
-							@Suppress("RemoveExplicitTypeArguments")
 							findPreference<Preference>(key)?.setOnPreferenceChangeListener { _, _ ->
 								activity?.recreate()
 								true
 							}
 						}
+					}
 					"preferences_connectivity" ->
-						@Suppress("RemoveExplicitTypeArguments")
 						findPreference<Preference>("preference_connectivity_proxy_about")?.setOnPreferenceClickListener {
 							startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(WIKI_URL_PROXY)))
 							true
 						}
 				}
 			}
+		}
+
+		private fun refreshColorPreferences(newValue: Set<*>) {
+			val regularColors = listOf("preference_background_regular", "preference_background_regular_past", "preference_use_theme_background")
+			val irregularColors = listOf("preference_background_irregular", "preference_background_irregular_past")
+			val cancelledColors = listOf("preference_background_cancelled", "preference_background_cancelled_past")
+			val examColors = listOf("preference_background_exam", "preference_background_exam_past")
+
+			regularColors.forEach { findPreference<Preference>(it)?.isEnabled = !newValue.contains("regular") }
+			irregularColors.forEach { findPreference<Preference>(it)?.isEnabled = !newValue.contains("irregular") }
+			cancelledColors.forEach { findPreference<Preference>(it)?.isEnabled = !newValue.contains("cancelled") }
+			examColors.forEach { findPreference<Preference>(it)?.isEnabled = !newValue.contains("exam") }
 		}
 
 		override fun onPreferenceTreeClick(preference: Preference): Boolean {

@@ -174,8 +174,8 @@
 	<string name="preference_timetable_lesson_info_font_size">Font size for lesson infos</string>
 	<string name="preference_timetable_lesson_name_font_size">Font size for lesson name</string>
 	<string name="preference_timetable_personal_timetable">Custom Personal Timetable</string>
-	<string name="preference_use_default_background">Use colors provided from your school</string>
-	<string name="preference_use_default_background_desc">Some schools send their own background colors.</string>
+	<string name="preference_school_background">Use colors provided from your school</string>
+	<string name="preference_school_background_desc">Some schools send their own background colors.</string>
 	<string name="preference_use_theme_background">Use theme colors</string>
 	<string name="preference_use_theme_background_desc">This only applies to regular lessons.</string>
 	<string name="preference_double_tap_to_exit">Double tap back button to exit</string>
