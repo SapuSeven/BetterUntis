@@ -26,14 +26,16 @@
 	<group
 		android:checkableBehavior="none">
 		<item
+			android:id="@+id/nav_infocenter"
+			android:icon="@drawable/all_infocenter"
+			android:title="@string/activity_title_info_center" />
+		<item
 			android:id="@+id/nav_free_rooms"
 			android:icon="@drawable/all_search_rooms"
-			android:title="@string/menu_free_rooms">
-		</item>
+			android:title="@string/activity_title_free_rooms" />
 		<item
 			android:id="@+id/nav_settings"
 			android:icon="@drawable/all_settings"
-			android:title="@string/menu_settings">
-		</item>
+			android:title="@string/activity_title_settings" />
 	</group>
 </menu>

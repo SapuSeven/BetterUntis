@@ -10,6 +10,7 @@
 	<dimen name="textsize_header_line2">14sp</dimen>
 	<dimen name="textsize_listitem_line1">16sp</dimen>
 	<dimen name="textsize_listitem_line2">14sp</dimen>
+	<dimen name="textsize_listitem_overline">10sp</dimen>
 	<dimen name="textsize_login_welcome">36sp</dimen>
 
 	<dimen name="width_main_leftsidebar">38dp</dimen>

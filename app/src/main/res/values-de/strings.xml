@@ -27,12 +27,14 @@
 	<string name="all_dialog_datepicker_button_today">Heute</string>
 
 	<string name="activity_title_free_rooms">Freie Räume</string>
+	<string name="activity_title_info_center">Info-Center</string>
 	<string name="activity_title_settings">Einstellungen</string>
 
 	<string name="menu_nav_timetables">Stundenpläne</string>
-	<string name="menu_free_rooms">Freie Räume</string>
-	<string name="menu_settings">Einstellungen</string>
 	<string name="menu_share">Teilen</string>
+	<string name="menu_infocenter_officehours">Sprechstunden</string>
+	<string name="menu_infocenter_events">Termine</string>
+	<string name="menu_infocenter_absences">Abwesenheiten</string>
 
 	<string name="mainactivitydrawer_dropdown_show">Alle Profile anzeigen</string>
 	<string name="mainactivitydrawer_profile_add">Profil hinzufügen…</string>
@@ -105,6 +107,13 @@
 	<string name="roomfinder_image_previous_hour">vorherige Stunde</string>
 	<string name="roomfinder_image_next_hour">nächste Stunde</string>
 	<string name="roomfinder_loading_data">Lade Daten…</string>
+
+	<string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
+	<string name="infocenter_timeformat_sameday">%2$s - %4$s, %1$s</string>
+	<string name="infocenter_officehours_empty">Keine Sprechstunden</string>
+	<string name="infocenter_events_empty">Keine Termine</string>
+	<string name="infocenter_absences_empty">Keine Abwesenheiten</string>
+	<string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
 
 	<string name="elementpicker_hint_search">Suchen…</string>
 	<string name="elementpicker_hint_search_classes">Klassen durchsuchen…</string>

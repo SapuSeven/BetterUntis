@@ -11,10 +11,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 @Table(TABLE_NAME_SCHOOL_YEARS)
 data class SchoolYear(
-		@field:TableColumn("INTEGER NOT NULL") val id: Int,
-		@field:TableColumn("VARCHAR(255) NOT NULL") val name: String,
-		@field:TableColumn("VARCHAR(255) NOT NULL") val startDate: String,
-		@field:TableColumn("VARCHAR(255) NOT NULL") val endDate: String
+		@field:TableColumn("INTEGER NOT NULL") val id: Int = 0,
+		@field:TableColumn("VARCHAR(255) NOT NULL") val name: String = "",
+		@field:TableColumn("VARCHAR(255) NOT NULL") val startDate: String = "",
+		@field:TableColumn("VARCHAR(255) NOT NULL") val endDate: String = ""
 ) : TableModel {
 	companion object {
 		const val TABLE_NAME = TABLE_NAME_SCHOOL_YEARS

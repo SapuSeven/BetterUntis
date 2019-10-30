@@ -511,14 +511,19 @@ class MainActivity :
 				showItemList(TimetableDatabaseInterface.Type.ROOM)
 			}
 			R.id.nav_settings -> {
-				val intent = Intent(this@MainActivity, SettingsActivity::class.java)
-				intent.putExtra(SettingsActivity.EXTRA_LONG_PROFILE_ID, profileId)
-				startActivity(intent)
+				val i = Intent(this@MainActivity, SettingsActivity::class.java)
+				i.putExtra(SettingsActivity.EXTRA_LONG_PROFILE_ID, profileId)
+				startActivity(i)
+			}
+			R.id.nav_infocenter -> {
+				val i = Intent(this@MainActivity, InfoCenterActivity::class.java)
+				i.putExtra(InfoCenterActivity.EXTRA_LONG_PROFILE_ID, profileId)
+				startActivityForResult(i, REQUEST_CODE_ROOM_FINDER)
 			}
 			R.id.nav_free_rooms -> {
-				val i3 = Intent(this@MainActivity, RoomFinderActivity::class.java)
-				i3.putExtra(RoomFinderActivity.EXTRA_LONG_PROFILE_ID, profileId)
-				startActivityForResult(i3, REQUEST_CODE_ROOM_FINDER)
+				val i = Intent(this@MainActivity, RoomFinderActivity::class.java)
+				i.putExtra(RoomFinderActivity.EXTRA_LONG_PROFILE_ID, profileId)
+				startActivityForResult(i, REQUEST_CODE_ROOM_FINDER)
 			}
 		}
 

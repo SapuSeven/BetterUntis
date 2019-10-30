@@ -7,6 +7,10 @@ object UntisApiConstants {
 
 	const val METHOD_GET_USER_DATA = "getUserData2017"
 	const val METHOD_GET_TIMETABLE = "getTimetable2017"
+	const val METHOD_GET_OFFICEHOURS = "getOfficeHours2017"
+	const val METHOD_GET_EXAMS = "getExams2017"
+	const val METHOD_GET_HOMEWORKS = "getHomeWork2017"
+	const val METHOD_GET_ABSENCES = "getStudentAbsences2017"
 	const val METHOD_SEARCH_SCHOOLS = "searchSchool"
 	const val METHOD_GET_APP_SHARED_SECRET = "getAppSharedSecret"
 
