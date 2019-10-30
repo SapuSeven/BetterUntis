@@ -113,6 +113,7 @@
 	<string name="infocenter_officehours_empty">No office hours</string>
 	<string name="infocenter_events_empty">No events</string>
 	<string name="infocenter_absences_empty">No absences</string>
+	<string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
 
 	<string name="elementpicker_hint_search">Search…</string>
 	<string name="elementpicker_hint_search_classes">Search for classes…</string>

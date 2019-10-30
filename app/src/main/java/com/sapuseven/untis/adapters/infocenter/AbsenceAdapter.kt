@@ -17,12 +17,10 @@ import org.joda.time.format.DateTimeFormat
 
 class AbsenceAdapter(
 		private val context: Context,
-		//private val onClickListener: AbsenceClickListener,
 		private val absenceList: List<UntisAbsence> = ArrayList()
 ) : RecyclerView.Adapter<AbsenceAdapter.ViewHolder>() {
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		val v = LayoutInflater.from(parent.context).inflate(R.layout.item_absence, parent, false)
-		//v.setOnClickListener(onClickListener)
 		return ViewHolder(v)
 	}
 

@@ -16,12 +16,10 @@ import org.joda.time.format.DateTimeFormat
 
 class OfficeHourAdapter(
 		private val context: Context,
-		//private val onClickListener: AbsenceClickListener,
 		private val officeHourList: List<UntisOfficeHour> = ArrayList()
 ) : RecyclerView.Adapter<OfficeHourAdapter.ViewHolder>() {
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		val v = LayoutInflater.from(parent.context).inflate(R.layout.item_officehour, parent, false)
-		//v.setOnClickListener(onClickListener)
 		return ViewHolder(v)
 	}
 
