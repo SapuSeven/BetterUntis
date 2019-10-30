@@ -1,6 +1,7 @@
 package com.sapuseven.untis.activities
 
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -76,28 +77,30 @@ class InfoCenterActivity : BaseActivity() {
 		recyclerview_infocenter.layoutManager = LinearLayoutManager(this)
 
 		bottomnavigationview_infocenter.setOnNavigationItemSelectedListener {
-			when (it.itemId) {
-				R.id.item_infocenter_officehours -> {
-					showList(officeHourAdapter, officeHoursLoading, if (officeHourList.isEmpty()) getString(R.string.infocenter_officehours_empty) else "") { user ->
-						GlobalScope.launch(Dispatchers.Main) { refreshOfficeHours(user) }
-					}
-				}
-				R.id.item_infocenter_events -> {
-					showList(eventAdapter, eventsLoading, if (eventList.isEmpty()) getString(R.string.infocenter_events_empty) else "") { user ->
-						GlobalScope.launch(Dispatchers.Main) { refreshEvents(user) }
-					}
-				}
-				R.id.item_infocenter_absences -> {
-					showList(absenceAdapter, absencesLoading, if (absenceList.isEmpty()) getString(R.string.infocenter_absences_empty) else "") { user ->
-						GlobalScope.launch(Dispatchers.Main) { refreshAbsences(user) }
-					}
-				}
-			}
+			showPage(it)
 			true
 		}
 
-		showList(officeHourAdapter, officeHoursLoading, if (officeHourList.isEmpty()) getString(R.string.infocenter_officehours_empty) else "") { user ->
-			GlobalScope.launch(Dispatchers.Main) { loadOfficeHours(user) }
+		showPage(bottomnavigationview_infocenter.menu.getItem(0))
+	}
+
+	private fun showPage(item: MenuItem) {
+		when (item.itemId) {
+			R.id.item_infocenter_officehours -> {
+				showList(officeHourAdapter, officeHoursLoading, if (officeHourList.isEmpty()) getString(R.string.infocenter_officehours_empty) else "") { user ->
+					GlobalScope.launch(Dispatchers.Main) { refreshOfficeHours(user) }
+				}
+			}
+			R.id.item_infocenter_events -> {
+				showList(eventAdapter, eventsLoading, if (eventList.isEmpty()) getString(R.string.infocenter_events_empty) else "") { user ->
+					GlobalScope.launch(Dispatchers.Main) { refreshEvents(user) }
+				}
+			}
+			R.id.item_infocenter_absences -> {
+				showList(absenceAdapter, absencesLoading, if (absenceList.isEmpty()) getString(R.string.infocenter_absences_empty) else "") { user ->
+					GlobalScope.launch(Dispatchers.Main) { refreshAbsences(user) }
+				}
+			}
 		}
 	}
 
