@@ -32,3 +32,4 @@
 -keepclassmembernames class kotlinx.** {
     volatile <fields>;
 }
+-keep class com.sapuseven.untis.models.** { *; }
