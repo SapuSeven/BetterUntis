@@ -158,6 +158,29 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 								true
 							}
 						}
+
+						findPreference<Preference>("preference_timetable_colors_reset")?.setOnPreferenceClickListener {
+							MaterialAlertDialogBuilder(context)
+									.setTitle(R.string.preference_dialog_colors_reset_title)
+									.setMessage(R.string.preference_dialog_colors_reset_text)
+									.setPositiveButton(R.string.all_yes) { _, _ ->
+										preferenceManager.sharedPreferences.edit().apply {
+											listOf(
+													"preference_background_regular", "preference_background_regular_past",
+													"preference_background_exam", "preference_background_exam_past",
+													"preference_background_irregular", "preference_background_irregular_past",
+													"preference_background_cancelled", "preference_background_cancelled_past"
+											).forEach {
+												remove(it)
+											}
+											apply()
+										}
+										activity?.recreate()
+									}
+									.setNegativeButton(R.string.all_cancel) { _, _ -> }
+									.show()
+							true
+						}
 					}
 					"preferences_connectivity" ->
 						findPreference<Preference>("preference_connectivity_proxy_about")?.setOnPreferenceClickListener {

@@ -105,7 +105,6 @@
 				android:title="@string/preference_background_cancelled_past" />
 
 			<Preference
-				android:enabled="false"
 				android:key="preference_timetable_colors_reset"
 				android:title="@string/preference_timetable_colors_reset" />
 

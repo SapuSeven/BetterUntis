@@ -152,6 +152,9 @@
 	<string name="preference_dark_theme_oled">Use total black background</string>
 	<string name="preference_dark_theme_oled_desc">Useful for OLED-screens</string>
 	<string name="preference_dark_theme_on">Always on</string>
+	<string name="preference_dialog_colors_reset_title">Reset colors?</string>
+	<string name="preference_dialog_colors_reset_text">This will reset all colors above to their default values.</string>
+	<string name="preference_double_tap_to_exit">Double tap back button to exit</string>
 	<string name="preference_info_app_version">App version</string>
 	<string name="preference_info_changelog">Change Log</string>
 	<string name="preference_info_contact">Contact</string>
@@ -187,7 +190,6 @@
 	<string name="preference_school_background_desc">Some schools send their own background colors.</string>
 	<string name="preference_use_theme_background">Use theme colors</string>
 	<string name="preference_use_theme_background_desc">This only applies to regular lessons.</string>
-	<string name="preference_double_tap_to_exit">Double tap back button to exit</string>
 
 	<string name="settings_designing_message">Contribute by creating the missing settings icons!</string>
 	<string name="settings_designing_hide">Don\'t show again</string>
