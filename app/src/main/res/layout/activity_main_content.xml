@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/content_main"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	app:layout_behavior="@string/appbar_scrolling_view_behavior"
+	tools:context=".activities.MainActivity">
+
+	<com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
+		android:id="@+id/swiperefreshlayout_main_timetable"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+
+		<com.alamkanak.weekview.WeekView
+			android:id="@+id/weekview_main_timetable"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			app:columnGap="4dp"
+			app:futureBackgroundColor="@android:color/transparent"
+			app:headerRowBackgroundColor="@android:color/transparent"
+			app:daySeparatorColor="?attr/colorDivider"
+			app:headerRowPadding="8dp"
+			app:headerRowSecondaryTextColor="?android:textColorSecondary"
+			app:headerRowSecondaryTextSize="12sp"
+			app:headerRowTextColor="?android:textColorPrimary"
+			app:headerRowTextSize="18sp"
+			app:headerRowTextSpacing="10dp"
+			app:hourSeparatorColor="?attr/colorDivider"
+			app:pastBackgroundColor="#40808080"
+			app:todayHeaderTextColor="?attr/colorPrimary"
+			app:defaultEventColor="?attr/colorPrimary"
+			app:eventCornerRadius="2dp"
+			app:eventSecondaryTextSize="10sp"
+			app:eventTextColor="@android:color/white"
+			app:eventTextSize="16sp"
+			app:holidayTextColor="?android:textColorPrimary"
+			app:holidayTextSize="16sp"
+			app:hourHeight="72dp"
+			app:nowLineColor="@color/white"
+			app:nowLineStrokeWidth="2dp"
+			app:numberOfVisibleDays="5"
+			app:overlappingEventGap="16dp"
+			app:scrollDuration="100"
+			app:showDistinctPastFutureColor="true"
+			app:showHourSeparator="true"
+			app:showNowLine="true"
+			app:startOnFirstDay="true"
+			app:timeColumnBackground="@android:color/transparent"
+			app:timeColumnCaptionColor="?android:textColorPrimary"
+			app:timeColumnCaptionSize="16sp"
+			app:timeColumnTextColor="?android:textColorPrimary"
+			app:timeColumnTextSize="12sp"
+			app:timeColumnPadding="4dp"
+			app:todayBackgroundColor="@android:color/transparent"
+			app:topLeftCornerDrawable="@drawable/all_calendar"
+			app:topLeftCornerPadding="4dp"/>
+
+	</com.sapuseven.untis.views.WeekViewSwipeRefreshLayout>
+
+	<ProgressBar
+		android:id="@+id/progressbar_main_loading"
+		style="?android:attr/progressBarStyle"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginEnd="8dp"
+		android:layout_marginBottom="8dp"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"/>
+
+	<TextView
+		android:id="@+id/textview_main_lastrefresh"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginStart="@dimen/width_main_leftsidebar"
+		android:layout_marginTop="8dp"
+		android:layout_marginBottom="8dp"
+		android:padding="8dp"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintStart_toStartOf="parent"/>
+
+	<androidx.constraintlayout.widget.ConstraintLayout
+		android:id="@+id/constraintlayout_main_anonymouslogininfo"
+		android:layout_width="0dp"
+		android:layout_height="0dp"
+		android:background="@color/color_anonymous_login_info_background"
+		android:visibility="gone"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="parent">
+
+		<TextView
+			android:id="@+id/textView"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="16dp"
+			android:layout_marginEnd="16dp"
+			android:gravity="center_horizontal"
+			android:paddingLeft="24dp"
+			android:paddingRight="24dp"
+			android:text="@string/main_anonymous_login_info_text"
+			android:textColor="?android:attr/textColorPrimary"
+			android:textSize="18sp"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent"/>
+
+		<Button
+			android:id="@+id/button_main_settings"
+			style="@style/Widget.AppCompat.Button.Colored"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="16dp"
+			android:text="@string/main_go_to_settings"
+			android:textColor="@android:color/white"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/textView" />
+	</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:title="@string/menu_nav_timetables">
+		<menu>
+			<group android:checkableBehavior="single">
+				<item
+					android:id="@+id/nav_show_personal"
+					android:icon="@drawable/all_prefs_personal"
+					android:title="@string/all_personal_timetable"/>
+				<item
+					android:id="@+id/nav_show_classes"
+					android:icon="@drawable/all_classes"
+					android:title="@string/all_classes"/>
+				<item
+					android:id="@+id/nav_show_teachers"
+					android:icon="@drawable/all_teacher"
+					android:title="@string/all_teachers"/>
+				<item
+					android:id="@+id/nav_show_rooms"
+					android:icon="@drawable/all_rooms"
+					android:title="@string/all_rooms"/>
+			</group>
+		</menu>
+	</item>
+
+	<group
+		android:checkableBehavior="none">
+		<item
+			android:id="@+id/nav_infocenter"
+			android:icon="@drawable/all_infocenter"
+			android:title="@string/activity_title_info_center" />
+		<item
+			android:id="@+id/nav_free_rooms"
+			android:icon="@drawable/all_search_rooms"
+			android:title="@string/activity_title_free_rooms" />
+		<item
+			android:id="@+id/nav_settings"
+			android:icon="@drawable/all_settings"
+			android:title="@string/activity_title_settings" />
+	</group>
+</menu>

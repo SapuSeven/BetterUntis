@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string-array name="preference_themes">
+		<item>@string/preference_theme_stock</item>
+		<item>@string/preference_theme_untis</item>
+		<item>@string/preference_theme_blue</item>
+		<item>@string/preference_theme_green</item>
+		<item>@string/preference_theme_pink</item>
+		<item>@string/preference_theme_cyan</item>
+	</string-array>
+
+	<string-array name="preference_theme_values" translatable="false">
+		<item>default</item>
+		<item>untis</item>
+		<item>blue</item>
+		<item>green</item>
+		<item>pink</item>
+		<item>cyan</item>
+	</string-array>
+
+	<string-array name="preference_dark_theme">
+		<item>@string/preference_dark_theme_auto</item>
+		<item>@string/preference_dark_theme_on</item>
+		<item>@string/preference_dark_theme_off</item>
+	</string-array>
+
+	<string-array name="preference_dark_theme_values" translatable="false">
+		<item>auto</item>
+		<item>on</item>
+		<item>off</item>
+	</string-array>
+
+	<string-array name="preference_notifications_visibility">
+		<item>@string/preference_notifications_visibility_hidden</item>
+		<item>@string/preference_notifications_visibility_short</item>
+		<item>@string/preference_notifications_visibility_long</item>
+	</string-array>
+
+	<string-array name="preference_notifications_visibility_values" translatable="false">
+		<item>hidden</item>
+		<item>short</item>
+		<item>long</item>
+	</string-array>
+
+	<string-array name="preference_schoolcolors">
+		<item>For regular lessons</item>
+		<item>For lessons with tests</item>
+		<item>For irregular lessons</item>
+		<item>For cancelled lessons</item>
+	</string-array>
+
+	<string-array name="preference_schoolcolors_values" translatable="false">
+		<item>regular</item>
+		<item>exam</item>
+		<item>irregular</item>
+		<item>cancelled</item>
+	</string-array>
+</resources>

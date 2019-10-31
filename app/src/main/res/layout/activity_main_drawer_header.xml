@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical">
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="@dimen/height_header_content"
+		android:background="?attr/colorPrimary"
+		android:orientation="vertical"
+		android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+		<ImageView
+			android:layout_width="@dimen/size_header_icon"
+			android:layout_height="@dimen/size_header_icon"
+			android:layout_marginStart="16dp"
+			android:layout_marginTop="48dp"
+			android:layout_marginBottom="8dp"
+			android:contentDescription="@string/main_drawer_image_logo"
+			app:srcCompat="@drawable/mainactivitydrawer_headericon" />
+
+		<androidx.constraintlayout.widget.ConstraintLayout
+			android:id="@+id/constraintlayout_mainactivitydrawer_dropdown"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="?android:attr/selectableItemBackground"
+			android:clickable="true"
+			android:focusable="true">
+
+			<TextView
+				android:id="@+id/textview_mainactivtydrawer_line1"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginStart="16dp"
+				android:layout_marginTop="8dp"
+				android:text="@string/app_name"
+				android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+				android:textSize="@dimen/textsize_header_line1"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toTopOf="parent" />
+
+			<TextView
+				android:id="@+id/textview_mainactivitydrawer_line2"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginStart="16dp"
+				android:layout_marginBottom="8dp"
+				android:text="@string/all_contact_email"
+				android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+				android:textSize="@dimen/textsize_header_line2"
+				app:layout_constraintBottom_toBottomOf="parent"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toBottomOf="@+id/textview_mainactivtydrawer_line1" />
+
+			<ImageView
+				android:id="@+id/imageview_mainactivitydrawer_dropdown_arrow"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="16dp"
+				android:contentDescription="@string/mainactivitydrawer_dropdown_show"
+				app:layout_constraintBottom_toBottomOf="parent"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintTop_toTopOf="parent"
+				app:srcCompat="@drawable/mainactivitydrawer_dropdown" />
+		</androidx.constraintlayout.widget.ConstraintLayout>
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:id="@+id/linearlayout_mainactivitydrawer_dropdown_view"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="vertical"
+		android:visibility="gone">
+
+		<androidx.recyclerview.widget.RecyclerView
+			android:id="@+id/recyclerview_mainactivitydrawer_profile_list"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+
+		</androidx.recyclerview.widget.RecyclerView>
+
+		<LinearLayout
+			android:id="@+id/linearlayout_mainactivitydrawer_add"
+			android:layout_width="match_parent"
+			android:layout_height="48dp"
+			android:background="?android:attr/selectableItemBackground"
+			android:clickable="true"
+			android:focusable="true"
+			android:gravity="center_vertical"
+			android:orientation="horizontal"
+			android:paddingStart="24dp"
+			android:paddingEnd="8dp">
+
+			<androidx.appcompat.widget.AppCompatImageView
+				android:layout_width="24dp"
+				android:layout_height="24dp"
+				android:layout_marginEnd="24dp"
+				app:srcCompat="@drawable/all_add" />
+
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/mainactivitydrawer_profile_add"
+				android:textColor="?android:attr/textColorPrimary"
+				android:textSize="13sp" />
+
+		</LinearLayout>
+
+		<View
+			android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:background="?android:attr/listDivider" />
+
+		<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginStart="16dp"
+			android:layout_marginTop="16dp"
+			android:layout_marginEnd="8dp"
+			android:text="@string/mainactivitydrawer_profile_delete_hint"
+			android:textColor="?android:attr/textColorSecondary"
+			android:textSize="13sp" />
+
+	</LinearLayout>
+</LinearLayout>

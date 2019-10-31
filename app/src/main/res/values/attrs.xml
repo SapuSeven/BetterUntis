@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<attr name="dependentValue" format="string"/>
+	<attr name="colorDivider" format="reference"/>
+
+	<declare-styleable name="UnitPreference">
+		<attr name="unit" format="string" />
+	</declare-styleable>
+
+	<declare-styleable name="DependentListPreference">
+		<attr name="disabledDependentValue"/>
+	</declare-styleable>
+</resources>
