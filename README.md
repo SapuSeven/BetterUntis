@@ -26,9 +26,7 @@ Another major change is the use of a custom WeekView (based on [Till Hellmund](h
 - Support for multiple accounts
 - Support for using a custom proxy server for increased privacy
 
-## Missing features
-- No in-timetable room availability indicator
-- No support for viewing own absences
+## Missing features (TODO)
 - No support for teacher-specific features (like editing homeworks or class management)
 - Almost no unit and integration tests
 
