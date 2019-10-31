@@ -216,19 +216,19 @@
 			android:icon="@drawable/settings_notifications_active"
 			android:key="preference_notifications_enable"
 			android:summary="@string/preference_notifications_enable_desc"
-			android:title="@string/preference_notifications_enable"/>
+			android:title="@string/preference_notifications_enable" />
 
 		<CheckBoxPreference
 			android:defaultValue="@bool/preference_notifications_in_multiple_default"
 			android:dependency="preference_notifications_enable"
 			android:key="preference_notifications_in_multiple"
 			android:summary="@string/preference_notifications_multiple_desc"
-			android:title="@string/preference_notifications_multiple"/>
+			android:title="@string/preference_notifications_multiple" />
 
 		<com.sapuseven.untis.preferences.NotificationClearPreference
 			android:icon="@drawable/settings_notifications_clear_all"
 			android:key="preference_notifications_clear"
-			android:title="@string/preference_notifications_clear"/>
+			android:title="@string/preference_notifications_clear" />
 
 		<PreferenceCategory android:title="@string/preference_category_notifications_visible_fields">
 
@@ -239,7 +239,7 @@
 				android:entryValues="@array/preference_notifications_visibility_values"
 				android:key="preference_notifications_visibility_subjects"
 				android:summary="%s"
-				android:title="@string/all_subjects"/>
+				android:title="@string/all_subjects" />
 
 			<ListPreference
 				android:defaultValue="@string/preference_notifications_visibility_rooms_default"
@@ -249,7 +249,7 @@
 				android:icon="@drawable/all_rooms"
 				android:key="preference_notifications_visibility_rooms"
 				android:summary="%s"
-				android:title="@string/all_rooms"/>
+				android:title="@string/all_rooms" />
 
 			<ListPreference
 				android:defaultValue="@string/preference_notifications_visibility_teachers_default"
@@ -259,7 +259,7 @@
 				android:icon="@drawable/all_teacher"
 				android:key="preference_notifications_visibility_teachers"
 				android:summary="%s"
-				android:title="@string/all_teachers"/>
+				android:title="@string/all_teachers" />
 
 			<ListPreference
 				android:defaultValue="@string/preference_notifications_visibility_classes_default"
@@ -269,7 +269,7 @@
 				android:icon="@drawable/all_classes"
 				android:key="preference_notifications_visibility_classes"
 				android:summary="%s"
-				android:title="@string/all_classes"/>
+				android:title="@string/all_classes" />
 
 		</PreferenceCategory>
 
@@ -306,31 +306,14 @@
 		android:key="preferences_info"
 		android:title="@string/preferences_infos">
 
-		<com.sapuseven.untis.preferences.AlertPreference
-			android:dialogMessage="Some preferences are not implemented yet, so they are disabled until development is finished."
-			android:dialogTitle="This app isn't finished."
-			android:icon="@drawable/settings_info"
-			android:key="preference_info_disabled"
-			android:negativeButtonText=""
-			android:summary="Tap to see why some preferences are not available."
-			android:title="Disabled Preferences?" />
-
 		<Preference
-			android:enabled="false"
+			android:icon="@drawable/settings_info"
 			android:key="preference_info_app_version"
 			android:title="@string/preference_info_app_version" />
 
 		<Preference
-			android:enabled="false"
-			android:icon="@drawable/settings_info_list_bulleted"
-			android:key="preference_info_changelog"
-			android:title="@string/preference_info_changelog" />
-
-		<Preference
-			android:enabled="false"
-			android:icon="@drawable/settings_info_message"
-			android:key="preference_info_contact_email"
-			android:summary="@string/all_contact_email"
-			android:title="@string/preference_info_contact" />
+			android:icon="@drawable/settings_info_github"
+			android:key="preference_info_github"
+			android:title="@string/preference_info_github" />
 	</PreferenceScreen>
 </androidx.preference.PreferenceScreen>

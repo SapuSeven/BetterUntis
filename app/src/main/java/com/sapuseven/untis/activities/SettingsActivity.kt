@@ -3,6 +3,7 @@ package com.sapuseven.untis.activities
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -32,8 +33,9 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 
 		private const val DIALOG_DESIGNING_HIDE = "preference_dialog_designing_hide"
 
-		private const val WIKI_URL_DESIGNING = "https://github.com/SapuSeven/BetterUntis/wiki/Designing"
-		private const val WIKI_URL_PROXY = "https://github.com/SapuSeven/BetterUntis/wiki/Proxy"
+		private const val REPOSITORY_URL_GITHUB = "https://github.com/SapuSeven/BetterUntis"
+		private const val WIKI_URL_DESIGNING = "$REPOSITORY_URL_GITHUB/wiki/Designing"
+		private const val WIKI_URL_PROXY = "$REPOSITORY_URL_GITHUB/wiki/Proxy"
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -187,6 +189,28 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 							startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(WIKI_URL_PROXY)))
 							true
 						}
+					"preferences_info" -> {
+						findPreference<Preference>("preference_info_app_version")?.summary = let {
+							val pInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
+							requireContext().getString(R.string.preference_info_app_version_desc,
+									pInfo.versionName,
+									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+										pInfo.longVersionCode
+									} else {
+										@Suppress("DEPRECATION")
+										pInfo.versionCode.toLong()
+									}
+							)
+						}
+
+						findPreference<Preference>("preference_info_github")?.apply {
+							summary = REPOSITORY_URL_GITHUB
+							setOnPreferenceClickListener {
+								startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(REPOSITORY_URL_GITHUB)))
+								true
+							}
+						}
+					}
 				}
 			}
 		}

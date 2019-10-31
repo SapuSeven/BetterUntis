@@ -156,8 +156,10 @@
 	<string name="preference_dialog_colors_reset_text">This will reset all colors above to their default values.</string>
 	<string name="preference_double_tap_to_exit">Double tap back button to exit</string>
 	<string name="preference_info_app_version">App version</string>
+	<string name="preference_info_app_version_desc">%1$s (%2$d)</string>
 	<string name="preference_info_changelog">Change Log</string>
 	<string name="preference_info_contact">Contact</string>
+	<string name="preference_info_github">GitHub Repository</string>
 	<string name="preference_marker">Time indicator</string>
 	<string name="preference_notifications_clear">Clear all notifications</string>
 	<string name="preference_notifications_enable">Enable Notification</string>
