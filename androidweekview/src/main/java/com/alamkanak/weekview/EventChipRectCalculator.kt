@@ -14,7 +14,7 @@ class EventChipRectCalculator internal constructor(private val config: WeekViewC
 	 * @return A [RectF] at the absolute location and size of the EventChip's final position in the WeekView
 	 */
 	fun calculateEventRect(eventChip: EventChip<*>, startFromPixel: Float): RectF {
-		val eventMargin = config.eventMarginVertical.toFloat()
+		val eventMargin = config.eventMarginVertical.toFloat() / 2
 
 		val verticalOrigin = config.drawConfig.currentOrigin.y
 		val widthPerDay = config.drawConfig.widthPerDay - config.columnGap

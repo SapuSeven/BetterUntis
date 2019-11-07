@@ -2,7 +2,6 @@ package com.alamkanak.weekview.drawers
 
 import android.graphics.Canvas
 import com.alamkanak.weekview.DrawingContext
-
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.config.WeekViewConfig
 import com.alamkanak.weekview.config.WeekViewDrawConfig
@@ -13,8 +12,6 @@ class TimeColumnDrawer(private val config: WeekViewConfig) : BaseDrawer {
 	override fun draw(drawingContext: DrawingContext, canvas: Canvas) {
 		var top = drawConfig.headerHeight
 		val bottom = WeekView.viewHeight.toFloat()
-
-		val bottomTimeOffset = 8f
 
 		// Draw the background color for the time column.
 		canvas.drawRect(0f, top, drawConfig.timeColumnWidth, bottom, drawConfig.timeColumnBackgroundPaint)
@@ -39,15 +36,18 @@ class TimeColumnDrawer(private val config: WeekViewConfig) : BaseDrawer {
 			val time = drawConfig.dateTimeInterpreter.interpretTime(config.hourLines[i])
 
 			if (top - (hourTop - lastHourTop) < bottom) {
+				val bottomCoordinate = top - config.hourSeparatorStrokeWidth - config.timeColumnPadding / 2
+				val topCoordinate = top - (hourTop - lastHourTop) - config.hourSeparatorStrokeWidth - config.timeColumnPadding / 2
+
 				if (i % 2 == 0) {
 					if (config.hourLines[i + 1] - config.hourLines[i] > 30)
-						canvas.drawText(time, config.timeColumnPadding.toFloat(), top + drawConfig.timeTextHeight, drawConfig.timeTextTopPaint)
+						canvas.drawText(time, config.timeColumnPadding.toFloat(), top + drawConfig.timeTextHeight + config.timeColumnPadding / 2, drawConfig.timeTextTopPaint)
 				} else
 					if (config.hourLines[i] - config.hourLines[i - 1] > 30)
-						canvas.drawText(time, config.timeColumnPadding + drawConfig.timeTextWidth, top - bottomTimeOffset, drawConfig.timeTextBottomPaint)
+						canvas.drawText(time, config.timeColumnPadding + drawConfig.timeTextWidth, bottomCoordinate, drawConfig.timeTextBottomPaint)
 
 				if (i % 2 == 1)
-					canvas.drawText((i / 2 + 1).toString(), config.timeColumnPadding + drawConfig.timeTextWidth / 2, top - (hourTop - lastHourTop) / 2 + bottomTimeOffset * 1.5f, drawConfig.timeCaptionPaint)
+					canvas.drawText((i / 2 + 1).toString(), config.timeColumnPadding + drawConfig.timeTextWidth / 2, topCoordinate + (bottomCoordinate - topCoordinate + drawConfig.timeCaptionHeight + config.timeColumnPadding) / 2, drawConfig.timeCaptionPaint)
 			}
 		}
 
