@@ -8,8 +8,8 @@ It was more and more obvious that my [original version](https://github.com/SapuS
 As a result, development became increasingly more difficult.
 So I came to the conclusion to scrap the project and start over from scratch.
 
-Although I reused some parts of the original code, my plan is to entirely switch to Kotlin.
-Kotlin has many features and libraries that immensly help to communicate with the Untis API and process the timetable data.
+Although I reused some parts of the original code, my plan was to entirely switch to Kotlin.
+Kotlin has many features and libraries that immensely help to communicate with the Untis API and process the timetable data.
 
 Another major change is the use of a custom WeekView (based on [Till Hellmund](https://github.com/thellmund)'s fork of [Android-Week-View](https://github.com/alamkanak/Android-Week-View)) for the timetable display. This also improved performance by a lot.
 
@@ -25,6 +25,7 @@ Another major change is the use of a custom WeekView (based on [Till Hellmund](h
 - Flexible timegrid allows to display hours outside the regular timetable (like consultation times with teachers)
 - Support for multiple accounts
 - Support for using a custom proxy server for increased privacy
+- Info Center for viewing events, contact hours and own absences.
 
 ## Missing features (TODO)
 - No support for teacher-specific features (like editing homeworks or class management)
@@ -40,8 +41,6 @@ Basically, there are two main branches: **master** and **develop**. They both ar
 
 ### Branch: master
 This branch always and only contains the latest release version. This includes alpha/beta releases.
-
-_Note: As the app hasn't been released yet, this branch doesn't contain any useful code (see below)._
 
 ### Branch: develop
 This branch contains the current development version. Small changes and fixes can be committed directly to this branch.
