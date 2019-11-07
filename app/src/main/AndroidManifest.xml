@@ -32,7 +32,7 @@
 
 		<activity
 			android:name=".activities.ScanCodeActivity"
-			android:label="@string/activity_title_free_rooms"
+			android:label="@string/login_scan_code"
 			android:parentActivityName=".activities.LoginActivity">
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
