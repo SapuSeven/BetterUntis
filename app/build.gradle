@@ -12,8 +12,8 @@ android {
 		applicationId "com.sapuseven.untis"
 		minSdkVersion 21
 		targetSdkVersion 28
-		versionCode 12
-		versionName "3.0.1"
+		versionCode 13
+		versionName "3.0.2"
 		vectorDrawables.useSupportLibrary = true
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 	}
