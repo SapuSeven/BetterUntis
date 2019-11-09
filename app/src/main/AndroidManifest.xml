@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-	xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.sapuseven.untis">
 
-	<uses-permission android:name="android.permission.INTERNET"/>
-	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.CAMERA" />
+	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
 	<application
 		android:allowBackup="true"
@@ -20,15 +20,23 @@
 			android:launchMode="singleTop"
 			android:theme="@style/AppTheme.Launcher.NoActionBar">
 			<intent-filter>
-				<action android:name="android.intent.action.MAIN"/>
+				<action android:name="android.intent.action.MAIN" />
 
-				<category android:name="android.intent.category.LAUNCHER"/>
+				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
 
 		<activity
 			android:name=".activities.LoginActivity"
-			android:launchMode="singleTop">
+			android:launchMode="singleTop" />
+
+		<activity
+			android:name=".activities.ScanCodeActivity"
+			android:label="@string/login_scan_code"
+			android:parentActivityName=".activities.LoginActivity">
+			<meta-data
+				android:name="android.support.PARENT_ACTIVITY"
+				android:value=".activities.LoginActivity" />
 		</activity>
 
 		<activity
@@ -37,7 +45,7 @@
 			android:parentActivityName=".activities.MainActivity">
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
-				android:value=".activities.MainActivity"/>
+				android:value=".activities.MainActivity" />
 		</activity>
 
 		<activity
@@ -55,17 +63,17 @@
 			android:windowSoftInputMode="adjustResize">
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
-				android:value=".activities.LoginActivity"/>
+				android:value=".activities.LoginActivity" />
 
 			<intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
+				<action android:name="android.intent.action.VIEW" />
 
-				<category android:name="android.intent.category.DEFAULT"/>
-				<category android:name="android.intent.category.BROWSABLE"/>
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
 
 				<data
 					android:host="setschool"
-					android:scheme="untis"/>
+					android:scheme="untis" />
 			</intent-filter>
 		</activity>
 
@@ -75,17 +83,17 @@
 			android:parentActivityName=".activities.MainActivity">
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
-				android:value=".activities.MainActivity"/>
+				android:value=".activities.MainActivity" />
 		</activity>
 
 		<receiver android:name=".notifications.StartupReceiver">
 			<intent-filter>
-				<action android:name="android.intent.action.BOOT_COMPLETED"/>
+				<action android:name="android.intent.action.BOOT_COMPLETED" />
 			</intent-filter>
 		</receiver>
 
-		<receiver android:name=".notifications.NotificationSetup"/>
+		<receiver android:name=".notifications.NotificationSetup" />
 
-		<receiver android:name=".notifications.NotificationReceiver"/>
+		<receiver android:name=".notifications.NotificationReceiver" />
 	</application>
 </manifest>

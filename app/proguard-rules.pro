@@ -32,4 +32,4 @@
 -keepclassmembernames class kotlinx.** {
     volatile <fields>;
 }
--keep class com.sapuseven.untis.models.** { *; }
+-keepclasseswithmembers class com.sapuseven.untis.** implements com.sapuseven.untis.interfaces.TableModel { *; }

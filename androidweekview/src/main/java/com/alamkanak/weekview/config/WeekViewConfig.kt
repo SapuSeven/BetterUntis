@@ -55,11 +55,13 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 			drawConfig.timeTextTopPaint.textSize = value
 			drawConfig.timeTextBottomPaint.textSize = value
 			drawConfig.calculateTimeTextWidth()
+			drawConfig.calculateTimeTextHeight()
 		}
 	var timeColumnCaptionSize: Float
 		get() = drawConfig.timeCaptionPaint.textSize
 		set(value) {
 			drawConfig.timeCaptionPaint.textSize = value
+			drawConfig.calculateTimeCaptionHeight()
 		}
 
 	// Time column separator
@@ -132,7 +134,6 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 		get() = drawConfig.eventTextPaint.textSize
 		set(value) {
 			drawConfig.eventTextPaint.textSize = value
-			drawConfig.calculateTimeTextHeight()
 		}
 	var eventSecondaryTextSize: Float
 		get() = drawConfig.eventTopPaint.textSize

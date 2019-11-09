@@ -2,11 +2,11 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android"
 	android:opacity="opaque">
 
-	<item android:drawable="@color/colorPrimary" />
+	<item android:drawable="?attr/colorPrimary" />
 
 	<item>
 		<bitmap
 			android:gravity="center"
-			android:src="@drawable/app_splash_512" />
+			android:src="@drawable/app_splash_icon" />
 	</item>
 </layer-list>

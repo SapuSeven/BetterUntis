@@ -1,9 +1,10 @@
 package com.sapuseven.untis.activities
 
+import android.Manifest
 import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
@@ -15,9 +16,12 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
+import com.sapuseven.untis.activities.ScanCodeActivity.Companion.EXTRA_STRING_SCAN_RESULT
 import com.sapuseven.untis.adapters.SchoolSearchAdapter
 import com.sapuseven.untis.adapters.SchoolSearchAdapterItem
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
@@ -34,8 +38,10 @@ import kotlinx.coroutines.launch
 
 class LoginActivity : BaseActivity(), View.OnClickListener {
 	companion object {
-		const val REQUEST_SCAN_CODE = 0x00000001
-		const val REQUEST_LOGIN = 0x00000002
+		const val PERMISSION_REQUEST_CAMERA = 1
+
+		const val REQUEST_SCAN_CODE = 2
+		const val REQUEST_LOGIN = 3
 	}
 
 	private var searchMode: Boolean = false
@@ -69,36 +75,14 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 		rvSearchResults = findViewById(R.id.recyclerview_login_search_results)
 
 		findViewById<Button>(R.id.button_login_scan_code).setOnClickListener {
-			try {
-				val intent = Intent("com.google.zxing.client.android.SCAN")
-				intent.putExtra("SCAN_MODE", "QR_CODE_MODE")
-				startActivityForResult(intent, REQUEST_SCAN_CODE)
-			} catch (e: ActivityNotFoundException) {
-				try {
-					val i = Intent(Intent.ACTION_VIEW)
-					i.data = Uri.parse("market://details?id=com.google.zxing.client.android")
-					startActivity(i)
-				} catch (e2: ActivityNotFoundException) {
-					val i = Intent(Intent.ACTION_VIEW)
-					i.data = Uri.parse("https://sapuseven.com/scan_qr.php")
-					startActivity(i)
-				}
-			} catch (e: SecurityException) {
-				try {
-					val i = Intent(Intent.ACTION_VIEW)
-					i.data = Uri.parse("market://details?id=com.google.zxing.client.android")
-					startActivity(i)
-				} catch (e2: ActivityNotFoundException) {
-					val i = Intent(Intent.ACTION_VIEW)
-					i.data = Uri.parse("https://sapuseven.com/scan_qr.php")
-					startActivity(i)
-				}
-			}
+			if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+				ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), PERMISSION_REQUEST_CAMERA)
+			else
+				startActivityForResult(Intent(this, ScanCodeActivity::class.java), REQUEST_SCAN_CODE)
 		}
 
 		findViewById<Button>(R.id.button_login_manual_data_input).setOnClickListener {
-			val loginDataInputIntent = Intent(this, LoginDataInputActivity::class.java)
-			startActivityForResult(loginDataInputIntent, REQUEST_LOGIN)
+			startActivityForResult(Intent(this, LoginDataInputActivity::class.java), REQUEST_LOGIN)
 		}
 
 
@@ -123,6 +107,14 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 
 		adapter = SchoolSearchAdapter(this)
 		rvSearchResults?.adapter = adapter
+	}
+
+	override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+		when (requestCode) {
+			PERMISSION_REQUEST_CAMERA ->
+				if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED))
+					startActivityForResult(Intent(this, ScanCodeActivity::class.java), REQUEST_SCAN_CODE)
+		}
 	}
 
 	private fun loadResults(search: String) = GlobalScope.launch(Dispatchers.Main) {
@@ -165,7 +157,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 		when (requestCode) {
 			REQUEST_SCAN_CODE -> if (resultCode == Activity.RESULT_OK) {
 				val i = Intent(this, LoginDataInputActivity::class.java)
-				data?.let { i.data = Uri.parse(data.getStringExtra("SCAN_RESULT")) }
+				data?.let { i.data = Uri.parse(data.getStringExtra(EXTRA_STRING_SCAN_RESULT)) }
 				startActivityForResult(i, REQUEST_LOGIN)
 			}
 			REQUEST_LOGIN -> {

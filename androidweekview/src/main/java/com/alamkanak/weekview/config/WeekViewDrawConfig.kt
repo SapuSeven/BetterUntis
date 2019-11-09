@@ -18,9 +18,10 @@ import java.util.*
 class WeekViewDrawConfig(context: Context) {
 	val timeTextTopPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 	val timeTextBottomPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
-	val timeCaptionPaint: Paint = Paint()
+	val timeCaptionPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 	var timeTextWidth: Float = 0.0f
 	var timeTextHeight: Float = 0.0f
+	var timeCaptionHeight: Float = 0.0f
 	var timeColumnWidth: Float = 0.0f
 
 	val headerTextPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
@@ -152,6 +153,13 @@ class WeekViewDrawConfig(context: Context) {
 
 		timeTextTopPaint.getTextBounds("00 PM", 0, "00 PM".length, rect)
 		timeTextHeight = rect.height().toFloat()
+	}
+
+	internal fun calculateTimeCaptionHeight() {
+		val rect = Rect()
+
+		timeCaptionPaint.getTextBounds("10", 0, "10".length, rect)
+		timeCaptionHeight = rect.height().toFloat()
 	}
 
 	internal fun calculateHeaderTextHeight() {
