@@ -57,8 +57,9 @@ android {
 			applicationIdSuffix '.debug'
 			versionNameSuffix '-DEBUG'
 
-			if (file("BetterUntis.jks").exists())
+			if (file("BetterUntis.jks").exists()) {
 				signingConfig signingConfigs.debug
+			}
 		}
 	}
 
