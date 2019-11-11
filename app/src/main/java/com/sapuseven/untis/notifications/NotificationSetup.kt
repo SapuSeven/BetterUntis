@@ -142,6 +142,8 @@ class NotificationSetup : BroadcastReceiver() {
 					&& !PreferenceUtils.getPrefBool(preferenceManager, "preference_notifications_in_multiple"))
 				return@forEach // multi-hour lesson
 
+			if (item.first.periodData.isCancelled()) return@forEach // cancelled lesson
+
 			Log.d("NotificationSetup", "found ${item.first.periodData.getShortTitle()}")
 			val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
 			val id = item.first.endDateTime.millisOfDay / 1000
