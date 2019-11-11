@@ -1,18 +1,18 @@
 package com.sapuseven.untis.activities
 
+import android.app.NotificationManager
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentTransaction
-import androidx.preference.MultiSelectListPreference
-import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.PreferenceScreen
+import androidx.preference.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
@@ -141,6 +141,19 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 				setPreferencesFromResource(R.xml.preferences, rootKey)
 
 				when (rootKey) {
+					"preferences_general" -> {
+						findPreference<CheckBoxPreference>("preference_automute_enable")?.setOnPreferenceChangeListener { preference, newValue ->
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && newValue == true) {
+								(activity?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
+									if (!isNotificationPolicyAccessGranted) {
+										startActivity(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
+										return@setOnPreferenceChangeListener false
+									}
+								}
+							}
+							true
+						}
+					}
 					"preferences_styling" -> {
 						findPreference<MultiSelectListPreference>("preference_school_background")?.apply {
 							setOnPreferenceChangeListener { _, newValue ->

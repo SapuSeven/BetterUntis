@@ -1,4 +1,4 @@
-package com.sapuseven.untis.notifications
+package com.sapuseven.untis.receivers
 
 import android.annotation.SuppressLint
 import android.app.AlarmManager
@@ -9,7 +9,7 @@ import android.content.Intent
 import android.util.Log
 import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.helpers.config.PreferenceUtils
-import com.sapuseven.untis.notifications.NotificationSetup.Companion.EXTRA_LONG_PROFILE_ID
+import com.sapuseven.untis.receivers.LessonEventSetup.Companion.EXTRA_LONG_PROFILE_ID
 import org.joda.time.DateTime
 
 class StartupReceiver : BroadcastReceiver() {
@@ -22,13 +22,21 @@ class StartupReceiver : BroadcastReceiver() {
 			return
 
 		val dateTime = DateTime().withTime(2, 0, 0, 0)
-		val newIntent = Intent(context, NotificationSetup::class.java)
-		newIntent.putExtra(EXTRA_LONG_PROFILE_ID, preferenceManager.currentProfileId())
-		newIntent.putExtra(NotificationSetup.EXTRA_BOOLEAN_MANUAL, intent.getBooleanExtra(NotificationSetup.EXTRA_BOOLEAN_MANUAL, false))
-		val pendingIntent = PendingIntent.getBroadcast(context, 0, newIntent, 0)
-		val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-		am.setInexactRepeating(AlarmManager.RTC_WAKEUP, dateTime.millis, AlarmManager.INTERVAL_DAY, pendingIntent)
 
-		context.sendBroadcast(newIntent)
+		listOf(
+				Intent(context, NotificationSetup::class.java).apply {
+					putExtra(EXTRA_LONG_PROFILE_ID, preferenceManager.currentProfileId())
+					putExtra(NotificationSetup.EXTRA_BOOLEAN_MANUAL, intent.getBooleanExtra(NotificationSetup.EXTRA_BOOLEAN_MANUAL, false))
+				},
+				Intent(context, AutoMuteSetup::class.java).apply {
+					putExtra(EXTRA_LONG_PROFILE_ID, preferenceManager.currentProfileId())
+				}
+		).forEach {
+			val pendingIntent = PendingIntent.getBroadcast(context, 0, it, 0)
+			val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+			am.setInexactRepeating(AlarmManager.RTC_WAKEUP, dateTime.millis, AlarmManager.INTERVAL_DAY, pendingIntent)
+
+			context.sendBroadcast(it)
+		}
 	}
 }

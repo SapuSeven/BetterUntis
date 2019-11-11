@@ -53,9 +53,9 @@ import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.Holiday
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import com.sapuseven.untis.notifications.NotificationSetup.Companion.EXTRA_BOOLEAN_MANUAL
-import com.sapuseven.untis.notifications.StartupReceiver
 import com.sapuseven.untis.preferences.ElementPickerPreference
+import com.sapuseven.untis.receivers.NotificationSetup.Companion.EXTRA_BOOLEAN_MANUAL
+import com.sapuseven.untis.receivers.StartupReceiver
 import kotlinx.android.synthetic.main.activity_main_content.*
 import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants

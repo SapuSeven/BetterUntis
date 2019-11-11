@@ -8,10 +8,10 @@ class PeriodData(
 		private var timetableDatabaseInterface: TimetableDatabaseInterface? = null,
 		var element: Period
 ) {
-	val classes = ArrayList<PeriodElement>()
-	val teachers = ArrayList<PeriodElement>()
-	val subjects = ArrayList<PeriodElement>()
-	val rooms = ArrayList<PeriodElement>()
+	val classes = HashSet<PeriodElement>()
+	val teachers = HashSet<PeriodElement>()
+	val subjects = HashSet<PeriodElement>()
+	val rooms = HashSet<PeriodElement>()
 
 	companion object {
 		// TODO: Convert to string resources
