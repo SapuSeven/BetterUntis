@@ -181,12 +181,6 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 		set(value) {
 			drawConfig.dayBackgroundPaint.color = value
 		}
-	var todayBackgroundColor: Int
-		get() = drawConfig.todayBackgroundPaint.color
-		set(value) {
-			drawConfig.todayBackgroundPaint.color = value
-		}
-	var showDistinctPastFutureColor: Boolean
 	var pastBackgroundColor: Int
 		get() = drawConfig.pastBackgroundPaint.color
 		set(value) {
@@ -337,8 +331,6 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 
 			// Colors
 			dayBackgroundColor = a.getColor(R.styleable.WeekView_dayBackgroundColor, Color.WHITE)
-			todayBackgroundColor = a.getColor(R.styleable.WeekView_todayBackgroundColor, Color.WHITE)
-			showDistinctPastFutureColor = a.getBoolean(R.styleable.WeekView_showDistinctPastFutureColor, false)
 			pastBackgroundColor = a.getColor(R.styleable.WeekView_pastBackgroundColor, Color.rgb(227, 227, 227))
 			futureBackgroundColor = a.getColor(R.styleable.WeekView_futureBackgroundColor, Color.rgb(245, 245, 245))
 

@@ -86,6 +86,20 @@ class WeekView<T>(
 			invalidate()
 		}
 
+	var pastBackgroundColor: Int
+		get() = config.pastBackgroundColor
+		set(pastBackgroundColor) {
+			config.pastBackgroundColor = pastBackgroundColor
+			invalidate()
+		}
+
+	var futureBackgroundColor: Int
+		get() = config.futureBackgroundColor
+		set(futureBackgroundColor) {
+			config.futureBackgroundColor = futureBackgroundColor
+			invalidate()
+		}
+
 	var columnGap: Int
 		get() = config.columnGap
 		set(columnGap) {

@@ -138,8 +138,10 @@
 	<string name="preference_background_cancelled_past">Past cancelled lessons</string>
 	<string name="preference_background_exam">Lessons with tests</string>
 	<string name="preference_background_exam_past">Past lessons with tests</string>
+	<string name="preference_background_future">Future day background</string>
 	<string name="preference_background_irregular">Irregular lessons</string>
 	<string name="preference_background_irregular_past">Past irregular lessons</string>
+	<string name="preference_background_past">Past day background</string>
 	<string name="preference_background_regular">Regular lessons</string>
 	<string name="preference_background_regular_past">Past regular lessons</string>
 	<string name="preference_connectivity_proxy_about">About this feature</string>

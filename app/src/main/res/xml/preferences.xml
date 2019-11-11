@@ -28,14 +28,14 @@
 			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
 				android:defaultValue="@integer/preference_background_future_default"
 				android:key="preference_background_future"
-				android:title="Future day background"
+				android:title="@string/preference_background_future"
 				app:cpv_showAlphaSlider="true"
 				app:cpv_showColorShades="false" />
 
 			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
 				android:defaultValue="@integer/preference_background_past_default"
-				android:key="preference_background"
-				android:title="Past day background"
+				android:key="preference_background_past"
+				android:title="@string/preference_background_past"
 				app:cpv_showAlphaSlider="true"
 				app:cpv_showColorShades="false" />
 

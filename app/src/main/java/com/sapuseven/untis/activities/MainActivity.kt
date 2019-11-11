@@ -350,6 +350,8 @@ class MainActivity :
 		weekView.eventTextSize = ConversionUtils.spToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_lesson_name_font_size").toFloat(), this)
 		weekView.eventSecondaryTextSize = ConversionUtils.spToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_lesson_info_font_size").toFloat(), this)
 		weekView.eventTextColor = if (PreferenceUtils.getPrefBool(preferences, "preference_timetable_item_text_light")) Color.WHITE else Color.BLACK
+		weekView.pastBackgroundColor = PreferenceUtils.getPrefInt(preferences, "preference_background_past")
+		weekView.futureBackgroundColor = PreferenceUtils.getPrefInt(preferences, "preference_background_future")
 		weekView.nowLineColor = PreferenceUtils.getPrefInt(preferences, "preference_marker")
 	}
 

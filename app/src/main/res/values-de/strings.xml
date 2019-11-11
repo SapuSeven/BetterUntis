@@ -138,8 +138,10 @@
 	<string name="preference_background_cancelled_past">Vergangene entfallene Stunden</string>
 	<string name="preference_background_exam">Stunden mit Tests</string>
 	<string name="preference_background_exam_past">Vergangene Stunden mit Tests</string>
+	<string name="preference_background_future">Hintergrundfarbe zukünftiger Tage</string>
 	<string name="preference_background_irregular">Irreguläre Stunden</string>
 	<string name="preference_background_irregular_past">Vergangene irreguläre Stunden</string>
+	<string name="preference_background_past">Hintergrundfarbe vergangener Tage</string>
 	<string name="preference_background_regular">Normale Stunden</string>
 	<string name="preference_background_regular_past">Vergangene normale Stunden</string>
 	<string name="preference_connectivity_proxy_about">About this feature</string>

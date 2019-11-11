@@ -44,7 +44,6 @@
 			app:numberOfVisibleDays="5"
 			app:overlappingEventGap="16dp"
 			app:scrollDuration="100"
-			app:showDistinctPastFutureColor="true"
 			app:showHourSeparator="true"
 			app:showNowLine="true"
 			app:startOnFirstDay="true"
@@ -56,7 +55,6 @@
 			app:timeColumnPadding="4dp"
 			app:eventMarginVertical="4dp"
 			app:eventPadding="4dp"
-			app:todayBackgroundColor="@android:color/transparent"
 			app:topLeftCornerDrawable="@drawable/all_calendar"
 			app:topLeftCornerPadding="4dp"/>
 
