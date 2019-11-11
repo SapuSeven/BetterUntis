@@ -28,28 +28,31 @@ class AutoMuteReceiver : BroadcastReceiver() {
 
 		if (intent.hasExtra(EXTRA_BOOLEAN_MUTE)) {
 			val prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(context)
+			val editor = prefs.edit()
 
 			if (intent.getBooleanExtra(EXTRA_BOOLEAN_MUTE, false)) {
-				val editor = prefs.edit()
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 					val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-					editor.putInt(PREFERENCE_KEY_INTERRUPTION_FILTER, notificationManager.currentInterruptionFilter)
+					if (!prefs.contains(PREFERENCE_KEY_INTERRUPTION_FILTER))
+						editor.putInt(PREFERENCE_KEY_INTERRUPTION_FILTER, notificationManager.currentInterruptionFilter)
 					notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE)
 				} else {
 					val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 					editor.putInt(PREFERENCE_KEY_RINGER_MODE, audioManager.ringerMode)
 					audioManager.ringerMode = AudioManager.RINGER_MODE_SILENT
 				}
-				editor.apply()
 			} else {
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 					val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 					notificationManager.setInterruptionFilter(prefs.getInt(PREFERENCE_KEY_INTERRUPTION_FILTER, NotificationManager.INTERRUPTION_FILTER_ALL))
+					editor.remove(PREFERENCE_KEY_INTERRUPTION_FILTER)
 				} else {
 					val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 					audioManager.ringerMode = prefs.getInt(PREFERENCE_KEY_RINGER_MODE, AudioManager.RINGER_MODE_NORMAL)
 				}
 			}
+
+			editor.apply()
 		}
 	}
 }
