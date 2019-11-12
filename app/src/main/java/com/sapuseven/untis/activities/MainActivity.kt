@@ -82,6 +82,8 @@ class MainActivity :
 		private const val REQUEST_CODE_SETTINGS = 2
 		private const val REQUEST_CODE_LOGINDATAINPUT_ADD = 3
 		private const val REQUEST_CODE_LOGINDATAINPUT_EDIT = 4
+
+		private const val UNTIS_DEFAULT_COLOR = "#f49f25"
 	}
 
 	private val userDatabase = UserDatabase.createInstance(this)
@@ -415,12 +417,15 @@ class MainActivity :
 		val newItems = mergeItems(items.mapNotNull { item ->
 			if (PreferenceUtils.getPrefBool(preferences, "preference_timetable_hide_cancelled") && item.periodData.isCancelled()) return@mapNotNull null
 
-			if (PreferenceUtils.getPrefBool(preferences, "preference_timetable_substitutions_irregular")) item.periodData.apply {
-				forceIrregular = (classes.find { it.id != it.orgId } != null
-						|| teachers.find { it.id != it.orgId } != null
-						|| subjects.find { it.id != it.orgId } != null
-						|| rooms.find { it.id != it.orgId } != null
-						)
+			if (PreferenceUtils.getPrefBool(preferences, "preference_timetable_substitutions_irregular")) {
+				item.periodData.apply {
+					forceIrregular =
+							classes.find { it.id != it.orgId } != null
+									|| teachers.find { it.id != it.orgId } != null
+									|| subjects.find { it.id != it.orgId } != null
+									|| rooms.find { it.id != it.orgId } != null
+									|| (PreferenceUtils.getPrefBool(preferences, "preference_timetable_background_irregular") && item.periodData.element.backColor != UNTIS_DEFAULT_COLOR)
+				}
 			}
 			item
 		})

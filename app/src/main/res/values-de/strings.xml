@@ -178,6 +178,8 @@
 	<string name="preference_theme_pink">Pink</string>
 	<string name="preference_theme_stock">Standard</string>
 	<string name="preference_theme_untis">Originale Untis-App</string>
+	<string name="preference_timetable_background_irregular">Hintergrundfarbe berücksichtigen</string>
+	<string name="preference_timetable_background_irregular_desc">Nützlich wenn kein Zugriff auf Lehrer besteht</string>
 	<string name="preference_timetable_bold_lesson_name">Fetten Stundennamen</string>
 	<string name="preference_timetable_centered_lesson_info">Stundeninfo zentrieren</string>
 	<string name="preference_timetable_colors_reset">Farben zurücksetzen</string>

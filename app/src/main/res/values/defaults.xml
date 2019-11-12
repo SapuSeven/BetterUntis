@@ -3,6 +3,7 @@
 	<bool name="preference_use_theme_background_default">false</bool>
 	<bool name="preference_dark_theme_oled_default">false</bool>
 	<bool name="preference_connectivity_refresh_in_background_default">true</bool>
+	<bool name="preference_timetable_background_irregular_default">false</bool>
 	<bool name="preference_timetable_centered_lesson_info_default">false</bool>
 	<bool name="preference_timetable_bold_lesson_name_default">true</bool>
 	<bool name="preference_timetable_item_text_light_default">true</bool>

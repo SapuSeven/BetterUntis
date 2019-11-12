@@ -162,6 +162,13 @@
 			android:summary="@string/preference_timetable_substitutions_irregular_desc"
 			android:title="@string/preference_timetable_substitutions_irregular" />
 
+		<CheckBoxPreference
+			android:defaultValue="@bool/preference_timetable_background_irregular_default"
+			android:dependency="preference_timetable_substitutions_irregular"
+			android:key="preference_timetable_background_irregular"
+			android:summary="@string/preference_timetable_background_irregular_desc"
+			android:title="@string/preference_timetable_background_irregular" />
+
 		<PreferenceCategory android:title="@string/preference_category_timetable_item_appearance">
 
 			<com.sapuseven.untis.preferences.UnitPreference
