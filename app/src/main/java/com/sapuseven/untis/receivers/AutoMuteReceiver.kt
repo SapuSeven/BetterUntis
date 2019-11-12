@@ -21,7 +21,7 @@ class AutoMuteReceiver : BroadcastReceiver() {
 	}
 
 	override fun onReceive(context: Context, intent: Intent) {
-		Log.d("AutoMuteReceiver", "AutoMuteReceiver received")
+		Log.d("AutoMuteReceiver", "AutoMuteReceiver received, mute = ${intent.getBooleanExtra(EXTRA_BOOLEAN_MUTE, false)}")
 
 		val preferenceManager = PreferenceManager(context)
 		if (!PreferenceUtils.getPrefBool(preferenceManager, "preference_automute_enable")) return
@@ -33,8 +33,10 @@ class AutoMuteReceiver : BroadcastReceiver() {
 			if (intent.getBooleanExtra(EXTRA_BOOLEAN_MUTE, false)) {
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 					val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-					if (!prefs.contains(PREFERENCE_KEY_INTERRUPTION_FILTER))
+					if (!prefs.contains(PREFERENCE_KEY_INTERRUPTION_FILTER)) {
 						editor.putInt(PREFERENCE_KEY_INTERRUPTION_FILTER, notificationManager.currentInterruptionFilter)
+						Log.d("AutoMuteReceiver", "Saved interruption filter: ${notificationManager.currentInterruptionFilter}")
+					}
 					notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE)
 				} else {
 					val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
