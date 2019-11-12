@@ -156,6 +156,12 @@
 			android:summary="@string/preference_timetable_hide_cancelled_desc"
 			android:title="@string/preference_timetable_hide_cancelled" />
 
+		<CheckBoxPreference
+			android:defaultValue="@bool/preference_timetable_substitutions_irregular_default"
+			android:key="preference_timetable_substitutions_irregular"
+			android:summary="@string/preference_timetable_substitutions_irregular_desc"
+			android:title="@string/preference_timetable_substitutions_irregular" />
+
 		<PreferenceCategory android:title="@string/preference_category_timetable_item_appearance">
 
 			<com.sapuseven.untis.preferences.UnitPreference

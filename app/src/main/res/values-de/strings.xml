@@ -190,6 +190,8 @@
 	<string name="preference_timetable_lesson_info_font_size">Schriftgröße für Stundeninfo</string>
 	<string name="preference_timetable_lesson_name_font_size">Schriftgröße für Stundenname</string>
 	<string name="preference_timetable_personal_timetable">Benutzerdefinierter persönlicher Stundenplan</string>
+	<string name="preference_timetable_substitutions_irregular">Irreguläre Stunden erkennen</string>
+	<string name="preference_timetable_substitutions_irregular_desc">Supplierte Stunden als irregulär behandeln</string>
 	<string name="preference_school_background">Farben der Schule verwenden</string>
 	<string name="preference_school_background_desc">Manche Schulen senden eigene Hintergrundfarben</string>
 	<string name="preference_use_theme_background">Designfarben verwenden</string>

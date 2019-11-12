@@ -13,6 +13,8 @@ class PeriodData(
 	val subjects = ArrayList<PeriodElement>()
 	val rooms = ArrayList<PeriodElement>()
 
+	var forceIrregular = false
+
 	companion object {
 		// TODO: Convert to string resources
 		const val ELEMENT_NAME_SEPARATOR = ", "
@@ -82,7 +84,7 @@ class PeriodData(
 
 	fun isCancelled(): Boolean = element.`is`.contains(Period.CODE_CANCELLED)
 
-	fun isIrregular(): Boolean = element.`is`.contains(Period.CODE_IRREGULAR)
+	fun isIrregular(): Boolean = forceIrregular || element.`is`.contains(Period.CODE_IRREGULAR)
 
 	fun isExam(): Boolean = element.`is`.contains(Period.CODE_EXAM)
 }
