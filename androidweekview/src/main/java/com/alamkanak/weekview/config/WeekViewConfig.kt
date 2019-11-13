@@ -63,7 +63,6 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 			drawConfig.timeCaptionPaint.textSize = value
 			drawConfig.calculateTimeCaptionHeight()
 		}
-
 	// Time column separator
 	var showTimeColumnSeparator: Boolean
 	var timeColumnSeparatorColor: Int
@@ -72,6 +71,7 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 			drawConfig.timeColumnSeparatorPaint.color = value
 		}
 	var timeColumnSeparatorStrokeWidth: Float
+	var hourIndexOffset: Int = 0
 
 	// Header row
 	var headerRowTextColor: Int

@@ -133,6 +133,7 @@
 	<string name="preference_category_styling_themes">Themes</string>
 	<string name="preference_category_timetable_item_appearance">Item appearance</string>
 	<string name="preference_category_timetable_lesson_text">Lesson text</string>
+	<string name="preference_category_timetable_range">Timetable range</string>
 	<string name="preference_category_general_behaviour">Behaviour</string>
 	<string name="preference_background_cancelled">Cancelled lessons</string>
 	<string name="preference_background_cancelled_past">Past cancelled lessons</string>
@@ -192,6 +193,9 @@
 	<string name="preference_timetable_lesson_info_font_size">Font size for lesson infos</string>
 	<string name="preference_timetable_lesson_name_font_size">Font size for lesson name</string>
 	<string name="preference_timetable_personal_timetable">Custom Personal Timetable</string>
+	<string name="preference_timetable_range">Hours to display</string>
+	<string name="preference_timetable_range_desc">Hours %1$d to %2$d</string>
+	<string name="preference_timetable_range_index_reset">Reset lesson numbering</string>
 	<string name="preference_timetable_substitutions_irregular">Detect irregular lessons</string>
 	<string name="preference_timetable_substitutions_irregular_desc">Treat lessons with substitutions as irregular</string>
 	<string name="preference_school_background">Use colors provided from your school</string>

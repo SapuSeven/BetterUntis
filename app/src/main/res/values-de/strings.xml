@@ -133,6 +133,7 @@
 	<string name="preference_category_styling_themes">Design</string>
 	<string name="preference_category_timetable_item_appearance">Stundendesign</string>
 	<string name="preference_category_timetable_lesson_text">Stundentext</string>
+	<string name="preference_category_timetable_range">Stundenbereich</string>
 	<string name="preference_category_general_behaviour">Verhalten</string>
 	<string name="preference_background_cancelled">Entfallene Stunden</string>
 	<string name="preference_background_cancelled_past">Vergangene entfallene Stunden</string>
@@ -192,6 +193,9 @@
 	<string name="preference_timetable_lesson_info_font_size">Schriftgröße für Stundeninfo</string>
 	<string name="preference_timetable_lesson_name_font_size">Schriftgröße für Stundenname</string>
 	<string name="preference_timetable_personal_timetable">Benutzerdefinierter persönlicher Stundenplan</string>
+	<string name="preference_timetable_range">Anzuzeigende Stunden</string>
+	<string name="preference_timetable_range_desc">%1$d. bis %2$d. Stunde</string>
+	<string name="preference_timetable_range_index_reset">Stundennummerierung zurücksetzen</string>
 	<string name="preference_timetable_substitutions_irregular">Irreguläre Stunden erkennen</string>
 	<string name="preference_timetable_substitutions_irregular_desc">Supplierte Stunden als irregulär behandeln</string>
 	<string name="preference_school_background">Farben der Schule verwenden</string>

@@ -44,7 +44,12 @@ class WeekView<T>(
 
 	private val eventChipsProvider: EventChipProvider<T>
 
-	// TODO: Move these setters entirely to WeekViewConfig
+	var hourIndexOffset: Int
+		get() = config.hourIndexOffset
+		set(hourIndexOffset) {
+			config.hourIndexOffset = hourIndexOffset
+		}
+
 	var eventCornerRadius: Int
 		get() = config.eventCornerRadius
 		set(eventCornerRadius) {

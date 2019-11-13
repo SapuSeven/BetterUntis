@@ -169,8 +169,26 @@
 			android:summary="@string/preference_timetable_background_irregular_desc"
 			android:title="@string/preference_timetable_background_irregular" />
 
-		<PreferenceCategory android:title="@string/preference_category_timetable_item_appearance">
+		<PreferenceCategory android:title="@string/preference_category_timetable_range">
 
+			<com.sapuseven.untis.preferences.RangePreference
+				android:key="preference_timetable_range"
+				android:title="@string/preference_timetable_range" />
+
+			<CheckBoxPreference
+				android:defaultValue="@bool/preference_timetable_range_index_reset_default"
+				android:dependency="preference_timetable_range"
+				android:key="preference_timetable_range_index_reset"
+				android:title="@string/preference_timetable_range_index_reset" />
+
+			<!--CheckBoxPreference
+				android:enabled="false"
+				android:key="preference_timetable_range_hide_outside"
+				android:summary="(not implemented)"
+				android:title="Hide lessons outside specified range" /-->
+		</PreferenceCategory>
+
+		<PreferenceCategory android:title="@string/preference_category_timetable_item_appearance">
 			<com.sapuseven.untis.preferences.UnitPreference
 				android:defaultValue="@integer/preference_timetable_item_padding_overlap_default"
 				android:key="preference_timetable_item_padding_overlap"

@@ -56,6 +56,7 @@ import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.notifications.NotificationSetup.Companion.EXTRA_BOOLEAN_MANUAL
 import com.sapuseven.untis.notifications.StartupReceiver
 import com.sapuseven.untis.preferences.ElementPickerPreference
+import com.sapuseven.untis.preferences.RangePreference
 import kotlinx.android.synthetic.main.activity_main_content.*
 import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants
@@ -163,7 +164,7 @@ class MainActivity :
 				preferences,
 				"preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_TYPE}",
 				TimetableDatabaseInterface.Type.SUBJECT.toString()
-		))
+		) ?: TimetableDatabaseInterface.Type.SUBJECT.toString())
 
 		if (customType === TimetableDatabaseInterface.Type.SUBJECT) {
 			profileUser.userData.elemType?.let { type ->
@@ -375,8 +376,11 @@ class MainActivity :
 
 	private fun setupHours() {
 		val lines = MutableList(0) { return@MutableList 0 }
+		val range = RangePreference.convertToPair(PreferenceUtils.getPrefString(preferences, "preference_timetable_range", null))
 
-		profileUser.timeGrid.days.maxBy { it.units.size }?.units?.forEach { hour ->
+		profileUser.timeGrid.days.maxBy { it.units.size }?.units?.forEachIndexed { index, hour ->
+			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
+
 			val startTime = DateTimeUtils.tTimeNoSeconds().parseLocalTime(hour.startTime).toString(DateTimeUtils.shortDisplayableTime())
 			val endTime = DateTimeUtils.tTimeNoSeconds().parseLocalTime(hour.endTime).toString(DateTimeUtils.shortDisplayableTime())
 
@@ -390,10 +394,12 @@ class MainActivity :
 			lines.add(endTimeInt)
 		}
 
+		if (!PreferenceUtils.getPrefBool(preferences, "preference_timetable_range_index_reset"))
+			weekView.hourIndexOffset = (range?.first ?: 1) - 1
 		weekView.hourLines = lines.toIntArray()
 
-		weekView.startTime = lines[0]
-		weekView.endTime = lines[lines.size - 1] + 30 // TODO: Don't hard-code this offset
+		weekView.startTime = lines.first()
+		weekView.endTime = lines.last() + 30 // TODO: Don't hard-code this offset
 	}
 
 	private fun setupHolidays() {
@@ -529,7 +535,7 @@ class MainActivity :
 			R.id.nav_settings -> {
 				val i = Intent(this@MainActivity, SettingsActivity::class.java)
 				i.putExtra(SettingsActivity.EXTRA_LONG_PROFILE_ID, profileId)
-				startActivity(i)
+				startActivityForResult(i, REQUEST_CODE_SETTINGS)
 			}
 			R.id.nav_infocenter -> {
 				val i = Intent(this@MainActivity, InfoCenterActivity::class.java)

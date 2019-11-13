@@ -122,7 +122,7 @@ class NotificationSetup : BroadcastReceiver() {
 				preferenceManager,
 				"preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_TYPE}",
 				TimetableDatabaseInterface.Type.SUBJECT.toString()
-		))
+		) ?: TimetableDatabaseInterface.Type.SUBJECT.toString())
 
 		if (customType === TimetableDatabaseInterface.Type.SUBJECT) {
 			profileUser.userData.elemType?.let { type ->
