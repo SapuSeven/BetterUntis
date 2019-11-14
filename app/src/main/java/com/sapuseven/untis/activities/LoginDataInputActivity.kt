@@ -215,8 +215,12 @@ class LoginDataInputActivity : BaseActivity() {
 		result.fold({ data ->
 			val untisResponse = getJSON().parse(SchoolSearchResponse.serializer(), data)
 
-			untisResponse.result?.let { return it.schools[0].schoolId /* TODO: Show selection dialog if multiple schools are returned */ }
-					?: run {
+			untisResponse.result?.let {
+				if (it.schools.size != 1)
+					stopLoadingAndShowError(getString(R.string.logindatainput_error_invalid_school))
+				else
+					return it.schools[0].schoolId
+			} ?: run {
 						stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code, untisResponse.error?.message.orEmpty()))
 					}
 		}, { error ->
