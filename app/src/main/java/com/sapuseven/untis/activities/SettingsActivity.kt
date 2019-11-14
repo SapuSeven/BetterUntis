@@ -202,6 +202,17 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 							startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(WIKI_URL_PROXY)))
 							true
 						}
+
+					"preferences_notifications" -> {
+						findPreference<Preference>("preference_notifications_enable")?.setOnPreferenceChangeListener { _, newValue ->
+							if (newValue == true) clearNotifications()
+							true
+						}
+						findPreference<Preference>("preference_notifications_clear")?.setOnPreferenceClickListener {
+							clearNotifications()
+							true
+						}
+					}
 					"preferences_info" -> {
 						findPreference<Preference>("preference_info_app_version")?.summary = let {
 							val pInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
@@ -227,6 +238,8 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 				}
 			}
 		}
+
+		private fun clearNotifications() = (context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancelAll()
 
 		private fun refreshColorPreferences(newValue: Set<*>) {
 			val regularColors = listOf("preference_background_regular", "preference_background_regular_past", "preference_use_theme_background")
