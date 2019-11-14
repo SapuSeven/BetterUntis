@@ -101,11 +101,11 @@ class TimetableItemDetailsDialog : DialogFragment() {
 		val klassenList = root.findViewById<LinearLayout>(R.id.llClassList)
 		val roomList = root.findViewById<LinearLayout>(R.id.llRoomList)
 
-		if (populateList(timetableDatabaseInterface, teacherList, item.periodData.teachers, TimetableDatabaseInterface.Type.TEACHER, color))
+		if (populateList(timetableDatabaseInterface, teacherList, item.periodData.teachers.toList(), TimetableDatabaseInterface.Type.TEACHER, color))
 			root.findViewById<View>(R.id.llTeachers).visibility = View.GONE
-		if (populateList(timetableDatabaseInterface, klassenList, item.periodData.classes, TimetableDatabaseInterface.Type.CLASS, color))
+		if (populateList(timetableDatabaseInterface, klassenList, item.periodData.classes.toList(), TimetableDatabaseInterface.Type.CLASS, color))
 			root.findViewById<View>(R.id.llClasses).visibility = View.GONE
-		if (populateList(timetableDatabaseInterface, roomList, item.periodData.rooms, TimetableDatabaseInterface.Type.ROOM, color))
+		if (populateList(timetableDatabaseInterface, roomList, item.periodData.rooms.toList(), TimetableDatabaseInterface.Type.ROOM, color))
 			root.findViewById<View>(R.id.llRooms).visibility = View.GONE
 
 		if (item.periodData.subjects.size > 0) {

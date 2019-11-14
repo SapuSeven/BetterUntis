@@ -42,5 +42,14 @@ class TimegridItem(
 		return false
 	}
 
+	fun mergeValuesWith(item: TimegridItem) {
+		periodData.apply {
+			classes.addAll(item.periodData.classes)
+			teachers.addAll(item.periodData.teachers)
+			subjects.addAll(item.periodData.subjects)
+			rooms.addAll(item.periodData.rooms)
+		}
+	}
+
 	fun equalsIgnoreTime(secondItem: TimegridItem) = periodData.element.equalsIgnoreTime(secondItem.periodData.element)
 }

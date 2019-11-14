@@ -12,6 +12,14 @@
 				android:key="preference_double_tap_to_exit"
 				android:title="@string/preference_double_tap_to_exit" />
 		</PreferenceCategory>
+
+		<PreferenceCategory android:title="Auto-Mute">
+			<CheckBoxPreference
+				android:defaultValue="@bool/preference_automute_enable_default"
+				android:key="preference_automute_enable"
+				android:summary="Automatically turns on Do Not Disturb during lessons"
+				android:title="Enable auto-mute" />
+		</PreferenceCategory>
 	</PreferenceScreen>
 
 	<PreferenceScreen

@@ -1,4 +1,4 @@
-package com.sapuseven.untis.notifications
+package com.sapuseven.untis.receivers
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
