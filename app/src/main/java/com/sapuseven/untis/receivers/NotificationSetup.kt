@@ -48,7 +48,7 @@ class NotificationSetup : LessonEventSetup() {
 	override fun onReceive(context: Context, intent: Intent) {
 		Log.d("NotificationSetup", "NotificationSetup received")
 
-		preferenceManager = PreferenceManager(context)
+		preferenceManager = PreferenceManager(context, intent.getLongExtra(EXTRA_LONG_PROFILE_ID, 0))
 		if (PreferenceUtils.getPrefBool(preferenceManager, "preference_notifications_enable"))
 			super.onReceive(context, intent)
 
