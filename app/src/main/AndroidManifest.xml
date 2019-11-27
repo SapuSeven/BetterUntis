@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.sapuseven.untis">
 
+	<uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.CAMERA" />
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -86,14 +87,18 @@
 				android:value=".activities.MainActivity" />
 		</activity>
 
-		<receiver android:name=".notifications.StartupReceiver">
+		<receiver android:name=".receivers.StartupReceiver">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 			</intent-filter>
 		</receiver>
 
-		<receiver android:name=".notifications.NotificationSetup" />
+		<receiver android:name=".receivers.NotificationSetup" />
 
-		<receiver android:name=".notifications.NotificationReceiver" />
+		<receiver android:name=".receivers.NotificationReceiver" />
+
+		<receiver android:name=".receivers.AutoMuteSetup" />
+
+		<receiver android:name=".receivers.AutoMuteReceiver" />
 	</application>
 </manifest>

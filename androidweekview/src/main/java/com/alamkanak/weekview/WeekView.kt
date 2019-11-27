@@ -44,7 +44,12 @@ class WeekView<T>(
 
 	private val eventChipsProvider: EventChipProvider<T>
 
-	// TODO: Move these setters entirely to WeekViewConfig
+	var hourIndexOffset: Int
+		get() = config.hourIndexOffset
+		set(hourIndexOffset) {
+			config.hourIndexOffset = hourIndexOffset
+		}
+
 	var eventCornerRadius: Int
 		get() = config.eventCornerRadius
 		set(eventCornerRadius) {
@@ -83,6 +88,20 @@ class WeekView<T>(
 		get() = config.eventTextColor
 		set(eventTextColor) {
 			config.eventTextColor = eventTextColor
+			invalidate()
+		}
+
+	var pastBackgroundColor: Int
+		get() = config.pastBackgroundColor
+		set(pastBackgroundColor) {
+			config.pastBackgroundColor = pastBackgroundColor
+			invalidate()
+		}
+
+	var futureBackgroundColor: Int
+		get() = config.futureBackgroundColor
+		set(futureBackgroundColor) {
+			config.futureBackgroundColor = futureBackgroundColor
 			invalidate()
 		}
 

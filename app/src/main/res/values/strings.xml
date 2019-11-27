@@ -73,6 +73,7 @@
 	<string name="logindatainput_anonymous_login">Anonymous login</string>
 	<string name="logindatainput_error_field_empty">This field cannot be empty!</string>
 	<string name="logindatainput_error_generic">Error: %1$s</string>
+	<string name="logindatainput_error_invalid_school">Invalid school ID!</string>
 	<string name="logindatainput_data_loaded">Data loaded.</string>
 	<string name="logindatainput_aquiring_app_secret">Acquiring app secret…</string>
 	<string name="logindatainput_aquiring_schoolid">Loading school…</string>
@@ -133,13 +134,16 @@
 	<string name="preference_category_styling_themes">Themes</string>
 	<string name="preference_category_timetable_item_appearance">Item appearance</string>
 	<string name="preference_category_timetable_lesson_text">Lesson text</string>
+	<string name="preference_category_timetable_range">Timetable range</string>
 	<string name="preference_category_general_behaviour">Behaviour</string>
 	<string name="preference_background_cancelled">Cancelled lessons</string>
 	<string name="preference_background_cancelled_past">Past cancelled lessons</string>
 	<string name="preference_background_exam">Lessons with tests</string>
 	<string name="preference_background_exam_past">Past lessons with tests</string>
+	<string name="preference_background_future">Future day background</string>
 	<string name="preference_background_irregular">Irregular lessons</string>
 	<string name="preference_background_irregular_past">Past irregular lessons</string>
+	<string name="preference_background_past">Past day background</string>
 	<string name="preference_background_regular">Regular lessons</string>
 	<string name="preference_background_regular_past">Past regular lessons</string>
 	<string name="preference_connectivity_proxy_about">About this feature</string>
@@ -176,6 +180,8 @@
 	<string name="preference_theme_pink">Pink</string>
 	<string name="preference_theme_stock">Default</string>
 	<string name="preference_theme_untis">Original Untis-App</string>
+	<string name="preference_timetable_background_irregular">Consider item background</string>
+	<string name="preference_timetable_background_irregular_desc">Use this if you have no access to teachers</string>
 	<string name="preference_timetable_bold_lesson_name">Bold lesson name</string>
 	<string name="preference_timetable_centered_lesson_info">Center lesson infos</string>
 	<string name="preference_timetable_colors_reset">Reset colors</string>
@@ -188,10 +194,15 @@
 	<string name="preference_timetable_lesson_info_font_size">Font size for lesson infos</string>
 	<string name="preference_timetable_lesson_name_font_size">Font size for lesson name</string>
 	<string name="preference_timetable_personal_timetable">Custom Personal Timetable</string>
+	<string name="preference_timetable_range">Hours to display</string>
+	<string name="preference_timetable_range_desc">Hours %1$d to %2$d</string>
+	<string name="preference_timetable_range_index_reset">Reset lesson numbering</string>
+	<string name="preference_timetable_substitutions_irregular">Detect irregular lessons</string>
+	<string name="preference_timetable_substitutions_irregular_desc">Treat lessons with substitutions as irregular</string>
 	<string name="preference_school_background">Use colors provided from your school</string>
-	<string name="preference_school_background_desc">Some schools send their own background colors.</string>
+	<string name="preference_school_background_desc">Some schools send their own background colors</string>
 	<string name="preference_use_theme_background">Use theme colors</string>
-	<string name="preference_use_theme_background_desc">This only applies to regular lessons.</string>
+	<string name="preference_use_theme_background_desc">This only applies to regular lessons</string>
 
 	<string name="settings_designing_message">Contribute by creating the missing settings icons!</string>
 	<string name="settings_designing_hide">Don\'t show again</string>

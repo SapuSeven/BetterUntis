@@ -53,9 +53,10 @@ import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.Holiday
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import com.sapuseven.untis.notifications.NotificationSetup.Companion.EXTRA_BOOLEAN_MANUAL
-import com.sapuseven.untis.notifications.StartupReceiver
 import com.sapuseven.untis.preferences.ElementPickerPreference
+import com.sapuseven.untis.preferences.RangePreference
+import com.sapuseven.untis.receivers.NotificationSetup.Companion.EXTRA_BOOLEAN_MANUAL
+import com.sapuseven.untis.receivers.StartupReceiver
 import kotlinx.android.synthetic.main.activity_main_content.*
 import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants
@@ -82,6 +83,8 @@ class MainActivity :
 		private const val REQUEST_CODE_SETTINGS = 2
 		private const val REQUEST_CODE_LOGINDATAINPUT_ADD = 3
 		private const val REQUEST_CODE_LOGINDATAINPUT_EDIT = 4
+
+		private const val UNTIS_DEFAULT_COLOR = "#f49f25"
 	}
 
 	private val userDatabase = UserDatabase.createInstance(this)
@@ -161,7 +164,7 @@ class MainActivity :
 				preferences,
 				"preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_TYPE}",
 				TimetableDatabaseInterface.Type.SUBJECT.toString()
-		))
+		) ?: TimetableDatabaseInterface.Type.SUBJECT.toString())
 
 		if (customType === TimetableDatabaseInterface.Type.SUBJECT) {
 			profileUser.userData.elemType?.let { type ->
@@ -350,6 +353,8 @@ class MainActivity :
 		weekView.eventTextSize = ConversionUtils.spToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_lesson_name_font_size").toFloat(), this)
 		weekView.eventSecondaryTextSize = ConversionUtils.spToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_lesson_info_font_size").toFloat(), this)
 		weekView.eventTextColor = if (PreferenceUtils.getPrefBool(preferences, "preference_timetable_item_text_light")) Color.WHITE else Color.BLACK
+		weekView.pastBackgroundColor = PreferenceUtils.getPrefInt(preferences, "preference_background_past")
+		weekView.futureBackgroundColor = PreferenceUtils.getPrefInt(preferences, "preference_background_future")
 		weekView.nowLineColor = PreferenceUtils.getPrefInt(preferences, "preference_marker")
 	}
 
@@ -371,8 +376,11 @@ class MainActivity :
 
 	private fun setupHours() {
 		val lines = MutableList(0) { return@MutableList 0 }
+		val range = RangePreference.convertToPair(PreferenceUtils.getPrefString(preferences, "preference_timetable_range", null))
 
-		profileUser.timeGrid.days.maxBy { it.units.size }?.units?.forEach { hour ->
+		profileUser.timeGrid.days.maxBy { it.units.size }?.units?.forEachIndexed { index, hour ->
+			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
+
 			val startTime = DateTimeUtils.tTimeNoSeconds().parseLocalTime(hour.startTime).toString(DateTimeUtils.shortDisplayableTime())
 			val endTime = DateTimeUtils.tTimeNoSeconds().parseLocalTime(hour.endTime).toString(DateTimeUtils.shortDisplayableTime())
 
@@ -386,10 +394,12 @@ class MainActivity :
 			lines.add(endTimeInt)
 		}
 
+		if (!PreferenceUtils.getPrefBool(preferences, "preference_timetable_range_index_reset"))
+			weekView.hourIndexOffset = (range?.first ?: 1) - 1
 		weekView.hourLines = lines.toIntArray()
 
-		weekView.startTime = lines[0]
-		weekView.endTime = lines[lines.size - 1] + 30 // TODO: Don't hard-code this offset
+		weekView.startTime = lines.first()
+		weekView.endTime = lines.last() + 30 // TODO: Don't hard-code this offset
 	}
 
 	private fun setupHolidays() {
@@ -410,12 +420,26 @@ class MainActivity :
 	}
 
 	private fun prepareItems(items: List<TimegridItem>): List<TimegridItem> {
-		val newItems = mergeItems(items, PreferenceUtils.getPrefBool(preferences, "preference_timetable_hide_cancelled"))
+		val newItems = mergeItems(items.mapNotNull { item ->
+			if (PreferenceUtils.getPrefBool(preferences, "preference_timetable_hide_cancelled") && item.periodData.isCancelled()) return@mapNotNull null
+
+			if (PreferenceUtils.getPrefBool(preferences, "preference_timetable_substitutions_irregular")) {
+				item.periodData.apply {
+					forceIrregular =
+							classes.find { it.id != it.orgId } != null
+									|| teachers.find { it.id != it.orgId } != null
+									|| subjects.find { it.id != it.orgId } != null
+									|| rooms.find { it.id != it.orgId } != null
+									|| (PreferenceUtils.getPrefBool(preferences, "preference_timetable_background_irregular") && item.periodData.element.backColor != UNTIS_DEFAULT_COLOR)
+				}
+			}
+			item
+		})
 		colorItems(newItems)
 		return newItems
 	}
 
-	private fun mergeItems(items: List<TimegridItem>, hideCancelled: Boolean): List<TimegridItem> {
+	private fun mergeItems(items: List<TimegridItem>): List<TimegridItem> {
 		val days = profileUser.timeGrid.days
 		val itemGrid: Array<Array<MutableList<TimegridItem>>> = Array(days.size) { Array(days.maxBy { it.units.size }!!.units.size) { mutableListOf<TimegridItem>() } }
 
@@ -424,8 +448,6 @@ class MainActivity :
 
 		// Put all items into a two dimensional array depending on day and hour
 		items.forEach { item ->
-			if (hideCancelled && item.periodData.isCancelled()) return@forEach
-
 			val startDateTime = DateTimeUtils.isoDateTimeNoSeconds().parseLocalDateTime(item.periodData.element.startDateTime)
 			val endDateTime = DateTimeUtils.isoDateTimeNoSeconds().parseLocalDateTime(item.periodData.element.endDateTime)
 
@@ -513,7 +535,7 @@ class MainActivity :
 			R.id.nav_settings -> {
 				val i = Intent(this@MainActivity, SettingsActivity::class.java)
 				i.putExtra(SettingsActivity.EXTRA_LONG_PROFILE_ID, profileId)
-				startActivity(i)
+				startActivityForResult(i, REQUEST_CODE_SETTINGS)
 			}
 			R.id.nav_infocenter -> {
 				val i = Intent(this@MainActivity, InfoCenterActivity::class.java)

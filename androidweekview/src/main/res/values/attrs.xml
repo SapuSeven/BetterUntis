@@ -66,8 +66,6 @@
 
         <!-- Colors -->
         <attr name="dayBackgroundColor" format="color" />
-        <attr name="todayBackgroundColor" format="color" />
-        <attr name="showDistinctPastFutureColor" format="boolean" />
         <attr name="pastBackgroundColor" format="color" />
         <attr name="futureBackgroundColor" format="color" />
 

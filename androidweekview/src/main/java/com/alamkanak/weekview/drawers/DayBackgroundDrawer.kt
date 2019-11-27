@@ -6,7 +6,7 @@ import com.alamkanak.weekview.DrawingContext
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.config.WeekViewConfig
 import org.joda.time.DateTime
-import java.lang.Math.max
+import kotlin.math.max
 
 class DayBackgroundDrawer(private val config: WeekViewConfig) {
 	internal fun draw(drawingContext: DrawingContext, canvas: Canvas) {
@@ -35,27 +35,21 @@ class DayBackgroundDrawer(private val config: WeekViewConfig) {
 
 		val height = WeekView.viewHeight
 
-		if (config.showDistinctPastFutureColor) {
-			val pastPaint = config.drawConfig.pastBackgroundPaint
-			val futurePaint = config.drawConfig.futureBackgroundPaint
+		val pastPaint = config.drawConfig.pastBackgroundPaint
+		val futurePaint = config.drawConfig.futureBackgroundPaint
 
-			val startY = config.drawConfig.headerHeight + config.drawConfig.currentOrigin.y
-			val endX = startPixel + config.drawConfig.widthPerDay
+		val startY = config.drawConfig.headerHeight + config.drawConfig.currentOrigin.y
+		val endX = startPixel + config.drawConfig.widthPerDay
 
-			when {
-				isToday -> {
-					val now = DateTime.now()
-					val minutesUntilNow = now.hourOfDay * 60 + now.minuteOfHour - config.startTime
-					canvas.drawRect(startX, startY, endX, startY + minutesUntilNow / 60.0f * config.hourHeight, pastPaint)
-					canvas.drawRect(startX, startY + minutesUntilNow, endX, height.toFloat(), futurePaint)
-				}
-				day < today -> canvas.drawRect(startX, startY, endX, height.toFloat(), pastPaint)
-				else -> canvas.drawRect(startX, startY, endX, height.toFloat(), futurePaint)
+		when {
+			isToday -> {
+				val now = DateTime.now()
+				val minutesUntilNow = now.hourOfDay * 60 + now.minuteOfHour - config.startTime
+				canvas.drawRect(startX, startY, endX, startY + minutesUntilNow / 60.0f * config.hourHeight, pastPaint)
+				canvas.drawRect(startX, startY + minutesUntilNow / 60.0f * config.hourHeight, endX, height.toFloat(), futurePaint)
 			}
-		} else {
-			val todayPaint = config.drawConfig.getTodayBackgroundPaint(isToday)
-			val right = startPixel + config.drawConfig.widthPerDay
-			canvas.drawRect(startX, config.drawConfig.headerHeight, right, height.toFloat(), todayPaint)
+			day < today -> canvas.drawRect(startX, startY, endX, height.toFloat(), pastPaint)
+			else -> canvas.drawRect(startX, startY, endX, height.toFloat(), futurePaint)
 		}
 	}
 }

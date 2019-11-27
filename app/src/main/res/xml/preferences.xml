@@ -12,6 +12,14 @@
 				android:key="preference_double_tap_to_exit"
 				android:title="@string/preference_double_tap_to_exit" />
 		</PreferenceCategory>
+
+		<PreferenceCategory android:title="Auto-Mute">
+			<CheckBoxPreference
+				android:defaultValue="@bool/preference_automute_enable_default"
+				android:key="preference_automute_enable"
+				android:summary="Automatically turns on Do Not Disturb during lessons"
+				android:title="Enable auto-mute" />
+		</PreferenceCategory>
 	</PreferenceScreen>
 
 	<PreferenceScreen
@@ -28,14 +36,14 @@
 			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
 				android:defaultValue="@integer/preference_background_future_default"
 				android:key="preference_background_future"
-				android:title="Future day background"
+				android:title="@string/preference_background_future"
 				app:cpv_showAlphaSlider="true"
 				app:cpv_showColorShades="false" />
 
 			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
 				android:defaultValue="@integer/preference_background_past_default"
-				android:key="preference_background"
-				android:title="Past day background"
+				android:key="preference_background_past"
+				android:title="@string/preference_background_past"
 				app:cpv_showAlphaSlider="true"
 				app:cpv_showColorShades="false" />
 
@@ -156,8 +164,39 @@
 			android:summary="@string/preference_timetable_hide_cancelled_desc"
 			android:title="@string/preference_timetable_hide_cancelled" />
 
-		<PreferenceCategory android:title="@string/preference_category_timetable_item_appearance">
+		<CheckBoxPreference
+			android:defaultValue="@bool/preference_timetable_substitutions_irregular_default"
+			android:key="preference_timetable_substitutions_irregular"
+			android:summary="@string/preference_timetable_substitutions_irregular_desc"
+			android:title="@string/preference_timetable_substitutions_irregular" />
 
+		<CheckBoxPreference
+			android:defaultValue="@bool/preference_timetable_background_irregular_default"
+			android:dependency="preference_timetable_substitutions_irregular"
+			android:key="preference_timetable_background_irregular"
+			android:summary="@string/preference_timetable_background_irregular_desc"
+			android:title="@string/preference_timetable_background_irregular" />
+
+		<PreferenceCategory android:title="@string/preference_category_timetable_range">
+
+			<com.sapuseven.untis.preferences.RangePreference
+				android:key="preference_timetable_range"
+				android:title="@string/preference_timetable_range" />
+
+			<CheckBoxPreference
+				android:defaultValue="@bool/preference_timetable_range_index_reset_default"
+				android:dependency="preference_timetable_range"
+				android:key="preference_timetable_range_index_reset"
+				android:title="@string/preference_timetable_range_index_reset" />
+
+			<!--CheckBoxPreference
+				android:enabled="false"
+				android:key="preference_timetable_range_hide_outside"
+				android:summary="(not implemented)"
+				android:title="Hide lessons outside specified range" /-->
+		</PreferenceCategory>
+
+		<PreferenceCategory android:title="@string/preference_category_timetable_item_appearance">
 			<com.sapuseven.untis.preferences.UnitPreference
 				android:defaultValue="@integer/preference_timetable_item_padding_overlap_default"
 				android:key="preference_timetable_item_padding_overlap"
@@ -225,7 +264,7 @@
 			android:summary="@string/preference_notifications_multiple_desc"
 			android:title="@string/preference_notifications_multiple" />
 
-		<com.sapuseven.untis.preferences.NotificationClearPreference
+		<Preference
 			android:icon="@drawable/settings_notifications_clear_all"
 			android:key="preference_notifications_clear"
 			android:title="@string/preference_notifications_clear" />

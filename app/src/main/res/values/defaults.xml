@@ -3,13 +3,17 @@
 	<bool name="preference_use_theme_background_default">false</bool>
 	<bool name="preference_dark_theme_oled_default">false</bool>
 	<bool name="preference_connectivity_refresh_in_background_default">true</bool>
+	<bool name="preference_timetable_background_irregular_default">false</bool>
 	<bool name="preference_timetable_centered_lesson_info_default">false</bool>
 	<bool name="preference_timetable_bold_lesson_name_default">true</bool>
 	<bool name="preference_timetable_item_text_light_default">true</bool>
 	<bool name="preference_timetable_hide_cancelled_default">false</bool>
+	<bool name="preference_timetable_range_index_reset_default">false</bool>
+	<bool name="preference_timetable_substitutions_irregular_default">false</bool>
 	<bool name="preference_notifications_enable_default">true</bool>
 	<bool name="preference_notifications_in_multiple_default">true</bool>
 	<bool name="preference_double_tap_to_exit_default">true</bool>
+	<bool name="preference_automute_enable_default">false</bool>
 
 	<integer name="preference_background_regular_default">0xFFF44336</integer>
 	<integer name="preference_background_regular_past_default">0xFFD32F2F</integer>
@@ -20,7 +24,7 @@
 	<integer name="preference_background_cancelled_default">0xFF9E9E9E</integer>
 	<integer name="preference_background_cancelled_past_default">0xFF616161</integer>
 	<integer name="preference_background_future_default">0x00000000</integer>
-	<integer name="preference_background_past_default">0x20FFFFFF</integer>
+	<integer name="preference_background_past_default">0x40808080</integer>
 	<integer name="preference_marker_default">0xFFFFFFFF</integer>
 	<integer name="preference_timetable_item_padding_overlap_default">4</integer>
 	<integer name="preference_timetable_item_padding_default">4</integer>

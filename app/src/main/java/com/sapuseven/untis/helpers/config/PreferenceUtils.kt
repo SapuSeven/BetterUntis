@@ -21,9 +21,10 @@ object PreferenceUtils {
 		val res = manager.context.resources
 
 		return getPrefString(manager, key, res.getString(res.getIdentifier(key + "_default", "string", manager.context.packageName)))
+				?: ""
 	}
 
-	fun getPrefString(manager: PreferenceManager, key: String, default: String): String {
-		return manager.defaultPrefs.getString(key, default) ?: ""
+	fun getPrefString(manager: PreferenceManager, key: String, default: String?): String? {
+		return manager.defaultPrefs.getString(key, default)
 	}
 }

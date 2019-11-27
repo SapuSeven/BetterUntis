@@ -8,10 +8,12 @@ class PeriodData(
 		private var timetableDatabaseInterface: TimetableDatabaseInterface? = null,
 		var element: Period
 ) {
-	val classes = ArrayList<PeriodElement>()
-	val teachers = ArrayList<PeriodElement>()
-	val subjects = ArrayList<PeriodElement>()
-	val rooms = ArrayList<PeriodElement>()
+	val classes = HashSet<PeriodElement>()
+	val teachers = HashSet<PeriodElement>()
+	val subjects = HashSet<PeriodElement>()
+	val rooms = HashSet<PeriodElement>()
+
+	var forceIrregular = false
 
 	companion object {
 		// TODO: Convert to string resources
@@ -82,7 +84,7 @@ class PeriodData(
 
 	fun isCancelled(): Boolean = element.`is`.contains(Period.CODE_CANCELLED)
 
-	fun isIrregular(): Boolean = element.`is`.contains(Period.CODE_IRREGULAR)
+	fun isIrregular(): Boolean = forceIrregular || element.`is`.contains(Period.CODE_IRREGULAR)
 
 	fun isExam(): Boolean = element.`is`.contains(Period.CODE_EXAM)
 }

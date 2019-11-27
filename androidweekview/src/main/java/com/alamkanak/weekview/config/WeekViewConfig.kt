@@ -63,7 +63,6 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 			drawConfig.timeCaptionPaint.textSize = value
 			drawConfig.calculateTimeCaptionHeight()
 		}
-
 	// Time column separator
 	var showTimeColumnSeparator: Boolean
 	var timeColumnSeparatorColor: Int
@@ -72,6 +71,7 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 			drawConfig.timeColumnSeparatorPaint.color = value
 		}
 	var timeColumnSeparatorStrokeWidth: Float
+	var hourIndexOffset: Int = 0
 
 	// Header row
 	var headerRowTextColor: Int
@@ -181,12 +181,6 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 		set(value) {
 			drawConfig.dayBackgroundPaint.color = value
 		}
-	var todayBackgroundColor: Int
-		get() = drawConfig.todayBackgroundPaint.color
-		set(value) {
-			drawConfig.todayBackgroundPaint.color = value
-		}
-	var showDistinctPastFutureColor: Boolean
 	var pastBackgroundColor: Int
 		get() = drawConfig.pastBackgroundPaint.color
 		set(value) {
@@ -337,8 +331,6 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 
 			// Colors
 			dayBackgroundColor = a.getColor(R.styleable.WeekView_dayBackgroundColor, Color.WHITE)
-			todayBackgroundColor = a.getColor(R.styleable.WeekView_todayBackgroundColor, Color.WHITE)
-			showDistinctPastFutureColor = a.getBoolean(R.styleable.WeekView_showDistinctPastFutureColor, false)
 			pastBackgroundColor = a.getColor(R.styleable.WeekView_pastBackgroundColor, Color.rgb(227, 227, 227))
 			futureBackgroundColor = a.getColor(R.styleable.WeekView_futureBackgroundColor, Color.rgb(245, 245, 245))
 
