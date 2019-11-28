@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.*
 import android.view.MotionEvent.ACTION_UP
 import android.widget.OverScroller
-import androidx.interpolator.view.animation.FastOutLinearInInterpolator
 import com.alamkanak.weekview.config.WeekViewConfig
 import com.alamkanak.weekview.config.WeekViewDrawConfig
 import com.alamkanak.weekview.listeners.*
@@ -42,7 +41,7 @@ internal class WeekViewGestureHandler<T>(
 
 		touchHandler = WeekViewTouchHandler(config)
 		gestureDetector = GestureDetector(context, this)
-		scroller = OverScroller(context, FastOutLinearInInterpolator())
+		scroller = OverScroller(context)
 
 		minimumFlingVelocity = ViewConfiguration.get(context).scaledMinimumFlingVelocity
 		scaledTouchSlop = ViewConfiguration.get(context).scaledTouchSlop
@@ -71,12 +70,6 @@ internal class WeekViewGestureHandler<T>(
 		goToNearestOrigin()
 		return true
 	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	//   Gesture Detector
-	//
-	////////////////////////////////////////////////////////////////////////////////////////////////
 
 	override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
 		if (isZooming) return true
@@ -140,9 +133,9 @@ internal class WeekViewGestureHandler<T>(
 
 		currentFlingDirection = currentScrollDirection
 		when (currentFlingDirection) {
-			Direction.LEFT, Direction.RIGHT -> onFlingHorizontal(velocityX)
-			Direction.VERTICAL -> onFlingVertical(velocityY)
-			else -> {
+			Direction.LEFT, Direction.RIGHT -> if (config.horizontalFlingEnabled) onFlingHorizontal(velocityX)
+			Direction.VERTICAL -> if (config.verticalFlingEnabled) onFlingVertical(velocityY)
+			Direction.NONE -> {
 			}
 		}
 
@@ -285,9 +278,8 @@ internal class WeekViewGestureHandler<T>(
 			listener.onScrolled()
 		}
 
-		// Reset scrolling and fling direction.
 		currentFlingDirection = Direction.NONE
-		currentScrollDirection = currentFlingDirection
+		currentScrollDirection = Direction.NONE
 	}
 
 	fun onTouchEvent(event: MotionEvent): Boolean {
@@ -340,5 +332,4 @@ internal class WeekViewGestureHandler<T>(
 
 		fun onScrolled()
 	}
-
 }
