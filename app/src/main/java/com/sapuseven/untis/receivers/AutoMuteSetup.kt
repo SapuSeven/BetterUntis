@@ -25,25 +25,28 @@ class AutoMuteSetup : LessonEventSetup() {
 	}
 
 	override fun onLoadingSuccess(context: Context, items: List<TimegridItem>) {
-		items.merged().forEach { item ->
-			val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
-			val id = item.startDateTime.millisOfDay / 1000
+		items.merged().sortedBy { it.startDateTime }.zipWithNext().withLast().forEach {
+			it.first?.let { item ->
+				val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
+				val id = item.startDateTime.millisOfDay / 1000
 
-			if (item.endDateTime.millisOfDay <= LocalDateTime.now().millisOfDay) return@forEach
+				if (item.endDateTime.millisOfDay <= LocalDateTime.now().millisOfDay) return@forEach
 
-			val muteIntent = Intent(context, AutoMuteReceiver::class.java)
-					.putExtra(EXTRA_INT_ID, id)
-					.putExtra(EXTRA_BOOLEAN_MUTE, true)
-			val pendingMuteIntent = PendingIntent.getBroadcast(context, item.startDateTime.millisOfDay, muteIntent, 0)
-			alarmManager.setExact(AlarmManager.RTC_WAKEUP, item.startDateTime.millis, pendingMuteIntent)
-			Log.d("AutoMuteSetup", "${item.periodData.getShortTitle()} mute scheduled for ${item.startDateTime}")
+				val muteIntent = Intent(context, AutoMuteReceiver::class.java)
+						.putExtra(EXTRA_INT_ID, id)
+						.putExtra(EXTRA_BOOLEAN_MUTE, true)
+				val pendingMuteIntent = PendingIntent.getBroadcast(context, item.startDateTime.millisOfDay, muteIntent, 0)
+				alarmManager.setExact(AlarmManager.RTC_WAKEUP, item.startDateTime.millis, pendingMuteIntent)
+				Log.d("AutoMuteSetup", "${item.periodData.getShortTitle()} mute scheduled for ${item.startDateTime}")
 
-			val unmuteIntent = Intent(context, AutoMuteReceiver::class.java)
-					.putExtra(EXTRA_INT_ID, id)
-					.putExtra(EXTRA_BOOLEAN_MUTE, false)
-			val pendingUnmuteIntent = PendingIntent.getBroadcast(context, item.endDateTime.millisOfDay, unmuteIntent, 0)
-			alarmManager.setExact(AlarmManager.RTC_WAKEUP, item.endDateTime.millis, pendingUnmuteIntent)
-			Log.d("AutoMuteSetup", "${item.periodData.getShortTitle()} unmute scheduled for ${item.endDateTime}")
+				if (item.endDateTime == it.second?.startDateTime) return@forEach // No break exists, don't unmute
+				val unmuteIntent = Intent(context, AutoMuteReceiver::class.java)
+						.putExtra(EXTRA_INT_ID, id)
+						.putExtra(EXTRA_BOOLEAN_MUTE, false)
+				val pendingUnmuteIntent = PendingIntent.getBroadcast(context, item.endDateTime.millisOfDay, unmuteIntent, 0)
+				alarmManager.setExact(AlarmManager.RTC_WAKEUP, item.endDateTime.millis, pendingUnmuteIntent)
+				Log.d("AutoMuteSetup", "${item.periodData.getShortTitle()} unmute scheduled for ${item.endDateTime}")
+			}
 		}
 	}
 

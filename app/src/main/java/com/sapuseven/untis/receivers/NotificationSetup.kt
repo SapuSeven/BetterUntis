@@ -56,7 +56,9 @@ class NotificationSetup : LessonEventSetup() {
 	}
 
 	override fun onLoadingSuccess(context: Context, items: List<TimegridItem>) {
-		items.sortedBy { it.startDateTime }.merged().zipWithNext().forEach { item ->
+		items.merged().sortedBy { it.startDateTime }.zipWithNext().forEach { item ->
+			if (item.first.endDateTime == item.second.startDateTime) return // No break exists
+
 			if (item.first.equalsIgnoreTime(item.second)
 					&& !PreferenceUtils.getPrefBool(preferenceManager, "preference_notifications_in_multiple"))
 				return@forEach // multi-hour lesson

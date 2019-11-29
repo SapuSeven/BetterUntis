@@ -97,5 +97,14 @@ abstract class LessonEventSetup : BroadcastReceiver() {
 	abstract fun onLoadingError(context: Context, requestId: Int, code: Int?, message: String?)
 }
 
+/**
+ * Merges all values from contemporaneous lessons.
+ * After this operation, every time period only has a single lesson containing all subjects, teachers, rooms and classes.
+ */
 internal fun List<TimegridItem>.merged(): List<TimegridItem> = this.groupBy { it.startDateTime }
 		.map { it.value.reduce { item1, item2 -> item1.mergeValuesWith(item2); item1 } }
+
+/**
+ * Creates a copy of a zipped list with the very last element duplicated into a new Pair whose second element is null.
+ */
+internal fun <E> List<Pair<E?, E?>>.withLast(): List<Pair<E?, E?>> = this.toMutableList().apply { add(Pair(this.last().second, null)) }.toList()
