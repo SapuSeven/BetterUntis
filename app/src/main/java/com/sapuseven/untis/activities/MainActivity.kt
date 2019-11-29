@@ -442,6 +442,7 @@ class MainActivity :
 	private fun mergeItems(items: List<TimegridItem>): List<TimegridItem> {
 		val days = profileUser.timeGrid.days
 		val itemGrid: Array<Array<MutableList<TimegridItem>>> = Array(days.size) { Array(days.maxBy { it.units.size }!!.units.size) { mutableListOf<TimegridItem>() } }
+		val leftover: MutableList<TimegridItem> = mutableListOf()
 
 		// TODO: Check if the day from the untis API is always an english string
 		val firstDayOfWeek = DateTimeConstants.MONDAY //DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(days.first().day).dayOfWeek
@@ -465,9 +466,12 @@ class MainActivity :
 
 			if (thisUnitStartIndex != -1 && thisUnitEndIndex != -1)
 				itemGrid[day][thisUnitStartIndex].add(item)
+			else
+				leftover.add(item)
 		}
 
 		val newItems = mutableListOf<TimegridItem>()
+		newItems.addAll(leftover)
 		itemGrid.forEach { unitsOfDay ->
 			unitsOfDay.forEachIndexed { unitIndex, items ->
 				items.forEach {
