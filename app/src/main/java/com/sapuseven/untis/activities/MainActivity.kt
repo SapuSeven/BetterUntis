@@ -132,7 +132,7 @@ class MainActivity :
 
 	override fun onResume() {
 		super.onResume()
-		preferences.reload()
+		preferences.reload(profileId)
 		proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
 		setupWeekViewConfig()
 		weekView.invalidate()
@@ -261,7 +261,7 @@ class MainActivity :
 	@SuppressLint("ApplySharedPref")
 	private fun switchToProfile(user: UserDatabase.User) {
 		preferences.saveProfileId(user.id!!)
-		preferences.reload()
+		preferences.reload(profileId)
 		if (!loadProfile()) finish() // TODO: Show error
 		else {
 			setupNavDrawerHeader(findViewById(R.id.navigationview_main))
