@@ -260,7 +260,8 @@ class MainActivity :
 
 	@SuppressLint("ApplySharedPref")
 	private fun switchToProfile(user: UserDatabase.User) {
-		preferences.saveProfileId(user.id!!)
+		profileId = user.id!!
+		preferences.saveProfileId(profileId)
 		preferences.reload(profileId)
 		if (!loadProfile()) finish() // TODO: Show error
 		else {
@@ -466,8 +467,6 @@ class MainActivity :
 
 			if (thisUnitStartIndex != -1 && thisUnitEndIndex != -1)
 				itemGrid[day][thisUnitStartIndex].add(item)
-			else
-				leftover.add(item)
 		}
 
 		val newItems = mutableListOf<TimegridItem>()
