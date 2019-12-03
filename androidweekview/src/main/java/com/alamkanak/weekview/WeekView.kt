@@ -206,6 +206,13 @@ class WeekView<T>(
 			invalidate()
 		}
 
+	var horizontalFlingEnabled: Boolean
+		get() = config.horizontalFlingEnabled
+		set(horizontalFlingEnabled) {
+			config.horizontalFlingEnabled = horizontalFlingEnabled
+			invalidate()
+		}
+
 	init {
 		gestureHandler = WeekViewGestureHandler(context, this, config, data)
 

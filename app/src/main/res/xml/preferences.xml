@@ -11,6 +11,11 @@
 				android:defaultValue="@bool/preference_double_tap_to_exit_default"
 				android:key="preference_double_tap_to_exit"
 				android:title="@string/preference_double_tap_to_exit" />
+
+			<CheckBoxPreference
+				android:defaultValue="@bool/preference_fling_enable_default"
+				android:key="preference_fling_enable"
+				android:title="Enable flinging" />
 		</PreferenceCategory>
 
 		<PreferenceCategory android:title="Auto-Mute">

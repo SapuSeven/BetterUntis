@@ -343,9 +343,6 @@ class MainActivity :
 	private fun setupWeekViewConfig() {
 		weekView.numberOfVisibleDays = profileUser.timeGrid.days.size
 
-		// Customization
-
-		// Timetable
 		weekView.columnGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_padding").toFloat(), this).toInt()
 		weekView.overlappingEventGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_padding_overlap").toFloat(), this).toInt()
 		weekView.eventCornerRadius = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_corner_radius").toFloat(), this).toInt()
@@ -357,6 +354,8 @@ class MainActivity :
 		weekView.pastBackgroundColor = PreferenceUtils.getPrefInt(preferences, "preference_background_past")
 		weekView.futureBackgroundColor = PreferenceUtils.getPrefInt(preferences, "preference_background_future")
 		weekView.nowLineColor = PreferenceUtils.getPrefInt(preferences, "preference_marker")
+
+		weekView.horizontalFlingEnabled = PreferenceUtils.getPrefBool(preferences, "preference_fling_enable")
 	}
 
 	override fun onPeriodChange(startDate: DateTime, endDate: DateTime): List<WeekViewDisplayable<TimegridItem>> {
