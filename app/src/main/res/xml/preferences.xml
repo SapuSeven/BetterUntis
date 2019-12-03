@@ -18,6 +18,18 @@
 				android:title="Enable flinging" />
 		</PreferenceCategory>
 
+		<PreferenceCategory android:title="Week Display Settings">
+			<CheckBoxPreference
+				android:defaultValue="@bool/preference_week_snap_to_days_default"
+				android:key="preference_week_snap_to_days"
+				android:summary="instead of weeks"
+				android:title="Snap to days" />
+
+			<Preference
+				android:key="preference_week_custom_range"
+				android:title="Custom week range" />
+		</PreferenceCategory>
+
 		<PreferenceCategory android:title="Auto-Mute">
 			<CheckBoxPreference
 				android:defaultValue="@bool/preference_automute_enable_default"

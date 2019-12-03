@@ -98,7 +98,8 @@
 
         <attr name="topLeftCornerDrawable" format="reference" />
         <attr name="topLeftCornerPadding" format="dimension" />
-        <attr name="startOnFirstDay" format="boolean" />
+
+	    <attr name="snapToWeek" format="boolean" />
 
     </declare-styleable>
 
