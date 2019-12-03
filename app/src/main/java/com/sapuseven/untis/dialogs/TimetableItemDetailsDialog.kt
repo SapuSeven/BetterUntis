@@ -131,8 +131,9 @@ class TimetableItemDetailsDialog : DialogFragment() {
 	                         textColor: Int?): Boolean {
 		if (data.isEmpty()) return true
 		data.forEach { element ->
-			generateTextViewForElement(element, type, timetableDatabaseInterface, textColor, element.id != element.orgId)?.let { list.addView(it) }
-					?: return true
+			generateTextViewForElement(element, type, timetableDatabaseInterface, textColor, false)?.let { list.addView(it) }
+			if (element.id != element.orgId)
+				generateTextViewForElement(element, type, timetableDatabaseInterface, textColor, true)?.let { list.addView(it) }
 		}
 		return false
 	}

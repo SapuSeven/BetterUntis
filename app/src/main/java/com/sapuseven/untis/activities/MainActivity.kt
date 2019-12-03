@@ -132,7 +132,7 @@ class MainActivity :
 
 	override fun onResume() {
 		super.onResume()
-		preferences.reload()
+		preferences.reload(profileId)
 		proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
 		setupWeekViewConfig()
 		weekView.invalidate()
@@ -260,8 +260,9 @@ class MainActivity :
 
 	@SuppressLint("ApplySharedPref")
 	private fun switchToProfile(user: UserDatabase.User) {
-		preferences.saveProfileId(user.id!!)
-		preferences.reload()
+		profileId = user.id!!
+		preferences.saveProfileId(profileId)
+		preferences.reload(profileId)
 		if (!loadProfile()) finish() // TODO: Show error
 		else {
 			setupNavDrawerHeader(findViewById(R.id.navigationview_main))
@@ -442,6 +443,7 @@ class MainActivity :
 	private fun mergeItems(items: List<TimegridItem>): List<TimegridItem> {
 		val days = profileUser.timeGrid.days
 		val itemGrid: Array<Array<MutableList<TimegridItem>>> = Array(days.size) { Array(days.maxBy { it.units.size }!!.units.size) { mutableListOf<TimegridItem>() } }
+		val leftover: MutableList<TimegridItem> = mutableListOf()
 
 		// TODO: Check if the day from the untis API is always an english string
 		val firstDayOfWeek = DateTimeConstants.MONDAY //DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(days.first().day).dayOfWeek
@@ -468,6 +470,7 @@ class MainActivity :
 		}
 
 		val newItems = mutableListOf<TimegridItem>()
+		newItems.addAll(leftover)
 		itemGrid.forEach { unitsOfDay ->
 			unitsOfDay.forEachIndexed { unitIndex, items ->
 				items.forEach {
