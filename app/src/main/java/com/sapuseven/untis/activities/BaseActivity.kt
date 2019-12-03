@@ -64,7 +64,7 @@ open class BaseActivity : AppCompatActivity() {
 					.setMessage(stackTrace)
 					.setNegativeButton(R.string.all_copy) { _, _ ->
 						val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-						clipboard.primaryClip = ClipData.newPlainText("BetterUntis Crash Log", stackTrace)
+						clipboard.setPrimaryClip(ClipData.newPlainText("BetterUntis Crash Log", stackTrace))
 						Toast.makeText(this, "Crash log copied to clipboard.", Toast.LENGTH_SHORT).show()
 					}
 					.setPositiveButton(R.string.all_close) { dialog, _ ->
@@ -133,11 +133,11 @@ open class BaseActivity : AppCompatActivity() {
 		return typedValue.data
 	}
 
-	class CrashHandler(val context: Context, private val defaultUncaughtExceptionHandler: Thread.UncaughtExceptionHandler) : Thread.UncaughtExceptionHandler {
+	class CrashHandler(val context: Context, private val defaultUncaughtExceptionHandler: Thread.UncaughtExceptionHandler?) : Thread.UncaughtExceptionHandler {
 		override fun uncaughtException(t: Thread, e: Throwable) {
 			Log.e("BetterUntis", "Application crashed!", e)
 			saveCrash(e)
-			defaultUncaughtExceptionHandler.uncaughtException(t, e)
+			defaultUncaughtExceptionHandler?.uncaughtException(t, e)
 		}
 
 		private fun saveCrash(e: Throwable) {
