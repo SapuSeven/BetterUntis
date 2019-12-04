@@ -5,8 +5,8 @@ import android.graphics.Paint
 import android.text.SpannableStringBuilder
 import android.text.TextUtils
 import android.view.MotionEvent
-
 import com.sapuseven.untis.views.weekview.config.WeekViewConfig
+
 
 /**
  * A class to hold reference to the events and their visual representation. An EventRect is
@@ -59,10 +59,10 @@ internal constructor(var event: WeekViewEvent<T>, var originalEvent: WeekViewEve
 	}
 
 	private fun drawTitle(config: WeekViewConfig, canvas: Canvas) {
-		val negativeWidth = rect!!.right - rect!!.left - (config.eventPadding * 2).toFloat() < 0
-		val negativeHeight = rect!!.bottom - rect!!.top - (config.eventPadding * 2).toFloat() < 0
+		val availableHeight = (rect!!.bottom - rect!!.top - (config.eventPadding * 2).toFloat()).toInt()
+		val availableWidth = (rect!!.right - rect!!.left - (config.eventPadding * 2).toFloat()).toInt()
 
-		if (negativeWidth || negativeHeight) return
+		if (availableHeight < 0 || availableWidth < 0) return
 
 		// Prepare the name of the event.
 		val topBuilder = SpannableStringBuilder()
@@ -72,9 +72,6 @@ internal constructor(var event: WeekViewEvent<T>, var originalEvent: WeekViewEve
 		topBuilder.append(event.top)
 		titleBuilder.append(event.title)
 		bottomBuilder.append(event.bottom)
-
-		val availableHeight = (rect!!.bottom - rect!!.top - (config.eventPadding * 2).toFloat()).toInt()
-		val availableWidth = (rect!!.right - rect!!.left - (config.eventPadding * 2).toFloat()).toInt()
 
 		val topPaint = config.drawConfig.eventTopPaint
 		val titlePaint = config.drawConfig.eventTextPaint
@@ -88,10 +85,10 @@ internal constructor(var event: WeekViewEvent<T>, var originalEvent: WeekViewEve
 		canvas.translate(rect!!.left + config.eventPadding, rect!!.top + config.eventPadding)
 
 		if (config.eventSecondaryTextCentered) {
-			canvas.drawText(eventTop.toString(), availableWidth / 2.0f, -topPaint.ascent(), topPaint)
+			canvas.drawText(eventTop.toString(), availableWidth / 2.0f, -(topPaint.ascent() + topPaint.descent()), topPaint)
 			canvas.drawText(eventBottom.toString(), availableWidth / 2.0f, availableHeight.toFloat(), bottomPaint)
 		} else {
-			canvas.drawText(eventTop.toString(), 0f, -topPaint.ascent(), topPaint)
+			canvas.drawText(eventTop.toString(), 0f, -(topPaint.ascent() + topPaint.descent()), topPaint)
 			canvas.drawText(eventBottom.toString(), availableWidth.toFloat(), availableHeight.toFloat(), bottomPaint)
 		}
 
