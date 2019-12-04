@@ -11,9 +11,9 @@ import com.sapuseven.untis.views.weekview.DateUtils
 import com.sapuseven.untis.views.weekview.WeekView
 import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants
-import java.lang.Math.max
-import java.lang.Math.min
 import java.util.*
+import kotlin.math.max
+import kotlin.math.min
 
 class WeekViewDrawConfig(context: Context) {
 	val timeTextTopPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
@@ -38,7 +38,6 @@ class WeekViewDrawConfig(context: Context) {
 	val daySeparatorPaint: Paint = Paint()
 	var headerMarginBottom: Float = 0.0f
 
-	val todayBackgroundPaint: Paint = Paint()
 	val timeColumnSeparatorPaint: Paint = Paint()
 	val nowLinePaint: Paint = Paint()
 	val todayHeaderTextPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
@@ -121,14 +120,6 @@ class WeekViewDrawConfig(context: Context) {
 
 		currentOrigin.y = max(currentOrigin.y, potentialNewVerticalOrigin)
 		currentOrigin.y = min(currentOrigin.y, 0f)
-	}
-
-	fun resetOrigin() {
-		currentOrigin = PointF(0f, 0f)
-	}
-
-	fun getTodayBackgroundPaint(isToday: Boolean): Paint {
-		return if (isToday) todayBackgroundPaint else dayBackgroundPaint
 	}
 
 	private fun buildDefaultDateTimeInterpreter(context: Context): DateTimeInterpreter {

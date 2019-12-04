@@ -21,15 +21,7 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 	var firstDayOfWeek: Int
 	var snapToWeek: Boolean
 	var numberOfVisibleDays: Int = 0
-		set(value) {
-			if (field != value) drawConfig.resetOrigin()
-			field = value
-		}
 	var weekLength: Int = 0
-		set(value) {
-			if (field != value) drawConfig.resetOrigin()
-			field = value
-		}
 	var showFirstDayOfWeekFirst: Boolean
 
 	// Time column
@@ -373,6 +365,7 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 		} finally {
 			a.recycle()
 		}
+
 		drawConfig.calculateTimeColumnWidth(this)
 		drawConfig.calculateHeaderHeight(this)
 	}

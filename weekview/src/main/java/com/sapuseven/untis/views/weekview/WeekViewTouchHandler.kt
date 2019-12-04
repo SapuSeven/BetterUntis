@@ -5,6 +5,7 @@ import com.sapuseven.untis.views.weekview.config.WeekViewConfig
 import com.sapuseven.untis.views.weekview.config.WeekViewDrawConfig
 import org.joda.time.DateTime
 import java.lang.Math.max
+import kotlin.math.ceil
 
 internal class WeekViewTouchHandler(private val config: WeekViewConfig) {
 	private val drawConfig: WeekViewDrawConfig = config.drawConfig
@@ -23,7 +24,7 @@ internal class WeekViewTouchHandler(private val config: WeekViewConfig) {
 		val originX = drawConfig.currentOrigin.x
 		val timeColumnWidth = drawConfig.timeColumnWidth
 
-		val leftDaysWithGaps = (Math.ceil((originX / widthPerDay).toDouble()) * -1).toInt()
+		val leftDaysWithGaps = (ceil((originX / widthPerDay).toDouble()) * -1).toInt()
 		var startPixel = originX + widthPerDay * leftDaysWithGaps + timeColumnWidth
 
 		val begin = leftDaysWithGaps + 1

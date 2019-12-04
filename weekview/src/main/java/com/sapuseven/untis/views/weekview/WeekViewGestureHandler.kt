@@ -246,7 +246,7 @@ internal class WeekViewGestureHandler<T>(
 		val totalDayWidth = config.totalDayWidth
 		var leftDays = drawConfig.currentOrigin.x.toDouble()
 		leftDays /= if (config.snapToWeek)
-			(totalDayWidth * config.numberOfVisibleDays).toDouble()
+			(totalDayWidth * config.weekLength).toDouble()
 		else
 			totalDayWidth.toDouble()
 
@@ -261,7 +261,7 @@ internal class WeekViewGestureHandler<T>(
 
 		var nearestOrigin = drawConfig.currentOrigin.x.toInt()
 		nearestOrigin -= if (config.snapToWeek)
-			(leftDays * totalDayWidth.toDouble() * config.numberOfVisibleDays.toDouble()).toInt()
+			(leftDays * totalDayWidth.toDouble() * config.weekLength.toDouble()).toInt()
 		else
 			(leftDays * totalDayWidth).toInt()
 

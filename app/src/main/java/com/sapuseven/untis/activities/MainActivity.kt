@@ -228,7 +228,7 @@ class MainActivity :
 		val line1 = if (profileUser.anonymous) getString(R.string.all_anonymous) else profileUser.userData.displayName
 		val line2 = profileUser.userData.schoolName
 		(navigationView.getHeaderView(0).findViewById<View>(R.id.textview_mainactivtydrawer_line1) as TextView).text =
-				if (line1.isNullOrBlank()) getString(R.string.app_name) else line1
+				if (line1.isBlank()) getString(R.string.app_name) else line1
 		(navigationView.getHeaderView(0).findViewById<View>(R.id.textview_mainactivitydrawer_line2) as TextView).text =
 				if (line2.isBlank()) getString(R.string.all_contact_email) else line2
 	}
