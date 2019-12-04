@@ -1,7 +1,7 @@
 package com.sapuseven.untis.data.timetable
 
-import com.alamkanak.weekview.WeekViewEvent
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import com.sapuseven.untis.views.weekview.WeekViewEvent
 import org.joda.time.DateTime
 
 class TimegridItem(

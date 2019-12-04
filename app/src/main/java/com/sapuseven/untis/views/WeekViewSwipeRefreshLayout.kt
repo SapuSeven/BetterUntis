@@ -2,7 +2,7 @@ package com.sapuseven.untis.views
 
 import android.content.Context
 import android.util.AttributeSet
-import com.alamkanak.weekview.WeekView
+import com.sapuseven.untis.views.weekview.WeekView
 
 class WeekViewSwipeRefreshLayout : androidx.swiperefreshlayout.widget.SwipeRefreshLayout {
 	constructor(context: Context) : super(context, null)

@@ -92,5 +92,5 @@ dependencies {
 	androidTestImplementation 'androidx.test:rules:1.3.0-alpha02'
 	androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0-alpha02'
 
-	implementation project(':androidweekview')
+	implementation project(':weekview')
 }

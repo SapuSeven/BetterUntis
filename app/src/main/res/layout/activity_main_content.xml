@@ -13,7 +13,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent">
 
-		<com.alamkanak.weekview.WeekView
+		<com.sapuseven.untis.views.weekview.WeekView
 			android:id="@+id/weekview_main_timetable"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"

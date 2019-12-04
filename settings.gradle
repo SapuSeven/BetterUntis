@@ -1,1 +1,1 @@
-include ':app', ':androidweekview'
+include ':app', ':weekview'
