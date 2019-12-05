@@ -9,6 +9,7 @@ import ca.antonious.materialdaypicker.MaterialDayPicker
 import ca.antonious.materialdaypicker.SelectionMode
 import ca.antonious.materialdaypicker.SelectionState
 import com.sapuseven.untis.R
+import com.sapuseven.untis.preferences.WeekRangePickerPreference
 
 class WeekRangePickerPreferenceDialog : PreferenceDialogFragmentCompat() {
 	private lateinit var picker: MaterialDayPicker
@@ -29,7 +30,7 @@ class WeekRangePickerPreferenceDialog : PreferenceDialogFragmentCompat() {
 		picker.apply {
 			selectionMode = RangeSelectionMode(this)
 			val savedDays = preference.getPersistedStringSet(emptySet()).toList().map { MaterialDayPicker.Weekday.valueOf(it) }
-			setSelectedDays(listOfNotNull(savedDays.min(), savedDays.max()))
+			setSelectedDays(if (savedDays.size == 1) listOf(savedDays.first()) else listOfNotNull(savedDays.min(), savedDays.max()))
 		}
 		return root
 	}
@@ -45,6 +46,7 @@ class WeekRangePickerPreferenceDialog : PreferenceDialogFragmentCompat() {
 
 	override fun onDialogClosed(positiveResult: Boolean) {
 		if (positiveResult) preference.persistStringSet(picker.selectedDays.map { it.name }.toSet())
+		(preference as? WeekRangePickerPreference)?.refreshSummary()
 	}
 
 	class RangeSelectionMode(private val materialDayPicker: MaterialDayPicker) : SelectionMode {

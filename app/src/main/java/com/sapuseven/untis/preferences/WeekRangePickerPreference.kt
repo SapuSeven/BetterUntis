@@ -9,7 +9,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class WeekRangePickerPreference(context: Context?, attrs: AttributeSet?) : DialogPreference(context, attrs) {
-	override fun getSummary(): CharSequence {
+	override fun getSummary(): CharSequence = generateSummary()
+
+	private fun generateSummary(): String {
 		val selectedDays = getPersistedStringSet(emptySet()).toList().map { MaterialDayPicker.Weekday.valueOf(it) }
 		val selectionBounds = MaterialDayPicker.Weekday.getOrderedDaysOfWeek(Locale.getDefault()).filter { selectedDays.contains(it) }.bounds()
 
@@ -20,6 +22,10 @@ class WeekRangePickerPreference(context: Context?, attrs: AttributeSet?) : Dialo
 				context.getString(R.string.preference_week_custom_range_summary_short, first)
 			}
 		} ?: ""
+	}
+
+	fun refreshSummary() {
+		summary = generateSummary()
 	}
 }
 
