@@ -136,9 +136,9 @@ class WeekView<T>(
 		}
 
 	var numberOfVisibleDays: Int
-		get() = config.numberOfVisibleDays
+		get() = config.visibleDays
 		set(value) {
-			config.numberOfVisibleDays = value
+			config.visibleDays = value
 		}
 
 	var weekLength: Int
@@ -247,13 +247,13 @@ class WeekView<T>(
 	}
 
 	override fun onSaveInstanceState(): Parcelable {
-		return SavedState(super.onSaveInstanceState()!!, config.numberOfVisibleDays)
+		return SavedState(super.onSaveInstanceState()!!, config.visibleDays)
 	}
 
 	override fun onRestoreInstanceState(state: Parcelable) {
 		val savedState = state as SavedState
 		super.onRestoreInstanceState(savedState.superState)
-		config.numberOfVisibleDays = savedState.numberOfVisibleDays
+		config.visibleDays = savedState.numberOfVisibleDays
 	}
 
 	override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
@@ -331,7 +331,7 @@ class WeekView<T>(
 	private fun calculateWidthPerDay() {
 		// Calculate the available width for each day
 		config.drawConfig.widthPerDay = width - config.drawConfig.timeColumnWidth
-		config.drawConfig.widthPerDay = config.drawConfig.widthPerDay / config.numberOfVisibleDays
+		config.drawConfig.widthPerDay = config.drawConfig.widthPerDay / config.visibleDays
 	}
 
 	private fun clipEventsRect(canvas: Canvas) {

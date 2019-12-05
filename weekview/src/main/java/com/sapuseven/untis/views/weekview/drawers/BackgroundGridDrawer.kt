@@ -32,7 +32,7 @@ class BackgroundGridDrawer(private val config: WeekViewConfig) : BaseDrawer {
 		val drawConfig = config.drawConfig
 		val height = WeekView.viewHeight
 		var lineCount = ((height - drawConfig.headerHeight) / config.hourHeight).toInt() + 1
-		lineCount *= (config.numberOfVisibleDays + 1)
+		lineCount *= (config.visibleDays + 1)
 		return FloatArray(lineCount * 4)
 	}
 
@@ -44,7 +44,7 @@ class BackgroundGridDrawer(private val config: WeekViewConfig) : BaseDrawer {
 	}
 
 	private fun drawDaySeparators(startPixel: Float, canvas: Canvas) {
-		val days = config.numberOfVisibleDays
+		val days = config.visibleDays
 		val widthPerDay = config.totalDayWidth
 
 		val height = WeekView.viewHeight

@@ -203,6 +203,9 @@
 	<string name="preference_school_background_desc">Manche Schulen senden eigene Hintergrundfarben</string>
 	<string name="preference_use_theme_background">Designfarben verwenden</string>
 	<string name="preference_use_theme_background_desc">Verwendet Farben des aktuellen Designs für normale Stunden</string>
+	<string name="preference_week_custom_range">Wochenlänge</string>
+	<string name="preference_week_custom_range_summary">%1$s bis %2$s</string>
+	<string name="preference_week_custom_range_summary_short">%1$s</string>
 
 	<string name="settings_designing_message">Trage zur Entwicklung bei, indem du die fehlenden Icons in den Einstellungen erstellst!</string>
 	<string name="settings_designing_hide">Nicht mehr anzeigen</string>

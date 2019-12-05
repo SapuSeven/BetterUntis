@@ -25,9 +25,17 @@
 				android:summary="instead of weeks"
 				android:title="Snap to days" />
 
-			<Preference
+			<com.sapuseven.untis.preferences.WeekRangePickerPreference
+				android:dialogLayout="@layout/dialog_day_picker"
 				android:key="preference_week_custom_range"
-				android:title="Custom week range" />
+				android:title="@string/preference_week_custom_range" />
+
+			<SeekBarPreference
+				android:key="preference_week_custom_display_length"
+				android:max="7"
+				android:summary="Set to 0 to use week length"
+				android:title="Days to display"
+				app:showSeekBarValue="true" />
 		</PreferenceCategory>
 
 		<PreferenceCategory android:title="Auto-Mute">

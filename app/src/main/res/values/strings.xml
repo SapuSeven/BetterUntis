@@ -203,6 +203,9 @@
 	<string name="preference_school_background_desc">Some schools send their own background colors</string>
 	<string name="preference_use_theme_background">Use theme colors</string>
 	<string name="preference_use_theme_background_desc">This only applies to regular lessons</string>
+	<string name="preference_week_custom_range">Custom week range</string>
+	<string name="preference_week_custom_range_summary">%1$s to %2$s</string>
+	<string name="preference_week_custom_range_summary_short">%1$s</string>
 
 	<string name="settings_designing_message">Contribute by creating the missing settings icons!</string>
 	<string name="settings_designing_hide">Don\'t show again</string>

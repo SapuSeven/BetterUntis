@@ -1,4 +1,4 @@
-package com.sapuseven.untis.preferences
+package com.sapuseven.untis.dialogs
 
 import android.os.Bundle
 import androidx.preference.PreferenceDialogFragmentCompat

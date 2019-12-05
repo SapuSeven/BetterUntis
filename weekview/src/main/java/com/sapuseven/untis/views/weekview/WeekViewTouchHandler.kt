@@ -28,7 +28,7 @@ internal class WeekViewTouchHandler(private val config: WeekViewConfig) {
 		var startPixel = originX + widthPerDay * leftDaysWithGaps + timeColumnWidth
 
 		val begin = leftDaysWithGaps + 1
-		val end = leftDaysWithGaps + config.numberOfVisibleDays + 1
+		val end = leftDaysWithGaps + config.visibleDays + 1
 
 		for (dayNumber in begin..end) {
 			val start = max(startPixel, timeColumnWidth)

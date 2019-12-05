@@ -20,7 +20,7 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 	// Calendar configuration
 	var firstDayOfWeek: Int
 	var snapToWeek: Boolean
-	var numberOfVisibleDays: Int = 0
+	var visibleDays: Int = 0
 	var weekLength: Int = 0
 	var showFirstDayOfWeekFirst: Boolean
 
@@ -267,7 +267,7 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 		}
 
 	val isSingleDay: Boolean
-		get() = numberOfVisibleDays == 1
+		get() = visibleDays == 1
 
 	init {
 		val a = context.theme.obtainStyledAttributes(attrs, R.styleable.WeekView, 0, 0)
@@ -275,7 +275,7 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 			// Calendar configuration
 			firstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, DateTimeConstants.MONDAY)
 			snapToWeek = a.getBoolean(R.styleable.WeekView_snapToWeek, true)
-			numberOfVisibleDays = a.getInteger(R.styleable.WeekView_numberOfVisibleDays, 3)
+			visibleDays = a.getInteger(R.styleable.WeekView_numberOfVisibleDays, 3)
 			showFirstDayOfWeekFirst = a.getBoolean(R.styleable.WeekView_showFirstDayOfWeekFirst, false)
 
 			// Header bottom line

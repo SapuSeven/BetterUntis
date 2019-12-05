@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<color name="colorDivider">#1FFFFFFF</color>
+	<color name="daySelected">@color/colorPrimary</color>
+	<color name="daySelectedTextColor">@android:color/white</color>
 </resources>

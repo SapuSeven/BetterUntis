@@ -341,8 +341,10 @@ class MainActivity :
 	}
 
 	private fun setupWeekViewConfig() {
-		weekView.weekLength = profileUser.timeGrid.days.size
-		weekView.numberOfVisibleDays = profileUser.timeGrid.days.size
+		weekView.weekLength = preferences.defaultPrefs.getStringSet("preference_week_custom_range", emptySet())?.size?.zeroToNull
+				?: profileUser.timeGrid.days.size
+		weekView.numberOfVisibleDays = preferences.defaultPrefs.getInt("preference_week_custom_display_length", 0).zeroToNull
+				?: weekView.weekLength
 
 		weekView.columnGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_padding").toFloat(), this).toInt()
 		weekView.overlappingEventGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_padding_overlap").toFloat(), this).toInt()
@@ -357,7 +359,7 @@ class MainActivity :
 		weekView.nowLineColor = PreferenceUtils.getPrefInt(preferences, "preference_marker")
 
 		weekView.horizontalFlingEnabled = PreferenceUtils.getPrefBool(preferences, "preference_fling_enable")
-		weekView.snapToWeek = !PreferenceUtils.getPrefBool(preferences, "preference_week_snap_to_days")
+		weekView.snapToWeek = !PreferenceUtils.getPrefBool(preferences, "preference_week_snap_to_days") && weekView.numberOfVisibleDays != 1
 	}
 
 	override fun onPeriodChange(startDate: DateTime, endDate: DateTime): List<WeekViewDisplayable<TimegridItem>> {
@@ -756,3 +758,6 @@ class MainActivity :
 		var dateRange: Pair<UntisDate, UntisDate>? = null
 	}
 }
+
+private val Int.zeroToNull: Int?
+	get() = if (this != 0) this else null

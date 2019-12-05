@@ -16,13 +16,15 @@ import androidx.preference.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.dialogs.AlertPreferenceDialog
 import com.sapuseven.untis.dialogs.ElementPickerDialog
+import com.sapuseven.untis.dialogs.WeekRangePickerPreferenceDialog
 import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.AlertPreference
-import com.sapuseven.untis.preferences.AlertPreferenceDialog
 import com.sapuseven.untis.preferences.ElementPickerPreference
+import com.sapuseven.untis.preferences.WeekRangePickerPreference
 import kotlinx.android.synthetic.main.activity_settings.*
 
 class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback {
@@ -142,7 +144,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 
 				when (rootKey) {
 					"preferences_general" -> {
-						findPreference<CheckBoxPreference>("preference_automute_enable")?.setOnPreferenceChangeListener { preference, newValue ->
+						findPreference<CheckBoxPreference>("preference_automute_enable")?.setOnPreferenceChangeListener { _, newValue ->
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && newValue == true) {
 								(activity?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
 									if (!isNotificationPolicyAccessGranted) {
@@ -292,6 +294,11 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 				when (preference) {
 					is AlertPreference -> {
 						val f: DialogFragment = AlertPreferenceDialog.newInstance(preference.key)
+						f.setTargetFragment(this, 0)
+						f.show(manager, DIALOG_FRAGMENT_TAG)
+					}
+					is WeekRangePickerPreference -> {
+						val f: DialogFragment = WeekRangePickerPreferenceDialog.newInstance(preference.key)
 						f.setTargetFragment(this, 0)
 						f.show(manager, DIALOG_FRAGMENT_TAG)
 					}

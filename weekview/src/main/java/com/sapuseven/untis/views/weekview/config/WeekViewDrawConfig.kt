@@ -89,7 +89,7 @@ class WeekViewDrawConfig(context: Context) {
 	fun moveCurrentOriginIfFirstDraw(config: WeekViewConfig) {
 		// If the week view is being drawn for the first time, then consider the first day of the week.
 		val today = DateTime.now()
-		val isWeekView = config.numberOfVisibleDays >= 7
+		val isWeekView = config.visibleDays >= 7
 		val currentDayIsNotToday = today.dayOfWeek != config.firstDayOfWeek
 		if (isWeekView && currentDayIsNotToday && config.showFirstDayOfWeekFirst) {
 			val difference = today.dayOfWeek - config.firstDayOfWeek
