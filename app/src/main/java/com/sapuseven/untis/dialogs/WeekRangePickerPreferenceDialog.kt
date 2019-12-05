@@ -28,7 +28,8 @@ class WeekRangePickerPreferenceDialog : PreferenceDialogFragmentCompat() {
 		picker = root.findViewById(R.id.day_picker)
 		picker.apply {
 			selectionMode = RangeSelectionMode(this)
-			setSelectedDays(preference.getPersistedStringSet(emptySet()).toList().map { MaterialDayPicker.Weekday.valueOf(it) })
+			val savedDays = preference.getPersistedStringSet(emptySet()).toList().map { MaterialDayPicker.Weekday.valueOf(it) }
+			setSelectedDays(listOfNotNull(savedDays.min(), savedDays.max()))
 		}
 		return root
 	}
