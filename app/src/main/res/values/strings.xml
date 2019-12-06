@@ -21,10 +21,15 @@
 	<string name="all_report">Report</string>
 	<string name="all_add">Add</string>
 	<string name="all_delete">Delete</string>
+	<string name="all_reset">Reset</string>
 	<string name="all_lesson_cancelled">%1$s (cancelled)</string>
 	<string name="all_lesson_irregular">%1$s (irregular)</string>
 	<string name="all_lesson_exam">%1$s (exam!)</string>
 	<string name="all_dialog_datepicker_button_today">Today</string>
+	<string name="all_dialog_error_title">Error information</string>
+	<string name="all_dialog_error_message">Request ID: %1$d\nError code: %2$d\nError message: %3$s</string>
+	<string name="all_dialog_crash_title">Crash log found</string>
+	<string name="all_dialog_crash_copied">Crash log copied to clipboard.</string>
 
 	<string name="activity_title_free_rooms">Free Rooms</string>
 	<string name="activity_title_info_center">Info Center</string>
@@ -136,6 +141,8 @@
 	<string name="preference_category_timetable_lesson_text">Lesson text</string>
 	<string name="preference_category_timetable_range">Timetable range</string>
 	<string name="preference_category_general_behaviour">Behaviour</string>
+	<string name="preference_automute_enable">Enable auto-mute</string>
+	<string name="preference_automute_enable_summary">Automatically turns on Do Not Disturb during lessons</string>
 	<string name="preference_background_cancelled">Cancelled lessons</string>
 	<string name="preference_background_cancelled_past">Past cancelled lessons</string>
 	<string name="preference_background_exam">Lessons with tests</string>
@@ -159,6 +166,7 @@
 	<string name="preference_dialog_colors_reset_title">Reset colors?</string>
 	<string name="preference_dialog_colors_reset_text">This will reset all colors above to their default values.</string>
 	<string name="preference_double_tap_to_exit">Double tap back button to exit</string>
+	<string name="preference_flinging_enable">Enable flinging</string>
 	<string name="preference_info_app_version">App version</string>
 	<string name="preference_info_app_version_desc">%1$s (%2$d)</string>
 	<string name="preference_info_changelog">Change Log</string>
@@ -206,6 +214,10 @@
 	<string name="preference_week_custom_range">Custom week range</string>
 	<string name="preference_week_custom_range_summary">%1$s to %2$s</string>
 	<string name="preference_week_custom_range_summary_short">%1$s</string>
+	<string name="preference_week_display_length">Days to display</string>
+	<string name="preference_week_display_length_summary">Set to 0 to use week length</string>
+	<string name="preference_week_snap_to_days">Snap to days</string>
+	<string name="preference_week_snap_to_days_summary">instead of weeks</string>
 
 	<string name="settings_designing_message">Contribute by creating the missing settings icons!</string>
 	<string name="settings_designing_hide">Don\'t show again</string>

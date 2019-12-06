@@ -37,8 +37,7 @@ class WeekRangePickerPreferenceDialog(private val onCloseListener: ((positiveRes
 
 	override fun onPrepareDialogBuilder(builder: AlertDialog.Builder) {
 		super.onPrepareDialogBuilder(builder)
-		// TODO: Localize
-		builder.setNeutralButton("Reset") { dialog, _ ->
+		builder.setNeutralButton(R.string.all_reset) { dialog, _ ->
 			preference.persistStringSet(emptySet())
 			onCloseListener?.invoke(true, 0)
 			dialog.dismiss()

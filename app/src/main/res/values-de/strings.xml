@@ -21,10 +21,15 @@
 	<string name="all_report">Melden</string>
 	<string name="all_add">Hinzufügen</string>
 	<string name="all_delete">Löschen</string>
+	<string name="all_reset">Zurücksetzen</string>
 	<string name="all_lesson_cancelled">%1$s (entfallen)</string>
 	<string name="all_lesson_irregular">%1$s (irregulär)</string>
 	<string name="all_lesson_exam">%1$s (Test!)</string>
 	<string name="all_dialog_datepicker_button_today">Heute</string>
+	<string name="all_dialog_error_title">Fehlerinformation</string>
+	<string name="all_dialog_error_message">Anfragen-ID: %1$d\nFehlercode: %2$d\nFehlermeldung: %3$s</string>
+	<string name="all_dialog_crash_title">Absturzprotokoll gefunden</string>
+	<string name="all_dialog_crash_copied">Absturzprotokoll wurde in die Zwischenablage kopiert.</string>
 
 	<string name="activity_title_free_rooms">Freie Räume</string>
 	<string name="activity_title_info_center">Info-Center</string>
@@ -136,6 +141,8 @@
 	<string name="preference_category_timetable_lesson_text">Stundentext</string>
 	<string name="preference_category_timetable_range">Stundenbereich</string>
 	<string name="preference_category_general_behaviour">Verhalten</string>
+	<string name="preference_automute_enable">Automatisches Stummschalten</string>
+	<string name="preference_automute_enable_summary">Aktiviert während jeder Stunde automatisch den "nicht stören"-Modus</string>
 	<string name="preference_background_cancelled">Entfallene Stunden</string>
 	<string name="preference_background_cancelled_past">Vergangene entfallene Stunden</string>
 	<string name="preference_background_exam">Stunden mit Tests</string>
@@ -159,6 +166,7 @@
 	<string name="preference_dialog_colors_reset_title">Farben zurücksetzen?</string>
 	<string name="preference_dialog_colors_reset_text">Alle Farben werden auf ihre Standardwerte gesetzt.</string>
 	<string name="preference_double_tap_to_exit">Zurück-Button zweimal antippen zum Beenden</string>
+	<string name="preference_flinging_enable">Schnelles Scrollen aktivieren</string>
 	<string name="preference_info_app_version">App-Version</string>
 	<string name="preference_info_app_version_desc">%1$s (%2$d)</string>
 	<string name="preference_info_changelog">Änderungsprotokoll</string>
@@ -206,6 +214,10 @@
 	<string name="preference_week_custom_range">Wochenlänge</string>
 	<string name="preference_week_custom_range_summary">%1$s bis %2$s</string>
 	<string name="preference_week_custom_range_summary_short">%1$s</string>
+	<string name="preference_week_display_length">Anzuzeigende Tage</string>
+	<string name="preference_week_display_length_summary">Auf 0 setzen, um die Wochenlänge zu verwenden</string>
+	<string name="preference_week_snap_to_days">Tageweise scrollen</string>
+	<string name="preference_week_snap_to_days_summary">statt wochenweise</string>
 
 	<string name="settings_designing_message">Trage zur Entwicklung bei, indem du die fehlenden Icons in den Einstellungen erstellst!</string>
 	<string name="settings_designing_hide">Nicht mehr anzeigen</string>

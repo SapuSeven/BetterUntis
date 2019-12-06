@@ -16,15 +16,15 @@
 			<CheckBoxPreference
 				android:defaultValue="@bool/preference_fling_enable_default"
 				android:key="preference_fling_enable"
-				android:title="Enable flinging" />
+				android:title="@string/preference_flinging_enable" />
 		</PreferenceCategory>
 
 		<PreferenceCategory android:title="Week Display Settings">
 			<CheckBoxPreference
 				android:defaultValue="@bool/preference_week_snap_to_days_default"
 				android:key="preference_week_snap_to_days"
-				android:summary="instead of weeks"
-				android:title="Snap to days" />
+				android:summary="@string/preference_week_snap_to_days_summary"
+				android:title="@string/preference_week_snap_to_days" />
 
 			<com.sapuseven.untis.preferences.WeekRangePickerPreference
 				android:dialogLayout="@layout/dialog_day_picker"
@@ -34,8 +34,8 @@
 			<SeekBarPreference
 				android:key="preference_week_custom_display_length"
 				android:max="7"
-				android:summary="Set to 0 to use week length"
-				android:title="Days to display"
+				android:summary="@string/preference_week_display_length_summary"
+				android:title="@string/preference_week_display_length"
 				app:showSeekBarValue="true" />
 		</PreferenceCategory>
 
@@ -43,8 +43,8 @@
 			<CheckBoxPreference
 				android:defaultValue="@bool/preference_automute_enable_default"
 				android:key="preference_automute_enable"
-				android:summary="Automatically turns on Do Not Disturb during lessons"
-				android:title="Enable auto-mute" />
+				android:summary="@string/preference_automute_enable_summary"
+				android:title="@string/preference_automute_enable" />
 		</PreferenceCategory>
 	</PreferenceScreen>
 

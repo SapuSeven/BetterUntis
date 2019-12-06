@@ -58,14 +58,13 @@ open class BaseActivity : AppCompatActivity() {
 			reader.close()
 			crashFile.delete()
 
-			// TODO: Localize
 			MaterialAlertDialogBuilder(this)
-					.setTitle("Crash log found")
+					.setTitle(R.string.all_dialog_crash_title)
 					.setMessage(stackTrace)
 					.setNegativeButton(R.string.all_copy) { _, _ ->
 						val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 						clipboard.setPrimaryClip(ClipData.newPlainText("BetterUntis Crash Log", stackTrace))
-						Toast.makeText(this, "Crash log copied to clipboard.", Toast.LENGTH_SHORT).show()
+						Toast.makeText(this, R.string.all_dialog_crash_copied, Toast.LENGTH_SHORT).show()
 					}
 					.setPositiveButton(R.string.all_close) { dialog, _ ->
 						dialog.dismiss()

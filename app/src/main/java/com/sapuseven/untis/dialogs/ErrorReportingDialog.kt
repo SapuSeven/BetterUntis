@@ -8,10 +8,9 @@ import com.sapuseven.untis.helpers.issues.Issue
 
 class ErrorReportingDialog(val context: Context) {
 	fun showRequestErrorDialog(requestId: Int, code: Int?, message: String?) {
-		val errorMessage = "Request ID: $requestId\nError code: $code\nError message: $message"
-		// TODO: Localize
+		val errorMessage = context.getString(R.string.all_dialog_error_message, requestId, code, message)
 		MaterialAlertDialogBuilder(context)
-				.setTitle("Error Information")
+				.setTitle(R.string.all_dialog_error_title)
 				.setMessage(errorMessage)
 				.setPositiveButton(R.string.all_ok) { dialog, _ ->
 					dialog.dismiss()
