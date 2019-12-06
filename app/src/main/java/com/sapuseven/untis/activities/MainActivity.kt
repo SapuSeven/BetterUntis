@@ -63,7 +63,9 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants
 import org.joda.time.Instant
 import org.joda.time.LocalDate
+import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
+import java.util.*
 
 class MainActivity :
 		BaseActivity(),
@@ -347,7 +349,7 @@ class MainActivity :
 		weekView.numberOfVisibleDays = preferences.defaultPrefs.getInt("preference_week_custom_display_length", 0).zeroToNull
 				?: weekView.weekLength
 		weekView.firstDayOfWeek = preferences.defaultPrefs.getStringSet("preference_week_custom_range", emptySet())?.map { MaterialDayPicker.Weekday.valueOf(it) }?.min()?.ordinal
-				?: 0
+				?: DateTimeFormat.forPattern("E").withLocale(Locale.ENGLISH).parseDateTime((profileUser.timeGrid.days[0].day)).dayOfWeek
 
 		weekView.columnGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_padding").toFloat(), this).toInt()
 		weekView.overlappingEventGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_padding_overlap").toFloat(), this).toInt()

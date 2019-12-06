@@ -304,12 +304,12 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 						f.show(manager, DIALOG_FRAGMENT_TAG)
 					}
 					is WeekRangePickerPreference -> {
-						val f: DialogFragment = WeekRangePickerPreferenceDialog.newInstance(preference.key) { positiveResult, picker ->
+						val f: DialogFragment = WeekRangePickerPreferenceDialog.newInstance(preference.key) { positiveResult, selectedDays ->
 							val visibleDaysPreference = findPreference<SeekBarPreference>("preference_week_custom_display_length")
 							if (positiveResult) {
-								visibleDaysPreference?.max = picker.selectedDays.size
+								visibleDaysPreference?.max = selectedDays.zeroToNull ?: 7
 								visibleDaysPreference?.value = min(visibleDaysPreference?.value
-										?: 0, picker.selectedDays.size)
+										?: 0, selectedDays.zeroToNull ?: 7)
 							}
 						}
 						f.setTargetFragment(this, 0)

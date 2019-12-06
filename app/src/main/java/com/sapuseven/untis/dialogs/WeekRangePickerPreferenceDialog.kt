@@ -11,13 +11,11 @@ import ca.antonious.materialdaypicker.SelectionState
 import com.sapuseven.untis.R
 import com.sapuseven.untis.preferences.WeekRangePickerPreference
 
-class WeekRangePickerPreferenceDialog(var onCloseListener: ((positiveResult: Boolean, picker: MaterialDayPicker) -> Unit)? = null) : PreferenceDialogFragmentCompat() {
+class WeekRangePickerPreferenceDialog(private val onCloseListener: ((positiveResult: Boolean, selectedDays: Int) -> Unit)? = null) : PreferenceDialogFragmentCompat() {
 	private lateinit var picker: MaterialDayPicker
 
 	companion object {
-		fun newInstance(key: String): WeekRangePickerPreferenceDialog = newInstance(key, null)
-
-		fun newInstance(key: String, onCloseListener: ((positiveResult: Boolean, picker: MaterialDayPicker) -> Unit)?): WeekRangePickerPreferenceDialog {
+		fun newInstance(key: String, onCloseListener: ((positiveResult: Boolean, selectedDays: Int) -> Unit)?): WeekRangePickerPreferenceDialog {
 			val fragment = WeekRangePickerPreferenceDialog(onCloseListener)
 			val bundle = Bundle(1)
 			bundle.putString(ARG_KEY, key)
@@ -42,6 +40,7 @@ class WeekRangePickerPreferenceDialog(var onCloseListener: ((positiveResult: Boo
 		// TODO: Localize
 		builder.setNeutralButton("Reset") { dialog, _ ->
 			preference.persistStringSet(emptySet())
+			onCloseListener?.invoke(true, 0)
 			dialog.dismiss()
 		}
 	}
@@ -50,7 +49,7 @@ class WeekRangePickerPreferenceDialog(var onCloseListener: ((positiveResult: Boo
 		if (positiveResult) preference.persistStringSet(picker.selectedDays.map { it.name }.toSet())
 		(preference as? WeekRangePickerPreference)?.refreshSummary()
 
-		onCloseListener?.invoke(positiveResult, picker)
+		onCloseListener?.invoke(positiveResult, picker.selectedDays.size)
 	}
 
 	class RangeSelectionMode(private val materialDayPicker: MaterialDayPicker) : SelectionMode {
