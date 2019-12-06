@@ -26,6 +26,7 @@ import com.sapuseven.untis.preferences.AlertPreference
 import com.sapuseven.untis.preferences.ElementPickerPreference
 import com.sapuseven.untis.preferences.WeekRangePickerPreference
 import kotlinx.android.synthetic.main.activity_settings.*
+import kotlin.math.min
 
 class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback {
 	private var profileId: Long? = null
@@ -144,6 +145,11 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 
 				when (rootKey) {
 					"preferences_general" -> {
+						findPreference<SeekBarPreference>("preference_week_custom_display_length")?.apply {
+							max = findPreference<WeekRangePickerPreference>("preference_week_custom_range")?.getPersistedStringSet(emptySet())?.size?.zeroToNull
+									?: this.max
+						}
+
 						findPreference<CheckBoxPreference>("preference_automute_enable")?.setOnPreferenceChangeListener { _, newValue ->
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && newValue == true) {
 								(activity?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
@@ -298,7 +304,14 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 						f.show(manager, DIALOG_FRAGMENT_TAG)
 					}
 					is WeekRangePickerPreference -> {
-						val f: DialogFragment = WeekRangePickerPreferenceDialog.newInstance(preference.key)
+						val f: DialogFragment = WeekRangePickerPreferenceDialog.newInstance(preference.key) { positiveResult, picker ->
+							val visibleDaysPreference = findPreference<SeekBarPreference>("preference_week_custom_display_length")
+							if (positiveResult) {
+								visibleDaysPreference?.max = picker.selectedDays.size
+								visibleDaysPreference?.value = min(visibleDaysPreference?.value
+										?: 0, picker.selectedDays.size)
+							}
+						}
 						f.setTargetFragment(this, 0)
 						f.show(manager, DIALOG_FRAGMENT_TAG)
 					}
@@ -308,3 +321,6 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 		}
 	}
 }
+
+private val Int.zeroToNull: Int?
+	get() = if (this != 0) this else null

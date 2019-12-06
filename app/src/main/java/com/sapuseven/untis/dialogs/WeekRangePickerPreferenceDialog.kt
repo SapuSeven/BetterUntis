@@ -11,12 +11,14 @@ import ca.antonious.materialdaypicker.SelectionState
 import com.sapuseven.untis.R
 import com.sapuseven.untis.preferences.WeekRangePickerPreference
 
-class WeekRangePickerPreferenceDialog : PreferenceDialogFragmentCompat() {
+class WeekRangePickerPreferenceDialog(var onCloseListener: ((positiveResult: Boolean, picker: MaterialDayPicker) -> Unit)? = null) : PreferenceDialogFragmentCompat() {
 	private lateinit var picker: MaterialDayPicker
 
 	companion object {
-		fun newInstance(key: String): WeekRangePickerPreferenceDialog {
-			val fragment = WeekRangePickerPreferenceDialog()
+		fun newInstance(key: String): WeekRangePickerPreferenceDialog = newInstance(key, null)
+
+		fun newInstance(key: String, onCloseListener: ((positiveResult: Boolean, picker: MaterialDayPicker) -> Unit)?): WeekRangePickerPreferenceDialog {
+			val fragment = WeekRangePickerPreferenceDialog(onCloseListener)
 			val bundle = Bundle(1)
 			bundle.putString(ARG_KEY, key)
 			fragment.arguments = bundle
@@ -47,6 +49,8 @@ class WeekRangePickerPreferenceDialog : PreferenceDialogFragmentCompat() {
 	override fun onDialogClosed(positiveResult: Boolean) {
 		if (positiveResult) preference.persistStringSet(picker.selectedDays.map { it.name }.toSet())
 		(preference as? WeekRangePickerPreference)?.refreshSummary()
+
+		onCloseListener?.invoke(positiveResult, picker)
 	}
 
 	class RangeSelectionMode(private val materialDayPicker: MaterialDayPicker) : SelectionMode {
