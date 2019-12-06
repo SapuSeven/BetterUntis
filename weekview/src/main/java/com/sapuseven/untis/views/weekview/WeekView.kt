@@ -147,6 +147,12 @@ class WeekView<T>(
 			config.weekLength = value
 		}
 
+	var firstDayOfWeek: Int
+		get() = config.firstDayOfWeek
+		set(value) {
+			config.firstDayOfWeek = value
+		}
+
 	//  Public methods
 
 	fun setOnEventClickListener(listener: EventClickListener<T>) {
@@ -283,8 +289,8 @@ class WeekView<T>(
 
 		prepareEventDrawing(canvas)
 
-		val drawingContext = DrawingContext.create(config, viewState)
-		eventChipsProvider.loadEventsIfNecessary(this, drawingContext.dayRange[drawingContext.dayRange.size / 2])
+		val drawingContext = DrawingContext.create(config)
+		eventChipsProvider.loadEventsIfNecessary(this, drawingContext.dayRange[0])
 
 		dayBackgroundDrawer.draw(drawingContext, canvas)
 		backgroundGridDrawer.draw(drawingContext, canvas)

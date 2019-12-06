@@ -9,7 +9,7 @@ class DrawingContext(val startPixel: Float) {
 	var freeDays: List<Pair<DateTime, Float>> = emptyList()
 
 	companion object {
-		internal fun create(config: WeekViewConfig, viewState: WeekViewViewState): DrawingContext {
+		internal fun create(config: WeekViewConfig): DrawingContext {
 			val today = DateTime.now().withTimeAtStartOfDay()
 			val daysScrolled = (ceil((config.drawConfig.currentOrigin.x / config.totalDayWidth).toDouble()) * -1).toInt()
 			val startPixel = (config.drawConfig.currentOrigin.x
@@ -17,12 +17,11 @@ class DrawingContext(val startPixel: Float) {
 					+ config.drawConfig.timeColumnWidth)
 
 			val dayRange = mutableListOf<DateTime>()
+			val offset = if (config.snapToWeek) DateUtils.offsetInWeek(today, config.firstDayOfWeek) else 0
 			if (config.isSingleDay) {
-				viewState.firstVisibleDay?.let { dayRange.add(it) }
+				dayRange.addAll(DateUtils.getDateRange(today.plusDays(DateUtils.actualDays(daysScrolled, config.weekLength) - offset), config.visibleDays + 1, config.firstDayOfWeek, config.weekLength))
 			} else {
-				val offset = if (config.snapToWeek) DateUtils.offsetInWeek(today, config.firstDayOfWeek) else 0
 				val offsetCompensation = DateUtils.offsetInWeek(today, config.firstDayOfWeek) - offset // This is to start calculations at the first day of week while leaving the visible offset at the correct location
-
 				dayRange.addAll(DateUtils.getDateRange(today.plusDays(DateUtils.actualDays(daysScrolled + offsetCompensation, config.weekLength) - offset - offsetCompensation), config.visibleDays + 1, config.firstDayOfWeek, config.weekLength))
 			}
 

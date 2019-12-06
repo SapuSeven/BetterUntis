@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import androidx.preference.DialogPreference
 import ca.antonious.materialdaypicker.MaterialDayPicker
 import com.sapuseven.untis.R
-import java.text.SimpleDateFormat
+import com.sapuseven.untis.helpers.toLocalizedString
 import java.util.*
 
 class WeekRangePickerPreference(context: Context?, attrs: AttributeSet?) : DialogPreference(context, attrs) {
@@ -27,21 +27,6 @@ class WeekRangePickerPreference(context: Context?, attrs: AttributeSet?) : Dialo
 	fun refreshSummary() {
 		summary = generateSummary()
 	}
-}
-
-private fun MaterialDayPicker.Weekday.toLocalizedString(): String =
-		SimpleDateFormat("EEEE", Locale.getDefault()).format(Calendar.getInstance().apply {
-			set(Calendar.DAY_OF_WEEK, toCalendar())
-		}.time)
-
-private fun MaterialDayPicker.Weekday.toCalendar(): Int = when (this) {
-	MaterialDayPicker.Weekday.SUNDAY -> Calendar.SUNDAY
-	MaterialDayPicker.Weekday.MONDAY -> Calendar.MONDAY
-	MaterialDayPicker.Weekday.TUESDAY -> Calendar.TUESDAY
-	MaterialDayPicker.Weekday.WEDNESDAY -> Calendar.WEDNESDAY
-	MaterialDayPicker.Weekday.THURSDAY -> Calendar.THURSDAY
-	MaterialDayPicker.Weekday.FRIDAY -> Calendar.FRIDAY
-	MaterialDayPicker.Weekday.SATURDAY -> Calendar.SATURDAY
 }
 
 private fun <E> List<E>.bounds(): Pair<E, E?>? = if (size >= 1)
