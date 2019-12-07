@@ -178,6 +178,10 @@
 	<string name="preference_notifications_clear">Alle Benachrichtigungen löschen</string>
 	<string name="preference_notifications_enable">Benachrichtigungen aktivieren</string>
 	<string name="preference_notifications_enable_desc">Zeigt während Pausen eine Benachrichtigung mit Infos zur nächsten Stunde an.</string>
+	<string name="preference_notifications_first_lesson">Benachrichtigung vor der ersten Stunde</string>
+	<string name="preference_notifications_first_lesson_desc">Zeigt eine zusätzliche Benachrichtigungen zu Beginn der ersten Stunde an</string>
+	<string name="preference_notifications_first_lesson_time">Benachrichtigungszeit</string>
+	<string name="preference_notifications_first_lesson_time_unit">min vor der ersten Stunde</string>
 	<string name="preference_notifications_multiple">In mehrstündigem Unterricht aktivieren</string>
 	<string name="preference_notifications_multiple_desc">Benachrichtigung für Pausen während mehrstündigem Unterricht anzeigen</string>
 	<string name="preference_notifications_visibility_hidden">Nicht anzeigen</string>

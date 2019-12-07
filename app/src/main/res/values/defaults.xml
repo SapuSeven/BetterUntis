@@ -10,6 +10,7 @@
 	<bool name="preference_timetable_hide_cancelled_default">false</bool>
 	<bool name="preference_timetable_range_index_reset_default">false</bool>
 	<bool name="preference_timetable_substitutions_irregular_default">false</bool>
+	<bool name="preference_notifications_before_first_default">false</bool>
 	<bool name="preference_notifications_enable_default">true</bool>
 	<bool name="preference_notifications_in_multiple_default">true</bool>
 	<bool name="preference_double_tap_to_exit_default">true</bool>
@@ -28,6 +29,7 @@
 	<integer name="preference_background_future_default">0x00000000</integer>
 	<integer name="preference_background_past_default">0x40808080</integer>
 	<integer name="preference_marker_default">0xFFFFFFFF</integer>
+	<integer name="preference_notifications_before_first_time_default">30</integer>
 	<integer name="preference_timetable_item_padding_overlap_default">4</integer>
 	<integer name="preference_timetable_item_padding_default">4</integer>
 	<integer name="preference_timetable_item_corner_radius_default">2</integer>
