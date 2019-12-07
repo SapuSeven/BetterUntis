@@ -60,7 +60,7 @@ class NotificationSetup : LessonEventSetup() {
 	override fun onLoadingSuccess(context: Context, items: List<TimegridItem>) {
 		val preparedItems = items.filter { !it.periodData.isCancelled() }.sortedBy { it.startDateTime }.merged().zipWithNext()
 
-		if (PreferenceUtils.getPrefBool(preferenceManager, "preference_notifications_before_first"))
+		if (preparedItems.isNotEmpty() && PreferenceUtils.getPrefBool(preferenceManager, "preference_notifications_before_first"))
 			with(preparedItems.first().first) {
 				if (startDateTime.millisOfDay < LocalDateTime.now().millisOfDay) return@with
 
