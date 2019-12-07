@@ -37,6 +37,7 @@
 
 	<string name="menu_nav_timetables">Stundenpläne</string>
 	<string name="menu_share">Teilen</string>
+	<string name="menu_infocenter_messagesofday">Nachrichten</string>
 	<string name="menu_infocenter_officehours">Sprechstunden</string>
 	<string name="menu_infocenter_events">Termine</string>
 	<string name="menu_infocenter_absences">Abwesenheiten</string>
@@ -119,6 +120,7 @@
 	<string name="infocenter_officehours_empty">Keine Sprechstunden</string>
 	<string name="infocenter_events_empty">Keine Termine</string>
 	<string name="infocenter_absences_empty">Keine Abwesenheiten</string>
+	<string name="infocenter_messages_empty">Keine Nachrichten</string>
 	<string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
 
 	<string name="elementpicker_hint_search">Suchen…</string>

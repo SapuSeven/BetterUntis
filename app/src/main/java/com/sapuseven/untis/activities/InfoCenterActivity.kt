@@ -6,10 +6,7 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
-import com.sapuseven.untis.adapters.infocenter.AbsenceAdapter
-import com.sapuseven.untis.adapters.infocenter.EventAdapter
-import com.sapuseven.untis.adapters.infocenter.EventAdapterItem
-import com.sapuseven.untis.adapters.infocenter.OfficeHourAdapter
+import com.sapuseven.untis.adapters.infocenter.*
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
@@ -17,17 +14,12 @@ import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.UntisAbsence
+import com.sapuseven.untis.models.UntisMessage
 import com.sapuseven.untis.models.UntisOfficeHour
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.SchoolYear
-import com.sapuseven.untis.models.untis.params.AbsenceParams
-import com.sapuseven.untis.models.untis.params.ExamParams
-import com.sapuseven.untis.models.untis.params.HomeworkParams
-import com.sapuseven.untis.models.untis.params.OfficeHoursParams
-import com.sapuseven.untis.models.untis.response.AbsenceResponse
-import com.sapuseven.untis.models.untis.response.ExamResponse
-import com.sapuseven.untis.models.untis.response.HomeworkResponse
-import com.sapuseven.untis.models.untis.response.OfficeHoursResponse
+import com.sapuseven.untis.models.untis.params.*
+import com.sapuseven.untis.models.untis.response.*
 import kotlinx.android.synthetic.main.activity_infocenter.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -38,14 +30,17 @@ class InfoCenterActivity : BaseActivity() {
 	private val officeHourList = arrayListOf<UntisOfficeHour>()
 	private val eventList = arrayListOf<EventAdapterItem>()
 	private val absenceList = arrayListOf<UntisAbsence>()
+	private val messageList = arrayListOf<UntisMessage>()
 
 	private val officeHourAdapter = OfficeHourAdapter(this, officeHourList)
 	private val eventAdapter = EventAdapter(this, eventList)
 	private val absenceAdapter = AbsenceAdapter(this, absenceList)
+	private val messageAdapter = MessageAdapter(this, messageList)
 
 	private var officeHoursLoading = true
 	private var eventsLoading = true
 	private var absencesLoading = true
+	private var messagesLoading = true
 
 	private var api: UntisRequest = UntisRequest()
 
@@ -69,6 +64,7 @@ class InfoCenterActivity : BaseActivity() {
 			if (bottomnavigationview_infocenter.menu.size() <= 1) bottomnavigationview_infocenter.visibility = View.GONE
 
 			eventAdapter.timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, it.id!!)
+			refreshMessages(it)
 			if (it.userData.rights.contains("R_OFFICEHOURS")) refreshOfficeHours(it)
 			refreshEvents(it)
 			if (it.userData.rights.contains("R_MY_ABSENCES")) refreshAbsences(it)
@@ -86,6 +82,11 @@ class InfoCenterActivity : BaseActivity() {
 
 	private fun showPage(item: MenuItem) {
 		when (item.itemId) {
+			R.id.item_infocenter_messages -> {
+				showList(messageAdapter, messagesLoading, if (messageList.isEmpty()) getString(R.string.infocenter_messages_empty) else "") { user ->
+					GlobalScope.launch(Dispatchers.Main) { refreshMessages(user) }
+				}
+			}
 			R.id.item_infocenter_officehours -> {
 				showList(officeHourAdapter, officeHoursLoading, if (officeHourList.isEmpty()) getString(R.string.infocenter_officehours_empty) else "") { user ->
 					GlobalScope.launch(Dispatchers.Main) { refreshOfficeHours(user) }
@@ -109,6 +110,20 @@ class InfoCenterActivity : BaseActivity() {
 		swiperefreshlayout_infocenter.isRefreshing = refreshing
 		swiperefreshlayout_infocenter.setOnRefreshListener { user?.let { refreshFunction(it) } }
 		textview_infocenter_emptylist.text = if (refreshing) "" else infoString
+	}
+
+	private fun refreshMessages(user: UserDatabase.User) = GlobalScope.launch(Dispatchers.Main) {
+		messagesLoading = true
+		loadMessages(user)?.let {
+			messageList.clear()
+			messageList.addAll(it)
+			messageAdapter.notifyDataSetChanged()
+		}
+		messagesLoading = false
+		if (bottomnavigationview_infocenter.selectedItemId == R.id.item_infocenter_messages) {
+			swiperefreshlayout_infocenter.isRefreshing = false
+			textview_infocenter_emptylist.text = if (messageList.isEmpty()) getString(R.string.infocenter_messages_empty) else ""
+		}
 	}
 
 	private fun refreshOfficeHours(user: UserDatabase.User) = GlobalScope.launch(Dispatchers.Main) {
@@ -169,6 +184,28 @@ class InfoCenterActivity : BaseActivity() {
 			val now = LocalDate.now()
 			now.isAfter(LocalDate(it.startDate)) && now.isBefore(LocalDate(it.endDate))
 		}
+	}
+
+	private suspend fun loadMessages(user: UserDatabase.User): List<UntisMessage>? {
+		messagesLoading = true
+
+		val query = UntisRequest.UntisRequestQuery()
+
+		query.data.method = UntisApiConstants.METHOD_GET_MESSAGES
+		query.url = user.apiUrl
+				?: (UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL + UntisApiConstants.DEFAULT_WEBUNTIS_HOST + UntisApiConstants.DEFAULT_WEBUNTIS_PATH + user.schoolId)
+		query.proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
+		query.data.params = listOf(MessageParams(
+				UntisDate.fromLocalDate(LocalDate.now()),
+				auth = UntisAuthentication.getAuthObject(user)
+		))
+
+		val result = api.request(query)
+		return result.fold({ data ->
+			val untisResponse = getJSON().parse(MessageResponse.serializer(), data)
+
+			untisResponse.result?.messages
+		}, { null })
 	}
 
 	private suspend fun loadOfficeHours(user: UserDatabase.User): List<UntisOfficeHour>? {
