@@ -236,6 +236,7 @@
 	<string name="notifications_text_error_title">Failed to load timetable</string>
 	<string name="notifications_text_error_message">You won\'t get any notifications today.</string>
 	<string name="notifications_text_title">Break until %1$s</string>
+	<string name="notifications_text_first_title">School starts at %1$s</string>
 	<string name="notifications_text_message_subjects">Next lesson: %1$s</string>
 	<string name="notifications_text_message_rooms">Room: %1$s</string>
 	<string name="notifications_text_message_teachers">Teacher: %1$s</string>

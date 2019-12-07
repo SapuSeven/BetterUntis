@@ -17,6 +17,7 @@ import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.helpers.config.PreferenceUtils
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_BOOLEAN_CLEAR
+import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_BOOLEAN_FIRST
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_INT_BREAK_END_TIME
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_INT_ID
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_BREAK_END_TIME
@@ -63,7 +64,10 @@ class NotificationSetup : LessonEventSetup() {
 			with(preparedItems.first().first) {
 				if (startDateTime.millisOfDay < LocalDateTime.now().millisOfDay) return@with
 
-				scheduleNotification(context, startDateTime.minusMinutes(PreferenceUtils.getPrefInt(preferenceManager, "preference_notifications_before_first_time")), this)
+				scheduleNotification(context,
+						startDateTime.minusMinutes(PreferenceUtils.getPrefInt(preferenceManager, "preference_notifications_before_first_time")),
+						this,
+						true)
 			}
 
 		preparedItems.forEach { item ->
@@ -78,7 +82,7 @@ class NotificationSetup : LessonEventSetup() {
 		}
 	}
 
-	private fun scheduleNotification(context: Context, notificationTime: DateTime, notificationEndLesson: TimegridItem) {
+	private fun scheduleNotification(context: Context, notificationTime: DateTime, notificationEndLesson: TimegridItem, isFirst: Boolean = false) {
 		val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
 		val id = notificationTime.millisOfDay / 1000
 
@@ -94,6 +98,8 @@ class NotificationSetup : LessonEventSetup() {
 				.putExtra(EXTRA_STRING_NEXT_TEACHER_LONG, notificationEndLesson.periodData.getLongTeachers())
 				.putExtra(EXTRA_STRING_NEXT_CLASS, notificationEndLesson.periodData.getShortClasses())
 				.putExtra(EXTRA_STRING_NEXT_CLASS_LONG, notificationEndLesson.periodData.getLongClasses())
+
+		if (isFirst) intent.putExtra(EXTRA_BOOLEAN_FIRST, true)
 
 		val pendingIntent = PendingIntent.getBroadcast(context, notificationTime.millisOfDay, intent, 0)
 		alarmManager.setExact(AlarmManager.RTC_WAKEUP, notificationTime.millis, pendingIntent)

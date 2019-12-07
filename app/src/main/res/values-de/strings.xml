@@ -236,6 +236,7 @@
 	<string name="notifications_text_error_title">Fehler beim Laden des Stundenplans</string>
 	<string name="notifications_text_error_message">Du wirst heute keine Benachrichtigungen erhalten.</string>
 	<string name="notifications_text_title">Pause bis %1$s</string>
+	<string name="notifications_text_first_title">Schulstart um %1$s</string>
 	<string name="notifications_text_message_subjects">Nächste Stunde: %1$s</string>
 	<string name="notifications_text_message_rooms">Raum: %1$s</string>
 	<string name="notifications_text_message_teachers">Lehrer: %1$s</string>
