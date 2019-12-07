@@ -19,7 +19,7 @@
 				android:title="@string/preference_flinging_enable" />
 		</PreferenceCategory>
 
-		<PreferenceCategory android:title="Week Display Settings">
+		<PreferenceCategory android:title="@string/preference_category_general_week_display">
 			<CheckBoxPreference
 				android:defaultValue="@bool/preference_week_snap_to_days_default"
 				android:key="preference_week_snap_to_days"
@@ -39,7 +39,7 @@
 				app:showSeekBarValue="true" />
 		</PreferenceCategory>
 
-		<PreferenceCategory android:title="Auto-Mute">
+		<PreferenceCategory android:title="@string/preference_category_general_automute">
 			<CheckBoxPreference
 				android:defaultValue="@bool/preference_automute_enable_default"
 				android:key="preference_automute_enable"

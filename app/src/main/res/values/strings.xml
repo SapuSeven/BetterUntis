@@ -141,6 +141,8 @@
 	<string name="preference_category_timetable_lesson_text">Lesson text</string>
 	<string name="preference_category_timetable_range">Timetable range</string>
 	<string name="preference_category_general_behaviour">Behaviour</string>
+	<string name="preference_category_general_week_display">Week Display Settings</string>
+	<string name="preference_category_general_automute">Auto-Mute</string>
 	<string name="preference_automute_enable">Enable auto-mute</string>
 	<string name="preference_automute_enable_summary">Automatically turns on Do Not Disturb during lessons</string>
 	<string name="preference_background_cancelled">Cancelled lessons</string>
@@ -171,10 +173,10 @@
 	<string name="preference_info_app_version_desc">%1$s (%2$d)</string>
 	<string name="preference_info_changelog">Change Log</string>
 	<string name="preference_info_contact">Contact</string>
-	<string name="preference_info_github">GitHub Repository</string>
+	<string name="preference_info_github">GitHub repository</string>
 	<string name="preference_marker">Time indicator</string>
 	<string name="preference_notifications_clear">Clear all notifications</string>
-	<string name="preference_notifications_enable">Enable Notification</string>
+	<string name="preference_notifications_enable">Enable notification</string>
 	<string name="preference_notifications_enable_desc">Displays a notification with information about the next lesson while you have break.</string>
 	<string name="preference_notifications_multiple">Enable in multiple-hour lesson</string>
 	<string name="preference_notifications_multiple_desc">Notifications will be shown in breaks within multiple-hour lessons.</string>
