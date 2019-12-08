@@ -11,5 +11,5 @@ data class UntisError(
 
 @Serializable
 data class UntisErrorData(
-		val serverTime: Long
+		val serverTime: Long? = null
 )
