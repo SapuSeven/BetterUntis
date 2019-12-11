@@ -14,7 +14,7 @@
 		android:layout_marginLeft="@dimen/margin_listitem_text"
 		android:layout_marginRight="@dimen/margin_listitem_text"
 		android:layout_marginStart="@dimen/margin_listitem_text"
-		android:layout_marginTop="@dimen/margin_listitem_text_top"
+		android:layout_marginTop="@dimen/margin_listitem_text_vertical"
 		android:textColor="?android:attr/textColorPrimary"
 		android:textSize="@dimen/textsize_listitem_line1"
 		app:layout_constraintEnd_toEndOf="parent"

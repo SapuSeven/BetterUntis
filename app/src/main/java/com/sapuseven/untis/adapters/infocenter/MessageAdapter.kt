@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
 import com.sapuseven.untis.models.UntisMessage
@@ -24,7 +25,9 @@ class MessageAdapter(
 		val message = messageList[position]
 
 		holder.tvSubject.text = message.subject
-		holder.tvBody.text = message.body
+		holder.tvBody.text = HtmlCompat.fromHtml(message.body, HtmlCompat.FROM_HTML_MODE_COMPACT)
+
+		holder.tvSubject.visibility = if (message.subject.isBlank()) View.GONE else View.VISIBLE
 	}
 
 	class ViewHolder(rootView: View) : RecyclerView.ViewHolder(rootView) {

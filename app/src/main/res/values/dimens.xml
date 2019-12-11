@@ -2,7 +2,7 @@
 <resources>
 	<dimen name="height_header_content">172dp</dimen>
 	<dimen name="margin_listitem_text">16dp</dimen>
-	<dimen name="margin_listitem_text_top">12dp</dimen>
+	<dimen name="margin_listitem_text_vertical">12dp</dimen>
 	<dimen name="margin_login_input">8dp</dimen>
 	<dimen name="margin_login_pleaselogin_top">24dp</dimen>
 	<dimen name="size_header_icon">48dp</dimen>
