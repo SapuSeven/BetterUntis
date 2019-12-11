@@ -2,7 +2,6 @@ package com.sapuseven.untis.data.connectivity
 
 import com.sapuseven.untis.models.untis.UntisAuth
 import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.joda.time.DateTimeUtils
 import org.junit.After
@@ -25,13 +24,8 @@ class UntisAuthenticationTest {
 	}
 
 	@Test
-	fun constructor() {
-		assertThat(UntisAuthentication(), notNullValue())
-	}
-
-	@Test
 	fun getAuthObject_returnsCorrect() {
-		assertThat(UntisAuthentication.getAuthObject("user", "ABCDEFGHIJKLMNOP"), `is`(UntisAuth(
+		assertThat(UntisAuthentication.createAuthObject("user", "ABCDEFGHIJKLMNOP"), `is`(UntisAuth(
 				user = "user",
 				otp = 439266,
 				clientTime = TIME_MILLIS
@@ -40,7 +34,7 @@ class UntisAuthenticationTest {
 
 	@Test
 	fun getAuthObject_nullValueForKey() {
-		assertThat(UntisAuthentication.getAuthObject("user", null), `is`(UntisAuth(
+		assertThat(UntisAuthentication.createAuthObject("user", null), `is`(UntisAuth(
 				user = "user",
 				otp = 0,
 				clientTime = TIME_MILLIS
@@ -49,7 +43,7 @@ class UntisAuthenticationTest {
 
 	@Test
 	fun getAnonymousAuthObject_returnsCorrect() {
-		assertThat(UntisAuthentication.getAnonymousAuthObject(), `is`(UntisAuth(
+		assertThat(UntisAuthentication.createAuthObject(), `is`(UntisAuth(
 				user = "#anonymous#",
 				otp = 0,
 				clientTime = TIME_MILLIS

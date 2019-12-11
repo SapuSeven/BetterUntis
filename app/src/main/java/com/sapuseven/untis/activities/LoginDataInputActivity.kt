@@ -278,10 +278,10 @@ class LoginDataInputActivity : BaseActivity() {
 		query.data.method = UntisApiConstants.METHOD_GET_USER_DATA
 
 		if (anonymous)
-			query.data.params = listOf(UserDataParams(UntisAuthentication.getAnonymousAuthObject()))
+			query.data.params = listOf(UserDataParams(UntisAuthentication.createAuthObject()))
 		else {
 			if (key == null) return null
-			query.data.params = listOf(UserDataParams(UntisAuthentication.getAuthObject(user, key)))
+			query.data.params = listOf(UserDataParams(UntisAuthentication.createAuthObject(user, key)))
 		}
 
 

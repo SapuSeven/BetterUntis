@@ -197,7 +197,7 @@ class InfoCenterActivity : BaseActivity() {
 		query.proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
 		query.data.params = listOf(MessageParams(
 				UntisDate.fromLocalDate(LocalDate.now()),
-				auth = UntisAuthentication.getAuthObject(user)
+				auth = UntisAuthentication.createAuthObject(user)
 		))
 
 		val result = api.request(query)
@@ -220,7 +220,7 @@ class InfoCenterActivity : BaseActivity() {
 		query.data.params = listOf(OfficeHoursParams(
 				-1,
 				UntisDate.fromLocalDate(LocalDate.now()),
-				auth = UntisAuthentication.getAuthObject(user)
+				auth = UntisAuthentication.createAuthObject(user)
 		))
 
 		val result = api.request(query)
@@ -246,7 +246,7 @@ class InfoCenterActivity : BaseActivity() {
 					user.userData.elemType ?: "",
 					UntisDate.fromLocalDate(LocalDate.now()),
 					UntisDate(currentSchoolYearEndDate),
-					auth = UntisAuthentication.getAuthObject(user)
+					auth = UntisAuthentication.createAuthObject(user)
 			))
 
 			val result = api.request(query)
@@ -274,7 +274,7 @@ class InfoCenterActivity : BaseActivity() {
 					user.userData.elemType ?: "",
 					UntisDate.fromLocalDate(LocalDate.now()),
 					UntisDate(currentSchoolYearEndDate),
-					auth = UntisAuthentication.getAuthObject(user)
+					auth = UntisAuthentication.createAuthObject(user)
 			))
 
 			val result = api.request(query)
@@ -301,7 +301,7 @@ class InfoCenterActivity : BaseActivity() {
 				UntisDate.fromLocalDate(LocalDate.now().plusMonths(1)),
 				includeExcused = true,
 				includeUnExcused = true,
-				auth = UntisAuthentication.getAuthObject(user)
+				auth = UntisAuthentication.createAuthObject(user)
 		))
 
 		val result = api.request(query)

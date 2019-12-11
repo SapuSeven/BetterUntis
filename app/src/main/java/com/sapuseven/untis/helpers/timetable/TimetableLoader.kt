@@ -83,7 +83,7 @@ class TimetableLoader(
 				emptyList(),
 				target.id,
 				target.type,
-				if (user.anonymous) UntisAuthentication.getAnonymousAuthObject() else UntisAuthentication.getAuthObject(user.user, user.key)
+				if (user.anonymous) UntisAuthentication.createAuthObject() else UntisAuthentication.createAuthObject(user.user, user.key)
 		)
 
 		query.data.id = requestId.toString()
