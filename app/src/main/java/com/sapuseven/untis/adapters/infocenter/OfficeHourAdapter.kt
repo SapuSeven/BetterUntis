@@ -33,11 +33,11 @@ class OfficeHourAdapter(
 		)
 		holder.tvTitle.text = officeHour.displayNameTeacher
 
-		val text = listOfNotNull(
+		val text = listOf(
 				officeHour.displayNameRooms,
 				officeHour.phone,
 				officeHour.email
-		).joinToString("\n")
+		).filter { it?.isNotEmpty() == true }.joinToString("\n")
 
 		holder.tvText.visibility = if (text.isBlank()) View.GONE else View.VISIBLE
 		holder.tvText.text = text
