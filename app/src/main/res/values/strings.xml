@@ -37,6 +37,7 @@
 
 	<string name="menu_nav_timetables">Timetables</string>
 	<string name="menu_share">Share</string>
+	<string name="menu_infocenter_messagesofday">Messages</string>
 	<string name="menu_infocenter_officehours">Office Hours</string>
 	<string name="menu_infocenter_events">Events</string>
 	<string name="menu_infocenter_absences">Absences</string>
@@ -117,6 +118,7 @@
 	<string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
 	<string name="infocenter_timeformat_sameday">%2$s - %4$s, %1$s</string>
 	<string name="infocenter_officehours_empty">No office hours</string>
+	<string name="infocenter_messages_empty">No messages</string>
 	<string name="infocenter_events_empty">No events</string>
 	<string name="infocenter_absences_empty">No absences</string>
 	<string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
