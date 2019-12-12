@@ -2,6 +2,9 @@ package com.sapuseven.untis.helpers.config
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.ContextCompat
+import java.io.File
+
 
 class PreferenceManager(val context: Context, private var profileId: Long = 0) {
 	lateinit var defaultPrefs: SharedPreferences
@@ -24,4 +27,21 @@ class PreferenceManager(val context: Context, private var profileId: Long = 0) {
 	}
 
 	fun currentProfileId() = profileId
+
+	fun deleteProfile(profileId: Long) {
+		deleteSharedPreferences("preferences_${profileId}")
+
+		if (this.profileId == profileId) reload(-1)
+	}
+
+	private fun deleteSharedPreferences(name: String): Boolean {
+		getSharedPreferencesPath(name).apply {
+			delete()
+			return !exists()
+		}
+	}
+
+	private fun getSharedPreferencesPath(name: String): File = File(getPreferencesDir(), "$name.xml")
+
+	private fun getPreferencesDir(): File = File(ContextCompat.getDataDir(context), "shared_prefs")
 }
