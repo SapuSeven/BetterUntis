@@ -1,11 +1,12 @@
 package com.sapuseven.untis.models
 
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
+import com.sapuseven.untis.models.untis.response.UserDataResult
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
-class UntisUserDataTest {
+class UntisUserDataResultTest {
 	@Test
 	fun untisUserData_serialization() {
 		/*assertThat(getJSON().stringify(UntisUserData(
@@ -37,7 +38,7 @@ class UntisUserDataTest {
 
 	@Test
 	fun untisUserData_deserialization() {
-		val userData = getJSON().parse(UntisUserData.serializer(), """{"masterData":{"timeStamp":10,"absenceReasons":[],"departments":[],"duties":[],"eventReasons":[],"eventReasonGroups":[],"excuseStatuses":[],"holidays":[],"klassen":[],"rooms":[],"subjects":[],"teachers":[],"teachingMethods":[],"schoolyears":[],"timeGrid":{"days":[]}},"userData":{"elemType":"STUDENT","elemId":10,"displayName":"display name","schoolName":"school-name","departmentId":10,"children":[],"klassenIds":[],"rights":[]},"settings":{"showAbsenceReason":true,"showAbsenceText":false,"absenceCheckRequired":true,"defaultAbsenceReasonId":10,"defaultLatenessReasonId":20,"defaultAbsenceEndTime":"startTime","customAbsenceEndTime":"endTime"}}""")
+		val userData = getJSON().parse(UserDataResult.serializer(), """{"masterData":{"timeStamp":10,"absenceReasons":[],"departments":[],"duties":[],"eventReasons":[],"eventReasonGroups":[],"excuseStatuses":[],"holidays":[],"klassen":[],"rooms":[],"subjects":[],"teachers":[],"teachingMethods":[],"schoolyears":[],"timeGrid":{"days":[]}},"userData":{"elemType":"STUDENT","elemId":10,"displayName":"display name","schoolName":"school-name","departmentId":10,"children":[],"klassenIds":[],"rights":[]},"settings":{"showAbsenceReason":true,"showAbsenceText":false,"absenceCheckRequired":true,"defaultAbsenceReasonId":10,"defaultLatenessReasonId":20,"defaultAbsenceEndTime":"startTime","customAbsenceEndTime":"endTime"}}""")
 
 		assertThat(userData.masterData.timeStamp, `is`(10L))
 

@@ -6,12 +6,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TimetableParams(
+		val id: Int,
+		val type: String,
 		val startDate: UntisDate,
 		val endDate: UntisDate,
 		val masterDataTimestamp: Long, // TODO: Try how the response behaves depending on changes to this value
 		val timetableTimestamp: Long,
 		val timetableTimestamps: List<Long>,
-		val id: Int,
-		val type: String,
 		val auth: UntisAuth
 ) : BaseParams()

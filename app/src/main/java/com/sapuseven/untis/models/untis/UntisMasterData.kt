@@ -4,7 +4,7 @@ import com.sapuseven.untis.models.untis.masterdata.*
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MasterData(
+data class UntisMasterData(
 		val timeStamp: Long = 0,
 		val absenceReasons: List<AbsenceReason>,
 		val departments: List<Department>,

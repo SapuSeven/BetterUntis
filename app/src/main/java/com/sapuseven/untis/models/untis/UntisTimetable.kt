@@ -4,7 +4,7 @@ import com.sapuseven.untis.models.untis.timetable.Period
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Timetable(
+data class UntisTimetable(
 		val displayableStartDate: String,
 		val displayableEndDate: String,
 		val periods: List<Period>

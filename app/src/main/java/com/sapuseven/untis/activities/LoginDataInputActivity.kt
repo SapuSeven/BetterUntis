@@ -19,13 +19,13 @@ import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.models.UntisSchoolInfo
-import com.sapuseven.untis.models.UntisUserData
 import com.sapuseven.untis.models.untis.params.AppSharedSecretParams
 import com.sapuseven.untis.models.untis.params.SchoolSearchParams
 import com.sapuseven.untis.models.untis.params.UserDataParams
 import com.sapuseven.untis.models.untis.response.AppSharedSecretResponse
 import com.sapuseven.untis.models.untis.response.SchoolSearchResponse
 import com.sapuseven.untis.models.untis.response.UserDataResponse
+import com.sapuseven.untis.models.untis.response.UserDataResult
 import kotlinx.android.synthetic.main.activity_logindatainput.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -265,7 +265,7 @@ class LoginDataInputActivity : BaseActivity() {
 		return null
 	}
 
-	private suspend fun acquireUserData(schoolId: Int, user: String, key: String?): UntisUserData? {
+	private suspend fun acquireUserData(schoolId: Int, user: String, key: String?): UserDataResult? {
 		updateLoadingStatus(getString(R.string.logindatainput_loading_user_data))
 
 		val query = UntisRequest.UntisRequestQuery()

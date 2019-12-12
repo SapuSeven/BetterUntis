@@ -76,13 +76,13 @@ class TimetableLoader(
 		query.proxyHost = proxyHost
 
 		val params = TimetableParams(
+				target.id,
+				target.type,
 				target.startDate,
 				target.endDate,
 				user.masterDataTimestamp,
 				0, // TODO: Figure out how timetableTimestamp works
 				emptyList(),
-				target.id,
-				target.type,
 				if (user.anonymous) UntisAuthentication.createAuthObject() else UntisAuthentication.createAuthObject(user.user, user.key)
 		)
 

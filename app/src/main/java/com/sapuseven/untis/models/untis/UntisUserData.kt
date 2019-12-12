@@ -4,7 +4,7 @@ import com.sapuseven.untis.models.UnknownObject
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UserData (
+data class UntisUserData(
 		val elemType: String?, // TODO: Enumerate all possible values
 		val elemId: Int,
 		val displayName: String,

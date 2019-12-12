@@ -11,11 +11,11 @@ data class HomeworkResponse(
 @Serializable
 data class HomeworkResult(
 		val homeWorks: List<UntisHomework>,
-		val lessonsById: Map<String, HomeworkLesson>
+		val lessonsById: Map<String, UntisHomeworkLesson>
 )
 
 @Serializable
-data class HomeworkLesson(
+data class UntisHomeworkLesson(
 		val id: Int,
 		val subjectId: Int,
 		val klassenIds: List<Int>,
