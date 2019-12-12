@@ -7,6 +7,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.RectF
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -99,11 +101,19 @@ class MainActivity :
 	private var proxyHost: String? = null
 	private var profileUpdateDialog: AlertDialog? = null
 	private var currentWeekIndex = 0
+	private val weekViewRefreshHandler = Handler(Looper.getMainLooper())
 	private lateinit var profileUser: UserDatabase.User
 	private lateinit var profileListAdapter: ProfileListAdapter
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 	private lateinit var timetableLoader: TimetableLoader
 	private lateinit var weekView: WeekView<TimegridItem>
+
+	private val weekViewUpdate = object : Runnable {
+		override fun run() {
+			weekView.invalidate()
+			weekViewRefreshHandler.postDelayed(this, 60 * 1000)
+		}
+	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		hasOwnToolbar = true
@@ -133,12 +143,18 @@ class MainActivity :
 		refreshNavigationViewSelection()
 	}
 
+	override fun onPause() {
+		weekViewRefreshHandler.removeCallbacks(weekViewUpdate)
+		super.onPause()
+	}
+
 	override fun onResume() {
 		super.onResume()
 		preferences.reload(profileId)
 		proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
 		setupWeekViewConfig()
-		weekView.invalidate()
+
+		weekViewRefreshHandler.post(weekViewUpdate)
 
 		if (profileUser.schoolId <= 0 && profileUpdateDialog == null)
 			showProfileUpdateRequired()
