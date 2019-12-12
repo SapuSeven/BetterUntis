@@ -213,7 +213,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 
 					"preferences_notifications" -> {
 						findPreference<Preference>("preference_notifications_enable")?.setOnPreferenceChangeListener { _, newValue ->
-							if (newValue == true) clearNotifications()
+							if (newValue == false) clearNotifications()
 							true
 						}
 						findPreference<Preference>("preference_notifications_clear")?.setOnPreferenceClickListener {
