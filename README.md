@@ -1,4 +1,6 @@
 # BetterUntis
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FSapuSeven%2FBetterUntis.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FSapuSeven%2FBetterUntis?ref=badge_shield)
+
 An alternative mobile client for the Untis timetable system.
 
 You can download the latest automated debug build [from my website](https://sapuseven.com/app/BetterUntis).
@@ -54,3 +56,7 @@ When it reaches a state ready to release, it can be merged into the **master**-b
 Especially bigger features which require multiple commits should branch off **develop** and merge back into it. These should be named in a way to describe the feature as clearly as possible.
 
 These branches have a limited lifetime. After the last merge back into **develop**, they should be deleted if no longer needed.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FSapuSeven%2FBetterUntis.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FSapuSeven%2FBetterUntis?ref=badge_large)
