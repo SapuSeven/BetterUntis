@@ -148,7 +148,7 @@ class LoginDataInputActivity : BaseActivity() {
 		editor.putBoolean("switch_logindatainput_anonymouslogin", switch_logindatainput_anonymouslogin.isChecked)
 		editor.putString("edittext_logindatainput_user", edittext_logindatainput_user?.text.toString())
 		editor.putString("edittext_logindatainput_key", edittext_logindatainput_key?.text.toString())
-		editor.putString("edittext_logindatainput_proxy_host", edittext_logindatainput_proxy_host?.text.toString())
+		editor.putString("edittext_logindatainput_proxy_host", getProxyHost())
 		editor.apply()
 	}
 
@@ -208,7 +208,7 @@ class LoginDataInputActivity : BaseActivity() {
 
 		query.data.method = UntisApiConstants.METHOD_SEARCH_SCHOOLS
 		query.url = SCHOOL_SEARCH_URL
-		query.proxyHost = edittext_logindatainput_proxy_host?.text.toString()
+		query.proxyHost = getProxyHost()
 		query.data.params = listOf(SchoolSearchParams(edittext_logindatainput_school?.text.toString()))
 
 		val result = api.request(query)
@@ -221,8 +221,8 @@ class LoginDataInputActivity : BaseActivity() {
 				else
 					return it.schools[0].schoolId
 			} ?: run {
-						stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code, untisResponse.error?.message.orEmpty()))
-					}
+				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code, untisResponse.error?.message.orEmpty()))
+			}
 		}, { error ->
 			stopLoadingAndShowError(getString(R.string.logindatainput_error_generic, error.message))
 		})
@@ -240,7 +240,7 @@ class LoginDataInputActivity : BaseActivity() {
 			else null
 		} ?: (DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + DEFAULT_WEBUNTIS_PATH + schoolId)
 
-		query.proxyHost = edittext_logindatainput_proxy_host?.text.toString()
+		query.proxyHost = getProxyHost()
 		query.data.method = UntisApiConstants.METHOD_GET_APP_SHARED_SECRET
 		query.data.params = listOf(AppSharedSecretParams(user, password))
 
@@ -274,7 +274,7 @@ class LoginDataInputActivity : BaseActivity() {
 			if (it.useMobileServiceUrlAndroid) it.mobileServiceUrl
 			else null
 		} ?: (DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + DEFAULT_WEBUNTIS_PATH + schoolId)
-		query.proxyHost = edittext_logindatainput_proxy_host?.text.toString()
+		query.proxyHost = getProxyHost()
 		query.data.method = UntisApiConstants.METHOD_GET_USER_DATA
 
 		if (anonymous)
@@ -339,10 +339,11 @@ class LoginDataInputActivity : BaseActivity() {
 
 				preferences.saveProfileId(userId.toLong())
 
-				with(preferences.defaultPrefs.edit()) {
-					putString("preference_connectivity_proxy_host", edittext_logindatainput_proxy_host?.text.toString())
-					apply()
-				}
+				if (getProxyHost()?.isNotBlank() == true)
+					with(preferences.defaultPrefs.edit()) {
+						putString("preference_connectivity_proxy_host", getProxyHost())
+						apply()
+					}
 
 				setResult(Activity.RESULT_OK)
 				finish()
@@ -381,6 +382,8 @@ class LoginDataInputActivity : BaseActivity() {
 		setElementsEnabled(false)
 		super.onBackPressed()
 	}
+
+	private fun getProxyHost(): String? = if (switch_logindatainput_advanced.isChecked) edittext_logindatainput_proxy_host?.text.toString() else null
 
 	private fun setElementsEnabled(enabled: Boolean) {
 		textinputlayout_logindatainput_school?.isEnabled = enabled && schoolInfo == null
