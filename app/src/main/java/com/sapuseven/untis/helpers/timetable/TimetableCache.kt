@@ -30,7 +30,7 @@ class TimetableCache(val context: WeakReference<Context>) {
 	}
 
 	private fun targetCacheFile(target: CacheTarget?): File? {
-		return File(context.get()?.cacheDir, target?.getName())
+		return File(context.get()?.cacheDir, target?.getName() ?: "default")
 	}
 
 	override fun toString(): String {
