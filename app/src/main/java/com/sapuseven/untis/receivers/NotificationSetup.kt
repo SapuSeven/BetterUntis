@@ -71,6 +71,8 @@ class NotificationSetup : LessonEventSetup() {
 			}
 
 		preparedItems.forEach { item ->
+			if (item.first.endDateTime == item.second.startDateTime) return // No break exists
+
 			if (item.first.equalsIgnoreTime(item.second)
 					&& !PreferenceUtils.getPrefBool(preferenceManager, "preference_notifications_in_multiple"))
 				return@forEach // multi-hour lesson
