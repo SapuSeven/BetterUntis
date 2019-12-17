@@ -27,7 +27,7 @@ class AutoMuteReceiver : BroadcastReceiver() {
 		if (!PreferenceUtils.getPrefBool(preferenceManager, "preference_automute_enable")) return
 
 		if (intent.hasExtra(EXTRA_BOOLEAN_MUTE)) {
-			val prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(context)
+			val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
 			val editor = prefs.edit()
 
 			if (intent.getBooleanExtra(EXTRA_BOOLEAN_MUTE, false)) {
