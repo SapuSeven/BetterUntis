@@ -34,6 +34,7 @@ internal class WeekViewGestureHandler<T>(
 	var topLeftCornerClickListener: TopLeftCornerClickListener? = null
 	var weekViewLoader: WeekViewLoader<T>? = null
 	var scrollListener: ScrollListener? = null
+	var scaleListener: ScaleListener? = null
 
 	init {
 		this.listener = view as Listener

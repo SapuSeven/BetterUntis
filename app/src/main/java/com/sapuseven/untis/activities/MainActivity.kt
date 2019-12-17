@@ -57,6 +57,7 @@ import com.sapuseven.untis.views.weekview.WeekView
 import com.sapuseven.untis.views.weekview.WeekViewDisplayable
 import com.sapuseven.untis.views.weekview.WeekViewEvent
 import com.sapuseven.untis.views.weekview.listeners.EventClickListener
+import com.sapuseven.untis.views.weekview.listeners.ScaleListener
 import com.sapuseven.untis.views.weekview.listeners.ScrollListener
 import com.sapuseven.untis.views.weekview.listeners.TopLeftCornerClickListener
 import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
@@ -90,6 +91,8 @@ class MainActivity :
 		private const val REQUEST_CODE_LOGINDATAINPUT_EDIT = 4
 
 		private const val UNTIS_DEFAULT_COLOR = "#f49f25"
+
+		private const val PERSISTENT_INT_ZOOM_LEVEL = "persistent_zoom_level"
 	}
 
 	private val userDatabase = UserDatabase.createInstance(this)
@@ -297,6 +300,7 @@ class MainActivity :
 
 	private fun setupViews() {
 		setupWeekView()
+		restoreZoomLevel()
 
 		textview_main_lastrefresh?.text = getString(R.string.main_last_refreshed, getString(R.string.main_last_refreshed_never))
 
@@ -356,7 +360,23 @@ class MainActivity :
 						?: 0)
 			}
 		}
+		weekView.scaleListener = object : ScaleListener {
+			override fun onScaleFinished() {
+				saveZoomLevel()
+			}
+		}
 		setupWeekViewConfig()
+	}
+
+	private fun saveZoomLevel() {
+		preferences.defaultPrefs.edit().apply {
+			putInt(PERSISTENT_INT_ZOOM_LEVEL, weekView.hourHeight)
+			apply()
+		}
+	}
+
+	private fun restoreZoomLevel() {
+		weekView.hourHeight = preferences.defaultPrefs.getInt(PERSISTENT_INT_ZOOM_LEVEL, weekView.hourHeight)
 	}
 
 	private fun setupWeekViewConfig() {

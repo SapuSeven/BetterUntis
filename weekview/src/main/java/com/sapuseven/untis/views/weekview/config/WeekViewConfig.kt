@@ -334,7 +334,7 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 			// Hour height
 			hourHeight = a.getDimensionPixelSize(R.styleable.WeekView_hourHeight, 50)
 			minHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_minHourHeight, 0) // no minimum specified (will be dynamic, based on screen)
-			maxHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_maxHourHeight, 250)
+			maxHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_maxHourHeight, 500)
 			effectiveMinHourHeight = minHourHeight
 
 			// Now line

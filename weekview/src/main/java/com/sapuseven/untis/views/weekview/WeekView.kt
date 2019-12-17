@@ -192,6 +192,12 @@ class WeekView<T>(
 			gestureHandler.emptyViewLongPressListener = emptyViewLongPressListener
 		}
 
+	var scaleListener: ScaleListener?
+		get() = gestureHandler.scaleListener
+		set(scaleListener) {
+			gestureHandler.scaleListener = scaleListener
+		}
+
 	var scrollListener: ScrollListener?
 		get() = gestureHandler.scrollListener
 		set(scrollListener) {
@@ -346,6 +352,7 @@ class WeekView<T>(
 	}
 
 	override fun onScaled() {
+		scaleListener?.onScaleFinished()
 		invalidate()
 	}
 
