@@ -18,7 +18,8 @@ class StartupReceiver : BroadcastReceiver() {
 	override fun onReceive(context: Context, intent: Intent) {
 		Log.d("StartupReceiver", "StartupReceiver received")
 		val preferenceManager = PreferenceManager(context)
-		if (!PreferenceUtils.getPrefBool(preferenceManager, "preference_notifications_enable"))
+		if (!PreferenceUtils.getPrefBool(preferenceManager, "preference_notifications_enable")
+				&& !PreferenceUtils.getPrefBool(preferenceManager, "preference_automute_enable"))
 			return
 
 		val dateTime = DateTime().withTime(2, 0, 0, 0)
