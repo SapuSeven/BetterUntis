@@ -107,4 +107,6 @@ internal fun List<TimegridItem>.merged(): List<TimegridItem> = this.groupBy { it
 /**
  * Creates a copy of a zipped list with the very last element duplicated into a new Pair whose second element is null.
  */
-internal fun <E> List<Pair<E?, E?>>.withLast(): List<Pair<E?, E?>> = this.toMutableList().apply { add(Pair(this.last().second, null)) }.toList()
+internal fun <E> List<Pair<E?, E?>>.withLast(): List<Pair<E?, E?>> =
+		if (this.isEmpty()) this
+		else this.toMutableList().apply { add(Pair(this.last().second, null)) }.toList()
