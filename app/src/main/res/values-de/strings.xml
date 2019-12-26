@@ -41,7 +41,7 @@
 	<string name="menu_infocenter_absences">Abwesenheiten</string>
 	<string name="mainactivitydrawer_dropdown_show">Alle Profile anzeigen</string>
 	<string name="mainactivitydrawer_profile_add">Profil hinzufügen…</string>
-	<string name="mainactivitydrawer_profile_delete_hint">Lange auf ein Profil drücken, um zu bearbeiten</string>
+	<string name="mainactivitydrawer_profile_delete_hint">Lange auf ein Profil tippen, um zu bearbeiten</string>
 	<string name="main_dialog_delete_profile_title">Profil löschen?</string>
 	<string name="main_dialog_delete_profile_message">Bist du sicher, dass du das Profil mit dem Benutzer %1$s an der Schule %2$s löschen möchtest?</string>
 	<string name="main_dialog_update_profile_title">Profilaktualisierung notwendig</string>
@@ -75,7 +75,7 @@
 	<string name="logindatainput_error_generic">Fehler: %1$s</string>
 	<string name="logindatainput_error_invalid_school">Ungültige Schul-ID!</string>
 	<string name="logindatainput_data_loaded">Daten erfolgreich geladen.</string>
-	<string name="logindatainput_aquiring_app_secret">Lade App Secret…</string>
+	<string name="logindatainput_aquiring_app_secret">Lade App-Secret…</string>
 	<string name="logindatainput_aquiring_schoolid">Lade Schule…</string>
 	<string name="logindatainput_loading_user_data">Lade Benutzerdaten…</string>
 	<string name="logindatainput_adding_user_unknown_error">Beim Hinzufügen des Benutzers trat ein unbekannter Fehler auf.</string>
@@ -122,9 +122,9 @@
 	<string name="preferences_styling">Anpassung</string>
 	<string name="preferences_timetable">Stundenplan</string>
 	<string name="preferences_general">Allgemein</string>
-	<string name="preference_category_connectivity_proxy">WebUntis Proxy</string>
+	<string name="preference_category_connectivity_proxy">WebUntis-Proxy</string>
 	<string name="preference_category_notifications_visible_fields">Sichtbare Felder</string>
-	<string name="preference_category_styling_backgrounds">Hintergrundfarben</string>
+	<string name="preference_category_styling_backgrounds">Elementfarben</string>
 	<string name="preference_category_styling_colors">Farben</string>
 	<string name="preference_category_styling_themes">Design</string>
 	<string name="preference_category_timetable_item_appearance">Stundendesign</string>
@@ -150,7 +150,7 @@
 	<string name="preference_connectivity_refresh_in_background">Stundenplan immer aktualisieren</string>
 	<string name="preference_connectivity_refresh_in_background_desc">Ausschalten, um Datenvolumen zu sparen</string>
 	<string name="preference_dark_theme">Dunkles Design</string>
-	<string name="preference_dark_theme_auto">Bei niedrigem Akkustand</string>
+	<string name="preference_dark_theme_auto">Bei niedrigem Akkustand aktivieren</string>
 	<string name="preference_dark_theme_off">Immer aus</string>
 	<string name="preference_dark_theme_oled">Schwarzen Hintergrund verwenden</string>
 	<string name="preference_dark_theme_oled_desc">Nützlich für OLED-Bildschirme</string>
