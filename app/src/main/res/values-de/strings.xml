@@ -167,11 +167,11 @@
 	<string name="preference_notifications_enable">Benachrichtigungen aktivieren</string>
 	<string name="preference_notifications_enable_desc">Zeigt während Pausen eine Benachrichtigung mit Infos zur nächsten Stunde an.</string>
 	<string name="preference_notifications_first_lesson">Benachrichtigung vor der ersten Stunde</string>
-	<string name="preference_notifications_first_lesson_desc">Zeigt eine zusätzliche Benachrichtigungen zu Beginn der ersten Stunde an</string>
+	<string name="preference_notifications_first_lesson_desc">Zeigt eine zusätzliche Benachrichtigung vor Beginn der ersten Stunde an</string>
 	<string name="preference_notifications_first_lesson_time">Benachrichtigungszeit</string>
 	<string name="preference_notifications_first_lesson_time_unit">min vor der ersten Stunde</string>
 	<string name="preference_notifications_multiple">In mehrstündigem Unterricht aktivieren</string>
-	<string name="preference_notifications_multiple_desc">Benachrichtigung für Pausen während mehrstündigem Unterricht anzeigen</string>
+	<string name="preference_notifications_multiple_desc">Benachrichtigungen für Pausen während mehrstündigem Unterricht anzeigen</string>
 	<string name="preference_notifications_visibility_hidden">Nicht anzeigen</string>
 	<string name="preference_notifications_visibility_long">Langer Name</string>
 	<string name="preference_notifications_visibility_short">Kurzer Name</string>
@@ -184,7 +184,7 @@
 	<string name="preference_theme_untis">Originale Untis-App</string>
 	<string name="preference_timetable_background_irregular">Hintergrundfarbe berücksichtigen</string>
 	<string name="preference_timetable_background_irregular_desc">Nützlich wenn kein Zugriff auf Lehrer besteht</string>
-	<string name="preference_timetable_bold_lesson_name">Fetten Stundennamen</string>
+	<string name="preference_timetable_bold_lesson_name">Fetter Stundenname</string>
 	<string name="preference_timetable_centered_lesson_info">Stundeninfo zentrieren</string>
 	<string name="preference_timetable_colors_reset">Farben zurücksetzen</string>
 	<string name="preference_timetable_hide_cancelled">Entfallene Stunden ausblenden</string>
@@ -204,7 +204,7 @@
 	<string name="preference_school_background">Farben der Schule verwenden</string>
 	<string name="preference_school_background_desc">Manche Schulen senden eigene Hintergrundfarben</string>
 	<string name="preference_use_theme_background">Designfarben verwenden</string>
-	<string name="preference_use_theme_background_desc">Verwendet Farben des aktuellen Designs für normale Stunden</string>
+	<string name="preference_use_theme_background_desc">Trifft nur auf normale Stunden zu</string>
 	<string name="preference_week_custom_range">Wochenlänge</string>
 	<string name="preference_week_custom_range_summary">%1$s bis %2$s</string>
 	<string name="preference_week_custom_range_summary_short">%1$s</string>
