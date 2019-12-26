@@ -126,7 +126,7 @@
 	<string name="preference_category_notifications_visible_fields">Sichtbare Felder</string>
 	<string name="preference_category_styling_backgrounds">Elementfarben</string>
 	<string name="preference_category_styling_colors">Farben</string>
-	<string name="preference_category_styling_themes">Design</string>
+	<string name="preference_category_styling_themes">Designs</string>
 	<string name="preference_category_timetable_item_appearance">Stundendesign</string>
 	<string name="preference_category_timetable_lesson_text">Stundentext</string>
 	<string name="preference_category_timetable_range">Stundenbereich</string>
@@ -222,7 +222,7 @@
 	<string name="notifications_text_error_title">Fehler beim Laden des Stundenplans</string>
 	<string name="notifications_text_error_message">Du wirst heute keine Benachrichtigungen erhalten.</string>
 	<string name="notifications_text_title">Pause bis %1$s</string>
-	<string name="notifications_text_first_title">Schulstart um %1$s</string>
+	<string name="notifications_text_first_title">Unterrichtsbeginn um %1$s</string>
 	<string name="notifications_text_message_subjects">Nächste Stunde: %1$s</string>
 	<string name="notifications_text_message_rooms">Raum: %1$s</string>
 	<string name="notifications_text_message_teachers">Lehrer: %1$s</string>
