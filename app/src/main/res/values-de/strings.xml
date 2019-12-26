@@ -147,7 +147,7 @@
 	<string name="preference_background_regular_past">Vergangene normale Stunden</string>
 	<string name="preference_connectivity_proxy_about">Über diese Funktion</string>
 	<string name="preference_connectivity_proxy_host">Proxy-Server-Adresse</string>
-	<string name="preference_connectivity_refresh_in_background">Stundenplan immer aktuell halten</string>
+	<string name="preference_connectivity_refresh_in_background">Stundenplan immer aktualisieren</string>
 	<string name="preference_connectivity_refresh_in_background_desc">Ausschalten, um Datenvolumen zu sparen</string>
 	<string name="preference_dark_theme">Dunkles Design</string>
 	<string name="preference_dark_theme_auto">Bei niedrigem Akkustand</string>
@@ -156,13 +156,13 @@
 	<string name="preference_dark_theme_oled_desc">Nützlich für OLED-Bildschirme</string>
 	<string name="preference_dark_theme_on">Immer ein</string>
 	<string name="preference_dialog_colors_reset_title">Farben zurücksetzen?</string>
-	<string name="preference_dialog_colors_reset_text">Alle Farben werden auf ihre Standardwerte gesetzt.</string>
+	<string name="preference_dialog_colors_reset_text">Alle obigen Farben werden auf ihre Standardwerte gesetzt.</string>
 	<string name="preference_double_tap_to_exit">Zurück-Button zweimal antippen zum Beenden</string>
 	<string name="preference_flinging_enable">Schnelles Scrollen aktivieren</string>
 	<string name="preference_info_app_version">App-Version</string>
 	<string name="preference_info_app_version_desc">%1$s (%2$d)</string>
-	<string name="preference_info_github">GitHub Repository</string>
-	<string name="preference_marker">Zeitmarkierung</string>
+	<string name="preference_info_github">GitHub-Repository</string>
+	<string name="preference_marker">Zeitanzeige</string>
 	<string name="preference_notifications_clear">Alle Benachrichtigungen löschen</string>
 	<string name="preference_notifications_enable">Benachrichtigungen aktivieren</string>
 	<string name="preference_notifications_enable_desc">Zeigt während Pausen eine Benachrichtigung mit Infos zur nächsten Stunde an.</string>
