@@ -38,8 +38,8 @@
 	<string name="menu_infocenter_messagesofday">Meldinger</string>
 	<string name="menu_infocenter_officehours">Office Hours</string>
 	<string name="menu_infocenter_events">Hendelser</string>
-	<string name="menu_infocenter_absences">Absences</string>
-	<string name="mainactivitydrawer_dropdown_show">Show profile list</string>
+	<string name="menu_infocenter_absences">Fravær</string>
+	<string name="mainactivitydrawer_dropdown_show">Vis profilliste</string>
 	<string name="mainactivitydrawer_profile_add">Legg til en profil…</string>
 	<string name="mainactivitydrawer_profile_delete_hint">Trykk lenge på en profil for å redigere</string>
 	<string name="main_dialog_delete_profile_title">Vil du slette profilen?</string>
@@ -197,7 +197,7 @@
 	<string name="preference_timetable_lesson_name_font_size">Skriftstørrelse for leksjonsnavn</string>
 	<string name="preference_timetable_personal_timetable">Egendefinert personlig timeplan</string>
 	<string name="preference_timetable_range">Timer å vise</string>
-	<string name="preference_timetable_range_desc">Hours %1$d to %2$d</string>
+	<string name="preference_timetable_range_desc">Timer fra %1$d til %2$d</string>
 	<string name="preference_timetable_range_index_reset">Tilbakestill leksjonsnummerering</string>
 	<string name="preference_timetable_substitutions_irregular">Oppdag uregelmessige leksjoner</string>
 	<string name="preference_timetable_substitutions_irregular_desc">Behandle leksjoner med vikarer som uregelmessige</string>
@@ -222,11 +222,11 @@
 	<string name="notifications_text_error_title">Klarte ikke laste timeplan</string>
 	<string name="notifications_text_error_message">Du vil ikke få noen varsler i dag.</string>
 	<string name="notifications_text_title">Pause til %1$s</string>
-	<string name="notifications_text_first_title">School starts at %1$s</string>
-	<string name="notifications_text_message_subjects">Next lesson: %1$s</string>
-	<string name="notifications_text_message_rooms">Room: %1$s</string>
-	<string name="notifications_text_message_teachers">Teacher: %1$s</string>
-	<string name="notifications_text_message_classes">Class: %1$s</string>
+	<string name="notifications_text_first_title">Skolen starter %1$s</string>
+	<string name="notifications_text_message_subjects">Neste leksjon: %1$s</string>
+	<string name="notifications_text_message_rooms">Rom: %1$s</string>
+	<string name="notifications_text_message_teachers">Lærer: %1$s</string>
+	<string name="notifications_text_message_classes">Klasse: %1$s</string>
 	<string name="notifications_text_message_separator"> / </string>
 	<string name="homeworks_due_time">til %1$s</string>
 	<string name="homeworks_due_time_format">EEE, dd. MMM</string>
