@@ -156,7 +156,7 @@
 	<string name="preference_dark_theme_oled_desc">Nützlich für OLED-Bildschirme</string>
 	<string name="preference_dark_theme_on">Immer ein</string>
 	<string name="preference_dialog_colors_reset_title">Farben zurücksetzen?</string>
-	<string name="preference_dialog_colors_reset_text">Alle obigen Farben werden auf ihre Standardwerte gesetzt.</string>
+	<string name="preference_dialog_colors_reset_text">Dies wird alle oben stehenden Farben auf die Standardwerte zurücksetzen.</string>
 	<string name="preference_double_tap_to_exit">Zurück-Button zweimal antippen zum Beenden</string>
 	<string name="preference_flinging_enable">Schnelles Scrollen aktivieren</string>
 	<string name="preference_info_app_version">App-Version</string>
