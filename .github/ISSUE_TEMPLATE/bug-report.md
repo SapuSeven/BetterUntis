@@ -8,27 +8,23 @@ assignees: ''
 ---
 
 **Description**
-A clear and concise description of what the bug is.
-
-**Actual behavior**
-Steps to reproduce the behavior.
-
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+_A clear and concise description of what the bug is.
+Please add steps to reproduce the behavior._
 
 <details>
   <summary><b>Screenshots</b></summary>
 
-  Add screenshots here to describe the problem.
-  Please include screenshots of the original Untis Mobile app if applicable.
+  _Add screenshots here to describe the problem.
+  Please include screenshots of the original Untis Mobile app if applicable._
 </details>
 
 <details>
   <summary><b>Logs</b></summary>
 
-  Add a detailed stack trace / crash log here if applicable.
+  _Add a detailed stack trace / crash log here if applicable_
 </details>
 
-**Additional information (please replace)**
- - Android Version
- - BetterUntis version (Settings -> About -> App version)
+**Additional information**
+ - Android version: _System Settings -> About -> Android version (varies per device)_
+ - BetterUntis version: _Settings -> About -> App version_
+ - Installation source: _Google Play / F-Drod / SapuSeven.com / Own Build_
