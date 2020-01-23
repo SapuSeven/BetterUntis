@@ -35,11 +35,13 @@ android {
 			keyPassword signingProperties["keyReleasePassword"] != null ? signingProperties["keyReleasePassword"] : System.getenv("KEY_RELEASE_PASSWORD")
 		}
 
-		debug {
-			storeFile file("BetterUntis.jks")
-			storePassword signingProperties["keystorePassword"] != null ? signingProperties["keystorePassword"] : System.getenv("KEYSTORE_PASSWORD")
-			keyAlias "debug"
-			keyPassword signingProperties["keyDebugPassword"] != null ? signingProperties["keyDebugPassword"] : System.getenv("KEY_DEBUG_PASSWORD")
+		if (file("BetterUntis.jks").exists()) {
+			debug {
+				storeFile file("BetterUntis.jks")
+				storePassword signingProperties["keystorePassword"] != null ? signingProperties["keystorePassword"] : System.getenv("KEYSTORE_PASSWORD")
+				keyAlias "debug"
+				keyPassword signingProperties["keyDebugPassword"] != null ? signingProperties["keyDebugPassword"] : System.getenv("KEY_DEBUG_PASSWORD")
+			}
 		}
 	}
 
