@@ -8,6 +8,7 @@ assignees: ''
 ---
 
 **Description**
+
 _A clear and concise description of what the bug is.
 Please add steps to reproduce the behavior._
 
@@ -25,6 +26,7 @@ Please add steps to reproduce the behavior._
 </details>
 
 **Additional information**
+
  - Android version: _System Settings -> About -> Android version (varies per device)_
  - BetterUntis version: _Settings -> About -> App version_
  - Installation source: _Google Play / F-Drod / SapuSeven.com / Own Build_
