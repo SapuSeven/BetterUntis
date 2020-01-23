@@ -511,6 +511,8 @@ class MainActivity :
 
 			if (thisUnitStartIndex != -1 && thisUnitEndIndex != -1)
 				itemGrid[day][thisUnitStartIndex].add(item)
+			else
+				leftover.add(item)
 		}
 
 		val newItems = mutableListOf<TimegridItem>()
