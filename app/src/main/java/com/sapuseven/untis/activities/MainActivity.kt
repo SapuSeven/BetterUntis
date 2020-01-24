@@ -144,6 +144,8 @@ class MainActivity :
 		setupTimetableLoader()
 		showPersonalTimetable()
 		refreshNavigationViewSelection()
+
+		checkForCrashes(findViewById(R.id.content_main))
 	}
 
 	override fun onPause() {

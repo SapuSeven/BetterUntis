@@ -31,6 +31,7 @@
 	<string name="all_dialog_crash_title">Crash log found</string>
 	<string name="all_dialog_crash_copied">Crash log copied to clipboard.</string>
 
+	<string name="activity_title_errors">Errors</string>
 	<string name="activity_title_free_rooms">Free Rooms</string>
 	<string name="activity_title_info_center">Info Center</string>
 	<string name="activity_title_settings">Settings</string>

@@ -1,24 +1,21 @@
 package com.sapuseven.untis.activities
 
 import android.annotation.SuppressLint
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
-import android.widget.Toast
+import android.view.View
 import androidx.annotation.AttrRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.helpers.config.PreferenceUtils
-import com.sapuseven.untis.helpers.issues.GithubIssue
-import com.sapuseven.untis.helpers.issues.Issue
 import java.io.File
 import java.io.PrintStream
 
@@ -39,41 +36,31 @@ open class BaseActivity : AppCompatActivity() {
 		currentDarkTheme = PreferenceUtils.getPrefString(preferences, "preference_dark_theme")
 		setAppTheme(hasOwnToolbar)
 		super.onCreate(savedInstanceState)
-		checkForCrashes()
 	}
 
-	private fun checkForCrashes() {
-		File(filesDir, "crash").listFiles()?.forEach { crashFile ->
-			val reader = crashFile.bufferedReader()
-
-			val stackTrace = StringBuilder()
-			val buffer = CharArray(1024)
-			var length = reader.read(buffer)
-
-			while (length != -1) {
-				stackTrace.append(String(buffer, 0, length))
-				length = reader.read(buffer)
-			}
-
-			reader.close()
-			crashFile.delete()
-
-			MaterialAlertDialogBuilder(this)
-					.setTitle(R.string.all_dialog_crash_title)
-					.setMessage(stackTrace)
-					.setNegativeButton(R.string.all_copy) { _, _ ->
-						val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-						clipboard.setPrimaryClip(ClipData.newPlainText("BetterUntis Crash Log", stackTrace))
-						Toast.makeText(this, R.string.all_dialog_crash_copied, Toast.LENGTH_SHORT).show()
-					}
-					.setPositiveButton(R.string.all_close) { dialog, _ ->
-						dialog.dismiss()
-					}
-					.setNeutralButton(R.string.all_report) { _, _ ->
-						GithubIssue(Issue.Type.CRASH, stackTrace.toString()).launch(this)
+	protected fun checkForCrashes(rootView: View) {
+		if (File(filesDir, "crash").listFiles()?.isNotEmpty() == true) {
+			Snackbar.make(rootView, "Some errors have been found.", Snackbar.LENGTH_INDEFINITE)
+					.setAction("Show") {
+						startActivity(Intent(this, ErrorsActivity::class.java))
 					}
 					.show()
 		}
+	}
+
+	protected fun readCrashData(crashFile: File): String {
+		val reader = crashFile.bufferedReader()
+
+		val stackTrace = StringBuilder()
+		val buffer = CharArray(1024)
+		var length = reader.read(buffer)
+
+		while (length != -1) {
+			stackTrace.append(String(buffer, 0, length))
+			length = reader.read(buffer)
+		}
+
+		return stackTrace.toString()
 	}
 
 	override fun onStart() {
