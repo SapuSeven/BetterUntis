@@ -32,7 +32,7 @@
 	<integer name="preference_notifications_before_first_time_default">30</integer>
 	<integer name="preference_timetable_item_padding_overlap_default">4</integer>
 	<integer name="preference_timetable_item_padding_default">4</integer>
-	<integer name="preference_timetable_item_corner_radius_default">2</integer>
+	<integer name="preference_timetable_item_corner_radius_default">4</integer>
 	<integer name="preference_timetable_lesson_name_font_size_default">14</integer>
 	<integer name="preference_timetable_lesson_info_font_size_default">10</integer>
 
