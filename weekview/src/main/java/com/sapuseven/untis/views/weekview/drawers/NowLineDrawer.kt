@@ -6,7 +6,7 @@ import com.sapuseven.untis.views.weekview.DrawingContext
 import com.sapuseven.untis.views.weekview.config.WeekViewConfig
 import com.sapuseven.untis.views.weekview.config.WeekViewDrawConfig
 import org.joda.time.DateTime
-import java.lang.Math.max
+import kotlin.math.max
 
 class NowLineDrawer(private val config: WeekViewConfig) : BaseDrawer {
 	private val drawConfig: WeekViewDrawConfig = config.drawConfig

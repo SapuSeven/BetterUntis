@@ -5,6 +5,7 @@ import android.graphics.Rect
 import com.sapuseven.untis.views.weekview.DrawingContext
 import com.sapuseven.untis.views.weekview.config.WeekViewConfig
 import com.sapuseven.untis.views.weekview.config.WeekViewDrawConfig
+import kotlin.math.min
 
 class TopLeftCornerDrawer(private val config: WeekViewConfig) : BaseDrawer {
 	private val drawConfig: WeekViewDrawConfig = config.drawConfig
@@ -31,6 +32,6 @@ class TopLeftCornerDrawer(private val config: WeekViewConfig) : BaseDrawer {
 	}
 
 	private fun Rect.shortestSide(): Int {
-		return Math.min(width(), height())
+		return min(width(), height())
 	}
 }
