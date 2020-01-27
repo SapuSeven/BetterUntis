@@ -31,16 +31,16 @@ jobs:
           name: Upload build artifacts
           path: app/build/outputs
           destination: outputs
-      - run:
-          name: Run Tests
-          command: ./gradlew lint test
-      - store_artifacts:
-          name: Upload test artifacts
-          path: app/build/reports
-          destination: reports
-      - store_test_results:
-          name: Upload test results
-          path: app/build/test-results
+      #      - run:
+      #          name: Run Tests
+      #          command: ./gradlew lint test
+      #      - store_artifacts:
+      #          name: Upload test artifacts
+      #          path: app/build/reports
+      #          destination: reports
+      #      - store_test_results:
+      #          name: Upload test results
+      #          path: app/build/test-results
       - run:
           name: Preparing workspace
           command: |
@@ -50,7 +50,7 @@ jobs:
           root: workspace
           paths:
             - outputs
-  deploy:
+  deploy_debug:
     machine:
       enabled: true
     working_directory: ~/betteruntis
@@ -58,22 +58,41 @@ jobs:
       - attach_workspace:
           at: workspace
       - run:
-          name: Deploy Over SSH
+          name: Deploy Debug Builds Over SSH
           command: |
+            if [[ ! -v SSH_DEPLOY_HOST ]]; then exit 1; fi
             echo $SSH_DEPLOY_KEY_ENCODED | base64 --decode >> id_rsa
             chmod 600 id_rsa
-            scp -r -P $SSH_DEPLOY_PORT -i id_rsa workspace/outputs "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/$CIRCLE_BUILD_NUM"
+            scp -r -P $SSH_DEPLOY_PORT -i id_rsa workspace/outputs/apk/debug "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/$CIRCLE_BUILD_NUM"
+  deploy_release:
+    machine:
+      enabled: true
+    working_directory: ~/betteruntis
+    steps:
+      - attach_workspace:
+          at: workspace
+      - run:
+          name: Deploy Release Builds Over SSH
+          command: |
+            if [[ ! -v SSH_DEPLOY_HOST ]]; then exit 1; fi
+            echo $SSH_DEPLOY_KEY_ENCODED | base64 --decode >> id_rsa
+            chmod 600 id_rsa
+            scp -r -P $SSH_DEPLOY_PORT -i id_rsa workspace/outputs "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG"
 
 workflows:
   version: 2
   build-and-deploy:
     jobs:
       - build
-      - deploy:
-          requires:
-            - build
-          filters:
-            branches:
-              only:
-                - master
-                - develop
+      - deploy_debug:
+        requires: build
+        filters:
+          branches:
+            only: develop
+      - deploy_release:
+        requires: build
+        filters:
+          branches:
+            only: master
+          tags:
+            only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
