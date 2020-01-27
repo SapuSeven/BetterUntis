@@ -63,7 +63,7 @@ jobs:
             if [[ ! -v SSH_DEPLOY_HOST ]]; then exit 1; fi
             echo $SSH_DEPLOY_KEY_ENCODED | base64 --decode >> id_rsa
             chmod 600 id_rsa
-            scp -r -P $SSH_DEPLOY_PORT -i id_rsa workspace/outputs/apk/debug "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/$CIRCLE_BUILD_NUM"
+            scp -r -P $SSH_DEPLOY_PORT -i id_rsa workspace/outputs/apk/debug "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/debug/$CIRCLE_BUILD_NUM"
   deploy_release:
     machine:
       enabled: true
@@ -77,7 +77,7 @@ jobs:
             if [[ ! -v SSH_DEPLOY_HOST ]]; then exit 1; fi
             echo $SSH_DEPLOY_KEY_ENCODED | base64 --decode >> id_rsa
             chmod 600 id_rsa
-            scp -r -P $SSH_DEPLOY_PORT -i id_rsa workspace/outputs "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG"
+            scp -r -P $SSH_DEPLOY_PORT -i id_rsa workspace/outputs/apk/release workspace/outputs/mapping/release "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG"
 
 workflows:
   version: 2
