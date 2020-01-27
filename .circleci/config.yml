@@ -85,14 +85,16 @@ workflows:
     jobs:
       - build
       - deploy_debug:
-        requires: build
-        filters:
-          branches:
-            only: develop
+          requires:
+            - build
+          filters:
+            branches:
+              only: develop
       - deploy_release:
-        requires: build
-        filters:
-          branches:
-            only: master
-          tags:
-            only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+            tags:
+              only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
