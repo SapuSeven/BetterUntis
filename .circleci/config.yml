@@ -20,6 +20,7 @@ jobs:
       - run:
           name: Prepare signing config
           command: |
+            if [[ ! -v KEYSTORE_ENCODED ]]; then exit 0; fi
             echo $KEYSTORE_ENCODED | base64 --decode >> app/BetterUntis.jks
             echo 'export KEYSTORE_PASSWORD=$(echo "$KEYSTORE_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
             echo 'export KEY_DEBUG_PASSWORD=$(echo "$KEY_DEBUG_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
