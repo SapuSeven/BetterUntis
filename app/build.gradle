@@ -28,14 +28,14 @@ android {
 			}
 		}
 
-		release {
-			storeFile file("BetterUntis.jks")
-			storePassword signingProperties["keystorePassword"] != null ? signingProperties["keystorePassword"] : System.getenv("KEYSTORE_PASSWORD")
-			keyAlias "release"
-			keyPassword signingProperties["keyReleasePassword"] != null ? signingProperties["keyReleasePassword"] : System.getenv("KEY_RELEASE_PASSWORD")
-		}
-
 		if (file("BetterUntis.jks").exists()) {
+			release {
+				storeFile file("BetterUntis.jks")
+				storePassword signingProperties["keystorePassword"] != null ? signingProperties["keystorePassword"] : System.getenv("KEYSTORE_PASSWORD")
+				keyAlias "release"
+				keyPassword signingProperties["keyReleasePassword"] != null ? signingProperties["keyReleasePassword"] : System.getenv("KEY_RELEASE_PASSWORD")
+			}
+
 			debug {
 				storeFile file("BetterUntis.jks")
 				storePassword signingProperties["keystorePassword"] != null ? signingProperties["keystorePassword"] : System.getenv("KEYSTORE_PASSWORD")
