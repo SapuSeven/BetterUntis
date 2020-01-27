@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import com.sapuseven.untis.views.weekview.DrawingContext
 import com.sapuseven.untis.views.weekview.WeekView
 import com.sapuseven.untis.views.weekview.config.WeekViewConfig
+import kotlin.math.max
 
 class BackgroundGridDrawer(private val config: WeekViewConfig) : BaseDrawer {
 	override fun draw(drawingContext: DrawingContext, canvas: Canvas) {
@@ -12,7 +13,7 @@ class BackgroundGridDrawer(private val config: WeekViewConfig) : BaseDrawer {
 
 		var startPixel = drawingContext.startPixel
 
-		val startX = Math.max(startPixel, config.drawConfig.timeColumnWidth)
+		val startX = max(startPixel, config.drawConfig.timeColumnWidth)
 		drawGrid(calcHourLines(), startX, startPixel, canvas)
 
 		for (i in 0 until size) {
