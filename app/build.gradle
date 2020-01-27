@@ -50,7 +50,10 @@ android {
 			minifyEnabled true
 			shrinkResources true
 			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-			signingConfig signingConfigs.release
+
+			if (file("BetterUntis.jks").exists()) {
+				signingConfig signingConfigs.release
+			}
 		}
 
 		debug {
