@@ -248,6 +248,11 @@
 	<string name="homeworks_due_time">until %1$s</string>
 	<string name="homeworks_due_time_format">EEE, dd. MMM</string>
 
+	<string name="contributor_domi04151309" translatable="false">Domi04151309</string>
+	<string name="contributor_l12c" translatable="false">L12C</string>
+	<string name="contributor_nautilusx" translatable="false">nautilusx</string>
+	<string name="contributor_sapuseven" translatable="false">SapuSeven</string>
+
 	<plurals name="main_time_diff_minutes">
 		<item quantity="one">a minute ago</item>
 		<item quantity="other">%d minutes ago</item>
