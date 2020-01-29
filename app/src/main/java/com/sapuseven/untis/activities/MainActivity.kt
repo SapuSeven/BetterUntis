@@ -387,7 +387,7 @@ class MainActivity :
 		weekView.firstDayOfWeek = preferences.defaultPrefs.getStringSet("preference_week_custom_range", emptySet())?.map { MaterialDayPicker.Weekday.valueOf(it) }?.min()?.ordinal
 				?: DateTimeFormat.forPattern("E").withLocale(Locale.ENGLISH).parseDateTime((profileUser.timeGrid.days[0].day)).dayOfWeek
 
-		if (PreferenceUtils.getPrefBool(preferences, "preference_timetable_hide_time_stamps")) weekView.timeColumnTextColor = Color.TRANSPARENT
+        weekView.timeColumnVisibility = !PreferenceUtils.getPrefBool(preferences, "preference_timetable_hide_time_stamps")
 
 		weekView.columnGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_padding").toFloat(), this).toInt()
 		weekView.overlappingEventGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_padding_overlap").toFloat(), this).toInt()

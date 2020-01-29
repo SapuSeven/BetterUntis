@@ -45,10 +45,10 @@ class WeekView<T>(
 
 	private val eventChipsProvider: EventChipProvider<T>
 
-	var timeColumnTextColor: Int
-		get() = config.timeColumnTextColor
-		set(timeColumnTextColor) {
-			config.timeColumnTextColor = timeColumnTextColor
+	var timeColumnVisibility: Boolean
+		get() = config.timeColumnVisibility
+		set(timeColumnVisibility) {
+			config.timeColumnVisibility = timeColumnVisibility
 		}
 
 	var hourIndexOffset: Int
