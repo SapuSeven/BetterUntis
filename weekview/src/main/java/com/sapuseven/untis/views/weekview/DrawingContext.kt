@@ -18,7 +18,7 @@ class DrawingContext(val startPixel: Float) {
 
 			val dayRange = mutableListOf<DateTime>()
 			val offset = if (config.snapToWeek) DateUtils.offsetInWeek(today, config.firstDayOfWeek) else 0
-			val offsetCompensation = if (!config.isSingleDay) DateUtils.offsetInWeek(today, config.firstDayOfWeek) - offset else 0 // This is to start calculations at the first day of week while leaving the visible offset at the correct location
+			val offsetCompensation = DateUtils.offsetInWeek(today, config.firstDayOfWeek) - offset
 			dayRange.addAll(DateUtils.getDateRange(today.plusDays(DateUtils.actualDays(daysScrolled + offsetCompensation, config.weekLength) - offset - offsetCompensation), config.visibleDays + 1, config.firstDayOfWeek, config.weekLength))
 
 			return DrawingContext(startPixel).apply { this.dayRange = dayRange }

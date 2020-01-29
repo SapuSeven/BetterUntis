@@ -2,7 +2,7 @@ package com.sapuseven.untis.views.weekview
 
 import com.sapuseven.untis.views.weekview.config.WeekViewConfig
 import org.joda.time.DateTime
-import java.lang.Math.max
+import kotlin.math.max
 
 class WeekViewViewState {
 	internal var scrollToDay: DateTime? = null
