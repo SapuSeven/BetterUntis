@@ -386,13 +386,35 @@
 		android:title="@string/preferences_infos">
 
 		<Preference
-			android:icon="@drawable/settings_info"
-			android:key="preference_info_app_version"
-			android:title="@string/preference_info_app_version" />
+			android:icon="@drawable/settings_about_app_icon"
+			android:summary="@string/app_desc"
+			android:title="@string/app_name" />
 
-		<Preference
-			android:icon="@drawable/settings_info_github"
-			android:key="preference_info_github"
-			android:title="@string/preference_info_github" />
+		<PreferenceCategory android:title="@string/preferences_general">
+
+			<Preference
+				android:icon="@drawable/settings_info"
+				android:key="preference_info_app_version"
+				android:title="@string/preference_info_app_version" />
+
+			<Preference
+				android:icon="@drawable/settings_info_github"
+				android:key="preference_info_github"
+				android:title="@string/preference_info_github" />
+		</PreferenceCategory>
+
+		<PreferenceCategory android:title="@string/preference_info_contributors">
+
+			<Preference
+				android:icon="@drawable/settings_about_contributor"
+				android:title="Dummy item" />
+		</PreferenceCategory>
+
+		<PreferenceCategory android:title="@string/preference_info_libraries">
+
+			<Preference
+				android:icon="@drawable/settings_about_library"
+				android:title="Dummy item" />
+		</PreferenceCategory>
 	</PreferenceScreen>
 </androidx.preference.PreferenceScreen>

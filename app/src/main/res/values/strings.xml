@@ -1,5 +1,6 @@
 <resources>
 	<string name="app_name">BetterUntis</string>
+	<string name="app_desc">An alternative mobile client for the Untis timetable system.</string>
 
 	<string name="all_success">success</string>
 	<string name="all_failed">failed</string>
@@ -169,9 +170,12 @@
 	<string name="preference_dialog_colors_reset_text">This will reset all colors above to their default values.</string>
 	<string name="preference_double_tap_to_exit">Double tap back button to exit</string>
 	<string name="preference_flinging_enable">Enable flinging</string>
+	<string name="preference_info_general">General</string>
 	<string name="preference_info_app_version">App version</string>
 	<string name="preference_info_app_version_desc">%1$s (%2$d)</string>
 	<string name="preference_info_github">GitHub repository</string>
+	<string name="preference_info_contributors">Contributors</string>
+	<string name="preference_info_libraries">Libraries</string>
 	<string name="preference_marker">Time indicator</string>
 	<string name="preference_notifications_clear">Clear all notifications</string>
 	<string name="preference_notifications_enable">Enable notification</string>
