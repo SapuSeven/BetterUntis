@@ -57,6 +57,7 @@ jobs:
     working_directory: ~/betteruntis
     steps:
       - run:
+          name: Check for deployability
           command: |
             if [[ ! -v SSH_DEPLOY_HOST ]]; then
               circleci-agent step halt
@@ -75,6 +76,7 @@ jobs:
     working_directory: ~/betteruntis
     steps:
       - run:
+          name: Check for deployability
           command: |
             if [[ ! -v SSH_DEPLOY_HOST ]]; then
               circleci-agent step halt
