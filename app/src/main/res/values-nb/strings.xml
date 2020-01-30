@@ -134,6 +134,7 @@
 	<string name="preference_category_general_automute">Automatisk demping</string>
 	<string name="preference_automute_enable">Aktiver automatisk demping</string>
 	<string name="preference_automute_enable_summary">Slå automatisk på Ikke forstyrr under leksjonene</string>
+	<string name="preference_automute_cancelled_lessons">Also mute in cancelled lessons</string>
 	<string name="preference_background_cancelled">Kansellerte leksjoner</string>
 	<string name="preference_background_cancelled_past">Tidligere kansellerte leksjoner</string>
 	<string name="preference_background_exam">Leksjoner med prøver</string>
@@ -188,6 +189,8 @@
 	<string name="preference_timetable_colors_reset">Tilbakestill farger</string>
 	<string name="preference_timetable_hide_cancelled">Skjul kansellerte leksjoner</string>
 	<string name="preference_timetable_hide_cancelled_desc">Du må laste inn timeplanen på nytt etter at du har endret denne innstillingen</string>
+	<string name="preference_timetable_hide_time_stamps">Hide time stamps</string>
+	<string name="preference_timetable_hide_time_stamps_desc">Hide the time stamps next to the timetable</string>
 	<string name="preference_timetable_item_corner_radius">Radius for hjørner på element</string>
 	<string name="preference_timetable_item_padding">Indre margin på element</string>
 	<string name="preference_timetable_item_padding_overlap">Indre margin for overlappende elementer</string>
