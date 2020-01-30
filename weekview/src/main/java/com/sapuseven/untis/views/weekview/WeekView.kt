@@ -45,6 +45,12 @@ class WeekView<T>(
 
 	private val eventChipsProvider: EventChipProvider<T>
 
+	var timeColumnVisibility: Boolean
+		get() = config.timeColumnVisibility
+		set(timeColumnVisibility) {
+			config.timeColumnVisibility = timeColumnVisibility
+		}
+
 	var hourIndexOffset: Int
 		get() = config.hourIndexOffset
 		set(hourIndexOffset) {

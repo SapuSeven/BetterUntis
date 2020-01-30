@@ -20,6 +20,7 @@ jobs:
       - run:
           name: Prepare signing config
           command: |
+            if [[ ! -v KEYSTORE_ENCODED ]]; then exit 0; fi
             echo $KEYSTORE_ENCODED | base64 --decode >> app/BetterUntis.jks
             echo 'export KEYSTORE_PASSWORD=$(echo "$KEYSTORE_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
             echo 'export KEY_DEBUG_PASSWORD=$(echo "$KEY_DEBUG_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
@@ -55,12 +56,17 @@ jobs:
       enabled: true
     working_directory: ~/betteruntis
     steps:
+      - run:
+          name: Check for deployability
+          command: |
+            if [[ ! -v SSH_DEPLOY_HOST ]]; then
+              circleci-agent step halt
+            fi
       - attach_workspace:
           at: workspace
       - run:
           name: Deploy Debug Builds Over SSH
           command: |
-            if [[ ! -v SSH_DEPLOY_HOST ]]; then exit 1; fi
             echo $SSH_DEPLOY_KEY_ENCODED | base64 --decode > id_rsa
             chmod 600 id_rsa
             scp -r -P $SSH_DEPLOY_PORT -i id_rsa workspace/outputs/apk/debug "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/debug/$CIRCLE_BUILD_NUM"
@@ -69,12 +75,17 @@ jobs:
       enabled: true
     working_directory: ~/betteruntis
     steps:
+      - run:
+          name: Check for deployability
+          command: |
+            if [[ ! -v SSH_DEPLOY_HOST ]]; then
+              circleci-agent step halt
+            fi
       - attach_workspace:
           at: workspace
       - run:
           name: Deploy Release Builds Over SSH
           command: |
-            if [[ ! -v SSH_DEPLOY_HOST ]]; then exit 1; fi
             echo $SSH_DEPLOY_KEY_ENCODED | base64 --decode > id_rsa
             chmod 600 id_rsa
             scp -r -P $SSH_DEPLOY_PORT -i id_rsa workspace/outputs/apk/release workspace/outputs/mapping/release "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG"

@@ -1,7 +1,6 @@
 <resources>
-	<string name="app_name">BetterUntis</string>
 	<string name="app_desc">Eine mobile App für das Untis Stundenplansystem.</string>
-
+  
 	<string name="all_success">Erfolg</string>
 	<string name="all_failed">fehlgeschlagen</string>
 	<string name="all_personal">Persönlich</string>
@@ -146,6 +145,7 @@
 	<string name="preference_category_general_automute">Automatisches Stummschalten</string>
 	<string name="preference_automute_enable">Automatisches Stummschalten</string>
 	<string name="preference_automute_enable_summary">Aktiviert während jeder Stunde automatisch den "nicht stören"-Modus</string>
+	<string name="preference_automute_cancelled_lessons">Auch in entfallenen Stunden stummschalten</string>
 	<string name="preference_background_cancelled">Entfallene Stunden</string>
 	<string name="preference_background_cancelled_past">Vergangene entfallene Stunden</string>
 	<string name="preference_background_exam">Stunden mit Tests</string>
@@ -205,6 +205,8 @@
 	<string name="preference_timetable_colors_reset">Farben zurücksetzen</string>
 	<string name="preference_timetable_hide_cancelled">Entfallene Stunden ausblenden</string>
 	<string name="preference_timetable_hide_cancelled_desc">Wird erst bei erneutem Laden des Stundenplans aktiv</string>
+	<string name="preference_timetable_hide_time_stamps">Zeitstempel verstecken</string>
+	<string name="preference_timetable_hide_time_stamps_desc">Zeitstempel neben dem Stundenplan verstecken</string>
 	<string name="preference_timetable_item_corner_radius">Abgerundete Ecken</string>
 	<string name="preference_timetable_item_padding">Abstand zwischen Stunden</string>
 	<string name="preference_timetable_item_padding_overlap">Abstand zwischen gleichzeitigen Stunden</string>

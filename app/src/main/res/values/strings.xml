@@ -1,5 +1,5 @@
 <resources>
-	<string name="app_name">BetterUntis</string>
+	<string name="app_name" translatable="false">BetterUntis</string>
 	<string name="app_desc">An alternative mobile client for the Untis timetable system.</string>
 
 	<string name="all_success">success</string>
@@ -146,6 +146,7 @@
 	<string name="preference_category_general_automute">Auto-Mute</string>
 	<string name="preference_automute_enable">Enable auto-mute</string>
 	<string name="preference_automute_enable_summary">Automatically turns on Do Not Disturb during lessons</string>
+	<string name="preference_automute_cancelled_lessons">Also mute in cancelled lessons</string>
 	<string name="preference_background_cancelled">Cancelled lessons</string>
 	<string name="preference_background_cancelled_past">Past cancelled lessons</string>
 	<string name="preference_background_exam">Lessons with tests</string>
@@ -205,6 +206,8 @@
 	<string name="preference_timetable_colors_reset">Reset colors</string>
 	<string name="preference_timetable_hide_cancelled">Hide cancelled lessons</string>
 	<string name="preference_timetable_hide_cancelled_desc">You need to reload the timetable after you change this setting</string>
+	<string name="preference_timetable_hide_time_stamps">Hide time stamps</string>
+	<string name="preference_timetable_hide_time_stamps_desc">Hide the time stamps next to the timetable</string>
 	<string name="preference_timetable_item_corner_radius">Item corner radius</string>
 	<string name="preference_timetable_item_padding">Item padding</string>
 	<string name="preference_timetable_item_padding_overlap">Overlapping item padding</string>
