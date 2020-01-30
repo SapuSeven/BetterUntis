@@ -45,6 +45,11 @@
 				android:key="preference_automute_enable"
 				android:summary="@string/preference_automute_enable_summary"
 				android:title="@string/preference_automute_enable" />
+			<CheckBoxPreference
+				android:defaultValue="@bool/preference_automute_cancelled_lessons_default"
+				android:dependency="preference_automute_enable"
+				android:key="preference_automute_cancelled_lessons"
+				android:title="@string/preference_automute_cancelled_lessons" />
 		</PreferenceCategory>
 	</PreferenceScreen>
 

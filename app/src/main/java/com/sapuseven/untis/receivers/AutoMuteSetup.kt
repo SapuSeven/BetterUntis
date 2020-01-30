@@ -31,6 +31,7 @@ class AutoMuteSetup : LessonEventSetup() {
 				val id = item.startDateTime.millisOfDay / 1000
 
 				if (item.endDateTime.millisOfDay <= LocalDateTime.now().millisOfDay) return@forEach
+				if (item.periodData.isCancelled() && !PreferenceUtils.getPrefBool(preferenceManager, "preference_automute_cancelled_lessons")) return@forEach
 
 				val muteIntent = Intent(context, AutoMuteReceiver::class.java)
 						.putExtra(EXTRA_INT_ID, id)
