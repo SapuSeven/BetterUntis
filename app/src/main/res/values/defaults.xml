@@ -18,6 +18,7 @@
 	<bool name="preference_fling_enable_default">false</bool>
 	<bool name="preference_week_snap_to_days_default">false</bool>
 	<bool name="preference_automute_enable_default">false</bool>
+	<bool name="preference_automute_cancelled_lessons_default">true</bool>
 
 	<integer name="preference_background_regular_default">0xFFF44336</integer>
 	<integer name="preference_background_regular_past_default">0xFFD32F2F</integer>
