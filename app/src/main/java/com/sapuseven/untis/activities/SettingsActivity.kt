@@ -4,16 +4,20 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.res.Resources
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.MenuItem
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.*
+import com.github.kittinunf.fuel.coroutines.awaitByteArrayResult
 import com.github.kittinunf.fuel.coroutines.awaitStringResult
 import com.github.kittinunf.fuel.httpGet
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -268,7 +272,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 			}
 		}
 
-		private fun showContributorList(success: Boolean, data: String = "") {
+		private suspend fun showContributorList(success: Boolean, data: String = "") {
 			val preferenceScreen = this.preferenceScreen
 			val indicator = findPreference<Preference>("preferences_contributors_indicator")
 			if (success) {
@@ -278,13 +282,26 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 
 				contributors.forEach { user ->
 					preferenceScreen.addPreference(Preference(context).apply {
-						icon = ContextCompat.getDrawable(requireContext(), R.drawable.settings_about_contributor)
+						GlobalScope.launch(Dispatchers.Main) { icon = loadProfileImage(user.avatar_url, resources) }
 						title = user.login
+						setOnPreferenceClickListener {
+							startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(user.html_url)))
+							true
+						}
 					})
 				}
 			} else {
 				indicator?.title = resources.getString(R.string.loading_failed)
 			}
+		}
+
+		private suspend fun loadProfileImage(avatarUrl: String, resources: Resources): Drawable? {
+			return avatarUrl
+					.httpGet()
+					.awaitByteArrayResult()
+					.fold({
+						BitmapDrawable(resources, BitmapFactory.decodeByteArray(it, 0, it.size))
+					}, { null })
 		}
 
 		private fun clearNotifications() = (context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancelAll()
