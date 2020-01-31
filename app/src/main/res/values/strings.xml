@@ -235,6 +235,7 @@
 	<string name="preference_week_display_length_summary">Set to 0 to use week length</string>
 	<string name="preference_week_snap_to_days">Snap to days</string>
 	<string name="preference_week_snap_to_days_summary">instead of weeks</string>
+	<string name="preferences_contributors_contributions">%1$d contributions</string>
 
 	<string name="settings_designing_message">Contribute by creating the missing settings icons!</string>
 	<string name="settings_designing_hide">Don\'t show again</string>
