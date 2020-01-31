@@ -22,8 +22,10 @@ import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.dialogs.AlertPreferenceDialog
 import com.sapuseven.untis.dialogs.ElementPickerDialog
 import com.sapuseven.untis.dialogs.WeekRangePickerPreferenceDialog
+import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import com.sapuseven.untis.models.github.GithubUser
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.AlertPreference
 import com.sapuseven.untis.preferences.ElementPickerPreference
@@ -32,7 +34,7 @@ import kotlinx.android.synthetic.main.activity_settings.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.json.JSONArray
+import kotlinx.serialization.list
 import kotlin.math.min
 
 class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback {
@@ -257,7 +259,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 									.awaitStringResult()
 									.fold({ data ->
 										showContributorList(true, data)
-									}, { error ->
+									}, {
 										showContributorList(false)
 									})
 						}
@@ -270,16 +272,18 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 			val preferenceScreen = this.preferenceScreen
 			val indicator = findPreference<Preference>("preferences_contributors_indicator")
 			if (success) {
-				val contributors = JSONArray(data)
+				val contributors = getJSON().parse(GithubUser.serializer().list, data)
+
 				preferenceScreen.removePreference(indicator)
-				for (i in 0 until contributors.length()) {
-					val item = Preference(context)
-					item.icon = ContextCompat.getDrawable(context!!, R.drawable.settings_about_contributor)
-					item.title = contributors.getJSONObject(i).getString("login")
-					preferenceScreen.addPreference(item)
+
+				contributors.forEach { user ->
+					preferenceScreen.addPreference(Preference(context).apply {
+						icon = ContextCompat.getDrawable(requireContext(), R.drawable.settings_about_contributor)
+						title = user.login
+					})
 				}
 			} else {
-				indicator!!.title = resources.getString(R.string.loading_failed)
+				indicator?.title = resources.getString(R.string.loading_failed)
 			}
 		}
 
