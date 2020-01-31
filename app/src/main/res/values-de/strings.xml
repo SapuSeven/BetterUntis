@@ -134,7 +134,7 @@
 	<string name="preference_category_general_automute">Automatisches Stummschalten</string>
 	<string name="preference_automute_enable">Automatisches Stummschalten</string>
 	<string name="preference_automute_enable_summary">Aktiviert während jeder Stunde automatisch den \"Bitte nicht stören\"-Modus</string>
-	<string name="preference_automute_cancelled_lessons">Also mute in cancelled lessons</string>
+	<string name="preference_automute_cancelled_lessons">Auch in entfallenen Stunden stumm schalten</string>
 	<string name="preference_background_cancelled">Entfallene Stunden</string>
 	<string name="preference_background_cancelled_past">Vergangene entfallene Stunden</string>
 	<string name="preference_background_exam">Stunden mit Tests</string>
@@ -175,10 +175,10 @@
 	<string name="preference_notifications_visibility_hidden">Nicht anzeigen</string>
 	<string name="preference_notifications_visibility_long">Langer Name</string>
 	<string name="preference_notifications_visibility_short">Kurzer Name</string>
-	<string name="preference_schoolcolors_regular">For regular lessons</string>
-	<string name="preference_schoolcolors_exam">For lessons with tests</string>
-	<string name="preference_schoolcolors_irregular">For irregular lessons</string>
-	<string name="preference_schoolcolors_cancelled">For cancelled lessons</string>
+	<string name="preference_schoolcolors_regular">Für normale Stunden</string>
+	<string name="preference_schoolcolors_exam">Für Stunden mit Tests</string>
+	<string name="preference_schoolcolors_irregular">Für irreguläre Stunden</string>
+	<string name="preference_schoolcolors_cancelled">Für entfallene Stunden</string>
 	<string name="preference_theme">Design auswählen</string>
 	<string name="preference_theme_blue">Blau</string>
 	<string name="preference_theme_cyan">Türkis</string>
@@ -193,8 +193,8 @@
 	<string name="preference_timetable_colors_reset">Farben zurücksetzen</string>
 	<string name="preference_timetable_hide_cancelled">Entfallene Stunden ausblenden</string>
 	<string name="preference_timetable_hide_cancelled_desc">Wird erst bei erneutem Laden des Stundenplans aktiv</string>
-	<string name="preference_timetable_hide_time_stamps">Hide time stamps</string>
-	<string name="preference_timetable_hide_time_stamps_desc">Hide the time stamps next to the timetable</string>
+	<string name="preference_timetable_hide_time_stamps">Zeitstempel verstecken</string>
+	<string name="preference_timetable_hide_time_stamps_desc">Start- und Endzeit von Stunden neben dem Stundenplan verstecken</string>
 	<string name="preference_timetable_item_corner_radius">Abgerundete Ecken</string>
 	<string name="preference_timetable_item_padding">Abstand zwischen Stunden</string>
 	<string name="preference_timetable_item_padding_overlap">Abstand zwischen gleichzeitigen Stunden</string>
