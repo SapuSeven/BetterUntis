@@ -14,8 +14,8 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.*
+import com.github.kittinunf.fuel.coroutines.awaitStringResult
 import com.github.kittinunf.fuel.httpGet
-import com.github.kittinunf.result.Result
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
@@ -252,32 +252,27 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 					}
 					"preferences_contributors" -> {
 						GlobalScope.launch(Dispatchers.Main) {
-							val httpAsync = "https://api.github.com/repos/sapuseven/betteruntis/contributors"
+							"https://api.github.com/repos/sapuseven/betteruntis/contributors"
 									.httpGet()
-									.responseString { _, _, result ->
-										when (result) {
-											is Result.Failure -> {
-												loadContributorList(false)
-											}
-											is Result.Success -> {
-												loadContributorList(true, result.get())
-											}
-										}
-									}
-							httpAsync.join()
+									.awaitStringResult()
+									.fold({ data ->
+										showContributorList(true, data)
+									}, { error ->
+										showContributorList(false)
+									})
 						}
 					}
 				}
 			}
 		}
 
-		private fun loadContributorList(success: Boolean, data: String = "") {
+		private fun showContributorList(success: Boolean, data: String = "") {
 			val preferenceScreen = this.preferenceScreen
 			val indicator = findPreference<Preference>("preferences_contributors_indicator")
 			if (success) {
 				val contributors = JSONArray(data)
 				preferenceScreen.removePreference(indicator)
-				for (i in 0 until contributors.length()){
+				for (i in 0 until contributors.length()) {
 					val item = Preference(context)
 					item.icon = ContextCompat.getDrawable(context!!, R.drawable.settings_about_contributor)
 					item.title = contributors.getJSONObject(i).getString("login")
