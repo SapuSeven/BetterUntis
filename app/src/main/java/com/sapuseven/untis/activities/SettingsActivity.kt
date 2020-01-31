@@ -29,6 +29,9 @@ import com.sapuseven.untis.preferences.AlertPreference
 import com.sapuseven.untis.preferences.ElementPickerPreference
 import com.sapuseven.untis.preferences.WeekRangePickerPreference
 import kotlinx.android.synthetic.main.activity_settings.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import kotlin.math.min
 
@@ -248,31 +251,40 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 						}
 					}
 					"preferences_contributors" -> {
-						val preferenceScreen = this.preferenceScreen
-						val indicator = findPreference<Preference>("preferences_contributors_indicator")
-						val httpAsync = "https://api.github.com/repos/sapuseven/betteruntis/contributors"
-								.httpGet()
-								.responseString { _, _, result ->
-									when (result) {
-										is Result.Failure -> {
-											indicator!!.title = resources.getString(R.string.loading_failed)
-										}
-										is Result.Success -> {
-											val data = result.get()
-											val contributors = JSONArray(data)
-											preferenceScreen.removePreference(indicator)
-											for (i in 0 until contributors.length()){
-												val item = Preference(context)
-												item.icon = ContextCompat.getDrawable(context!!, R.drawable.settings_about_contributor)
-												item.title = contributors.getJSONObject(i).getString("login")
-												preferenceScreen.addPreference(item)
+						GlobalScope.launch(Dispatchers.Main) {
+							val httpAsync = "https://api.github.com/repos/sapuseven/betteruntis/contributors"
+									.httpGet()
+									.responseString { _, _, result ->
+										when (result) {
+											is Result.Failure -> {
+												loadContributorList(false)
+											}
+											is Result.Success -> {
+												loadContributorList(true, result.get())
 											}
 										}
 									}
-								}
-						httpAsync.join()
+							httpAsync.join()
+						}
 					}
 				}
+			}
+		}
+
+		private fun loadContributorList(success: Boolean, data: String = "") {
+			val preferenceScreen = this.preferenceScreen
+			val indicator = findPreference<Preference>("preferences_contributors_indicator")
+			if (success) {
+				val contributors = JSONArray(data)
+				preferenceScreen.removePreference(indicator)
+				for (i in 0 until contributors.length()){
+					val item = Preference(context)
+					item.icon = ContextCompat.getDrawable(context!!, R.drawable.settings_about_contributor)
+					item.title = contributors.getJSONObject(i).getString("login")
+					preferenceScreen.addPreference(item)
+				}
+			} else {
+				indicator!!.title = resources.getString(R.string.loading_failed)
 			}
 		}
 
