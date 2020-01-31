@@ -175,6 +175,10 @@
 	<string name="preference_notifications_visibility_hidden">Skjult</string>
 	<string name="preference_notifications_visibility_long">Langt navn</string>
 	<string name="preference_notifications_visibility_short">Kort navn</string>
+	<string name="preference_schoolcolors_regular">For regular lessons</string>
+	<string name="preference_schoolcolors_exam">For lessons with tests</string>
+	<string name="preference_schoolcolors_irregular">For irregular lessons</string>
+	<string name="preference_schoolcolors_cancelled">For cancelled lessons</string>
 	<string name="preference_theme">Velg et tema</string>
 	<string name="preference_theme_blue">Blå</string>
 	<string name="preference_theme_cyan">Cyan</string>
