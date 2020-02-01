@@ -2,7 +2,7 @@
 An alternative mobile client for the Untis timetable system.
 
 <a href="https://circleci.com/gh/SapuSeven/BetterUntis"><img src="https://img.shields.io/circleci/build/gh/SapuSeven/BetterUntis?style=for-the-badge" alt="CircleCI"></a>
-<a href="https://hosted.weblate.org/engage/betteruntis/?utm_source=widget"><img src="https://hosted.weblate.org/widgets/betteruntis/-/svg-badge.svg" alt="Translation status" width=147.5 height=28/></a>
+<a href="https://hosted.weblate.org/engage/betteruntis/?utm_source=widget"><img src="https://img.shields.io/badge/dynamic/xml?color=green&label=localized&query=%2F%2F%2A%5Blocal-name%28%29%3D%27text%27%5D%5Blast%28%29%5D%2Ftext%28%29&url=https%3A%2F%2Fhosted.weblate.org%2Fwidgets%2Fbetteruntis%2F-%2Fsvg-badge.svg&style=for-the-badge" alt="Translation status" width=147.5 height=28/></a>
 <a href="https://gitter.im/SapuSeven/BetterUntis"><img src="https://img.shields.io/gitter/room/SapuSeven/BetterUntis?color=blueviolet&style=for-the-badge" alt="Gitter"></a>
 
 You can download the latest automated debug build [from my website](https://sapuseven.com/app/BetterUntis).
@@ -72,4 +72,6 @@ If your language already exists, you can directly correct possible mistakes.
 
 Your translation will be included in the next release of BetterUntis.
 
-You will find all details on [weblate.org](https://hosted.weblate.org/engage/betteruntis/).
+You can find all details on [weblate.org](https://hosted.weblate.org/engage/betteruntis).
+
+Alternatively, you can also use [Crowdin](https://crowdin.com/project/betteruntis) to translate BetterUntis.
