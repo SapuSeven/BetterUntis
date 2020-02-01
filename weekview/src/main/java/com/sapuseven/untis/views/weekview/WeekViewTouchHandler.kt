@@ -4,8 +4,8 @@ import android.view.MotionEvent
 import com.sapuseven.untis.views.weekview.config.WeekViewConfig
 import com.sapuseven.untis.views.weekview.config.WeekViewDrawConfig
 import org.joda.time.DateTime
-import java.lang.Math.max
 import kotlin.math.ceil
+import kotlin.math.max
 
 internal class WeekViewTouchHandler(private val config: WeekViewConfig) {
 	private val drawConfig: WeekViewDrawConfig = config.drawConfig

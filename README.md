@@ -1,6 +1,9 @@
 # BetterUntis
 An alternative mobile client for the Untis timetable system.
 
+<a href="https://circleci.com/gh/SapuSeven/BetterUntis"><img src="https://img.shields.io/circleci/build/gh/SapuSeven/BetterUntis?style=for-the-badge" alt="CircleCI"></a>
+<a href="https://gitter.im/SapuSeven/BetterUntis"><img src="https://img.shields.io/gitter/room/SapuSeven/BetterUntis?color=blueviolet&style=for-the-badge" alt="Gitter"></a>
+
 You can download the latest automated debug build [from my website](https://sapuseven.com/app/BetterUntis).
 
 <a href="https://f-droid.org/packages/com.sapuseven.untis"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80"></a>

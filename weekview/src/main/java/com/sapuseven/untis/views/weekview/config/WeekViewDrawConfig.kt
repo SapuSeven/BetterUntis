@@ -16,6 +16,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 class WeekViewDrawConfig(context: Context) {
+	var timeTextVisibility: Boolean = true
 	val timeTextTopPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 	val timeTextBottomPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 	val timeCaptionPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)

@@ -84,22 +84,22 @@ class InfoCenterActivity : BaseActivity() {
 		when (item.itemId) {
 			R.id.item_infocenter_messages -> {
 				showList(messageAdapter, messagesLoading, if (messageList.isEmpty()) getString(R.string.infocenter_messages_empty) else "") { user ->
-					GlobalScope.launch(Dispatchers.Main) { refreshMessages(user) }
+					refreshMessages(user)
 				}
 			}
 			R.id.item_infocenter_officehours -> {
 				showList(officeHourAdapter, officeHoursLoading, if (officeHourList.isEmpty()) getString(R.string.infocenter_officehours_empty) else "") { user ->
-					GlobalScope.launch(Dispatchers.Main) { refreshOfficeHours(user) }
+					refreshOfficeHours(user)
 				}
 			}
 			R.id.item_infocenter_events -> {
 				showList(eventAdapter, eventsLoading, if (eventList.isEmpty()) getString(R.string.infocenter_events_empty) else "") { user ->
-					GlobalScope.launch(Dispatchers.Main) { refreshEvents(user) }
+					refreshEvents(user)
 				}
 			}
 			R.id.item_infocenter_absences -> {
 				showList(absenceAdapter, absencesLoading, if (absenceList.isEmpty()) getString(R.string.infocenter_absences_empty) else "") { user ->
-					GlobalScope.launch(Dispatchers.Main) { refreshAbsences(user) }
+					refreshAbsences(user)
 				}
 			}
 		}

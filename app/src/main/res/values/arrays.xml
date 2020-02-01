@@ -43,10 +43,10 @@
 	</string-array>
 
 	<string-array name="preference_schoolcolors">
-		<item>For regular lessons</item>
-		<item>For lessons with tests</item>
-		<item>For irregular lessons</item>
-		<item>For cancelled lessons</item>
+		<item>@string/preference_schoolcolors_regular</item>
+		<item>@string/preference_schoolcolors_exam</item>
+		<item>@string/preference_schoolcolors_irregular</item>
+		<item>@string/preference_schoolcolors_cancelled</item>
 	</string-array>
 
 	<string-array name="preference_schoolcolors_values" translatable="false">
