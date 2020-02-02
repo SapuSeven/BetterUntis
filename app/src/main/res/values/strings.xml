@@ -58,7 +58,7 @@
     <string name="main_drawer_image_logo">BetterUntis Logo</string>
     <string name="main_press_back_double">Press BACK twice to exit</string>
     <string name="main_time_diff_just_now">just now</string>
-    <string name="login_scan_code">Scan QR Code</string>
+    <string name="login_scan_code">Scan QR code</string>
     <string name="login_welcome">Welcome to BetterUntis!</string>
     <string name="login_please_log_in">Choose one of the following options to login:</string>
     <string name="login_no_results">No results</string>
