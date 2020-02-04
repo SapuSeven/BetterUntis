@@ -168,6 +168,7 @@
 			<CheckBoxPreference
 				android:defaultValue="@bool/preference_dark_theme_oled_default"
 				android:dependency="preference_dark_theme"
+				android:icon="@drawable/settings_timetable_format_oled"
 				android:key="preference_dark_theme_oled"
 				android:summary="@string/preference_dark_theme_oled_desc"
 				android:title="@string/preference_dark_theme_oled" />
@@ -225,12 +226,14 @@
 		<PreferenceCategory android:title="@string/preference_category_timetable_item_appearance">
 			<com.sapuseven.untis.preferences.UnitPreference
 				android:defaultValue="@integer/preference_timetable_item_padding_overlap_default"
+				android:icon="@drawable/settings_timetable_padding"
 				android:key="preference_timetable_item_padding_overlap"
 				android:title="@string/preference_timetable_item_padding_overlap"
 				app:unit="dp" />
 
 			<com.sapuseven.untis.preferences.UnitPreference
 				android:defaultValue="@integer/preference_timetable_item_padding_default"
+				android:icon="@drawable/settings_timetable_padding"
 				android:key="preference_timetable_item_padding"
 				android:title="@string/preference_timetable_item_padding"
 				app:unit="dp" />
@@ -259,12 +262,14 @@
 
 			<com.sapuseven.untis.preferences.UnitPreference
 				android:defaultValue="@integer/preference_timetable_lesson_name_font_size_default"
+				android:icon="@drawable/settings_timetable_font_size"
 				android:key="preference_timetable_lesson_name_font_size"
 				android:title="@string/preference_timetable_lesson_name_font_size"
 				app:unit="sp" />
 
 			<com.sapuseven.untis.preferences.UnitPreference
 				android:defaultValue="@integer/preference_timetable_lesson_info_font_size_default"
+				android:icon="@drawable/settings_timetable_font_size"
 				android:key="preference_timetable_lesson_info_font_size"
 				android:title="@string/preference_timetable_lesson_info_font_size"
 				app:unit="sp" />
@@ -316,6 +321,7 @@
 				android:dependency="preference_notifications_enable"
 				android:entries="@array/preference_notifications_visibility"
 				android:entryValues="@array/preference_notifications_visibility_values"
+				android:icon="@drawable/all_subject"
 				android:key="preference_notifications_visibility_subjects"
 				android:summary="%s"
 				android:title="@string/all_subjects" />
