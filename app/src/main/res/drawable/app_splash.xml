@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android"
 	android:opacity="opaque">
-
 	<item android:drawable="?attr/colorPrimary" />
-
-	<item>
-		<bitmap
-			android:gravity="center"
-			android:src="@drawable/app_splash_icon" />
-	</item>
+	<item
+		android:drawable="@drawable/app_splash_icon"
+		android:gravity="center" />
 </layer-list>
