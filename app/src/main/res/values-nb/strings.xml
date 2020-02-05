@@ -90,7 +90,7 @@
     <string name="errormessagedictionary_invalid_credentials">Feil brukernavn eller nøkkel!</string>
     <string name="errormessagedictionary_no_public_access">Anonym tilgang er deaktivert.</string>
     <string name="errormessagedictionary_invalid_time_settings">Ugyldige innstillinger for dato og/eller klokkeslett!</string>
-    <string name="errormessagedictionary_user_locked">Brukeren er låst!</string>
+    <string name="errormessagedictionary_user_locked">Brukeren er låst.</string>
     <string name="errormessagedictionary_no_right">Utilstrekkelige rettigheter for timeplan</string>
     <string name="roomfinder_current_hour">%1$s, %2$d. Leksjon</string>
     <string name="roomfinder_current_hour_time">%1$s - %2$s</string>
@@ -154,7 +154,7 @@
     <string name="preference_dark_theme_oled">Bruk helt svart bakgrunn</string>
     <string name="preference_dark_theme_oled_desc">Nyttig for OLED-skjermer</string>
     <string name="preference_dark_theme_on">Alltid på</string>
-    <string name="preference_dialog_colors_reset_title">Tilbakestill farger?</string>
+    <string name="preference_dialog_colors_reset_title">Tilbakestille farger\?</string>
     <string name="preference_dialog_colors_reset_text">Dette vil tilbakestille alle fargene ovenfor til standardverdiene deres.</string>
     <string name="preference_double_tap_to_exit">Dobbelttrykk tilbake-knapp for å avslutte</string>
     <string name="preference_flinging_enable">Aktiver flinging</string>
@@ -226,7 +226,7 @@
     <string name="notifications_channel_backgrounderrors_desc">Viser feilmeldinger for bakgrunnsoppgaver</string>
     <string name="notifications_text_error_title">Klarte ikke laste timeplan</string>
     <string name="notifications_text_error_message">Du vil ikke få noen varsler i dag.</string>
-    <string name="notifications_text_title">Pause til %1$s</string>
+    <string name="notifications_text_title">Pause frem til %1$s</string>
     <string name="notifications_text_first_title">Skolen starter %1$s</string>
     <string name="notifications_text_message_subjects">Neste leksjon: %1$s</string>
     <string name="notifications_text_message_rooms">Rom: %1$s</string>
