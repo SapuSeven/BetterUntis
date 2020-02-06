@@ -14,10 +14,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.snackbar.Snackbar
 import com.sapuseven.untis.R
+import com.sapuseven.untis.helpers.ErrorLogger
 import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.helpers.config.PreferenceUtils
 import java.io.File
-import java.io.PrintStream
 
 @SuppressLint("Registered") // This activity is not intended to be used directly
 open class BaseActivity : AppCompatActivity() {
@@ -29,6 +29,8 @@ open class BaseActivity : AppCompatActivity() {
 	private var themeId = -1
 
 	override fun onCreate(savedInstanceState: Bundle?) {
+		ErrorLogger.initialize(this)
+
 		Thread.setDefaultUncaughtExceptionHandler(CrashHandler(this, Thread.getDefaultUncaughtExceptionHandler()))
 
 		preferences = PreferenceManager(this)
@@ -127,13 +129,7 @@ open class BaseActivity : AppCompatActivity() {
 		}
 
 		private fun saveCrash(e: Throwable) {
-			val parent = File(context.filesDir, "crash")
-			parent.mkdir()
-
-			PrintStream(File(parent, "${System.currentTimeMillis()}.log")).use {
-				e.printStackTrace(it)
-				it.close()
-			}
+			ErrorLogger.instance?.logThrowable(e)
 		}
 	}
 }
