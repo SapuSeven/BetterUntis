@@ -11,5 +11,7 @@ data class UntisError(
 
 @Serializable
 data class UntisErrorData(
+		val exceptionTypeName: String? = null,
+		val message: String? = null,
 		val serverTime: Long? = null
 )
