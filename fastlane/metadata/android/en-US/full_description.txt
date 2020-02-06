@@ -16,13 +16,13 @@ and an info center to view upcoming events, your absences and more.
 Enjoy a fast and smooth experience with BetterUntis.
 
 Untis is proprietary timetable software. More information about Untis can be
-found at https://untis.at. To use Untis, your school must provide it. Your
-school must also give you an account with which you can access your current
-timetable, though anonymous access may also be available.
+found at https://untis.at.
+To use Untis, your school must provide it.
+Your school must also give you an account which you can use to access
+your current timetable if no anonymous access is available.
 
-Why use this app when there is an official one? The official app is
-also proprietary and includes libraries from google and other tracking software.
-BetterUntis offers you exactly the same features and even more. Free choice of
-themes and dark mode are of course also included.
+Why use this app when there is an official one?
+The official app is proprietary and includes tracking software and in-app purchases.
+BetterUntis is free and open source, feature-rich and respects your privacy.
 
 WebUntis is a non-free network.
