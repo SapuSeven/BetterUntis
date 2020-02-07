@@ -21,10 +21,13 @@ class ErrorsActivity : BaseActivity() {
 
 	private fun loadErrorList() {
 		recyclerview_errors.layoutManager = LinearLayoutManager(this)
-		recyclerview_errors.adapter = ErrorsAdapter(File(filesDir, "crash").listFiles()?.sortedDescending()?.map {
+		recyclerview_errors.adapter = ErrorsAdapter(File(filesDir, "logs").listFiles()?.sortedDescending()?.map {
+			val timestamp = it.name.replace(Regex("""^(\d+)(-\d+)?.log$"""), "$1").toLongOrNull()
+
 			ErrorData(
 					readCrashData(it),
-					DateTime(it.name.replace(".log", "").toLong()).toString(DateTimeFormat.mediumDateTime())
+					timestamp?.let { DateTime(timestamp).toString(DateTimeFormat.mediumDateTime()) }
+							?: "(unknown date)" // TODO: Extract string resource
 			)
 		} ?: emptyList())
 		(recyclerview_errors.adapter as ErrorsAdapter).setOnItemClickListener { item ->

@@ -41,7 +41,7 @@ open class BaseActivity : AppCompatActivity() {
 	}
 
 	protected fun checkForCrashes(rootView: View) {
-		if (File(filesDir, "crash").listFiles()?.isNotEmpty() == true) {
+		if (File(filesDir, "logs").listFiles()?.isNotEmpty() == true) {
 			Snackbar.make(rootView, "Some errors have been found.", Snackbar.LENGTH_INDEFINITE)
 					.setAction("Show") {
 						startActivity(Intent(this, ErrorsActivity::class.java))
