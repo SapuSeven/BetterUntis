@@ -21,14 +21,25 @@ class ErrorsActivity : BaseActivity() {
 
 	private fun loadErrorList() {
 		recyclerview_errors.layoutManager = LinearLayoutManager(this)
-		recyclerview_errors.adapter = ErrorsAdapter(File(filesDir, "logs").listFiles()?.sortedDescending()?.map {
-			val timestamp = it.name.replace(Regex("""^(\d+)(-\d+)?.log$"""), "$1").toLongOrNull()
+		recyclerview_errors.adapter = ErrorsAdapter(File(filesDir, "logs").listFiles()?.let { files ->
+			files.sortedDescending()
+					.map {
+						val timestamp = it.name.replace(Regex("""^(\d+)(-\d+)?.log$"""), "$1").toLongOrNull()
 
-			ErrorData(
-					readCrashData(it),
-					timestamp?.let { DateTime(timestamp).toString(DateTimeFormat.mediumDateTime()) }
-							?: "(unknown date)" // TODO: Extract string resource
-			)
+						ErrorData(
+								readCrashData(it),
+								timestamp?.let { DateTime(timestamp).toString(DateTimeFormat.mediumDateTime()) }
+										?: "(unknown date)" // TODO: Extract string resource
+						)
+					}
+					.groupingBy { it }
+					.eachCount()
+					.map {
+						ErrorData(
+								it.key.log,
+								"${it.key.time} (${it.value})"
+						)
+					}
 		} ?: emptyList())
 		(recyclerview_errors.adapter as ErrorsAdapter).setOnItemClickListener { item ->
 			ErrorReportingDialog(this).showGenericErrorDialog(item.log)
