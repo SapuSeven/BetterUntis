@@ -58,9 +58,14 @@ class TimetableLoader(
 		cache.setTarget(target.startDate, target.endDate, target.id, target.type)
 
 		if (cache.exists()) {
-			Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): cached file found, returning")
-			val cached = cache.load()
-			timetableDisplay.addTimetableItems(cached.items.map { periodToTimegridItem(it, target.type) }, target.startDate, target.endDate, cached.timestamp)
+			Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): cached file found")
+			cache.load()?.let {
+				timetableDisplay.addTimetableItems(it.items.map { periodToTimegridItem(it, target.type) }, target.startDate, target.endDate, it.timestamp)
+			} ?: run {
+				cache.delete()
+				Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): cached file corrupted")
+				timetableDisplay.onTimetableLoadingError(requestId, CODE_CACHE_MISSING, "cached timetable corrupted")
+			}
 		} else {
 			Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): cached file missing")
 			timetableDisplay.onTimetableLoadingError(requestId, CODE_CACHE_MISSING, "no cached timetable found")
