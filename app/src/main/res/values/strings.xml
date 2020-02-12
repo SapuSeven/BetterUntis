@@ -193,8 +193,8 @@
     <string name="preference_timetable_colors_reset">Reset colors</string>
     <string name="preference_timetable_hide_cancelled">Hide cancelled lessons</string>
     <string name="preference_timetable_hide_cancelled_desc">You need to reload the timetable after you change this setting</string>
-    <string name="preference_timetable_hide_time_stamps">Hide time stamps</string>
-    <string name="preference_timetable_hide_time_stamps_desc">Hide the time stamps next to the timetable</string>
+    <string name="preference_timetable_hide_time_stamps">Hide timestamps</string>
+    <string name="preference_timetable_hide_time_stamps_desc">Place the timestamps next to the timetable</string>
     <string name="preference_timetable_item_corner_radius">Item corner radius</string>
     <string name="preference_timetable_item_padding">Item padding</string>
     <string name="preference_timetable_item_padding_overlap">Overlapping item padding</string>
