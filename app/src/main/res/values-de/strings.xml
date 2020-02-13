@@ -193,7 +193,7 @@
     <string name="preference_timetable_hide_cancelled">Entfallene Stunden ausblenden</string>
     <string name="preference_timetable_hide_cancelled_desc">Wird erst bei erneutem Laden des Stundenplans aktiv</string>
     <string name="preference_timetable_hide_time_stamps">Zeitstempel verstecken</string>
-    <string name="preference_timetable_hide_time_stamps_desc">Start- und Endzeit von Stunden neben dem Stundenplan verstecken</string>
+    <string name="preference_timetable_hide_time_stamps_desc">Zeitstempel neben dem Zeitplan platzieren</string>
     <string name="preference_timetable_item_corner_radius">Abgerundete Ecken</string>
     <string name="preference_timetable_item_padding">Abstand zwischen Stunden</string>
     <string name="preference_timetable_item_padding_overlap">Abstand zwischen gleichzeitigen Stunden</string>
