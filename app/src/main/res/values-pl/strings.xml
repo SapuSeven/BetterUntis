@@ -1,2 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="all_success">pomyślnie</string>
+    <string name="all_failed">nieudane</string>
+    <string name="all_personal">Osobiste</string>
+    <string name="all_teachers">Nauczyciele</string>
+    <string name="all_classes">Klasy</string>
+    <string name="all_rooms">Pokoje</string>
+    <string name="all_contact_email">betteruntis@sapuseven.com</string>
+    <string name="all_ok">OK</string>
+    <string name="all_yes">Tak</string>
+    <string name="all_no">Nie</string>
+    <string name="all_close">Zamknij</string>
+    <string name="all_cancel">Anuluj</string>
+    <string name="all_copy">Kopiuj</string>
+    <string name="all_error">Błąd</string>
+    <string name="all_report">Raport</string>
+    <string name="all_add">Dodaj</string>
+    <string name="all_delete">Usuń</string>
+    <string name="all_reset">Reset</string>
+    <string name="all_dialog_datepicker_button_today">Dzisiaj</string>
+    <string name="activity_title_free_rooms">Wolne pokoje</string>
+    <string name="activity_title_settings">Ustawienia</string>
+    <string name="menu_infocenter_messagesofday">Wiadomości</string>
+    <string name="menu_infocenter_events">Wydarzenia</string>
+    <string name="mainactivitydrawer_profile_add">Dodaj profil…</string>
+    <string name="main_dialog_delete_profile_title">Usunąć profil\?</string>
+    <string name="main_dialog_update_profile_button">Zaktualizuj profil</string>
+    <string name="main_dialog_itemdetails_image_infos">Info</string>
+    <string name="main_dialog_itemdetails_image_homeworks">Praca domowa</string>
+    <string name="main_last_refreshed_never">nigdy</string>
+    <string name="main_go_to_settings">Przejdź do ustawień</string>
+    <string name="main_time_diff_just_now">właśnie teraz</string>
+    <string name="login_scan_code">Skanuj QR kod</string>
+    <string name="login_welcome">Witamy w BetterUntis!</string>
+    <string name="login_please_log_in">Wybierz jedną z następujących opcji, aby się zalogować:</string>
+    <string name="login_no_results">Brak wyników</string>
+    <string name="login_search_by_school_name_or_address">Szukaj poprzez nazwę szkoły lub adres</string>
+</resources>
