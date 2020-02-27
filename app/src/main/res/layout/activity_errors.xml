@@ -13,7 +13,7 @@
 		android:layout_marginStart="8dp"
 		android:layout_marginTop="8dp"
 		android:layout_marginEnd="8dp"
-		android:text="It looks like BetterUntis crashed."
+		android:text="@string/errors_crash_title"
 		android:textAppearance="@style/TextAppearance.AppCompat.Large"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
@@ -24,7 +24,7 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_marginStart="8dp"
-		android:text="Sorry for that."
+		android:text="@string/errors_crash_message"
 		android:textStyle="italic"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toBottomOf="@+id/textview_crash_title" />
@@ -36,7 +36,7 @@
 		android:layout_marginStart="8dp"
 		android:layout_marginTop="8dp"
 		android:layout_marginEnd="8dp"
-		android:text="Please help to fix the app by reporting the errors below:"
+		android:text="@string/errors_report"
 		android:textAppearance="@style/TextAppearance.AppCompat.Medium"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
@@ -67,7 +67,7 @@
 		android:layout_height="wrap_content"
 		android:layout_marginEnd="8dp"
 		android:layout_marginBottom="8dp"
-		android:text="Dismiss all"
+		android:text="@string/errors_button_dismiss"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toStartOf="@+id/button_report" />
 
@@ -78,7 +78,7 @@
 		android:layout_height="wrap_content"
 		android:layout_marginEnd="8dp"
 		android:layout_marginBottom="8dp"
-		android:text="Report all"
+		android:text="@string/errors_button_report"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toEndOf="parent" />
 

@@ -45,7 +45,7 @@ class ErrorsActivity : BaseActivity() {
 		button_report.setOnClickListener {
 			val zipFile = zipLogFiles()
 			deleteLogFiles()
-			GithubIssue(Issue.Type.CRASH, zipFile.absolutePath).launch(this)
+			GithubIssue(Issue.Type.CRASH, getString(R.string.errors_github_attach_file_message, zipFile.absolutePath)).launch(this)
 		}
 	}
 
