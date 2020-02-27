@@ -1,5 +1,6 @@
 package com.sapuseven.untis.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View.GONE
 import androidx.constraintlayout.widget.ConstraintSet
@@ -37,6 +38,7 @@ class ErrorsActivity : BaseActivity() {
 
 		button_dismiss.setOnClickListener {
 			deleteLogFiles()
+			startActivity(Intent(this, MainActivity::class.java))
 			finish()
 		}
 
