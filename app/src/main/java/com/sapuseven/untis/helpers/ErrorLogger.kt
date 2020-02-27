@@ -37,7 +37,7 @@ class ErrorLogger(
 		val parent = File(filesDir, "logs")
 		parent.mkdir()
 
-		PrintStream(generateFile(parent, System.currentTimeMillis().toString())).use {
+		PrintStream(generateFile(parent, "_" + System.currentTimeMillis().toString())).use {
 			e.printStackTrace(it)
 			it.close()
 		}

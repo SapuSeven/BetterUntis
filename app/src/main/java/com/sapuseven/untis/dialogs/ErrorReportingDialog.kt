@@ -16,7 +16,7 @@ class ErrorReportingDialog(val context: Context) {
 					dialog.dismiss()
 				}
 				.setNeutralButton(R.string.all_report) { _, _ ->
-					GithubIssue(Issue.Type.CRASH, errorMessage).launch(context)
+					GithubIssue(Issue.Type.EXCEPTION, errorMessage).launch(context)
 				}
 				.show()
 	}
@@ -29,7 +29,7 @@ class ErrorReportingDialog(val context: Context) {
 					dialog.dismiss()
 				}
 				.setNeutralButton(R.string.all_report) { _, _ ->
-					GithubIssue(Issue.Type.CRASH, message).launch(context)
+					GithubIssue(Issue.Type.EXCEPTION, message).launch(context)
 				}
 				.show()
 	}

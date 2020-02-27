@@ -40,14 +40,24 @@ open class BaseActivity : AppCompatActivity() {
 		super.onCreate(savedInstanceState)
 	}
 
-	protected fun checkForCrashes(rootView: View) {
-		if (File(filesDir, "logs").listFiles()?.isNotEmpty() == true) {
+	/**
+	 * Checks for saved crashes and shows a snackbar if so.
+	 *
+	 * @param rootView A view used for showing the snackbar
+	 * @return `true` if the logs contain a critical application crash, `false` otherwise
+	 */
+	fun checkForCrashes(rootView: View): Boolean {
+		val logFiles = File(filesDir, "logs").listFiles()
+		if (logFiles?.isNotEmpty() == true) {
 			Snackbar.make(rootView, "Some errors have been found.", Snackbar.LENGTH_INDEFINITE)
 					.setAction("Show") {
 						startActivity(Intent(this, ErrorsActivity::class.java))
 					}
 					.show()
+
+			return logFiles.find { f -> f.name.startsWith("_") } != null
 		}
+		return false
 	}
 
 	protected fun readCrashData(crashFile: File): String {
