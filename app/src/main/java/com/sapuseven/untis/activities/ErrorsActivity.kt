@@ -25,7 +25,7 @@ class ErrorsActivity : BaseActivity() {
 
 		setContentView(R.layout.activity_errors)
 
-		if (intent.getBooleanExtra(EXTRA_BOOLEAN_SHOW_CRASH_MESSAGE, false)) {
+		if (!intent.getBooleanExtra(EXTRA_BOOLEAN_SHOW_CRASH_MESSAGE, false)) {
 			textview_crash_title.visibility = GONE
 			textview_crash_message.visibility = GONE
 			with(ConstraintSet()) {
