@@ -36,4 +36,10 @@
     <string name="login_please_log_in">Wybierz jedną z następujących opcji, aby się zalogować:</string>
     <string name="login_no_results">Brak wyników</string>
     <string name="login_search_by_school_name_or_address">Szukaj poprzez nazwę szkoły lub adres</string>
+    <string name="preference_timetable_hide_cancelled">Ukryj anulowane lekcje</string>
+    <plurals name="roomfinder_item_desc">
+        <item quantity="one">Ten Pokój jest wolny teraz.</item>
+        <item quantity="few">Ten Pokój jest wolny przez %d godziny.</item>
+        <item quantity="many">Ten Pokój jest wolny przez %d godzin.</item>
+    </plurals>
 </resources>
