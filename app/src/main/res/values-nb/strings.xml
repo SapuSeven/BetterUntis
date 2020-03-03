@@ -211,6 +211,9 @@
 	<string name="preference_school_background_desc">Noen skoler sender sine egne bakgrunnsfarger</string>
 	<string name="preference_use_theme_background">Bruk temafarger</string>
 	<string name="preference_use_theme_background_desc">Dette gjelder bare for vanlige leksjoner</string>
+	<string name="preference_wear_os_support">Wear OS Support</string>
+    <string name="preference_wear_os_support_connecting">Connecting to your wearable</string>
+    <string name="preference_wear_os_support_connecting_desc">Please wait while your profile is copied to your watch.</string>
 	<string name="preference_week_custom_range">Custom week range</string>
 	<string name="preference_week_custom_range_summary">%1$s til %2$s</string>
 	<string name="preference_week_custom_range_summary_short">%1$s</string>

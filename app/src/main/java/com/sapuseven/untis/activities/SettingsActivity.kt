@@ -144,6 +144,12 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 				setPreferencesFromResource(R.xml.preferences, rootKey)
 
 				when (rootKey) {
+					null -> {
+						findPreference<Preference>("preference_wear_os_support")?.setOnPreferenceClickListener {
+							startActivity(Intent(context, WearOSActivity::class.java))
+							true
+						}
+					}
 					"preferences_general" -> {
 						findPreference<SeekBarPreference>("preference_week_custom_display_length")?.apply {
 							max = findPreference<WeekRangePickerPreference>("preference_week_custom_range")?.getPersistedStringSet(emptySet())?.size?.zeroToNull
