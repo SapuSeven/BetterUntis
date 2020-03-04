@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+	xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.sapuseven.untis">
 
 	<uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
@@ -86,6 +87,10 @@
 				android:name="android.support.PARENT_ACTIVITY"
 				android:value=".activities.MainActivity" />
 		</activity>
+
+		<activity
+			android:name=".activities.ErrorsActivity"
+			android:label="@string/activity_title_errors" />
 
 		<receiver android:name=".receivers.StartupReceiver">
 			<intent-filter>

@@ -16,7 +16,20 @@ class ErrorReportingDialog(val context: Context) {
 					dialog.dismiss()
 				}
 				.setNeutralButton(R.string.all_report) { _, _ ->
-					GithubIssue(Issue.Type.CRASH, errorMessage).launch(context)
+					GithubIssue(Issue.Type.EXCEPTION, errorMessage).launch(context)
+				}
+				.show()
+	}
+
+	fun showGenericErrorDialog(message: String) {
+		MaterialAlertDialogBuilder(context)
+				.setTitle(R.string.all_dialog_error_title)
+				.setMessage(message)
+				.setPositiveButton(R.string.all_ok) { dialog, _ ->
+					dialog.dismiss()
+				}
+				.setNeutralButton(R.string.all_report) { _, _ ->
+					GithubIssue(Issue.Type.EXCEPTION, message).launch(context)
 				}
 				.show()
 	}
