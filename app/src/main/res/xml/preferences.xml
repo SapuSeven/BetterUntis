@@ -403,13 +403,106 @@
 		android:title="@string/preferences_infos">
 
 		<Preference
-			android:icon="@drawable/settings_info"
-			android:key="preference_info_app_version"
-			android:title="@string/preference_info_app_version" />
+			android:icon="@drawable/settings_about_app_icon"
+			android:summary="@string/app_desc"
+			android:title="@string/app_name" />
 
-		<Preference
-			android:icon="@drawable/settings_info_github"
-			android:key="preference_info_github"
-			android:title="@string/preference_info_github" />
+		<PreferenceCategory android:title="@string/preference_info_general">
+
+			<Preference
+				android:icon="@drawable/settings_info"
+				android:key="preference_info_app_version"
+				android:title="@string/preference_info_app_version" />
+
+			<Preference
+				android:icon="@drawable/settings_info_github"
+				android:key="preference_info_github"
+				android:title="@string/preference_info_github" />
+
+			<PreferenceScreen
+				android:icon="@drawable/settings_about_contributor"
+				android:key="preferences_contributors"
+				android:summary="@string/preference_info_contributors_desc"
+				android:title="@string/preference_info_contributors">
+
+				<!-- This is in alphabetical order -->
+				<Preference
+					android:icon="@drawable/settings_about_contributor"
+					android:key="preferences_contributors_indicator"
+					android:title="@string/loading" />
+			</PreferenceScreen>
+
+			<PreferenceScreen
+				android:icon="@drawable/settings_about_library"
+				android:key="preferences_libraries"
+				android:summary="@string/preference_info_libraries_desc"
+				android:title="@string/preference_info_libraries">
+
+				<!-- This is in alphabetical order -->
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_appcompat" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_constraintlayout" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_preference_ktx" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_swiperefreshlayout" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_recyclerview" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_code_scanner" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_colorpicker_compat" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_fuel" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_fuel_coroutines" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_joda_time" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_junit" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_kotlin_reflect" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_kotlin_stdlib" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_kotlin_test_junit" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_kotlinx_coroutines_android" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_kotlinx_serialization_runtime" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_materialdaypicker" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_materialcomponent_banner" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_material" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_mockito_core" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_weekview" />
+			</PreferenceScreen>
+		</PreferenceCategory>
 	</PreferenceScreen>
 </androidx.preference.PreferenceScreen>

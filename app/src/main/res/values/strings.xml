@@ -1,5 +1,6 @@
 <resources>
 	<string name="app_name" translatable="false">BetterUntis</string>
+	<string name="app_desc">An alternative mobile client for the Untis timetable system.</string>
 
 	<string name="all_success">success</string>
 	<string name="all_failed">failed</string>
@@ -170,9 +171,14 @@
 	<string name="preference_dialog_colors_reset_text">This will reset all colors above to their default values.</string>
 	<string name="preference_double_tap_to_exit">Double tap back button to exit</string>
 	<string name="preference_flinging_enable">Enable flinging</string>
+	<string name="preference_info_general">General</string>
 	<string name="preference_info_app_version">App version</string>
 	<string name="preference_info_app_version_desc">%1$s (%2$d)</string>
 	<string name="preference_info_github">GitHub repository</string>
+	<string name="preference_info_contributors">Contributors</string>
+	<string name="preference_info_contributors_desc">A list of the contributors</string>
+	<string name="preference_info_libraries">Libraries</string>
+	<string name="preference_info_libraries_desc">A list of all used libraries</string>
 	<string name="preference_marker">Time indicator</string>
 	<string name="preference_notifications_clear">Clear all notifications</string>
 	<string name="preference_notifications_enable">Enable notification</string>
@@ -229,6 +235,7 @@
 	<string name="preference_week_display_length_summary">Set to 0 to use week length</string>
 	<string name="preference_week_snap_to_days">Snap to days</string>
 	<string name="preference_week_snap_to_days_summary">instead of weeks</string>
+	<string name="preferences_contributors_contributions">%1$d contributions</string>
 
 	<string name="settings_designing_message">Contribute by creating the missing settings icons!</string>
 	<string name="settings_designing_hide">Don\'t show again</string>
@@ -250,6 +257,31 @@
 
 	<string name="homeworks_due_time">until %1$s</string>
 	<string name="homeworks_due_time_format">EEE, dd. MMM</string>
+
+	<string name="loading">Loading</string>
+	<string name="loading_failed">Loading failed</string>
+
+	<string name="library_appcompat" translatable="false">Android AppCompat Library V7</string>
+	<string name="library_constraintlayout" translatable="false">Android ConstraintLayout</string>
+	<string name="library_preference_ktx" translatable="false">Android Preferences KTX</string>
+	<string name="library_swiperefreshlayout" translatable="false">Android Support Library Custom View</string>
+	<string name="library_recyclerview" translatable="false">Android Support RecyclerView V7</string>
+	<string name="library_code_scanner" translatable="false">CodeScanner</string>
+	<string name="library_colorpicker_compat" translatable="false">ColorPicker Compat</string>
+	<string name="library_fuel" translatable="false">Fuel</string>
+	<string name="library_fuel_coroutines" translatable="false">Fuel Coroutines</string>
+	<string name="library_joda_time" translatable="false">Joda Time</string>
+	<string name="library_junit" translatable="false">JUnit</string>
+	<string name="library_kotlin_reflect" translatable="false">Kotlin Reflection</string>
+	<string name="library_kotlin_stdlib" translatable="false">Kotlin Standard Library</string>
+	<string name="library_kotlin_test_junit" translatable="false">Kotlin Test JUnit</string>
+	<string name="library_kotlinx_coroutines_android" translatable="false">Kotlinx Coroutines Android</string>
+	<string name="library_kotlinx_serialization_runtime" translatable="false">Kotlinx Serialization Runtime</string>
+	<string name="library_materialdaypicker" translatable="false">Materialdaypicker</string>
+	<string name="library_materialcomponent_banner" translatable="false">MaterialComponent.Banner</string>
+	<string name="library_material" translatable="false">Material Components For Android</string>
+	<string name="library_mockito_core" translatable="false">Mockito Core</string>
+	<string name="library_weekview" translatable="false">WeekView</string>
 
 	<plurals name="main_time_diff_minutes">
 		<item quantity="one">a minute ago</item>

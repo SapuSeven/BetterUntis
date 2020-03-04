@@ -4,6 +4,10 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.res.Resources
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -13,19 +17,28 @@ import android.view.View
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.*
+import com.github.kittinunf.fuel.coroutines.awaitByteArrayResult
+import com.github.kittinunf.fuel.coroutines.awaitStringResult
+import com.github.kittinunf.fuel.httpGet
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.dialogs.AlertPreferenceDialog
 import com.sapuseven.untis.dialogs.ElementPickerDialog
 import com.sapuseven.untis.dialogs.WeekRangePickerPreferenceDialog
+import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import com.sapuseven.untis.models.github.GithubUser
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.AlertPreference
 import com.sapuseven.untis.preferences.ElementPickerPreference
 import com.sapuseven.untis.preferences.WeekRangePickerPreference
 import kotlinx.android.synthetic.main.activity_settings.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.serialization.list
 import kotlin.math.min
 
 class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback {
@@ -243,8 +256,53 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 							}
 						}
 					}
+					"preferences_contributors" -> {
+						GlobalScope.launch(Dispatchers.Main) {
+							"https://api.github.com/repos/sapuseven/betteruntis/contributors"
+									.httpGet()
+									.awaitStringResult()
+									.fold({ data ->
+										showContributorList(true, data)
+									}, {
+										showContributorList(false)
+									})
+						}
+					}
 				}
 			}
+		}
+
+		private suspend fun showContributorList(success: Boolean, data: String = "") {
+			val preferenceScreen = this.preferenceScreen
+			val indicator = findPreference<Preference>("preferences_contributors_indicator")
+			if (success) {
+				val contributors = getJSON().parse(GithubUser.serializer().list, data)
+
+				preferenceScreen.removePreference(indicator)
+
+				contributors.forEach { user ->
+					preferenceScreen.addPreference(Preference(context).apply {
+						GlobalScope.launch(Dispatchers.Main) { icon = loadProfileImage(user.avatar_url, resources) }
+						title = user.login
+						summary = resources.getString(R.string.preferences_contributors_contributions, user.contributions)
+						setOnPreferenceClickListener {
+							startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(user.html_url)))
+							true
+						}
+					})
+				}
+			} else {
+				indicator?.title = resources.getString(R.string.loading_failed)
+			}
+		}
+
+		private suspend fun loadProfileImage(avatarUrl: String, resources: Resources): Drawable? {
+			return avatarUrl
+					.httpGet()
+					.awaitByteArrayResult()
+					.fold({
+						BitmapDrawable(resources, BitmapFactory.decodeByteArray(it, 0, it.size))
+					}, { null })
 		}
 
 		private fun clearNotifications() = (context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancelAll()
