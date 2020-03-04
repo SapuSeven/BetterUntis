@@ -12,7 +12,6 @@ import android.os.Looper
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -61,6 +60,7 @@ import com.sapuseven.untis.views.weekview.listeners.ScaleListener
 import com.sapuseven.untis.views.weekview.listeners.ScrollListener
 import com.sapuseven.untis.views.weekview.listeners.TopLeftCornerClickListener
 import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants
@@ -132,18 +132,26 @@ class MainActivity :
 
 		setContentView(R.layout.activity_main)
 
-		setupActionBar()
-		setupNavDrawer()
+		if (checkForCrashes(content_main)) {
+			startActivity(Intent(this, ErrorsActivity::class.java).apply {
+				putExtra(ErrorsActivity.EXTRA_BOOLEAN_SHOW_CRASH_MESSAGE, true)
+			})
+			finish()
+		} else {
 
-		setupViews()
-		setupHours()
-		setupHolidays()
+			setupActionBar()
+			setupNavDrawer()
 
-		if (profileUser.schoolId <= 0) return
+			setupViews()
+			setupHours()
+			setupHolidays()
 
-		setupTimetableLoader()
-		showPersonalTimetable()
-		refreshNavigationViewSelection()
+			if (profileUser.schoolId <= 0) return
+
+			setupTimetableLoader()
+			showPersonalTimetable()
+			refreshNavigationViewSelection()
+		}
 	}
 
 	override fun onPause() {
@@ -214,13 +222,12 @@ class MainActivity :
 	}
 
 	private fun setupNavDrawer() {
-		val navigationView = findViewById<NavigationView>(R.id.navigationview_main)
-		navigationView.setNavigationItemSelectedListener(this)
-		navigationView.setCheckedItem(R.id.nav_show_personal)
+		navigationview_main.setNavigationItemSelectedListener(this)
+		navigationview_main.setCheckedItem(R.id.nav_show_personal)
 
-		setupNavDrawerHeader(navigationView)
+		setupNavDrawerHeader(navigationview_main)
 
-		val header = navigationView.getHeaderView(0)
+		val header = navigationview_main.getHeaderView(0)
 		val dropdown = header.findViewById<ConstraintLayout>(R.id.constraintlayout_mainactivitydrawer_dropdown)
 		val dropdownView = header.findViewById<LinearLayout>(R.id.linearlayout_mainactivitydrawer_dropdown_view)
 		val dropdownImage = header.findViewById<ImageView>(R.id.imageview_mainactivitydrawer_dropdown_arrow)
@@ -304,7 +311,7 @@ class MainActivity :
 
 		textview_main_lastrefresh?.text = getString(R.string.main_last_refreshed, getString(R.string.main_last_refreshed_never))
 
-		findViewById<Button>(R.id.button_main_settings).setOnClickListener {
+		button_main_settings.setOnClickListener {
 			val intent = Intent(this@MainActivity, SettingsActivity::class.java)
 			intent.putExtra(SettingsActivity.EXTRA_LONG_PROFILE_ID, profileId)
 			// TODO: Find a way to jump directly to the personal timetable setting
@@ -387,6 +394,8 @@ class MainActivity :
 		weekView.firstDayOfWeek = preferences.defaultPrefs.getStringSet("preference_week_custom_range", emptySet())?.map { MaterialDayPicker.Weekday.valueOf(it) }?.min()?.ordinal
 				?: DateTimeFormat.forPattern("E").withLocale(Locale.ENGLISH).parseDateTime((profileUser.timeGrid.days[0].day)).dayOfWeek
 
+        weekView.timeColumnVisibility = !PreferenceUtils.getPrefBool(preferences, "preference_timetable_hide_time_stamps")
+
 		weekView.columnGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_padding").toFloat(), this).toInt()
 		weekView.overlappingEventGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_padding_overlap").toFloat(), this).toInt()
 		weekView.eventCornerRadius = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_corner_radius").toFloat(), this).toInt()
@@ -458,9 +467,8 @@ class MainActivity :
 	private fun setupActionBar() {
 		val toolbar: Toolbar = findViewById(R.id.toolbar_main)
 		setSupportActionBar(toolbar)
-		val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-		val toggle = ActionBarDrawerToggle(this, drawer, toolbar, R.string.main_drawer_open, R.string.main_drawer_close)
-		drawer.addDrawerListener(toggle)
+		val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.main_drawer_open, R.string.main_drawer_close)
+		drawer_layout.addDrawerListener(toggle)
 		toggle.syncState()
 	}
 
@@ -516,7 +524,7 @@ class MainActivity :
 		}
 
 		val newItems = mutableListOf<TimegridItem>()
-		newItems.addAll(leftover)
+		newItems.addAll(leftover) // Add items that didn't fit inside the timegrid. These will always be single lessons.
 		itemGrid.forEach { unitsOfDay ->
 			unitsOfDay.forEachIndexed { unitIndex, items ->
 				items.forEach {
@@ -636,12 +644,11 @@ class MainActivity :
 	}
 
 	override fun onBackPressed() {
-		val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-		if (drawer.isDrawerOpen(GravityCompat.START)) {
-			closeDrawer(drawer)
+		if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
+			closeDrawer(drawer_layout)
 		} else if (!showPersonalTimetable()) {
 			if (System.currentTimeMillis() - 2000 > lastBackPress && PreferenceUtils.getPrefBool(preferences, "preference_double_tap_to_exit")) {
-				Snackbar.make(findViewById<ConstraintLayout>(R.id.content_main),
+				Snackbar.make(content_main,
 						R.string.main_press_back_double, 2000).show()
 				lastBackPress = System.currentTimeMillis()
 			} else {
@@ -709,14 +716,10 @@ class MainActivity :
 
 	private fun refreshNavigationViewSelection() {
 		when (displayedElement?.type) {
-			TimetableDatabaseInterface.Type.CLASS.name -> (findViewById<View>(R.id.navigationview_main) as NavigationView)
-					.setCheckedItem(R.id.nav_show_classes)
-			TimetableDatabaseInterface.Type.TEACHER.name -> (findViewById<View>(R.id.navigationview_main) as NavigationView)
-					.setCheckedItem(R.id.nav_show_teachers)
-			TimetableDatabaseInterface.Type.ROOM.name -> (findViewById<View>(R.id.navigationview_main) as NavigationView)
-					.setCheckedItem(R.id.nav_show_rooms)
-			else -> (findViewById<View>(R.id.navigationview_main) as NavigationView)
-					.setCheckedItem(R.id.nav_show_personal)
+			TimetableDatabaseInterface.Type.CLASS.name -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_classes)
+			TimetableDatabaseInterface.Type.TEACHER.name -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_teachers)
+			TimetableDatabaseInterface.Type.ROOM.name -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_rooms)
+			else -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_personal)
 		}
 	}
 

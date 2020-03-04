@@ -2,6 +2,9 @@ package com.sapuseven.untis.data.databases
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
+import android.database.Cursor.FIELD_TYPE_INTEGER
+import android.database.Cursor.FIELD_TYPE_STRING
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
@@ -15,7 +18,7 @@ import com.sapuseven.untis.models.untis.UntisSettings
 import com.sapuseven.untis.models.untis.UntisUserData
 import com.sapuseven.untis.models.untis.masterdata.*
 
-private const val DATABASE_VERSION = 2
+private const val DATABASE_VERSION = 3
 private const val DATABASE_NAME = "userdata.db"
 
 class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -30,7 +33,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 	}
 
 	override fun onCreate(db: SQLiteDatabase) {
-		db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V2)
+		db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V3)
 
 		db.execSQL(generateCreateTable<AbsenceReason>())
 		db.execSQL(generateCreateTable<Department>())
@@ -57,6 +60,12 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 					db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V2)
 					db.execSQL("INSERT INTO ${UserDatabaseContract.Users.TABLE_NAME} SELECT _id, apiUrl, NULL, user, ${UserDatabaseContract.Users.TABLE_NAME}_v1.\"key\", anonymous, timeGrid, masterDataTimestamp, userData, settings, time_created FROM ${UserDatabaseContract.Users.TABLE_NAME}_v1;")
 					db.execSQL("DROP TABLE ${UserDatabaseContract.Users.TABLE_NAME}_v1")
+				}
+				2 -> {
+					db.execSQL("ALTER TABLE ${UserDatabaseContract.Users.TABLE_NAME} RENAME TO ${UserDatabaseContract.Users.TABLE_NAME}_v2")
+					db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V3)
+					db.execSQL("INSERT INTO ${UserDatabaseContract.Users.TABLE_NAME} SELECT * FROM ${UserDatabaseContract.Users.TABLE_NAME}_v2;")
+					db.execSQL("DROP TABLE ${UserDatabaseContract.Users.TABLE_NAME}_v2")
 				}
 			}
 
@@ -94,7 +103,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID, getJSON().stringify(TimeGrid.serializer(), user.timeGrid))
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP, user.masterDataTimestamp)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USERDATA, getJSON().stringify(UntisUserData.serializer(), user.userData))
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().stringify(UntisSettings.serializer(), user.settings))
+		user.settings?.let { values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().stringify(UntisSettings.serializer(), it)) }
 
 		val id = db.insert(UserDatabaseContract.Users.TABLE_NAME, null, values)
 
@@ -118,7 +127,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID, getJSON().stringify(TimeGrid.serializer(), user.timeGrid))
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP, user.masterDataTimestamp)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USERDATA, getJSON().stringify(UntisUserData.serializer(), user.userData))
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().stringify(UntisSettings.serializer(), user.settings))
+		user.settings?.let { values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().stringify(UntisSettings.serializer(), it)) }
 
 		db.update(UserDatabaseContract.Users.TABLE_NAME, values, BaseColumns._ID + "=?", arrayOf(user.id.toString()))
 		db.close()
@@ -157,16 +166,16 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 
 		val user = User(
 				id,
-				cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_APIURL)),
+				cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_APIURL)),
 				cursor.getInt(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID)),
-				cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USER)),
-				cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_KEY)),
-				cursor.getInt(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS)) == 1,
+				cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USER)),
+				cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_KEY)),
+				cursor.getIntOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS)) == 1,
 				getJSON().parse(TimeGrid.serializer(), cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID))),
 				cursor.getLong(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP)),
 				getJSON().parse(UntisUserData.serializer(), cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USERDATA))),
-				getJSON().parse(UntisSettings.serializer(), cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS))),
-				cursor.getLong(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_CREATED))
+				cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS))?.let { getJSON().parse(UntisSettings.serializer(), it) },
+				cursor.getLongOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_CREATED))
 		)
 
 		cursor.close()
@@ -198,17 +207,17 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		if (cursor.moveToFirst()) {
 			do {
 				users.add(User(
-						cursor.getLong(cursor.getColumnIndex(BaseColumns._ID)),
-						cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_APIURL)),
+						cursor.getLongOrNull(cursor.getColumnIndex(BaseColumns._ID)),
+						cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_APIURL)),
 						cursor.getInt(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID)),
-						cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USER)),
-						cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_KEY)),
+						cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USER)),
+						cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_KEY)),
 						cursor.getInt(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS)) == 1,
 						getJSON().parse(TimeGrid.serializer(), cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID))),
 						cursor.getLong(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP)),
 						getJSON().parse(UntisUserData.serializer(), cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USERDATA))),
-						getJSON().parse(UntisSettings.serializer(), cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS))),
-						cursor.getLong(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_CREATED))
+						cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS))?.let { getJSON().parse(UntisSettings.serializer(), it) },
+						cursor.getLongOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_CREATED))
 				))
 			} while (cursor.moveToNext())
 		}
@@ -311,7 +320,25 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 			val timeGrid: TimeGrid,
 			val masterDataTimestamp: Long,
 			val userData: UntisUserData,
-			val settings: UntisSettings,
+			val settings: UntisSettings? = null,
 			val created: Long? = null
 	)
+}
+
+private fun Cursor.getIntOrNull(columnIndex: Int): Int? {
+	return if (getType(columnIndex) == FIELD_TYPE_INTEGER)
+		getInt(columnIndex)
+	else null
+}
+
+private fun Cursor.getLongOrNull(columnIndex: Int): Long? {
+	return if (getType(columnIndex) == FIELD_TYPE_INTEGER)
+		getLong(columnIndex)
+	else null
+}
+
+private fun Cursor.getStringOrNull(columnIndex: Int): String? {
+	return if (getType(columnIndex) == FIELD_TYPE_STRING)
+		getString(columnIndex)
+	else null
 }

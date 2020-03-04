@@ -5,6 +5,7 @@ import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.timetable.Period
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
+import kotlinx.serialization.cbor.CborDecodingException
 import java.io.File
 import java.lang.ref.WeakReference
 
@@ -20,9 +21,13 @@ class TimetableCache(val context: WeakReference<Context>) {
 		return targetCacheFile(target)?.exists() ?: false
 	}
 
-	fun load(): CacheObject {
-		return Cbor.load(CacheObject.serializer(), targetCacheFile(target)?.readBytes()
-				?: ByteArray(0))
+	fun load(): CacheObject? {
+		return try {
+			Cbor.load(CacheObject.serializer(), targetCacheFile(target)?.readBytes()
+					?: ByteArray(0))
+		} catch (e: CborDecodingException) {
+			null
+		}
 	}
 
 	fun save(items: CacheObject) {
@@ -35,6 +40,10 @@ class TimetableCache(val context: WeakReference<Context>) {
 
 	override fun toString(): String {
 		return target?.getName() ?: "null"
+	}
+
+	fun delete() {
+		targetCacheFile(target)?.delete()
 	}
 
 	@Serializable

@@ -25,6 +25,11 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 	var showFirstDayOfWeekFirst: Boolean
 
 	// Time column
+	var timeColumnVisibility: Boolean = true
+		set(value) {
+			field = value
+			drawConfig.timeTextVisibility = value
+		}
 	var timeColumnTextColor: Int = 0
 		set(value) {
 			field = value

@@ -15,6 +15,6 @@ data class UserDataResponse(
 data class UserDataResult(
 		val masterData: UntisMasterData,
 		val userData: UntisUserData,
-		val settings: UntisSettings,
+		val settings: UntisSettings? = null,
 		val messengerSettings: UntisMessengerSettings? = null
 )
