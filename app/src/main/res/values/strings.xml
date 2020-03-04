@@ -32,9 +32,12 @@
 	<string name="all_dialog_crash_title">Crash log found</string>
 	<string name="all_dialog_crash_copied">Crash log copied to clipboard.</string>
 
+	<string name="activity_title_errors">Errors</string>
 	<string name="activity_title_free_rooms">Free Rooms</string>
 	<string name="activity_title_info_center">Info Center</string>
 	<string name="activity_title_settings">Settings</string>
+
+	<string name="errors_github_attach_file_message">Please attach the compressed log files to this issue.\nThey have been saved to `%1$s`</string>
 
 	<string name="menu_nav_timetables">Timetables</string>
 	<string name="menu_infocenter_messagesofday">Messages</string>
@@ -257,6 +260,11 @@
 
 	<string name="homeworks_due_time">until %1$s</string>
 	<string name="homeworks_due_time_format">EEE, dd. MMM</string>
+	<string name="errors_crash_title">It looks like BetterUntis crashed.</string>
+	<string name="errors_crash_message">Sorry for that.</string>
+	<string name="errors_report">Please help to fix the app by reporting the errors below:</string>
+	<string name="errors_button_dismiss">Dismiss all</string>
+	<string name="errors_button_report">Report all</string>
 
 	<string name="loading">Loading</string>
 	<string name="loading_failed">Loading failed</string>

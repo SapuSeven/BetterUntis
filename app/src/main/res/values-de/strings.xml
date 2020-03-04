@@ -32,6 +32,8 @@
 	<string name="all_dialog_error_message">Anfragen-ID: %1$d\nFehlercode: %2$d\nFehlermeldung: %3$s</string>
 	<string name="all_dialog_crash_title">Absturzprotokoll gefunden</string>
 	<string name="all_dialog_crash_copied">Absturzprotokoll wurde in die Zwischenablage kopiert.</string>
+
+	<string name="activity_title_errors">Fehlermeldungen</string>
 	<string name="activity_title_free_rooms">Freie Räume</string>
 	<string name="activity_title_info_center">Info-Center</string>
 	<string name="activity_title_settings">Einstellungen</string>

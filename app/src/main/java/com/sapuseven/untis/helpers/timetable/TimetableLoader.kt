@@ -37,6 +37,7 @@ class TimetableLoader(
 
 		const val CODE_CACHE_MISSING = 1
 		const val CODE_REQUEST_FAILED = 2
+		const val CODE_REQUEST_PARSING_EXCEPTION = 3
 	}
 
 	private val requestList = ArrayList<TimetableLoaderTarget>()
@@ -97,21 +98,25 @@ class TimetableLoader(
 
 		val userDataResult = api.request(query)
 		userDataResult.fold({ data ->
-			val untisResponse = getJSON().parse(TimetableResponse.serializer(), data)
+			try {
+				val untisResponse = getJSON().parse(TimetableResponse.serializer(), data)
 
-			if (untisResponse.result != null) {
-				Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): network request success, returning")
+				if (untisResponse.result != null) {
+					Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): network request success, returning")
 
-				val items = untisResponse.result.timetable.periods
-				val timestamp = Instant.now().millis
-				timetableDisplay.addTimetableItems(items.map { periodToTimegridItem(it, target.type) }, target.startDate, target.endDate, timestamp)
-				Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): saving to cache: $cache")
-				cache.save(TimetableCache.CacheObject(timestamp, items))
+					val items = untisResponse.result.timetable.periods
+					val timestamp = Instant.now().millis
+					timetableDisplay.addTimetableItems(items.map { periodToTimegridItem(it, target.type) }, target.startDate, target.endDate, timestamp)
+					Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): saving to cache: $cache")
+					cache.save(TimetableCache.CacheObject(timestamp, items))
 
-				// TODO: Interpret masterData in the response
-			} else {
-				Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): network request failed at Untis API level")
-				timetableDisplay.onTimetableLoadingError(requestId, untisResponse.error?.code, untisResponse.error?.message)
+					// TODO: Interpret masterData in the response
+				} else {
+					Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): network request failed at Untis API level")
+					timetableDisplay.onTimetableLoadingError(requestId, untisResponse.error?.code, untisResponse.error?.message)
+				}
+			} catch (e: Exception) {
+				timetableDisplay.onTimetableLoadingError(requestId, CODE_REQUEST_PARSING_EXCEPTION, e.message)
 			}
 		}, { error ->
 			Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): network request failed at OS level")
