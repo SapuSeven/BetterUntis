@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="app_name" translatable="false">BetterUntis</string>
 	<string name="app_desc">An alternative mobile client for the Untis timetable system.</string>
@@ -50,7 +51,7 @@
 	<string name="mainactivitydrawer_profile_delete_hint">Long-press a profile to edit</string>
 
 	<string name="main_dialog_delete_profile_title">Delete profile?</string>
-	<string name="main_dialog_delete_profile_message">This will delete your profile with user %1$s at school %2$s.</string>
+	<string name="main_dialog_delete_profile_message">Are you sure you want to delete your profile with user %1$s at school %2$s\?</string>
 	<string name="main_dialog_update_profile_title">Profile update required</string>
 	<string name="main_dialog_update_profile_message">A recent app update has changed the way user data is saved. Please update your current profile to continue using the app.</string>
 	<string name="main_dialog_update_profile_button">Update profile</string>
@@ -67,7 +68,7 @@
 	<string name="main_press_back_double">Press BACK twice to exit</string>
 	<string name="main_time_diff_just_now">just now</string>
 
-	<string name="login_scan_code">Scan QR Code</string>
+	<string name="login_scan_code">Scan QR code</string>
 	<string name="login_welcome">Welcome to BetterUntis!</string>
 	<string name="login_please_log_in">Choose one of the following options to login:</string>
 	<string name="login_no_results">No results</string>
@@ -93,7 +94,6 @@
 	<string name="logindatainput_delete">Delete Profile</string>
 	<string name="logindatainput_proxy_host">Proxy server (optional)</string>
 	<string name="logindatainput_show_advanced">Show advanced settings</string>
-
 	<string name="errormessagedictionary_generic">Unknown error</string>
 	<string name="errormessagedictionary_too_many_results">Too many results</string>
 	<string name="errormessagedictionary_invalid_school">The specified school doesn\'t exist!</string>
@@ -104,7 +104,6 @@
 	<string name="errormessagedictionary_invalid_time_settings">Invalid date and/or time settings!</string>
 	<string name="errormessagedictionary_user_locked">User locked!</string>
 	<string name="errormessagedictionary_no_right">No right for timetable</string>
-
 	<string name="roomfinder_current_hour">%1$s, %2$d. Lesson</string>
 	<string name="roomfinder_current_hour_time">%1$s - %2$s</string>
 	<string name="roomfinder_delete_item">Delete item</string>
@@ -116,7 +115,6 @@
 	<string name="roomfinder_image_previous_hour">previous hour</string>
 	<string name="roomfinder_image_next_hour">next hour</string>
 	<string name="roomfinder_loading_data">Loading data…</string>
-
 	<string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
 	<string name="infocenter_timeformat_sameday">%2$s - %4$s, %1$s</string>
 	<string name="infocenter_officehours_empty">No office hours</string>
@@ -124,7 +122,6 @@
 	<string name="infocenter_events_empty">No events</string>
 	<string name="infocenter_absences_empty">No absences</string>
 	<string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
-
 	<string name="elementpicker_hint_search">Search…</string>
 	<string name="elementpicker_hint_search_classes">Search for classes…</string>
 	<string name="elementpicker_hint_search_teachers">Search for teachers…</string>
@@ -136,14 +133,14 @@
 	<string name="preferences_styling">Customization</string>
 	<string name="preferences_timetable">Timetable</string>
 	<string name="preferences_general">General</string>
-	<string name="preference_category_connectivity_proxy">WebUntis proxy</string>
-	<string name="preference_category_notifications_visible_fields">Visible fields</string>
+	<string name="preference_category_connectivity_proxy">WebUntis Proxy</string>
+	<string name="preference_category_notifications_visible_fields">Visible Fields</string>
 	<string name="preference_category_styling_backgrounds">Item Colors</string>
 	<string name="preference_category_styling_colors">Colors</string>
 	<string name="preference_category_styling_themes">Themes</string>
-	<string name="preference_category_timetable_item_appearance">Item appearance</string>
-	<string name="preference_category_timetable_lesson_text">Lesson text</string>
-	<string name="preference_category_timetable_range">Timetable range</string>
+	<string name="preference_category_timetable_item_appearance">Item Appearance</string>
+	<string name="preference_category_timetable_lesson_text">Lesson Text</string>
+	<string name="preference_category_timetable_range">Timetable Range</string>
 	<string name="preference_category_general_behaviour">Behaviour</string>
 	<string name="preference_category_general_week_display">Week Display Settings</string>
 	<string name="preference_category_general_automute">Auto-Mute</string>
@@ -213,8 +210,8 @@
 	<string name="preference_timetable_colors_reset">Reset colors</string>
 	<string name="preference_timetable_hide_cancelled">Hide cancelled lessons</string>
 	<string name="preference_timetable_hide_cancelled_desc">You need to reload the timetable after you change this setting</string>
-	<string name="preference_timetable_hide_time_stamps">Hide time stamps</string>
-	<string name="preference_timetable_hide_time_stamps_desc">Hide the time stamps next to the timetable</string>
+	<string name="preference_timetable_hide_time_stamps">Hide timestamps</string>
+	<string name="preference_timetable_hide_time_stamps_desc">Hide the timestamps next to the timetable</string>
 	<string name="preference_timetable_item_corner_radius">Item corner radius</string>
 	<string name="preference_timetable_item_padding">Item padding</string>
 	<string name="preference_timetable_item_padding_overlap">Overlapping item padding</string>
@@ -243,7 +240,6 @@
 	<string name="settings_designing_message">Contribute by creating the missing settings icons!</string>
 	<string name="settings_designing_hide">Don\'t show again</string>
 	<string name="settings_designing_info">Learn more</string>
-
 	<string name="notifications_channel_breakinfo">Break info</string>
 	<string name="notifications_channel_breakinfo_desc">Shows information about the current break and the following lesson</string>
 	<string name="notifications_channel_backgrounderrors">Background errors</string>
@@ -257,7 +253,6 @@
 	<string name="notifications_text_message_teachers">Teacher: %1$s</string>
 	<string name="notifications_text_message_classes">Class: %1$s</string>
 	<string name="notifications_text_message_separator"> / </string>
-
 	<string name="homeworks_due_time">until %1$s</string>
 	<string name="homeworks_due_time_format">EEE, dd. MMM</string>
 	<string name="errors_crash_title">It looks like BetterUntis crashed.</string>
@@ -303,7 +298,6 @@
 		<item quantity="one">a day ago</item>
 		<item quantity="other">%d days ago</item>
 	</plurals>
-
 	<plurals name="roomfinder_item_desc">
 		<item quantity="one">This Room is free right now.</item>
 		<item quantity="other">This Room is free for %d hours.</item>
