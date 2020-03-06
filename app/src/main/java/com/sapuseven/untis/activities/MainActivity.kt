@@ -89,6 +89,7 @@ class MainActivity :
 		private const val REQUEST_CODE_SETTINGS = 2
 		private const val REQUEST_CODE_LOGINDATAINPUT_ADD = 3
 		private const val REQUEST_CODE_LOGINDATAINPUT_EDIT = 4
+		private const val REQUEST_CODE_ERRORS = 5
 
 		private const val UNTIS_DEFAULT_COLOR = "#f49f25"
 
@@ -132,13 +133,11 @@ class MainActivity :
 
 		setContentView(R.layout.activity_main)
 
-		if (checkForCrashes(content_main)) {
-			startActivity(Intent(this, ErrorsActivity::class.java).apply {
+		if (checkForCrashes()) {
+			startActivityForResult(Intent(this, ErrorsActivity::class.java).apply {
 				putExtra(ErrorsActivity.EXTRA_BOOLEAN_SHOW_CRASH_MESSAGE, true)
-			})
-			finish()
+			}, REQUEST_CODE_ERRORS)
 		} else {
-
 			setupActionBar()
 			setupNavDrawer()
 
@@ -169,6 +168,16 @@ class MainActivity :
 
 		if (profileUser.schoolId <= 0 && profileUpdateDialog == null)
 			showProfileUpdateRequired()
+	}
+
+	override fun onErrorLogFound() {
+		// TODO: Extract string resources
+		if (PreferenceUtils.getPrefBool(preferences, "preference_additional_error_messages"))
+			Snackbar.make(content_main, "Some errors have been found.", Snackbar.LENGTH_INDEFINITE)
+					.setAction("Show") {
+						startActivity(Intent(this, ErrorsActivity::class.java))
+					}
+					.show()
 	}
 
 	private fun showProfileUpdateRequired() {
@@ -394,7 +403,7 @@ class MainActivity :
 		weekView.firstDayOfWeek = preferences.defaultPrefs.getStringSet("preference_week_custom_range", emptySet())?.map { MaterialDayPicker.Weekday.valueOf(it) }?.min()?.ordinal
 				?: DateTimeFormat.forPattern("E").withLocale(Locale.ENGLISH).parseDateTime((profileUser.timeGrid.days[0].day)).dayOfWeek
 
-        weekView.timeColumnVisibility = !PreferenceUtils.getPrefBool(preferences, "preference_timetable_hide_time_stamps")
+		weekView.timeColumnVisibility = !PreferenceUtils.getPrefBool(preferences, "preference_timetable_hide_time_stamps")
 
 		weekView.columnGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_padding").toFloat(), this).toInt()
 		weekView.overlappingEventGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_padding_overlap").toFloat(), this).toInt()
@@ -621,25 +630,22 @@ class MainActivity :
 		super.onActivityResult(requestCode, resultCode, intent)
 
 		when (requestCode) {
-			REQUEST_CODE_ROOM_FINDER -> {
-				if (resultCode == Activity.RESULT_OK) {
-					val roomId = data?.getIntExtra(RoomFinderActivity.EXTRA_INT_ROOM_ID, -1) ?: -1
-					if (roomId != -1)
-						@Suppress("RemoveRedundantQualifierName")
-						setTarget(roomId, TimetableDatabaseInterface.Type.ROOM.toString(), timetableDatabaseInterface.getLongName(roomId, TimetableDatabaseInterface.Type.ROOM))
-				}
-			}
-			REQUEST_CODE_SETTINGS -> {
-				recreate()
-			}
-			REQUEST_CODE_LOGINDATAINPUT_ADD -> {
+			REQUEST_CODE_ROOM_FINDER ->
+				if (resultCode == Activity.RESULT_OK)
+					(data?.getIntExtra(RoomFinderActivity.EXTRA_INT_ROOM_ID, -1)
+							?: -1).let { roomId ->
+						if (roomId != -1)
+							@Suppress("RemoveRedundantQualifierName")
+							setTarget(roomId, TimetableDatabaseInterface.Type.ROOM.toString(), timetableDatabaseInterface.getLongName(roomId, TimetableDatabaseInterface.Type.ROOM))
+					}
+			REQUEST_CODE_SETTINGS -> recreate()
+			REQUEST_CODE_LOGINDATAINPUT_ADD ->
 				if (resultCode == Activity.RESULT_OK)
 					recreate()
-			}
-			REQUEST_CODE_LOGINDATAINPUT_EDIT -> {
+			REQUEST_CODE_LOGINDATAINPUT_EDIT ->
 				if (resultCode == Activity.RESULT_OK)
 					recreate()
-			}
+			REQUEST_CODE_ERRORS -> recreate()
 		}
 	}
 
