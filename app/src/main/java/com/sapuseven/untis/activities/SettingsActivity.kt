@@ -38,6 +38,7 @@ import kotlinx.android.synthetic.main.activity_settings.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.list
 import kotlin.math.min
 
 class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback {
