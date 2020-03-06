@@ -285,6 +285,8 @@ class WeekView<T>(
 	override fun onDraw(canvas: Canvas) {
 		super.onDraw(canvas)
 
+		if (weekLength == 0) return
+
 		val isFirstDraw = viewState.isFirstDraw
 
 		viewState.update(config, this)
