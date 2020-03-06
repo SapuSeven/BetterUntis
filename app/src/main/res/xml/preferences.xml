@@ -51,6 +51,20 @@
 				android:key="preference_automute_cancelled_lessons"
 				android:title="@string/preference_automute_cancelled_lessons" />
 		</PreferenceCategory>
+
+		<!-- TODO: Extract string resources -->
+		<PreferenceCategory android:title="Error Reporting">
+			<CheckBoxPreference
+				android:defaultValue="preference_additional_error_messages_default"
+				android:key="preference_additional_error_messages"
+				android:summary="This is used for non-critical background errors"
+				android:title="Enable additional error messages" />
+
+			<Preference
+				android:key="preference_errors"
+				android:summary="Crash logs and non-critical background errors"
+				android:title="View logged errors" />
+		</PreferenceCategory>
 	</PreferenceScreen>
 
 	<PreferenceScreen

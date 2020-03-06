@@ -2,17 +2,14 @@ package com.sapuseven.untis.activities
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
-import android.view.View
 import androidx.annotation.AttrRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import com.google.android.material.snackbar.Snackbar
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.ErrorLogger
 import com.sapuseven.untis.helpers.config.PreferenceManager
@@ -41,23 +38,27 @@ open class BaseActivity : AppCompatActivity() {
 	}
 
 	/**
-	 * Checks for saved crashes and shows a snackbar if so.
+	 * Checks for saved crashes. Calls [onErrorLogFound] if logs are found.
 	 *
-	 * @param rootView A view used for showing the snackbar
 	 * @return `true` if the logs contain a critical application crash, `false` otherwise
 	 */
-	fun checkForCrashes(rootView: View): Boolean {
+	protected fun checkForCrashes(): Boolean {
 		val logFiles = File(filesDir, "logs").listFiles()
 		if (logFiles?.isNotEmpty() == true) {
-			Snackbar.make(rootView, "Some errors have been found.", Snackbar.LENGTH_INDEFINITE)
-					.setAction("Show") {
-						startActivity(Intent(this, ErrorsActivity::class.java))
-					}
-					.show()
+			onErrorLogFound()
 
 			return logFiles.find { f -> f.name.startsWith("_") } != null
 		}
 		return false
+	}
+
+	/**
+	 * Gets called if any error logs are found.
+	 *
+	 * Override this function in your actual activity.
+	 */
+	open fun onErrorLogFound() {
+		return
 	}
 
 	protected fun readCrashData(crashFile: File): String {
@@ -131,7 +132,7 @@ open class BaseActivity : AppCompatActivity() {
 		return typedValue.data
 	}
 
-	class CrashHandler(val context: Context, private val defaultUncaughtExceptionHandler: Thread.UncaughtExceptionHandler?) : Thread.UncaughtExceptionHandler {
+	private class CrashHandler(val context: Context, private val defaultUncaughtExceptionHandler: Thread.UncaughtExceptionHandler?) : Thread.UncaughtExceptionHandler {
 		override fun uncaughtException(t: Thread, e: Throwable) {
 			Log.e("BetterUntis", "Application crashed!", e)
 			saveCrash(e)

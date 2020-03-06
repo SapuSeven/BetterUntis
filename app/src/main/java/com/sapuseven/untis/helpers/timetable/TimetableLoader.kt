@@ -21,6 +21,7 @@ import com.sapuseven.untis.models.untis.timetable.Period
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonParsingException
 import org.joda.time.DateTimeZone
 import org.joda.time.Instant
 import java.lang.ref.WeakReference
@@ -116,12 +117,29 @@ class TimetableLoader(
 					timetableDisplay.onTimetableLoadingError(requestId, untisResponse.error?.code, untisResponse.error?.message)
 				}
 			} catch (e: Exception) {
-				timetableDisplay.onTimetableLoadingError(requestId, CODE_REQUEST_PARSING_EXCEPTION, e.message)
+				val msg = when (e) {
+					is JsonParsingException -> formatJsonParsingException(e, data)
+					else -> e.toString()
+				}
+				timetableDisplay.onTimetableLoadingError(requestId, CODE_REQUEST_PARSING_EXCEPTION, msg)
 			}
 		}, { error ->
 			Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): network request failed at OS level")
 			timetableDisplay.onTimetableLoadingError(requestId, CODE_REQUEST_FAILED, error.message)
 		})
+	}
+
+	private fun formatJsonParsingException(e: JsonParsingException, jsonData: String): String {
+		val errorMargin = 20
+		val errorIndex: Int? = e.message?.let {
+			it.split(" ")[3].let { i ->
+				i.substring(0, i.length - 1)
+			}.toIntOrNull()
+		}
+
+		return e.toString() + if (errorIndex != null)
+			"\n(near " + jsonData.substring((errorIndex - errorMargin).coerceAtLeast(0), (errorIndex + errorMargin).coerceAtMost(jsonData.length)) + ")"
+		else ""
 	}
 
 	private fun periodToTimegridItem(period: Period, type: String): TimegridItem {
