@@ -11,9 +11,10 @@ import com.sapuseven.untis.wear.R
 
 class ConnectActivity : WearableActivity() {
 
-    val receiver = object : BroadcastReceiver() {
+    private val receiver = object : BroadcastReceiver() {
         override fun onReceive(c: Context, intent: Intent) {
             startActivity(Intent(c, MainActivity::class.java))
+            finish()
         }
     }
 
