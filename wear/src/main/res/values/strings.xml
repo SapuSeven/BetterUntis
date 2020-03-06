@@ -1,9 +1,14 @@
 <resources>
     <string name="app_name">BetterUntis</string>
-    <string name="hello_world">Hello World!</string>
 
     <string name="login_welcome">Welcome to BetterUntis!</string>
     <string name="login_connect">Connect</string>
 
     <string name="connect_connecting">Open the BetterUntis app on your phone and go to Settings > Wear OS Support</string>
+
+    <string name="main_your_timetable_for_today">Your Timetable for Today</string>
+    <string name="main_no_timetable_available_for_today">No timetable available for today</string>
+    <string name="main_settings">Settings</string>
+    <string name="main_reload">Reload</string>
+    <string name="main_sign_out">Sign out</string>
 </resources>
