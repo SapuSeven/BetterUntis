@@ -73,5 +73,3 @@ If your language already exists, you can directly correct possible mistakes.
 Your translation will be included in the next release of BetterUntis.
 
 You can find all details on [weblate.org](https://hosted.weblate.org/engage/betteruntis).
-
-Alternatively, you can also use [Crowdin](https://crowdin.com/project/betteruntis) to translate BetterUntis.
