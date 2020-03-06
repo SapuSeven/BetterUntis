@@ -22,6 +22,8 @@ internal object DateUtils {
 	 * @return A list with all days that are within the visible week, starting with [startDay]
 	 */
 	fun getDateRange(startDay: DateTime, size: Int, weekStart: Int, weekLength: Int): List<DateTime> {
+		if (weekLength == 0) return emptyList()
+
 		val days = ArrayList<DateTime>()
 		var day: DateTime
 		var dayNumber = 0
@@ -58,6 +60,8 @@ internal object DateUtils {
 	 * @return The amount of actual days.
 	 */
 	fun actualDays(displayedDays: Int, weekLength: Int): Int {
+		if (weekLength == 0) return 0
+
 		val skippedDays = if (displayedDays < 0)
 			(displayedDays + 1) / weekLength * (7 - weekLength) - (7 - weekLength)
 		else

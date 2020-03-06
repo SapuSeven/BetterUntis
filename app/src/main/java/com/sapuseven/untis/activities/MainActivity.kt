@@ -161,13 +161,16 @@ class MainActivity :
 	override fun onResume() {
 		super.onResume()
 		preferences.reload(profileId)
-		proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
-		setupWeekViewConfig()
 
-		weekViewRefreshHandler.post(weekViewUpdate)
+		if (::weekView.isInitialized) {
+			proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
+			setupWeekViewConfig()
 
-		if (profileUser.schoolId <= 0 && profileUpdateDialog == null)
-			showProfileUpdateRequired()
+			weekViewRefreshHandler.post(weekViewUpdate)
+
+			if (profileUser.schoolId <= 0 && profileUpdateDialog == null)
+				showProfileUpdateRequired()
+		}
 	}
 
 	override fun onErrorLogFound() {
