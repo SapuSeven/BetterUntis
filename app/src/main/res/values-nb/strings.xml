@@ -119,7 +119,6 @@
     <string name="preferences_styling">Tilpasning</string>
     <string name="preferences_timetable">Timeplan</string>
     <string name="preferences_general">Generelt</string>
-    <string name="preference_category_connectivity_proxy"></string>
     <string name="preference_category_notifications_visible_fields">Synlige felt</string>
     <string name="preference_category_styling_backgrounds">Elementenes farger</string>
     <string name="preference_category_styling_colors">Farger</string>
@@ -161,10 +160,6 @@
     <string name="preference_info_app_version">App-versjon</string>
     <string name="preference_info_app_version_desc">%1$s (%2$d)</string>
     <string name="preference_info_github">GitHub-repo</string>
-    <string name="preference_info_contributors"></string>
-    <string name="preference_info_contributors_desc"></string>
-    <string name="preference_info_libraries"></string>
-    <string name="preference_info_libraries_desc"></string>
     <string name="preference_marker">Tidsindikator</string>
     <string name="preference_notifications_clear">Tøm alle varsler</string>
     <string name="preference_notifications_enable">Aktiver varsler</string>
@@ -215,7 +210,6 @@
     <string name="preference_week_display_length_summary">Sett til 0 for å bruke ukelengde</string>
     <string name="preference_week_snap_to_days">Sett visning på linje med dagene</string>
     <string name="preference_week_snap_to_days_summary">i stedet for uker</string>
-    <string name="preferences_contributors_contributions"></string>
     <string name="settings_designing_message">Bidra ved å opprette de manglende innstillingsikonene!</string>
     <string name="settings_designing_hide">Ikke vis igjen</string>
     <string name="settings_designing_info">Finn ut mer</string>
