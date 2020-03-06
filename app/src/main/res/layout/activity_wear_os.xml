@@ -14,12 +14,25 @@
         android:orientation="vertical"
         tools:ignore="UselessParent">
 
-        <ImageView
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="72dp"
-            android:layout_marginBottom="?dialogPreferredPadding"
-            app:srcCompat="@drawable/settings_watch"
-            android:contentDescription="@string/preference_wear_os_support" />
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="?dialogPreferredPadding">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_centerInParent="true"
+                app:srcCompat="@drawable/settings_watch"
+                android:contentDescription="@null" />
+
+            <ImageView
+                android:id="@+id/status"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_centerInParent="true"
+                android:contentDescription="@string/preference_wear_os_support" />
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/title"
