@@ -10,10 +10,10 @@ class SplashActivity : WearableActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (PreferenceManager.getDefaultSharedPreferences(this).getString("edittext_logindatainput_school", "") == "") {
-            startActivity(Intent(this, LoginActivity::class.java))
-        } else {
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("signed_in", false)) {
             startActivity(Intent(this, MainActivity::class.java))
+        } else {
+            startActivity(Intent(this, LoginActivity::class.java))
         }
         finish()
     }

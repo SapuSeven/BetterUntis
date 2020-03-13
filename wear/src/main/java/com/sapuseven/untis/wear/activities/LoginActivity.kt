@@ -14,6 +14,7 @@ class LoginActivity : WearableActivity() {
 
         findViewById<Button>(R.id.connect).setOnClickListener {
             startActivity(Intent(this, ConnectActivity::class.java))
+            finish()
         }
     }
 }

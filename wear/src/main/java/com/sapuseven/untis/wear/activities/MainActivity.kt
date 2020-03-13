@@ -1,12 +1,16 @@
 package com.sapuseven.untis.wear.activities
 
+import android.content.Intent
 import android.content.res.Resources
 import android.os.Bundle
 import android.support.wearable.activity.WearableActivity
 import android.support.wearable.input.RotaryEncoder
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Button
 import android.widget.ScrollView
+import android.widget.Toast
+import androidx.preference.PreferenceManager
 import com.sapuseven.untis.wear.R
 import kotlin.math.roundToInt
 
@@ -20,6 +24,16 @@ class MainActivity : WearableActivity() {
 
         adjustInset(findViewById(R.id.content))
         scrollView = findViewById(R.id.root)
+
+        findViewById<Button>(R.id.reload).setOnClickListener {
+            Toast.makeText(this, "TODO", Toast.LENGTH_LONG).show()
+        }
+
+        findViewById<Button>(R.id.sign_out).setOnClickListener {
+            PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("signed_in", false).apply()
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+        }
     }
 
     override fun onGenericMotionEvent(event: MotionEvent?): Boolean {

@@ -30,6 +30,7 @@ class DataLayerListenerService : WearableListenerService() {
                 editor.putString("edittext_logindatainput_school", map.getString("edittext_logindatainput_school"))
                 editor.putString("edittext_logindatainput_user", map.getString("edittext_logindatainput_user"))
                 editor.putBoolean("switch_logindatainput_anonymouslogin", map.getBoolean("switch_logindatainput_anonymouslogin"))
+                editor.putBoolean("signed_in", true)
                 editor.apply()
 
                 LocalBroadcastManager.getInstance(this).sendBroadcast(Intent("LOGIN_SUCCESS"))
