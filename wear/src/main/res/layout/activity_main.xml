@@ -4,7 +4,7 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.MainActivity"
+    tools:context=".wear.activities.MainActivity"
     tools:deviceIds="wear">
 
     <LinearLayout

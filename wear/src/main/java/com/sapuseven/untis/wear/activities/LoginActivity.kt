@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.wearable.activity.WearableActivity
 import android.widget.Button
-import com.sapuseven.untis.wear.R
+import com.sapuseven.untis.R
 
 class LoginActivity : WearableActivity() {
 

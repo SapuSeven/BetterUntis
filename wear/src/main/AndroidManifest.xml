@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.sapuseven.untis.wear">
+    package="com.sapuseven.untis">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-feature android:name="android.hardware.type.watch" />
 
@@ -23,7 +24,7 @@
             android:value="true" />
 
         <activity
-            android:name=".activities.SplashActivity"
+            android:name=".wear.activities.SplashActivity"
             android:theme="@style/SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,10 +32,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.LoginActivity" />
-        <activity android:name=".activities.ConnectActivity" />
-        <activity android:name=".activities.MainActivity" />
-        <service android:name=".services.DataLayerListenerService">
+        <activity android:name=".wear.activities.LoginActivity" />
+        <activity android:name=".wear.activities.ConnectActivity" />
+        <activity android:name=".wear.activities.MainActivity" />
+        <service android:name=".wear.services.DataLayerListenerService">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
 

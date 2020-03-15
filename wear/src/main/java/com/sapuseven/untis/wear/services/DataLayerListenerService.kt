@@ -1,7 +1,6 @@
 package com.sapuseven.untis.wear.services
 
 import android.content.Intent
-import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.PreferenceManager
 import com.google.android.gms.common.data.FreezableUtils
@@ -20,10 +19,6 @@ class DataLayerListenerService : WearableListenerService() {
             val item = it.dataItem
             if (item.uri.path == UNTIS_LOGIN) {
                 val map = DataMapItem.fromDataItem(item).dataMap
-                Log.e("LOGIN", map.getString("edittext_logindatainput_key"))
-                Log.e("LOGIN", map.getString("edittext_logindatainput_school"))
-                Log.e("LOGIN", map.getString("edittext_logindatainput_user"))
-                Log.e("LOGIN", map.getBoolean("switch_logindatainput_anonymouslogin").toString())
 
                 val editor = PreferenceManager.getDefaultSharedPreferences(this).edit()
                 editor.putString("edittext_logindatainput_key", map.getString("edittext_logindatainput_key"))
