@@ -91,7 +91,7 @@ class ConnectActivity : WearableActivity() {
             if (key == null) return null
             query.data.params = listOf(UserDataParams(UntisAuthentication.createAuthObject(user, key)))
         }
-        
+
         val userDataResult = api.request(query)
 
         userDataResult.fold({ data ->

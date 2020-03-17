@@ -14,9 +14,15 @@ import android.widget.Toast
 import androidx.preference.PreferenceManager
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import com.sapuseven.untis.wear.interfaces.TimetableDisplay
+import com.sapuseven.untis.models.untis.UntisDate
+import com.sapuseven.untis.wear.data.TimeGridItem
+import com.sapuseven.untis.wear.helpers.TimetableLoader
+import java.lang.ref.WeakReference
 import kotlin.math.roundToInt
 
-class MainActivity : WearableActivity() {
+class MainActivity : WearableActivity(), TimetableDisplay {
 
     private var preferences: com.sapuseven.untis.helpers.config.PreferenceManager? = null
     private var scrollView: ScrollView? = null
@@ -24,6 +30,7 @@ class MainActivity : WearableActivity() {
     private var profileId: Long = -1
 
     private lateinit var profileUser: UserDatabase.User
+    private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +51,13 @@ class MainActivity : WearableActivity() {
         }
 
         loadProfile()
+        val timetableLoader = TimetableLoader(WeakReference(this), this, profileUser, timetableDatabaseInterface)
+
+        //TODO: Print timetable for today to log
+        /*val dateRange: UntisDate? = null
+        val element: PeriodElement? = null
+
+        timetableLoader.load(TimetableLoader.TimetableLoaderTarget(dateRange.first, dateRange.second, element.id, element.type), TimetableLoader.FLAG_LOAD_SERVER)*/
     }
 
     private fun loadProfile(): Boolean {
@@ -57,9 +71,16 @@ class MainActivity : WearableActivity() {
         profileUser = userDatabase.getUser(profileId) ?: return false
 
         preferences!!.saveProfileId(profileId)
-        Log.w("Untis", profileUser.user ?: "null")
-        //timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileUser.id ?: 0)
+        timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileUser.id ?: 0)
         return true
+    }
+
+    override fun addTimetableItems(items: List<TimeGridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
+        Log.d("Untis", "Load")
+    }
+
+    override fun onTimetableLoadingError(requestId: Int, code: Int?, message: String?) {
+        Log.d("Untis", "error")
     }
 
     override fun onGenericMotionEvent(event: MotionEvent?): Boolean {
