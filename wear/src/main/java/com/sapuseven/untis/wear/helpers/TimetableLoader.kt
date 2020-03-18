@@ -131,11 +131,6 @@ class TimetableLoader(
         )
     }
 
-    fun repeat(requestId: Int, flags: Int = 0, proxyHost: String? = null) {
-        Log.d("TimetableLoaderDebug", "target ${requestList[requestId]} (requestId $requestId): repeat")
-        load(requestList[requestId], flags, proxyHost)
-    }
-
     data class TimetableLoaderTarget(
             val startDate: UntisDate,
             val endDate: UntisDate,
