@@ -20,6 +20,7 @@
             style="@style/TitleText" />
 
         <LinearLayout
+            android:id="@+id/timetable"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="@dimen/inner_frame_layout_padding_2"
@@ -29,7 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableStart="@drawable/ic_info"
-                android:text="@string/main_no_timetable_available_for_today"
+                android:text="@string/main_loading"
                 style="@style/SettingsButton" />
         </LinearLayout>
 

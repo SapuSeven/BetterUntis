@@ -10,12 +10,13 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import android.widget.ScrollView
-import android.widget.Toast
 import androidx.preference.PreferenceManager
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.UntisDate
+import com.sapuseven.untis.wear.adapters.TimetableListAdapter
 import com.sapuseven.untis.wear.data.TimeGridItem
 import com.sapuseven.untis.wear.helpers.TimetableLoader
 import com.sapuseven.untis.wear.interfaces.TimetableDisplay
@@ -28,13 +29,15 @@ import kotlin.math.roundToInt
 
 class MainActivity : WearableActivity(), TimetableDisplay {
 
-    private var preferences: com.sapuseven.untis.helpers.config.PreferenceManager? = null
     private var scrollView: ScrollView? = null
+    private var preferences: com.sapuseven.untis.helpers.config.PreferenceManager? = null
+    private var timetableListAdapter: TimetableListAdapter? = null
     private val userDatabase = UserDatabase.createInstance(this)
     private var profileId: Long = -1
 
     private lateinit var profileUser: UserDatabase.User
     private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
+    private lateinit var timetableLoader: TimetableLoader
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,9 +46,14 @@ class MainActivity : WearableActivity(), TimetableDisplay {
         adjustInset(findViewById(R.id.content))
         scrollView = findViewById(R.id.root)
         preferences = com.sapuseven.untis.helpers.config.PreferenceManager(this)
+        timetableListAdapter = TimetableListAdapter(this, findViewById(R.id.timetable))
+
+        loadProfile()
+        timetableLoader = TimetableLoader(WeakReference(this), this, profileUser, timetableDatabaseInterface)
 
         findViewById<Button>(R.id.reload).setOnClickListener {
-            Toast.makeText(this, "TODO", Toast.LENGTH_LONG).show()
+            timetableListAdapter!!.resetListLoading()
+            loadTimetable()
         }
 
         findViewById<Button>(R.id.sign_out).setOnClickListener {
@@ -53,12 +61,11 @@ class MainActivity : WearableActivity(), TimetableDisplay {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
+    }
 
-        loadProfile()
-        val timetableLoader = TimetableLoader(WeakReference(this), this, profileUser, timetableDatabaseInterface)
-
-        val today = UntisDate.fromLocalDate(LocalDate.now())
-        timetableLoader.load(TimetableLoader.TimetableLoaderTarget(today, today, profileUser.userData.elemId, profileUser.userData.elemType ?: ""), TimetableLoader.FLAG_LOAD_SERVER)
+    override fun onResume() {
+        super.onResume()
+        loadTimetable()
     }
 
     private fun loadProfile(): Boolean {
@@ -76,19 +83,37 @@ class MainActivity : WearableActivity(), TimetableDisplay {
         return true
     }
 
+    private fun loadTimetable() {
+        val today = UntisDate.fromLocalDate(LocalDate.now())
+        timetableLoader.load(TimetableLoader.TimetableLoaderTarget(today, today, profileUser.userData.elemId, profileUser.userData.elemType ?: ""), TimetableLoader.FLAG_LOAD_SERVER)
+    }
+
     override fun addTimetableItems(items: List<TimeGridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
+        timetableListAdapter!!.clearList()
+        val fmt: DateTimeFormatter = DateTimeFormat.forPattern("HH:mm")
+        var data: PeriodData
+        var time: String
+        var title: String
+        var teacher: String
+        var room: String
+        var text: String
         items.forEach {
-            val fmt: DateTimeFormatter = DateTimeFormat.forPattern("HH:mm")
-            val time = it.startDateTime.toString(fmt) + " - " + it.endDateTime.toString(fmt)
-            val title = it.periodData.getShortTitle()
-            val teacher = if (it.contextType == TimetableDatabaseInterface.Type.TEACHER.name) it.periodData.getShortClasses() else it.periodData.getShortTeachers()
-            val room = if (it.contextType == TimetableDatabaseInterface.Type.ROOM.name) it.periodData.getShortClasses() else it.periodData.getShortRooms()
-            Log.d("Timetable", time + "\n" + title + ", " + teacher + ", " + room)
+            data = it.periodData
+            time = it.startDateTime.toString(fmt) + " - " + it.endDateTime.toString(fmt)
+            title = if (data.getShortTitle() == "") resources.getString(R.string.main_untitled) else data.getShortTitle()
+            teacher = if (it.contextType == TimetableDatabaseInterface.Type.TEACHER.name) data.getShortClasses() else data.getShortTeachers()
+            room = if (it.contextType == TimetableDatabaseInterface.Type.ROOM.name)data.getShortClasses() else it.periodData.getShortRooms()
+
+            text = "$time\n$title"
+            if (teacher != "") text += ", $teacher"
+            if (room != "") text += ", $room"
+            timetableListAdapter!!.addItem(text, data.isCancelled())
         }
     }
 
     override fun onTimetableLoadingError(requestId: Int, code: Int?, message: String?) {
         Log.d("Timetable", message ?: "")
+        timetableListAdapter!!.resetListUnavailable()
     }
 
     override fun onGenericMotionEvent(event: MotionEvent?): Boolean {
