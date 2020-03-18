@@ -19,6 +19,7 @@ import com.sapuseven.untis.wear.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.wear.data.TimeGridItem
 import com.sapuseven.untis.wear.helpers.TimetableLoader
+import org.joda.time.LocalDate
 import java.lang.ref.WeakReference
 import kotlin.math.roundToInt
 
@@ -53,11 +54,8 @@ class MainActivity : WearableActivity(), TimetableDisplay {
         loadProfile()
         val timetableLoader = TimetableLoader(WeakReference(this), this, profileUser, timetableDatabaseInterface)
 
-        //TODO: Print timetable for today to log
-        /*val dateRange: UntisDate? = null
-        val element: PeriodElement? = null
-
-        timetableLoader.load(TimetableLoader.TimetableLoaderTarget(dateRange.first, dateRange.second, element.id, element.type), TimetableLoader.FLAG_LOAD_SERVER)*/
+        val today = UntisDate.fromLocalDate(LocalDate.now())
+        timetableLoader.load(TimetableLoader.TimetableLoaderTarget(today, today, profileUser.userData.elemId, profileUser.userData.elemType ?: ""), TimetableLoader.FLAG_LOAD_SERVER)
     }
 
     private fun loadProfile(): Boolean {
