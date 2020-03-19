@@ -5,6 +5,9 @@
     <string name="login_connect">Connect</string>
 
     <string name="connect_connecting">Open the BetterUntis app on your phone and go to Settings > Wear OS Support</string>
+    <string name="connect_acquiring_app_shared_secret_failed">Acquiring the app shared secret failed</string>
+    <string name="connect_acquiring_user_data_failed">Acquiring the user data failed</string>
+    <string name="connect_adding_user_failed">Creating the user failed</string>
 
     <string name="main_your_timetable_for_today">Your Timetable for Today</string>
     <string name="main_loading">Loading</string>

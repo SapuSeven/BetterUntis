@@ -23,6 +23,9 @@ import com.sapuseven.untis.models.UntisSchoolInfo
 import com.sapuseven.untis.models.untis.params.UserDataParams
 import com.sapuseven.untis.models.untis.response.UserDataResponse
 import com.sapuseven.untis.models.untis.response.UserDataResult
+import com.sapuseven.untis.wear.helpers.ErrorHandling.ACQUIRING_APP_SHARED_SECRET_FAILED
+import com.sapuseven.untis.wear.helpers.ErrorHandling.ACQUIRING_USER_DATA_FAILED
+import com.sapuseven.untis.wear.helpers.ErrorHandling.ADDING_USER_FAILED
 import com.sapuseven.untis.wear.helpers.ErrorHandling.handleError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -67,11 +70,11 @@ class ConnectActivity : WearableActivity() {
             val untisResponse = getJSON().parse(AppSharedSecretResponse.serializer(), data)
 
             if (untisResponse.result.isNullOrEmpty())
-                handleError(this, "no response")
+                handleError(this, ACQUIRING_APP_SHARED_SECRET_FAILED)
             else
                 return untisResponse.result
         }, { error ->
-            handleError(this, error.toString())
+            handleError(this, ACQUIRING_APP_SHARED_SECRET_FAILED)
         })
         return null
     }
@@ -100,10 +103,10 @@ class ConnectActivity : WearableActivity() {
             if (untisResponse.result != null) {
                 return untisResponse.result
             } else {
-                handleError(this, "no response")
+                handleError(this, ACQUIRING_USER_DATA_FAILED)
             }
         }, { error ->
-            handleError(this, error.toString())
+            handleError(this, ACQUIRING_USER_DATA_FAILED)
         })
 
         return null
@@ -140,7 +143,7 @@ class ConnectActivity : WearableActivity() {
                 userDatabase.setAdditionalUserData(userId, response.masterData)
                 com.sapuseven.untis.helpers.config.PreferenceManager(this@ConnectActivity).saveProfileId(userId.toLong())
             } ?: run {
-                handleError(this@ConnectActivity, "unknown")
+                handleError(this@ConnectActivity, ADDING_USER_FAILED)
             }
         }
 
