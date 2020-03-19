@@ -6,7 +6,7 @@ import org.joda.time.DateTime
 class TimeGridItem(
         id: Long,
         val startDateTime: DateTime,
-        val endDateTime: DateTime,
+        var endDateTime: DateTime,
         val contextType: String,
         val periodData: PeriodData
 ) {
