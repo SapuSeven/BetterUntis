@@ -54,7 +54,7 @@ class MainActivity : WearableActivity(), TimetableDisplay {
 
         findViewById<Button>(R.id.reload).setOnClickListener {
             timetableListAdapter!!.resetListLoading()
-            loadTimetable()
+            loadTimetable(true)
         }
 
         findViewById<Button>(R.id.sign_out).setOnClickListener {
@@ -84,9 +84,10 @@ class MainActivity : WearableActivity(), TimetableDisplay {
         return true
     }
 
-    private fun loadTimetable() {
+    private fun loadTimetable(force: Boolean = false) {
         val today = UntisDate.fromLocalDate(LocalDate.now())
-        timetableLoader.load(TimetableLoader.TimetableLoaderTarget(today, today, profileUser.userData.elemId, profileUser.userData.elemType ?: ""), TimetableLoader.FLAG_LOAD_SERVER)
+        val flags = if (force) TimetableLoader.FLAG_LOAD_SERVER else TimetableLoader.FLAG_LOAD_CACHE
+        timetableLoader.load(TimetableLoader.TimetableLoaderTarget(today, today, profileUser.userData.elemId, profileUser.userData.elemType ?: ""), flags)
     }
 
     override fun addTimetableItems(items: List<TimeGridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
@@ -115,7 +116,12 @@ class MainActivity : WearableActivity(), TimetableDisplay {
 
     override fun onTimetableLoadingError(requestId: Int, code: Int?, message: String?) {
         Log.d("Timetable", message ?: "")
-        timetableListAdapter!!.resetListUnavailable()
+        when (code) {
+            TimetableLoader.CODE_CACHE_MISSING -> timetableLoader.repeat(requestId, TimetableLoader.FLAG_LOAD_SERVER)
+            else -> {
+                timetableListAdapter!!.resetListUnavailable()
+            }
+        }
     }
 
     override fun onGenericMotionEvent(event: MotionEvent?): Boolean {

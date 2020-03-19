@@ -62,7 +62,7 @@ class TimetableLoader(
         if (cache.exists()) {
             Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): cached file found")
             cache.load()?.let {
-                timetableDisplay.addTimetableItems(it.items.map { periodToTimegridItem(it, target.type) }, target.startDate, target.endDate, it.timestamp)
+                timetableDisplay.addTimetableItems(it.items.map { periodToTimeGridItem(it, target.type) }, target.startDate, target.endDate, it.timestamp)
             } ?: run {
                 cache.delete()
                 Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): cached file corrupted")
@@ -106,7 +106,7 @@ class TimetableLoader(
 
                 val items = untisResponse.result.timetable.periods
                 val timestamp = Instant.now().millis
-                timetableDisplay.addTimetableItems(items.map { periodToTimegridItem(it, target.type) }, target.startDate, target.endDate, timestamp)
+                timetableDisplay.addTimetableItems(items.map { periodToTimeGridItem(it, target.type) }, target.startDate, target.endDate, timestamp)
                 Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): saving to cache: $cache")
                 cache.save(TimetableCache.CacheObject(timestamp, items))
 
@@ -121,7 +121,7 @@ class TimetableLoader(
         })
     }
 
-    private fun periodToTimegridItem(period: Period, type: String): TimeGridItem {
+    private fun periodToTimeGridItem(period: Period, type: String): TimeGridItem {
         return TimeGridItem(
                 period.id.toLong(),
                 DateTimeUtils.isoDateTimeNoSeconds().withZone(DateTimeZone.getDefault()).parseLocalDateTime(period.startDateTime).toDateTime(),
@@ -129,6 +129,11 @@ class TimetableLoader(
                 type,
                 PeriodData(timetableDatabaseInterface, period)
         )
+    }
+
+    fun repeat(requestId: Int, flags: Int = 0, proxyHost: String? = null) {
+        Log.d("TimetableLoaderDebug", "target ${requestList[requestId]} (requestId $requestId): repeat")
+        load(requestList[requestId], flags, proxyHost)
     }
 
     data class TimetableLoaderTarget(
