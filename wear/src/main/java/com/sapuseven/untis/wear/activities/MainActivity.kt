@@ -19,6 +19,7 @@ import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.wear.adapters.TimetableListAdapter
 import com.sapuseven.untis.wear.data.TimeGridItem
 import com.sapuseven.untis.wear.helpers.TimetableLoader
+import com.sapuseven.untis.wear.helpers.TimetableSorting.formatItems
 import com.sapuseven.untis.wear.interfaces.TimetableDisplay
 import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
@@ -89,7 +90,7 @@ class MainActivity : WearableActivity(), TimetableDisplay {
     }
 
     override fun addTimetableItems(items: List<TimeGridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
-        timetableListAdapter!!.clearList()
+        val formattedItems = formatItems(items)
         val fmt: DateTimeFormatter = DateTimeFormat.forPattern("HH:mm")
         var data: PeriodData
         var time: String
@@ -97,7 +98,8 @@ class MainActivity : WearableActivity(), TimetableDisplay {
         var teacher: String
         var room: String
         var text: String
-        items.forEach {
+        timetableListAdapter!!.clearList()
+        formattedItems.forEach {
             data = it.periodData
             time = it.startDateTime.toString(fmt) + " - " + it.endDateTime.toString(fmt)
             title = if (data.getShortTitle() == "") resources.getString(R.string.main_untitled) else data.getShortTitle()
