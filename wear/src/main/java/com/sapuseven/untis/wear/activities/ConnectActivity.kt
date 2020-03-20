@@ -79,6 +79,8 @@ class ConnectActivity : WearableActivity() {
         appSharedSecretResult.fold({ data ->
             val untisResponse = getJSON().parse(AppSharedSecretResponse.serializer(), data)
 
+            if (untisResponse.error?.code == -8504)
+                return password
             if (untisResponse.result.isNullOrEmpty()) {
                 status = 0x00
                 handleError(this, ACQUIRING_APP_SHARED_SECRET_FAILED)
