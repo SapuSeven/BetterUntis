@@ -53,6 +53,8 @@ class ConnectActivity : WearableActivity() {
         }
     }
 
+    private var status: Byte = 0x01
+
     private var anonymous: Boolean = false
     private var schoolInfo: UntisSchoolInfo? = null
 
@@ -77,11 +79,13 @@ class ConnectActivity : WearableActivity() {
         appSharedSecretResult.fold({ data ->
             val untisResponse = getJSON().parse(AppSharedSecretResponse.serializer(), data)
 
-            if (untisResponse.result.isNullOrEmpty())
+            if (untisResponse.result.isNullOrEmpty()) {
+                status = 0x00
                 handleError(this, ACQUIRING_APP_SHARED_SECRET_FAILED)
-            else
-                return untisResponse.result
-        }, { error ->
+            }
+            else return untisResponse.result
+        }, { _ ->
+            status = 0x00
             handleError(this, ACQUIRING_APP_SHARED_SECRET_FAILED)
         })
         return null
@@ -111,9 +115,11 @@ class ConnectActivity : WearableActivity() {
             if (untisResponse.result != null) {
                 return untisResponse.result
             } else {
+                status = 0x00
                 handleError(this, ACQUIRING_USER_DATA_FAILED)
             }
-        }, { error ->
+        }, { _ ->
+            status = 0x00
             handleError(this, ACQUIRING_USER_DATA_FAILED)
         })
 
@@ -155,19 +161,19 @@ class ConnectActivity : WearableActivity() {
             }
         }
 
-        SendMessage(this@ConnectActivity).start()
+        SendMessage(this@ConnectActivity, status).start()
         startActivity(Intent(this@ConnectActivity, MainActivity::class.java))
         finish()
     }
 
-    internal class SendMessage(private val c: Context) : Thread() {
+    internal class SendMessage(private val c: Context, private val status: Byte) : Thread() {
 
         override fun run() {
             val nodeListTask: Task<List<Node>> = Wearable.getNodeClient(c.applicationContext).connectedNodes
             try {
                 val nodes: List<Node> = Tasks.await(nodeListTask)
                 nodes.forEach {
-                    val sendMessageTask: Task<Int> = Wearable.getMessageClient(c).sendMessage(it.id, UNTIS_SUCCESS, byteArrayOf(0x01))
+                    val sendMessageTask: Task<Int> = Wearable.getMessageClient(c).sendMessage(it.id, UNTIS_SUCCESS, byteArrayOf(status))
                     try {
                         val result: Int = Tasks.await(sendMessageTask)
                     } catch (e: Exception) { }

@@ -216,6 +216,10 @@
 	<string name="preference_wear_os_support">Wear OS Unterstützung</string>
     <string name="preference_wear_os_support_connecting">Verbindungsaufbau zur Uhr</string>
     <string name="preference_wear_os_support_connecting_desc">Bitte warte, während dein Profil auf die Uhr kopiert wird.</string>
+	<string name="preference_wear_os_support_error">Verbindungsaufbau fehlgeschlagen</string>
+	<string name="preference_wear_os_support_error_desc">Es konnte keine Verbindung zu deiner Uhr aufgebaut werden.</string>
+	<string name="preference_wear_os_support_success">Profil kopiert</string>
+	<string name="preference_wear_os_support_success_desc">Dein Profil wurde erfolgreich auf deine Uhr kopiert.</string>
 	<string name="preference_week_custom_range">Wochenlänge</string>
 	<string name="preference_week_custom_range_summary">%1$s bis %2$s</string>
 	<string name="preference_week_custom_range_summary_short">%1$s</string>

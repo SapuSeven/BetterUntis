@@ -225,6 +225,10 @@
     <string name="preference_wear_os_support">Wear OS Support</string>
     <string name="preference_wear_os_support_connecting">Connecting to your wearable</string>
     <string name="preference_wear_os_support_connecting_desc">Please wait while your profile is copied to your watch.</string>
+    <string name="preference_wear_os_support_error">Could not connect to your wearable</string>
+    <string name="preference_wear_os_support_error_desc">A connection to your wearable could not be established.</string>
+    <string name="preference_wear_os_support_success">Finished copying your profile</string>
+    <string name="preference_wear_os_support_success_desc">Your profile has been successfully copied to your watch.</string>
     <string name="preference_week_custom_range">Custom week range</string>
     <string name="preference_week_custom_range_summary">%1$s to %2$s</string>
     <string name="preference_week_custom_range_summary_short">%1$s</string>
