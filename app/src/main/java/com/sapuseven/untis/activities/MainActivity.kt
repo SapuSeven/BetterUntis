@@ -12,7 +12,6 @@ import android.os.Looper
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -61,6 +60,7 @@ import com.sapuseven.untis.views.weekview.listeners.ScaleListener
 import com.sapuseven.untis.views.weekview.listeners.ScrollListener
 import com.sapuseven.untis.views.weekview.listeners.TopLeftCornerClickListener
 import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants
@@ -89,6 +89,7 @@ class MainActivity :
 		private const val REQUEST_CODE_SETTINGS = 2
 		private const val REQUEST_CODE_LOGINDATAINPUT_ADD = 3
 		private const val REQUEST_CODE_LOGINDATAINPUT_EDIT = 4
+		private const val REQUEST_CODE_ERRORS = 5
 
 		private const val UNTIS_DEFAULT_COLOR = "#f49f25"
 
@@ -132,18 +133,24 @@ class MainActivity :
 
 		setContentView(R.layout.activity_main)
 
-		setupActionBar()
-		setupNavDrawer()
+		if (checkForCrashes()) {
+			startActivityForResult(Intent(this, ErrorsActivity::class.java).apply {
+				putExtra(ErrorsActivity.EXTRA_BOOLEAN_SHOW_CRASH_MESSAGE, true)
+			}, REQUEST_CODE_ERRORS)
+		} else {
+			setupActionBar()
+			setupNavDrawer()
 
-		setupViews()
-		setupHours()
-		setupHolidays()
+			setupViews()
+			setupHours()
+			setupHolidays()
 
-		if (profileUser.schoolId <= 0) return
+			if (profileUser.schoolId <= 0) return
 
-		setupTimetableLoader()
-		showPersonalTimetable()
-		refreshNavigationViewSelection()
+			setupTimetableLoader()
+			showPersonalTimetable()
+			refreshNavigationViewSelection()
+		}
 	}
 
 	override fun onPause() {
@@ -154,13 +161,26 @@ class MainActivity :
 	override fun onResume() {
 		super.onResume()
 		preferences.reload(profileId)
-		proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
-		setupWeekViewConfig()
 
-		weekViewRefreshHandler.post(weekViewUpdate)
+		if (::weekView.isInitialized) {
+			proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
+			setupWeekViewConfig()
 
-		if (profileUser.schoolId <= 0 && profileUpdateDialog == null)
-			showProfileUpdateRequired()
+			weekViewRefreshHandler.post(weekViewUpdate)
+
+			if (profileUser.schoolId <= 0 && profileUpdateDialog == null)
+				showProfileUpdateRequired()
+		}
+	}
+
+	override fun onErrorLogFound() {
+		// TODO: Extract string resources
+		if (PreferenceUtils.getPrefBool(preferences, "preference_additional_error_messages"))
+			Snackbar.make(content_main, "Some errors have been found.", Snackbar.LENGTH_INDEFINITE)
+					.setAction("Show") {
+						startActivity(Intent(this, ErrorsActivity::class.java))
+					}
+					.show()
 	}
 
 	private fun showProfileUpdateRequired() {
@@ -214,13 +234,12 @@ class MainActivity :
 	}
 
 	private fun setupNavDrawer() {
-		val navigationView = findViewById<NavigationView>(R.id.navigationview_main)
-		navigationView.setNavigationItemSelectedListener(this)
-		navigationView.setCheckedItem(R.id.nav_show_personal)
+		navigationview_main.setNavigationItemSelectedListener(this)
+		navigationview_main.setCheckedItem(R.id.nav_show_personal)
 
-		setupNavDrawerHeader(navigationView)
+		setupNavDrawerHeader(navigationview_main)
 
-		val header = navigationView.getHeaderView(0)
+		val header = navigationview_main.getHeaderView(0)
 		val dropdown = header.findViewById<ConstraintLayout>(R.id.constraintlayout_mainactivitydrawer_dropdown)
 		val dropdownView = header.findViewById<LinearLayout>(R.id.linearlayout_mainactivitydrawer_dropdown_view)
 		val dropdownImage = header.findViewById<ImageView>(R.id.imageview_mainactivitydrawer_dropdown_arrow)
@@ -304,7 +323,7 @@ class MainActivity :
 
 		textview_main_lastrefresh?.text = getString(R.string.main_last_refreshed, getString(R.string.main_last_refreshed_never))
 
-		findViewById<Button>(R.id.button_main_settings).setOnClickListener {
+		button_main_settings.setOnClickListener {
 			val intent = Intent(this@MainActivity, SettingsActivity::class.java)
 			intent.putExtra(SettingsActivity.EXTRA_LONG_PROFILE_ID, profileId)
 			// TODO: Find a way to jump directly to the personal timetable setting
@@ -387,7 +406,7 @@ class MainActivity :
 		weekView.firstDayOfWeek = preferences.defaultPrefs.getStringSet("preference_week_custom_range", emptySet())?.map { MaterialDayPicker.Weekday.valueOf(it) }?.min()?.ordinal
 				?: DateTimeFormat.forPattern("E").withLocale(Locale.ENGLISH).parseDateTime((profileUser.timeGrid.days[0].day)).dayOfWeek
 
-        weekView.timeColumnVisibility = !PreferenceUtils.getPrefBool(preferences, "preference_timetable_hide_time_stamps")
+		weekView.timeColumnVisibility = !PreferenceUtils.getPrefBool(preferences, "preference_timetable_hide_time_stamps")
 
 		weekView.columnGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_padding").toFloat(), this).toInt()
 		weekView.overlappingEventGap = ConversionUtils.dpToPx(PreferenceUtils.getPrefInt(preferences, "preference_timetable_item_padding_overlap").toFloat(), this).toInt()
@@ -460,9 +479,8 @@ class MainActivity :
 	private fun setupActionBar() {
 		val toolbar: Toolbar = findViewById(R.id.toolbar_main)
 		setSupportActionBar(toolbar)
-		val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-		val toggle = ActionBarDrawerToggle(this, drawer, toolbar, R.string.main_drawer_open, R.string.main_drawer_close)
-		drawer.addDrawerListener(toggle)
+		val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.main_drawer_open, R.string.main_drawer_close)
+		drawer_layout.addDrawerListener(toggle)
 		toggle.syncState()
 	}
 
@@ -518,7 +536,7 @@ class MainActivity :
 		}
 
 		val newItems = mutableListOf<TimegridItem>()
-		newItems.addAll(leftover)
+		newItems.addAll(leftover) // Add items that didn't fit inside the timegrid. These will always be single lessons.
 		itemGrid.forEach { unitsOfDay ->
 			unitsOfDay.forEachIndexed { unitIndex, items ->
 				items.forEach {
@@ -615,35 +633,31 @@ class MainActivity :
 		super.onActivityResult(requestCode, resultCode, intent)
 
 		when (requestCode) {
-			REQUEST_CODE_ROOM_FINDER -> {
-				if (resultCode == Activity.RESULT_OK) {
-					val roomId = data?.getIntExtra(RoomFinderActivity.EXTRA_INT_ROOM_ID, -1) ?: -1
-					if (roomId != -1)
-						@Suppress("RemoveRedundantQualifierName")
-						setTarget(roomId, TimetableDatabaseInterface.Type.ROOM.toString(), timetableDatabaseInterface.getLongName(roomId, TimetableDatabaseInterface.Type.ROOM))
-				}
-			}
-			REQUEST_CODE_SETTINGS -> {
-				recreate()
-			}
-			REQUEST_CODE_LOGINDATAINPUT_ADD -> {
+			REQUEST_CODE_ROOM_FINDER ->
+				if (resultCode == Activity.RESULT_OK)
+					(data?.getIntExtra(RoomFinderActivity.EXTRA_INT_ROOM_ID, -1)
+							?: -1).let { roomId ->
+						if (roomId != -1)
+							@Suppress("RemoveRedundantQualifierName")
+							setTarget(roomId, TimetableDatabaseInterface.Type.ROOM.toString(), timetableDatabaseInterface.getLongName(roomId, TimetableDatabaseInterface.Type.ROOM))
+					}
+			REQUEST_CODE_SETTINGS -> recreate()
+			REQUEST_CODE_LOGINDATAINPUT_ADD ->
 				if (resultCode == Activity.RESULT_OK)
 					recreate()
-			}
-			REQUEST_CODE_LOGINDATAINPUT_EDIT -> {
+			REQUEST_CODE_LOGINDATAINPUT_EDIT ->
 				if (resultCode == Activity.RESULT_OK)
 					recreate()
-			}
+			REQUEST_CODE_ERRORS -> recreate()
 		}
 	}
 
 	override fun onBackPressed() {
-		val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-		if (drawer.isDrawerOpen(GravityCompat.START)) {
-			closeDrawer(drawer)
+		if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
+			closeDrawer(drawer_layout)
 		} else if (!showPersonalTimetable()) {
 			if (System.currentTimeMillis() - 2000 > lastBackPress && PreferenceUtils.getPrefBool(preferences, "preference_double_tap_to_exit")) {
-				Snackbar.make(findViewById<ConstraintLayout>(R.id.content_main),
+				Snackbar.make(content_main,
 						R.string.main_press_back_double, 2000).show()
 				lastBackPress = System.currentTimeMillis()
 			} else {
@@ -711,14 +725,10 @@ class MainActivity :
 
 	private fun refreshNavigationViewSelection() {
 		when (displayedElement?.type) {
-			TimetableDatabaseInterface.Type.CLASS.name -> (findViewById<View>(R.id.navigationview_main) as NavigationView)
-					.setCheckedItem(R.id.nav_show_classes)
-			TimetableDatabaseInterface.Type.TEACHER.name -> (findViewById<View>(R.id.navigationview_main) as NavigationView)
-					.setCheckedItem(R.id.nav_show_teachers)
-			TimetableDatabaseInterface.Type.ROOM.name -> (findViewById<View>(R.id.navigationview_main) as NavigationView)
-					.setCheckedItem(R.id.nav_show_rooms)
-			else -> (findViewById<View>(R.id.navigationview_main) as NavigationView)
-					.setCheckedItem(R.id.nav_show_personal)
+			TimetableDatabaseInterface.Type.CLASS.name -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_classes)
+			TimetableDatabaseInterface.Type.TEACHER.name -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_teachers)
+			TimetableDatabaseInterface.Type.ROOM.name -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_rooms)
+			else -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_personal)
 		}
 	}
 

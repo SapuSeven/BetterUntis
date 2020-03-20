@@ -1,26 +1,20 @@
 package com.sapuseven.untis.activities
 
 import android.annotation.SuppressLint
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
-import android.widget.Toast
 import androidx.annotation.AttrRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.sapuseven.untis.R
+import com.sapuseven.untis.helpers.ErrorLogger
 import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.helpers.config.PreferenceUtils
-import com.sapuseven.untis.helpers.issues.GithubIssue
-import com.sapuseven.untis.helpers.issues.Issue
 import java.io.File
-import java.io.PrintStream
 
 @SuppressLint("Registered") // This activity is not intended to be used directly
 open class BaseActivity : AppCompatActivity() {
@@ -32,6 +26,8 @@ open class BaseActivity : AppCompatActivity() {
 	private var themeId = -1
 
 	override fun onCreate(savedInstanceState: Bundle?) {
+		ErrorLogger.initialize(this)
+
 		Thread.setDefaultUncaughtExceptionHandler(CrashHandler(this, Thread.getDefaultUncaughtExceptionHandler()))
 
 		preferences = PreferenceManager(this)
@@ -39,41 +35,45 @@ open class BaseActivity : AppCompatActivity() {
 		currentDarkTheme = PreferenceUtils.getPrefString(preferences, "preference_dark_theme")
 		setAppTheme(hasOwnToolbar)
 		super.onCreate(savedInstanceState)
-		checkForCrashes()
 	}
 
-	private fun checkForCrashes() {
-		File(filesDir, "crash").listFiles()?.forEach { crashFile ->
-			val reader = crashFile.bufferedReader()
+	/**
+	 * Checks for saved crashes. Calls [onErrorLogFound] if logs are found.
+	 *
+	 * @return `true` if the logs contain a critical application crash, `false` otherwise
+	 */
+	protected fun checkForCrashes(): Boolean {
+		val logFiles = File(filesDir, "logs").listFiles()
+		if (logFiles?.isNotEmpty() == true) {
+			onErrorLogFound()
 
-			val stackTrace = StringBuilder()
-			val buffer = CharArray(1024)
-			var length = reader.read(buffer)
-
-			while (length != -1) {
-				stackTrace.append(String(buffer, 0, length))
-				length = reader.read(buffer)
-			}
-
-			reader.close()
-			crashFile.delete()
-
-			MaterialAlertDialogBuilder(this)
-					.setTitle(R.string.all_dialog_crash_title)
-					.setMessage(stackTrace)
-					.setNegativeButton(R.string.all_copy) { _, _ ->
-						val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-						clipboard.setPrimaryClip(ClipData.newPlainText("BetterUntis Crash Log", stackTrace))
-						Toast.makeText(this, R.string.all_dialog_crash_copied, Toast.LENGTH_SHORT).show()
-					}
-					.setPositiveButton(R.string.all_close) { dialog, _ ->
-						dialog.dismiss()
-					}
-					.setNeutralButton(R.string.all_report) { _, _ ->
-						GithubIssue(Issue.Type.CRASH, stackTrace.toString()).launch(this)
-					}
-					.show()
+			return logFiles.find { f -> f.name.startsWith("_") } != null
 		}
+		return false
+	}
+
+	/**
+	 * Gets called if any error logs are found.
+	 *
+	 * Override this function in your actual activity.
+	 */
+	open fun onErrorLogFound() {
+		return
+	}
+
+	protected fun readCrashData(crashFile: File): String {
+		val reader = crashFile.bufferedReader()
+
+		val stackTrace = StringBuilder()
+		val buffer = CharArray(1024)
+		var length = reader.read(buffer)
+
+		while (length != -1) {
+			stackTrace.append(String(buffer, 0, length))
+			length = reader.read(buffer)
+		}
+
+		return stackTrace.toString()
 	}
 
 	override fun onStart() {
@@ -132,7 +132,7 @@ open class BaseActivity : AppCompatActivity() {
 		return typedValue.data
 	}
 
-	class CrashHandler(val context: Context, private val defaultUncaughtExceptionHandler: Thread.UncaughtExceptionHandler?) : Thread.UncaughtExceptionHandler {
+	private class CrashHandler(val context: Context, private val defaultUncaughtExceptionHandler: Thread.UncaughtExceptionHandler?) : Thread.UncaughtExceptionHandler {
 		override fun uncaughtException(t: Thread, e: Throwable) {
 			Log.e("BetterUntis", "Application crashed!", e)
 			saveCrash(e)
@@ -140,13 +140,7 @@ open class BaseActivity : AppCompatActivity() {
 		}
 
 		private fun saveCrash(e: Throwable) {
-			val parent = File(context.filesDir, "crash")
-			parent.mkdir()
-
-			PrintStream(File(parent, "${System.currentTimeMillis()}.log")).use {
-				e.printStackTrace(it)
-				it.close()
-			}
+			ErrorLogger.instance?.logThrowable(e)
 		}
 	}
 }

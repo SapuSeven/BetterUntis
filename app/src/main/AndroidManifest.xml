@@ -89,6 +89,10 @@
                 android:value=".activities.MainActivity" />
         </activity>
 
+    		<activity
+    			android:name=".activities.ErrorsActivity"
+    			android:label="@string/activity_title_errors" />
+
         <receiver android:name=".receivers.StartupReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

@@ -8,7 +8,7 @@
 	android:paddingTop="@dimen/margin_listitem_text_vertical">
 
 	<TextView
-		android:id="@+id/textview_itemmessage_subject"
+		android:id="@+id/textview_listitem_line1"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_marginStart="@dimen/margin_listitem_text"
@@ -20,7 +20,7 @@
 		app:layout_constraintTop_toTopOf="parent" />
 
 	<TextView
-		android:id="@+id/textview_itemmessage_body"
+		android:id="@+id/textview_listitem_line2"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_marginStart="@dimen/margin_listitem_text"
@@ -31,6 +31,6 @@
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@+id/textview_itemmessage_subject" />
+		app:layout_constraintTop_toBottomOf="@+id/textview_listitem_line1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

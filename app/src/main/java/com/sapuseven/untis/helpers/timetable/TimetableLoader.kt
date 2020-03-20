@@ -21,6 +21,7 @@ import com.sapuseven.untis.models.untis.timetable.Period
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonParsingException
 import org.joda.time.DateTimeZone
 import org.joda.time.Instant
 import java.lang.ref.WeakReference
@@ -37,6 +38,7 @@ class TimetableLoader(
 
 		const val CODE_CACHE_MISSING = 1
 		const val CODE_REQUEST_FAILED = 2
+		const val CODE_REQUEST_PARSING_EXCEPTION = 3
 	}
 
 	private val requestList = ArrayList<TimetableLoaderTarget>()
@@ -97,26 +99,47 @@ class TimetableLoader(
 
 		val userDataResult = api.request(query)
 		userDataResult.fold({ data ->
-			val untisResponse = getJSON().parse(TimetableResponse.serializer(), data)
+			try {
+				val untisResponse = getJSON().parse(TimetableResponse.serializer(), data)
 
-			if (untisResponse.result != null) {
-				Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): network request success, returning")
+				if (untisResponse.result != null) {
+					Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): network request success, returning")
 
-				val items = untisResponse.result.timetable.periods
-				val timestamp = Instant.now().millis
-				timetableDisplay.addTimetableItems(items.map { periodToTimegridItem(it, target.type) }, target.startDate, target.endDate, timestamp)
-				Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): saving to cache: $cache")
-				cache.save(TimetableCache.CacheObject(timestamp, items))
+					val items = untisResponse.result.timetable.periods
+					val timestamp = Instant.now().millis
+					timetableDisplay.addTimetableItems(items.map { periodToTimegridItem(it, target.type) }, target.startDate, target.endDate, timestamp)
+					Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): saving to cache: $cache")
+					cache.save(TimetableCache.CacheObject(timestamp, items))
 
-				// TODO: Interpret masterData in the response
-			} else {
-				Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): network request failed at Untis API level")
-				timetableDisplay.onTimetableLoadingError(requestId, untisResponse.error?.code, untisResponse.error?.message)
+					// TODO: Interpret masterData in the response
+				} else {
+					Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): network request failed at Untis API level")
+					timetableDisplay.onTimetableLoadingError(requestId, untisResponse.error?.code, untisResponse.error?.message)
+				}
+			} catch (e: Exception) {
+				val msg = when (e) {
+					is JsonParsingException -> formatJsonParsingException(e, data)
+					else -> e.toString()
+				}
+				timetableDisplay.onTimetableLoadingError(requestId, CODE_REQUEST_PARSING_EXCEPTION, msg)
 			}
 		}, { error ->
 			Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): network request failed at OS level")
 			timetableDisplay.onTimetableLoadingError(requestId, CODE_REQUEST_FAILED, error.message)
 		})
+	}
+
+	private fun formatJsonParsingException(e: JsonParsingException, jsonData: String): String {
+		val errorMargin = 20
+		val errorIndex: Int? = e.message?.let {
+			it.split(" ")[3].let { i ->
+				i.substring(0, i.length - 1)
+			}.toIntOrNull()
+		}
+
+		return e.toString() + if (errorIndex != null)
+			"\n(near " + jsonData.substring((errorIndex - errorMargin).coerceAtLeast(0), (errorIndex + errorMargin).coerceAtMost(jsonData.length)) + ")"
+		else ""
 	}
 
 	private fun periodToTimegridItem(period: Period, type: String): TimegridItem {
