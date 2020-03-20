@@ -287,6 +287,7 @@
   	<string name="library_kotlin_test_junit" translatable="false">Kotlin Test JUnit</string>
   	<string name="library_kotlinx_coroutines_android" translatable="false">Kotlinx Coroutines Android</string>
   	<string name="library_kotlinx_serialization_runtime" translatable="false">Kotlinx Serialization Runtime</string>
+	<string name="library_localbroadcastmanager" translatable="false">Android Support Library Local Broadcast Manager</string>
   	<string name="library_materialdaypicker" translatable="false">Materialdaypicker</string>
   	<string name="library_materialcomponent_banner" translatable="false">MaterialComponent.Banner</string>
   	<string name="library_material" translatable="false">Material Components For Android</string>

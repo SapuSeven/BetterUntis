@@ -472,6 +472,9 @@
 					android:title="@string/library_swiperefreshlayout" />
 				<Preference
 					android:icon="@drawable/settings_about_library"
+					android:title="@string/library_localbroadcastmanager" />
+				<Preference
+					android:icon="@drawable/settings_about_library"
 					android:title="@string/library_recyclerview" />
 				<Preference
 					android:icon="@drawable/settings_about_library"
