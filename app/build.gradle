@@ -93,6 +93,7 @@ dependencies {
     implementation 'com.github.cesarferreira:MaterialComponent.Banner:0.13.0'
     implementation 'com.budiyev.android:code-scanner:2.1.0'
     implementation 'ca.antonious:materialdaypicker:0.6.0'
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
     testImplementation 'junit:junit:4.13'
     testImplementation 'org.mockito:mockito-core:2.28.2'
     implementation 'com.google.android.gms:play-services-wearable:17.0.0'

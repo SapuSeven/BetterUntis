@@ -14,30 +14,38 @@
         android:orientation="vertical"
         tools:ignore="UselessParent">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="?dialogPreferredPadding">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/size_wear_icons"
+            android:layout_marginBottom="?dialogPreferredPadding"
+            android:layout_gravity="center"
+            android:orientation="horizontal">
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="72dp"
-                android:layout_centerInParent="true"
-                app:srcCompat="@drawable/settings_watch"
+                android:layout_width="@dimen/size_wear_icons"
+                android:layout_height="match_parent"
+                app:srcCompat="@drawable/settings_wear_phone"
                 android:contentDescription="@null" />
 
             <ImageView
                 android:id="@+id/status"
-                android:layout_width="match_parent"
-                android:layout_height="36dp"
-                android:layout_centerInParent="true"
+                android:layout_width="@dimen/size_wear_icons"
+                android:layout_height="match_parent"
+                app:srcCompat="@drawable/settings_wear_connecting"
                 android:contentDescription="@string/preference_wear_os_support" />
-        </RelativeLayout>
+
+            <ImageView
+                android:layout_width="@dimen/size_wear_icons"
+                android:layout_height="match_parent"
+                app:srcCompat="@drawable/settings_wear_watch"
+                android:contentDescription="@null" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="?dialogPreferredPadding"
             android:gravity="center"
             android:text="@string/preference_wear_os_support_connecting"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />

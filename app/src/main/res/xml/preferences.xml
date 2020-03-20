@@ -398,7 +398,7 @@
 	</PreferenceScreen>
 
 	<Preference
-		android:icon="@drawable/settings_watch"
+		android:icon="@drawable/settings_wear_watch"
 		android:key="preference_wear_os_support"
 		android:title="@string/preference_wear_os_support" />
 

@@ -14,4 +14,6 @@
 	<dimen name="textsize_login_welcome">36sp</dimen>
 
 	<dimen name="width_main_leftsidebar">38dp</dimen>
+
+	<dimen name="size_wear_icons">72dp</dimen>
 </resources>

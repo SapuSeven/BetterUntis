@@ -10,7 +10,6 @@ class DataLayerListenerService : WearableListenerService() {
 
     companion object {
         private const val UNTIS_LOGIN = "/untis_login"
-        private const val UNTIS_SUCCESS = "/untis_success"
     }
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
@@ -29,9 +28,6 @@ class DataLayerListenerService : WearableListenerService() {
                 editor.apply()
 
                 LocalBroadcastManager.getInstance(this).sendBroadcast(Intent("LOGIN_SUCCESS"))
-
-                //TODO: Does not work
-                Wearable.getMessageClient(this).sendMessage(item.uri.host ?:"", UNTIS_SUCCESS, item.uri.toString().toByteArray())
             }
         }
     }

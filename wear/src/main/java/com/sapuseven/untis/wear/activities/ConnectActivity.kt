@@ -8,6 +8,10 @@ import android.os.Bundle
 import android.support.wearable.activity.WearableActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.PreferenceManager
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
+import com.google.android.gms.wearable.Node
+import com.google.android.gms.wearable.Wearable
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_WEBUNTIS_HOST
@@ -16,11 +20,11 @@ import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_WEBUNTIS_
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.models.untis.params.AppSharedSecretParams
-import com.sapuseven.untis.models.untis.response.AppSharedSecretResponse
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.models.UntisSchoolInfo
+import com.sapuseven.untis.models.untis.params.AppSharedSecretParams
 import com.sapuseven.untis.models.untis.params.UserDataParams
+import com.sapuseven.untis.models.untis.response.AppSharedSecretResponse
 import com.sapuseven.untis.models.untis.response.UserDataResponse
 import com.sapuseven.untis.models.untis.response.UserDataResult
 import com.sapuseven.untis.wear.helpers.ErrorHandling.ACQUIRING_APP_SHARED_SECRET_FAILED
@@ -32,6 +36,10 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class ConnectActivity : WearableActivity() {
+
+    companion object {
+        private const val UNTIS_SUCCESS = "/untis_success"
+    }
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(c: Context, intent: Intent) {
@@ -147,7 +155,24 @@ class ConnectActivity : WearableActivity() {
             }
         }
 
+        SendMessage(this@ConnectActivity).start()
         startActivity(Intent(this@ConnectActivity, MainActivity::class.java))
         finish()
+    }
+
+    internal class SendMessage(private val c: Context) : Thread() {
+
+        override fun run() {
+            val nodeListTask: Task<List<Node>> = Wearable.getNodeClient(c.applicationContext).connectedNodes
+            try {
+                val nodes: List<Node> = Tasks.await(nodeListTask)
+                nodes.forEach {
+                    val sendMessageTask: Task<Int> = Wearable.getMessageClient(c).sendMessage(it.id, UNTIS_SUCCESS, byteArrayOf(0x01))
+                    try {
+                        val result: Int = Tasks.await(sendMessageTask)
+                    } catch (e: Exception) { }
+                }
+            } catch (e: Exception) { }
+        }
     }
 }
