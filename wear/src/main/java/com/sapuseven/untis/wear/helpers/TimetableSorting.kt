@@ -22,14 +22,20 @@ object TimetableSorting {
     private fun mergeLessons(items: List<TimeGridItem>): List<TimeGridItem> {
         val mutableList = items.toMutableList()
         for (i in 0 until mutableList.size) {
-            if (i >= mutableList.size) break
-
+            if (i + 1 >= mutableList.size) break
             val currentItem = mutableList[i]
-            val nextItem = mutableList[i + 1]
-
-            if (currentItem.endDateTime == nextItem.startDateTime) {
-                currentItem.endDateTime = nextItem.endDateTime
-                mutableList.removeAt(i + 1)
+            var nextItem: TimeGridItem
+            for (j in i + 1 until mutableList.size) {
+                nextItem = mutableList[j]
+                if (
+                        currentItem.periodData.getShortTitle() == nextItem.periodData.getShortTitle()
+                        && currentItem.endDateTime == nextItem.startDateTime
+                        && currentItem.periodData.isCancelled() == nextItem.periodData.isCancelled()
+                ) {
+                    currentItem.endDateTime = nextItem.endDateTime
+                    mutableList.removeAt(j)
+                    break
+                }
             }
         }
         return mutableList.toList()
