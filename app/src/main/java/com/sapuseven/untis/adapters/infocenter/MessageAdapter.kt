@@ -15,7 +15,7 @@ class MessageAdapter(
 		private val messageList: List<UntisMessage> = ArrayList()
 ) : RecyclerView.Adapter<MessageAdapter.ViewHolder>() {
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-		val v = LayoutInflater.from(parent.context).inflate(R.layout.item_message, parent, false)
+		val v = LayoutInflater.from(parent.context).inflate(R.layout.list_item_twoline, parent, false)
 		return ViewHolder(v)
 	}
 
@@ -31,7 +31,7 @@ class MessageAdapter(
 	}
 
 	class ViewHolder(rootView: View) : RecyclerView.ViewHolder(rootView) {
-		val tvSubject: TextView = rootView.findViewById(R.id.textview_itemmessage_subject)
-		val tvBody: TextView = rootView.findViewById(R.id.textview_itemmessage_body)
+		val tvSubject: TextView = rootView.findViewById(R.id.textview_listitem_line1)
+		val tvBody: TextView = rootView.findViewById(R.id.textview_listitem_line2)
 	}
 }

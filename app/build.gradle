@@ -8,15 +8,15 @@ android {
     compileSdkVersion 29
     buildToolsVersion '29.0.2'
 
-    defaultConfig {
-        applicationId "com.sapuseven.untis"
-        minSdkVersion 21
-        targetSdkVersion 29
-        versionCode 18
-        versionName "3.2.2"
-        vectorDrawables.useSupportLibrary = true
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
+	defaultConfig {
+		applicationId "com.sapuseven.untis"
+		minSdkVersion 21
+		targetSdkVersion 29
+		versionCode 20
+		versionName "3.3.1"
+		vectorDrawables.useSupportLibrary = true
+		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+	}
 
     signingConfigs {
 		def propertiesFile = file("signing.properties")
@@ -68,10 +68,15 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
+	compileOptions {
+		sourceCompatibility JavaVersion.VERSION_1_8
+		targetCompatibility JavaVersion.VERSION_1_8
+	}
+
+
+	lintOptions {
+		disable "MissingTranslation"
+	}
 }
 
 dependencies {

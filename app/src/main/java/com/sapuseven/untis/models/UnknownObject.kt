@@ -1,6 +1,6 @@
 package com.sapuseven.untis.models
 
-import android.util.Log
+import com.sapuseven.untis.helpers.ErrorLogger
 import kotlinx.serialization.*
 import kotlinx.serialization.internal.StringDescriptor
 import kotlinx.serialization.json.JsonInput
@@ -20,11 +20,25 @@ class UnknownObject(val jsonString: String?) {
 		fun validate(fields: Map<String, UnknownObject?>) {
 			fields.forEach {
 				it.value?.let { value ->
-					if (value.jsonString?.isNotBlank() == true && value.jsonString.toIntOrNull() != 0) {
-						Log.w(descriptor.name, "Unknown JSON object ${it.key} encountered: ${value.jsonString}")
-					}
+					if (value.jsonString?.isNotBlank() == true && value.jsonString.toIntOrNull() != 0 && value.jsonString != "[]")
+						ErrorLogger.instance?.log("Unknown JSON object \"${it.key}\" encountered, value: ${value.jsonString}")
 				}
 			}
 		}
+	}
+
+	override fun equals(other: Any?): Boolean {
+		if (this === other) return true
+		if (javaClass != other?.javaClass) return false
+
+		other as UnknownObject
+
+		if (jsonString != other.jsonString) return false
+
+		return true
+	}
+
+	override fun hashCode(): Int {
+		return jsonString?.hashCode() ?: 0
 	}
 }
