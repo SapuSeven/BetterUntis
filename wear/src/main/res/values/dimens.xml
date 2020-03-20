@@ -2,4 +2,5 @@
 <resources>
     <dimen name="inner_frame_layout_padding">5dp</dimen>
     <dimen name="inner_frame_layout_padding_2">10dp</dimen>
+    <dimen name="login_icon_size">72dp</dimen>
 </resources>
