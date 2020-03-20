@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.wearable.*
 import com.sapuseven.untis.R
+import com.sapuseven.untis.data.databases.UserDatabase
 
 class WearOSActivity : BaseActivity() {
 
@@ -51,13 +52,17 @@ class WearOSActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
 
-        val prefs = this.getSharedPreferences(BACKUP_PREF_NAME, Context.MODE_PRIVATE)
+        val userDatabase = UserDatabase.createInstance(this)
+        var profileId = preferences.currentProfileId()
+        if (profileId == 0L || userDatabase.getUser(profileId) == null) profileId = userDatabase.getAllUsers()[0].id ?: 0
+        val profileUser = userDatabase.getUser(profileId)
+
         val putDataMapRequest = PutDataMapRequest.create(UNTIS_LOGIN)
         val map = putDataMapRequest.dataMap
-        map.putString("edittext_logindatainput_key", prefs.getString("edittext_logindatainput_key", ""))
-        map.putString("edittext_logindatainput_school", prefs.getString("edittext_logindatainput_school", ""))
-        map.putString("edittext_logindatainput_user", prefs.getString("edittext_logindatainput_user", ""))
-        map.putBoolean("switch_logindatainput_anonymouslogin", prefs.getBoolean("switch_logindatainput_anonymouslogin", false))
+        map.putString("edittext_logindatainput_key", profileUser!!.key ?: "")
+        map.putString("edittext_logindatainput_school", profileUser.schoolId.toString())
+        map.putString("edittext_logindatainput_user", profileUser.user)
+        map.putBoolean("switch_logindatainput_anonymouslogin", profileUser.anonymous)
         val request = putDataMapRequest.asPutDataRequest()
         request.setUrgent()
         Wearable.getDataClient(this).putDataItem(request)
