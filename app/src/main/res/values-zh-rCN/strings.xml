@@ -10,7 +10,7 @@
     <string name="all_rooms">教室</string>
     <string name="all_anonymous">匿名</string>
     <string name="all_personal_timetable">个人时间表</string>
-    <string name="all_contact_email"></string>
+    <string name="all_contact_email"/>
     <string name="all_ok">好的</string>
     <string name="all_yes">是的</string>
     <string name="all_no">不了</string>
@@ -131,4 +131,12 @@
     <string name="preference_category_timetable_range">课程表范围</string>
     <string name="preference_category_general_automute">自动静音</string>
     <string name="preference_automute_enable">可自动静音</string>
+    <string name="preference_category_styling_backgrounds">格子颜色</string>
+    <string name="preference_category_timetable_item_appearance">格子外观</string>
+    <string name="preference_category_general_behaviour">动作</string>
+    <string name="preference_category_general_week_display">星期显示设置</string>
+    <string name="preference_automute_enable_summary">上课时自动开启勿扰模式</string>
+    <string name="preference_automute_cancelled_lessons">同时不提醒已取消课程</string>
+    <string name="preference_background_cancelled">取消的课程</string>
+    <string name="preference_background_cancelled_past">此前取消的课程</string>
 </resources>
