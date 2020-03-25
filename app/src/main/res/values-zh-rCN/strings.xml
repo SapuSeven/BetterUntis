@@ -61,7 +61,7 @@
     <string name="main_drawer_open">开启导航栏</string>
     <string name="main_drawer_close">关闭导航栏</string>
     <string name="main_drawer_image_logo">BetterUntis 标志</string>
-    <string name="main_press_back_double">按两次“返回”可退出</string>
+    <string name="main_press_back_double">双击“返回”即可退出</string>
     <string name="main_time_diff_just_now">刚刚</string>
     <string name="login_scan_code">扫描二维码</string>
     <string name="login_welcome">欢迎来到BetterUntis！</string>
