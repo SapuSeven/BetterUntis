@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_desc">Eine alternative App für das Untis-Stundenplansystem.</string>
+    <string name="app_desc">Ein alternativer mobiler Client für das Untis-Fahrplansystem.</string>
     <string name="all_success">erfolgreich</string>
     <string name="all_failed">fehlgeschlagen</string>
     <string name="all_personal">Persönlich</string>
@@ -10,7 +10,7 @@
     <string name="all_rooms">Räume</string>
     <string name="all_anonymous">Anonym</string>
     <string name="all_personal_timetable">Eigener Stundenplan</string>
-	<string name="all_contact_email">betteruntis-de@sapuseven.com</string>
+    <string name="all_contact_email">betteruntis-de@sapuseven.com</string>
     <string name="all_ok">OK</string>
     <string name="all_yes">Ja</string>
     <string name="all_no">Nein</string>
