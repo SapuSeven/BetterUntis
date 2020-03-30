@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_desc">Ein alternativer mobiler Client für das Untis-Fahrplansystem.</string>
+    <string name="app_desc">Eine alternative App für das Untis-Stundenplansystem.</string>
     <string name="all_success">erfolgreich</string>
     <string name="all_failed">fehlgeschlagen</string>
     <string name="all_personal">Persönlich</string>
