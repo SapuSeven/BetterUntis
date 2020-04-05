@@ -251,4 +251,14 @@
     <string name="preference_schoolcolors_cancelled">For kansellerte skoletimer</string>
     <string name="preference_timetable_hide_time_stamps">Skjul tidsstempel</string>
     <string name="preference_timetable_hide_time_stamps_desc">Skjul tidsstempel ved siden av timeplanen</string>
+    <string name="errors_crash_title">Det ser ut til at BetterUntis kræsjet.</string>
+    <string name="loading_failed">Innlasting mislyktes</string>
+    <string name="loading">Laster</string>
+    <string name="errors_crash_message">Dette beklages.</string>
+    <string name="preferences_contributors_contributions">%1$d bidragsytere</string>
+    <string name="preference_info_libraries_desc">En liste over alle brukte bibliotek</string>
+    <string name="preference_info_libraries">Bibliotek</string>
+    <string name="preference_info_contributors_desc">En liste over bidragsyterne</string>
+    <string name="preference_info_contributors">Bidragsytere</string>
+    <string name="activity_title_errors">Feil</string>
 </resources>
