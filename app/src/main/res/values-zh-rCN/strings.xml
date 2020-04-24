@@ -10,7 +10,7 @@
     <string name="all_rooms">教室</string>
     <string name="all_anonymous">匿名</string>
     <string name="all_personal_timetable">个人时间表</string>
-    <string name="all_contact_email"/>
+    <string name="all_contact_email">betteruntis@sapuseven.com</string>
     <string name="all_ok">好的</string>
     <string name="all_yes">是的</string>
     <string name="all_no">不了</string>
@@ -166,19 +166,19 @@
     <string name="preference_background_past">已过日期背景</string>
     <plurals name="roomfinder_item_desc">
         <item quantity="one">该教室可使用%d 小时。</item>
-        <item quantity="other"></item>
+        <item quantity="other"/>
     </plurals>
     <plurals name="main_time_diff_days">
         <item quantity="one">%d 天前</item>
-        <item quantity="other"></item>
+        <item quantity="other"/>
     </plurals>
     <plurals name="main_time_diff_hours">
         <item quantity="one">%d 小时前</item>
-        <item quantity="other"></item>
+        <item quantity="other"/>
     </plurals>
     <plurals name="main_time_diff_minutes">
         <item quantity="one">%d 分钟前</item>
-        <item quantity="other"></item>
+        <item quantity="other"/>
     </plurals>
     <string name="loading_failed">加载失败</string>
     <string name="loading">加载中</string>
@@ -268,4 +268,7 @@
     <string name="preference_background_future">未来日期背景</string>
     <string name="preference_background_exam">考试课程</string>
     <string name="preference_background_irregular">不定期课程</string>
+    <string name="notifications_text_message_separator">"/ "</string>
+    <string name="preference_week_custom_range_summary_short">%1$s</string>
+    <string name="preference_flinging_enable">允许翻页</string>
 </resources>
