@@ -16,8 +16,8 @@ class TimegridItem(
 		periodData.setup()
 
 		title = periodData.getShortTitle()
-		top = if (contextType == TimetableDatabaseInterface.Type.TEACHER.name) periodData.getShortClasses() else periodData.getShortTeachers()
-		bottom = if (contextType == TimetableDatabaseInterface.Type.ROOM.name) periodData.getShortClasses() else periodData.getShortRooms()
+		top = if (contextType == TimetableDatabaseInterface.Type.TEACHER.name) periodData.getShortClasses() else periodData.getShortSpanned(periodData.teachers, TimetableDatabaseInterface.Type.TEACHER)
+		bottom = if (contextType == TimetableDatabaseInterface.Type.ROOM.name) periodData.getShortClasses() else periodData.getShortSpanned(periodData.rooms, TimetableDatabaseInterface.Type.ROOM)
 	}
 
 	override fun toWeekViewEvent(): WeekViewEvent<TimegridItem> {
