@@ -44,6 +44,11 @@ Another major change is the use of a custom WeekView (based on [Till Hellmund](h
 - English
 - German
 
+_Versions since 3.3.0 will also include:_
+- Chinese (Simplified)
+- French
+- Norwegian Bokmål
+
 ## Project Git Structure
 I established a simple system to manage this Git repository.
 Basically, there are two main branches: **master** and **develop**. They both are permanent and can't be deleted.
