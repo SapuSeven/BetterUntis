@@ -70,12 +70,19 @@ These branches have a limited lifetime. After the last merge back into **develop
 
 ### Translating into your language
 
-Translating BetterUntis is very easy. Just sign up for an account at weblate.org.
-After you are logged in, go to the BetterUntis translation project. 
+Translating BetterUntis is very easy.
+Just sign up for an account at [weblate.org](https://hosted.weblate.org/accounts/register/).
+After you are logged in, go to the [BetterUntis translation project](https://hosted.weblate.org/projects/betteruntis/translations/). 
 
 There you can click the “Start new translation“ button if your language does not exist.
 If your language already exists, you can directly correct possible mistakes.
 
 Your translation will be included in the next release of BetterUntis.
 
-You can find all details on [weblate.org](https://hosted.weblate.org/engage/betteruntis).
+### Implementing new features / Fixing bugs
+
+Anything that requires you to perform code changes should be done on the **develop** branch.
+Pull requests should always be based on this branch, except for larger, experimental or incomplete features.
+These can be on their own, new feature branch.
+
+_Please **do not** submit pull requests that merge into the master branch, except for changes that **only** affect the repository on GitHub (e.g. README.md changes)._
