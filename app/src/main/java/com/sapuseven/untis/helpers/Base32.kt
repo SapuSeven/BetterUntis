@@ -26,7 +26,7 @@ import kotlin.experimental.or
 
 /**
  * Base32 - encodes and decodes RFC3548 Base32
- * (see http://www.faqs.org/rfcs/rfc3548.html )
+ * (see http://www.faqs.org/rfcs/rfc3548.html)
  *
  * @author Robert Kaye
  * @author Gordon Mohr
@@ -34,7 +34,8 @@ import kotlin.experimental.or
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 object Base32 {
 	private const val base32Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
-	private val base32Lookup = intArrayOf(0xFF, 0xFF, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, // '0', '1', '2', '3', '4', '5', '6', '7'
+	private val base32Lookup = intArrayOf(
+			0xFF, 0xFF, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, // '0', '1', '2', '3', '4', '5', '6', '7'
 			0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // '8', '9', ':', ';', '<', '=', '>', '?'
 			0xFF, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, // '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G'
 			0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, // 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O'
