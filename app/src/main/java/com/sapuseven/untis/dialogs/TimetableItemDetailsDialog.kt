@@ -14,6 +14,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import com.sapuseven.untis.R
+import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_LESSON_TOPIC
+import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_STUDENT_ABSENCE
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.KotlinUtils.safeLet
@@ -97,6 +99,16 @@ class TimetableItemDetailsDialog : DialogFragment() {
 			root.addView(infoView)
 		}
 
+		if (item.periodData.element.can.contains(CAN_READ_STUDENT_ABSENCE)) {
+			val infoView = activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_absences, null)
+			root.addView(infoView)
+		}
+
+		if (item.periodData.element.can.contains(CAN_READ_LESSON_TOPIC)) {
+			val infoView = activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_lessontopic, null)
+			root.addView(infoView)
+		}
+
 		val teacherList = root.findViewById<LinearLayout>(R.id.llTeacherList)
 		val klassenList = root.findViewById<LinearLayout>(R.id.llClassList)
 		val roomList = root.findViewById<LinearLayout>(R.id.llRoomList)
@@ -163,3 +175,5 @@ class TimetableItemDetailsDialog : DialogFragment() {
 		return tv
 	}
 }
+
+private fun <E> List<E>.containsAny(vararg items: E): Boolean = this.any(items.toSet()::contains)
