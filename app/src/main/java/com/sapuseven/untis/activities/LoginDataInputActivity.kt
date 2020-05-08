@@ -170,7 +170,7 @@ class LoginDataInputActivity : BaseActivity() {
 	}
 
 	private fun restoreInput(user: UserDatabase.User) {
-		if (user.schoolId > 0) edittext_logindatainput_school?.setText(user.schoolId.toString())
+		if (user.schoolId.isNotBlank()) edittext_logindatainput_school?.setText(user.schoolId)
 
 		user.id?.let { profileId ->
 			preferences.reload(profileId)
@@ -199,8 +199,11 @@ class LoginDataInputActivity : BaseActivity() {
 		sendRequest()
 	}
 
-	private suspend fun acquireSchoolId(): Int? {
-		edittext_logindatainput_school?.text.toString().toIntOrNull()?.let { return it }
+	private suspend fun acquireSchoolId(): String? {
+		edittext_logindatainput_school?.text.toString().toIntOrNull()?.let { return it.toString() }
+
+		if (switch_logindatainput_advanced.isChecked && checkbox_logindatainput_skip_school_id.isChecked)
+			return edittext_logindatainput_school.text.toString()
 
 		updateLoadingStatus(getString(R.string.logindatainput_aquiring_schoolid))
 
@@ -219,7 +222,7 @@ class LoginDataInputActivity : BaseActivity() {
 				if (it.schools.size != 1)
 					stopLoadingAndShowError(getString(R.string.logindatainput_error_invalid_school))
 				else
-					return it.schools[0].schoolId
+					return it.schools[0].schoolId.toString()
 			} ?: run {
 				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code, untisResponse.error?.message.orEmpty()))
 			}
@@ -230,12 +233,15 @@ class LoginDataInputActivity : BaseActivity() {
 		return null
 	}
 
-	private suspend fun acquireAppSharedSecret(schoolId: Int, user: String, password: String): String? {
+	private suspend fun acquireAppSharedSecret(schoolId: String, user: String, password: String): String? {
+		if (switch_logindatainput_advanced.isChecked && checkbox_logindatainput_skip_app_secret.isChecked)
+			return password
+
 		updateLoadingStatus(getString(R.string.logindatainput_aquiring_app_secret))
 
 		val query = UntisRequest.UntisRequestQuery()
 
-		query.url = schoolInfo?.let {
+		query.url = getApiUrl() ?: schoolInfo?.let {
 			if (it.useMobileServiceUrlAndroid) it.mobileServiceUrl
 			else null
 		} ?: (DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + DEFAULT_WEBUNTIS_PATH + schoolId)
@@ -265,17 +271,16 @@ class LoginDataInputActivity : BaseActivity() {
 		return null
 	}
 
-	private suspend fun acquireUserData(schoolId: Int, user: String, key: String?): UserDataResult? {
+	private suspend fun acquireUserData(schoolId: String, user: String, key: String?): UserDataResult? {
 		updateLoadingStatus(getString(R.string.logindatainput_loading_user_data))
 
 		val query = UntisRequest.UntisRequestQuery()
 
-		query.url = schoolInfo?.let {
-			if (it.useMobileServiceUrlAndroid) it.mobileServiceUrl
-			else null
-		} ?: (DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + DEFAULT_WEBUNTIS_PATH + schoolId)
+		query.url = getApiUrl()
+				?: (DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + DEFAULT_WEBUNTIS_PATH + schoolId)
 		query.proxyHost = getProxyHost()
 		query.data.method = UntisApiConstants.METHOD_GET_USER_DATA
+		query.data.school = schoolId
 
 		if (anonymous)
 			query.data.params = listOf(UserDataParams(UntisAuthentication.createAuthObject()))
@@ -307,7 +312,7 @@ class LoginDataInputActivity : BaseActivity() {
 	private fun sendRequest() = GlobalScope.launch(Dispatchers.Main) {
 		updateLoadingStatus(getString(R.string.logindatainput_connecting))
 
-		val schoolId: Int = acquireSchoolId() ?: return@launch
+		val schoolId: String = acquireSchoolId() ?: return@launch
 		val username = edittext_logindatainput_user?.text.toString()
 		val password = edittext_logindatainput_key?.text.toString()
 		val appSharedSecret: String? = if (anonymous) null else acquireAppSharedSecret(schoolId, username, password)
@@ -317,7 +322,8 @@ class LoginDataInputActivity : BaseActivity() {
 		acquireUserData(schoolId, username, appSharedSecret)?.let { response ->
 			val user = UserDatabase.User(
 					existingUserId,
-					if (schoolInfo?.useMobileServiceUrlAndroid == true) schoolInfo?.mobileServiceUrl else null,
+					getApiUrl()
+							?: if (schoolInfo?.useMobileServiceUrlAndroid == true) schoolInfo?.mobileServiceUrl else null,
 					schoolId,
 					if (!anonymous) username else null,
 					if (!anonymous) appSharedSecret else null,
@@ -384,6 +390,13 @@ class LoginDataInputActivity : BaseActivity() {
 	}
 
 	private fun getProxyHost(): String? = if (switch_logindatainput_advanced.isChecked) edittext_logindatainput_proxy_host?.text.toString() else null
+
+	private fun getApiUrl(): String? {
+		return if (switch_logindatainput_advanced.isChecked) edittext_logindatainput_api_url?.text.toString()
+		else schoolInfo?.let {
+			if (it.useMobileServiceUrlAndroid) it.mobileServiceUrl else null
+		}
+	}
 
 	private fun setElementsEnabled(enabled: Boolean) {
 		textinputlayout_logindatainput_school?.isEnabled = enabled && schoolInfo == null

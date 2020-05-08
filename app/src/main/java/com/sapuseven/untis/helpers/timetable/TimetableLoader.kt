@@ -3,9 +3,6 @@ package com.sapuseven.untis.helpers.timetable
 import android.content.Context
 import android.util.Log
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
-import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_WEBUNTIS_HOST
-import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_WEBUNTIS_PATH
-import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
@@ -44,7 +41,7 @@ class TimetableLoader(
 	private val requestList = ArrayList<TimetableLoaderTarget>()
 
 	private var api: UntisRequest = UntisRequest()
-	private var query: UntisRequest.UntisRequestQuery = UntisRequest.UntisRequestQuery()
+	private var query: UntisRequest.UntisRequestQuery = UntisRequest.UntisRequestQuery(user)
 
 	fun load(target: TimetableLoaderTarget, flags: Int = 0, proxyHost: String? = null) = GlobalScope.launch(Dispatchers.Main) {
 		requestList.add(target)
@@ -78,8 +75,6 @@ class TimetableLoader(
 		val cache = TimetableCache(context)
 		cache.setTarget(target.startDate, target.endDate, target.id, target.type)
 
-		query.url = user.apiUrl
-				?: (DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + DEFAULT_WEBUNTIS_PATH + user.schoolId)
 		query.proxyHost = proxyHost
 
 		val params = TimetableParams(
