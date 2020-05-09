@@ -91,7 +91,7 @@ internal constructor(var event: WeekViewEvent<T>, var originalEvent: WeekViewEve
 	}
 
 	private fun restoreSpanned(original: CharSequence, target: CharSequence): CharSequence {
-		if (original !is SpannableString) return original
+		if (original !is SpannableString) return target
 
 		val targetSpannable = SpannableString.valueOf(target)
 		var next: Int
