@@ -45,11 +45,11 @@ class RoomFinderAdapter(
 		}
 
 		if (room.getState() >= RoomFinderAdapterItem.STATE_FREE && !room.loading) {
-			holder.ivState.setImageResource(R.drawable.roomfinder_available)
+			holder.ivState.setImageResource(R.drawable.all_check)
 			holder.ivState.visibility = View.VISIBLE
 			holder.pbLoading.visibility = View.GONE
 		} else if (room.getState() == RoomFinderAdapterItem.STATE_OCCUPIED && !room.loading) {
-			holder.ivState.setImageResource(R.drawable.roomfinder_occupied)
+			holder.ivState.setImageResource(R.drawable.all_cross)
 			holder.ivState.visibility = View.VISIBLE
 			holder.pbLoading.visibility = View.GONE
 		} else {

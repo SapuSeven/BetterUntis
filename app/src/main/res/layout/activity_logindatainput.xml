@@ -196,7 +196,7 @@
 					android:layout_height="24dp"
 					android:contentDescription="@string/all_failed"
 					android:visibility="gone"
-					app:srcCompat="@drawable/all_failed" />
+					app:srcCompat="@drawable/all_cross" />
 
 				<TextView
 					android:id="@+id/textview_logindatainput_loadingstatus"
