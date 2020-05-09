@@ -17,7 +17,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.GravityCompat
@@ -483,11 +482,27 @@ class MainActivity :
 	}
 
 	private fun setupActionBar() {
-		val toolbar: Toolbar = findViewById(R.id.toolbar_main)
-		setSupportActionBar(toolbar)
-		val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.main_drawer_open, R.string.main_drawer_close)
+		setSupportActionBar(toolbar_main)
+		val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar_main, R.string.main_drawer_open, R.string.main_drawer_close)
 		drawer_layout.addDrawerListener(toggle)
 		toggle.syncState()
+
+		supportFragmentManager.addOnBackStackChangedListener {
+			if (supportFragmentManager.backStackEntryCount > 0) {
+				toggle.isDrawerIndicatorEnabled = false
+				supportActionBar?.setDisplayHomeAsUpEnabled(true)
+				drawer_layout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
+				toolbar_main.setNavigationOnClickListener { onBackPressed() }
+				// TODO: Set actionBar title to match fragment
+			} else {
+				supportActionBar?.setDisplayHomeAsUpEnabled(false)
+				toggle.isDrawerIndicatorEnabled = true
+				toggle.syncState()
+				drawer_layout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
+				toolbar_main.setNavigationOnClickListener { openDrawer() }
+				// TODO: Set actionBar title to default
+			}
+		}
 	}
 
 	private fun prepareItems(items: List<TimegridItem>): List<TimegridItem> {
@@ -829,7 +844,9 @@ class MainActivity :
 
 	override fun onCornerLongClick() = weekView.goToToday()
 
-	private fun closeDrawer(drawer: DrawerLayout = findViewById(R.id.drawer_layout)) = drawer.closeDrawer(GravityCompat.START)
+	private fun openDrawer(drawer: DrawerLayout = drawer_layout) = drawer.openDrawer(GravityCompat.START)
+
+	private fun closeDrawer(drawer: DrawerLayout = drawer_layout) = drawer.closeDrawer(GravityCompat.START)
 
 	private fun Int.darken(ratio: Float) = ColorUtils.blendARGB(this, Color.BLACK, ratio)
 
