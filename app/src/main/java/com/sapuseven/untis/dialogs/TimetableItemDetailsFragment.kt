@@ -1,17 +1,15 @@
 package com.sapuseven.untis.dialogs
 
-import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.Context
 import android.graphics.Paint
 import android.os.Bundle
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_LESSON_TOPIC
@@ -20,12 +18,13 @@ import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.KotlinUtils.safeLet
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import com.sapuseven.untis.models.untis.timetable.Period
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.ISODateTimeFormat
 
 
-class TimetableItemDetailsDialog : DialogFragment() {
+class TimetableItemDetailsFragment : Fragment() {
 	private var item: TimegridItem? = null
 	private var timetableDatabaseInterface: TimetableDatabaseInterface? = null
 
@@ -34,16 +33,17 @@ class TimetableItemDetailsDialog : DialogFragment() {
 	companion object {
 		val HOMEWORK_DUE_TIME_FORMAT: DateTimeFormatter = ISODateTimeFormat.date()
 
-		fun createInstance(item: TimegridItem, timetableDatabaseInterface: TimetableDatabaseInterface?): TimetableItemDetailsDialog {
-			val fragment = TimetableItemDetailsDialog()
-			fragment.item = item
-			fragment.timetableDatabaseInterface = timetableDatabaseInterface
-			return fragment
-		}
+		fun createInstance(item: TimegridItem, timetableDatabaseInterface: TimetableDatabaseInterface?): TimetableItemDetailsFragment =
+				TimetableItemDetailsFragment().apply {
+					this.item = item
+					this.timetableDatabaseInterface = timetableDatabaseInterface
+				}
 	}
 
 	interface TimetableItemDetailsDialogListener {
-		fun onPeriodElementClick(dialog: DialogFragment, element: PeriodElement?, useOrgId: Boolean)
+		fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean)
+
+		fun onPeriodAbsencesClick(fragment: Fragment, element: Period)
 	}
 
 	override fun onAttach(context: Context) {
@@ -54,24 +54,16 @@ class TimetableItemDetailsDialog : DialogFragment() {
 			throw ClassCastException("$context must implement TimetableItemDetailsDialogListener")
 	}
 
-	override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		return activity?.let { activity ->
-			return AlertDialog.Builder(activity).apply {
-				safeLet(item, timetableDatabaseInterface) { item, timetableDatabaseInterface ->
-					setView(generateView(activity, item, timetableDatabaseInterface))
-				} ?: run {
-					setMessage(getString(R.string.main_dialog_itemdetails_error_not_found))
-							.setNeutralButton(getString(R.string.all_close)) { dialog, _ ->
-								dialog.dismiss()
-							}
-				}
-			}.create()
+			safeLet(item, timetableDatabaseInterface) { item, timetableDatabaseInterface ->
+				generateView(activity, container, item, timetableDatabaseInterface)
+			} ?: generateErrorView(activity, container)
 		} ?: throw IllegalStateException("Activity cannot be null")
 	}
 
-	@SuppressLint("InflateParams")
-	private fun generateView(activity: FragmentActivity, item: TimegridItem, timetableDatabaseInterface: TimetableDatabaseInterface): View {
-		val root = activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page, null) as LinearLayout
+	private fun generateView(activity: FragmentActivity, container: ViewGroup?, item: TimegridItem, timetableDatabaseInterface: TimetableDatabaseInterface): View {
+		val root = activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page, container, false) as LinearLayout
 
 		val attrs = intArrayOf(android.R.attr.textColorPrimary)
 		val ta = context?.obtainStyledAttributes(attrs)
@@ -83,31 +75,30 @@ class TimetableItemDetailsDialog : DialogFragment() {
 				item.periodData.element.text.substitution,
 				item.periodData.element.text.info
 		).forEach {
-			if (it.isNotBlank()) {
-				val infoView = activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_info, null)
-				(infoView.findViewById<TextView>(R.id.tvInfo)).text = it
-				root.addView(infoView)
-			}
+			if (it.isNotBlank())
+				activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_info, root).run {
+					(findViewById<TextView>(R.id.tvInfo)).text = it
+				}
 		}
 
 		item.periodData.element.homeWorks?.forEach {
 			val endDate = HOMEWORK_DUE_TIME_FORMAT.parseDateTime(it.endDate)
 
-			val infoView = activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_homework, null)
-			(infoView.findViewById<TextView>(R.id.textview_roomfinder_name)).text = it.text
-			(infoView.findViewById<TextView>(R.id.tvDate)).text = getString(R.string.homeworks_due_time, endDate.toString(getString(R.string.homeworks_due_time_format)))
-			root.addView(infoView)
+			activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_homework, root).run {
+				(findViewById<TextView>(R.id.textview_roomfinder_name)).text = it.text
+				(findViewById<TextView>(R.id.tvDate)).text = getString(R.string.homeworks_due_time, endDate.toString(getString(R.string.homeworks_due_time_format)))
+			}
 		}
 
-		if (item.periodData.element.can.contains(CAN_READ_STUDENT_ABSENCE)) {
-			val infoView = activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_absences, null)
-			root.addView(infoView)
-		}
+		if (item.periodData.element.can.contains(CAN_READ_STUDENT_ABSENCE))
+			activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_absences, root).run {
+				setOnClickListener {
+					listener.onPeriodAbsencesClick(this@TimetableItemDetailsFragment, item.periodData.element)
+				}
+			}
 
-		if (item.periodData.element.can.contains(CAN_READ_LESSON_TOPIC)) {
-			val infoView = activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_lessontopic, null)
-			root.addView(infoView)
-		}
+		if (item.periodData.element.can.contains(CAN_READ_LESSON_TOPIC))
+			activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_lessontopic, root)
 
 		val teacherList = root.findViewById<LinearLayout>(R.id.llTeacherList)
 		val klassenList = root.findViewById<LinearLayout>(R.id.llClassList)
@@ -121,7 +112,7 @@ class TimetableItemDetailsDialog : DialogFragment() {
 			root.findViewById<View>(R.id.llRooms).visibility = View.GONE
 
 		if (item.periodData.subjects.size > 0) {
-			var title = item.periodData.getLongTitle()
+			var title = item.periodData.getLong(item.periodData.subjects, TimetableDatabaseInterface.Type.SUBJECT)
 			if (item.periodData.isCancelled())
 				title = getString(R.string.all_lesson_cancelled, title)
 			if (item.periodData.isIrregular())
@@ -134,6 +125,10 @@ class TimetableItemDetailsDialog : DialogFragment() {
 			root.findViewById<View>(R.id.title).visibility = View.GONE
 		}
 		return root
+	}
+
+	private fun generateErrorView(activity: FragmentActivity, container: ViewGroup?): View {
+		return activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page, container, false) as LinearLayout
 	}
 
 	private fun populateList(timetableDatabaseInterface: TimetableDatabaseInterface,
@@ -170,7 +165,6 @@ class TimetableItemDetailsDialog : DialogFragment() {
 		}
 		tv.setOnClickListener {
 			listener.onPeriodElementClick(this, element, useOrgId)
-			dismiss()
 		}
 		return tv
 	}

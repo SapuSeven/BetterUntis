@@ -23,6 +23,9 @@ import androidx.core.graphics.ColorUtils
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.antonious.materialdaypicker.MaterialDayPicker
@@ -36,7 +39,7 @@ import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.dialogs.DatePickerDialog
 import com.sapuseven.untis.dialogs.ElementPickerDialog
 import com.sapuseven.untis.dialogs.ErrorReportingDialog
-import com.sapuseven.untis.dialogs.TimetableItemDetailsDialog
+import com.sapuseven.untis.dialogs.TimetableItemDetailsFragment
 import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
@@ -46,6 +49,7 @@ import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.Holiday
+import com.sapuseven.untis.models.untis.timetable.Period
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.ElementPickerPreference
 import com.sapuseven.untis.preferences.RangePreference
@@ -77,7 +81,7 @@ class MainActivity :
 		EventClickListener<TimegridItem>,
 		TopLeftCornerClickListener,
 		TimetableDisplay,
-		TimetableItemDetailsDialog.TimetableItemDetailsDialogListener,
+		TimetableItemDetailsFragment.TimetableItemDetailsDialogListener,
 		ElementPickerDialog.ElementPickerDialogListener {
 
 	companion object {
@@ -94,6 +98,8 @@ class MainActivity :
 		private const val UNTIS_DEFAULT_COLOR = "#f49f25"
 
 		private const val PERSISTENT_INT_ZOOM_LEVEL = "persistent_zoom_level"
+
+		private const val FRAGMENT_TAG_LESSON_INFO = "com.sapuseven.untis.fragments.lessoninfo"
 	}
 
 	private val userDatabase = UserDatabase.createInstance(this)
@@ -655,6 +661,8 @@ class MainActivity :
 	override fun onBackPressed() {
 		if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
 			closeDrawer(drawer_layout)
+		} else if (supportFragmentManager.backStackEntryCount > 0) {
+			super.onBackPressed()
 		} else if (!showPersonalTimetable()) {
 			if (System.currentTimeMillis() - 2000 > lastBackPress && PreferenceUtils.getPrefBool(preferences, "preference_double_tap_to_exit")) {
 				Snackbar.make(content_main,
@@ -704,8 +712,11 @@ class MainActivity :
 		showLessonInfo(data)
 	}
 
-	override fun onPeriodElementClick(dialog: DialogFragment, element: PeriodElement?, useOrgId: Boolean) {
-		dialog.dismiss()
+	override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
+		if (fragment is DialogFragment)
+			fragment.dismiss()
+		else
+			removeFragment(fragment)
 		element?.let {
 			setTarget(if (useOrgId) element.orgId else element.id, element.type, timetableDatabaseInterface.getLongName(
 					if (useOrgId) element.orgId else element.id, TimetableDatabaseInterface.Type.valueOf(element.type)))
@@ -715,12 +726,19 @@ class MainActivity :
 		refreshNavigationViewSelection()
 	}
 
+	override fun onPeriodAbsencesClick(fragment: Fragment, element: Period) {
+	}
+
 	override fun onDialogDismissed(dialog: DialogInterface?) {
 		refreshNavigationViewSelection()
 	}
 
 	override fun onPositiveButtonClicked(dialog: ElementPickerDialog) {
 		dialog.dismiss() // unused, but just in case
+	}
+
+	private fun removeFragment(fragment: Fragment) {
+		supportFragmentManager.popBackStack(fragment.tag, FragmentManager.POP_BACK_STACK_INCLUSIVE)
 	}
 
 	private fun refreshNavigationViewSelection() {
@@ -733,7 +751,15 @@ class MainActivity :
 	}
 
 	private fun showLessonInfo(item: TimegridItem) {
-		TimetableItemDetailsDialog.createInstance(item, timetableDatabaseInterface).show(supportFragmentManager, "itemDetails") // TODO: Remove hard-coded tag
+		val fragment = TimetableItemDetailsFragment
+				.createInstance(item, timetableDatabaseInterface)
+
+		supportFragmentManager.beginTransaction().run {
+			setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+			add(R.id.content_main, fragment, FRAGMENT_TAG_LESSON_INFO)
+			addToBackStack(fragment.tag)
+			commit()
+		}
 	}
 
 	private fun setLastRefresh(timestamp: Long) {

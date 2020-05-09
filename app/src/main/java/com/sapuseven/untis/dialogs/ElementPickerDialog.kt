@@ -20,6 +20,7 @@ import androidx.annotation.ColorInt
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -45,7 +46,7 @@ class ElementPickerDialog : DialogFragment() {
 
 	interface ElementPickerDialogListener {
 		fun onDialogDismissed(dialog: DialogInterface?)
-		fun onPeriodElementClick(dialog: DialogFragment, element: PeriodElement?, useOrgId: Boolean)
+		fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean)
 		fun onPositiveButtonClicked(dialog: ElementPickerDialog)
 	}
 
