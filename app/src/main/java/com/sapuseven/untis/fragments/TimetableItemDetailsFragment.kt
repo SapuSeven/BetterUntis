@@ -129,7 +129,7 @@ class TimetableItemDetailsFragment : Fragment() {
 	}
 
 	private fun generateErrorView(activity: FragmentActivity, container: ViewGroup?): View {
-		return activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page, container, false) as LinearLayout
+		return activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_error, container, false)
 	}
 
 	private fun populateList(timetableDatabaseInterface: TimetableDatabaseInterface,
