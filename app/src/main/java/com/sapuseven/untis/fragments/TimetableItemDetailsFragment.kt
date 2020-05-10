@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentActivity
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_LESSON_TOPIC
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_STUDENT_ABSENCE
+import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.KotlinUtils.safeLet
@@ -25,7 +26,7 @@ import org.joda.time.format.ISODateTimeFormat
 
 
 class TimetableItemDetailsFragment : Fragment() {
-	private var item: TimegridItem? = null
+	private var periodData: PeriodData? = null
 	private var timetableDatabaseInterface: TimetableDatabaseInterface? = null
 
 	private lateinit var listener: TimetableItemDetailsDialogListener
@@ -33,9 +34,12 @@ class TimetableItemDetailsFragment : Fragment() {
 	companion object {
 		val HOMEWORK_DUE_TIME_FORMAT: DateTimeFormatter = ISODateTimeFormat.date()
 
+		const val STATE_ITEM_DATA = "com.sapuseven.untis.state.itemdata"
+		const val STATE_DATABASE_INTERFACE = "com.sapuseven.untis.state.databaseinterface"
+
 		fun createInstance(item: TimegridItem, timetableDatabaseInterface: TimetableDatabaseInterface?): TimetableItemDetailsFragment =
 				TimetableItemDetailsFragment().apply {
-					this.item = item
+					this.periodData = item.periodData
 					this.timetableDatabaseInterface = timetableDatabaseInterface
 				}
 	}
@@ -55,14 +59,25 @@ class TimetableItemDetailsFragment : Fragment() {
 	}
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+		savedInstanceState?.let {
+			this.periodData = savedInstanceState.getSerializable(STATE_ITEM_DATA) as PeriodData?
+			this.timetableDatabaseInterface = savedInstanceState.getSerializable(STATE_DATABASE_INTERFACE) as TimetableDatabaseInterface?
+		}
+
 		return activity?.let { activity ->
-			safeLet(item, timetableDatabaseInterface) { item, timetableDatabaseInterface ->
-				generateView(activity, container, item, timetableDatabaseInterface)
+			safeLet(periodData, timetableDatabaseInterface) { periodData, timetableDatabaseInterface ->
+				generateView(activity, container, periodData, timetableDatabaseInterface)
 			} ?: generateErrorView(activity, container)
 		} ?: throw IllegalStateException("Activity cannot be null")
 	}
 
-	private fun generateView(activity: FragmentActivity, container: ViewGroup?, item: TimegridItem, timetableDatabaseInterface: TimetableDatabaseInterface): View {
+	override fun onSaveInstanceState(outState: Bundle) {
+		super.onSaveInstanceState(outState)
+		outState.putSerializable(STATE_ITEM_DATA, periodData)
+		outState.putSerializable(STATE_DATABASE_INTERFACE, timetableDatabaseInterface)
+	}
+
+	private fun generateView(activity: FragmentActivity, container: ViewGroup?, periodData: PeriodData, timetableDatabaseInterface: TimetableDatabaseInterface): View {
 		val root = activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page, container, false) as LinearLayout
 
 		val attrs = intArrayOf(android.R.attr.textColorPrimary)
@@ -70,18 +85,19 @@ class TimetableItemDetailsFragment : Fragment() {
 		val color = ta?.getColor(0, 0)
 		ta?.recycle()
 
-		listOf(
-				item.periodData.element.text.lesson,
-				item.periodData.element.text.substitution,
-				item.periodData.element.text.info
+		setOf(
+				periodData.element.text.lesson,
+				periodData.element.text.substitution,
+				periodData.element.text.info
 		).forEach {
 			if (it.isNotBlank())
-				activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_info, root).run {
+				activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_info, root, false).run {
 					(findViewById<TextView>(R.id.tvInfo)).text = it
+					root.addView(this)
 				}
 		}
 
-		item.periodData.element.homeWorks?.forEach {
+		periodData.element.homeWorks?.forEach {
 			val endDate = HOMEWORK_DUE_TIME_FORMAT.parseDateTime(it.endDate)
 
 			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_homework, root).run {
@@ -90,35 +106,35 @@ class TimetableItemDetailsFragment : Fragment() {
 			}
 		}
 
-		if (item.periodData.element.can.contains(CAN_READ_STUDENT_ABSENCE))
+		if (periodData.element.can.contains(CAN_READ_STUDENT_ABSENCE))
 			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_absences, root, false).run {
 				setOnClickListener {
-					listener.onPeriodAbsencesClick(this@TimetableItemDetailsFragment, item.periodData.element)
+					listener.onPeriodAbsencesClick(this@TimetableItemDetailsFragment, periodData.element)
 				}
 				root.addView(this)
 			}
 
-		if (item.periodData.element.can.contains(CAN_READ_LESSON_TOPIC))
+		if (periodData.element.can.contains(CAN_READ_LESSON_TOPIC))
 			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_lessontopic, root)
 
 		val teacherList = root.findViewById<LinearLayout>(R.id.llTeacherList)
 		val klassenList = root.findViewById<LinearLayout>(R.id.llClassList)
 		val roomList = root.findViewById<LinearLayout>(R.id.llRoomList)
 
-		if (populateList(timetableDatabaseInterface, teacherList, item.periodData.teachers.toList(), TimetableDatabaseInterface.Type.TEACHER, color))
+		if (populateList(timetableDatabaseInterface, teacherList, periodData.teachers.toList(), TimetableDatabaseInterface.Type.TEACHER, color))
 			root.findViewById<View>(R.id.llTeachers).visibility = View.GONE
-		if (populateList(timetableDatabaseInterface, klassenList, item.periodData.classes.toList(), TimetableDatabaseInterface.Type.CLASS, color))
+		if (populateList(timetableDatabaseInterface, klassenList, periodData.classes.toList(), TimetableDatabaseInterface.Type.CLASS, color))
 			root.findViewById<View>(R.id.llClasses).visibility = View.GONE
-		if (populateList(timetableDatabaseInterface, roomList, item.periodData.rooms.toList(), TimetableDatabaseInterface.Type.ROOM, color))
+		if (populateList(timetableDatabaseInterface, roomList, periodData.rooms.toList(), TimetableDatabaseInterface.Type.ROOM, color))
 			root.findViewById<View>(R.id.llRooms).visibility = View.GONE
 
-		if (item.periodData.subjects.size > 0) {
-			var title = item.periodData.getLong(item.periodData.subjects, TimetableDatabaseInterface.Type.SUBJECT)
-			if (item.periodData.isCancelled())
+		if (periodData.subjects.size > 0) {
+			var title = periodData.getLong(periodData.subjects, TimetableDatabaseInterface.Type.SUBJECT)
+			if (periodData.isCancelled())
 				title = getString(R.string.all_lesson_cancelled, title)
-			if (item.periodData.isIrregular())
+			if (periodData.isIrregular())
 				title = getString(R.string.all_lesson_irregular, title)
-			if (item.periodData.isExam())
+			if (periodData.isExam())
 				title = getString(R.string.all_lesson_exam, title)
 
 			(root.findViewById(R.id.title) as TextView).text = title
