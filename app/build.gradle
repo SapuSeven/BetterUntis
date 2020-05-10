@@ -102,4 +102,5 @@ dependencies {
 	testImplementation 'org.mockito:mockito-core:2.28.2'
 
 	implementation project(':weekview')
+	implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
 }

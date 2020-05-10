@@ -38,7 +38,8 @@ import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.dialogs.DatePickerDialog
 import com.sapuseven.untis.dialogs.ElementPickerDialog
 import com.sapuseven.untis.dialogs.ErrorReportingDialog
-import com.sapuseven.untis.dialogs.TimetableItemDetailsFragment
+import com.sapuseven.untis.fragments.AbsenceCheckFragment
+import com.sapuseven.untis.fragments.TimetableItemDetailsFragment
 import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
@@ -99,6 +100,7 @@ class MainActivity :
 		private const val PERSISTENT_INT_ZOOM_LEVEL = "persistent_zoom_level"
 
 		private const val FRAGMENT_TAG_LESSON_INFO = "com.sapuseven.untis.fragments.lessoninfo"
+		private const val FRAGMENT_TAG_ABSENCE_CHECK = "com.sapuseven.untis.fragments.absencecheck"
 	}
 
 	private val userDatabase = UserDatabase.createInstance(this)
@@ -742,6 +744,14 @@ class MainActivity :
 	}
 
 	override fun onPeriodAbsencesClick(fragment: Fragment, element: Period) {
+		val absenceEditFragment = AbsenceCheckFragment.createInstance(element)
+
+		supportFragmentManager.beginTransaction().run {
+			setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+			add(R.id.content_main, absenceEditFragment, FRAGMENT_TAG_ABSENCE_CHECK)
+			addToBackStack(absenceEditFragment.tag)
+			commit()
+		}
 	}
 
 	override fun onDialogDismissed(dialog: DialogInterface?) {

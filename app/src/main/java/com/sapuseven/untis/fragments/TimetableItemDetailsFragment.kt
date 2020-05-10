@@ -1,4 +1,4 @@
-package com.sapuseven.untis.dialogs
+package com.sapuseven.untis.fragments
 
 import android.content.Context
 import android.graphics.Paint
@@ -63,7 +63,7 @@ class TimetableItemDetailsFragment : Fragment() {
 	}
 
 	private fun generateView(activity: FragmentActivity, container: ViewGroup?, item: TimegridItem, timetableDatabaseInterface: TimetableDatabaseInterface): View {
-		val root = activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page, container, false) as LinearLayout
+		val root = activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page, container, false) as LinearLayout
 
 		val attrs = intArrayOf(android.R.attr.textColorPrimary)
 		val ta = context?.obtainStyledAttributes(attrs)
@@ -76,7 +76,7 @@ class TimetableItemDetailsFragment : Fragment() {
 				item.periodData.element.text.info
 		).forEach {
 			if (it.isNotBlank())
-				activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_info, root).run {
+				activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_info, root).run {
 					(findViewById<TextView>(R.id.tvInfo)).text = it
 				}
 		}
@@ -84,21 +84,22 @@ class TimetableItemDetailsFragment : Fragment() {
 		item.periodData.element.homeWorks?.forEach {
 			val endDate = HOMEWORK_DUE_TIME_FORMAT.parseDateTime(it.endDate)
 
-			activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_homework, root).run {
+			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_homework, root).run {
 				(findViewById<TextView>(R.id.textview_roomfinder_name)).text = it.text
 				(findViewById<TextView>(R.id.tvDate)).text = getString(R.string.homeworks_due_time, endDate.toString(getString(R.string.homeworks_due_time_format)))
 			}
 		}
 
 		if (item.periodData.element.can.contains(CAN_READ_STUDENT_ABSENCE))
-			activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_absences, root).run {
+			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_absences, root, false).run {
 				setOnClickListener {
 					listener.onPeriodAbsencesClick(this@TimetableItemDetailsFragment, item.periodData.element)
 				}
+				root.addView(this)
 			}
 
 		if (item.periodData.element.can.contains(CAN_READ_LESSON_TOPIC))
-			activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page_lessontopic, root)
+			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_lessontopic, root)
 
 		val teacherList = root.findViewById<LinearLayout>(R.id.llTeacherList)
 		val klassenList = root.findViewById<LinearLayout>(R.id.llClassList)
@@ -128,7 +129,7 @@ class TimetableItemDetailsFragment : Fragment() {
 	}
 
 	private fun generateErrorView(activity: FragmentActivity, container: ViewGroup?): View {
-		return activity.layoutInflater.inflate(R.layout.dialog_timetable_item_details_page, container, false) as LinearLayout
+		return activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page, container, false) as LinearLayout
 	}
 
 	private fun populateList(timetableDatabaseInterface: TimetableDatabaseInterface,
