@@ -33,8 +33,8 @@ class AbsenceCheckFragment : Fragment() {
 		rvAbsenceCheck.layoutManager = LinearLayoutManager(context)
 		rvAbsenceCheck.adapter = adapter
 
-		val viewModel: AbsenceCheckViewModel by viewModels()
-		viewModel.absenceList.observe(viewLifecycleOwner, Observer { absenceList ->
+		val viewModel by viewModels<AbsenceCheckViewModel> { AbsenceCheckViewModel.Factory("Test") }
+		viewModel.absenceList().observe(viewLifecycleOwner, Observer { absenceList ->
 			adapter.clear()
 			adapter.addItems(absenceList.map { AbsenceCheckAdapterItem(it) })
 			adapter.notifyDataSetChanged()
