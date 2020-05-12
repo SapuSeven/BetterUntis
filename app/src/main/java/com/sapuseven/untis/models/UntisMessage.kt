@@ -7,5 +7,5 @@ data class UntisMessage(
 		var id: Int,
 		var subject: String,
 		var body: String,
-		var attachments: List<UnknownObject>
+		var attachments: List<UntisAttachment>
 )
