@@ -6,6 +6,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.RectF
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -94,6 +95,8 @@ class MainActivity :
 		private const val UNTIS_DEFAULT_COLOR = "#f49f25"
 
 		private const val PERSISTENT_INT_ZOOM_LEVEL = "persistent_zoom_level"
+
+		private const val MESSENGER_PACKAGE_NAME = "com.untis.chat"
 	}
 
 	private val userDatabase = UserDatabase.createInstance(this)
@@ -610,6 +613,17 @@ class MainActivity :
 				val i = Intent(this@MainActivity, InfoCenterActivity::class.java)
 				i.putExtra(InfoCenterActivity.EXTRA_LONG_PROFILE_ID, profileId)
 				startActivityForResult(i, REQUEST_CODE_ROOM_FINDER)
+			}
+			R.id.nav_messenger -> {
+				try {
+					startActivity(packageManager.getLaunchIntentForPackage(MESSENGER_PACKAGE_NAME))
+				} catch (e: Exception) {
+					try {
+						startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$MESSENGER_PACKAGE_NAME")))
+					} catch (e: Exception) {
+						startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$MESSENGER_PACKAGE_NAME")))
+					}
+				}
 			}
 			R.id.nav_free_rooms -> {
 				val i = Intent(this@MainActivity, RoomFinderActivity::class.java)

@@ -30,6 +30,10 @@
 			android:icon="@drawable/all_infocenter"
 			android:title="@string/activity_title_info_center" />
 		<item
+			android:id="@+id/nav_messenger"
+			android:icon="@drawable/all_messenger"
+			android:title="@string/activity_title_messenger" />
+		<item
 			android:id="@+id/nav_free_rooms"
 			android:icon="@drawable/all_search_rooms"
 			android:title="@string/activity_title_free_rooms" />
