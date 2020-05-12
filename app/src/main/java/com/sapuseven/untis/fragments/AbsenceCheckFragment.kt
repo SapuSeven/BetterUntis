@@ -13,14 +13,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
 import com.sapuseven.untis.adapters.AbsenceCheckAdapter
 import com.sapuseven.untis.adapters.AbsenceCheckAdapterItem
+import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.helpers.KotlinUtils
 import com.sapuseven.untis.models.untis.timetable.Period
 import com.sapuseven.untis.viewmodels.AbsenceCheckViewModel
 
 class AbsenceCheckFragment : Fragment() {
 	private var element: Period? = null
+	private var user: UserDatabase.User? = null
 
 	companion object {
-		fun createInstance(element: Period): AbsenceCheckFragment = AbsenceCheckFragment().apply {
+		fun createInstance(user: UserDatabase.User, element: Period): AbsenceCheckFragment = AbsenceCheckFragment().apply {
+			this.user = user
 			this.element = element
 		}
 	}
@@ -33,12 +37,14 @@ class AbsenceCheckFragment : Fragment() {
 		rvAbsenceCheck.layoutManager = LinearLayoutManager(context)
 		rvAbsenceCheck.adapter = adapter
 
-		val viewModel by viewModels<AbsenceCheckViewModel> { AbsenceCheckViewModel.Factory("Test") }
-		viewModel.absenceList().observe(viewLifecycleOwner, Observer { absenceList ->
-			adapter.clear()
-			adapter.addItems(absenceList.map { AbsenceCheckAdapterItem(it) })
-			adapter.notifyDataSetChanged()
-		})
+		KotlinUtils.safeLet(user, element?.id) { user, lessonId ->
+			val viewModel by viewModels<AbsenceCheckViewModel> { AbsenceCheckViewModel.Factory(user, lessonId) }
+			viewModel.absenceList().observe(viewLifecycleOwner, Observer { absenceList ->
+				adapter.clear()
+				adapter.addItems(absenceList.map { AbsenceCheckAdapterItem(it.key, it.value) })
+				adapter.notifyDataSetChanged()
+			})
+		}
 
 		return rootView
 	}

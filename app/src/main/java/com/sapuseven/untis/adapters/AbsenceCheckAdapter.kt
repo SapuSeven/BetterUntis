@@ -28,7 +28,7 @@ class AbsenceCheckAdapter(
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 		val item = dataset[position]
-		holder.tvName.text = item.name
-		holder.tvDetails.text = ""
+		holder.tvName.text = item.student.fullName()
+		holder.tvDetails.text = item.absence?.text ?: ""
 	}
 }

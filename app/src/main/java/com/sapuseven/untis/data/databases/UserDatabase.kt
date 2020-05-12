@@ -21,7 +21,7 @@ import com.sapuseven.untis.models.untis.masterdata.*
 private const val DATABASE_VERSION = 4
 private const val DATABASE_NAME = "userdata.db"
 
-class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION), java.io.Serializable {
+class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 	companion object {
 		const val COLUMN_NAME_USER_ID = "_user_id"
 

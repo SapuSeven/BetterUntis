@@ -71,6 +71,7 @@ class TimetableItemDetailsFragment : Fragment() {
 		} ?: throw IllegalStateException("Activity cannot be null")
 	}
 
+	// TODO: This isn't working. Use ViewModels instead, it's too tedious to serialize every object being used.
 	override fun onSaveInstanceState(outState: Bundle) {
 		super.onSaveInstanceState(outState)
 		outState.putSerializable(STATE_ITEM_DATA, periodData)

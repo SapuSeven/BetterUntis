@@ -744,7 +744,7 @@ class MainActivity :
 	}
 
 	override fun onPeriodAbsencesClick(fragment: Fragment, element: Period) {
-		val absenceEditFragment = AbsenceCheckFragment.createInstance(element)
+		val absenceEditFragment = AbsenceCheckFragment.createInstance(profileUser, element)
 
 		supportFragmentManager.beginTransaction().run {
 			setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
