@@ -41,7 +41,7 @@ class AbsenceCheckFragment : Fragment() {
 			val viewModel by viewModels<AbsenceCheckViewModel> { AbsenceCheckViewModel.Factory(user, lessonId) }
 			viewModel.absenceList().observe(viewLifecycleOwner, Observer { absenceList ->
 				adapter.clear()
-				adapter.addItems(absenceList.map { AbsenceCheckAdapterItem(it.key, it.value) })
+				adapter.addItems(absenceList.map { AbsenceCheckAdapterItem(it.key, it.value) }.sortedBy { it.student.fullName() })
 				adapter.notifyDataSetChanged()
 			})
 		}
