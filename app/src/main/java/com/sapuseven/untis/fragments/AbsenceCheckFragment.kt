@@ -17,6 +17,7 @@ import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.KotlinUtils
 import com.sapuseven.untis.models.untis.timetable.Period
 import com.sapuseven.untis.viewmodels.AbsenceCheckViewModel
+import java.text.Collator
 
 class AbsenceCheckFragment : Fragment() {
 	private var element: Period? = null
@@ -41,7 +42,9 @@ class AbsenceCheckFragment : Fragment() {
 			val viewModel by viewModels<AbsenceCheckViewModel> { AbsenceCheckViewModel.Factory(user, lessonId) }
 			viewModel.absenceList().observe(viewLifecycleOwner, Observer { absenceList ->
 				adapter.clear()
-				adapter.addItems(absenceList.map { AbsenceCheckAdapterItem(it.key, it.value) }.sortedBy { it.student.fullName() })
+				adapter.addItems(absenceList.map { AbsenceCheckAdapterItem(it.key, it.value) }.sortedWith(Comparator { s1, s2 ->
+					Collator.getInstance().compare(s1.student.fullName(), s2.student.fullName())
+				}))
 				adapter.notifyDataSetChanged()
 			})
 		}

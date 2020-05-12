@@ -28,7 +28,8 @@ class AbsenceCheckAdapter(
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 		val item = dataset[position]
-		holder.tvName.text = item.student.fullName()
+		holder.tvName.text = item.toString()
 		holder.tvDetails.text = item.absence?.text ?: ""
+		holder.ivStatus.setImageResource(if (item.absence == null) R.drawable.all_check else R.drawable.all_cross)
 	}
 }
