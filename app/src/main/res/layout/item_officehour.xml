@@ -1,40 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
+	android:orientation="vertical"
 	style="@style/DefaultItemStyle">
 
 	<TextView
 		android:id="@+id/textview_itemofficehour_time"
 		style="@style/TextAppearance.MaterialComponents.Overline"
-		android:layout_width="0dp"
+		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:textColor="?android:attr/textColorSecondary"
-		android:textSize="@dimen/textsize_listitem_overline"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toTopOf="parent" />
+		android:textSize="@dimen/textsize_listitem_overline"/>
 
 	<TextView
 		android:id="@+id/textview_itemofficehour_title"
-		android:layout_width="0dp"
+		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:textColor="?android:attr/textColorPrimary"
-		android:textSize="@dimen/textsize_listitem_line1"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@+id/textview_itemofficehour_time" />
+		android:textSize="@dimen/textsize_listitem_line1"/>
 
 	<TextView
 		android:id="@+id/textview_itemofficehour_text"
-		android:layout_width="0dp"
+		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_marginTop="4dp"
 		android:textColor="?android:attr/textColorSecondary"
-		android:textSize="@dimen/textsize_listitem_line2"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@+id/textview_itemofficehour_title" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+		android:textSize="@dimen/textsize_listitem_line2"/>
+</LinearLayout>
