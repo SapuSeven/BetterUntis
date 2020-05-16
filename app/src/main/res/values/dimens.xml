@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<dimen name="height_header_content">172dp</dimen>
+	<dimen name="icon_listitem">24dp</dimen>
 	<dimen name="margin_listitem_text">16dp</dimen>
 	<dimen name="margin_listitem_text_vertical">12dp</dimen>
 	<dimen name="margin_login_input">8dp</dimen>

@@ -31,8 +31,8 @@
 
 	<androidx.appcompat.widget.AppCompatImageView
 		android:id="@+id/imageview_itemexam_icon"
-		android:layout_width="24dp"
-		android:layout_height="24dp"
+		android:layout_width="@dimen/icon_listitem"
+		android:layout_height="@dimen/icon_listitem"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent"
