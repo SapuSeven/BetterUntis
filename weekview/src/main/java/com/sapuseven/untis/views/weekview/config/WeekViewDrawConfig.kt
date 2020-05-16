@@ -54,7 +54,7 @@ class WeekViewDrawConfig(context: Context) {
 	val pastBackgroundPaint: Paint = Paint()
 
 	companion object {
-		private const val TYPEFACE_SEMI_BOLD: Typeface = Typeface.create("sans-serif-light", Typeface.BOLD)
+		private val TYPEFACE_SEMI_BOLD: Typeface = Typeface.create("sans-serif-light", Typeface.BOLD)
 	}
 	
 	init {
