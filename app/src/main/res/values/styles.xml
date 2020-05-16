@@ -94,4 +94,12 @@
 		<item name="android:windowEnterAnimation">@android:anim/fade_in</item>
 		<item name="android:windowExitAnimation">@android:anim/fade_out</item>
 	</style>
+
+	<style name="DefaultItemStyle">
+		<item name="android:background">?android:attr/selectableItemBackground</item>
+		<item name="android:paddingTop">@dimen/margin_listitem_text_vertical</item>
+		<item name="android:paddingStart">@dimen/margin_listitem_text</item>
+		<item name="android:paddingBottom">@dimen/margin_listitem_text_vertical</item>
+		<item name="android:paddingEnd">@dimen/margin_listitem_text</item>
+	</style>
 </resources>
