@@ -53,18 +53,20 @@ class WeekViewDrawConfig(context: Context) {
 	val futureBackgroundPaint: Paint = Paint()
 	val pastBackgroundPaint: Paint = Paint()
 
-	private val semiBold: Typeface = Typeface.create("sans-serif-light", Typeface.BOLD)
-
+	companion object {
+		private const val TYPEFACE_SEMI_BOLD: Typeface = Typeface.create("sans-serif-light", Typeface.BOLD)
+	}
+	
 	init {
 		// Set additional permanent properties
 		timeTextTopPaint.textAlign = Paint.Align.LEFT
 		timeTextBottomPaint.textAlign = Paint.Align.RIGHT
 
 		timeCaptionPaint.textAlign = Paint.Align.CENTER
-		timeCaptionPaint.typeface = semiBold
+		timeCaptionPaint.typeface = TYPEFACE_SEMI_BOLD
 
 		headerTextPaint.textAlign = Paint.Align.CENTER
-		headerTextPaint.typeface = semiBold
+		headerTextPaint.typeface = TYPEFACE_SEMI_BOLD
 
 		headerSecondaryTextPaint.textAlign = Paint.Align.CENTER
 		headerSecondaryTextPaint.typeface = Typeface.DEFAULT
@@ -74,7 +76,7 @@ class WeekViewDrawConfig(context: Context) {
 		daySeparatorPaint.style = Paint.Style.STROKE
 
 		todayHeaderTextPaint.textAlign = Paint.Align.CENTER
-		todayHeaderTextPaint.typeface = semiBold
+		todayHeaderTextPaint.typeface = TYPEFACE_SEMI_BOLD
 
 		todayHeaderSecondaryTextPaint.textAlign = Paint.Align.CENTER
 		todayHeaderSecondaryTextPaint.typeface = Typeface.DEFAULT
