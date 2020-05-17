@@ -152,8 +152,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 				val dayDate = DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseLocalDate(day.day)
 				if (dayDate.dayOfWeek == now.dayOfWeek)
 					day.units.forEach { unit ->
-						val unitEndTime = DateTimeFormat.forPattern("'T'HH:mm").withLocale(Locale.ENGLISH).parseLocalTime(unit.endTime)
-						if (unitEndTime.millisOfDay > now.millisOfDay)
+						if (unit.endTime.toLocalTime().millisOfDay > now.millisOfDay)
 							return index
 						index++
 					}
@@ -239,8 +238,8 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 								val dayDateTime = DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(day.day)
 
 								day.units.forEach { unit ->
-									val unitStartDateTime = DateTimeFormat.forPattern("'T'HH:mm").withLocale(Locale.ENGLISH).parseDateTime(unit.startTime)
-									val unitEndDateTime = DateTimeFormat.forPattern("'T'HH:mm").withLocale(Locale.ENGLISH).parseDateTime(unit.endTime)
+									val unitStartDateTime = unit.startTime.toLocalTime()
+									val unitEndDateTime = unit.endTime.toLocalTime()
 
 									var isOccupied = false
 									items.forEach allItems@{ item ->
@@ -328,7 +327,11 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		val unit = getUnitFromIndex(hourIndex)
 		unit?.let {
 			textview_roomfinder_currenthour.text = getString(R.string.roomfinder_current_hour, translateDay(unit.first.day), unit.second)
-			textview_roomfinder_currenthourtime.text = getString(R.string.roomfinder_current_hour_time, unit.third.startTime.substring(1), unit.third.endTime.substring(1))
+			textview_roomfinder_currenthourtime.text = getString(
+					R.string.roomfinder_current_hour_time,
+					unit.third.startTime.toLocalTime().toString(DateTimeFormat.shortTime()),
+					unit.third.endTime.toLocalTime().toString(DateTimeFormat.shortTime())
+			)
 		}
 
 		button_roomfinder_previous.isEnabled = hourIndex != 0

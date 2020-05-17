@@ -380,7 +380,7 @@ class MainActivity :
 		weekView.setOnCornerClickListener(this)
 		weekView.setPeriodChangeListener(this)
 		weekView.scrollListener = object : ScrollListener {
-			override fun onFirstVisibleDayChanged(newFirstVisibleDay: DateTime, oldFirstVisibleDay: DateTime?) {
+			override fun onFirstVisibleDayChanged(newFirstVisibleDay: LocalDate, oldFirstVisibleDay: LocalDate?) {
 				currentWeekIndex = convertDateTimeToWeekIndex(newFirstVisibleDay)
 				setLastRefresh(weeklyTimetableItems[currentWeekIndex]?.lastUpdated
 						?: 0)
@@ -431,7 +431,7 @@ class MainActivity :
 		weekView.snapToWeek = !PreferenceUtils.getPrefBool(preferences, "preference_week_snap_to_days") && weekView.numberOfVisibleDays != 1
 	}
 
-	override fun onPeriodChange(startDate: DateTime, endDate: DateTime): List<WeekViewDisplayable<TimegridItem>> {
+	override fun onPeriodChange(startDate: LocalDate, endDate: LocalDate): List<WeekViewDisplayable<TimegridItem>> {
 		val weekIndex = convertDateTimeToWeekIndex(startDate)
 		return weeklyTimetableItems[weekIndex]?.items ?: run {
 			displayedElement?.let { displayedElement ->
@@ -445,7 +445,7 @@ class MainActivity :
 		}
 	}
 
-	private fun convertDateTimeToWeekIndex(date: DateTime) = date.year * 100 + date.dayOfYear / 7
+	private fun convertDateTimeToWeekIndex(date: LocalDate) = date.year * 100 + date.dayOfYear / 7
 
 	private fun setupHours() {
 		val lines = MutableList(0) { return@MutableList 0 }
@@ -454,8 +454,8 @@ class MainActivity :
 		profileUser.timeGrid.days.maxBy { it.units.size }?.units?.forEachIndexed { index, hour ->
 			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
 
-			val startTime = DateTimeUtils.tTimeNoSeconds().parseLocalTime(hour.startTime).toString(DateTimeUtils.shortDisplayableTime())
-			val endTime = DateTimeUtils.tTimeNoSeconds().parseLocalTime(hour.endTime).toString(DateTimeUtils.shortDisplayableTime())
+			val startTime = hour.startTime.toLocalTime().toString(DateTimeUtils.shortDisplayableTime())
+			val endTime = hour.endTime.toLocalTime().toString(DateTimeUtils.shortDisplayableTime())
 
 			val startTimeParts = startTime.split(":")
 			val endTimeParts = endTime.split(":")
@@ -537,19 +537,19 @@ class MainActivity :
 
 		// Put all items into a two dimensional array depending on day and hour
 		items.forEach { item ->
-			val startDateTime = DateTimeUtils.isoDateTimeNoSeconds().parseLocalDateTime(item.periodData.element.startDateTime)
-			val endDateTime = DateTimeUtils.isoDateTimeNoSeconds().parseLocalDateTime(item.periodData.element.endDateTime)
+			val startDateTime = item.periodData.element.startDateTime.toLocalDateTime()
+			val endDateTime = item.periodData.element.endDateTime.toLocalDateTime()
 
 			val day = endDateTime.dayOfWeek - firstDayOfWeek
 
 			if (day < 0 || day >= days.size) return@forEach
 
 			val thisUnitStartIndex = days[day].units.indexOfFirst {
-				it.startTime == startDateTime.toString(DateTimeUtils.tTimeNoSeconds())
+				it.startTime.time == startDateTime.toString(DateTimeUtils.tTimeNoSeconds())
 			}
 
 			val thisUnitEndIndex = days[day].units.indexOfFirst {
-				it.endTime == endDateTime.toString(DateTimeUtils.tTimeNoSeconds())
+				it.endTime.time == endDateTime.toString(DateTimeUtils.tTimeNoSeconds())
 			}
 
 			if (thisUnitStartIndex != -1 && thisUnitEndIndex != -1)
@@ -803,7 +803,7 @@ class MainActivity :
 	}
 
 	override fun addTimetableItems(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
-		weeklyTimetableItems[convertDateTimeToWeekIndex(startDate.toDateTime())]?.apply {
+		weeklyTimetableItems[convertDateTimeToWeekIndex(startDate.toLocalDate())]?.apply {
 			this.items = prepareItems(items).map { it.toWeekViewEvent() }
 			lastUpdated = timestamp
 		}

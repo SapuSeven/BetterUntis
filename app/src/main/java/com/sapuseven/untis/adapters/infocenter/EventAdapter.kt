@@ -9,9 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.models.untis.UntisDate
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
+import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
 
 
@@ -19,13 +17,13 @@ class EventAdapter(
 		private val context: Context,
 		private val eventList: List<EventAdapterItem> = ArrayList(),
 		var timetableDatabaseInterface: TimetableDatabaseInterface? = null
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+) : RecyclerView.Adapter<ViewHolder>() {
 	companion object {
 		private const val TYPE_EXAM = 1
 		private const val TYPE_HOMEWORK = 2
 	}
 
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		return if (viewType == TYPE_EXAM) {
 			val v = LayoutInflater.from(parent.context).inflate(R.layout.item_exam, parent, false)
 			ExamViewHolder(v)
@@ -42,12 +40,12 @@ class EventAdapter(
 		if (holder is ExamViewHolder && event.exam != null) {
 			val subject = timetableDatabaseInterface?.getShortName(event.exam.subjectId, TimetableDatabaseInterface.Type.SUBJECT)
 			holder.tvTime.text = formatExamTime(
-					UntisDate(event.exam.startDateTime).toDateTime().withZone(DateTimeZone.UTC),
-					UntisDate(event.exam.endDateTime).toDateTime().withZone(DateTimeZone.UTC)
+					event.exam.startDateTime.toLocalDateTime(),
+					event.exam.endDateTime.toLocalDateTime()
 			)
 			holder.tvTitle.text = if (subject != null && !event.exam.name.contains(subject)) context.getString(R.string.infocenter_events_exam_name_long, subject, event.exam.name) else event.exam.name
 		} else if (holder is HomeworkViewHolder && event.homework != null) {
-			holder.tvTime.text = UntisDate(event.homework.endDate).toDateTime().toString(DateTimeFormat.mediumDate())
+			holder.tvTime.text = event.homework.endDate.toLocalDate().toString(DateTimeFormat.mediumDate())
 			holder.tvTitle.text = timetableDatabaseInterface?.getLongName(event.lessonsById?.get(event.homework.lessonId.toString())?.subjectId
 					?: 0, TimetableDatabaseInterface.Type.SUBJECT)
 					?: event.homework.lessonId.toString()
@@ -61,7 +59,7 @@ class EventAdapter(
 		return if (event.exam != null) TYPE_EXAM else TYPE_HOMEWORK
 	}
 
-	private fun formatExamTime(startDateTime: DateTime, endDateTime: DateTime): String {
+	private fun formatExamTime(startDateTime: LocalDateTime, endDateTime: LocalDateTime): String {
 		return context.getString(
 				if (startDateTime.dayOfYear == endDateTime.dayOfYear)
 					R.string.infocenter_timeformat_sameday
@@ -74,12 +72,12 @@ class EventAdapter(
 		)
 	}
 
-	class ExamViewHolder(rootView: View) : RecyclerView.ViewHolder(rootView) {
+	class ExamViewHolder(rootView: View) : ViewHolder(rootView) {
 		val tvTime: TextView = rootView.findViewById(R.id.textview_itemexam_time)
 		val tvTitle: TextView = rootView.findViewById(R.id.textview_itemexam_title)
 	}
 
-	class HomeworkViewHolder(rootView: View) : RecyclerView.ViewHolder(rootView) {
+	class HomeworkViewHolder(rootView: View) : ViewHolder(rootView) {
 		val tvTime: TextView = rootView.findViewById(R.id.textview_itemhomework_time)
 		val tvTitle: TextView = rootView.findViewById(R.id.textview_itemhomework_title)
 		val tvText: TextView = rootView.findViewById(R.id.textview_itemhomework_text)

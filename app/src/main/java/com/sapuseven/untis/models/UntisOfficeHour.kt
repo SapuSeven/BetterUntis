@@ -1,12 +1,13 @@
 package com.sapuseven.untis.models
 
+import com.sapuseven.untis.models.untis.UntisDateTime
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class UntisOfficeHour(
 		val id: Int,
-		val startDateTime: String,
-		val endDateTime: String,
+		val startDateTime: UntisDateTime,
+		val endDateTime: UntisDateTime,
 		val teacherId: Int,
 		val imageId: Int,
 		val email: String?,

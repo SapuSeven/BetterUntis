@@ -1,14 +1,15 @@
 package com.sapuseven.untis.models.untis.timetable
 
 import com.sapuseven.untis.models.UnknownObject
+import com.sapuseven.untis.models.untis.UntisDateTime
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class Period(
 		val id: Int,
 		val lessonId: Int,
-		var startDateTime: String,
-		var endDateTime: String,
+		var startDateTime: UntisDateTime,
+		var endDateTime: UntisDateTime,
 		val foreColor: String,
 		val backColor: String,
 		val innerForeColor: String,

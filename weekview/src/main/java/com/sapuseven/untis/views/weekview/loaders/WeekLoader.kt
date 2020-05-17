@@ -19,8 +19,8 @@ class WeekLoader<T> internal constructor(private var onWeekChangeListener: WeekV
 	override fun onLoad(periodIndex: Int): List<WeekViewEvent<T>> {
 		val millis = periodIndex * MILLIS_PER_WEEK.toLong()
 
-		val startDate = DateTime().withMillis(millis).dayOfWeek().withMinimumValue()
-		val endDate = DateTime().withMillis(millis).dayOfWeek().withMaximumValue()
+		val startDate = DateTime().withMillis(millis).dayOfWeek().withMinimumValue().toLocalDate()
+		val endDate = DateTime().withMillis(millis).dayOfWeek().withMaximumValue().toLocalDate()
 
 		val displayableItems = onWeekChangeListener.onPeriodChange(startDate, endDate)
 

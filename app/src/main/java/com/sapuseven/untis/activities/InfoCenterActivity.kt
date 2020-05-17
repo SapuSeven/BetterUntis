@@ -177,7 +177,7 @@ class InfoCenterActivity : BaseActivity() {
 		loadExams(user)?.let { events.addAll(it) }
 		loadHomeworks(user)?.let { events.addAll(it) }
 		return events.toList().sortedBy {
-			it.exam?.startDateTime ?: it.homework?.endDate
+			it.exam?.startDateTime?.toString() ?: it.homework?.endDate?.toString()
 		}
 	}
 

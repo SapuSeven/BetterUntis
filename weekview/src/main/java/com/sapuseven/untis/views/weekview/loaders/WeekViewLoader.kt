@@ -4,6 +4,7 @@ import com.sapuseven.untis.views.weekview.WeekView
 import com.sapuseven.untis.views.weekview.WeekViewDisplayable
 import com.sapuseven.untis.views.weekview.WeekViewEvent
 import org.joda.time.DateTime
+import org.joda.time.LocalDate
 
 interface WeekViewLoader<T> {
 
@@ -33,6 +34,6 @@ interface WeekViewLoader<T> {
 		 * @param endDate A [DateTime] representing the end date of the period
 		 * @return The list of [WeekViewDisplayable] of the provided period
 		 */
-		fun onPeriodChange(startDate: DateTime, endDate: DateTime): List<WeekViewDisplayable<T>>
+		fun onPeriodChange(startDate: LocalDate, endDate: LocalDate): List<WeekViewDisplayable<T>>
 	}
 }

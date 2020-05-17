@@ -1,5 +1,6 @@
 package com.sapuseven.untis.models
 
+import com.sapuseven.untis.models.untis.UntisDateTime
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -7,8 +8,8 @@ data class UntisAbsence(
 		var id: Int,
 		var studentId: Int,
 		var klasseId: Int,
-		var startDateTime: String,
-		var endDateTime: String,
+		var startDateTime: UntisDateTime,
+		var endDateTime: UntisDateTime,
 		var owner: Boolean,
 		var excused: Boolean,
 		var excuse: UnknownObject?,
