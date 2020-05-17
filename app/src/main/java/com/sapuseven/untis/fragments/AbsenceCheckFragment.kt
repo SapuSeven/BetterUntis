@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -32,6 +33,7 @@ class AbsenceCheckFragment(user: UserDatabase.User?, element: Period?) : Fragmen
 		rvAbsenceCheck.adapter = adapter
 
 		viewModel.absenceList().observe(viewLifecycleOwner, Observer { absenceList ->
+			rootView.findViewById<ProgressBar>(R.id.progressbar_absencecheck_loading).visibility = View.GONE
 			adapter.clear()
 			adapter.addItems(absenceList.map { AbsenceCheckAdapterItem(it.key, it.value) }.sortedWith(Comparator { s1, s2 ->
 				Collator.getInstance().compare(s1.student.fullName(), s2.student.fullName())
