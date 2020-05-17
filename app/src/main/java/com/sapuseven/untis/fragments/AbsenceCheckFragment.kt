@@ -1,11 +1,11 @@
 package com.sapuseven.untis.fragments
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -28,7 +28,9 @@ class AbsenceCheckFragment(user: UserDatabase.User?, element: Period?) : Fragmen
 		val rootView = activity?.layoutInflater?.inflate(R.layout.fragment_timetable_absence_check, container, false) as ViewGroup
 
 		val rvAbsenceCheck = rootView.findViewById<RecyclerView>(R.id.recyclerview_absence_check)
-		val adapter = AbsenceCheckAdapter(requireContext())
+		val adapter = AbsenceCheckAdapter {
+			Toast.makeText(context, it.student.fullName(), Toast.LENGTH_SHORT).show()
+		}
 		rvAbsenceCheck.layoutManager = LinearLayoutManager(context)
 		rvAbsenceCheck.adapter = adapter
 
@@ -42,11 +44,5 @@ class AbsenceCheckFragment(user: UserDatabase.User?, element: Period?) : Fragmen
 		})
 
 		return rootView
-	}
-
-	override fun onAttach(context: Context) {
-		super.onAttach(context)
-
-		if (activity == null) return
 	}
 }

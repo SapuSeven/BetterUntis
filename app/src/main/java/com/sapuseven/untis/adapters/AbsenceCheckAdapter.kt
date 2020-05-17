@@ -1,6 +1,5 @@
 package com.sapuseven.untis.adapters
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,8 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
 
 class AbsenceCheckAdapter(
-		private val context: Context/*,
-		private val onClickListener: View.OnClickListener*/
+		private val onClickListener: (item: AbsenceCheckAdapterItem) -> Unit
 ) : MutableAdapter<AbsenceCheckAdapterItem>() {
 
 	class ViewHolder(rootView: View) : RecyclerView.ViewHolder(rootView) {
@@ -23,8 +21,11 @@ class AbsenceCheckAdapter(
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		val v = LayoutInflater.from(parent.context).inflate(R.layout.item_absence_check, parent, false) as ConstraintLayout
-		//v.setOnClickListener(onClickListener)
-		return ViewHolder(v)
+		val viewHolder = ViewHolder(v)
+		v.setOnClickListener {
+			onClickListener(dataset[viewHolder.layoutPosition])
+		}
+		return viewHolder
 	}
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
