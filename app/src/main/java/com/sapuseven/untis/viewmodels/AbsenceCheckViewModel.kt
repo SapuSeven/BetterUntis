@@ -44,7 +44,7 @@ class AbsenceCheckViewModel(private val user: UserDatabase.User, private val les
 
 	fun absenceList(): LiveData<Map<UntisStudent, UntisAbsence?>> = absenceListLiveData
 
-	class Factory(val user: UserDatabase.User, val lessonId: Int) : ViewModelProvider.Factory {
+	class Factory(private val user: UserDatabase.User?, private val lessonId: Int?) : ViewModelProvider.Factory {
 		override fun <T : ViewModel?> create(modelClass: Class<T>): T {
 			return modelClass.getConstructor(UserDatabase.User::class.java, Int::class.java)
 					.newInstance(user, lessonId)

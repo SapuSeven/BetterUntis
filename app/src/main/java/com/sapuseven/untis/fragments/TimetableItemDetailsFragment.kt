@@ -11,6 +11,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.viewModels
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_LESSON_TOPIC
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_STUDENT_ABSENCE
@@ -21,27 +22,19 @@ import com.sapuseven.untis.helpers.KotlinUtils.safeLet
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.Period
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import com.sapuseven.untis.viewmodels.TimetableItemDetailsViewModel
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.ISODateTimeFormat
 
 
-class TimetableItemDetailsFragment : Fragment() {
-	private var periodData: PeriodData? = null
-	private var timetableDatabaseInterface: TimetableDatabaseInterface? = null
+class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterface: TimetableDatabaseInterface?) : Fragment() {
+	constructor() : this(null, null)
 
+	private val viewModel by viewModels<TimetableItemDetailsViewModel> { TimetableItemDetailsViewModel.Factory(item, timetableDatabaseInterface) }
 	private lateinit var listener: TimetableItemDetailsDialogListener
 
 	companion object {
 		val HOMEWORK_DUE_TIME_FORMAT: DateTimeFormatter = ISODateTimeFormat.date()
-
-		const val STATE_ITEM_DATA = "com.sapuseven.untis.state.itemdata"
-		const val STATE_DATABASE_INTERFACE = "com.sapuseven.untis.state.databaseinterface"
-
-		fun createInstance(item: TimegridItem, timetableDatabaseInterface: TimetableDatabaseInterface?): TimetableItemDetailsFragment =
-				TimetableItemDetailsFragment().apply {
-					this.periodData = item.periodData
-					this.timetableDatabaseInterface = timetableDatabaseInterface
-				}
 	}
 
 	interface TimetableItemDetailsDialogListener {
@@ -59,23 +52,11 @@ class TimetableItemDetailsFragment : Fragment() {
 	}
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-		savedInstanceState?.let {
-			this.periodData = savedInstanceState.getSerializable(STATE_ITEM_DATA) as PeriodData?
-			this.timetableDatabaseInterface = savedInstanceState.getSerializable(STATE_DATABASE_INTERFACE) as TimetableDatabaseInterface?
-		}
-
 		return activity?.let { activity ->
-			safeLet(periodData, timetableDatabaseInterface) { periodData, timetableDatabaseInterface ->
+			safeLet(viewModel.item?.periodData, viewModel.timetableDatabaseInterface) { periodData, timetableDatabaseInterface ->
 				generateView(activity, container, periodData, timetableDatabaseInterface)
 			} ?: generateErrorView(activity, container)
 		} ?: throw IllegalStateException("Activity cannot be null")
-	}
-
-	// TODO: This isn't working. Use ViewModels instead, it's too tedious to serialize every object being used.
-	override fun onSaveInstanceState(outState: Bundle) {
-		super.onSaveInstanceState(outState)
-		outState.putSerializable(STATE_ITEM_DATA, periodData)
-		outState.putSerializable(STATE_DATABASE_INTERFACE, timetableDatabaseInterface)
 	}
 
 	private fun generateView(activity: FragmentActivity, container: ViewGroup?, periodData: PeriodData, timetableDatabaseInterface: TimetableDatabaseInterface): View {

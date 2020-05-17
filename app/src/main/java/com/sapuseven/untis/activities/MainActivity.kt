@@ -744,7 +744,7 @@ class MainActivity :
 	}
 
 	override fun onPeriodAbsencesClick(fragment: Fragment, element: Period) {
-		val absenceEditFragment = AbsenceCheckFragment.createInstance(profileUser, element)
+		val absenceEditFragment = AbsenceCheckFragment(profileUser, element)
 
 		supportFragmentManager.beginTransaction().run {
 			setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
@@ -776,8 +776,7 @@ class MainActivity :
 	}
 
 	private fun showLessonInfo(item: TimegridItem) {
-		val fragment = TimetableItemDetailsFragment
-				.createInstance(item, timetableDatabaseInterface)
+		val fragment = TimetableItemDetailsFragment(item, timetableDatabaseInterface)
 
 		supportFragmentManager.beginTransaction().run {
 			setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)

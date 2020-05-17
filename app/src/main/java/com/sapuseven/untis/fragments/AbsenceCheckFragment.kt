@@ -14,21 +14,14 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.adapters.AbsenceCheckAdapter
 import com.sapuseven.untis.adapters.AbsenceCheckAdapterItem
 import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.helpers.KotlinUtils
 import com.sapuseven.untis.models.untis.timetable.Period
 import com.sapuseven.untis.viewmodels.AbsenceCheckViewModel
 import java.text.Collator
 
-class AbsenceCheckFragment : Fragment() {
-	private var element: Period? = null
-	private var user: UserDatabase.User? = null
+class AbsenceCheckFragment(user: UserDatabase.User?, element: Period?) : Fragment() {
+	constructor() : this(null, null)
 
-	companion object {
-		fun createInstance(user: UserDatabase.User, element: Period): AbsenceCheckFragment = AbsenceCheckFragment().apply {
-			this.user = user
-			this.element = element
-		}
-	}
+	private val viewModel by viewModels<AbsenceCheckViewModel> { AbsenceCheckViewModel.Factory(user, element?.id) }
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		val rootView = activity?.layoutInflater?.inflate(R.layout.fragment_timetable_absence_check, container, false) as ViewGroup
@@ -38,16 +31,13 @@ class AbsenceCheckFragment : Fragment() {
 		rvAbsenceCheck.layoutManager = LinearLayoutManager(context)
 		rvAbsenceCheck.adapter = adapter
 
-		KotlinUtils.safeLet(user, element?.id) { user, lessonId ->
-			val viewModel by viewModels<AbsenceCheckViewModel> { AbsenceCheckViewModel.Factory(user, lessonId) }
-			viewModel.absenceList().observe(viewLifecycleOwner, Observer { absenceList ->
-				adapter.clear()
-				adapter.addItems(absenceList.map { AbsenceCheckAdapterItem(it.key, it.value) }.sortedWith(Comparator { s1, s2 ->
-					Collator.getInstance().compare(s1.student.fullName(), s2.student.fullName())
-				}))
-				adapter.notifyDataSetChanged()
-			})
-		}
+		viewModel.absenceList().observe(viewLifecycleOwner, Observer { absenceList ->
+			adapter.clear()
+			adapter.addItems(absenceList.map { AbsenceCheckAdapterItem(it.key, it.value) }.sortedWith(Comparator { s1, s2 ->
+				Collator.getInstance().compare(s1.student.fullName(), s2.student.fullName())
+			}))
+			adapter.notifyDataSetChanged()
+		})
 
 		return rootView
 	}
