@@ -18,7 +18,7 @@ class ProfileListAdapter(
 ) :
 		RecyclerView.Adapter<ProfileListAdapter.ViewHolder>() {
 
-	class ViewHolder(val layout: ConstraintLayout) : RecyclerView.ViewHolder(layout) {
+	class ViewHolder(rootView: View) : RecyclerView.ViewHolder(rootView) {
 		var tvName: TextView = itemView.findViewById(R.id.textview_profiles_name)
 		var tvSchool: TextView = itemView.findViewById(R.id.textview_profiles_school)
 	}

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.UntisDate
@@ -36,7 +37,7 @@ class EventAdapter(
 
 	override fun getItemCount() = eventList.size
 
-	override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 		val event = eventList[position]
 		if (holder is ExamViewHolder && event.exam != null) {
 			val subject = timetableDatabaseInterface?.getShortName(event.exam.subjectId, TimetableDatabaseInterface.Type.SUBJECT)
