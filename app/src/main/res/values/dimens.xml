@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<dimen name="height_header_content">172dp</dimen>
-	<dimen name="icon_listitem">24dp</dimen>
 	<dimen name="margin_listitem_text">16dp</dimen>
 	<dimen name="margin_listitem_text_vertical">12dp</dimen>
 	<dimen name="margin_login_input">8dp</dimen>
 	<dimen name="margin_login_pleaselogin_top">24dp</dimen>
 	<dimen name="size_header_icon">48dp</dimen>
+	<dimen name="size_listitem_icon">24dp</dimen>
 	<dimen name="textsize_header_line1">18sp</dimen>
 	<dimen name="textsize_header_line2">14sp</dimen>
 	<dimen name="textsize_listitem_line1">16sp</dimen>

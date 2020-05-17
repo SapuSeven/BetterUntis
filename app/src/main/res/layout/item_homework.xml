@@ -44,8 +44,8 @@
 
 	<androidx.appcompat.widget.AppCompatImageView
 		android:id="@+id/imageview_itemhomework_icon"
-		android:layout_width="@dimen/icon_listitem"
-		android:layout_height="@dimen/icon_listitem"
+		android:layout_width="@dimen/size_listitem_icon"
+		android:layout_height="@dimen/size_listitem_icon"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent"
