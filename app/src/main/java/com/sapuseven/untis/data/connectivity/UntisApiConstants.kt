@@ -5,6 +5,7 @@ object UntisApiConstants {
 	const val DEFAULT_WEBUNTIS_HOST = "mobile.webuntis.com"
 	const val DEFAULT_WEBUNTIS_PATH = "/ms/app/"
 
+	const val METHOD_CREATE_IMMEDIATE_ABSENCE = "createImmediateAbsence2017"
 	const val METHOD_GET_ABSENCES = "getStudentAbsences2017"
 	const val METHOD_GET_APP_SHARED_SECRET = "getAppSharedSecret"
 	const val METHOD_GET_EXAMS = "getExams2017"

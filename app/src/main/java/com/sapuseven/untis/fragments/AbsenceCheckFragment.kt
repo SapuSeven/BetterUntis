@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -22,14 +21,14 @@ import java.text.Collator
 class AbsenceCheckFragment(user: UserDatabase.User?, element: Period?) : Fragment() {
 	constructor() : this(null, null)
 
-	private val viewModel by viewModels<AbsenceCheckViewModel> { AbsenceCheckViewModel.Factory(user, element?.id) }
+	private val viewModel by viewModels<AbsenceCheckViewModel> { AbsenceCheckViewModel.Factory(user, element) }
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		val rootView = activity?.layoutInflater?.inflate(R.layout.fragment_timetable_absence_check, container, false) as ViewGroup
 
 		val rvAbsenceCheck = rootView.findViewById<RecyclerView>(R.id.recyclerview_absence_check)
 		val adapter = AbsenceCheckAdapter {
-			Toast.makeText(context, it.student.fullName(), Toast.LENGTH_SHORT).show()
+			viewModel.createAbsence(it.student)
 		}
 		rvAbsenceCheck.layoutManager = LinearLayoutManager(context)
 		rvAbsenceCheck.adapter = adapter
