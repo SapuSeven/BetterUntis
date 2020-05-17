@@ -26,6 +26,10 @@
 	<color name="colorPrimaryDarkThemeCyan">#0097a7</color>
 	<color name="colorAccentThemeCyan">#ff4081</color>
 
+	<color name="colorPrimaryThemePixel">#4285F4</color>
+	<color name="colorPrimaryDarkThemePixel">#0059c1</color>
+	<color name="colorAccentThemePixel">#4285F4</color>
+
 	<color name="colorRoomOccupied">#fff44336</color>
 	<color name="colorRoomAvailable">#ff4caf50</color>
 
