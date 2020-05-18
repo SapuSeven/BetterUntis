@@ -30,12 +30,6 @@ class MessageAdapter(
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 		val message = messageList[position]
 
-		message.attachments = listOf(
-				UntisAttachment(1, "Name 1", ""),
-				UntisAttachment(2, "Name 2", ""),
-				UntisAttachment(3, "Name 3", "")
-		)
-
 		var attachmentTitles: Array<CharSequence> = arrayOf()
 		var attachmentURLs: Array<String> = arrayOf()
 		message.attachments.forEach {

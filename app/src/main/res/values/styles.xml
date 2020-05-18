@@ -9,6 +9,9 @@
 		<item name="colorOnPrimary">@color/white</item>
 		<item name="actionBarStyle">@style/Widget.MaterialComponents.ActionBar.Primary</item>
 		<item name="materialAlertDialogTheme">@style/ThemeOverlay.MaterialAlertDialog.Rounded</item>
+		<item name="android:dialogTheme">@style/ThemeOverlay.MaterialAlertDialog.Rounded</item>
+		<item name="android:alertDialogTheme">@style/ThemeOverlay.MaterialAlertDialog.Rounded</item>
+		<item name="dialogCornerRadius">@dimen/radius_dialog_corner_rounded</item>
 		<item name="android:windowAnimationStyle">@style/WindowFadeTransition</item>
 	</style>
 
@@ -21,7 +24,7 @@
 	</style>
 
 	<style name="ShapeAppearance.MaterialAlertDialog.Rounded" parent="">
-		<item name="cornerSize">8dp</item>
+		<item name="cornerSize">@dimen/radius_dialog_corner_rounded</item>
 	</style>
 
 	<style name="AppTheme.NoActionBar">
