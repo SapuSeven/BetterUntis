@@ -8,8 +8,20 @@
 		<item name="colorDivider">@color/colorDivider</item>
 		<item name="colorOnPrimary">@color/white</item>
 		<item name="actionBarStyle">@style/Widget.MaterialComponents.ActionBar.Primary</item>
-		<item name="dialogCornerRadius">8dp</item>
+		<item name="materialAlertDialogTheme">@style/ThemeOverlay.MaterialAlertDialog.Rounded</item>
 		<item name="android:windowAnimationStyle">@style/WindowFadeTransition</item>
+	</style>
+
+	<style name="ThemeOverlay.MaterialAlertDialog.Rounded" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+		<item name="alertDialogStyle">@style/MaterialAlertDialog.Rounded</item>
+	</style>
+
+	<style name="MaterialAlertDialog.Rounded" parent="MaterialAlertDialog.MaterialComponents">
+		<item name="shapeAppearance">@style/ShapeAppearance.MaterialAlertDialog.Rounded</item>
+	</style>
+
+	<style name="ShapeAppearance.MaterialAlertDialog.Rounded" parent="">
+		<item name="cornerSize">8dp</item>
 	</style>
 
 	<style name="AppTheme.NoActionBar">
