@@ -17,6 +17,7 @@
 
 	<style name="ThemeOverlay.MaterialAlertDialog.Rounded" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
 		<item name="alertDialogStyle">@style/MaterialAlertDialog.Rounded</item>
+		<item name="materialAlertDialogTitleTextStyle">@style/MaterialDialog.MaterialComponents.Title.Text</item>
 	</style>
 
 	<style name="MaterialAlertDialog.Rounded" parent="MaterialAlertDialog.MaterialComponents">
@@ -25,6 +26,16 @@
 
 	<style name="ShapeAppearance.MaterialAlertDialog.Rounded" parent="">
 		<item name="cornerSize">@dimen/radius_dialog_corner_rounded</item>
+	</style>
+
+	<style name="MaterialDialog.MaterialComponents.Title.Text" parent="@style/MaterialAlertDialog.MaterialComponents.Title.Text">
+		<item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Title</item>
+	</style>
+	
+	<style name="TextAppearance.MaterialComponents.Title" parent="">
+		<item name="android:textSize">20sp</item>
+		<item name="android:textStyle">bold</item>
+		<item name="android:textColor">?android:attr/textColorPrimary</item>
 	</style>
 
 	<style name="AppTheme.NoActionBar">
