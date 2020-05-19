@@ -17,10 +17,10 @@ import android.widget.GridView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.ColorInt
-import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.sapuseven.untis.R
@@ -63,7 +63,7 @@ class ElementPickerDialog : DialogFragment() {
 
 	override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 		return activity?.let { activity ->
-			val builder = AlertDialog.Builder(activity)
+			val builder = MaterialAlertDialogBuilder(activity)
 
 			builder.setView(generateView(activity))
 
