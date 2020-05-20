@@ -7,7 +7,9 @@
 		<item name="colorSecondary">@color/colorAccent</item>
 		<item name="colorDivider">@color/colorDivider</item>
 		<item name="colorOnPrimary">@color/white</item>
+		<item name="actionBarBackground">?attr/colorPrimary</item>
 		<item name="actionBarStyle">@style/Widget.MaterialComponents.ActionBar.Primary</item>
+		<item name="actionBarTheme">@style/ThemeOverlay.MaterialComponents.Dark.ActionBar</item>
 		<item name="android:windowAnimationStyle">@style/WindowFadeTransition</item>
 	</style>
 
@@ -15,8 +17,6 @@
 		<item name="windowActionBar">false</item>
 		<item name="windowNoTitle">true</item>
 	</style>
-
-	<style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
 
 	<style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
 
@@ -72,15 +72,16 @@
 		<item name="colorAccent">@color/colorAccentThemePixel</item>
 		<item name="colorSecondary">@color/colorAccentThemePixel</item>
 		<item name="android:statusBarColor">@color/appBarColorThemePixel</item>
+		<item name="actionBarBackground">@color/appBarColorThemePixel</item>
 		<item name="actionBarTheme">@style/PixelActionBarTheme</item>
 		<item name="actionBarStyle">@style/PixelActionBarStyle</item>
 	</style>
 
-	<style name="PixelActionBarTheme" parent="ThemeOverlay.AppCompat.ActionBar">
+	<style name="PixelActionBarTheme" parent="ThemeOverlay.MaterialComponents.ActionBar">
 		<item name="colorControlNormal">?android:attr/textColorSecondary</item>
 	</style>
 
-	<style name="PixelActionBarStyle" parent="Widget.AppCompat.ActionBar">
+	<style name="PixelActionBarStyle" parent="Widget.MaterialComponents.ActionBar.Primary">
 		<item name="background">@color/appBarColorThemePixel</item>
 	</style>
 
