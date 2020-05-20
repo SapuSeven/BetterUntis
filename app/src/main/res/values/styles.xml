@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
 	<style name="AppTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
 		<item name="colorPrimary">@color/colorPrimary</item>
@@ -66,10 +66,22 @@
 	</style>
 
 	<style name="AppTheme.ThemePixel">
+		<item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
 		<item name="colorPrimary">@color/colorPrimaryThemePixel</item>
 		<item name="colorPrimaryDark">@color/colorPrimaryDarkThemePixel</item>
 		<item name="colorAccent">@color/colorAccentThemePixel</item>
 		<item name="colorSecondary">@color/colorAccentThemePixel</item>
+		<item name="android:statusBarColor">@color/appBarColorThemePixel</item>
+		<item name="actionBarTheme">@style/PixelActionBarTheme</item>
+		<item name="actionBarStyle">@style/PixelActionBarStyle</item>
+	</style>
+
+	<style name="PixelActionBarTheme" parent="ThemeOverlay.AppCompat.ActionBar">
+		<item name="colorControlNormal">?android:attr/textColorSecondary</item>
+	</style>
+
+	<style name="PixelActionBarStyle" parent="Widget.AppCompat.ActionBar">
+		<item name="background">@color/appBarColorThemePixel</item>
 	</style>
 
 	<style name="AppTheme.ThemeUntis.NoActionBar">

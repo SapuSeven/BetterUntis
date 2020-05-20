@@ -28,6 +28,7 @@
 
 	<color name="colorPrimaryThemePixel">#4285F4</color>
 	<color name="colorPrimaryDarkThemePixel">#0059c1</color>
+	<color name="appBarColorThemePixel">#fff</color>
 	<color name="colorAccentThemePixel">#4285F4</color>
 
 	<color name="colorRoomOccupied">#fff44336</color>
