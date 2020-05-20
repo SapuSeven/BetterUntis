@@ -163,7 +163,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 									?: this.max
 						}
 
-						findPreference<CheckBoxPreference>("preference_automute_enable")?.setOnPreferenceChangeListener { _, newValue ->
+						findPreference<SwitchPreference>("preference_automute_enable")?.setOnPreferenceChangeListener { _, newValue ->
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && newValue == true) {
 								(activity?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
 									if (!isNotificationPolicyAccessGranted) {
