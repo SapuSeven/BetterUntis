@@ -82,7 +82,7 @@
 	</style>
 
 	<style name="PixelActionBarStyle" parent="Widget.MaterialComponents.ActionBar.Primary">
-		<item name="background">@color/appBarColorThemePixel</item>
+		<item name="background">?attr/actionBarBackground</item>
 	</style>
 
 	<style name="AppTheme.ThemeUntis.NoActionBar">
