@@ -60,8 +60,8 @@
 	<style name="AppTheme.ThemeUntis">
 		<item name="colorPrimary">@color/colorPrimaryThemeUntis</item>
 		<item name="colorPrimaryDark">@color/colorPrimaryDarkThemeUntis</item>
-		<item name="colorAccent">@color/colorAccent</item>
-		<item name="colorSecondary">@color/colorAccent</item>
+		<item name="colorAccent">@color/colorAccentThemeUntis</item>
+		<item name="colorSecondary">@color/colorAccentThemeUntis</item>
 	</style>
 
 	<style name="AppTheme.ThemeBlue">
