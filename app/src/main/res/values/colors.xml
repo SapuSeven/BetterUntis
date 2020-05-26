@@ -2,6 +2,7 @@
 <resources>
 	<color name="colorPrimary">#F44336</color>
 	<color name="colorPrimaryDark">#D32F2F</color>
+	<color name="colorAccent">#56BABD</color>
 	<color name="colorDivider">#1F000000</color>
 	<color name="daySelected">@color/colorPrimary</color>
 	<color name="daySelectedTextColor">@android:color/white</color>
@@ -16,7 +17,7 @@
 
 	<color name="colorPrimaryThemeGreen">#4caf50</color>
 	<color name="colorPrimaryDarkThemeGreen">#388e3c</color>
-	<color name="colorAccentThemeGreen">#607d8b</color>
+	<color name="colorAccentThemeGreen">#86AEE1</color>
 
 	<color name="colorPrimaryThemePink">#e91e63</color>
 	<color name="colorPrimaryDarkThemePink">#c2185b</color>
