@@ -2,6 +2,7 @@
 <resources>
 	<attr name="dependentValue" format="string"/>
 	<attr name="colorDivider" format="reference"/>
+	<attr name="actionBarBackground" format="reference"/>
 
 	<declare-styleable name="UnitPreference">
 		<attr name="unit" format="string" />

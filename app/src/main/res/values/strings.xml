@@ -201,6 +201,7 @@
 	<string name="preference_theme_cyan">Cyan</string>
 	<string name="preference_theme_green">Green</string>
 	<string name="preference_theme_pink">Pink</string>
+	<string name="preference_theme_pixel">Pixel</string>
 	<string name="preference_theme_stock">Default</string>
 	<string name="preference_theme_untis">Original Untis-App</string>
 	<string name="preference_timetable_background_irregular">Consider item background</string>

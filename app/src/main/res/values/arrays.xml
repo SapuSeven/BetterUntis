@@ -7,6 +7,7 @@
 		<item>@string/preference_theme_green</item>
 		<item>@string/preference_theme_pink</item>
 		<item>@string/preference_theme_cyan</item>
+		<item>@string/preference_theme_pixel</item>
 	</string-array>
 
 	<string-array name="preference_theme_values" translatable="false">
@@ -16,6 +17,7 @@
 		<item>green</item>
 		<item>pink</item>
 		<item>cyan</item>
+		<item>pixel</item>
 	</string-array>
 
 	<string-array name="preference_dark_theme">
