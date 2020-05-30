@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:orientation="vertical"
 	tools:context=".activities.LoginDataInputActivity">
 
 	<ScrollView
 		android:layout_width="match_parent"
-		android:layout_height="0dp"
-		android:layout_weight="1">
+		android:layout_height="match_parent">
 
 		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:orientation="vertical">
+			android:orientation="vertical"
+			android:paddingBottom="@dimen/margin_login_scrollview">
 
 			<ImageView
 				android:layout_width="@dimen/size_login_icon"
@@ -231,27 +229,29 @@
 		</LinearLayout>
 	</ScrollView>
 
-	<LinearLayout
+	<RelativeLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:gravity="end"
-		android:orientation="horizontal"
-		android:padding="8dp">
+		android:layout_gravity="bottom">
 
-		<androidx.appcompat.widget.AppCompatButton
+		<com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 			android:id="@+id/button_logindatainput_delete"
-			style="@style/Widget.MaterialComponents.Button"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_marginEnd="8dp"
 			android:text="@string/logindatainput_delete"
-			android:visibility="gone" />
+			android:contentDescription="@string/logindatainput_delete"
+			android:layout_alignParentStart="true"
+			android:visibility="gone"
+			style="@style/FabStyle" />
 
-		<androidx.appcompat.widget.AppCompatButton
+		<com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 			android:id="@+id/button_logindatainput_login"
-			style="@style/Widget.MaterialComponents.Button"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="@string/logindatainput_login" />
-	</LinearLayout>
-</LinearLayout>
+			android:text="@string/logindatainput_login"
+			android:contentDescription="@string/logindatainput_login"
+			android:layout_alignParentEnd="true"
+			tools:ignore="RelativeOverlap"
+			style="@style/FabStyle" />
+	</RelativeLayout>
+</FrameLayout>

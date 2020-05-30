@@ -5,6 +5,7 @@
 	<dimen name="margin_listitem_text_vertical">12dp</dimen>
 	<dimen name="margin_login_input">16dp</dimen>
 	<dimen name="margin_login_pleaselogin_top">24dp</dimen>
+	<dimen name="margin_login_scrollview">48dp</dimen>
 	<dimen name="radius_dialog_corner_rounded">8dp</dimen>
 	<dimen name="size_login_icon">96dp</dimen>
 	<dimen name="size_header_icon">48dp</dimen>
