@@ -204,7 +204,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 							MaterialAlertDialogBuilder(context)
 									.setTitle(R.string.preference_dialog_colors_reset_title)
 									.setMessage(R.string.preference_dialog_colors_reset_text)
-									.setPositiveButton(R.string.all_yes) { _, _ ->
+									.setPositiveButton(R.string.preference_timetable_colors_reset_button_positive) { _, _ ->
 										preferenceManager.sharedPreferences.edit().apply {
 											listOf(
 													"preference_background_regular", "preference_background_regular_past",

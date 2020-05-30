@@ -199,6 +199,7 @@
     <string name="preference_timetable_bold_lesson_name">Fetter Stundenname</string>
     <string name="preference_timetable_centered_lesson_info">Stundeninfo zentrieren</string>
     <string name="preference_timetable_colors_reset">Farben zurücksetzen</string>
+    <string name="preference_timetable_colors_reset_button_positive">Zurücksetzen</string>
     <string name="preference_timetable_hide_cancelled">Entfallene Stunden ausblenden</string>
     <string name="preference_timetable_hide_cancelled_desc">Wird erst bei erneutem Laden des Stundenplans aktiv</string>
     <string name="preference_timetable_hide_time_stamps">Zeitstempel ausblenden</string>
