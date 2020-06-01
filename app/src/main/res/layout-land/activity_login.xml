@@ -1,36 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                   xmlns:tools="http://schemas.android.com/tools"
-                                                   android:layout_width="match_parent"
-                                                   android:layout_height="match_parent"
-                                                   android:focusable="true"
-                                                   android:focusableInTouchMode="true"
-                                                   tools:context=".activities.LoginActivity">
+<androidx.constraintlayout.widget.ConstraintLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:focusable="true"
+	android:focusableInTouchMode="true"
+	tools:context=".activities.LoginActivity">
 
-	<TextView
-		android:id="@+id/textview_login_welcome"
-		android:layout_width="wrap_content"
+	<LinearLayout
+		android:id="@+id/linearlayout_login_welcome"
+		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginBottom="8dp"
-		android:gravity="center_horizontal"
-		android:text="@string/login_welcome"
-		android:textColor="?android:attr/textColorPrimary"
-		android:textSize="@dimen/textsize_login_welcome"
+		android:layout_margin="@dimen/margin_login_input"
+		android:gravity="center"
+		android:orientation="vertical"
 		app:layout_constraintBottom_toTopOf="@+id/textinputlayout_login_search"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toTopOf="parent"/>
+		app:layout_constraintTop_toTopOf="parent">
 
-	<TextView
-		android:id="@+id/textview_login_please_log_in"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_marginTop="@dimen/margin_login_pleaselogin_top"
-		android:text="@string/login_please_log_in"
-		app:layout_constraintEnd_toEndOf="@+id/textview_login_welcome"
-		app:layout_constraintStart_toStartOf="@+id/textview_login_welcome"
-		app:layout_constraintTop_toBottomOf="@+id/textview_login_welcome"/>
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/login_welcome"
+			android:textAlignment="center"
+			android:textColor="?android:attr/textColorPrimary"
+			android:textSize="@dimen/textsize_login_welcome" />
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="@dimen/margin_login_pleaselogin_top"
+			android:text="@string/login_please_log_in"
+			android:textAlignment="center" />
+	</LinearLayout>
 
 	<androidx.recyclerview.widget.RecyclerView
 		android:id="@+id/recyclerview_login_search_results"
@@ -53,7 +58,7 @@
 		app:layout_constraintBottom_toTopOf="@+id/textinputlayout_login_search"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toTopOf="parent"/>
+		app:layout_constraintTop_toTopOf="parent" />
 
 	<ProgressBar
 		android:id="@+id/progressbar_login_search_loading"
@@ -64,7 +69,7 @@
 		app:layout_constraintBottom_toTopOf="@+id/textinputlayout_login_search"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toTopOf="parent"/>
+		app:layout_constraintTop_toTopOf="parent" />
 
 	<com.google.android.material.textfield.TextInputLayout
 		android:id="@+id/textinputlayout_login_search"
@@ -85,7 +90,7 @@
 			android:hint="@string/login_search_by_school_name_or_address"
 			android:nextFocusLeft="@id/edittext_login_search"
 			android:nextFocusUp="@id/edittext_login_search"
-			android:singleLine="true"/>
+			android:singleLine="true" />
 	</com.google.android.material.textfield.TextInputLayout>
 
 	<Button
@@ -99,7 +104,7 @@
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toStartOf="@+id/button_login_manual_data_input"
 		app:layout_constraintHorizontal_bias="0.5"
-		app:layout_constraintStart_toStartOf="parent"/>
+		app:layout_constraintStart_toStartOf="parent" />
 
 	<Button
 		android:id="@+id/button_login_manual_data_input"
@@ -113,5 +118,5 @@
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintHorizontal_bias="0.5"
-		app:layout_constraintStart_toEndOf="@+id/button_login_scan_code"/>
+		app:layout_constraintStart_toEndOf="@+id/button_login_scan_code" />
 </androidx.constraintlayout.widget.ConstraintLayout>

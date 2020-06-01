@@ -154,4 +154,11 @@
 		<item name="android:paddingBottom">@dimen/margin_listitem_text_vertical</item>
 		<item name="android:paddingEnd">@dimen/margin_listitem_text</item>
 	</style>
+
+	<style name="FabStyle">
+		<item name="android:layout_margin">16dp</item>
+		<item name="android:backgroundTint">?attr/colorPrimary</item>
+		<item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+		<item name="android:gravity">center</item>
+	</style>
 </resources>
