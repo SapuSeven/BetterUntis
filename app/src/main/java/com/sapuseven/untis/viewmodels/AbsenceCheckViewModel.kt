@@ -9,6 +9,7 @@ import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.models.UntisAbsence
 import com.sapuseven.untis.models.untis.UntisTime
+import com.sapuseven.untis.models.untis.params.AbsencesCheckedParams
 import com.sapuseven.untis.models.untis.params.ImmediateAbsenceParams
 import com.sapuseven.untis.models.untis.params.PeriodDataParams
 import com.sapuseven.untis.models.untis.response.ImmediateAbsenceResponse
@@ -40,6 +41,7 @@ class AbsenceCheckViewModel(private val user: UserDatabase.User, private val per
 
 			untisResponse.result?.let { periodData ->
 				val absences = periodData.dataByTTId[period.id.toString()]?.absences
+				// TODO: Check for absenceChecked
 				periodData.referencedStudents.associateWith { student ->
 					absences?.find { it.studentId == student.id }
 				}
@@ -65,6 +67,20 @@ class AbsenceCheckViewModel(private val user: UserDatabase.User, private val per
 			untisResponse.result?.let { result ->
 				absenceListLiveData.postValue(absenceListLiveData.value?.mapValues { if (it.key == student) result.absences[0] else it.value })
 			}
+		}, {
+			// TODO: Show network error
+		})
+	}
+
+	fun submitAbsencesChecked() = viewModelScope.launch(Dispatchers.IO) {
+		query.data.method = UntisApiConstants.METHOD_SUBMIT_ABSENCES_CHECKED
+		query.data.params = listOf(AbsencesCheckedParams(
+				listOf(period.id),
+				UntisAuthentication.createAuthObject(user)
+		))
+
+		UntisRequest().request(query).fold({
+			// TODO: Return successful
 		}, {
 			// TODO: Show network error
 		})

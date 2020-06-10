@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.sapuseven.untis.R
 import com.sapuseven.untis.adapters.AbsenceCheckAdapter
 import com.sapuseven.untis.adapters.AbsenceCheckAdapterItem
@@ -41,6 +42,10 @@ class AbsenceCheckFragment(user: UserDatabase.User?, element: Period?) : Fragmen
 			}))
 			adapter.notifyDataSetChanged()
 		})
+
+		rootView.findViewById<FloatingActionButton>(R.id.fab_absencecheck_save).setOnClickListener {
+			viewModel.submitAbsencesChecked()
+		}
 
 		return rootView
 	}
