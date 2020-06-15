@@ -12,10 +12,7 @@ import android.text.TextWatcher
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -46,8 +43,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 
 	private var searchMode: Boolean = false
 
-	private var tvWelcome: TextView? = null
-	private var tvWelcomeMessage: TextView? = null
+	private var llWelcome: LinearLayout? = null
 	private var tvSearchMessage: TextView? = null
 	private var pbSearchLoading: ProgressBar? = null
 	private var btnScanCode: Button? = null
@@ -65,8 +61,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_login)
 
-		tvWelcome = findViewById(R.id.textview_login_welcome)
-		tvWelcomeMessage = findViewById(R.id.textview_login_please_log_in)
+		llWelcome = findViewById(R.id.linearlayout_login_welcome)
 		tvSearchMessage = findViewById(R.id.textview_login_search_message)
 		pbSearchLoading = findViewById(R.id.progressbar_login_search_loading)
 		btnScanCode = findViewById(R.id.button_login_scan_code)
@@ -206,8 +201,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 		searchMode = enable
 
 		if (enable) {
-			tvWelcome?.visibility = View.GONE
-			tvWelcomeMessage?.visibility = View.GONE
+			llWelcome?.visibility = View.GONE
 			btnScanCode?.visibility = View.GONE
 			btnManualDataInput?.visibility = View.GONE
 			rvSearchResults?.visibility = View.VISIBLE
@@ -216,8 +210,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 
 			etSearch?.requestFocus()
 		} else {
-			tvWelcome?.visibility = View.VISIBLE
-			tvWelcomeMessage?.visibility = View.VISIBLE
+			llWelcome?.visibility = View.VISIBLE
 			btnScanCode?.visibility = View.VISIBLE
 			btnManualDataInput?.visibility = View.VISIBLE
 			rvSearchResults?.visibility = View.GONE

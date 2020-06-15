@@ -163,7 +163,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 									?: this.max
 						}
 
-						findPreference<CheckBoxPreference>("preference_automute_enable")?.setOnPreferenceChangeListener { _, newValue ->
+						findPreference<SwitchPreference>("preference_automute_enable")?.setOnPreferenceChangeListener { _, newValue ->
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && newValue == true) {
 								(activity?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
 									if (!isNotificationPolicyAccessGranted) {
@@ -204,7 +204,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 							MaterialAlertDialogBuilder(context)
 									.setTitle(R.string.preference_dialog_colors_reset_title)
 									.setMessage(R.string.preference_dialog_colors_reset_text)
-									.setPositiveButton(R.string.all_yes) { _, _ ->
+									.setPositiveButton(R.string.preference_timetable_colors_reset_button_positive) { _, _ ->
 										preferenceManager.sharedPreferences.edit().apply {
 											listOf(
 													"preference_background_regular", "preference_background_regular_past",

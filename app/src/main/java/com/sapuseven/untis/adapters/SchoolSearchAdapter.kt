@@ -13,7 +13,7 @@ class SchoolSearchAdapter(private val onClickListener: View.OnClickListener) : R
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		val inflater = LayoutInflater.from(parent.context)
-		val v = inflater.inflate(R.layout.item_schoolsearch, parent, false)
+		val v = inflater.inflate(R.layout.list_item_twoline, parent, false)
 		v.setOnClickListener(onClickListener)
 		return ViewHolder(v)
 	}
@@ -44,7 +44,7 @@ class SchoolSearchAdapter(private val onClickListener: View.OnClickListener) : R
 	}
 
 	class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-		var tvSchool: TextView = itemView.findViewById(R.id.textview_itemschoolsearch_name)
-		var tvAddress: TextView = itemView.findViewById(R.id.textview_itemschoolsearch_address)
+		var tvSchool: TextView = itemView.findViewById(R.id.textview_listitem_line1)
+		var tvAddress: TextView = itemView.findViewById(R.id.textview_listitem_line2)
 	}
 }

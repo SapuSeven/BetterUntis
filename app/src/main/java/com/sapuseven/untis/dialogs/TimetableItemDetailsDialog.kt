@@ -10,9 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.ConversionUtils
@@ -54,7 +54,7 @@ class TimetableItemDetailsDialog : DialogFragment() {
 
 	override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 		return activity?.let { activity ->
-			return AlertDialog.Builder(activity).apply {
+			return MaterialAlertDialogBuilder(activity).apply {
 				safeLet(item, timetableDatabaseInterface) { item, timetableDatabaseInterface ->
 					setView(generateView(activity, item, timetableDatabaseInterface))
 				} ?: run {
@@ -148,7 +148,9 @@ class TimetableItemDetailsDialog : DialogFragment() {
 				ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.MATCH_PARENT)
 		params.setMargins(0, 0, ConversionUtils.dpToPx(12.0f, requireContext()).toInt(), 0)
-		tv.text = timetableDatabaseInterface.getShortName(if (useOrgId) element.orgId else element.id, type)
+		tv.text =
+				if (type == TimetableDatabaseInterface.Type.TEACHER) timetableDatabaseInterface.getLongName(if (useOrgId) element.orgId else element.id, type)
+				else timetableDatabaseInterface.getShortName(if (useOrgId) element.orgId else element.id, type)
 		if (tv.text.isBlank()) return null
 		tv.layoutParams = params
 		textColor?.let { tv.setTextColor(it) }

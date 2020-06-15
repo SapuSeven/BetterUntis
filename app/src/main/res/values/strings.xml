@@ -121,6 +121,7 @@
 	<string name="infocenter_absences_empty">No absences</string>
 	<string name="infocenter_events_empty">No events</string>
 	<string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
+	<string name="infocenter_messages_attachments">Attachments</string>
 	<string name="infocenter_messages_empty">No messages</string>
 	<string name="infocenter_officehours_empty">No office hours</string>
 	<string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
@@ -200,6 +201,7 @@
 	<string name="preference_theme_cyan">Cyan</string>
 	<string name="preference_theme_green">Green</string>
 	<string name="preference_theme_pink">Pink</string>
+	<string name="preference_theme_pixel">Pixel</string>
 	<string name="preference_theme_stock">Default</string>
 	<string name="preference_theme_untis">Original Untis-App</string>
 	<string name="preference_timetable_background_irregular">Consider item background</string>
@@ -207,6 +209,7 @@
 	<string name="preference_timetable_bold_lesson_name">Bold lesson name</string>
 	<string name="preference_timetable_centered_lesson_info">Center lesson infos</string>
 	<string name="preference_timetable_colors_reset">Reset colors</string>
+	<string name="preference_timetable_colors_reset_button_positive">Reset</string>
 	<string name="preference_timetable_hide_cancelled">Hide cancelled lessons</string>
 	<string name="preference_timetable_hide_cancelled_desc">You need to reload the timetable after you change this setting</string>
 	<string name="preference_timetable_hide_time_stamps">Hide timestamps</string>
