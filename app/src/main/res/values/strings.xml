@@ -75,78 +75,64 @@
 	<string name="login_search_by_school_name_or_address">Search by school name or address</string>
 	<string name="login_manual_data_input">Manual data input</string>
 
-	<string name="logindatainput_school">School name or ID</string>
-	<string name="logindatainput_username">Username</string>
-	<string name="logindatainput_key">Key or Password</string>
-	<string name="logindatainput_connecting">Connecting…</string>
-	<string name="logindatainput_login">Login</string>
+	<string name="logindatainput_adding_user_unknown_error">An unknown error happened while adding the user.</string>
 	<string name="logindatainput_anonymous_login">Anonymous login</string>
+	<string name="logindatainput_api_url">Untis API path</string>
+	<string name="logindatainput_aquiring_app_secret">Acquiring app secret…</string>
+	<string name="logindatainput_aquiring_schoolid">Loading school…</string>
+	<string name="logindatainput_connecting">Connecting…</string>
+	<string name="logindatainput_data_loaded">Data loaded.</string>
+	<string name="logindatainput_delete">Delete profile</string>
 	<string name="logindatainput_error_field_empty">This field cannot be empty!</string>
 	<string name="logindatainput_error_generic">Error: %1$s</string>
 	<string name="logindatainput_error_invalid_school">Invalid school ID!</string>
-	<string name="logindatainput_data_loaded">Data loaded.</string>
-	<string name="logindatainput_aquiring_app_secret">Acquiring app secret…</string>
-	<string name="logindatainput_aquiring_schoolid">Loading school…</string>
+	<string name="logindatainput_key">Key or Password</string>
 	<string name="logindatainput_loading_user_data">Loading user data…</string>
-	<string name="logindatainput_adding_user_unknown_error">An unknown error happened while adding the user.</string>
-	<string name="logindatainput_title_add">Add Profile</string>
-	<string name="logindatainput_title_edit">Edit Profile</string>
-	<string name="logindatainput_delete">Delete Profile</string>
+	<string name="logindatainput_login">Login</string>
 	<string name="logindatainput_proxy_host">Proxy server (optional)</string>
+	<string name="logindatainput_school">School name or ID</string>
 	<string name="logindatainput_show_advanced">Show advanced settings</string>
+	<string name="logindatainput_skip_app_secret">Skip app secret resolution</string>
+	<string name="logindatainput_skip_school_id">Skip school id resolution</string>
+	<string name="logindatainput_title_add">Add profile</string>
+	<string name="logindatainput_title_edit">Edit profile</string>
+	<string name="logindatainput_username">Username</string>
 	<string name="errormessagedictionary_generic">Unknown error</string>
-	<string name="errormessagedictionary_too_many_results">Too many results</string>
+	<string name="errormessagedictionary_invalid_credentials">Wrong username or key!</string>
 	<string name="errormessagedictionary_invalid_school">The specified school doesn\'t exist!</string>
 	<string name="errormessagedictionary_invalid_server_url">Invalid server URL!</string>
-	<string name="errormessagedictionary_server_webuntis_not_installed">The specified Server doesn\'t have WebUntis installed!</string>
-	<string name="errormessagedictionary_invalid_credentials">Wrong username or key!</string>
-	<string name="errormessagedictionary_no_public_access">Anonymous access is disabled.</string>
 	<string name="errormessagedictionary_invalid_time_settings">Invalid date and/or time settings!</string>
-	<string name="errormessagedictionary_user_locked">User locked!</string>
+	<string name="errormessagedictionary_no_public_access">Anonymous access is disabled.</string>
 	<string name="errormessagedictionary_no_right">No right for timetable</string>
+	<string name="errormessagedictionary_server_webuntis_not_installed">The specified Server doesn\'t have WebUntis installed!</string>
+	<string name="errormessagedictionary_too_many_results">Too many results</string>
+	<string name="errormessagedictionary_user_locked">User locked!</string>
 	<string name="roomfinder_current_hour">%1$s, %2$d. Lesson</string>
 	<string name="roomfinder_current_hour_time">%1$s - %2$s</string>
 	<string name="roomfinder_delete_item">Delete item</string>
-	<string name="roomfinder_image_availability_indicator">Room availability indicator</string>
-	<string name="roomfinder_item_desc_occupied">This Room is occupied.</string>
-	<string name="roomfinder_no_rooms">No rooms to display.\nTap + to add one!</string>
-	<string name="roomfinder_dialog_itemdelete_title">Delete %1$s</string>
 	<string name="roomfinder_dialog_itemdelete_text">Are you sure you want to remove this room from the list?</string>
-	<string name="roomfinder_image_previous_hour">previous hour</string>
+	<string name="roomfinder_dialog_itemdelete_title">Delete %1$s</string>
+	<string name="roomfinder_image_availability_indicator">Room availability indicator</string>
 	<string name="roomfinder_image_next_hour">next hour</string>
+	<string name="roomfinder_image_previous_hour">previous hour</string>
+	<string name="roomfinder_item_desc_occupied">This Room is occupied.</string>
 	<string name="roomfinder_loading_data">Loading data…</string>
+	<string name="roomfinder_no_rooms">No rooms to display.\nTap + to add one!</string>
+	<string name="infocenter_absences_empty">No absences</string>
+	<string name="infocenter_events_empty">No events</string>
+	<string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
+	<string name="infocenter_messages_empty">No messages</string>
+	<string name="infocenter_officehours_empty">No office hours</string>
 	<string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
 	<string name="infocenter_timeformat_sameday">%2$s - %4$s, %1$s</string>
-	<string name="infocenter_officehours_empty">No office hours</string>
-	<string name="infocenter_messages_empty">No messages</string>
-	<string name="infocenter_events_empty">No events</string>
-	<string name="infocenter_absences_empty">No absences</string>
-	<string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
 	<string name="elementpicker_hint_search">Search…</string>
 	<string name="elementpicker_hint_search_classes">Search for classes…</string>
-	<string name="elementpicker_hint_search_teachers">Search for teachers…</string>
 	<string name="elementpicker_hint_search_rooms">Search for rooms…</string>
+	<string name="elementpicker_hint_search_teachers">Search for teachers…</string>
 
-	<string name="preferences_connectivity">Connectivity</string>
-	<string name="preferences_infos">About</string>
-	<string name="preferences_notifications">Notifications</string>
-	<string name="preferences_styling">Customization</string>
-	<string name="preferences_timetable">Timetable</string>
-	<string name="preferences_general">General</string>
-	<string name="preference_category_connectivity_proxy">WebUntis Proxy</string>
-	<string name="preference_category_notifications_visible_fields">Visible Fields</string>
-	<string name="preference_category_styling_backgrounds">Item Colors</string>
-	<string name="preference_category_styling_colors">Colors</string>
-	<string name="preference_category_styling_themes">Themes</string>
-	<string name="preference_category_timetable_item_appearance">Item Appearance</string>
-	<string name="preference_category_timetable_lesson_text">Lesson Text</string>
-	<string name="preference_category_timetable_range">Timetable Range</string>
-	<string name="preference_category_general_behaviour">Behaviour</string>
-	<string name="preference_category_general_week_display">Week Display Settings</string>
-	<string name="preference_category_general_automute">Auto-Mute</string>
+	<string name="preference_automute_cancelled_lessons">Also mute in cancelled lessons</string>
 	<string name="preference_automute_enable">Enable auto-mute</string>
 	<string name="preference_automute_enable_summary">Automatically turns on Do Not Disturb during lessons</string>
-	<string name="preference_automute_cancelled_lessons">Also mute in cancelled lessons</string>
 	<string name="preference_background_cancelled">Cancelled lessons</string>
 	<string name="preference_background_cancelled_past">Past cancelled lessons</string>
 	<string name="preference_background_exam">Lessons with tests</string>
@@ -157,6 +143,17 @@
 	<string name="preference_background_past">Past day background</string>
 	<string name="preference_background_regular">Regular lessons</string>
 	<string name="preference_background_regular_past">Past regular lessons</string>
+	<string name="preference_category_connectivity_proxy">WebUntis Proxy</string>
+	<string name="preference_category_general_automute">Auto-Mute</string>
+	<string name="preference_category_general_behaviour">Behaviour</string>
+	<string name="preference_category_general_week_display">Week Display Settings</string>
+	<string name="preference_category_notifications_visible_fields">Visible Fields</string>
+	<string name="preference_category_styling_backgrounds">Item Colors</string>
+	<string name="preference_category_styling_colors">Colors</string>
+	<string name="preference_category_styling_themes">Themes</string>
+	<string name="preference_category_timetable_item_appearance">Item Appearance</string>
+	<string name="preference_category_timetable_lesson_text">Lesson Text</string>
+	<string name="preference_category_timetable_range">Timetable Range</string>
 	<string name="preference_connectivity_proxy_about">About this feature</string>
 	<string name="preference_connectivity_proxy_host">Proxy server host</string>
 	<string name="preference_connectivity_refresh_in_background">Always refresh timetable</string>
@@ -167,16 +164,16 @@
 	<string name="preference_dark_theme_oled">Use total black background</string>
 	<string name="preference_dark_theme_oled_desc">Useful for OLED-screens</string>
 	<string name="preference_dark_theme_on">Always on</string>
-	<string name="preference_dialog_colors_reset_title">Reset colors?</string>
 	<string name="preference_dialog_colors_reset_text">This will reset all colors above to their default values.</string>
+	<string name="preference_dialog_colors_reset_title">Reset colors?</string>
 	<string name="preference_double_tap_to_exit">Double tap back button to exit</string>
 	<string name="preference_flinging_enable">Enable flinging</string>
-	<string name="preference_info_general">General</string>
 	<string name="preference_info_app_version">App version</string>
 	<string name="preference_info_app_version_desc">%1$s (%2$d)</string>
-	<string name="preference_info_github">GitHub repository</string>
 	<string name="preference_info_contributors">Contributors</string>
 	<string name="preference_info_contributors_desc">A list of the contributors</string>
+	<string name="preference_info_general">General</string>
+	<string name="preference_info_github">GitHub repository</string>
 	<string name="preference_info_libraries">Libraries</string>
 	<string name="preference_info_libraries_desc">A list of all used libraries</string>
 	<string name="preference_marker">Time indicator</string>
@@ -192,10 +189,12 @@
 	<string name="preference_notifications_visibility_hidden">Hidden</string>
 	<string name="preference_notifications_visibility_long">Long name</string>
 	<string name="preference_notifications_visibility_short">Short name</string>
-	<string name="preference_schoolcolors_regular">For regular lessons</string>
+	<string name="preference_school_background">Use colors provided from your school</string>
+	<string name="preference_school_background_desc">Some schools send their own background colors</string>
+	<string name="preference_schoolcolors_cancelled">For cancelled lessons</string>
 	<string name="preference_schoolcolors_exam">For lessons with tests</string>
 	<string name="preference_schoolcolors_irregular">For irregular lessons</string>
-	<string name="preference_schoolcolors_cancelled">For cancelled lessons</string>
+	<string name="preference_schoolcolors_regular">For regular lessons</string>
 	<string name="preference_theme">Select a theme</string>
 	<string name="preference_theme_blue">Blue</string>
 	<string name="preference_theme_cyan">Cyan</string>
@@ -224,8 +223,6 @@
 	<string name="preference_timetable_range_index_reset">Reset lesson numbering</string>
 	<string name="preference_timetable_substitutions_irregular">Detect irregular lessons</string>
 	<string name="preference_timetable_substitutions_irregular_desc">Treat lessons with substitutions as irregular</string>
-	<string name="preference_school_background">Use colors provided from your school</string>
-	<string name="preference_school_background_desc">Some schools send their own background colors</string>
 	<string name="preference_use_theme_background">Use theme colors</string>
 	<string name="preference_use_theme_background_desc">This only applies to regular lessons</string>
 	<string name="preference_week_custom_range">Custom week range</string>
@@ -235,7 +232,13 @@
 	<string name="preference_week_display_length_summary">Set to 0 to use week length</string>
 	<string name="preference_week_snap_to_days">Snap to days</string>
 	<string name="preference_week_snap_to_days_summary">instead of weeks</string>
+	<string name="preferences_connectivity">Connectivity</string>
 	<string name="preferences_contributors_contributions">%1$d contributions</string>
+	<string name="preferences_general">General</string>
+	<string name="preferences_infos">About</string>
+	<string name="preferences_notifications">Notifications</string>
+	<string name="preferences_styling">Customization</string>
+	<string name="preferences_timetable">Timetable</string>
 
 	<string name="settings_designing_message">Contribute by creating the missing settings icons!</string>
 	<string name="settings_designing_hide">Don\'t show again</string>
@@ -265,12 +268,9 @@
 	<string name="loading_failed">Loading failed</string>
 
 	<string name="library_appcompat" translatable="false">Android AppCompat Library V7</string>
-	<string name="library_constraintlayout" translatable="false">Android ConstraintLayout</string>
-	<string name="library_preference_ktx" translatable="false">Android Preferences KTX</string>
-	<string name="library_swiperefreshlayout" translatable="false">Android Support Library Custom View</string>
-	<string name="library_recyclerview" translatable="false">Android Support RecyclerView V7</string>
 	<string name="library_code_scanner" translatable="false">CodeScanner</string>
 	<string name="library_colorpicker_compat" translatable="false">ColorPicker Compat</string>
+	<string name="library_constraintlayout" translatable="false">Android ConstraintLayout</string>
 	<string name="library_fuel" translatable="false">Fuel</string>
 	<string name="library_fuel_coroutines" translatable="false">Fuel Coroutines</string>
 	<string name="library_joda_time" translatable="false">Joda Time</string>
@@ -280,10 +280,13 @@
 	<string name="library_kotlin_test_junit" translatable="false">Kotlin Test JUnit</string>
 	<string name="library_kotlinx_coroutines_android" translatable="false">Kotlinx Coroutines Android</string>
 	<string name="library_kotlinx_serialization_runtime" translatable="false">Kotlinx Serialization Runtime</string>
-	<string name="library_materialdaypicker" translatable="false">Materialdaypicker</string>
-	<string name="library_materialcomponent_banner" translatable="false">MaterialComponent.Banner</string>
 	<string name="library_material" translatable="false">Material Components For Android</string>
+	<string name="library_materialcomponent_banner" translatable="false">MaterialComponent.Banner</string>
+	<string name="library_materialdaypicker" translatable="false">Materialdaypicker</string>
 	<string name="library_mockito_core" translatable="false">Mockito Core</string>
+	<string name="library_preference_ktx" translatable="false">Android Preferences KTX</string>
+	<string name="library_recyclerview" translatable="false">Android Support RecyclerView V7</string>
+	<string name="library_swiperefreshlayout" translatable="false">Android Support Library Custom View</string>
 	<string name="library_weekview" translatable="false">WeekView</string>
 
 	<plurals name="main_time_diff_minutes">

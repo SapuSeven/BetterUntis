@@ -10,7 +10,7 @@
     <string name="all_rooms">Räume</string>
     <string name="all_anonymous">Anonym</string>
     <string name="all_personal_timetable">Eigener Stundenplan</string>
-	<string name="all_contact_email">betteruntis-de@sapuseven.com</string>
+    <string name="all_contact_email">betteruntis-de@sapuseven.com</string>
     <string name="all_ok">OK</string>
     <string name="all_yes">Ja</string>
     <string name="all_no">Nein</string>
@@ -136,7 +136,7 @@
     <string name="preference_category_general_week_display">Wochenanzeige</string>
     <string name="preference_category_general_automute">Automatisches Stummschalten</string>
     <string name="preference_automute_enable">Automatisches Stummschalten</string>
-    <string name="preference_automute_enable_summary">Aktiviert während jeder Stunde automatisch den \"Bitte nicht stören\"-Modus</string>
+    <string name="preference_automute_enable_summary">Aktiviert während jeder Stunde automatisch den „Bitte nicht stören“-Modus</string>
     <string name="preference_automute_cancelled_lessons">Auch in entfallenen Stunden stumm schalten</string>
     <string name="preference_background_cancelled">Entfallene Stunden</string>
     <string name="preference_background_cancelled_past">Vergangene entfallene Stunden</string>

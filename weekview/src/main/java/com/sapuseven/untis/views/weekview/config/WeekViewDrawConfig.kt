@@ -83,8 +83,10 @@ class WeekViewDrawConfig(context: Context) {
 		eventTextPaint.typeface = Typeface.DEFAULT_BOLD
 
 		eventTopPaint.style = Paint.Style.FILL
+		eventTopPaint.strokeWidth = 4f
 
 		eventBottomPaint.style = Paint.Style.FILL
+		eventBottomPaint.strokeWidth = 4f
 	}
 
 	fun moveCurrentOriginIfFirstDraw(config: WeekViewConfig) {

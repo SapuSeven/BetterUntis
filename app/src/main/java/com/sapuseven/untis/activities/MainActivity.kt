@@ -145,7 +145,7 @@ class MainActivity :
 			setupHours()
 			setupHolidays()
 
-			if (profileUser.schoolId <= 0) return
+			if (profileUser.schoolId.isBlank()) return
 
 			setupTimetableLoader()
 			showPersonalTimetable()
@@ -168,7 +168,7 @@ class MainActivity :
 
 			weekViewRefreshHandler.post(weekViewUpdate)
 
-			if (profileUser.schoolId <= 0 && profileUpdateDialog == null)
+			if (profileUser.schoolId.isBlank() && profileUpdateDialog == null)
 				showProfileUpdateRequired()
 		}
 	}

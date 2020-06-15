@@ -42,4 +42,5 @@
         <item quantity="few">Ten Pokój jest wolny przez %d godziny.</item>
         <item quantity="many">Ten Pokój jest wolny przez %d godzin.</item>
     </plurals>
+    <string name="logindatainput_login">Zaloguj</string>
 </resources>

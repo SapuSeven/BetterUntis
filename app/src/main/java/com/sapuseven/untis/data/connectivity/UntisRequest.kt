@@ -5,8 +5,8 @@ import com.github.kittinunf.fuel.coroutines.awaitStringResult
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_WEBUNTIS_HOST
+import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
-import com.sapuseven.untis.helpers.TextUtils
 import com.sapuseven.untis.models.untis.params.BaseParams
 import kotlinx.serialization.ContextualSerialization
 import kotlinx.serialization.Serializable
@@ -23,17 +23,25 @@ class UntisRequest {
 				.awaitStringResult()
 	}
 
-	class UntisRequestQuery {
-		var url = ""
+	class UntisRequestQuery(val user: UserDatabase.User? = null, apiUrl: String? = null) {
+		var url = apiUrl ?: user?.apiUrl ?: user?.schoolId?.let {
+			UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + UntisApiConstants.DEFAULT_WEBUNTIS_PATH + it
+		} ?: ""
 		var data: UntisRequestData = UntisRequestData()
 		var proxyHost: String? = null
 
 		@Throws(URISyntaxException::class, UnsupportedEncodingException::class)
 		internal fun getURI(encoding: String): URI {
-			return if (!TextUtils.isNullOrEmpty(data.method))
-				URI(proxiedUrl() + "?m=" + URLEncoder.encode(data.method, encoding))
-			else
-				URI(proxiedUrl())
+			val parameters = listOf(
+					"m" to URLEncoder.encode(data.method, encoding),
+					"school" to (data.school ?: user?.schoolId)
+			).mapNotNull {
+				if (it.second?.isNotBlank() == true)
+					it.first + "=" + it.second
+				else null
+			}.joinToString("&")
+
+			return URI(proxiedUrl() + if (parameters.isNotBlank()) "?$parameters" else "")
 		}
 
 		private fun proxiedUrl() = if (proxyHost.isNullOrBlank()) url else url.replace(DEFAULT_WEBUNTIS_HOST, proxyHost.toString())
@@ -44,6 +52,7 @@ class UntisRequest {
 		var id: String = ""
 		var jsonrpc: String = "2.0"
 		var method: String = ""
+		var school: String? = null
 		var params: List<@ContextualSerialization BaseParams> = emptyList()
 	}
 }

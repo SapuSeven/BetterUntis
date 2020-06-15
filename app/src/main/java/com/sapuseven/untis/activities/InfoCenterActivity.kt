@@ -189,11 +189,9 @@ class InfoCenterActivity : BaseActivity() {
 	private suspend fun loadMessages(user: UserDatabase.User): List<UntisMessage>? {
 		messagesLoading = true
 
-		val query = UntisRequest.UntisRequestQuery()
+		val query = UntisRequest.UntisRequestQuery(user)
 
 		query.data.method = UntisApiConstants.METHOD_GET_MESSAGES
-		query.url = user.apiUrl
-				?: (UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL + UntisApiConstants.DEFAULT_WEBUNTIS_HOST + UntisApiConstants.DEFAULT_WEBUNTIS_PATH + user.schoolId)
 		query.proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
 		query.data.params = listOf(MessageParams(
 				UntisDate.fromLocalDate(LocalDate.now()),
@@ -211,11 +209,9 @@ class InfoCenterActivity : BaseActivity() {
 	private suspend fun loadOfficeHours(user: UserDatabase.User): List<UntisOfficeHour>? {
 		officeHoursLoading = true
 
-		val query = UntisRequest.UntisRequestQuery()
+		val query = UntisRequest.UntisRequestQuery(user)
 
 		query.data.method = UntisApiConstants.METHOD_GET_OFFICEHOURS
-		query.url = user.apiUrl
-				?: (UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL + UntisApiConstants.DEFAULT_WEBUNTIS_HOST + UntisApiConstants.DEFAULT_WEBUNTIS_PATH + user.schoolId)
 		query.proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
 		query.data.params = listOf(OfficeHoursParams(
 				-1,
@@ -235,11 +231,9 @@ class InfoCenterActivity : BaseActivity() {
 		val schoolYears = userDatabase.getAdditionalUserData<SchoolYear>(user.id!!, SchoolYear())?.values?.toList()
 				?: emptyList()
 		getCurrentYear(schoolYears)?.endDate?.let { currentSchoolYearEndDate ->
-			val query = UntisRequest.UntisRequestQuery()
+			val query = UntisRequest.UntisRequestQuery(user)
 
 			query.data.method = UntisApiConstants.METHOD_GET_EXAMS
-			query.url = user.apiUrl
-					?: (UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL + UntisApiConstants.DEFAULT_WEBUNTIS_HOST + UntisApiConstants.DEFAULT_WEBUNTIS_PATH + user.schoolId)
 			query.proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
 			query.data.params = listOf(ExamParams(
 					user.userData.elemId,
@@ -263,11 +257,9 @@ class InfoCenterActivity : BaseActivity() {
 		val schoolYears = userDatabase.getAdditionalUserData<SchoolYear>(user.id!!, SchoolYear())?.values?.toList()
 				?: emptyList()
 		getCurrentYear(schoolYears)?.endDate?.let { currentSchoolYearEndDate ->
-			val query = UntisRequest.UntisRequestQuery()
+			val query = UntisRequest.UntisRequestQuery(user)
 
 			query.data.method = UntisApiConstants.METHOD_GET_HOMEWORKS
-			query.url = user.apiUrl
-					?: (UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL + UntisApiConstants.DEFAULT_WEBUNTIS_HOST + UntisApiConstants.DEFAULT_WEBUNTIS_PATH + user.schoolId)
 			query.proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
 			query.data.params = listOf(HomeworkParams(
 					user.userData.elemId,
@@ -290,11 +282,9 @@ class InfoCenterActivity : BaseActivity() {
 	private suspend fun loadAbsences(user: UserDatabase.User): List<UntisAbsence>? {
 		absencesLoading = true
 
-		val query = UntisRequest.UntisRequestQuery()
+		val query = UntisRequest.UntisRequestQuery(user)
 
 		query.data.method = UntisApiConstants.METHOD_GET_ABSENCES
-		query.url = user.apiUrl
-				?: (UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL + UntisApiConstants.DEFAULT_WEBUNTIS_HOST + UntisApiConstants.DEFAULT_WEBUNTIS_PATH + user.schoolId)
 		query.proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
 		query.data.params = listOf(AbsenceParams(
 				UntisDate.fromLocalDate(LocalDate.now().minusYears(1)),

@@ -1,6 +1,7 @@
 package com.sapuseven.untis.helpers.timetable
 
 import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.timetable.PeriodData.Companion.ELEMENT_NAME_UNKNOWN
 import com.sapuseven.untis.interfaces.TableModel
 import com.sapuseven.untis.models.untis.masterdata.Klasse
 import com.sapuseven.untis.models.untis.masterdata.Room
@@ -35,7 +36,7 @@ class TimetableDatabaseInterface(val database: UserDatabase, id: Long) {
 			Type.SUBJECT -> allSubjects[id]?.name
 			Type.ROOM -> allRooms[id]?.name
 			else -> null
-		} ?: ""
+		} ?: ELEMENT_NAME_UNKNOWN
 	}
 
 	fun getLongName(id: Int, type: Type): String {
