@@ -37,7 +37,7 @@ Another major change is the use of a custom WeekView (based on [Till Hellmund](h
 - Info Center for viewing events, contact hours and own absences.
 
 ## Missing features (TODO)
-- ~~No support for teacher-specific features (like editing homeworks or class management)~~ - _This is currently being worked on. View progress in the [absence-check](tree/absence-check) branch._
+- ~~No support for teacher-specific features (like editing homeworks or class management)~~ - _This is currently being worked on. View progress in the [absence-check](https://github.com/SapuSeven/BetterUntis/tree/absence-check) branch._
 - Almost no unit and integration tests
 
 ## Available languages
