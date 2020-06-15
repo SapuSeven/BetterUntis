@@ -95,12 +95,17 @@ workflows:
   build-and-deploy:
     jobs:
       - build
+          filters:
+            tags:
+              only: /.*/
       - deploy_debug:
           requires:
             - build
           filters:
             branches:
               only: develop
+            tags:
+              only: /.*/
       - deploy_release:
           requires:
             - build
