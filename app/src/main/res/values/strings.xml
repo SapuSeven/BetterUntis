@@ -86,6 +86,7 @@
 	<string name="logindatainput_error_field_empty">This field cannot be empty!</string>
 	<string name="logindatainput_error_generic">Error: %1$s</string>
 	<string name="logindatainput_error_invalid_school">Invalid school ID!</string>
+	<string name="logindatainput_error_invalid_url">Invalid URL!</string>
 	<string name="logindatainput_key">Key or Password</string>
 	<string name="logindatainput_loading_user_data">Loading user data…</string>
 	<string name="logindatainput_login">Login</string>
