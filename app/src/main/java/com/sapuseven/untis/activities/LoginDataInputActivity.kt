@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Patterns
 import android.view.View
 import android.widget.EditText
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -113,12 +114,19 @@ class LoginDataInputActivity : BaseActivity() {
 
 	private fun validate(): EditText? {
 		if (edittext_logindatainput_user?.text?.isEmpty() == true && !anonymous) {
-			edittext_logindatainput_user?.error = getString(R.string.logindatainput_error_field_empty)
+			edittext_logindatainput_user.error = getString(R.string.logindatainput_error_field_empty)
 			return edittext_logindatainput_user
 		}
 		if (edittext_logindatainput_school?.text?.isEmpty() == true) {
-			edittext_logindatainput_school?.error = getString(R.string.logindatainput_error_field_empty)
+			edittext_logindatainput_school.error = getString(R.string.logindatainput_error_field_empty)
 			return edittext_logindatainput_school
+		}
+
+		if (switch_logindatainput_advanced.isChecked) {
+			if (!Patterns.WEB_URL.matcher(edittext_logindatainput_api_url.text.toString()).matches()) {
+				edittext_logindatainput_api_url.error = getString(R.string.logindatainput_error_invalid_url)
+				return edittext_logindatainput_api_url
+			}
 		}
 		return null
 	}
@@ -293,7 +301,7 @@ class LoginDataInputActivity : BaseActivity() {
 		val userDataResult = api.request(query)
 
 		userDataResult.fold({ data ->
-			val untisResponse = getJSON().parse(UserDataResponse.serializer(), data)
+			val untisResponse = getJSON().parse(UserDataResponse.serializer(), data) // TODO: Catch json parsing errors if response isn't valid json
 
 			if (untisResponse.result != null) {
 				return untisResponse.result
