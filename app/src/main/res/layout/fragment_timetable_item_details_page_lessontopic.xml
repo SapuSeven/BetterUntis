@@ -11,14 +11,13 @@
 	android:orientation="horizontal">
 
 	<ImageView
-		android:id="@+id/imageview_roomfinder_state"
 		android:layout_width="24dp"
 		android:layout_height="24dp"
 		android:layout_marginStart="24dp"
 		android:layout_marginTop="12dp"
 		android:layout_marginEnd="24dp"
 		android:layout_marginBottom="12dp"
-		android:contentDescription="Teaching content"
+		android:contentDescription="@string/all_teaching_content"
 		app:srcCompat="@drawable/all_lessoncontent" />
 
 	<LinearLayout
@@ -28,18 +27,16 @@
 		android:orientation="vertical">
 
 		<TextView
-			android:id="@+id/textview_roomfinder_name"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="Teaching content"
+			android:text="@string/all_teaching_content"
 			android:textColor="?android:attr/textColorPrimary"
 			android:textSize="13sp" />
 
 		<TextView
-			android:id="@+id/textview_roomfinder_details"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="(Tap to edit)"
+			android:text="@string/all_hint_tap_to_edit"
 			android:textColor="?android:attr/textColorSecondary"
 			android:textSize="13sp" />
 	</LinearLayout>
