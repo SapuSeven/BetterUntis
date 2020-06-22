@@ -36,7 +36,7 @@ class AbsenceCheckAdapter(
 		holder.tvName.text = item.toString()
 		holder.tvDetails.text = item.absence.untisAbsence?.text ?: ""
 		if (item.absence is AbsenceCheckViewModel.PendingAbsence) {
-			holder.ivStatus.visibility = View.INVISIBLE // TODO: Test with GONE
+			holder.ivStatus.visibility = View.INVISIBLE
 			holder.pbLoading.visibility = View.VISIBLE
 		} else {
 			holder.ivStatus.visibility = View.VISIBLE
