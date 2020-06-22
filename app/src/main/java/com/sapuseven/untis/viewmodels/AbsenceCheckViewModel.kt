@@ -20,15 +20,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class AbsenceCheckViewModel(private val user: UserDatabase.User, private val period: Period) : ViewModel() {
-	private val absenceListLiveData: MutableLiveData<Map<UntisStudent, UntisAbsence?>> = liveData {
+	private val absenceListLiveData: MutableLiveData<Map<UntisStudent, Absence>> = liveData {
 		loadAbsenceList()?.let { emit(it) } // TODO: Show network error if null
-	} as MutableLiveData<Map<UntisStudent, UntisAbsence?>>
+	} as MutableLiveData<Map<UntisStudent, Absence>>
 
 	private val query = UntisRequest.UntisRequestQuery(user).apply {
 		//proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null) // TODO: Implement
 	}
 
-	private suspend fun loadAbsenceList(): Map<UntisStudent, UntisAbsence?>? {
+	private suspend fun loadAbsenceList(): Map<UntisStudent, Absence>? {
 		query.data.method = UntisApiConstants.METHOD_GET_PERIOD_DATA
 		query.data.params = listOf(PeriodDataParams(
 				listOf(period.id),
@@ -43,15 +43,18 @@ class AbsenceCheckViewModel(private val user: UserDatabase.User, private val per
 				val absences = periodData.dataByTTId[period.id.toString()]?.absences
 				// TODO: Check for absenceChecked
 				periodData.referencedStudents.associateWith { student ->
-					absences?.find { it.studentId == student.id }
+					Absence(absences?.find { it.studentId == student.id })
 				}
 			}
 		}, { null })
 	}
 
-	fun absenceList(): LiveData<Map<UntisStudent, UntisAbsence?>> = absenceListLiveData
+	fun absenceList(): LiveData<Map<UntisStudent, Absence>> = absenceListLiveData
 
 	fun createAbsence(student: UntisStudent) = viewModelScope.launch(Dispatchers.IO) {
+		val originalValue = absenceListLiveData.value
+		absenceListLiveData.postValue(absenceListLiveData.value?.mapValues { if (it.key == student) PendingAbsence() else it.value })
+
 		query.data.method = UntisApiConstants.METHOD_CREATE_IMMEDIATE_ABSENCE
 		query.data.params = listOf(ImmediateAbsenceParams(
 				period.id,
@@ -65,9 +68,10 @@ class AbsenceCheckViewModel(private val user: UserDatabase.User, private val per
 			val untisResponse = SerializationUtils.getJSON().parse(ImmediateAbsenceResponse.serializer(), data)
 
 			untisResponse.result?.let { result ->
-				absenceListLiveData.postValue(absenceListLiveData.value?.mapValues { if (it.key == student) result.absences[0] else it.value })
+				absenceListLiveData.postValue(absenceListLiveData.value?.mapValues { if (it.key == student) Absence(result.absences[0]) else it.value })
 			}
 		}, {
+			absenceListLiveData.postValue(originalValue)
 			// TODO: Show network error
 		})
 	}
@@ -92,4 +96,10 @@ class AbsenceCheckViewModel(private val user: UserDatabase.User, private val per
 					.newInstance(user, period)
 		}
 	}
+
+	open class Absence(
+			val untisAbsence: UntisAbsence? = null
+	)
+
+	class PendingAbsence : Absence()
 }
