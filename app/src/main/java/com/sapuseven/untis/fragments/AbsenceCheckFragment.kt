@@ -30,7 +30,10 @@ class AbsenceCheckFragment(user: UserDatabase.User?, element: Period?) : Fragmen
 
 		val rvAbsenceCheck = rootView.findViewById<RecyclerView>(R.id.recyclerview_absence_check)
 		val adapter = AbsenceCheckAdapter {
-			viewModel.createAbsence(it.student)
+			if (it.absence.untisAbsence == null)
+				viewModel.createAbsence(it.student)
+			else
+				viewModel.deleteAbsence(it.student, it.absence.untisAbsence)
 		}
 		rvAbsenceCheck.layoutManager = LinearLayoutManager(context)
 		rvAbsenceCheck.adapter = adapter

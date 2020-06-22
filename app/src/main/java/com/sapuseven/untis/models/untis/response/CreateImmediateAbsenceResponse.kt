@@ -4,11 +4,11 @@ import com.sapuseven.untis.models.UntisAbsence
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ImmediateAbsenceResponse(
-		val result: ImmediateAbsenceResult? = null
+data class CreateImmediateAbsenceResponse(
+		val result: CreateImmediateAbsenceResult? = null
 ) : BaseResponse()
 
 @Serializable
-data class ImmediateAbsenceResult(
+data class CreateImmediateAbsenceResult(
 		val absences: List<UntisAbsence>
 )

@@ -11,9 +11,11 @@ import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.models.UntisAbsence
 import com.sapuseven.untis.models.untis.UntisTime
 import com.sapuseven.untis.models.untis.params.AbsencesCheckedParams
-import com.sapuseven.untis.models.untis.params.ImmediateAbsenceParams
+import com.sapuseven.untis.models.untis.params.CreateImmediateAbsenceParams
+import com.sapuseven.untis.models.untis.params.DeleteAbsenceParams
 import com.sapuseven.untis.models.untis.params.PeriodDataParams
-import com.sapuseven.untis.models.untis.response.ImmediateAbsenceResponse
+import com.sapuseven.untis.models.untis.response.CreateImmediateAbsenceResponse
+import com.sapuseven.untis.models.untis.response.DeleteAbsenceResponse
 import com.sapuseven.untis.models.untis.response.PeriodDataResponse
 import com.sapuseven.untis.models.untis.response.UntisStudent
 import com.sapuseven.untis.models.untis.timetable.Period
@@ -57,7 +59,7 @@ class AbsenceCheckViewModel(private val user: UserDatabase.User, private val per
 		absenceListLiveData.postValue(absenceListLiveData.value?.mapValues { if (it.key == student) PendingAbsence() else it.value })
 
 		query.data.method = UntisApiConstants.METHOD_CREATE_IMMEDIATE_ABSENCE
-		query.data.params = listOf(ImmediateAbsenceParams(
+		query.data.params = listOf(CreateImmediateAbsenceParams(
 				period.id,
 				student.id,
 				UntisTime(period.startDateTime.toLocalDateTime().toString(DateTimeUtils.tTimeNoSeconds())),
@@ -66,10 +68,35 @@ class AbsenceCheckViewModel(private val user: UserDatabase.User, private val per
 		))
 
 		UntisRequest().request(query).fold({ data ->
-			val untisResponse = SerializationUtils.getJSON().parse(ImmediateAbsenceResponse.serializer(), data)
+			val untisResponse = SerializationUtils.getJSON().parse(CreateImmediateAbsenceResponse.serializer(), data)
 
 			untisResponse.result?.let { result ->
 				absenceListLiveData.postValue(absenceListLiveData.value?.mapValues { if (it.key == student) Absence(result.absences[0]) else it.value })
+			}
+		}, {
+			absenceListLiveData.postValue(originalValue)
+			// TODO: Show network error
+		})
+	}
+
+	fun deleteAbsence(student: UntisStudent, absence: UntisAbsence) = viewModelScope.launch(Dispatchers.IO) {
+		val originalValue = absenceListLiveData.value
+		absenceListLiveData.postValue(absenceListLiveData.value?.mapValues { if (it.key == student) PendingAbsence() else it.value })
+
+		query.data.method = UntisApiConstants.METHOD_DELETE_ABSENCE
+		query.data.params = listOf(DeleteAbsenceParams(
+				absence.id,
+				UntisAuthentication.createAuthObject(user)
+		))
+
+		UntisRequest().request(query).fold({ data ->
+			val untisResponse = SerializationUtils.getJSON().parse(DeleteAbsenceResponse.serializer(), data)
+
+			untisResponse.result?.let { result ->
+				if (result.success)
+					absenceListLiveData.postValue(absenceListLiveData.value?.mapValues { if (it.key == student) Absence() else it.value })
+				else
+					absenceListLiveData.postValue(originalValue) // TODO: show error
 			}
 		}, {
 			absenceListLiveData.postValue(originalValue)
