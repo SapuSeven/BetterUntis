@@ -1,6 +1,7 @@
 package com.sapuseven.untis.viewmodels
 
 import androidx.lifecycle.*
+import com.github.kittinunf.fuel.core.FuelError
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
@@ -76,7 +77,7 @@ class AbsenceCheckViewModel(private val user: UserDatabase.User, private val per
 		})
 	}
 
-	fun submitAbsencesChecked() = viewModelScope.launch(Dispatchers.IO) {
+	fun submitAbsencesChecked(onSuccess: () -> Unit, onFailure: (FuelError) -> Unit) = viewModelScope.launch(Dispatchers.IO) {
 		query.data.method = UntisApiConstants.METHOD_SUBMIT_ABSENCES_CHECKED
 		query.data.params = listOf(AbsencesCheckedParams(
 				listOf(period.id),
@@ -84,8 +85,9 @@ class AbsenceCheckViewModel(private val user: UserDatabase.User, private val per
 		))
 
 		UntisRequest().request(query).fold({
-			// TODO: Return successful
+			onSuccess()
 		}, {
+			onFailure(it)
 			// TODO: Show network error
 		})
 	}
