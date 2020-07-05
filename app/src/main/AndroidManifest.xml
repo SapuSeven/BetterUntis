@@ -26,7 +26,7 @@
                 android:resource="@xml/daily_messages_widget_info" />
         </receiver>
         <activity
-            android:name=".widgets.DailyMessagesWidgetConfigureActivity"
+            android:name=".activities.DailyMessagesWidgetConfigureActivity"
             android:label="@string/widget_daily_messages">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />

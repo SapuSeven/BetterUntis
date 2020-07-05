@@ -5,9 +5,9 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.widget.RemoteViews
 import com.sapuseven.untis.R
+import com.sapuseven.untis.activities.deleteIdPref
+import com.sapuseven.untis.activities.loadIdPref
 import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.helpers.config.PreferenceManager
-import com.sapuseven.untis.helpers.config.PreferenceUtils
 
 class DailyMessagesWidget : AppWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
@@ -32,7 +32,7 @@ internal fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManage
     views.setTextViewText(R.id.textview_daily_messages_widget_school, user?.userData?.schoolName)
     views.setTextViewText(R.id.textview_daily_messages_widget_content, "TODO: Get and format messages")
 
-    val colorPrimary = when (context.getSharedPreferences("preferences_${userId}", Context.MODE_PRIVATE).getString("preference_theme", null)) {
+    val colorPrimary = when (context.getSharedPreferences("preferences_$userId", Context.MODE_PRIVATE).getString("preference_theme", null)) {
         "untis" -> R.color.colorPrimaryThemeUntis
         "blue" -> R.color.colorPrimaryThemeBlue
         "green" -> R.color.colorPrimaryThemeGreen

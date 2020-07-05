@@ -1,4 +1,4 @@
-package com.sapuseven.untis.widgets
+package com.sapuseven.untis.activities
 
 import android.appwidget.AppWidgetManager
 import android.content.Context
@@ -8,9 +8,9 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.BaseActivity
 import com.sapuseven.untis.adapters.ProfileListAdapter
 import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.widgets.updateAppWidget
 
 class DailyMessagesWidgetConfigureActivity : BaseActivity() {
 
