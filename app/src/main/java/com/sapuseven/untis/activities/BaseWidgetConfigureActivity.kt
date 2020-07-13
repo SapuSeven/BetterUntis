@@ -1,7 +1,6 @@
 package com.sapuseven.untis.activities
 
 import android.appwidget.AppWidgetManager
-import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -10,8 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
 import com.sapuseven.untis.adapters.ProfileListAdapter
 import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.widgets.DailyMessagesWidget
-import com.sapuseven.untis.widgets.TimetableWidget
 import com.sapuseven.untis.widgets.saveIdPref
 
 class BaseWidgetConfigureActivity : BaseActivity() {
@@ -26,20 +23,7 @@ class BaseWidgetConfigureActivity : BaseActivity() {
         val userId = profileListAdapter.itemAt(userList.getChildLayoutPosition(it)).id ?: 0
         saveIdPref(context, appWidgetId, userId)
 
-        val intent = Intent(context, DailyMessagesWidget::class.java).setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
-        val ids = AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, DailyMessagesWidget::class.java))
-        if (ids != null && ids.isNotEmpty()) {
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
-            context.sendBroadcast(intent)
-        }
-        val intent2 = Intent(context, TimetableWidget::class.java).setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
-        val ids2 = AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, TimetableWidget::class.java))
-        if (ids2 != null && ids2.isNotEmpty()) {
-            intent2.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids2)
-            context.sendBroadcast(intent2)
-        }
-
-
+        context.sendBroadcast(Intent().setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE).putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(appWidgetId)))
         setResult(RESULT_OK, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId))
         finish()
     }
