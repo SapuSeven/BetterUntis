@@ -309,6 +309,7 @@
         <item quantity="one">This Room is free right now.</item>
         <item quantity="other">This Room is free for %d hours.</item>
     </plurals>
+    <string name="widget_timetable">Timetable</string>
     <string name="widget_daily_messages">Daily Messages</string>
     <string name="widget_select_profile">Please select a profile for the widget</string>
 </resources>

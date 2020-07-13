@@ -27,7 +27,7 @@ open class BaseWidget : AppWidgetProvider() {
     open fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
         val userId = loadIdPref(context, appWidgetId)
         user = UserDatabase.createInstance(context).getUser(userId)
-        views = RemoteViews(context.packageName, R.layout.daily_messages_widget)
+        views = RemoteViews(context.packageName, R.layout.base_widget)
         views.setTextViewText(R.id.textview_daily_messages_widget_account, user?.userData?.displayName)
         views.setTextViewText(R.id.textview_daily_messages_widget_school, user?.userData?.schoolName)
 

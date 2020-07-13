@@ -13,14 +13,14 @@ import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.widgets.DailyMessagesWidget
 import com.sapuseven.untis.widgets.saveIdPref
 
-class DailyMessagesWidgetConfigureActivity : BaseActivity() {
+class BaseWidgetConfigureActivity : BaseActivity() {
 
     private lateinit var profileListAdapter: ProfileListAdapter
     private lateinit var userList: RecyclerView
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 
     private val onClickListener = View.OnClickListener {
-        val context = this@DailyMessagesWidgetConfigureActivity
+        val context = this@BaseWidgetConfigureActivity
 
         val userId = profileListAdapter.itemAt(userList.getChildLayoutPosition(it)).id ?: 0
         saveIdPref(context, appWidgetId, userId)
@@ -40,7 +40,7 @@ class DailyMessagesWidgetConfigureActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setResult(RESULT_CANCELED)
-        setContentView(R.layout.daily_messages_widget_configure)
+        setContentView(R.layout.base_widget_configure)
 
         userList = findViewById(R.id.recyclerview_daily_messages_widget_configure_profile_list)
         profileListAdapter = ProfileListAdapter(this, UserDatabase.createInstance(this).getAllUsers().toMutableList(), onClickListener, onLongClickListener)

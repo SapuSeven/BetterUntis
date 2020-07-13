@@ -16,6 +16,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <receiver
+            android:name=".widgets.TimetableWidget"
+            android:label="@string/widget_timetable">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/timetable_widget_info" />
+        </receiver>
+        <receiver
             android:name=".widgets.DailyMessagesWidget"
             android:label="@string/widget_daily_messages">
             <intent-filter>
@@ -26,7 +36,7 @@
                 android:resource="@xml/daily_messages_widget_info" />
         </receiver>
         <activity
-            android:name=".activities.DailyMessagesWidgetConfigureActivity"
+            android:name=".activities.BaseWidgetConfigureActivity"
             android:label="@string/widget_daily_messages">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
