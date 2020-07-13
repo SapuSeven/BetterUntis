@@ -1,7 +1,7 @@
 package com.sapuseven.untis.activities
 
 import android.appwidget.AppWidgetManager
-import android.content.Context
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -10,7 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
 import com.sapuseven.untis.adapters.ProfileListAdapter
 import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.widgets.updateAppWidget
+import com.sapuseven.untis.widgets.DailyMessagesWidget
+import com.sapuseven.untis.widgets.saveIdPref
 
 class DailyMessagesWidgetConfigureActivity : BaseActivity() {
 
@@ -24,7 +25,13 @@ class DailyMessagesWidgetConfigureActivity : BaseActivity() {
         val userId = profileListAdapter.itemAt(userList.getChildLayoutPosition(it)).id ?: 0
         saveIdPref(context, appWidgetId, userId)
 
-        updateAppWidget(context, AppWidgetManager.getInstance(context), appWidgetId)
+        val intent = Intent(context, DailyMessagesWidget::class.java).setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
+        val ids = AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, DailyMessagesWidget::class.java))
+        if (ids != null && ids.isNotEmpty()) {
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+            context.sendBroadcast(intent)
+        }
+
         setResult(RESULT_OK, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId))
         finish()
     }
@@ -51,20 +58,4 @@ class DailyMessagesWidgetConfigureActivity : BaseActivity() {
             return
         }
     }
-
-}
-
-private const val PREFS_NAME = "com.sapuseven.untis.widgets.DailyMessagesWidget"
-private const val PREF_PREFIX_KEY = "appwidget_"
-
-internal fun saveIdPref(context: Context, appWidgetId: Int, userId: Long) {
-    context.getSharedPreferences(PREFS_NAME, 0).edit().putLong(PREF_PREFIX_KEY + appWidgetId, userId).apply()
-}
-
-internal fun loadIdPref(context: Context, appWidgetId: Int): Long {
-    return context.getSharedPreferences(PREFS_NAME, 0).getLong(PREF_PREFIX_KEY + appWidgetId, 0)
-}
-
-internal fun deleteIdPref(context: Context, appWidgetId: Int) {
-    context.getSharedPreferences(PREFS_NAME, 0).edit().remove(PREF_PREFIX_KEY + appWidgetId).apply()
 }
