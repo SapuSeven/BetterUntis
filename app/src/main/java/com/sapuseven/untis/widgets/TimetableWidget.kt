@@ -1,6 +1,10 @@
 package com.sapuseven.untis.widgets
 
 import android.appwidget.AppWidgetManager
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
@@ -22,8 +26,6 @@ class TimetableWidget : BaseWidget() {
 
     override fun updateAppWidget(appWidgetId: Int) {
         super.updateAppWidget(appWidgetId)
-        //appWidgetManager.updateAppWidget(appWidgetId, views)
-
         timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, user?.id ?: return)
         timetableLoader = TimetableLoader(WeakReference(context), TimetableWidgetTimetableDisplay(appWidgetManager, appWidgetId, user), user ?: return, timetableDatabaseInterface)
         loadTimetable()
@@ -45,14 +47,18 @@ class TimetableWidget : BaseWidget() {
             val newViews = loadBaseLayout(user)
             val formattedItems = formatItems(items)
             val fmt: DateTimeFormatter = DateTimeFormat.forPattern("HH:mm")
-            var time: String
-            var text = ""
+            val text = SpannableStringBuilder()
+            var firstLine: SpannableString
+            var secondLine: String
             formattedItems.forEach {
-                time = it.startDateTime.toString(fmt) + " - " + it.endDateTime.toString(fmt)
-                text += "$time\n${it.title}"
-                if (it.top != "") text += ", ${it.top}"
-                if (it.bottom != "") text += ", ${it.bottom}"
-                text += "\n\n"
+                firstLine = SpannableString("${it.startDateTime.toString(fmt)} - ${it.endDateTime.toString(fmt)} | ${it.title}\n")
+                firstLine.setSpan(ForegroundColorSpan(context.resources.getColor(android.R.color.primary_text_light)), 0, firstLine.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                secondLine = ""
+                if (it.top != "") secondLine += "${it.top}, "
+                if (it.bottom != "") secondLine += "${it.bottom}"
+                text.append(firstLine)
+                text.append(secondLine)
+                text.append("\n\n")
             }
             newViews.setTextViewText(R.id.textview_base_widget_content, text)
             appWidgetManager.updateAppWidget(appWidgetId, newViews)
