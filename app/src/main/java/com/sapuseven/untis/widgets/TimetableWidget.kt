@@ -48,7 +48,10 @@ class TimetableWidget : BaseWidget(), TimetableDisplay {
     }
 
     override fun onTimetableLoadingError(requestId: Int, code: Int?, message: String?) {
-        Log.e("BetterUntis", message)
+        Log.e(TimetableWidget::class.java.simpleName, message ?: "")
+        val newViews = loadBaseLayout()
+        newViews.setTextViewText(R.id.textview_base_widget_content, context.resources.getString(R.string.all_error))
+        updateViews(newViews)
     }
 
     private fun loadTimetable(force: Boolean = false) {
