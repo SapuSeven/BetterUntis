@@ -3,32 +3,29 @@ package com.sapuseven.untis.widgets
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
+import android.util.Log
 import android.widget.RemoteViews
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
 
 open class BaseWidget : AppWidgetProvider() {
 
-    protected var userId: Long = 0
     protected var user: UserDatabase.User? = null
     protected lateinit var userDatabase: UserDatabase
-    protected lateinit var views: RemoteViews
     protected lateinit var context: Context
     protected lateinit var appWidgetManager: AppWidgetManager
-    protected lateinit var appWidgetIds: IntArray
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         this.context = context
         this.appWidgetManager = appWidgetManager
-        this.appWidgetIds = appWidgetIds
+        userDatabase = UserDatabase.createInstance(context)
+
+        Log.e("Widget", "called")
 
         for (appWidgetId in appWidgetIds) {
-            userDatabase = UserDatabase.createInstance(context)
-            userId = loadIdPref(context, appWidgetId)
-            user = userDatabase.getUser(userId)
-            views = loadBaseLayout()
-            if (user != null) updateAppWidget(context, appWidgetManager, appWidgetId)
-            else appWidgetManager.updateAppWidget(appWidgetId, views)
+            user = userDatabase.getUser(loadIdPref(context, appWidgetId))
+            if (user != null) updateAppWidget(appWidgetId)
+            else appWidgetManager.updateAppWidget(appWidgetId, loadBaseLayout(user))
         }
     }
 
@@ -38,19 +35,19 @@ open class BaseWidget : AppWidgetProvider() {
         }
     }
 
-    open fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) { }
+    open fun updateAppWidget(appWidgetId: Int) {}
 
-    fun loadBaseLayout(): RemoteViews {
+    fun loadBaseLayout(user: UserDatabase.User?): RemoteViews {
         val remoteViews = RemoteViews(context.packageName, R.layout.base_widget)
         if (user == null) {
             remoteViews.setTextViewText(R.id.textview_base_widget_account, context.resources.getString(R.string.all_error))
             remoteViews.setTextViewText(R.id.textview_base_widget_school, context.resources.getString(R.string.all_error))
             remoteViews.setTextViewText(R.id.textview_base_widget_content, context.resources.getString(R.string.all_error))
         } else {
-            remoteViews.setTextViewText(R.id.textview_base_widget_account, user?.userData?.displayName)
-            remoteViews.setTextViewText(R.id.textview_base_widget_school, user?.userData?.schoolName)
+            remoteViews.setTextViewText(R.id.textview_base_widget_account, user.userData.displayName)
+            remoteViews.setTextViewText(R.id.textview_base_widget_school, user.userData.schoolName)
 
-            val colorPrimary = when (context.getSharedPreferences("preferences_$userId", Context.MODE_PRIVATE).getString("preference_theme", null)) {
+            val colorPrimary = when (context.getSharedPreferences("preferences_${user.id}", Context.MODE_PRIVATE).getString("preference_theme", null)) {
                 "untis" -> R.color.colorPrimaryThemeUntis
                 "blue" -> R.color.colorPrimaryThemeBlue
                 "green" -> R.color.colorPrimaryThemeGreen
@@ -63,12 +60,6 @@ open class BaseWidget : AppWidgetProvider() {
         }
 
         return remoteViews
-    }
-
-    fun updateViews(remoteViews: RemoteViews) {
-        for (appWidgetId in appWidgetIds) {
-            appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
-        }
     }
 }
 
