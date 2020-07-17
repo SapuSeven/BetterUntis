@@ -43,7 +43,7 @@ class TimetableWidget : BaseWidget(), TimetableDisplay {
             if (it.bottom != "") text += ", ${it.bottom}"
             text += "\n\n"
         }
-        newViews.setTextViewText(R.id.textview_daily_messages_widget_content, text)
+        newViews.setTextViewText(R.id.textview_base_widget_content, text)
         updateViews(newViews)
     }
 

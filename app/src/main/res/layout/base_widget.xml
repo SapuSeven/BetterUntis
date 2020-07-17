@@ -4,7 +4,7 @@
     android:background="@android:color/white">
 
     <LinearLayout
-        android:id="@+id/linearlayout_daily_messages_widget_top_bar"
+        android:id="@+id/linearlayout_base_widget_top_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="16dp"
@@ -15,7 +15,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/textview_daily_messages_widget_account"
+            android:id="@+id/textview_base_widget_account"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/loading"
@@ -23,7 +23,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <TextView
-            android:id="@+id/textview_daily_messages_widget_school"
+            android:id="@+id/textview_base_widget_school"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/loading"
@@ -32,10 +32,10 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/textview_daily_messages_widget_content"
+        android:id="@+id/textview_base_widget_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/linearlayout_daily_messages_widget_top_bar"
+        android:layout_below="@id/linearlayout_base_widget_top_bar"
         android:layout_margin="16dp"
         android:text="@string/loading" />
 </RelativeLayout>

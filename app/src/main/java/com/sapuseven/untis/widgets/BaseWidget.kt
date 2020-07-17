@@ -45,16 +45,16 @@ open class BaseWidget : AppWidgetProvider() {
 
     private fun onUnknownUser(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int): Nothing {
         views = RemoteViews(context.packageName, R.layout.base_widget)
-        views.setTextViewText(R.id.textview_daily_messages_widget_account, context.resources.getString(R.string.all_error))
-        views.setTextViewText(R.id.textview_daily_messages_widget_school, context.resources.getString(R.string.all_error))
+        views.setTextViewText(R.id.textview_base_widget_account, context.resources.getString(R.string.all_error))
+        views.setTextViewText(R.id.textview_base_widget_school, context.resources.getString(R.string.all_error))
         appWidgetManager.updateAppWidget(appWidgetId, views)
         throw Exception()
     }
 
     fun loadBaseLayout(): RemoteViews {
         val remoteViews = RemoteViews(context.packageName, R.layout.base_widget)
-        remoteViews.setTextViewText(R.id.textview_daily_messages_widget_account, user.userData.displayName)
-        remoteViews.setTextViewText(R.id.textview_daily_messages_widget_school, user.userData.schoolName)
+        remoteViews.setTextViewText(R.id.textview_base_widget_account, user.userData.displayName)
+        remoteViews.setTextViewText(R.id.textview_base_widget_school, user.userData.schoolName)
 
         val colorPrimary = when (context.getSharedPreferences("preferences_$userId", Context.MODE_PRIVATE).getString("preference_theme", null)) {
             "untis" -> R.color.colorPrimaryThemeUntis
@@ -65,7 +65,7 @@ open class BaseWidget : AppWidgetProvider() {
             "pixel" -> R.color.colorPrimaryThemePixel
             else -> R.color.colorPrimary
         }
-        remoteViews.setInt(R.id.linearlayout_daily_messages_widget_top_bar, "setBackgroundColor", context.resources.getColor(colorPrimary))
+        remoteViews.setInt(R.id.linearlayout_base_widget_top_bar, "setBackgroundColor", context.resources.getColor(colorPrimary))
 
         return remoteViews
     }
