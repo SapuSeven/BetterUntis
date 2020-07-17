@@ -6,12 +6,11 @@ import android.content.Context
 import android.widget.RemoteViews
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
-import java.lang.Exception
 
 open class BaseWidget : AppWidgetProvider() {
 
     protected var userId: Long = 0
-    protected lateinit var user: UserDatabase.User
+    protected var user: UserDatabase.User? = null
     protected lateinit var userDatabase: UserDatabase
     protected lateinit var views: RemoteViews
     protected lateinit var context: Context
@@ -24,9 +23,12 @@ open class BaseWidget : AppWidgetProvider() {
         this.appWidgetIds = appWidgetIds
 
         for (appWidgetId in appWidgetIds) {
-            try {
-                updateAppWidget(context, appWidgetManager, appWidgetId)
-            } catch (e: Exception) { }
+            userDatabase = UserDatabase.createInstance(context)
+            userId = loadIdPref(context, appWidgetId)
+            user = userDatabase.getUser(userId)
+            views = loadBaseLayout()
+            if (user != null) updateAppWidget(context, appWidgetManager, appWidgetId)
+            else appWidgetManager.updateAppWidget(appWidgetId, views)
         }
     }
 
@@ -36,36 +38,29 @@ open class BaseWidget : AppWidgetProvider() {
         }
     }
 
-    open fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
-        userDatabase = UserDatabase.createInstance(context)
-        userId = loadIdPref(context, appWidgetId)
-        user = userDatabase.getUser(userId) ?: onUnknownUser(context, appWidgetManager, appWidgetId)
-        views = loadBaseLayout()
-    }
-
-    private fun onUnknownUser(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int): Nothing {
-        views = RemoteViews(context.packageName, R.layout.base_widget)
-        views.setTextViewText(R.id.textview_base_widget_account, context.resources.getString(R.string.all_error))
-        views.setTextViewText(R.id.textview_base_widget_school, context.resources.getString(R.string.all_error))
-        appWidgetManager.updateAppWidget(appWidgetId, views)
-        throw Exception()
-    }
+    open fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) { }
 
     fun loadBaseLayout(): RemoteViews {
         val remoteViews = RemoteViews(context.packageName, R.layout.base_widget)
-        remoteViews.setTextViewText(R.id.textview_base_widget_account, user.userData.displayName)
-        remoteViews.setTextViewText(R.id.textview_base_widget_school, user.userData.schoolName)
+        if (user == null) {
+            remoteViews.setTextViewText(R.id.textview_base_widget_account, context.resources.getString(R.string.all_error))
+            remoteViews.setTextViewText(R.id.textview_base_widget_school, context.resources.getString(R.string.all_error))
+            remoteViews.setTextViewText(R.id.textview_base_widget_content, context.resources.getString(R.string.all_error))
+        } else {
+            remoteViews.setTextViewText(R.id.textview_base_widget_account, user?.userData?.displayName)
+            remoteViews.setTextViewText(R.id.textview_base_widget_school, user?.userData?.schoolName)
 
-        val colorPrimary = when (context.getSharedPreferences("preferences_$userId", Context.MODE_PRIVATE).getString("preference_theme", null)) {
-            "untis" -> R.color.colorPrimaryThemeUntis
-            "blue" -> R.color.colorPrimaryThemeBlue
-            "green" -> R.color.colorPrimaryThemeGreen
-            "pink" -> R.color.colorPrimaryThemePink
-            "cyan" -> R.color.colorPrimaryThemeCyan
-            "pixel" -> R.color.colorPrimaryThemePixel
-            else -> R.color.colorPrimary
+            val colorPrimary = when (context.getSharedPreferences("preferences_$userId", Context.MODE_PRIVATE).getString("preference_theme", null)) {
+                "untis" -> R.color.colorPrimaryThemeUntis
+                "blue" -> R.color.colorPrimaryThemeBlue
+                "green" -> R.color.colorPrimaryThemeGreen
+                "pink" -> R.color.colorPrimaryThemePink
+                "cyan" -> R.color.colorPrimaryThemeCyan
+                "pixel" -> R.color.colorPrimaryThemePixel
+                else -> R.color.colorPrimary
+            }
+            remoteViews.setInt(R.id.linearlayout_base_widget_top_bar, "setBackgroundColor", context.resources.getColor(colorPrimary))
         }
-        remoteViews.setInt(R.id.linearlayout_base_widget_top_bar, "setBackgroundColor", context.resources.getColor(colorPrimary))
 
         return remoteViews
     }

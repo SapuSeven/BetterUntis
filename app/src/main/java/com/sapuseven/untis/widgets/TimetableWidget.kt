@@ -24,7 +24,7 @@ class TimetableWidget : BaseWidget(), TimetableDisplay {
         super.updateAppWidget(context, appWidgetManager, appWidgetId)
 
         timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, userId)
-        timetableLoader = TimetableLoader(WeakReference(context), this, user, timetableDatabaseInterface)
+        timetableLoader = TimetableLoader(WeakReference(context), this, user ?: return, timetableDatabaseInterface)
         loadTimetable()
 
         appWidgetManager.updateAppWidget(appWidgetId, views)
@@ -54,6 +54,6 @@ class TimetableWidget : BaseWidget(), TimetableDisplay {
     private fun loadTimetable(force: Boolean = false) {
         val today = UntisDate.fromLocalDate(LocalDate.now())
         val flags = if (force) TimetableLoader.FLAG_LOAD_SERVER else TimetableLoader.FLAG_LOAD_CACHE
-        timetableLoader.load(TimetableLoader.TimetableLoaderTarget(today, today, user.userData.elemId, user.userData.elemType ?: ""), flags)
+        timetableLoader.load(TimetableLoader.TimetableLoaderTarget(today, today, user?.userData?.elemId ?: return, user?.userData?.elemType ?: ""), flags)
     }
 }
