@@ -7,7 +7,7 @@ import org.joda.time.DateTime
 class TimegridItem(
 		id: Long,
 		val startDateTime: DateTime,
-		val endDateTime: DateTime,
+		var endDateTime: DateTime,
 		contextType: String,
 		val periodData: PeriodData
 ) : WeekViewEvent<TimegridItem>(id, startTime = startDateTime, endTime = endDateTime) {

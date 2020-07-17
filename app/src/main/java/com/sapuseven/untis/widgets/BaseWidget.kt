@@ -14,8 +14,15 @@ open class BaseWidget : AppWidgetProvider() {
     protected lateinit var user: UserDatabase.User
     protected lateinit var userDatabase: UserDatabase
     protected lateinit var views: RemoteViews
+    protected lateinit var context: Context
+    protected lateinit var appWidgetManager: AppWidgetManager
+    protected lateinit var appWidgetIds: IntArray
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+        this.context = context
+        this.appWidgetManager = appWidgetManager
+        this.appWidgetIds = appWidgetIds
+
         for (appWidgetId in appWidgetIds) {
             try {
                 updateAppWidget(context, appWidgetManager, appWidgetId)
@@ -33,9 +40,21 @@ open class BaseWidget : AppWidgetProvider() {
         userDatabase = UserDatabase.createInstance(context)
         userId = loadIdPref(context, appWidgetId)
         user = userDatabase.getUser(userId) ?: onUnknownUser(context, appWidgetManager, appWidgetId)
+        views = loadBaseLayout()
+    }
+
+    private fun onUnknownUser(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int): Nothing {
         views = RemoteViews(context.packageName, R.layout.base_widget)
-        views.setTextViewText(R.id.textview_daily_messages_widget_account, user.userData.displayName)
-        views.setTextViewText(R.id.textview_daily_messages_widget_school, user.userData.schoolName)
+        views.setTextViewText(R.id.textview_daily_messages_widget_account, context.resources.getString(R.string.all_error))
+        views.setTextViewText(R.id.textview_daily_messages_widget_school, context.resources.getString(R.string.all_error))
+        appWidgetManager.updateAppWidget(appWidgetId, views)
+        throw Exception()
+    }
+
+    fun loadBaseLayout(): RemoteViews {
+        val remoteViews = RemoteViews(context.packageName, R.layout.base_widget)
+        remoteViews.setTextViewText(R.id.textview_daily_messages_widget_account, user.userData.displayName)
+        remoteViews.setTextViewText(R.id.textview_daily_messages_widget_school, user.userData.schoolName)
 
         val colorPrimary = when (context.getSharedPreferences("preferences_$userId", Context.MODE_PRIVATE).getString("preference_theme", null)) {
             "untis" -> R.color.colorPrimaryThemeUntis
@@ -46,15 +65,15 @@ open class BaseWidget : AppWidgetProvider() {
             "pixel" -> R.color.colorPrimaryThemePixel
             else -> R.color.colorPrimary
         }
-        views.setInt(R.id.linearlayout_daily_messages_widget_top_bar, "setBackgroundColor", context.resources.getColor(colorPrimary))
+        remoteViews.setInt(R.id.linearlayout_daily_messages_widget_top_bar, "setBackgroundColor", context.resources.getColor(colorPrimary))
+
+        return remoteViews
     }
 
-    private fun onUnknownUser(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int): Nothing {
-        views = RemoteViews(context.packageName, R.layout.base_widget)
-        views.setTextViewText(R.id.textview_daily_messages_widget_account, context.resources.getString(R.string.all_error))
-        views.setTextViewText(R.id.textview_daily_messages_widget_school, context.resources.getString(R.string.all_error))
-        appWidgetManager.updateAppWidget(appWidgetId, views)
-        throw Exception()
+    fun updateViews(remoteViews: RemoteViews) {
+        for (appWidgetId in appWidgetIds) {
+            appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
+        }
     }
 }
 
