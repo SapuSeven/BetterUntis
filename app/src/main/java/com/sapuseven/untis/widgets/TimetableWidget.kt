@@ -31,7 +31,7 @@ class TimetableWidget : BaseWidget() {
         loadTimetable()
     }
 
-    private fun loadTimetable(force: Boolean = false) {
+    private fun loadTimetable(force: Boolean = true) {
         val today = UntisDate.fromLocalDate(LocalDate.now())
         val flags = if (force) TimetableLoader.FLAG_LOAD_SERVER else TimetableLoader.FLAG_LOAD_CACHE
         timetableLoader.load(TimetableLoader.TimetableLoaderTarget(today, today, user?.userData?.elemId ?: return, user?.userData?.elemType ?: ""), flags)

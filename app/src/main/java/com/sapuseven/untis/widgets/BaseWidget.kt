@@ -20,8 +20,6 @@ open class BaseWidget : AppWidgetProvider() {
         this.appWidgetManager = appWidgetManager
         userDatabase = UserDatabase.createInstance(context)
 
-        Log.e("Widget", "called")
-
         for (appWidgetId in appWidgetIds) {
             user = userDatabase.getUser(loadIdPref(context, appWidgetId))
             if (user != null) updateAppWidget(appWidgetId)
