@@ -1,6 +1,5 @@
 package com.sapuseven.untis.widgets
 
-import android.R
 import android.content.Context
 import android.text.Spannable
 import android.text.SpannableString
@@ -35,7 +34,7 @@ class DailyMessagesWidget : BaseWidget() {
         loadMessages(user)?.forEach {
             if (it.subject != "") {
                 firstLine = SpannableString("${it.subject}\n")
-                firstLine.setSpan(ForegroundColorSpan(context.resources.getColor(R.color.primary_text_light)), 0, firstLine.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                firstLine.setSpan(ForegroundColorSpan(context.resources.getColor(android.R.color.primary_text_light)), 0, firstLine.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                 text.append(firstLine)
             }
             secondLine = "${it.body}\n\n"

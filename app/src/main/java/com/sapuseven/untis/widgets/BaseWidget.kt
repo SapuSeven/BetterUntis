@@ -3,7 +3,6 @@ package com.sapuseven.untis.widgets
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
-import android.util.Log
 import android.widget.RemoteViews
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
