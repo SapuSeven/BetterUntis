@@ -24,7 +24,10 @@ class BaseWidgetConfigureActivity : BaseActivity() {
         saveIdPref(context, appWidgetId, userId)
 
         setResult(RESULT_OK, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId))
-        context.sendBroadcast(Intent().setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE).putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(appWidgetId)))
+        context.sendBroadcast(
+                Intent().setComponent(AppWidgetManager.getInstance(context).getAppWidgetInfo(appWidgetId).provider)
+                        .setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
+                        .putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(appWidgetId)))
         finish()
     }
     private val onLongClickListener = View.OnLongClickListener { true }
