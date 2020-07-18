@@ -269,4 +269,8 @@
         <item quantity="one">Dieser Raum ist gerade frei.</item>
         <item quantity="other">Dieser Raum ist die nächsten %d Stunden frei.</item>
     </plurals>
+    <string name="widget_timetable">Stundenplan</string>
+    <string name="widget_timetable_empty">Kein Stundenplan für heute verfügbar</string>
+    <string name="widget_daily_messages">Tagesnachrichten</string>
+    <string name="widget_select_profile">Bitte wähle ein Profil für das Widget aus</string>
 </resources>

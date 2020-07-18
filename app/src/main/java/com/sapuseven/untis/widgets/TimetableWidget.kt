@@ -64,6 +64,7 @@ class TimetableWidget : BaseWidget() {
                 text.append(secondLine)
                 text.append("\n\n")
             }
+            if (text.isEmpty()) text.append(context.resources.getString(R.string.widget_timetable_empty))
             newViews.setTextViewText(R.id.textview_base_widget_content, text)
             appWidgetManager.updateAppWidget(appWidgetId, newViews)
         }

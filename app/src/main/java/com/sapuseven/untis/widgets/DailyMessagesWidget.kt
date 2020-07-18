@@ -5,6 +5,7 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
+import com.sapuseven.untis.R
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
@@ -17,6 +18,7 @@ import com.sapuseven.untis.models.untis.response.MessageResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.joda.time.LocalDate
 
 class DailyMessagesWidget : BaseWidget() {
@@ -40,7 +42,10 @@ class DailyMessagesWidget : BaseWidget() {
             secondLine = "${it.body}\n\n"
             text.append(secondLine)
         }
-        newViews.setTextViewText(com.sapuseven.untis.R.id.textview_base_widget_content, text)
+        if (text.isEmpty()) withContext(Dispatchers.IO) {
+            text.append(context.resources.getString(R.string.infocenter_messages_empty))
+        }
+        newViews.setTextViewText(R.id.textview_base_widget_content, text)
         appWidgetManager.updateAppWidget(appWidgetId, newViews)
     }
 
