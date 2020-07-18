@@ -23,8 +23,8 @@ class BaseWidgetConfigureActivity : BaseActivity() {
         val userId = profileListAdapter.itemAt(userList.getChildLayoutPosition(it)).id ?: 0
         saveIdPref(context, appWidgetId, userId)
 
-        context.sendBroadcast(Intent().setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE).putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(appWidgetId)))
         setResult(RESULT_OK, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId))
+        context.sendBroadcast(Intent().setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE).putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(appWidgetId)))
         finish()
     }
     private val onLongClickListener = View.OnLongClickListener { true }
