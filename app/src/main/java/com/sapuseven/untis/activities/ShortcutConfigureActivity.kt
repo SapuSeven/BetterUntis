@@ -55,6 +55,8 @@ class ShortcutConfigureActivity : BaseActivity(), ElementPickerDialog.ElementPic
 
     private fun setupShortcut(user: Long, element: PeriodElement?, useOrgId: Boolean) {
         val shortcutIntent = Intent(this, MainActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 .putExtra("user", user)
                 .putExtra("type", element?.type)
                 .putExtra("id", element?.id)
