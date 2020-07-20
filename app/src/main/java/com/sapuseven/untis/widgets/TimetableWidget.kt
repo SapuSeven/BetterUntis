@@ -5,10 +5,10 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
+import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.TimetableListSorter.formatItems
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
@@ -57,9 +57,7 @@ class TimetableWidget : BaseWidget() {
             formattedItems.forEach {
                 firstLine = SpannableString("${it.startDateTime.toString(fmt)} - ${it.endDateTime.toString(fmt)} | ${it.title}\n")
                 firstLine.setSpan(ForegroundColorSpan(context.resources.getColor(android.R.color.primary_text_light)), 0, firstLine.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                secondLine = ""
-                if (it.top != "") secondLine += "${it.top}, "
-                if (it.bottom != "") secondLine += "${it.bottom}"
+                secondLine = "${it.top}, ${it.bottom}"
                 text.append(firstLine)
                 text.append(secondLine)
                 text.append("\n\n")
@@ -70,9 +68,10 @@ class TimetableWidget : BaseWidget() {
         }
 
         override fun onTimetableLoadingError(requestId: Int, code: Int?, message: String?) {
-            Log.e(TimetableWidget::class.java.simpleName, message ?: "")
             val newViews = loadBaseLayout(user)
-            newViews.setTextViewText(R.id.textview_base_widget_content, context.resources.getString(R.string.all_error))
+            newViews.setTextViewText(R.id.textview_base_widget_content,
+                    if (code != null) ErrorMessageDictionary.getErrorMessage(context.resources, code)
+                    else context.resources.getString(R.string.all_error))
             appWidgetManager.updateAppWidget(appWidgetId, newViews)
         }
     }
