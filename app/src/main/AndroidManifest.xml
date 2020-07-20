@@ -17,6 +17,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activities.ShortcutConfigureActivity"
+            android:icon="@mipmap/ic_shortcut"
             android:label="@string/widget_timetable_link">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
@@ -45,7 +46,7 @@
         </receiver>
         <activity
             android:name=".activities.BaseWidgetConfigureActivity"
-            android:label="@string/widget_daily_messages">
+            android:label="@string/widget_configuration">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>

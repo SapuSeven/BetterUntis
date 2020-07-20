@@ -66,7 +66,7 @@ class ShortcutConfigureActivity : BaseActivity(), ElementPickerDialog.ElementPic
                 RESULT_OK,
                 Intent().putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent)
                         .putExtra(Intent.EXTRA_SHORTCUT_NAME, element?.id.toString())
-                        .putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, Intent.ShortcutIconResource.fromContext(this, R.mipmap.ic_launcher))
+                        .putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, Intent.ShortcutIconResource.fromContext(this, R.mipmap.ic_shortcut))
         )
     }
 }

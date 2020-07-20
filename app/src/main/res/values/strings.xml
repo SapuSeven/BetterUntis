@@ -310,6 +310,7 @@
         <item quantity="other">This Room is free for %d hours.</item>
     </plurals>
 
+    <string name="widget_configuration">Widget Configuration</string>
     <string name="widget_timetable">Timetable</string>
     <string name="widget_timetable_empty">No timetable available for today</string>
     <string name="widget_daily_messages">Daily Messages</string>
