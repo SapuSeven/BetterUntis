@@ -17,15 +17,16 @@ import com.sapuseven.untis.models.untis.timetable.PeriodElement
 class ShortcutConfigureActivity : BaseActivity(), ElementPickerDialog.ElementPickerDialogListener {
 
     private var userId: Long = 0
+    private var timetableDatabaseInterface: TimetableDatabaseInterface? = null
     private lateinit var profileListAdapter: ProfileListAdapter
     private lateinit var userList: RecyclerView
 
     private val onClickListener = View.OnClickListener {
         userId = profileListAdapter.itemAt(userList.getChildLayoutPosition(it)).id ?: 0
-        val timetableDatabaseInterface = TimetableDatabaseInterface(UserDatabase.createInstance(this), userId)
+        timetableDatabaseInterface = TimetableDatabaseInterface(UserDatabase.createInstance(this), userId)
 
         ElementPickerDialog.newInstance(
-                timetableDatabaseInterface,
+                timetableDatabaseInterface ?: return@OnClickListener,
                 ElementPickerDialog.Companion.ElementPickerDialogConfig(TimetableDatabaseInterface.Type.CLASS)
         ).show(supportFragmentManager, "elementPicker") // TODO: Do not hard-code the tag
     }
@@ -65,7 +66,9 @@ class ShortcutConfigureActivity : BaseActivity(), ElementPickerDialog.ElementPic
         setResult(
                 RESULT_OK,
                 Intent().putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent)
-                        .putExtra(Intent.EXTRA_SHORTCUT_NAME, element?.id.toString())
+                        .putExtra(Intent.EXTRA_SHORTCUT_NAME,
+                                if (element == null) resources.getString(R.string.all_personal)
+                                else timetableDatabaseInterface?.getShortName(element.id, TimetableDatabaseInterface.Type.valueOf(element.type)))
                         .putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, Intent.ShortcutIconResource.fromContext(this, R.mipmap.ic_shortcut))
         )
     }
