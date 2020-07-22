@@ -34,7 +34,6 @@
 		android:layout_width="0dp"
 		android:layout_height="wrap_content"
 		android:layout_marginStart="@dimen/margin_listitem_text"
-		android:layout_marginTop="4dp"
 		android:textColor="?android:attr/textColorSecondary"
 		android:textSize="@dimen/textsize_listitem_line2"
 		app:layout_constraintBottom_toBottomOf="parent"
