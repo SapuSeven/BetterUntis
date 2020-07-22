@@ -1,15 +1,18 @@
 package com.sapuseven.untis.adapters
 
 import android.content.Context
-import android.widget.ArrayAdapter
-import android.widget.Filter
-import android.widget.Filterable
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import java.util.*
 
 open class GridViewDatabaseItemAdapter(context: Context)
 	: ArrayAdapter<String>(context, android.R.layout.simple_list_item_1), Filterable {
+	private var inflater: LayoutInflater = LayoutInflater.from(context)
 	private var originalItems: List<PeriodElement> = emptyList()
 	private val filteredItems: MutableList<PeriodElement> = originalItems.toMutableList()
 	private val filter = ItemFilter()
@@ -32,6 +35,12 @@ open class GridViewDatabaseItemAdapter(context: Context)
 
 	override fun getItem(position: Int): String {
 		return timetableDatabaseInterface?.getShortName(filteredItems[position].id, type) ?: ""
+	}
+
+	override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+		val view = convertView ?: inflater.inflate(R.layout.item_gridview, parent, false)
+		Holder(view.findViewById(R.id.textView)).textView.text = getItem(position)
+		return view
 	}
 
 	fun itemAt(position: Int): PeriodElement {
@@ -70,4 +79,8 @@ open class GridViewDatabaseItemAdapter(context: Context)
 			return results
 		}
 	}
+
+	private data class Holder(
+			var textView: TextView
+	)
 }
