@@ -1,5 +1,6 @@
 package com.sapuseven.untis.adapters.infocenter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,8 @@ import com.sapuseven.untis.models.untis.UntisDate
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class AbsenceAdapter(
@@ -26,6 +29,7 @@ class AbsenceAdapter(
 
 	override fun getItemCount() = absenceList.size
 
+	@SuppressLint("SetTextI18n")
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 		val absence = absenceList[position]
 
@@ -33,7 +37,11 @@ class AbsenceAdapter(
 				UntisDate(absence.startDateTime).toDateTime().withZone(DateTimeZone.UTC),
 				UntisDate(absence.endDateTime).toDateTime().withZone(DateTimeZone.UTC)
 		)
-		holder.tvTitle.text = absence.absenceReason
+		holder.tvTitle.text =
+				if (absence.absenceReason.isNotEmpty())
+					absence.absenceReason.substring(0, 1).toUpperCase(Locale.getDefault()) + absence.absenceReason.substring(1)
+				else
+					context.getString(R.string.infocenter_absence_unknown_reason)
 
 		holder.ivExcused.setImageDrawable(
 				if (absence.excused)
