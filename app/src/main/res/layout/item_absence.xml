@@ -29,6 +29,19 @@
 		app:layout_constraintStart_toEndOf="@+id/imageview_itemabsence_excused"
 		app:layout_constraintTop_toBottomOf="@+id/textview_itemabsence_time" />
 
+	<TextView
+		android:id="@+id/textview_itemabsence_text"
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"
+		android:layout_marginStart="@dimen/margin_listitem_text"
+		android:textColor="?android:attr/textColorSecondary"
+		android:textSize="@dimen/textsize_listitem_line2"
+		android:visibility="gone"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toEndOf="@+id/imageview_itemabsence_excused"
+		app:layout_constraintTop_toBottomOf="@+id/textview_itemabsence_title" />
+
 	<androidx.appcompat.widget.AppCompatImageView
 		android:id="@+id/imageview_itemabsence_excused"
 		android:layout_width="@dimen/size_listitem_icon"

@@ -17,7 +17,6 @@ import org.joda.time.format.DateTimeFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-
 class AbsenceAdapter(
 		private val context: Context,
 		private val absenceList: List<UntisAbsence> = ArrayList()
@@ -43,6 +42,11 @@ class AbsenceAdapter(
 				else
 					context.getString(R.string.infocenter_absence_unknown_reason)
 
+		if (absence.text.isNotEmpty()) {
+			holder.tvText.visibility = View.VISIBLE
+			holder.tvText.text = absence.text
+		}
+
 		holder.ivExcused.setImageDrawable(
 				if (absence.excused)
 					context.getDrawable(R.drawable.infocenter_absences_excused)
@@ -67,6 +71,7 @@ class AbsenceAdapter(
 	class ViewHolder(rootView: View) : RecyclerView.ViewHolder(rootView) {
 		val tvTime: TextView = rootView.findViewById(R.id.textview_itemabsence_time)
 		val tvTitle: TextView = rootView.findViewById(R.id.textview_itemabsence_title)
+		val tvText: TextView = rootView.findViewById(R.id.textview_itemabsence_text)
 		val ivExcused: AppCompatImageView = rootView.findViewById(R.id.imageview_itemabsence_excused)
 	}
 }
