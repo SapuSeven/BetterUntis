@@ -126,7 +126,7 @@ class ElementPickerDialog : DialogFragment() {
 		}
 
 		if (config?.hideTypeSelection == true)
-			root.findViewById<ConstraintLayout>(R.id.constraintlayout_elementpicker_typeselect).visibility = View.GONE
+			root.findViewById<LinearLayout>(R.id.linearlayout_elementpicker_typeselect).visibility = View.GONE
 
 		searchField = root.findViewById(R.id.textinputedittext_elementpicker_search)
 		searchField.addTextChangedListener(object : TextWatcher {
