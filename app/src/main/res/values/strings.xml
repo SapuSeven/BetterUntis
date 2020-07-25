@@ -127,6 +127,7 @@
 	<string name="infocenter_officehours_empty">No office hours</string>
 	<string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
 	<string name="infocenter_timeformat_sameday">%2$s - %4$s, %1$s</string>
+	<string name="infocenter_absence_unknown_reason">Unknown reason</string>
 	<string name="elementpicker_hint_search">Search…</string>
 	<string name="elementpicker_hint_search_classes">Search for classes…</string>
 	<string name="elementpicker_hint_search_rooms">Search for rooms…</string>
