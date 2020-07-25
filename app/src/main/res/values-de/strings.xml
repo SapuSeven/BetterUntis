@@ -33,6 +33,7 @@
     <string name="activity_title_errors">Fehler</string>
     <string name="activity_title_free_rooms">Freie Räume</string>
     <string name="activity_title_info_center">Info-Center</string>
+    <string name="activity_title_messenger">Messenger</string>
     <string name="activity_title_settings">Einstellungen</string>
     <string name="errors_github_attach_file_message">Bitte füge die komprimierten Log-Dateien als Anhang hinzu.
 \nDiese wurden hier gespeichert: `%1$s`</string>
@@ -114,6 +115,7 @@
     <string name="infocenter_events_empty">Keine Termine</string>
     <string name="infocenter_absences_empty">Keine Abwesenheiten</string>
     <string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
+    <string name="infocenter_absence_unknown_reason">Unbekannter Grund</string>
     <string name="elementpicker_hint_search">Suchen…</string>
     <string name="elementpicker_hint_search_classes">Klassen durchsuchen…</string>
     <string name="elementpicker_hint_search_teachers">Lehrer durchsuchen…</string>
