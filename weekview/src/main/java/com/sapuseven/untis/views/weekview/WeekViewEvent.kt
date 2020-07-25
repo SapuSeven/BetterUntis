@@ -13,7 +13,8 @@ open class WeekViewEvent<T>(
 		var endTime: DateTime,
 		var color: Int = 0,
 		var pastColor: Int = 0,
-		var data: T? = null
+		var data: T? = null,
+		var hasIndicator: Boolean = false
 ) : WeekViewDisplayable<T>, Comparable<WeekViewEvent<*>> {
 	companion object {
 		private val DEFAULT_COLOR = Color.parseColor("#9fc6e7") // TODO: Different default color, but this is good for testing

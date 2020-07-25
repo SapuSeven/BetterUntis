@@ -70,6 +70,7 @@ internal constructor(var event: WeekViewEvent<T>, var originalEvent: WeekViewEve
 		val topPaint = config.drawConfig.eventTopPaint
 		val titlePaint = config.drawConfig.eventTextPaint
 		val bottomPaint = config.drawConfig.eventBottomPaint
+		val indicatorRadius = topPaint.textSize / 4f
 
 		val eventTop = restoreSpanned(event.top, TextUtils.ellipsize(event.top, topPaint, availableWidth.toFloat(), TextUtils.TruncateAt.END))
 		val eventTitle = restoreSpanned(event.title, TextUtils.ellipsize(event.title, titlePaint, availableWidth.toFloat(), TextUtils.TruncateAt.END))
@@ -86,6 +87,7 @@ internal constructor(var event: WeekViewEvent<T>, var originalEvent: WeekViewEve
 			canvas.drawSpannableString(eventBottom, availableWidth.toFloat(), availableHeight.toFloat(), bottomPaint)
 		}
 
+		if (event.hasIndicator) canvas.drawCircle(availableWidth - indicatorRadius, -(topPaint.ascent() + topPaint.descent()) - indicatorRadius, indicatorRadius, topPaint)
 		canvas.drawText(eventTitle.toString(), availableWidth / 2.0f, availableHeight / 2.0f - (titlePaint.descent() + titlePaint.ascent()) / 2, titlePaint)
 		canvas.restore()
 	}
