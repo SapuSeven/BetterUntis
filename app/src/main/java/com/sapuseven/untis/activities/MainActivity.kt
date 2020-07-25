@@ -240,7 +240,7 @@ class MainActivity :
 		navigationview_main.setNavigationItemSelectedListener(this)
 		navigationview_main.setCheckedItem(R.id.nav_show_personal)
 
-		setupNavDrawerHeader(navigationview_main)
+		updateNavDrawer(navigationview_main)
 
 		val header = navigationview_main.getHeaderView(0)
 		val dropdown = header.findViewById<ConstraintLayout>(R.id.constraintlayout_mainactivitydrawer_dropdown)
@@ -268,13 +268,15 @@ class MainActivity :
 		}
 	}
 
-	private fun setupNavDrawerHeader(navigationView: NavigationView) {
+	private fun updateNavDrawer(navigationView: NavigationView) {
 		val line1 = if (profileUser.anonymous) getString(R.string.all_anonymous) else profileUser.userData.displayName
 		val line2 = profileUser.userData.schoolName
 		(navigationView.getHeaderView(0).findViewById<View>(R.id.textview_mainactivtydrawer_line1) as TextView).text =
 				if (line1.isBlank()) getString(R.string.app_name) else line1
 		(navigationView.getHeaderView(0).findViewById<View>(R.id.textview_mainactivitydrawer_line2) as TextView).text =
 				if (line2.isBlank()) getString(R.string.all_contact_email) else line2
+
+		navigationView.menu.findItem(R.id.nav_messenger).isVisible = false
 	}
 
 	private fun toggleProfileDropdown(dropdownView: ViewGroup, dropdownImage: ImageView, dropdownList: RecyclerView) {
@@ -309,7 +311,7 @@ class MainActivity :
 		preferences.reload(profileId)
 		if (!loadProfile()) finish() // TODO: Show error
 		else {
-			setupNavDrawerHeader(findViewById(R.id.navigationview_main))
+			updateNavDrawer(findViewById(R.id.navigationview_main))
 
 			closeDrawer()
 			setupTimetableLoader()
@@ -767,6 +769,13 @@ class MainActivity :
 	}
 
 	override fun addTimetableItems(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
+		for (item in items) {
+			if (item.periodData.element.messengerChannel != null) {
+				navigationview_main.menu.findItem(R.id.nav_messenger).isVisible = true
+				break
+			}
+		}
+
 		weeklyTimetableItems[convertDateTimeToWeekIndex(startDate.toDateTime())]?.apply {
 			this.items = prepareItems(items).map { it.toWeekViewEvent() }
 			lastUpdated = timestamp
