@@ -1,6 +1,5 @@
 package com.sapuseven.untis.adapters.infocenter
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -28,7 +27,6 @@ class AbsenceAdapter(
 
 	override fun getItemCount() = absenceList.size
 
-	@SuppressLint("SetTextI18n")
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 		val absence = absenceList[position]
 
