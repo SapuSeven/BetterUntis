@@ -6,6 +6,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.RectF
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -94,6 +95,8 @@ class MainActivity :
 		private const val UNTIS_DEFAULT_COLOR = "#f49f25"
 
 		private const val PERSISTENT_INT_ZOOM_LEVEL = "persistent_zoom_level"
+
+		private const val MESSENGER_PACKAGE_NAME = "com.untis.chat"
 	}
 
 	private val userDatabase = UserDatabase.createInstance(this)
@@ -237,7 +240,7 @@ class MainActivity :
 		navigationview_main.setNavigationItemSelectedListener(this)
 		navigationview_main.setCheckedItem(R.id.nav_show_personal)
 
-		setupNavDrawerHeader(navigationview_main)
+		updateNavDrawer(navigationview_main)
 
 		val header = navigationview_main.getHeaderView(0)
 		val dropdown = header.findViewById<ConstraintLayout>(R.id.constraintlayout_mainactivitydrawer_dropdown)
@@ -265,13 +268,15 @@ class MainActivity :
 		}
 	}
 
-	private fun setupNavDrawerHeader(navigationView: NavigationView) {
+	private fun updateNavDrawer(navigationView: NavigationView) {
 		val line1 = if (profileUser.anonymous) getString(R.string.all_anonymous) else profileUser.userData.displayName
 		val line2 = profileUser.userData.schoolName
 		(navigationView.getHeaderView(0).findViewById<View>(R.id.textview_mainactivtydrawer_line1) as TextView).text =
 				if (line1.isBlank()) getString(R.string.app_name) else line1
 		(navigationView.getHeaderView(0).findViewById<View>(R.id.textview_mainactivitydrawer_line2) as TextView).text =
 				if (line2.isBlank()) getString(R.string.all_contact_email) else line2
+
+		navigationView.menu.findItem(R.id.nav_messenger).isVisible = false
 	}
 
 	private fun toggleProfileDropdown(dropdownView: ViewGroup, dropdownImage: ImageView, dropdownList: RecyclerView) {
@@ -306,7 +311,7 @@ class MainActivity :
 		preferences.reload(profileId)
 		if (!loadProfile()) finish() // TODO: Show error
 		else {
-			setupNavDrawerHeader(findViewById(R.id.navigationview_main))
+			updateNavDrawer(findViewById(R.id.navigationview_main))
 
 			closeDrawer()
 			setupTimetableLoader()
@@ -611,6 +616,17 @@ class MainActivity :
 				i.putExtra(InfoCenterActivity.EXTRA_LONG_PROFILE_ID, profileId)
 				startActivityForResult(i, REQUEST_CODE_ROOM_FINDER)
 			}
+			R.id.nav_messenger -> {
+				try {
+					startActivity(packageManager.getLaunchIntentForPackage(MESSENGER_PACKAGE_NAME))
+				} catch (e: Exception) {
+					try {
+						startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$MESSENGER_PACKAGE_NAME")))
+					} catch (e: Exception) {
+						startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$MESSENGER_PACKAGE_NAME")))
+					}
+				}
+			}
 			R.id.nav_free_rooms -> {
 				val i = Intent(this@MainActivity, RoomFinderActivity::class.java)
 				i.putExtra(RoomFinderActivity.EXTRA_LONG_PROFILE_ID, profileId)
@@ -753,6 +769,13 @@ class MainActivity :
 	}
 
 	override fun addTimetableItems(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
+		for (item in items) {
+			if (item.periodData.element.messengerChannel != null) {
+				navigationview_main.menu.findItem(R.id.nav_messenger).isVisible = true
+				break
+			}
+		}
+
 		weeklyTimetableItems[convertDateTimeToWeekIndex(startDate.toDateTime())]?.apply {
 			this.items = prepareItems(items).map { it.toWeekViewEvent() }
 			lastUpdated = timestamp

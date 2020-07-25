@@ -36,6 +36,7 @@
 	<string name="activity_title_errors">Errors</string>
 	<string name="activity_title_free_rooms">Free Rooms</string>
 	<string name="activity_title_info_center">Info Center</string>
+	<string name="activity_title_messenger">Messenger</string>
 	<string name="activity_title_settings">Settings</string>
 
 	<string name="errors_github_attach_file_message">Please attach the compressed log files to this issue.\nThey have been saved to `%1$s`</string>
