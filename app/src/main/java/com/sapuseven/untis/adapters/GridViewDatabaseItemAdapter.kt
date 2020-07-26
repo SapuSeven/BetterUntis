@@ -25,7 +25,7 @@ open class GridViewDatabaseItemAdapter(context: Context)
 		field = value
 		originalItems = timetableDatabaseInterface?.getElements(type) ?: emptyList()
 		filteredItems.clear()
-		filteredItems.addAll(originalItems)
+		filteredItems.addAll(moveAllowedToFront(originalItems))
 	}
 
 	override fun getFilter(): Filter {
@@ -50,6 +50,19 @@ open class GridViewDatabaseItemAdapter(context: Context)
 
 	fun itemAt(position: Int): PeriodElement {
 		return filteredItems[position]
+	}
+
+	private fun moveAllowedToFront(items: List<PeriodElement>): List<PeriodElement> {
+		val enabledItems: MutableList<PeriodElement> = mutableListOf()
+		val disabledItems: MutableList<PeriodElement> = mutableListOf()
+		for (item in items) {
+			if (timetableDatabaseInterface?.isAllowed(item.id, type) == true) {
+				enabledItems.add(item)
+			} else {
+				disabledItems.add(item)
+			}
+		}
+		return enabledItems + disabledItems
 	}
 
 	private inner class ItemFilter : Filter() {
