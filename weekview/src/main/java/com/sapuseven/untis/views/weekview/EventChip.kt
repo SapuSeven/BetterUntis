@@ -87,7 +87,7 @@ internal constructor(var event: WeekViewEvent<T>, var originalEvent: WeekViewEve
 			canvas.drawSpannableString(eventBottom, availableWidth.toFloat(), availableHeight.toFloat(), bottomPaint)
 		}
 
-		if (event.hasIndicator) canvas.drawCircle(availableWidth - indicatorRadius, -(topPaint.ascent() + topPaint.descent()) - indicatorRadius, indicatorRadius, topPaint)
+		if (event.hasIndicator) canvas.drawCircle(availableWidth - indicatorRadius, -(topPaint.ascent() + topPaint.descent()) - indicatorRadius * 2, indicatorRadius, topPaint)
 		canvas.drawText(eventTitle.toString(), availableWidth / 2.0f, availableHeight / 2.0f - (titlePaint.descent() + titlePaint.ascent()) / 2, titlePaint)
 		canvas.restore()
 	}
