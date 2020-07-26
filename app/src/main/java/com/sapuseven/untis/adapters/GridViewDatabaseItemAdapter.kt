@@ -4,7 +4,10 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.Filter
+import android.widget.Filterable
+import android.widget.TextView
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
@@ -39,7 +42,9 @@ open class GridViewDatabaseItemAdapter(context: Context)
 
 	override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
 		val view = convertView ?: inflater.inflate(R.layout.item_gridview, parent, false)
-		Holder(view.findViewById(R.id.textView)).textView.text = getItem(position)
+		val textView = Holder(view.findViewById(R.id.textView)).textView
+		textView.text = getItem(position)
+		textView.isEnabled = timetableDatabaseInterface?.isAllowed(filteredItems[position].id, type) ?: false
 		return view
 	}
 
