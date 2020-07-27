@@ -295,6 +295,23 @@
 	<string name="library_swiperefreshlayout" translatable="false">Android Support Library Custom View</string>
 	<string name="library_weekview" translatable="false">WeekView</string>
 
+	<string name="tutorial_welcome_title">Welcome to BetterUntis</string>
+	<string name="tutorial_welcome_message">Take the tutorial to learn how to use the app.</string>
+	<string name="tutorial_timetable_title">Your Timetable</string>
+	<string name="tutorial_timetable_message">Here you can see your personal timetable. Use the calendar icon in the top-left corner to quickly jump to a date or long-press it to return to the present day.</string>
+	<string name="tutorial_timetable_item_title">Your Lessons</string>
+	<string name="tutorial_timetable_item_message">Every element represents a lesson with its name, teacher, and room at a glance. A white dot in the top-right corner signalizes that there is additional information available like homework or substitution texts. Tap the element to display a dialog with all the information you need in one place.</string>
+	<string name="tutorial_timetable_picker_title">Choosing a Different Timetable</string>
+	<string name="tutorial_timetable_picker_message">You can choose another timetable from the sidebar. Simply click on the category and select the one you want to view.</string>
+	<string name="tutorial_info_center_title">The Info Center</string>
+	<string name="tutorial_info_center_message">In the info center, you can find everything at a glance. Go there if you want to see your daily messages, office hours, upcoming events, or absences.</string>
+	<string name="tutorial_free_rooms_title">Free Rooms</string>
+	<string name="tutorial_free_rooms_message">Finally, there is the free rooms feature. Go there if you want to know which rooms are free.</string>
+	<string name="tutorial_finish_title">The End</string>
+	<string name="tutorial_finish_message">Now you should know everything you need to use the app. Have fun.</string>
+	<string name="tutorial_next">Next</string>
+	<string name="tutorial_skip">Skip Tutorial</string>
+
 	<plurals name="main_time_diff_minutes">
 		<item quantity="one">a minute ago</item>
 		<item quantity="other">%d minutes ago</item>
