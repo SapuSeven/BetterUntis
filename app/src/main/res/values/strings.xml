@@ -311,6 +311,7 @@
 	<string name="tutorial_finish_message">Now you should know everything you need to use the app. Have fun.</string>
 	<string name="tutorial_prev">Previous</string>
 	<string name="tutorial_next">Next</string>
+	<string name="tutorial_finish">Finish</string>
 	<string name="tutorial_skip">Skip Tutorial</string>
 
 	<plurals name="main_time_diff_minutes">

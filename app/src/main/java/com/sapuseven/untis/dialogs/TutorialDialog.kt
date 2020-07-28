@@ -3,6 +3,7 @@ package com.sapuseven.untis.dialogs
 import android.content.Context
 import android.content.SharedPreferences
 import android.view.Gravity
+import android.view.Menu
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -11,8 +12,12 @@ import com.sapuseven.untis.R
 class TutorialDialog(
         private val context: Context,
         private val prefs: SharedPreferences,
-        private val drawer: DrawerLayout
+        private val drawer: DrawerLayout,
+        menu: Menu
 ) {
+
+    private val infoCenter = menu.findItem(R.id.nav_infocenter)
+    private val freeRooms = menu.findItem(R.id.nav_free_rooms)
 
     fun show(type: Byte = DIALOG_WELCOME, gravity: Int = Gravity.CENTER, dim: Float = 0.32f) {
 
@@ -22,8 +27,8 @@ class TutorialDialog(
                 builder.setTitle(context.getString(R.string.tutorial_welcome_title))
                 builder.setMessage(context.getString(R.string.tutorial_welcome_message))
                 builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
-                            show(DIALOG_TIMETABLE, Gravity.BOTTOM, 0f)
-                        }
+                    show(DIALOG_TIMETABLE, Gravity.BOTTOM, 0f)
+                }
             }
             DIALOG_TIMETABLE -> {
                 builder.setTitle(context.getString(R.string.tutorial_timetable_title))
@@ -55,6 +60,7 @@ class TutorialDialog(
                 }
                 builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
                     show(DIALOG_INFO_CENTER, Gravity.TOP, 0f)
+                    infoCenter.isChecked = true
                 }
             }
             DIALOG_INFO_CENTER -> {
@@ -62,9 +68,12 @@ class TutorialDialog(
                 builder.setMessage(context.getString(R.string.tutorial_info_center_message))
                 builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
                     show(DIALOG_TIMETABLE_PICKER, Gravity.BOTTOM, 0f)
+                    infoCenter.isChecked = false
                 }
                 builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
                     show(DIALOG_FREE_ROOMS, Gravity.TOP, 0f)
+                    infoCenter.isChecked = false
+                    freeRooms.isChecked = true
                 }
             }
             DIALOG_FREE_ROOMS -> {
@@ -72,10 +81,13 @@ class TutorialDialog(
                 builder.setMessage(context.getString(R.string.tutorial_free_rooms_message))
                 builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
                     show(DIALOG_INFO_CENTER, Gravity.TOP, 0f)
+                    freeRooms.isChecked = false
+                    infoCenter.isChecked = true
                 }
                 builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
                     show(DIALOG_FINISH)
                     drawer.closeDrawer(GravityCompat.START)
+                    freeRooms.isChecked = false
                 }
             }
             DIALOG_FINISH -> {
@@ -84,8 +96,9 @@ class TutorialDialog(
                 builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
                     show(DIALOG_FREE_ROOMS, Gravity.TOP, 0f)
                     drawer.openDrawer(GravityCompat.START)
+                    freeRooms.isChecked = true
                 }
-                builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
+                builder.setPositiveButton(context.getString(R.string.tutorial_finish)) { _, _ ->
                     finishTutorial()
                 }
             }
@@ -104,6 +117,8 @@ class TutorialDialog(
     }
 
     private fun finishTutorial() {
+        infoCenter.isChecked = false
+        freeRooms.isChecked = false
         prefs.edit().putBoolean("preference_has_finished_tutorial", true).apply()
     }
 
