@@ -28,6 +28,9 @@ class TutorialDialog(
             DIALOG_TIMETABLE -> {
                 builder.setTitle(context.getString(R.string.tutorial_timetable_title))
                 builder.setMessage(context.getString(R.string.tutorial_timetable_message))
+                builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
+                    show(DIALOG_WELCOME)
+                }
                 builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
                     show(DIALOG_TIMETABLE_ITEM, Gravity.BOTTOM, 0f)
                 }
@@ -35,6 +38,9 @@ class TutorialDialog(
             DIALOG_TIMETABLE_ITEM -> {
                 builder.setTitle(context.getString(R.string.tutorial_timetable_item_title))
                 builder.setMessage(context.getString(R.string.tutorial_timetable_item_message))
+                builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
+                    show(DIALOG_TIMETABLE, Gravity.BOTTOM, 0f)
+                }
                 builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
                     show(DIALOG_TIMETABLE_PICKER, Gravity.BOTTOM, 0f)
                     drawer.openDrawer(GravityCompat.START)
@@ -43,38 +49,52 @@ class TutorialDialog(
             DIALOG_TIMETABLE_PICKER -> {
                 builder.setTitle(context.getString(R.string.tutorial_timetable_picker_title))
                 builder.setMessage(context.getString(R.string.tutorial_timetable_picker_message))
+                builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
+                    show(DIALOG_TIMETABLE_ITEM, Gravity.BOTTOM, 0f)
+                    drawer.closeDrawer(GravityCompat.START)
+                }
                 builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
-                            show(DIALOG_INFO_CENTER, Gravity.TOP, 0f)
-                        }
+                    show(DIALOG_INFO_CENTER, Gravity.TOP, 0f)
+                }
             }
             DIALOG_INFO_CENTER -> {
                 builder.setTitle(context.getString(R.string.tutorial_info_center_title))
                 builder.setMessage(context.getString(R.string.tutorial_info_center_message))
+                builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
+                    show(DIALOG_TIMETABLE_PICKER, Gravity.BOTTOM, 0f)
+                }
                 builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
-                            show(DIALOG_FREE_ROOMS, Gravity.TOP, 0f)
-                        }
+                    show(DIALOG_FREE_ROOMS, Gravity.TOP, 0f)
+                }
             }
             DIALOG_FREE_ROOMS -> {
                 builder.setTitle(context.getString(R.string.tutorial_free_rooms_title))
                 builder.setMessage(context.getString(R.string.tutorial_free_rooms_message))
+                builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
+                    show(DIALOG_INFO_CENTER, Gravity.TOP, 0f)
+                }
                 builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
-                            show(DIALOG_FINISH)
-                            drawer.closeDrawer(GravityCompat.START)
-                        }
+                    show(DIALOG_FINISH)
+                    drawer.closeDrawer(GravityCompat.START)
+                }
             }
             DIALOG_FINISH -> {
                 builder.setTitle(context.getString(R.string.tutorial_finish_title))
                 builder.setMessage(context.getString(R.string.tutorial_finish_message))
+                builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
+                    show(DIALOG_FREE_ROOMS, Gravity.TOP, 0f)
+                    drawer.openDrawer(GravityCompat.START)
+                }
                 builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
-                            finishTutorial()
-                        }
+                    finishTutorial()
+                }
             }
         }
 
         builder.setCancelable(false)
         builder.setNeutralButton(context.getString(R.string.tutorial_skip)){ _, _ ->
-                    finishTutorial()
-                }
+            finishTutorial()
+        }
 
         val dialog = builder.create()
         val window = dialog.window

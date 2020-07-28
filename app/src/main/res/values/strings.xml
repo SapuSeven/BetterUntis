@@ -309,6 +309,7 @@
 	<string name="tutorial_free_rooms_message">Finally, there is the free rooms feature. Go there if you want to know which rooms are free.</string>
 	<string name="tutorial_finish_title">The End</string>
 	<string name="tutorial_finish_message">Now you should know everything you need to use the app. Have fun.</string>
+	<string name="tutorial_prev">Previous</string>
 	<string name="tutorial_next">Next</string>
 	<string name="tutorial_skip">Skip Tutorial</string>
 
