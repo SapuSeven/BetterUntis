@@ -296,7 +296,7 @@
 	<string name="library_weekview" translatable="false">WeekView</string>
 
 	<string name="tutorial_welcome_title">Welcome to BetterUntis</string>
-	<string name="tutorial_welcome_message">Take the tutorial to learn how to use the app.</string>
+	<string name="tutorial_welcome_message">The following tutorial will show you everything you need to know to use the app. Tap next to continue.</string>
 	<string name="tutorial_timetable_title">Your Timetable</string>
 	<string name="tutorial_timetable_message">Here you can see your personal timetable. Use the calendar icon in the top-left corner to quickly jump to a date or long-press it to return to the present day.</string>
 	<string name="tutorial_timetable_item_title">Your Lessons</string>
@@ -307,7 +307,7 @@
 	<string name="tutorial_info_center_message">In the info center, you can find everything at a glance. Go there if you want to see your daily messages, office hours, upcoming events, or absences.</string>
 	<string name="tutorial_free_rooms_title">Free Rooms</string>
 	<string name="tutorial_free_rooms_message">Finally, there is the free rooms feature. Go there if you want to know which rooms are free.</string>
-	<string name="tutorial_finish_title">The End</string>
+	<string name="tutorial_finish_title">Finished Tutorial</string>
 	<string name="tutorial_finish_message">Now you should know everything you need to use the app. Have fun.</string>
 	<string name="tutorial_prev">Previous</string>
 	<string name="tutorial_next">Next</string>
