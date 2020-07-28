@@ -62,10 +62,10 @@ class TutorialDialog(
                 }
                 builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
                     show(DIALOG_INFO_CENTER, Gravity.TOP, 0f)
-                    infoCenter.isChecked = true
                 }
             }
             DIALOG_INFO_CENTER -> {
+                infoCenter.isChecked = true
                 builder.setTitle(context.getString(R.string.tutorial_info_center_title))
                 builder.setMessage(context.getString(R.string.tutorial_info_center_message))
                 builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
@@ -75,16 +75,15 @@ class TutorialDialog(
                 builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
                     show(DIALOG_FREE_ROOMS, Gravity.TOP, 0f)
                     infoCenter.isChecked = false
-                    freeRooms.isChecked = true
                 }
             }
             DIALOG_FREE_ROOMS -> {
+                freeRooms.isChecked = true
                 builder.setTitle(context.getString(R.string.tutorial_free_rooms_title))
                 builder.setMessage(context.getString(R.string.tutorial_free_rooms_message))
                 builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
                     show(DIALOG_INFO_CENTER, Gravity.TOP, 0f)
                     freeRooms.isChecked = false
-                    infoCenter.isChecked = true
                 }
                 builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
                     show(DIALOG_FINISH)
@@ -98,7 +97,6 @@ class TutorialDialog(
                 builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
                     show(DIALOG_FREE_ROOMS, Gravity.TOP, 0f)
                     drawer.openDrawer(GravityCompat.START)
-                    freeRooms.isChecked = true
                 }
                 builder.setPositiveButton(context.getString(R.string.tutorial_finish)) { _, _ ->
                     finishTutorial()
