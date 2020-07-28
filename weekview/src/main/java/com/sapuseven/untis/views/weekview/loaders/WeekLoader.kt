@@ -14,7 +14,7 @@ import java.util.*
  * [WeekViewEvent].
  */
 class WeekLoader<T> internal constructor(private var onWeekChangeListener: WeekViewLoader.PeriodChangeListener<T>) : WeekViewLoader<T> {
-	override fun toWeekViewPeriodIndex(instance: DateTime) = instance.millis / MILLIS_PER_WEEK + 1
+	override fun toWeekViewPeriodIndex(instance: DateTime): Long = instance.millis / MILLIS_PER_WEEK + 1
 
 	override fun onLoad(periodIndex: Int): List<WeekViewEvent<T>> {
 		val millis = periodIndex * MILLIS_PER_WEEK.toLong()

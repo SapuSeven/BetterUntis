@@ -390,7 +390,7 @@ class WeekView<T>(
 	/**
 	 * Show today on the week view.
 	 */
-	fun goToToday() = goToDate(DateTime.now())
+	fun goToToday(): Unit = goToDate(DateTime.now())
 
 	/**
 	 * Show a specific day on the week view.
