@@ -313,6 +313,7 @@
 	<string name="tutorial_next">Next</string>
 	<string name="tutorial_finish">Finish</string>
 	<string name="tutorial_skip">Skip Tutorial</string>
+	<string name="tutorial_tap_outside">You cannot interact with the underlying app while in the tutorial.</string>
 
 	<plurals name="main_time_diff_minutes">
 		<item quantity="one">a minute ago</item>

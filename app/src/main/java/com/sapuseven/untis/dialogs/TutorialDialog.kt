@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.view.Gravity
 import android.view.Menu
+import android.view.MotionEvent
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -113,6 +115,14 @@ class TutorialDialog(
         val window = dialog.window
         window?.setDimAmount(dim)
         window?.attributes?.gravity = gravity
+        window?.decorView?.setOnTouchListener { view, motionEvent ->
+            if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+                val toast = Toast.makeText(context, R.string.tutorial_tap_outside, Toast.LENGTH_SHORT)
+                toast.setGravity(Gravity.CENTER, 0, 0)
+                toast.show()
+            }
+            view.performClick()
+        }
         dialog.show()
     }
 
