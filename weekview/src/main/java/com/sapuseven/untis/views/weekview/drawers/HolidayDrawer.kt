@@ -12,12 +12,12 @@ class HolidayDrawer(private val config: WeekViewConfig) : BaseDrawer {
 
 	override fun draw(drawingContext: DrawingContext, canvas: Canvas) {
 		val text = mutableListOf<String>()
-		drawingContext.freeDays.forEach { day ->
+		drawingContext.freeDays.forEach { (first, second) ->
 			holidayChips.forEach {
-				if (it.isOnDay(day.first))
+				if (it.isOnDay(first))
 					text.add(it.text)
 			}
-			drawHoliday(text.joinToString(" / "), day.second, canvas)
+			drawHoliday(text.joinToString(" / "), second, canvas)
 			text.clear()
 		}
 	}

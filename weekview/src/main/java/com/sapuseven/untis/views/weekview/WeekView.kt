@@ -489,7 +489,7 @@ class WeekView<T>(
 			this.numberOfVisibleDays = numberOfVisibleDays
 		}
 
-		private constructor(`in`: Parcel) : super(`in`) {
+		internal constructor(`in`: Parcel) : super(`in`) {
 			numberOfVisibleDays = `in`.readInt()
 		}
 
