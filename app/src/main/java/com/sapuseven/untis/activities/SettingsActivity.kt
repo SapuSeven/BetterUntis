@@ -350,7 +350,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 								// positive button not used
 							}
 						}
-				).show(fragmentManager!!, "elementPicker")
+				).show(requireFragmentManager(), "elementPicker")
 			}
 
 			return true
