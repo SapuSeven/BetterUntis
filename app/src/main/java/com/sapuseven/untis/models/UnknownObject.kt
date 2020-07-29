@@ -2,7 +2,6 @@ package com.sapuseven.untis.models
 
 import com.sapuseven.untis.helpers.ErrorLogger
 import kotlinx.serialization.*
-import kotlinx.serialization.internal.StringDescriptor
 import kotlinx.serialization.json.JsonInput
 
 @Serializable
