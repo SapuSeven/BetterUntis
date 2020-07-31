@@ -233,7 +233,7 @@ class LoginDataInputActivity : BaseActivity() {
 				else
 					return it.schools[0].schoolId.toString()
 			} ?: run {
-				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code, untisResponse.error?.message.orEmpty()))
+				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code, untisResponse.error?.message))
 			}
 		}, { error ->
 			stopLoadingAndShowError(getString(R.string.logindatainput_error_generic, error.message))
@@ -267,7 +267,7 @@ class LoginDataInputActivity : BaseActivity() {
 			if (untisResponse.error?.code == ErrorMessageDictionary.ERROR_CODE_INVALID_CREDENTIALS)
 				return edittext_logindatainput_key?.text.toString()
 			if (untisResponse.result.isNullOrEmpty())
-				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code))
+				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code, untisResponse.error?.message))
 			else
 				return untisResponse.result
 		}, { error ->
@@ -307,7 +307,7 @@ class LoginDataInputActivity : BaseActivity() {
 			if (untisResponse.result != null) {
 				return untisResponse.result
 			} else {
-				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code))
+				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code, untisResponse.error?.message))
 			}
 
 			setElementsEnabled(true)
