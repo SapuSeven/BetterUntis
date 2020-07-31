@@ -123,7 +123,8 @@ class LoginDataInputActivity : BaseActivity() {
 		}
 
 		if (switch_logindatainput_advanced.isChecked) {
-			if (!Patterns.WEB_URL.matcher(edittext_logindatainput_api_url.text.toString()).matches()) {
+			if (!edittext_logindatainput_api_url.text.isNullOrBlank()
+					&& !Patterns.WEB_URL.matcher(edittext_logindatainput_api_url.text.toString()).matches()) {
 				edittext_logindatainput_api_url.error = getString(R.string.logindatainput_error_invalid_url)
 				return edittext_logindatainput_api_url
 			}
@@ -400,7 +401,8 @@ class LoginDataInputActivity : BaseActivity() {
 	private fun getProxyHost(): String? = if (switch_logindatainput_advanced.isChecked) edittext_logindatainput_proxy_host?.text.toString() else null
 
 	private fun getApiUrl(): String? {
-		return if (switch_logindatainput_advanced.isChecked) edittext_logindatainput_api_url?.text.toString()
+		return if (switch_logindatainput_advanced.isChecked && !edittext_logindatainput_api_url.text.isNullOrBlank())
+			edittext_logindatainput_api_url?.text.toString()
 		else schoolInfo?.let {
 			if (it.useMobileServiceUrlAndroid) it.mobileServiceUrl else null
 		}
