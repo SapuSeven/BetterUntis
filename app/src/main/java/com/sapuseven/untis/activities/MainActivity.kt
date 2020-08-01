@@ -10,9 +10,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -487,6 +485,8 @@ class MainActivity :
 		val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.main_drawer_open, R.string.main_drawer_close)
 		drawer_layout.addDrawerListener(toggle)
 		toggle.syncState()
+		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+		window.statusBarColor = Color.TRANSPARENT
 	}
 
 	private fun prepareItems(items: List<TimegridItem>): List<TimegridItem> {
@@ -585,7 +585,7 @@ class MainActivity :
 				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor.darken(0.25f) else examPastColor
 				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor.darken(0.25f) else cancelledPastColor
 				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(0.25f) else irregularPastColor
-				useTheme -> getAttr(R.attr.colorPrimaryDark)
+				useTheme -> if (currentTheme == "pixel") getAttr(R.attr.colorPrimary).darken(0.25f) else getAttr(R.attr.colorPrimaryDark)
 				else -> if (useDefault.contains("regular")) defaultColor.darken(0.25f) else regularPastColor
 			}
 		}
