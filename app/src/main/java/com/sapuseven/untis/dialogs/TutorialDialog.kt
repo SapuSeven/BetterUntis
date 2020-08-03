@@ -3,8 +3,10 @@ package com.sapuseven.untis.dialogs
 import android.content.Context
 import android.content.SharedPreferences
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MotionEvent
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GravityCompat
@@ -20,21 +22,30 @@ class TutorialDialog(
 
     private val infoCenter = menu.findItem(R.id.nav_infocenter)
     private val freeRooms = menu.findItem(R.id.nav_free_rooms)
+    private val inflater = LayoutInflater.from(context)
+    private val nullParent = null
 
     fun show(type: Byte = DIALOG_WELCOME, gravity: Int = Gravity.CENTER, dim: Float = 0.32f) {
 
         val builder = AlertDialog.Builder(context)
+        val layout = inflater.inflate(R.layout.dialog_tutorial, nullParent)
+        val title = layout.findViewById<TextView>(R.id.title)
+        val progress = layout.findViewById<TextView>(R.id.progress)
+        val message = layout.findViewById<TextView>(R.id.message)
+
         when (type) {
             DIALOG_WELCOME -> {
-                builder.setTitle(context.getString(R.string.tutorial_welcome_title))
-                builder.setMessage(context.getString(R.string.tutorial_welcome_message))
+                progress.text = "1/7"
+                title.text = context.getString(R.string.tutorial_welcome_title)
+                message.text = context.getString(R.string.tutorial_welcome_message)
                 builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
                     show(DIALOG_TIMETABLE, Gravity.BOTTOM, 0f)
                 }
             }
             DIALOG_TIMETABLE -> {
-                builder.setTitle(context.getString(R.string.tutorial_timetable_title))
-                builder.setMessage(context.getString(R.string.tutorial_timetable_message))
+                progress.text = "2/7"
+                title.text = context.getString(R.string.tutorial_timetable_title)
+                message.text = context.getString(R.string.tutorial_timetable_message)
                 builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
                     show(DIALOG_WELCOME)
                 }
@@ -43,8 +54,9 @@ class TutorialDialog(
                 }
             }
             DIALOG_TIMETABLE_ITEM -> {
-                builder.setTitle(context.getString(R.string.tutorial_timetable_item_title))
-                builder.setMessage(context.getString(R.string.tutorial_timetable_item_message))
+                progress.text = "3/7"
+                title.text = context.getString(R.string.tutorial_timetable_item_title)
+                message.text = context.getString(R.string.tutorial_timetable_item_message)
                 builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
                     show(DIALOG_TIMETABLE, Gravity.BOTTOM, 0f)
                 }
@@ -54,8 +66,9 @@ class TutorialDialog(
                 }
             }
             DIALOG_TIMETABLE_PICKER -> {
-                builder.setTitle(context.getString(R.string.tutorial_timetable_picker_title))
-                builder.setMessage(context.getString(R.string.tutorial_timetable_picker_message))
+                progress.text = "4/7"
+                title.text = context.getString(R.string.tutorial_timetable_picker_title)
+                message.text = context.getString(R.string.tutorial_timetable_picker_message)
                 builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
                     show(DIALOG_TIMETABLE_ITEM, Gravity.BOTTOM, 0f)
                     drawer.closeDrawer(GravityCompat.START)
@@ -66,8 +79,9 @@ class TutorialDialog(
             }
             DIALOG_INFO_CENTER -> {
                 infoCenter.isChecked = true
-                builder.setTitle(context.getString(R.string.tutorial_info_center_title))
-                builder.setMessage(context.getString(R.string.tutorial_info_center_message))
+                progress.text = "5/7"
+                title.text = context.getString(R.string.tutorial_info_center_title)
+                message.text = context.getString(R.string.tutorial_info_center_message)
                 builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
                     show(DIALOG_TIMETABLE_PICKER, Gravity.BOTTOM, 0f)
                     infoCenter.isChecked = false
@@ -79,8 +93,9 @@ class TutorialDialog(
             }
             DIALOG_FREE_ROOMS -> {
                 freeRooms.isChecked = true
-                builder.setTitle(context.getString(R.string.tutorial_free_rooms_title))
-                builder.setMessage(context.getString(R.string.tutorial_free_rooms_message))
+                progress.text = "6/7"
+                title.text = context.getString(R.string.tutorial_free_rooms_title)
+                message.text = context.getString(R.string.tutorial_free_rooms_message)
                 builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
                     show(DIALOG_INFO_CENTER, Gravity.TOP, 0f)
                     freeRooms.isChecked = false
@@ -92,8 +107,9 @@ class TutorialDialog(
                 }
             }
             DIALOG_FINISH -> {
-                builder.setTitle(context.getString(R.string.tutorial_finish_title))
-                builder.setMessage(context.getString(R.string.tutorial_finish_message))
+                progress.text = "7/7"
+                title.text = context.getString(R.string.tutorial_finish_title)
+                message.text = context.getString(R.string.tutorial_finish_message)
                 builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
                     show(DIALOG_FREE_ROOMS, Gravity.TOP, 0f)
                     drawer.openDrawer(GravityCompat.START)
@@ -108,6 +124,7 @@ class TutorialDialog(
         builder.setNeutralButton(context.getString(R.string.tutorial_skip)){ _, _ ->
             finishTutorial()
         }
+        builder.setView(layout)
 
         val dialog = builder.create()
         val window = dialog.window
