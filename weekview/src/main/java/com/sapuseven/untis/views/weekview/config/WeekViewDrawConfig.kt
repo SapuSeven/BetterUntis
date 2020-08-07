@@ -31,7 +31,7 @@ class WeekViewDrawConfig(context: Context) {
 	var headerSecondaryTextHeight: Float = 0.0f
 	var headerHeight: Float = 0.0f
 
-	var currentOrigin = PointF(0f, 0f)
+	var currentOrigin: PointF = PointF(0f, 0f)
 	val headerBackgroundPaint: Paint = Paint()
 	var widthPerDay: Float = 0.0f
 	val dayBackgroundPaint: Paint = Paint()
@@ -48,7 +48,7 @@ class WeekViewDrawConfig(context: Context) {
 	val eventTopPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 	val eventBottomPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 	val timeColumnBackgroundPaint: Paint = Paint()
-	var newHourHeight = -1
+	var newHourHeight: Int = -1
 	val dateTimeInterpreter: DateTimeInterpreter = buildDefaultDateTimeInterpreter(context)
 	val futureBackgroundPaint: Paint = Paint()
 	val pastBackgroundPaint: Paint = Paint()

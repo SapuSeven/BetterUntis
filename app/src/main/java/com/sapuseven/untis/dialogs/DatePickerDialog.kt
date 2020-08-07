@@ -14,10 +14,10 @@ class DatePickerDialog : DialogFragment() {
 			val year = it.getInt("year")
 			val month = it.getInt("month")
 			val day = it.getInt("day")
-			android.app.DatePickerDialog(context!!, dateSetListener, year, month - 1, day)
+			android.app.DatePickerDialog(requireContext(), dateSetListener, year, month - 1, day)
 		} ?: run {
 			val now = DateTime.now()
-			android.app.DatePickerDialog(context!!, dateSetListener, now.year, now.monthOfYear - 1, now.dayOfMonth)
+			android.app.DatePickerDialog(requireContext(), dateSetListener, now.year, now.monthOfYear - 1, now.dayOfMonth)
 		}
 		dialog.setButton(android.app.DatePickerDialog.BUTTON_NEUTRAL, getString(R.string.all_dialog_datepicker_button_today)) { _, _ ->
 			val dateTime = DateTime.now()
