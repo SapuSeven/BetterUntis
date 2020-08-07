@@ -3,7 +3,7 @@
 	<style name="AppTheme.ThemePixel">
 		<item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
 		<item name="colorPrimary">@color/colorPrimaryThemePixel</item>
-		<item name="colorPrimaryDark">@color/colorPrimaryDarkThemePixel</item>
+		<item name="colorPrimaryDark">@color/appBarColorThemePixel</item>
 		<item name="colorAccent">@color/colorAccentThemePixel</item>
 		<item name="colorSecondary">@color/colorAccentThemePixel</item>
 		<item name="android:statusBarColor">@color/appBarColorThemePixel</item>
