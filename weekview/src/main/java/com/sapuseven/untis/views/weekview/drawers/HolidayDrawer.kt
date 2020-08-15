@@ -8,16 +8,16 @@ import com.sapuseven.untis.views.weekview.HolidayChip
 import com.sapuseven.untis.views.weekview.config.WeekViewConfig
 
 class HolidayDrawer(private val config: WeekViewConfig) : BaseDrawer {
-	var holidayChips = emptyList<HolidayChip>()
+	var holidayChips: List<HolidayChip> = emptyList<HolidayChip>()
 
 	override fun draw(drawingContext: DrawingContext, canvas: Canvas) {
 		val text = mutableListOf<String>()
-		drawingContext.freeDays.forEach { day ->
+		drawingContext.freeDays.forEach { (first, second) ->
 			holidayChips.forEach {
-				if (it.isOnDay(day.first))
+				if (it.isOnDay(first))
 					text.add(it.text)
 			}
-			drawHoliday(text.joinToString(" / "), day.second, canvas)
+			drawHoliday(text.joinToString(" / "), second, canvas)
 			text.clear()
 		}
 	}
