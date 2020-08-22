@@ -13,7 +13,6 @@ import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.sapuseven.untis.R
-import com.sapuseven.untis.models.UntisAttachment
 import com.sapuseven.untis.models.UntisMessage
 
 class MessageAdapter(

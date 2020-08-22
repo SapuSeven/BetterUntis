@@ -13,7 +13,7 @@ data class HolidayChip(val text: String = "Test", val startDate: String, val end
 		val DATE_FORMAT: DateTimeFormatter = ISODateTimeFormat.date()
 	}
 
-	fun isOnDay(day: DateTime) = Interval(startDateTime, endDateTime.millisOfDay().withMaximumValue()).contains(day)
+	fun isOnDay(day: DateTime): Boolean = Interval(startDateTime, endDateTime.millisOfDay().withMaximumValue()).contains(day)
 
 	private fun parseDate(date: String) = DATE_FORMAT.parseDateTime(date)
 }

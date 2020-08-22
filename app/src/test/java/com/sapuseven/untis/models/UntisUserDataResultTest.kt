@@ -48,12 +48,12 @@ class UntisUserDataResultTest {
 		assertThat(userData.userData.schoolName, `is`("school-name"))
 		assertThat(userData.userData.departmentId, `is`(10))
 
-		assertThat(userData.settings.showAbsenceReason, `is`(true))
-		assertThat(userData.settings.showAbsenceText, `is`(false))
-		assertThat(userData.settings.absenceCheckRequired, `is`(true))
-		assertThat(userData.settings.defaultAbsenceReasonId, `is`(10))
-		assertThat(userData.settings.defaultLatenessReasonId, `is`(20))
-		assertThat(userData.settings.defaultAbsenceEndTime, `is`("startTime"))
-		assertThat(userData.settings.customAbsenceEndTime, `is`("endTime"))
+		assertThat(userData.settings?.showAbsenceReason, `is`(true))
+		assertThat(userData.settings?.showAbsenceText, `is`(false))
+		assertThat(userData.settings?.absenceCheckRequired, `is`(true))
+		assertThat(userData.settings?.defaultAbsenceReasonId, `is`(10))
+		assertThat(userData.settings?.defaultLatenessReasonId, `is`(20))
+		assertThat(userData.settings?.defaultAbsenceEndTime, `is`("startTime"))
+		assertThat(userData.settings?.customAbsenceEndTime, `is`("endTime"))
 	}
 }
