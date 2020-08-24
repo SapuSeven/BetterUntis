@@ -17,6 +17,11 @@
 				android:defaultValue="@bool/preference_fling_enable_default"
 				android:key="preference_fling_enable"
 				android:title="@string/preference_flinging_enable" />
+
+			<Preference
+				android:key="preference_tutorial"
+				android:summary="@string/preference_reset_tutorial_desc"
+				android:title="@string/preference_reset_tutorial" />
 		</PreferenceCategory>
 
 		<PreferenceCategory android:title="@string/preference_category_general_week_display">

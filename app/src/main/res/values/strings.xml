@@ -193,6 +193,8 @@
 	<string name="preference_notifications_visibility_hidden">Hidden</string>
 	<string name="preference_notifications_visibility_long">Long name</string>
 	<string name="preference_notifications_visibility_short">Short name</string>
+	<string name="preference_reset_tutorial">Reset tutorial</string>
+	<string name="preference_reset_tutorial_desc">Show tutorial on next app launch</string>
 	<string name="preference_school_background">Use colors provided from your school</string>
 	<string name="preference_school_background_desc">Some schools send their own background colors</string>
 	<string name="preference_schoolcolors_cancelled">For cancelled lessons</string>

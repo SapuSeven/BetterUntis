@@ -185,6 +185,8 @@
     <string name="preference_notifications_visibility_hidden">Nicht anzeigen</string>
     <string name="preference_notifications_visibility_long">Langer Name</string>
     <string name="preference_notifications_visibility_short">Kurzer Name</string>
+    <string name="preference_reset_tutorial">Tutorial zurücksetzen</string>
+    <string name="preference_reset_tutorial_desc">Tutorial beim nächsten Appstart erneut anzeigen</string>
     <string name="preference_schoolcolors_regular">Für normale Stunden</string>
     <string name="preference_schoolcolors_exam">Für Stunden mit Tests</string>
     <string name="preference_schoolcolors_irregular">Für irreguläre Stunden</string>

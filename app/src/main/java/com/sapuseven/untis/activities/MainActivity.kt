@@ -150,7 +150,6 @@ class MainActivity :
 			setupTimetableLoader()
 			showPersonalTimetable()
 			refreshNavigationViewSelection()
-			checkTutorial()
 		}
 	}
 
@@ -172,6 +171,8 @@ class MainActivity :
 			if (profileUser.schoolId.isBlank() && profileUpdateDialog == null)
 				showProfileUpdateRequired()
 		}
+
+		checkTutorial()
 	}
 
 	override fun onErrorLogFound() {
