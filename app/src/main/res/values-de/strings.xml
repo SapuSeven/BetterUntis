@@ -257,6 +257,27 @@
     <string name="errors_button_report">Alle melden</string>
     <string name="loading">Wird geladen</string>
     <string name="loading_failed">Ladevorgang fehlgeschlagen</string>
+
+    <string name="tutorial_welcome_title">Willkommen bei BetterUntis</string>
+    <string name="tutorial_welcome_message">Das folgende Tutorial zeigt dir alles, was du wissen musst, um die App zu verwenden. Tippe auf Weiter, um fortzufahren.</string>
+    <string name="tutorial_timetable_title">Dein Stundenplan</string>
+    <string name="tutorial_timetable_message">Hier siehst du deinen persönlichen Stundenplan. Verwende das Kalendersymbol in der oberen linken Ecke, um schnell zu einem Datum zu springen, oder drücke lange darauf, um zum heutigen Tag zu springen.</string>
+    <string name="tutorial_timetable_item_title">Deine Stunden</string>
+    <string name="tutorial_timetable_item_message">Jedes Element repräsentiert eine Stunde mit Namen, Lehrer und Raum auf einen Blick. Ein weißer Punkt in der oberen rechten Ecke zeigt an, dass zusätzliche Informationen wie Hausaufgaben oder Vertretungstexte verfügbar sind. Tippe auf das Element, um einen Dialog mit allen Informationen an einem Ort anzuzeigen.</string>
+    <string name="tutorial_timetable_picker_title">Einen anderen Stundenplan auswählen</string>
+    <string name="tutorial_timetable_picker_message">Du kannst einen anderen Stundenplan aus der Seitenleiste auswählen. Klicke einfach auf die Kategorie und wähle den Stundenplan aus, den du anzeigen möchtest.</string>
+    <string name="tutorial_info_center_title">Der Info-Center</string>
+    <string name="tutorial_info_center_message">Im Info-Center findest du alles auf einen Blick. Gehe dorthin, wenn du deine täglichen Nachrichten, Sprechstunden, bevorstehenden Ereignisse oder Abwesenheiten ansehen möchten.</string>
+    <string name="tutorial_free_rooms_title">Freie Räume</string>
+    <string name="tutorial_free_rooms_message">Zum Schluss gibt es die “Freie Räume”-Funktion. Gehe dorthin, wenn du wissen möchtest, welche Räume frei sind.</string>
+    <string name="tutorial_finish_title">Tutorial abgeschlossen</string>
+    <string name="tutorial_finish_message">Jetzt solltest du alles wissen, was du zur Verwendung der App benötigst. Viel Spaß.</string>
+    <string name="tutorial_prev">Zurück</string>
+    <string name="tutorial_next">Weiter</string>
+    <string name="tutorial_finish">Fertig</string>
+    <string name="tutorial_skip">Überspringen</string>
+    <string name="tutorial_tap_outside">Du kannst im Tutorial nicht mit der darunter liegenden App interagieren.</string>
+
     <plurals name="main_time_diff_minutes">
         <item quantity="one">vor einer Minute</item>
         <item quantity="other">vor %d Minuten</item>
