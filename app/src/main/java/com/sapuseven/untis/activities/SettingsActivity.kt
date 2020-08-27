@@ -39,7 +39,7 @@ import kotlinx.android.synthetic.main.activity_settings.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.list
+import kotlinx.serialization.builtins.list
 import kotlin.math.min
 
 class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback {
@@ -146,7 +146,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 		override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
 			profileId = arguments?.getLong(EXTRA_LONG_PROFILE_ID) ?: 0
 			if (profileId == 0L) {
-				MaterialAlertDialogBuilder(context)
+				MaterialAlertDialogBuilder(requireContext())
 						.setMessage("Invalid profile ID")
 						.setPositiveButton("Exit") { _, _ ->
 							activity?.finish()
@@ -208,7 +208,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 						}
 
 						findPreference<Preference>("preference_timetable_colors_reset")?.setOnPreferenceClickListener {
-							MaterialAlertDialogBuilder(context)
+							MaterialAlertDialogBuilder(requireContext())
 									.setTitle(R.string.preference_dialog_colors_reset_title)
 									.setMessage(R.string.preference_dialog_colors_reset_text)
 									.setPositiveButton(R.string.preference_timetable_colors_reset_button_positive) { _, _ ->
@@ -357,7 +357,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 								// positive button not used
 							}
 						}
-				).show(fragmentManager!!, "elementPicker")
+				).show(requireFragmentManager(), "elementPicker")
 			}
 
 			return true

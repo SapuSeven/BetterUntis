@@ -18,7 +18,7 @@ import com.sapuseven.untis.models.untis.timetable.Period
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.JsonParsingException
+import kotlinx.serialization.json.JsonDecodingException
 import org.joda.time.DateTimeZone
 import org.joda.time.Instant
 import java.lang.ref.WeakReference
@@ -113,7 +113,7 @@ class TimetableLoader(
 				}
 			} catch (e: Exception) {
 				val msg = when (e) {
-					is JsonParsingException -> formatJsonParsingException(e, data)
+					is JsonDecodingException -> formatJsonParsingException(e, data)
 					else -> e.toString()
 				}
 				timetableDisplay.onTimetableLoadingError(requestId, CODE_REQUEST_PARSING_EXCEPTION, msg)
@@ -124,7 +124,7 @@ class TimetableLoader(
 		})
 	}
 
-	private fun formatJsonParsingException(e: JsonParsingException, jsonData: String): String {
+	private fun formatJsonParsingException(e: JsonDecodingException, jsonData: String): String {
 		val errorMargin = 20
 		val errorIndex: Int? = e.message?.let {
 			it.split(" ")[3].let { i ->
