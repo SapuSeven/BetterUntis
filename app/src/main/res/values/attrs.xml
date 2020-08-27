@@ -9,6 +9,6 @@
 	</declare-styleable>
 
 	<declare-styleable name="DependentListPreference">
-		<attr name="disabledDependentValue"/>
+		<attr name="disabledDependentValue" format="string"/>
 	</declare-styleable>
 </resources>

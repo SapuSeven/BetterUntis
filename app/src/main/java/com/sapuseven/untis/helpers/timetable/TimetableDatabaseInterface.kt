@@ -48,6 +48,16 @@ class TimetableDatabaseInterface(val database: UserDatabase, id: Long) {
 		} ?: ""
 	}
 
+	fun isAllowed(id: Int, type: Type?): Boolean {
+		return when (type) {
+			Type.CLASS -> allClasses[id]?.displayable
+			Type.TEACHER -> allTeachers[id]?.displayAllowed
+			Type.SUBJECT -> allSubjects[id]?.displayAllowed
+			Type.ROOM -> allRooms[id]?.displayAllowed
+			else -> null
+		} ?: false
+	}
+
 	private fun tableModelToPeriodElement(values: Collection<TableModel>): List<PeriodElement> {
 		return values.map { item: TableModel ->
 			when (item) {

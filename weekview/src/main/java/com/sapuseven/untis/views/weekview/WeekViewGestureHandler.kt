@@ -18,13 +18,13 @@ internal class WeekViewGestureHandler<T>(
 ) : GestureDetector.SimpleOnGestureListener() {
 	var listener: Listener
 	var scroller: OverScroller
-	private val drawConfig: WeekViewDrawConfig
+	internal val drawConfig: WeekViewDrawConfig
 	private val touchHandler: WeekViewTouchHandler
 	var currentScrollDirection = Direction.NONE
 	var currentFlingDirection = Direction.NONE
 	private val gestureDetector: GestureDetector
 	private val scaleDetector: ScaleGestureDetector
-	private var isZooming: Boolean = false
+	internal var isZooming: Boolean = false
 	private val minimumFlingVelocity: Int
 	private val scaledTouchSlop: Int
 	var eventClickListener: EventClickListener<T>? = null
@@ -216,7 +216,7 @@ internal class WeekViewGestureHandler<T>(
 		if (eventChip != null && eventLongPressListener != null) {
 			val data = eventChip.originalEvent.data
 			if (data != null) {
-				eventLongPressListener!!.onEventLongPress(data, eventChip.rect!!)
+				eventLongPressListener?.onEventLongPress(data, eventChip.rect ?: return)
 			} else {
 				throw WeekViewException("No data to show. Did you pass the original object into the constructor of WeekViewEvent?")
 			}
@@ -243,7 +243,7 @@ internal class WeekViewGestureHandler<T>(
 		return null
 	}
 
-	private fun goToNearestOrigin() {
+	internal fun goToNearestOrigin() {
 		val totalDayWidth = config.totalDayWidth
 		var leftDays = drawConfig.currentOrigin.x.toDouble()
 		leftDays /= if (config.snapToWeek)

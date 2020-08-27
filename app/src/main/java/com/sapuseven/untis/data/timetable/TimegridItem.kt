@@ -18,10 +18,15 @@ class TimegridItem(
 		title = periodData.getShortTitle()
 		top = if (contextType == TimetableDatabaseInterface.Type.TEACHER.name) periodData.getShortClasses() else periodData.getShortSpanned(periodData.teachers, TimetableDatabaseInterface.Type.TEACHER)
 		bottom = if (contextType == TimetableDatabaseInterface.Type.ROOM.name) periodData.getShortClasses() else periodData.getShortSpanned(periodData.rooms, TimetableDatabaseInterface.Type.ROOM)
+
+		hasIndicator = !periodData.element.homeWorks.isNullOrEmpty()
+				|| periodData.element.text.lesson.isNotEmpty()
+				|| periodData.element.text.substitution.isNotEmpty()
+				|| periodData.element.text.info.isNotEmpty()
 	}
 
 	override fun toWeekViewEvent(): WeekViewEvent<TimegridItem> {
-		return WeekViewEvent(id, title, top, bottom, startTime, endTime, color, pastColor, this)
+		return WeekViewEvent(id, title, top, bottom, startTime, endTime, color, pastColor, this, hasIndicator)
 	}
 
 	fun mergeWith(items: MutableList<TimegridItem>): Boolean {

@@ -35,7 +35,7 @@ object ErrorMessageDictionary {
 	const val ERROR_CODE_WEBUNTIS_NOT_INSTALLED = 101
 
 	@JvmOverloads
-	fun getErrorMessage(resources: Resources, code: Int?, fallback: String = resources.getString(R.string.errormessagedictionary_generic)): String {
+	fun getErrorMessage(resources: Resources, code: Int?, fallback: String? = null): String {
 		return when (code) {
 			ERROR_CODE_TOO_MANY_RESULTS -> resources.getString(R.string.errormessagedictionary_too_many_results)
 			ERROR_CODE_INVALID_SCHOOLNAME -> resources.getString(R.string.errormessagedictionary_invalid_school)
@@ -46,7 +46,7 @@ object ErrorMessageDictionary {
 			ERROR_CODE_INVALID_CLIENT_TIME -> resources.getString(R.string.errormessagedictionary_invalid_time_settings)
 			ERROR_CODE_NO_SERVER_FOUND -> resources.getString(R.string.errormessagedictionary_invalid_server_url)
 			ERROR_CODE_WEBUNTIS_NOT_INSTALLED -> resources.getString(R.string.errormessagedictionary_server_webuntis_not_installed)
-			else -> fallback
+			else -> fallback ?: resources.getString(R.string.errormessagedictionary_generic)
 		}
 	}
 }

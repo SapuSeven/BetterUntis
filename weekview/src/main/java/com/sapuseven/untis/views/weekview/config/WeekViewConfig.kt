@@ -15,7 +15,7 @@ import org.joda.time.DateTimeConstants
  * Setting any value will update the drawConfig accordingly as well.
  */
 class WeekViewConfig(context: Context, attrs: AttributeSet?) {
-	val drawConfig = WeekViewDrawConfig(context)
+	val drawConfig: WeekViewDrawConfig = WeekViewDrawConfig(context)
 
 	// Calendar configuration
 	var firstDayOfWeek: Int
@@ -220,8 +220,8 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 		set(value) {
 			drawConfig.hourSeparatorPaint.color = value
 		}
-	var hourSeparatorStrokeWidth
-		get() = drawConfig.hourSeparatorPaint.strokeWidth
+	var hourSeparatorStrokeWidth: Float
+        get() = drawConfig.hourSeparatorPaint.strokeWidth
 		set(value) {
 			drawConfig.hourSeparatorPaint.strokeWidth = value
 		}
@@ -233,8 +233,8 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 		set(value) {
 			drawConfig.daySeparatorPaint.color = value
 		}
-	var daySeparatorStrokeWidth
-		get() = drawConfig.daySeparatorPaint.strokeWidth
+	var daySeparatorStrokeWidth: Float
+        get() = drawConfig.daySeparatorPaint.strokeWidth
 		set(value) {
 			drawConfig.daySeparatorPaint.strokeWidth = value
 		}

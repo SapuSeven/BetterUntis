@@ -18,7 +18,7 @@ import java.io.File
 
 @SuppressLint("Registered") // This activity is not intended to be used directly
 open class BaseActivity : AppCompatActivity() {
-	private var currentTheme: String = ""
+	protected var currentTheme: String = ""
 	private var currentDarkTheme: String = ""
 	protected lateinit var preferences: PreferenceManager
 	protected var hasOwnToolbar: Boolean = false

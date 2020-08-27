@@ -123,7 +123,8 @@ class LoginDataInputActivity : BaseActivity() {
 		}
 
 		if (switch_logindatainput_advanced.isChecked) {
-			if (!Patterns.WEB_URL.matcher(edittext_logindatainput_api_url.text.toString()).matches()) {
+			if (!edittext_logindatainput_api_url.text.isNullOrBlank()
+					&& !Patterns.WEB_URL.matcher(edittext_logindatainput_api_url.text.toString()).matches()) {
 				edittext_logindatainput_api_url.error = getString(R.string.logindatainput_error_invalid_url)
 				return edittext_logindatainput_api_url
 			}
@@ -232,7 +233,7 @@ class LoginDataInputActivity : BaseActivity() {
 				else
 					return it.schools[0].schoolId.toString()
 			} ?: run {
-				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code, untisResponse.error?.message.orEmpty()))
+				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code, untisResponse.error?.message))
 			}
 		}, { error ->
 			stopLoadingAndShowError(getString(R.string.logindatainput_error_generic, error.message))
@@ -266,7 +267,7 @@ class LoginDataInputActivity : BaseActivity() {
 			if (untisResponse.error?.code == ErrorMessageDictionary.ERROR_CODE_INVALID_CREDENTIALS)
 				return edittext_logindatainput_key?.text.toString()
 			if (untisResponse.result.isNullOrEmpty())
-				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code))
+				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code, untisResponse.error?.message))
 			else
 				return untisResponse.result
 		}, { error ->
@@ -306,7 +307,7 @@ class LoginDataInputActivity : BaseActivity() {
 			if (untisResponse.result != null) {
 				return untisResponse.result
 			} else {
-				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code))
+				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code, untisResponse.error?.message))
 			}
 
 			setElementsEnabled(true)
@@ -400,7 +401,8 @@ class LoginDataInputActivity : BaseActivity() {
 	private fun getProxyHost(): String? = if (switch_logindatainput_advanced.isChecked) edittext_logindatainput_proxy_host?.text.toString() else null
 
 	private fun getApiUrl(): String? {
-		return if (switch_logindatainput_advanced.isChecked) edittext_logindatainput_api_url?.text.toString()
+		return if (switch_logindatainput_advanced.isChecked && !edittext_logindatainput_api_url.text.isNullOrBlank())
+			edittext_logindatainput_api_url?.text.toString()
 		else schoolInfo?.let {
 			if (it.useMobileServiceUrlAndroid) it.mobileServiceUrl else null
 		}
