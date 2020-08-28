@@ -1,13 +1,12 @@
 package com.sapuseven.untis.dialogs
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
-import android.view.MotionEvent
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -19,132 +18,127 @@ class TutorialDialog(
 		private val drawer: DrawerLayout,
 		menu: Menu
 ) {
-	companion object {
-		private const val DIALOG_WELCOME: Byte = 0
-		private const val DIALOG_TIMETABLE: Byte = 1
-		private const val DIALOG_TIMETABLE_ITEM: Byte = 2
-		private const val DIALOG_TIMETABLE_PICKER: Byte = 3
-		private const val DIALOG_INFO_CENTER: Byte = 4
-		private const val DIALOG_FREE_ROOMS: Byte = 5
-		private const val DIALOG_FINISH: Byte = 6
-	}
-
 	private val infoCenter = menu.findItem(R.id.nav_infocenter)
 	private val freeRooms = menu.findItem(R.id.nav_free_rooms)
 	private val inflater = LayoutInflater.from(context)
-	private val nullParent = null
 
-	fun show(type: Byte = DIALOG_WELCOME, gravity: Int = Gravity.CENTER, dim: Float = 0.32f) {
+	private val pages = arrayOf(
+			Page(
+					title = context.getString(R.string.tutorial_welcome_title),
+					message = context.getString(R.string.tutorial_welcome_message)
+			),
+			Page(
+					title = context.getString(R.string.tutorial_timetable_title),
+					message = context.getString(R.string.tutorial_timetable_message),
+					gravity = Gravity.BOTTOM,
+					dim = false
+			),
+			Page(
+					title = context.getString(R.string.tutorial_timetable_item_title),
+					message = context.getString(R.string.tutorial_timetable_item_message),
+					gravity = Gravity.BOTTOM,
+					dim = false
+			),
+			Page(
+					title = context.getString(R.string.tutorial_timetable_picker_title),
+					message = context.getString(R.string.tutorial_timetable_picker_message),
+					gravity = Gravity.BOTTOM,
+					dim = false,
+					onShow = {
+						drawer.openDrawer(GravityCompat.START)
+					}
+			),
+			Page(
+					title = context.getString(R.string.tutorial_info_center_title),
+					message = context.getString(R.string.tutorial_info_center_message),
+					gravity = Gravity.TOP,
+					dim = false,
+					onShow = {
+						infoCenter.isChecked = true
+					},
+					onHide = {
+						infoCenter.isChecked = false
+					}
+			),
+			Page(
+					title = context.getString(R.string.tutorial_free_rooms_title),
+					message = context.getString(R.string.tutorial_free_rooms_message),
+					gravity = Gravity.TOP,
+					dim = false,
+					onShow = {
+						freeRooms.isChecked = true
+					},
+					onHide = {
+						freeRooms.isChecked = false
+						drawer.closeDrawer(GravityCompat.START)
+					}
+			),
+			Page(
+					title = context.getString(R.string.tutorial_finish_title),
+					message = context.getString(R.string.tutorial_finish_message)
+			)
+	)
 
-		val builder = AlertDialog.Builder(context)
-		val layout = inflater.inflate(R.layout.dialog_tutorial, nullParent)
-		val title = layout.findViewById<TextView>(R.id.title)
-		val progress = layout.findViewById<TextView>(R.id.progress)
-		val message = layout.findViewById<TextView>(R.id.message)
+	fun start() {
+		showPage(0)
+	}
 
-		when (type) {
-			DIALOG_WELCOME -> {
-				progress.text = "1/7"
-				title.text = context.getString(R.string.tutorial_welcome_title)
-				message.text = context.getString(R.string.tutorial_welcome_message)
-				builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
-					show(DIALOG_TIMETABLE, Gravity.BOTTOM, 0f)
+	@SuppressLint("InflateParams")
+	private fun showPage(index: Int) {
+		val page = pages[index]
+		val layout = inflater.inflate(R.layout.dialog_tutorial, null)
+
+		layout.findViewById<TextView>(R.id.progress).text = context.getString(R.string.tutorial_progress_indicator, index + 1, pages.size)
+		layout.findViewById<TextView>(R.id.title).text = page.title
+		layout.findViewById<TextView>(R.id.message).text = page.message
+
+		page.onShow()
+
+		AlertDialog.Builder(context).apply {
+			setCancelable(false)
+
+			if (index > 0) {
+				setNegativeButton(context.getString(R.string.tutorial_previous)) { _, _ ->
+					showPage(index - 1)
 				}
 			}
-			DIALOG_TIMETABLE -> {
-				progress.text = "2/7"
-				title.text = context.getString(R.string.tutorial_timetable_title)
-				message.text = context.getString(R.string.tutorial_timetable_message)
-				builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
-					show(DIALOG_WELCOME)
+			if (index < pages.size - 1) {
+				setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
+					page.onHide()
+					showPage(index + 1)
 				}
-				builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
-					show(DIALOG_TIMETABLE_ITEM, Gravity.BOTTOM, 0f)
-				}
-			}
-			DIALOG_TIMETABLE_ITEM -> {
-				progress.text = "3/7"
-				title.text = context.getString(R.string.tutorial_timetable_item_title)
-				message.text = context.getString(R.string.tutorial_timetable_item_message)
-				builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
-					show(DIALOG_TIMETABLE, Gravity.BOTTOM, 0f)
-				}
-				builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
-					show(DIALOG_TIMETABLE_PICKER, Gravity.BOTTOM, 0f)
-					drawer.openDrawer(GravityCompat.START)
+			} else {
+				setPositiveButton(context.getString(R.string.tutorial_finish)) { _, _ ->
+					page.onHide()
 				}
 			}
-			DIALOG_TIMETABLE_PICKER -> {
-				progress.text = "4/7"
-				title.text = context.getString(R.string.tutorial_timetable_picker_title)
-				message.text = context.getString(R.string.tutorial_timetable_picker_message)
-				builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
-					show(DIALOG_TIMETABLE_ITEM, Gravity.BOTTOM, 0f)
-					drawer.closeDrawer(GravityCompat.START)
-				}
-				builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
-					show(DIALOG_INFO_CENTER, Gravity.TOP, 0f)
-				}
+			setNeutralButton(context.getString(R.string.tutorial_skip)) { _, _ ->
+				page.onHide()
+				finishTutorial()
 			}
-			DIALOG_INFO_CENTER -> {
-				infoCenter.isChecked = true
-				progress.text = "5/7"
-				title.text = context.getString(R.string.tutorial_info_center_title)
-				message.text = context.getString(R.string.tutorial_info_center_message)
-				builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
-					show(DIALOG_TIMETABLE_PICKER, Gravity.BOTTOM, 0f)
-					infoCenter.isChecked = false
+			setView(layout)
+
+			create().apply {
+				window?.apply {
+					setDimAmount(if (page.dim) 0.32f else 0f)
+					attributes.gravity = page.gravity
 				}
-				builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
-					show(DIALOG_FREE_ROOMS, Gravity.TOP, 0f)
-					infoCenter.isChecked = false
-				}
-			}
-			DIALOG_FREE_ROOMS -> {
-				freeRooms.isChecked = true
-				progress.text = "6/7"
-				title.text = context.getString(R.string.tutorial_free_rooms_title)
-				message.text = context.getString(R.string.tutorial_free_rooms_message)
-				builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
-					show(DIALOG_INFO_CENTER, Gravity.TOP, 0f)
-					freeRooms.isChecked = false
-				}
-				builder.setPositiveButton(context.getString(R.string.tutorial_next)) { _, _ ->
-					show(DIALOG_FINISH)
-					drawer.closeDrawer(GravityCompat.START)
-					freeRooms.isChecked = false
-				}
-			}
-			DIALOG_FINISH -> {
-				progress.text = "7/7"
-				title.text = context.getString(R.string.tutorial_finish_title)
-				message.text = context.getString(R.string.tutorial_finish_message)
-				builder.setNegativeButton(context.getString(R.string.tutorial_prev)) { _, _ ->
-					show(DIALOG_FREE_ROOMS, Gravity.TOP, 0f)
-					drawer.openDrawer(GravityCompat.START)
-				}
-				builder.setPositiveButton(context.getString(R.string.tutorial_finish)) { _, _ ->
-					finishTutorial()
-				}
+				show()
 			}
 		}
-
-		builder.setCancelable(false)
-		builder.setNeutralButton(context.getString(R.string.tutorial_skip)) { _, _ ->
-			finishTutorial()
-		}
-		builder.setView(layout)
-
-		val dialog = builder.create()
-		val window = dialog.window
-		window?.setDimAmount(dim)
-		window?.attributes?.gravity = gravity
-		dialog.show()
 	}
 
 	private fun finishTutorial() {
-		infoCenter.isChecked = false
-		freeRooms.isChecked = false
+		drawer.closeDrawer(GravityCompat.START)
 		prefs.edit().putBoolean("preference_has_finished_tutorial", true).apply()
 	}
+
+	class Page(
+			val title: String,
+			val message: String,
+			val onShow: () -> Unit = {},
+			val onHide: () -> Unit = {},
+			val gravity: Int = Gravity.CENTER,
+			val dim: Boolean = true
+	)
 }

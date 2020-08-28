@@ -749,7 +749,7 @@ class MainActivity :
 
 	private fun checkTutorial() {
 		if (!preferences.defaultPrefs.getBoolean("preference_has_finished_tutorial", false))
-			TutorialDialog(this, preferences.defaultPrefs, findViewById(R.id.drawer_layout), navigationview_main.menu).show()
+			TutorialDialog(this, preferences.defaultPrefs, findViewById(R.id.drawer_layout), navigationview_main.menu).start()
 	}
 
 	private fun showLessonInfo(item: TimegridItem) {
