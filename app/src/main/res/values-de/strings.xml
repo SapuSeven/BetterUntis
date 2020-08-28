@@ -272,11 +272,11 @@
     <string name="tutorial_free_rooms_message">Zum Schluss gibt es die “Freie Räume”-Funktion. Gehe dorthin, wenn du wissen möchtest, welche Räume frei sind.</string>
     <string name="tutorial_finish_title">Tutorial abgeschlossen</string>
     <string name="tutorial_finish_message">Jetzt solltest du alles wissen, was du zur Verwendung der App benötigst. Viel Spaß.</string>
-    <string name="tutorial_prev">Zurück</string>
+    <string name="tutorial_skip">Überspringen</string>
+    <string name="tutorial_previous">Zurück</string>
     <string name="tutorial_next">Weiter</string>
     <string name="tutorial_finish">Fertig</string>
-    <string name="tutorial_skip">Überspringen</string>
-    <string name="tutorial_tap_outside">Du kannst im Tutorial nicht mit der darunter liegenden App interagieren.</string>
+    <string name="tutorial_progress_indicator">%1$d/%2$d</string>
 
     <plurals name="main_time_diff_minutes">
         <item quantity="one">vor einer Minute</item>
