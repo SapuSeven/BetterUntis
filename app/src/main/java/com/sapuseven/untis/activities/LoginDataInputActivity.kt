@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Patterns
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.sapuseven.untis.R
@@ -72,6 +73,7 @@ class LoginDataInputActivity : BaseActivity() {
 		title = getString(if (existingUserId == null) R.string.logindatainput_title_add else R.string.logindatainput_title_edit)
 
 		button_logindatainput_login?.setOnClickListener {
+			clearFocus()
 			validate()?.requestFocus() ?: run { loadData() }
 		}
 
@@ -110,6 +112,10 @@ class LoginDataInputActivity : BaseActivity() {
 		focusFirstFreeField()
 
 		setElementsEnabled(true)
+	}
+
+	private fun clearFocus() = this.currentFocus?.let { v ->
+		(getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)?.hideSoftInputFromWindow(v.windowToken, 0)
 	}
 
 	private fun validate(): EditText? {
