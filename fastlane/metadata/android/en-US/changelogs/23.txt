@@ -1,0 +1,5 @@
+- Added Untis Messenger shortcut if supported by school
+- Added dot indicator if lesson info is available
+- Gray out items without access
+- Absence list improvements
+- Minor design improvements

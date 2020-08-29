@@ -8,3 +8,4 @@
 .externalNativeBuild
 *.jks
 signing.properties
+fastlane/key.json

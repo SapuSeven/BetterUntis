@@ -1,0 +1,5 @@
+- Neu: Link zum Untis Messenger (wenn dieser von der Schule verwendet wird)
+- Neu: Ein Punkt im Stundenplan zeigt an, wenn eine Unterrichtseinheit weitere Informationen beinhaltet
+- Elemente, zu denen kein Zugriff besteht, werden in der Liste ausgegraut
+- Verbesserungen der Abwesenheitsliste
+- Mehrere kleine Designverbesserungen
