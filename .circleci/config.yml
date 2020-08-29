@@ -6,10 +6,23 @@ jobs:
       - image: circleci/android:api-29
     environment:
       JVM_OPTS: -Xmx3200m
+      FL_OUTPUT_DIR: output
+      FASTLANE_LANE: test
     steps:
       - checkout
       - restore_cache:
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+          keys:
+            - jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+            - 1-gems-{{ checksum "Gemfile.lock" }}
+      - run:
+          name: Update Gems
+          command: |
+            bundle check
+            bundle install --path vendor/bundle
+      - save_cache:
+          paths:
+            - vendor/bundle
+          key: 1-gems-{{ checksum "Gemfile.lock" }}
       - run:
           name: Download Dependencies
           command: ./gradlew androidDependencies
@@ -28,6 +41,9 @@ jobs:
       - run:
           name: Initial build
           command: ./gradlew clean assemble
+      - run:
+          name: Fastlane
+          command: bundle exec fastlane $FASTLANE_LANE
       - store_artifacts:
           name: Upload build artifacts
           path: app/build/outputs
