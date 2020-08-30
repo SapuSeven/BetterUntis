@@ -1,27 +1,14 @@
 package com.sapuseven.untis.widgets
 
-import android.appwidget.AppWidgetManager
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.SpannableStringBuilder
-import android.text.style.ForegroundColorSpan
-import com.sapuseven.untis.R
-import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.data.timetable.TimegridItem
-import com.sapuseven.untis.helpers.ErrorMessageDictionary
-import com.sapuseven.untis.helpers.TimetableListSorter.formatItems
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.helpers.timetable.TimetableLoader
-import com.sapuseven.untis.interfaces.TimetableDisplay
-import com.sapuseven.untis.models.untis.UntisDate
-import org.joda.time.LocalDate
-import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.DateTimeFormatter
-import java.lang.ref.WeakReference
+class MessagesWidget : BaseWidget() {
+    override fun getWidgetType(): Int = WidgetRemoteViewsFactory.WIDGET_TYPE_MESSAGES
+}
 
 class TimetableWidget : BaseWidget() {
+    override fun getWidgetType(): Int = WidgetRemoteViewsFactory.WIDGET_TYPE_TIMETABLE
 
-    private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
+    // TODO: Properly implement timetable loading in WidgetRemoteViews.kt
+    /*private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
     private lateinit var timetableLoader: TimetableLoader
 
     override fun updateAppWidget(appWidgetId: Int) {
@@ -63,16 +50,12 @@ class TimetableWidget : BaseWidget() {
                 text.append("\n\n")
             }
             if (text.isEmpty()) text.append(context.resources.getString(R.string.widget_timetable_empty))
-            newViews.setTextViewText(R.id.textview_base_widget_content, text)
             appWidgetManager.updateAppWidget(appWidgetId, newViews)
         }
 
         override fun onTimetableLoadingError(requestId: Int, code: Int?, message: String?) {
             val newViews = loadBaseLayout(user)
-            newViews.setTextViewText(R.id.textview_base_widget_content,
-                    if (code != null) ErrorMessageDictionary.getErrorMessage(context.resources, code)
-                    else context.resources.getString(R.string.all_error))
             appWidgetManager.updateAppWidget(appWidgetId, newViews)
         }
-    }
+    }*/
 }
