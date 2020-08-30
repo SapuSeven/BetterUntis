@@ -38,7 +38,7 @@
     <string name="menu_infocenter_events">Hendelser</string>
     <string name="menu_infocenter_absences">Fravær</string>
     <string name="mainactivitydrawer_dropdown_show">Vis profilliste</string>
-    <string name="mainactivitydrawer_profile_add">Legg til en profil…</string>
+    <string name="mainactivitydrawer_profile_add">Legg til en profil</string>
     <string name="mainactivitydrawer_profile_delete_hint">Trykk lenge på en profil for å redigere</string>
     <string name="main_dialog_delete_profile_title">Vil du slette profilen?</string>
     <string name="main_dialog_delete_profile_message">Er du sikker på at du vil slette profilen din med brukeren %1$s på skolen %2$s\?</string>
