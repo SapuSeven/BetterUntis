@@ -11,7 +11,11 @@ import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.SerializationUtils
+import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import com.sapuseven.untis.helpers.timetable.TimetableLoader
+import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.params.MessageParams
 import com.sapuseven.untis.models.untis.response.MessageResponse
@@ -19,6 +23,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.joda.time.LocalDate
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.DateTimeFormatter
+import java.lang.ref.WeakReference
 
 
 class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: Intent) : RemoteViewsFactory {
@@ -40,18 +47,18 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 		loadItems(intent)
 	}
 
-	private fun loadItems(intent: Intent) = GlobalScope.launch(Dispatchers.Main) {
-		items = when (intent.getIntExtra(EXTRA_INT_WIDGET_TYPE, 0)) {
+	private fun reloadWidget() = AppWidgetManager.getInstance(applicationContext)
+			.notifyAppWidgetViewDataChanged(appWidgetId, R.id.listview_widget_base_content)
+
+	private fun loadItems(intent: Intent) {
+		when (intent.getIntExtra(EXTRA_INT_WIDGET_TYPE, 0)) {
 			WIDGET_TYPE_MESSAGES -> user?.let { loadMessages(it) }
 			WIDGET_TYPE_TIMETABLE -> loadTimetable()
-			else -> emptyList()
+			else -> items = emptyList()
 		}
-
-		AppWidgetManager.getInstance(applicationContext)
-				.notifyAppWidgetViewDataChanged(appWidgetId, R.id.listview_widget_base_content)
 	}
 
-	private suspend fun loadMessages(user: UserDatabase.User): List<WidgetListItem> {
+	private fun loadMessages(user: UserDatabase.User) = GlobalScope.launch(Dispatchers.IO) {
 		val query = UntisRequest.UntisRequestQuery(user)
 
 		query.data.method = UntisApiConstants.METHOD_GET_MESSAGES
@@ -62,32 +69,47 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 		))
 
 		val result = UntisRequest().request(query)
-		return result.fold({ data ->
+		items = result.fold({ data ->
 			val untisResponse = SerializationUtils.getJSON().parse(MessageResponse.serializer(), data)
 
 			untisResponse.result?.messages?.map {
 				WidgetListItem(it.id.toLong(), it.subject, it.body)
 			}
-			/*listOf(
-					WidgetListItem(1, "Message 1", "Text 1"),
-					WidgetListItem(2, "Message 2", "Text 2"),
-					WidgetListItem(3, "Message 3", "Text 3"),
-					WidgetListItem(4, "Message 4", "Text 4"),
-					WidgetListItem(5, "Message 5", "Text 5"),
-					WidgetListItem(6, "Message 6", "Text 6")
-			)*/
-		}, { null }) ?: emptyList()
+		}, {
+			listOf(WidgetListItem(0, "Failed to load messages", "Tap to retry")) // TODO: Extract string resources
+		})
+		reloadWidget()
 	}
 
-	private suspend fun loadTimetable(): List<WidgetListItem> {
-		/*val today = UntisDate.fromLocalDate(LocalDate.now())
+	private fun loadTimetable() {
+		val timeFormatter: DateTimeFormatter = DateTimeFormat.forPattern("HH:mm")
+		val timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, user?.id
+				?: return)
+		val timetableLoader = TimetableLoader(WeakReference(applicationContext), user = user, timetableDatabaseInterface = timetableDatabaseInterface,
+				timetableDisplay = object : TimetableDisplay {
+					override fun addTimetableItems(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
+						this@WidgetRemoteViewsFactory.items = items.map {
+							WidgetListItem(
+									it.id,
+									"${it.startDateTime.toString(timeFormatter)} - ${it.endDateTime.toString(timeFormatter)} | ${it.title}",
+									"${it.top}, ${it.bottom}"
+							)
+						}
+						reloadWidget()
+					}
+
+					override fun onTimetableLoadingError(requestId: Int, code: Int?, message: String?) {
+						items = listOf(WidgetListItem(0, "Failed to load timetable", "Tap to retry")) // TODO: Extract string resources
+					}
+				})
+
+		val today = UntisDate.fromLocalDate(LocalDate.now())
 		timetableLoader.load(TimetableLoader.TimetableLoaderTarget(
 				today,
 				today,
-				user?.userData?.elemId ?: return,
-				user?.userData?.elemType ?: ""
-		), TimetableLoader.FLAG_LOAD_SERVER)*/
-		return listOf(WidgetListItem(1, "Not yet implemented", ""))
+				user.userData.elemId,
+				user.userData.elemType ?: ""
+		), TimetableLoader.FLAG_LOAD_SERVER)
 	}
 
 	override fun onCreate() {}
@@ -107,7 +129,7 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 		}
 	}
 
-	override fun getCount(): Int = items?.size ?: 1
+	override fun getCount(): Int = items?.size ?: 0
 
 	override fun getLoadingView(): RemoteViews? = null
 
