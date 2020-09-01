@@ -23,7 +23,7 @@
     <string name="activity_title_settings">Ustawienia</string>
     <string name="menu_infocenter_messagesofday">Wiadomości</string>
     <string name="menu_infocenter_events">Wydarzenia</string>
-    <string name="mainactivitydrawer_profile_add">Dodaj profil…</string>
+    <string name="mainactivitydrawer_profile_add">Dodaj profil</string>
     <string name="main_dialog_delete_profile_title">Usunąć profil\?</string>
     <string name="main_dialog_update_profile_button">Zaktualizuj profil</string>
     <string name="main_dialog_itemdetails_image_infos">Info</string>
