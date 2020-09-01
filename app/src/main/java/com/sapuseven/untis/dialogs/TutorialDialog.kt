@@ -37,7 +37,10 @@ class TutorialDialog(
 					title = context.getString(R.string.tutorial_timetable_item_title),
 					message = context.getString(R.string.tutorial_timetable_item_message),
 					gravity = Gravity.BOTTOM,
-					dim = false
+					dim = false,
+					onShow = {
+						drawer.closeDrawer(GravityCompat.START)
+					}
 			),
 			Page(
 					title = context.getString(R.string.tutorial_timetable_picker_title),
@@ -46,6 +49,7 @@ class TutorialDialog(
 					dim = false,
 					onShow = {
 						drawer.openDrawer(GravityCompat.START)
+						infoCenter.isChecked = false
 					}
 			),
 			Page(
@@ -55,6 +59,7 @@ class TutorialDialog(
 					dim = false,
 					onShow = {
 						infoCenter.isChecked = true
+						freeRooms.isChecked = false
 					},
 					onHide = {
 						infoCenter.isChecked = false
