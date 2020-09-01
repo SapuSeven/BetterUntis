@@ -227,7 +227,7 @@
     <string name="main_dialog_delete_profile_message">Êtes-vous sûr·e de vouloir supprimer votre profil avec l’utilisateur %1$s à l’école %2$s \?</string>
     <string name="main_dialog_delete_profile_title">Supprimer le profil \?</string>
     <string name="mainactivitydrawer_profile_delete_hint">Rester appuyé sur un profil pour le modifier</string>
-    <string name="mainactivitydrawer_profile_add">Ajouter un profil…</string>
+    <string name="mainactivitydrawer_profile_add">Ajouter un profil</string>
     <string name="mainactivitydrawer_dropdown_show">Afficher la liste des profils</string>
     <string name="menu_infocenter_absences">Absences</string>
     <string name="menu_infocenter_events">Évènements</string>

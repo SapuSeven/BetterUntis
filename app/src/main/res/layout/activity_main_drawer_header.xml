@@ -84,47 +84,12 @@
 
 		</androidx.recyclerview.widget.RecyclerView>
 
-		<LinearLayout
-			android:id="@+id/linearlayout_mainactivitydrawer_add"
-			android:layout_width="match_parent"
-			android:layout_height="48dp"
-			android:background="?android:attr/selectableItemBackground"
-			android:clickable="true"
-			android:focusable="true"
-			android:gravity="center_vertical"
-			android:orientation="horizontal"
-			android:paddingStart="24dp"
-			android:paddingEnd="8dp">
-
-			<androidx.appcompat.widget.AppCompatImageView
-				android:layout_width="24dp"
-				android:layout_height="24dp"
-				android:layout_marginEnd="24dp"
-				app:srcCompat="@drawable/all_add" />
-
-			<TextView
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:text="@string/mainactivitydrawer_profile_add"
-				android:textColor="?android:attr/textColorPrimary"
-				android:textSize="13sp" />
-
-		</LinearLayout>
+		<include layout="@layout/item_profiles_add" />
 
 		<View
 			android:layout_width="match_parent"
 			android:layout_height="1dp"
 			android:background="?android:attr/listDivider" />
-
-		<TextView
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginStart="16dp"
-			android:layout_marginTop="16dp"
-			android:layout_marginEnd="8dp"
-			android:text="@string/mainactivitydrawer_profile_delete_hint"
-			android:textColor="?android:attr/textColorSecondary"
-			android:textSize="13sp" />
 
 	</LinearLayout>
 </LinearLayout>
