@@ -35,6 +35,7 @@ import com.sapuseven.untis.preferences.AlertPreference
 import com.sapuseven.untis.preferences.ElementPickerPreference
 import com.sapuseven.untis.preferences.WeekRangePickerPreference
 import kotlinx.android.synthetic.main.activity_settings.*
+import kotlinx.android.synthetic.main.banner_icons.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -91,14 +92,14 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 		if (!prefs.defaultPrefs.getBoolean(DIALOG_DESIGNING_HIDE, false))
 			banner_settings_designing.visibility = View.VISIBLE
 
-		banner_settings_designing.setLeftButtonAction {
-			banner_settings_designing.dismiss()
+		leftButton.setOnClickListener {
+			banner_settings_designing.visibility = View.GONE
 
 			val editor = prefs.defaultPrefs.edit()
 			editor.putBoolean(DIALOG_DESIGNING_HIDE, true)
 			editor.apply()
 		}
-		banner_settings_designing.setRightButtonAction {
+		rightButton.setOnClickListener {
 			startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(WIKI_URL_DESIGNING)))
 		}
 	}
