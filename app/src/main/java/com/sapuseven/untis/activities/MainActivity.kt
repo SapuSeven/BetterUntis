@@ -32,10 +32,7 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.adapters.ProfileListAdapter
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
-import com.sapuseven.untis.dialogs.DatePickerDialog
-import com.sapuseven.untis.dialogs.ElementPickerDialog
-import com.sapuseven.untis.dialogs.ErrorReportingDialog
-import com.sapuseven.untis.dialogs.TimetableItemDetailsDialog
+import com.sapuseven.untis.dialogs.*
 import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
@@ -172,6 +169,8 @@ class MainActivity :
 			if (profileUser.schoolId.isBlank() && profileUpdateDialog == null)
 				showProfileUpdateRequired()
 		}
+
+		checkTutorial()
 	}
 
 	override fun onErrorLogFound() {
@@ -746,6 +745,11 @@ class MainActivity :
 			TimetableDatabaseInterface.Type.ROOM.name -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_rooms)
 			else -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_personal)
 		}
+	}
+
+	private fun checkTutorial() {
+		if (!preferences.defaultPrefs.getBoolean("preference_has_finished_tutorial", false))
+			TutorialDialog(this, preferences.defaultPrefs, findViewById(R.id.drawer_layout), navigationview_main.menu).start()
 	}
 
 	private fun showLessonInfo(item: TimegridItem) {

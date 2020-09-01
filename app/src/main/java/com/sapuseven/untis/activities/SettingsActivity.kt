@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.*
@@ -158,6 +159,12 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 
 				when (rootKey) {
 					"preferences_general" -> {
+						findPreference<Preference>("preference_tutorial")?.setOnPreferenceClickListener {
+							preferenceManager.sharedPreferences.edit().putBoolean("preference_has_finished_tutorial", false).apply()
+							Toast.makeText(context, R.string.all_success, Toast.LENGTH_SHORT).show()
+							true
+						}
+
 						findPreference<SeekBarPreference>("preference_week_custom_display_length")?.apply {
 							max = findPreference<WeekRangePickerPreference>("preference_week_custom_range")?.getPersistedStringSet(emptySet())?.size?.zeroToNull
 									?: this.max
