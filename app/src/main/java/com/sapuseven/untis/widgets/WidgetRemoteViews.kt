@@ -3,6 +3,7 @@ package com.sapuseven.untis.widgets
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import android.widget.RemoteViewsService.RemoteViewsFactory
@@ -11,21 +12,21 @@ import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
+import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.helpers.timetable.TimetableLoader
-import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.params.MessageParams
+import com.sapuseven.untis.models.untis.params.TimetableParams
 import com.sapuseven.untis.models.untis.response.MessageResponse
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.sapuseven.untis.models.untis.response.TimetableResponse
+import kotlinx.coroutines.runBlocking
+import org.joda.time.DateTimeZone
 import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
-import java.lang.ref.WeakReference
 
 
 class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: Intent) : RemoteViewsFactory {
@@ -41,25 +42,25 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 	private val appWidgetId = intent.getIntExtra(EXTRA_INT_WIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
 	private val userDatabase = UserDatabase.createInstance(applicationContext)
 	private val user = userDatabase.getUser(loadIdPref(applicationContext, appWidgetId))
+	private val type = intent.getIntExtra(EXTRA_INT_WIDGET_TYPE, 0)
 	private var items: List<WidgetListItem>? = null
 
-	init {
-		loadItems(intent)
-	}
+	private val errorItem = WidgetListItem(0, "Failed to load data", "Tap to retry") // TODO: Extract string resources
 
-	private fun reloadWidget() = AppWidgetManager.getInstance(applicationContext)
-			.notifyAppWidgetViewDataChanged(appWidgetId, R.id.listview_widget_base_content)
-
-	private fun loadItems(intent: Intent) {
-		when (intent.getIntExtra(EXTRA_INT_WIDGET_TYPE, 0)) {
-			WIDGET_TYPE_MESSAGES -> user?.let { loadMessages(it) }
-			WIDGET_TYPE_TIMETABLE -> loadTimetable()
-			else -> items = emptyList()
+	private fun loadItems() {
+		try {
+			items = when (type) {
+				WIDGET_TYPE_MESSAGES -> loadMessages()
+				WIDGET_TYPE_TIMETABLE -> loadTimetable()
+				else -> emptyList()
+			}
+		} catch (e: Exception) {
+			// TODO: Implement proper error handling
 		}
 	}
 
-	private fun loadMessages(user: UserDatabase.User) = GlobalScope.launch(Dispatchers.IO) {
-		val query = UntisRequest.UntisRequestQuery(user)
+	private fun loadMessages(): List<WidgetListItem>? {
+		val query = UntisRequest.UntisRequestQuery(user ?: return null)
 
 		query.data.method = UntisApiConstants.METHOD_GET_MESSAGES
 		query.proxyHost = applicationContext.getSharedPreferences("preferences_${user.id}", Context.MODE_PRIVATE).getString("preference_connectivity_proxy_host", null)
@@ -68,59 +69,80 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 				auth = UntisAuthentication.createAuthObject(user)
 		))
 
-		val result = UntisRequest().request(query)
-		items = result.fold({ data ->
-			val untisResponse = SerializationUtils.getJSON().parse(MessageResponse.serializer(), data)
+		return runBlocking {
+			val result = UntisRequest().request(query)
+			result.fold({ data ->
+				val untisResponse = SerializationUtils.getJSON().parse(MessageResponse.serializer(), data)
 
-			untisResponse.result?.messages?.map {
-				WidgetListItem(it.id.toLong(), it.subject, it.body)
-			}
-		}, {
-			listOf(WidgetListItem(0, "Failed to load messages", "Tap to retry")) // TODO: Extract string resources
-		})
-		reloadWidget()
+				untisResponse.result?.messages?.map {
+					WidgetListItem(it.id.toLong(), it.subject, it.body)
+				}
+			}, { null }) ?: listOf(errorItem)
+		}
 	}
 
-	private fun loadTimetable() {
-		val timeFormatter: DateTimeFormatter = DateTimeFormat.forPattern("HH:mm")
+	// TODO: This function duplicates code from TimetableLoader. This should be resolved during backend refactoring.
+	private fun loadTimetable(): List<WidgetListItem>? {
 		val timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, user?.id
-				?: return)
-		val timetableLoader = TimetableLoader(WeakReference(applicationContext), user = user, timetableDatabaseInterface = timetableDatabaseInterface,
-				timetableDisplay = object : TimetableDisplay {
-					override fun addTimetableItems(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
-						this@WidgetRemoteViewsFactory.items = items.map {
-							WidgetListItem(
-									it.id,
-									"${it.startDateTime.toString(timeFormatter)} - ${it.endDateTime.toString(timeFormatter)} | ${it.title}",
-									"${it.top}, ${it.bottom}"
-							)
-						}
-						reloadWidget()
-					}
-
-					override fun onTimetableLoadingError(requestId: Int, code: Int?, message: String?) {
-						items = listOf(WidgetListItem(0, "Failed to load timetable", "Tap to retry")) // TODO: Extract string resources
-					}
-				})
-
+				?: return null)
 		val today = UntisDate.fromLocalDate(LocalDate.now())
-		timetableLoader.load(TimetableLoader.TimetableLoaderTarget(
-				today,
-				today,
+		val timeFormatter: DateTimeFormatter = DateTimeFormat.forPattern("HH:mm")
+		val query = UntisRequest.UntisRequestQuery(user)
+
+		//query.proxyHost = proxyHost
+
+		val params = TimetableParams(
 				user.userData.elemId,
-				user.userData.elemType ?: ""
-		), TimetableLoader.FLAG_LOAD_SERVER)
+				user.userData.elemType ?: "",
+				today,
+				today,
+				user.masterDataTimestamp,
+				0,
+				emptyList(),
+				if (user.anonymous) UntisAuthentication.createAuthObject() else UntisAuthentication.createAuthObject(user.user, user.key)
+		)
+
+		query.data.id = "-1"
+		query.data.method = UntisApiConstants.METHOD_GET_TIMETABLE
+		query.data.params = listOf(params)
+
+		return runBlocking {
+			val userDataResult = UntisRequest().request(query)
+			userDataResult.fold({ data ->
+				val untisResponse = SerializationUtils.getJSON().parse(TimetableResponse.serializer(), data)
+
+				return@fold untisResponse.result?.timetable?.periods?.map {
+					TimegridItem(
+							it.id.toLong(),
+							DateTimeUtils.isoDateTimeNoSeconds().withZone(DateTimeZone.getDefault()).parseLocalDateTime(it.startDateTime).toDateTime(),
+							DateTimeUtils.isoDateTimeNoSeconds().withZone(DateTimeZone.getDefault()).parseLocalDateTime(it.endDateTime).toDateTime(),
+							params.type,
+							PeriodData(timetableDatabaseInterface, it)
+					).run {
+						WidgetListItem(
+								id,
+								"${startDateTime.toString(timeFormatter)} - ${endDateTime.toString(timeFormatter)} | $title",
+								"$top, $bottom"
+						)
+					}
+				}
+			}, { null }) ?: listOf(errorItem)
+		}
 	}
 
-	override fun onCreate() {}
+	override fun onCreate() {
+		Log.d("Widgets", "onCreate() for widget #${appWidgetId}")
+		loadItems()
+	}
 
-	override fun onDataSetChanged() {}
+	override fun onDataSetChanged() {
+		Log.d("Widgets", "onDataSetChanged() for widget #${appWidgetId}")
+		loadItems()
+	}
 
 	override fun onDestroy() {}
 
 	override fun getViewAt(position: Int): RemoteViews {
-		while (items == null) Thread.sleep(100)
-
 		return RemoteViews(applicationContext.packageName, R.layout.widget_base_item).apply {
 			items?.get(position)?.let { item: WidgetListItem ->
 				setTextViewText(R.id.textview_listitem_line1, item.firstLine)

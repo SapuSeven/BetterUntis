@@ -4,7 +4,10 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.util.Log
 import android.widget.RemoteViews
+import androidx.core.content.ContextCompat
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.widgets.WidgetRemoteViewsFactory.Companion.WIDGET_TYPE_UNKNOWN
@@ -18,13 +21,14 @@ open class BaseWidget : AppWidgetProvider() {
 	open fun getWidgetType(): Int = WIDGET_TYPE_UNKNOWN
 
 	override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+		Log.d("Widgets", "Provider onUpdate() for ${appWidgetIds.joinToString(",")}")
 		this.context = context
 		this.appWidgetManager = appWidgetManager
 		userDatabase = UserDatabase.createInstance(context)
 
 		for (appWidgetId in appWidgetIds) {
 			user = userDatabase.getUser(loadIdPref(context, appWidgetId))
-			if (user != null) updateAppWidget(appWidgetId)
+			if (user != null) updateData(appWidgetId)
 			else appWidgetManager.updateAppWidget(appWidgetId, loadBaseLayout(user))
 		}
 	}
@@ -35,15 +39,12 @@ open class BaseWidget : AppWidgetProvider() {
 		}
 	}
 
-	private fun updateAppWidget(appWidgetId: Int) {
-		updateData(appWidgetId)
-	}
-
 	private fun updateData(appWidgetId: Int) {
 		val remoteViews = loadBaseLayout(user)
 		val intent = Intent(context, WidgetRemoteViewsService::class.java).apply {
 			putExtra(WidgetRemoteViewsFactory.EXTRA_INT_WIDGET_TYPE, getWidgetType())
 			putExtra(WidgetRemoteViewsFactory.EXTRA_INT_WIDGET_ID, appWidgetId)
+			data = Uri.fromParts("content", appWidgetId.toString(), System.currentTimeMillis().toString())
 		}
 		remoteViews.setRemoteAdapter(R.id.listview_widget_base_content, intent)
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
