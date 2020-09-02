@@ -6,6 +6,8 @@
 	android:initialLayout="@layout/widget_base"
 	android:minWidth="180dp"
 	android:minHeight="180dp"
+	android:minResizeWidth="120dp"
+	android:minResizeHeight="80dp"
 	android:previewImage="@drawable/base_appwidget_preview"
 	android:resizeMode="horizontal|vertical"
 	android:updatePeriodMillis="3600000"

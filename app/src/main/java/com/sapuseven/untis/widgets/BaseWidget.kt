@@ -55,7 +55,6 @@ open class BaseWidget : AppWidgetProvider() {
 		if (user == null) {
 			remoteViews.setTextViewText(R.id.textview_base_widget_account, context.resources.getString(R.string.all_error))
 			remoteViews.setTextViewText(R.id.textview_base_widget_school, context.resources.getString(R.string.all_error))
-			//remoteViews.setTextViewText(R.id.textview_base_widget_content, context.resources.getString(R.string.all_error)) // TODO: Implement list
 		} else {
 			remoteViews.setTextViewText(R.id.textview_base_widget_account, user.userData.displayName)
 			remoteViews.setTextViewText(R.id.textview_base_widget_school, user.userData.schoolName)

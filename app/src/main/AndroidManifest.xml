@@ -34,7 +34,7 @@
 			</intent-filter>
 			<meta-data
 				android:name="android.appwidget.provider"
-				android:resource="@xml/timetable_widget_info" />
+				android:resource="@xml/widget_info" />
 		</receiver>
 		<receiver
 			android:name=".widgets.MessagesWidget"
@@ -44,7 +44,7 @@
 			</intent-filter>
 			<meta-data
 				android:name="android.appwidget.provider"
-				android:resource="@xml/messages_widget_info" />
+				android:resource="@xml/widget_info" />
 		</receiver>
 
 		<activity
