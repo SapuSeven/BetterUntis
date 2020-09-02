@@ -280,7 +280,7 @@ class MainActivity :
 			toggleProfileDropdown(dropdownView, dropdownImage, dropdownList)
 		}
 
-		val profileListAdd = header.findViewById<LinearLayout>(R.id.linearlayout_mainactivitydrawer_add)
+		val profileListAdd = header.findViewById<ConstraintLayout>(R.id.constraintlayout_mainactivitydrawer_add)
 		profileListAdd.setOnClickListener {
 			closeDrawer()
 			addProfile()

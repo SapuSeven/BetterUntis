@@ -48,7 +48,7 @@
 	<string name="menu_infocenter_absences">Absences</string>
 
 	<string name="mainactivitydrawer_dropdown_show">Show profile list</string>
-	<string name="mainactivitydrawer_profile_add">Add a profile…</string>
+	<string name="mainactivitydrawer_profile_add">Add a profile</string>
 	<string name="mainactivitydrawer_profile_delete_hint">Long-press a profile to edit</string>
 
 	<string name="main_dialog_delete_profile_title">Delete profile?</string>

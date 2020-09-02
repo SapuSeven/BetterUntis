@@ -44,7 +44,7 @@
     <string name="menu_infocenter_events">活动</string>
     <string name="menu_infocenter_absences">缺勤</string>
     <string name="mainactivitydrawer_dropdown_show">显示账号列表</string>
-    <string name="mainactivitydrawer_profile_add">添加账号…</string>
+    <string name="mainactivitydrawer_profile_add">添加账号</string>
     <string name="mainactivitydrawer_profile_delete_hint">长按进行编辑</string>
     <string name="main_dialog_delete_profile_title">删除此账号？</string>
     <string name="main_dialog_delete_profile_message">确定要删除你的在校生账号 %1$s %2$s\?</string>
