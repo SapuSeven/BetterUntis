@@ -60,7 +60,7 @@ open class BaseWidget : AppWidgetProvider() {
 			remoteViews.setTextViewText(R.id.textview_base_widget_account, user.userData.displayName)
 			remoteViews.setTextViewText(R.id.textview_base_widget_school, user.userData.schoolName)
 
-			val colorPrimary = when (context.getSharedPreferences("preferences_${user.id}", Context.MODE_PRIVATE).getString("preference_theme", null)) {
+			val primaryColor = when (context.getSharedPreferences("preferences_${user.id}", Context.MODE_PRIVATE).getString("preference_theme", null)) {
 				"untis" -> R.color.colorPrimaryThemeUntis
 				"blue" -> R.color.colorPrimaryThemeBlue
 				"green" -> R.color.colorPrimaryThemeGreen
@@ -69,7 +69,7 @@ open class BaseWidget : AppWidgetProvider() {
 				"pixel" -> R.color.colorPrimaryThemePixel
 				else -> R.color.colorPrimary
 			}
-			remoteViews.setInt(R.id.linearlayout_base_widget_top_bar, "setBackgroundColor", context.resources.getColor(colorPrimary))
+			remoteViews.setInt(R.id.linearlayout_base_widget_top_bar, "setBackgroundColor", ContextCompat.getColor(context, primaryColor))
 		}
 
 		return remoteViews
