@@ -111,7 +111,7 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 			userDataResult.fold({ data ->
 				val untisResponse = SerializationUtils.getJSON().parse(TimetableResponse.serializer(), data)
 
-				return@fold untisResponse.result?.timetable?.periods?.map {
+				return@fold untisResponse.result?.timetable?.periods?.sortedBy { it.startDateTime }?.map {
 					TimegridItem(
 							it.id.toLong(),
 							DateTimeUtils.isoDateTimeNoSeconds().withZone(DateTimeZone.getDefault()).parseLocalDateTime(it.startDateTime).toDateTime(),
