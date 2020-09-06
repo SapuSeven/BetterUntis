@@ -43,7 +43,7 @@
     <string name="menu_infocenter_events">Termine</string>
     <string name="menu_infocenter_absences">Abwesenheiten</string>
     <string name="mainactivitydrawer_dropdown_show">Alle Profile anzeigen</string>
-    <string name="mainactivitydrawer_profile_add">Profil hinzufügen…</string>
+    <string name="mainactivitydrawer_profile_add">Profil hinzufügen</string>
     <string name="mainactivitydrawer_profile_delete_hint">Lange auf ein Profil tippen, um zu bearbeiten</string>
     <string name="main_dialog_delete_profile_title">Profil löschen?</string>
     <string name="main_dialog_delete_profile_message">Bist du sicher, dass du dein Profil mit dem Benutzer %1$s an der Schule %2$s löschen möchtest\?</string>
