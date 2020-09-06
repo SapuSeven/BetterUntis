@@ -54,6 +54,7 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 	private var status = STATUS_UNKNOWN
 
 	private val errorItem = WidgetListItem(0, "Failed to load data", "Tap to retry") // TODO: Extract string resources
+	private val noLessonsItem = WidgetListItem(0, "No lessons today", "Enjoy your free time!") // TODO: Extract string resources
 
 	private fun loadItems() {
 		status = STATUS_LOADING
@@ -142,9 +143,10 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 					}
 				}
 
-				if (items != null)
+				items?.let {
 					status = STATUS_DONE
-				items
+					if (it.isNotEmpty()) it else listOf(noLessonsItem)
+				}
 			}, { null }) ?: run {
 				status = STATUS_ERROR
 				listOf(errorItem)
