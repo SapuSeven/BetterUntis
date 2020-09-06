@@ -133,12 +133,13 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 							DateTimeUtils.isoDateTimeNoSeconds().withZone(DateTimeZone.getDefault()).parseLocalDateTime(it.startDateTime).toDateTime(),
 							DateTimeUtils.isoDateTimeNoSeconds().withZone(DateTimeZone.getDefault()).parseLocalDateTime(it.endDateTime).toDateTime(),
 							params.type,
-							PeriodData(timetableDatabaseInterface, it)
+							PeriodData(timetableDatabaseInterface, it),
+							includeOrgIds = false
 					).run {
 						WidgetListItem(
 								id,
 								"${startDateTime.toString(timeFormatter)} - ${endDateTime.toString(timeFormatter)} | $title",
-								"$top, $bottom"
+								arrayOf(top, bottom).joinToString(PeriodData.ELEMENT_NAME_SEPARATOR)
 						)
 					}
 				}
