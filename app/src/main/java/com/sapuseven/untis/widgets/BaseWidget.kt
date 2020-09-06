@@ -1,5 +1,6 @@
 package com.sapuseven.untis.widgets
 
+import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
@@ -12,6 +13,7 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.widgets.WidgetRemoteViewsFactory.Companion.WIDGET_TYPE_UNKNOWN
 
+
 open class BaseWidget : AppWidgetProvider() {
 	private var user: UserDatabase.User? = null
 	private lateinit var userDatabase: UserDatabase
@@ -19,6 +21,15 @@ open class BaseWidget : AppWidgetProvider() {
 	private lateinit var appWidgetManager: AppWidgetManager
 
 	open fun getWidgetType(): Int = WIDGET_TYPE_UNKNOWN
+
+	companion object {
+		const val EXTRA_INT_RELOAD = "com.sapuseven.widgets.reload"
+	}
+
+	override fun onReceive(context: Context, intent: Intent) {
+		if (intent.getBooleanExtra(EXTRA_INT_RELOAD, true))
+			super.onReceive(context, intent)
+	}
 
 	override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
 		Log.d("Widgets", "Provider onUpdate() for ${appWidgetIds.joinToString(",")}")
@@ -29,7 +40,7 @@ open class BaseWidget : AppWidgetProvider() {
 		for (appWidgetId in appWidgetIds) {
 			user = userDatabase.getUser(loadIdPref(context, appWidgetId))
 			if (user != null) updateData(appWidgetId)
-			else appWidgetManager.updateAppWidget(appWidgetId, loadBaseLayout(user))
+			else appWidgetManager.updateAppWidget(appWidgetId, loadBaseLayout(user, appWidgetId))
 		}
 	}
 
@@ -40,7 +51,7 @@ open class BaseWidget : AppWidgetProvider() {
 	}
 
 	private fun updateData(appWidgetId: Int) {
-		val remoteViews = loadBaseLayout(user)
+		val remoteViews = loadBaseLayout(user, appWidgetId)
 		val intent = Intent(context, WidgetRemoteViewsService::class.java).apply {
 			putExtra(WidgetRemoteViewsFactory.EXTRA_INT_WIDGET_TYPE, getWidgetType())
 			putExtra(WidgetRemoteViewsFactory.EXTRA_INT_WIDGET_ID, appWidgetId)
@@ -50,7 +61,7 @@ open class BaseWidget : AppWidgetProvider() {
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
 	}
 
-	private fun loadBaseLayout(user: UserDatabase.User?): RemoteViews {
+	private fun loadBaseLayout(user: UserDatabase.User?, appWidgetId: Int): RemoteViews {
 		val remoteViews = RemoteViews(context.packageName, R.layout.widget_base)
 		if (user == null) {
 			remoteViews.setTextViewText(R.id.textview_base_widget_account, context.resources.getString(R.string.all_error))
@@ -70,6 +81,12 @@ open class BaseWidget : AppWidgetProvider() {
 			}
 			remoteViews.setInt(R.id.linearlayout_base_widget_top_bar, "setBackgroundColor", ContextCompat.getColor(context, primaryColor))
 		}
+
+		val updateIntent = Intent()
+				.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
+				.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(appWidgetId))
+		val pendingIntent = PendingIntent.getBroadcast(context, 0, updateIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+		remoteViews.setPendingIntentTemplate(R.id.listview_widget_base_content, pendingIntent)
 
 		return remoteViews
 	}

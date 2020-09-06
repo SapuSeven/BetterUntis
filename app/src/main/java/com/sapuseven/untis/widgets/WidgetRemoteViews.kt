@@ -22,6 +22,7 @@ import com.sapuseven.untis.models.untis.params.MessageParams
 import com.sapuseven.untis.models.untis.params.TimetableParams
 import com.sapuseven.untis.models.untis.response.MessageResponse
 import com.sapuseven.untis.models.untis.response.TimetableResponse
+import com.sapuseven.untis.widgets.BaseWidget.Companion.EXTRA_INT_RELOAD
 import kotlinx.coroutines.runBlocking
 import org.joda.time.DateTimeZone
 import org.joda.time.LocalDate
@@ -37,6 +38,11 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 		const val WIDGET_TYPE_UNKNOWN = 0
 		const val WIDGET_TYPE_MESSAGES = 1
 		const val WIDGET_TYPE_TIMETABLE = 2
+
+		const val STATUS_UNKNOWN = 0
+		const val STATUS_DONE = 1
+		const val STATUS_LOADING = 2
+		const val STATUS_ERROR = 3
 	}
 
 	private val appWidgetId = intent.getIntExtra(EXTRA_INT_WIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
@@ -45,9 +51,12 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 	private val type = intent.getIntExtra(EXTRA_INT_WIDGET_TYPE, 0)
 	private var items: List<WidgetListItem>? = null
 
+	private var status = STATUS_UNKNOWN
+
 	private val errorItem = WidgetListItem(0, "Failed to load data", "Tap to retry") // TODO: Extract string resources
 
 	private fun loadItems() {
+		status = STATUS_LOADING
 		try {
 			items = when (type) {
 				WIDGET_TYPE_MESSAGES -> loadMessages()
@@ -73,11 +82,17 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 			val result = UntisRequest().request(query)
 			result.fold({ data ->
 				val untisResponse = SerializationUtils.getJSON().parse(MessageResponse.serializer(), data)
-
-				untisResponse.result?.messages?.map {
+				items = untisResponse.result?.messages?.map {
 					WidgetListItem(it.id.toLong(), it.subject, it.body)
 				}
-			}, { null }) ?: listOf(errorItem)
+
+				if (items != null)
+					status = STATUS_DONE
+				items
+			}, { null }) ?: run {
+				status = STATUS_ERROR
+				listOf(errorItem)
+			}
 		}
 	}
 
@@ -111,7 +126,7 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 			userDataResult.fold({ data ->
 				val untisResponse = SerializationUtils.getJSON().parse(TimetableResponse.serializer(), data)
 
-				return@fold untisResponse.result?.timetable?.periods?.sortedBy { it.startDateTime }?.map {
+				items = untisResponse.result?.timetable?.periods?.sortedBy { it.startDateTime }?.map {
 					TimegridItem(
 							it.id.toLong(),
 							DateTimeUtils.isoDateTimeNoSeconds().withZone(DateTimeZone.getDefault()).parseLocalDateTime(it.startDateTime).toDateTime(),
@@ -126,7 +141,14 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 						)
 					}
 				}
-			}, { null }) ?: listOf(errorItem)
+
+				if (items != null)
+					status = STATUS_DONE
+				items
+			}, { null }) ?: run {
+				status = STATUS_ERROR
+				listOf(errorItem)
+			}
 		}
 	}
 
@@ -148,6 +170,10 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 				setTextViewText(R.id.textview_listitem_line1, item.firstLine)
 				setTextViewText(R.id.textview_listitem_line2, item.secondLine)
 			}
+
+			val reloadIntent = Intent()
+					.putExtra(EXTRA_INT_RELOAD, status == STATUS_ERROR)
+			setOnClickFillInIntent(R.id.linearlayout_widget_listitem_root, reloadIntent)
 		}
 	}
 
