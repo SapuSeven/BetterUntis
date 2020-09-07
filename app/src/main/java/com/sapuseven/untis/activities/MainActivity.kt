@@ -10,7 +10,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.*
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -225,24 +228,27 @@ class MainActivity :
 	}
 
 	private fun checkShortcut(): Boolean {
-		val extras = intent.extras
-		if (extras != null) {
+		return intent.extras?.let { extras ->
 			val userId = extras.getLong("user")
-			if (preferences.currentProfileId() != userId) {
+			if (preferences.currentProfileId() != userId)
 				switchToProfile(userDatabase.getUser(userId) ?: return false)
-			}
+
 			val element = PeriodElement(
 					type = extras.getString("type") ?: return false,
 					id = extras.getInt("id"),
 					orgId = extras.getInt("orgId")
 			)
 			val useOrgId = extras.getBoolean("useOrgId")
-			setTarget(if (useOrgId) element.orgId else element.id, element.type, timetableDatabaseInterface.getLongName(
-					if (useOrgId) element.orgId else element.id, TimetableDatabaseInterface.Type.valueOf(element.type)))
-			return true
-		} else {
-			return false
-		}
+			setTarget(
+					if (useOrgId) element.orgId else element.id,
+					element.type,
+					timetableDatabaseInterface.getLongName(
+							if (useOrgId) element.orgId else element.id,
+							TimetableDatabaseInterface.Type.valueOf(element.type)
+					)
+			)
+			true
+		} ?: false
 	}
 
 	private fun setupNotifications() {
