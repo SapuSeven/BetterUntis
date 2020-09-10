@@ -1,8 +1,8 @@
 package com.sapuseven.untis.helpers
 
-import com.sapuseven.untis.data.timetable.TimegridItem
+// This code will later be used for the backend once the project is split into modules
 
-object TimetableListSorter {
+/*object TimetableListSorter {
 	fun formatItems(items: List<TimegridItem>): List<TimegridItem> {
 		return mergeLessons(quickSort(items))
 	}
@@ -39,4 +39,4 @@ object TimetableListSorter {
 		}
 		return mutableList.toList()
 	}
-}
+}*/
