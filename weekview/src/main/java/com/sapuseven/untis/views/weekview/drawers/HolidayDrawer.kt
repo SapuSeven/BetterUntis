@@ -8,7 +8,7 @@ import com.sapuseven.untis.views.weekview.HolidayChip
 import com.sapuseven.untis.views.weekview.config.WeekViewConfig
 
 class HolidayDrawer(private val config: WeekViewConfig) : BaseDrawer {
-	var holidayChips: List<HolidayChip> = emptyList<HolidayChip>()
+	var holidayChips: List<HolidayChip> = emptyList()
 
 	override fun draw(drawingContext: DrawingContext, canvas: Canvas) {
 		val text = mutableListOf<String>()

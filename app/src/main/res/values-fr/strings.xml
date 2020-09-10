@@ -43,7 +43,6 @@
     <string name="settings_designing_info">En savoir plus</string>
     <string name="settings_designing_hide">Ne plus afficher</string>
     <string name="settings_designing_message">Contribuez en créant les icônes de réglage manquantes !</string>
-    <string name="preferences_contributors_contributions">%1$d contributions</string>
     <string name="preference_week_snap_to_days_summary">à la place des semaines</string>
     <string name="preference_week_snap_to_days">Défilement journalier</string>
     <string name="preference_week_display_length_summary">Définir à 0 pour utiliser la longueur de la semaine</string>
@@ -240,8 +239,6 @@
     <string name="activity_title_info_center">Centre d’infos</string>
     <string name="activity_title_free_rooms">Salles libres</string>
     <string name="activity_title_errors">Erreurs</string>
-    <string name="all_dialog_crash_copied">Rapport de plantage copié dans le presse-papier.</string>
-    <string name="all_dialog_crash_title">Rapport de plantage trouvé</string>
     <string name="all_dialog_error_message">Identifiant de la demande : %1$d
 \nCode de l’erreur : %2$d
 \nMessage d’erreur : %3$s</string>
@@ -255,7 +252,6 @@
     <string name="all_add">Ajouter</string>
     <string name="all_report">Signaler</string>
     <string name="all_error">Erreur</string>
-    <string name="all_copy">Copier</string>
     <string name="all_cancel">Annuler</string>
     <string name="all_close">Fermer</string>
     <string name="all_no">Non</string>

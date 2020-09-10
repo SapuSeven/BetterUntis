@@ -58,8 +58,8 @@ class TimetableLoader(
 
 		if (cache.exists()) {
 			Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): cached file found")
-			cache.load()?.let {
-				timetableDisplay.addTimetableItems(it.items.map { periodToTimegridItem(it, target.type) }, target.startDate, target.endDate, it.timestamp)
+			cache.load()?.let { cacheObject ->
+				timetableDisplay.addTimetableItems(cacheObject.items.map { periodToTimegridItem(it, target.type) }, target.startDate, target.endDate, cacheObject.timestamp)
 			} ?: run {
 				cache.delete()
 				Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): cached file corrupted")

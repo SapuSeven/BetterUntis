@@ -18,7 +18,6 @@
 	<string name="all_no">No</string>
 	<string name="all_close">Close</string>
 	<string name="all_cancel">Cancel</string>
-	<string name="all_copy">Copy</string>
 	<string name="all_error">Error</string>
 	<string name="all_report">Report</string>
 	<string name="all_add">Add</string>
@@ -30,8 +29,6 @@
 	<string name="all_dialog_datepicker_button_today">Today</string>
 	<string name="all_dialog_error_title">Error information</string>
 	<string name="all_dialog_error_message">Request ID: %1$d\nError code: %2$d\nError message: %3$s</string>
-	<string name="all_dialog_crash_title">Crash log found</string>
-	<string name="all_dialog_crash_copied">Crash log copied to clipboard.</string>
 
 	<string name="activity_title_errors">Errors</string>
 	<string name="activity_title_free_rooms">Free Rooms</string>
@@ -239,7 +236,6 @@
 	<string name="preference_week_snap_to_days">Snap to days</string>
 	<string name="preference_week_snap_to_days_summary">instead of weeks</string>
 	<string name="preferences_connectivity">Connectivity</string>
-	<string name="preferences_contributors_contributions">%1$d contributions</string>
 	<string name="preferences_general">General</string>
 	<string name="preferences_infos">About</string>
 	<string name="preferences_notifications">Notifications</string>
@@ -310,5 +306,9 @@
 	<plurals name="roomfinder_item_desc">
 		<item quantity="one">This Room is free right now.</item>
 		<item quantity="other">This Room is free for %d hours.</item>
+	</plurals>
+	<plurals name="preferences_contributors_contributions">
+		<item quantity="one">%1$d contribution</item>
+		<item quantity="other">%1$d contributions</item>
 	</plurals>
 </resources>

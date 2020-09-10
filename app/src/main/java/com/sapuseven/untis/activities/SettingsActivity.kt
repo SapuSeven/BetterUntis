@@ -289,7 +289,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 					preferenceScreen.addPreference(Preference(context).apply {
 						GlobalScope.launch(Dispatchers.Main) { icon = loadProfileImage(user.avatar_url, resources) }
 						title = user.login
-						summary = resources.getString(R.string.preferences_contributors_contributions, user.contributions)
+						summary = resources.getQuantityString(R.plurals.preferences_contributors_contributions, user.contributions, user.contributions)
 						setOnPreferenceClickListener {
 							startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(user.html_url)))
 							true

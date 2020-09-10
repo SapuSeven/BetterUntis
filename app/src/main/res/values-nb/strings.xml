@@ -15,7 +15,6 @@
     <string name="all_no">Nei</string>
     <string name="all_close">Lukk</string>
     <string name="all_cancel">Avbryt</string>
-    <string name="all_copy">Kopier</string>
     <string name="all_error">Feil</string>
     <string name="all_report">Rapporter</string>
     <string name="all_add">Legg til</string>
@@ -27,8 +26,6 @@
     <string name="all_dialog_datepicker_button_today">I dag</string>
     <string name="all_dialog_error_title">Informasjon om feil</string>
     <string name="all_dialog_error_message">Etterspørsel-ID: %1$d\nFeilkode: %2$d\nFeilmelding: %3$s</string>
-    <string name="all_dialog_crash_title">Krasjlogg funnet</string>
-    <string name="all_dialog_crash_copied">Krasjlogg kopiert til utklippstavlen.</string>
     <string name="activity_title_free_rooms">Ledige rom</string>
     <string name="activity_title_info_center">Infosenter</string>
     <string name="activity_title_settings">Innstillinger</string>
@@ -255,7 +252,6 @@
     <string name="loading_failed">Innlasting mislyktes</string>
     <string name="loading">Laster</string>
     <string name="errors_crash_message">Dette beklages.</string>
-    <string name="preferences_contributors_contributions">%1$d bidragsytere</string>
     <string name="preference_info_libraries_desc">En liste over alle brukte bibliotek</string>
     <string name="preference_info_libraries">Bibliotek</string>
     <string name="preference_info_contributors_desc">En liste over bidragsyterne</string>
