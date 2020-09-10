@@ -48,7 +48,7 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 	private val appWidgetId = intent.getIntExtra(EXTRA_INT_WIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
 	private val userDatabase = UserDatabase.createInstance(applicationContext)
 	private val user = userDatabase.getUser(loadIdPref(applicationContext, appWidgetId))
-	private val type = intent.getIntExtra(EXTRA_INT_WIDGET_TYPE, 0)
+	private val type = intent.getIntExtra(EXTRA_INT_WIDGET_TYPE, WIDGET_TYPE_UNKNOWN)
 	private var items: List<WidgetListItem>? = null
 
 	private var status = STATUS_UNKNOWN
@@ -83,13 +83,12 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 			val result = UntisRequest().request(query)
 			result.fold({ data ->
 				val untisResponse = SerializationUtils.getJSON().parse(MessageResponse.serializer(), data)
-				items = untisResponse.result?.messages?.map {
+				untisResponse.result?.messages?.map {
 					WidgetListItem(it.id.toLong(), it.subject, it.body)
-				}
-
-				if (items != null)
+				}?.let {
 					status = STATUS_DONE
-				items
+					it
+				}
 			}, { null }) ?: run {
 				status = STATUS_ERROR
 				listOf(errorItem)
@@ -127,7 +126,7 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 			userDataResult.fold({ data ->
 				val untisResponse = SerializationUtils.getJSON().parse(TimetableResponse.serializer(), data)
 
-				items = untisResponse.result?.timetable?.periods?.sortedBy { it.startDateTime }?.map {
+				untisResponse.result?.timetable?.periods?.sortedBy { it.startDateTime }?.map {
 					TimegridItem(
 							it.id.toLong(),
 							DateTimeUtils.isoDateTimeNoSeconds().withZone(DateTimeZone.getDefault()).parseLocalDateTime(it.startDateTime).toDateTime(),
@@ -139,12 +138,10 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 						WidgetListItem(
 								id,
 								"${startDateTime.toString(timeFormatter)} - ${endDateTime.toString(timeFormatter)} | $title",
-								arrayOf(top, bottom).joinToString(PeriodData.ELEMENT_NAME_SEPARATOR)
+								arrayOf(top, bottom).filter { s -> s.isNotBlank() }.joinToString(PeriodData.ELEMENT_NAME_SEPARATOR)
 						)
 					}
-				}
-
-				items?.let {
+				}?.let {
 					status = STATUS_DONE
 					if (it.isNotEmpty()) it else listOf(noLessonsItem)
 				}
@@ -176,6 +173,7 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 
 			val reloadIntent = Intent()
 					.putExtra(EXTRA_INT_RELOAD, status == STATUS_ERROR)
+					.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(appWidgetId))
 			setOnClickFillInIntent(R.id.linearlayout_widget_listitem_root, reloadIntent)
 		}
 	}

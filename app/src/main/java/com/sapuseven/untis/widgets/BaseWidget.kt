@@ -40,7 +40,7 @@ open class BaseWidget : AppWidgetProvider() {
 		for (appWidgetId in appWidgetIds) {
 			user = userDatabase.getUser(loadIdPref(context, appWidgetId))
 			if (user != null) updateData(appWidgetId)
-			else appWidgetManager.updateAppWidget(appWidgetId, loadBaseLayout(user, appWidgetId))
+			else appWidgetManager.updateAppWidget(appWidgetId, loadBaseLayout(user))
 		}
 	}
 
@@ -51,17 +51,17 @@ open class BaseWidget : AppWidgetProvider() {
 	}
 
 	private fun updateData(appWidgetId: Int) {
-		val remoteViews = loadBaseLayout(user, appWidgetId)
-		val intent = Intent(context, WidgetRemoteViewsService::class.java).apply {
-			putExtra(WidgetRemoteViewsFactory.EXTRA_INT_WIDGET_TYPE, getWidgetType())
-			putExtra(WidgetRemoteViewsFactory.EXTRA_INT_WIDGET_ID, appWidgetId)
-			data = Uri.fromParts("content", appWidgetId.toString(), System.currentTimeMillis().toString())
-		}
+		val remoteViews = loadBaseLayout(user)
+		val intent = Intent(context, WidgetRemoteViewsService::class.java)
+				.putExtra(WidgetRemoteViewsFactory.EXTRA_INT_WIDGET_TYPE, getWidgetType())
+				.putExtra(WidgetRemoteViewsFactory.EXTRA_INT_WIDGET_ID, appWidgetId)
+				.setData(Uri.fromParts("content", appWidgetId.toString(), System.currentTimeMillis().toString()))
+
 		remoteViews.setRemoteAdapter(R.id.listview_widget_base_content, intent)
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
 	}
 
-	private fun loadBaseLayout(user: UserDatabase.User?, appWidgetId: Int): RemoteViews {
+	private fun loadBaseLayout(user: UserDatabase.User?): RemoteViews {
 		val remoteViews = RemoteViews(context.packageName, R.layout.widget_base)
 		if (user == null) {
 			remoteViews.setTextViewText(R.id.textview_base_widget_account, context.resources.getString(R.string.all_error))
@@ -82,9 +82,8 @@ open class BaseWidget : AppWidgetProvider() {
 			remoteViews.setInt(R.id.linearlayout_base_widget_top_bar, "setBackgroundColor", ContextCompat.getColor(context, primaryColor))
 		}
 
-		val updateIntent = Intent()
+		val updateIntent = Intent(context, this.javaClass)
 				.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
-				.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(appWidgetId))
 		val pendingIntent = PendingIntent.getBroadcast(context, 0, updateIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 		remoteViews.setPendingIntentTemplate(R.id.listview_widget_base_content, pendingIntent)
 
