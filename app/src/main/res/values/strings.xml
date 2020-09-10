@@ -295,6 +295,13 @@
 	<string name="library_swiperefreshlayout" translatable="false">Android Support Library Custom View</string>
 	<string name="library_weekview" translatable="false">WeekView</string>
 
+	<string name="widget_configuration">Widget Configuration</string>
+	<string name="widget_timetable">Timetable</string>
+	<string name="widget_timetable_empty">No timetable available for today</string>
+	<string name="widget_daily_messages">Daily Messages</string>
+	<string name="widget_select_profile">Please select a profile for the widget</string>
+	<string name="widget_timetable_link">Timetable Link</string>
+
 	<plurals name="main_time_diff_minutes">
 		<item quantity="one">a minute ago</item>
 		<item quantity="other">%d minutes ago</item>

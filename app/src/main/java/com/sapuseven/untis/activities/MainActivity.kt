@@ -10,7 +10,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.*
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -149,7 +152,7 @@ class MainActivity :
 			if (profileUser.schoolId.isBlank()) return
 
 			setupTimetableLoader()
-			showPersonalTimetable()
+			if (!checkShortcut()) showPersonalTimetable()
 			refreshNavigationViewSelection()
 		}
 	}
@@ -222,6 +225,30 @@ class MainActivity :
 			val customId = preferences.defaultPrefs.getInt("preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_ID}", -1)
 			return setTarget(customId, customType.toString(), timetableDatabaseInterface.getLongName(customId, customType))
 		}
+	}
+
+	private fun checkShortcut(): Boolean {
+		return intent.extras?.let { extras ->
+			val userId = extras.getLong("user")
+			if (preferences.currentProfileId() != userId)
+				switchToProfile(userDatabase.getUser(userId) ?: return false)
+
+			val element = PeriodElement(
+					type = extras.getString("type") ?: return false,
+					id = extras.getInt("id"),
+					orgId = extras.getInt("orgId")
+			)
+			val useOrgId = extras.getBoolean("useOrgId")
+			setTarget(
+					if (useOrgId) element.orgId else element.id,
+					element.type,
+					timetableDatabaseInterface.getLongName(
+							if (useOrgId) element.orgId else element.id,
+							TimetableDatabaseInterface.Type.valueOf(element.type)
+					)
+			)
+			true
+		} ?: false
 	}
 
 	private fun setupNotifications() {
