@@ -20,6 +20,7 @@ import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.models.UntisSchoolInfo
+import com.sapuseven.untis.models.untis.masterdata.TimeGrid
 import com.sapuseven.untis.models.untis.params.AppSharedSecretParams
 import com.sapuseven.untis.models.untis.params.SchoolSearchParams
 import com.sapuseven.untis.models.untis.params.UserDataParams
@@ -337,7 +338,7 @@ class LoginDataInputActivity : BaseActivity() {
 					if (!anonymous) username else null,
 					if (!anonymous) appSharedSecret else null,
 					anonymous,
-					response.masterData.timeGrid,
+					response.masterData.timeGrid ?: TimeGrid.generateDefault(),
 					response.masterData.timeStamp,
 					response.userData,
 					response.settings
