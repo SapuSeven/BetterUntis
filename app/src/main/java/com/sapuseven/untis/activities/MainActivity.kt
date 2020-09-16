@@ -33,6 +33,9 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.sapuseven.untis.R
 import com.sapuseven.untis.adapters.ProfileListAdapter
+import com.sapuseven.untis.data.connectivity.UntisApiConstants
+import com.sapuseven.untis.data.connectivity.UntisAuthentication
+import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.dialogs.DatePickerDialog
@@ -42,12 +45,16 @@ import com.sapuseven.untis.dialogs.TimetableItemDetailsDialog
 import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
+import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.config.PreferenceUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.interfaces.TimetableDisplay
+import com.sapuseven.untis.models.UntisMessage
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.Holiday
+import com.sapuseven.untis.models.untis.params.MessageParams
+import com.sapuseven.untis.models.untis.response.MessageResponse
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.ElementPickerPreference
 import com.sapuseven.untis.preferences.RangePreference
@@ -64,12 +71,16 @@ import com.sapuseven.untis.views.weekview.listeners.TopLeftCornerClickListener
 import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants
 import org.joda.time.Instant
 import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
+import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity :
@@ -277,6 +288,8 @@ class MainActivity :
 		(navigationView.getHeaderView(0).findViewById<View>(R.id.textview_mainactivitydrawer_line2) as TextView).text =
 				if (line2.isBlank()) getString(R.string.all_contact_email) else line2
 
+		refreshMessages(profileUser, navigationView)
+
 		navigationView.menu.findItem(R.id.nav_messenger).isVisible = false
 	}
 
@@ -321,6 +334,40 @@ class MainActivity :
 
 			recreate()
 		}
+	}
+
+	private fun refreshMessages(user: UserDatabase.User, navigationView: NavigationView) = GlobalScope.launch(Dispatchers.Main) {
+		loadMessages(user)?.let {
+			navigationView.menu.findItem(R.id.nav_infocenter).icon = if (
+					it.size > preferences.defaultPrefs.getInt("preference_last_messages_count", 0) ||
+					(SimpleDateFormat("dd-MM-yyyy", Locale.US).format(Calendar.getInstance().time) != preferences.defaultPrefs.getString("preference_last_messages_date", "")
+							&& it.isNotEmpty())
+			) {
+				getDrawable(R.drawable.all_infocenter_dot)
+			} else {
+				getDrawable(R.drawable.all_infocenter)
+			}
+		}
+	}
+
+	//TODO: Duplicated function from info center
+	private suspend fun loadMessages(user: UserDatabase.User): List<UntisMessage>? {
+
+		val query = UntisRequest.UntisRequestQuery(user)
+
+		query.data.method = UntisApiConstants.METHOD_GET_MESSAGES
+		query.proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
+		query.data.params = listOf(MessageParams(
+				UntisDate.fromLocalDate(LocalDate.now()),
+				auth = UntisAuthentication.createAuthObject(user)
+		))
+
+		val result = UntisRequest().request(query)
+		return result.fold({ data ->
+			val untisResponse = SerializationUtils.getJSON().parse(MessageResponse.serializer(), data)
+
+			untisResponse.result?.messages
+		}, { null })
 	}
 
 	private fun setupViews() {

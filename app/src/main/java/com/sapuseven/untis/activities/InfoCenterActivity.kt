@@ -25,6 +25,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.joda.time.LocalDate
+import java.text.SimpleDateFormat
+import java.util.*
 
 class InfoCenterActivity : BaseActivity() {
 	private val officeHourList = arrayListOf<UntisOfficeHour>()
@@ -118,6 +120,11 @@ class InfoCenterActivity : BaseActivity() {
 			messageList.clear()
 			messageList.addAll(it)
 			messageAdapter.notifyDataSetChanged()
+
+			preferences.defaultPrefs.edit()
+					.putInt("preference_last_messages_count", it.size)
+					.putString("preference_last_messages_date", SimpleDateFormat("dd-MM-yyyy", Locale.US).format(Calendar.getInstance().time))
+					.apply()
 		}
 		messagesLoading = false
 		if (bottomnavigationview_infocenter.selectedItemId == R.id.item_infocenter_messages) {
