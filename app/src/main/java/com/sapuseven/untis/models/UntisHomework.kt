@@ -1,6 +1,7 @@
 package com.sapuseven.untis.models
 
 import com.sapuseven.untis.models.untis.UntisDate
+import com.sapuseven.untis.models.untis.UntisHomeworkAttachment
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -10,7 +11,7 @@ data class UntisHomework(
 		val startDate: UntisDate,
 		val endDate: UntisDate,
 		val text: String,
-		val remark: UnknownObject?,
+		val remark: String? = null,
 		val completed: Boolean,
-		val attachments: List<UnknownObject>
+		val attachments: List<UntisHomeworkAttachment>
 )

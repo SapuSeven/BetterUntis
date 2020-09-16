@@ -1,9 +1,9 @@
-package com.sapuseven.untis.models.untis.timetable
+package com.sapuseven.untis.models.untis
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class PeriodHomeworkAttachment(
+data class UntisHomeworkAttachment(
 		val id: Int,
 		val name: String,
 		val url: String
