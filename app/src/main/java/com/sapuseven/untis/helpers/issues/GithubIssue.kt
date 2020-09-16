@@ -17,9 +17,10 @@ class GithubIssue(type: Type, log: String) : Issue(type, log) {
 				.scheme("https")
 				.authority("github.com")
 				.path("/SapuSeven/BetterUntis/issues/new")
+				.appendQueryParameter("labels", "bug")
+				.appendQueryParameter("template", "bug-report.md")
 				.appendQueryParameter("title", generateTitle())
 				.appendQueryParameter("body", generateBody())
-				.appendQueryParameter("labels", "bug") //TODO: Make this label thing work
 
 		val browserIntent = Intent(Intent.ACTION_VIEW, uri.build())
 		context.startActivity(browserIntent)
