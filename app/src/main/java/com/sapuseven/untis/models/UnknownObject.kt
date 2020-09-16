@@ -2,14 +2,13 @@ package com.sapuseven.untis.models
 
 import com.sapuseven.untis.helpers.ErrorLogger
 import kotlinx.serialization.*
-import kotlinx.serialization.internal.StringDescriptor
 import kotlinx.serialization.json.JsonInput
 
 @Serializable
 class UnknownObject(val jsonString: String?) {
 	@Serializer(forClass = UnknownObject::class)
 	companion object : KSerializer<UnknownObject> {
-		override val descriptor: SerialDescriptor = StringDescriptor.withName("UnknownObject")
+		override val descriptor: SerialDescriptor = PrimitiveDescriptor("UnknownObject", PrimitiveKind.STRING)
 
 		override fun serialize(encoder: Encoder, obj: UnknownObject) {}
 

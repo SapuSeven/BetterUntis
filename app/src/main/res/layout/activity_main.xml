@@ -16,13 +16,13 @@
 		<com.google.android.material.appbar.AppBarLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:theme="@style/AppTheme.AppBarOverlay">
+			android:theme="?attr/actionBarTheme">
 
 			<androidx.appcompat.widget.Toolbar
 				android:id="@+id/toolbar_main"
 				android:layout_width="match_parent"
 				android:layout_height="?attr/actionBarSize"
-				android:background="?attr/colorPrimary"
+				android:background="?attr/actionBarBackground"
 				app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
 		</com.google.android.material.appbar.AppBarLayout>
@@ -36,7 +36,6 @@
 		android:layout_width="wrap_content"
 		android:layout_height="match_parent"
 		android:layout_gravity="start"
-		android:fitsSystemWindows="true"
 		app:headerLayout="@layout/activity_main_drawer_header"
 		app:menu="@menu/activity_main_drawer"/>
 

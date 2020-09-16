@@ -8,19 +8,19 @@
 		android:title="@string/preferences_general">
 
 		<PreferenceCategory android:title="@string/preference_category_general_behaviour">
-			<CheckBoxPreference
+			<SwitchPreference
 				android:defaultValue="@bool/preference_double_tap_to_exit_default"
 				android:key="preference_double_tap_to_exit"
 				android:title="@string/preference_double_tap_to_exit" />
 
-			<CheckBoxPreference
+			<SwitchPreference
 				android:defaultValue="@bool/preference_fling_enable_default"
 				android:key="preference_fling_enable"
 				android:title="@string/preference_flinging_enable" />
 		</PreferenceCategory>
 
 		<PreferenceCategory android:title="@string/preference_category_general_week_display">
-			<CheckBoxPreference
+			<SwitchPreference
 				android:defaultValue="@bool/preference_week_snap_to_days_default"
 				android:key="preference_week_snap_to_days"
 				android:summary="@string/preference_week_snap_to_days_summary"
@@ -40,12 +40,12 @@
 		</PreferenceCategory>
 
 		<PreferenceCategory android:title="@string/preference_category_general_automute">
-			<CheckBoxPreference
+			<SwitchPreference
 				android:defaultValue="@bool/preference_automute_enable_default"
 				android:key="preference_automute_enable"
 				android:summary="@string/preference_automute_enable_summary"
 				android:title="@string/preference_automute_enable" />
-			<CheckBoxPreference
+			<SwitchPreference
 				android:defaultValue="@bool/preference_automute_cancelled_lessons_default"
 				android:dependency="preference_automute_enable"
 				android:key="preference_automute_cancelled_lessons"
@@ -54,7 +54,7 @@
 
 		<!-- TODO: Extract string resources -->
 		<PreferenceCategory android:title="Error Reporting">
-			<CheckBoxPreference
+			<SwitchPreference
 				android:defaultValue="preference_additional_error_messages_default"
 				android:key="preference_additional_error_messages"
 				android:summary="This is used for non-critical background errors"
@@ -73,7 +73,7 @@
 		android:title="@string/preferences_styling">
 
 		<PreferenceCategory android:title="@string/preference_category_styling_colors">
-			<CheckBoxPreference
+			<SwitchPreference
 				android:defaultValue="@bool/preference_timetable_item_text_light_default"
 				android:key="preference_timetable_item_text_light"
 				android:title="@string/preference_timetable_item_text_light" />
@@ -108,7 +108,7 @@
 				android:summary="@string/preference_school_background_desc"
 				android:title="@string/preference_school_background" />
 
-			<CheckBoxPreference
+			<SwitchPreference
 				android:defaultValue="@bool/preference_use_theme_background_default"
 				android:disableDependentsState="true"
 				android:key="preference_use_theme_background"
@@ -184,7 +184,7 @@
 				android:title="@string/preference_dark_theme"
 				app:disabledDependentValue="off" />
 
-			<CheckBoxPreference
+			<SwitchPreference
 				android:defaultValue="@bool/preference_dark_theme_oled_default"
 				android:dependency="preference_dark_theme"
 				android:icon="@drawable/settings_timetable_format_oled"
@@ -204,25 +204,25 @@
 			android:key="preference_timetable_personal_timetable"
 			android:title="@string/preference_timetable_personal_timetable" />
 
-		<CheckBoxPreference
+		<SwitchPreference
 			android:defaultValue="@bool/preference_timetable_hide_time_stamps_default"
 			android:key="preference_timetable_hide_time_stamps"
 			android:summary="@string/preference_timetable_hide_time_stamps_desc"
 			android:title="@string/preference_timetable_hide_time_stamps" />
 
-		<CheckBoxPreference
+		<SwitchPreference
 			android:defaultValue="@bool/preference_timetable_hide_cancelled_default"
 			android:key="preference_timetable_hide_cancelled"
 			android:summary="@string/preference_timetable_hide_cancelled_desc"
 			android:title="@string/preference_timetable_hide_cancelled" />
 
-		<CheckBoxPreference
+		<SwitchPreference
 			android:defaultValue="@bool/preference_timetable_substitutions_irregular_default"
 			android:key="preference_timetable_substitutions_irregular"
 			android:summary="@string/preference_timetable_substitutions_irregular_desc"
 			android:title="@string/preference_timetable_substitutions_irregular" />
 
-		<CheckBoxPreference
+		<SwitchPreference
 			android:defaultValue="@bool/preference_timetable_background_irregular_default"
 			android:dependency="preference_timetable_substitutions_irregular"
 			android:key="preference_timetable_background_irregular"
@@ -235,13 +235,13 @@
 				android:key="preference_timetable_range"
 				android:title="@string/preference_timetable_range" />
 
-			<CheckBoxPreference
+			<SwitchPreference
 				android:defaultValue="@bool/preference_timetable_range_index_reset_default"
 				android:dependency="preference_timetable_range"
 				android:key="preference_timetable_range_index_reset"
 				android:title="@string/preference_timetable_range_index_reset" />
 
-			<!--CheckBoxPreference
+			<!--SwitchPreference
 				android:enabled="false"
 				android:key="preference_timetable_range_hide_outside"
 				android:summary="(not implemented)"
@@ -273,13 +273,13 @@
 
 		<PreferenceCategory android:title="@string/preference_category_timetable_lesson_text">
 
-			<CheckBoxPreference
+			<SwitchPreference
 				android:defaultValue="@bool/preference_timetable_centered_lesson_info_default"
 				android:icon="@drawable/settings_timetable_align_center"
 				android:key="preference_timetable_centered_lesson_info"
 				android:title="@string/preference_timetable_centered_lesson_info" />
 
-			<CheckBoxPreference
+			<SwitchPreference
 				android:defaultValue="@bool/preference_timetable_bold_lesson_name_default"
 				android:icon="@drawable/settings_timetable_format_bold"
 				android:key="preference_timetable_bold_lesson_name"
@@ -306,21 +306,21 @@
 		android:key="preferences_notifications"
 		android:title="@string/preferences_notifications">
 
-		<CheckBoxPreference
+		<SwitchPreference
 			android:defaultValue="@bool/preference_notifications_enable_default"
 			android:icon="@drawable/settings_notifications_active"
 			android:key="preference_notifications_enable"
 			android:summary="@string/preference_notifications_enable_desc"
 			android:title="@string/preference_notifications_enable" />
 
-		<CheckBoxPreference
+		<SwitchPreference
 			android:defaultValue="@bool/preference_notifications_in_multiple_default"
 			android:dependency="preference_notifications_enable"
 			android:key="preference_notifications_in_multiple"
 			android:summary="@string/preference_notifications_multiple_desc"
 			android:title="@string/preference_notifications_multiple" />
 
-		<CheckBoxPreference
+		<SwitchPreference
 			android:defaultValue="@bool/preference_notifications_before_first_default"
 			android:dependency="preference_notifications_enable"
 			android:key="preference_notifications_before_first"
@@ -390,7 +390,7 @@
 		android:key="preferences_connectivity"
 		android:title="@string/preferences_connectivity">
 
-		<CheckBoxPreference
+		<SwitchPreference
 			android:defaultValue="@bool/preference_connectivity_refresh_in_background_default"
 			android:key="preference_connectivity_refresh_in_background"
 			android:summary="@string/preference_connectivity_refresh_in_background_desc"

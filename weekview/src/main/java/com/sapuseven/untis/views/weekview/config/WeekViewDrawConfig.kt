@@ -31,7 +31,7 @@ class WeekViewDrawConfig(context: Context) {
 	var headerSecondaryTextHeight: Float = 0.0f
 	var headerHeight: Float = 0.0f
 
-	var currentOrigin = PointF(0f, 0f)
+	var currentOrigin: PointF = PointF(0f, 0f)
 	val headerBackgroundPaint: Paint = Paint()
 	var widthPerDay: Float = 0.0f
 	val dayBackgroundPaint: Paint = Paint()
@@ -48,21 +48,25 @@ class WeekViewDrawConfig(context: Context) {
 	val eventTopPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 	val eventBottomPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 	val timeColumnBackgroundPaint: Paint = Paint()
-	var newHourHeight = -1
+	var newHourHeight: Int = -1
 	val dateTimeInterpreter: DateTimeInterpreter = buildDefaultDateTimeInterpreter(context)
 	val futureBackgroundPaint: Paint = Paint()
 	val pastBackgroundPaint: Paint = Paint()
 
+	companion object {
+		private val TYPEFACE_SEMI_BOLD: Typeface = Typeface.create("sans-serif-light", Typeface.BOLD)
+	}
+	
 	init {
 		// Set additional permanent properties
 		timeTextTopPaint.textAlign = Paint.Align.LEFT
 		timeTextBottomPaint.textAlign = Paint.Align.RIGHT
 
 		timeCaptionPaint.textAlign = Paint.Align.CENTER
-		timeCaptionPaint.typeface = Typeface.DEFAULT_BOLD
+		timeCaptionPaint.typeface = TYPEFACE_SEMI_BOLD
 
 		headerTextPaint.textAlign = Paint.Align.CENTER
-		headerTextPaint.typeface = Typeface.DEFAULT_BOLD
+		headerTextPaint.typeface = TYPEFACE_SEMI_BOLD
 
 		headerSecondaryTextPaint.textAlign = Paint.Align.CENTER
 		headerSecondaryTextPaint.typeface = Typeface.DEFAULT
@@ -72,7 +76,7 @@ class WeekViewDrawConfig(context: Context) {
 		daySeparatorPaint.style = Paint.Style.STROKE
 
 		todayHeaderTextPaint.textAlign = Paint.Align.CENTER
-		todayHeaderTextPaint.typeface = Typeface.DEFAULT_BOLD
+		todayHeaderTextPaint.typeface = TYPEFACE_SEMI_BOLD
 
 		todayHeaderSecondaryTextPaint.textAlign = Paint.Align.CENTER
 		todayHeaderSecondaryTextPaint.typeface = Typeface.DEFAULT

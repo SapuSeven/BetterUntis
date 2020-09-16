@@ -154,7 +154,9 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 				ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.MATCH_PARENT)
 		params.setMargins(0, 0, ConversionUtils.dpToPx(12.0f, requireContext()).toInt(), 0)
-		tv.text = timetableDatabaseInterface.getShortName(if (useOrgId) element.orgId else element.id, type)
+		tv.text =
+				if (type == TimetableDatabaseInterface.Type.TEACHER) timetableDatabaseInterface.getLongName(if (useOrgId) element.orgId else element.id, type)
+				else timetableDatabaseInterface.getShortName(if (useOrgId) element.orgId else element.id, type)
 		if (tv.text.isBlank()) return null
 		tv.layoutParams = params
 		textColor?.let { tv.setTextColor(it) }

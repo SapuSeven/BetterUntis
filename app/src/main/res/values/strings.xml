@@ -18,7 +18,6 @@
 	<string name="all_no">No</string>
 	<string name="all_close">Close</string>
 	<string name="all_cancel">Cancel</string>
-	<string name="all_copy">Copy</string>
 	<string name="all_error">Error</string>
 	<string name="all_report">Report</string>
 	<string name="all_add">Add</string>
@@ -40,6 +39,7 @@
 	<string name="activity_title_errors">Errors</string>
 	<string name="activity_title_free_rooms">Free Rooms</string>
 	<string name="activity_title_info_center">Info Center</string>
+	<string name="activity_title_messenger">Messenger</string>
 	<string name="activity_title_settings">Settings</string>
 
 	<string name="errors_github_attach_file_message">Please attach the compressed log files to this issue.\nThey have been saved to `%1$s`</string>
@@ -51,7 +51,7 @@
 	<string name="menu_infocenter_absences">Absences</string>
 
 	<string name="mainactivitydrawer_dropdown_show">Show profile list</string>
-	<string name="mainactivitydrawer_profile_add">Add a profile…</string>
+	<string name="mainactivitydrawer_profile_add">Add a profile</string>
 	<string name="mainactivitydrawer_profile_delete_hint">Long-press a profile to edit</string>
 
 	<string name="main_dialog_delete_profile_title">Delete profile?</string>
@@ -90,6 +90,7 @@
 	<string name="logindatainput_error_field_empty">This field cannot be empty!</string>
 	<string name="logindatainput_error_generic">Error: %1$s</string>
 	<string name="logindatainput_error_invalid_school">Invalid school ID!</string>
+	<string name="logindatainput_error_invalid_url">Invalid URL!</string>
 	<string name="logindatainput_key">Key or Password</string>
 	<string name="logindatainput_loading_user_data">Loading user data…</string>
 	<string name="logindatainput_login">Login</string>
@@ -125,10 +126,12 @@
 	<string name="infocenter_absences_empty">No absences</string>
 	<string name="infocenter_events_empty">No events</string>
 	<string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
+	<string name="infocenter_messages_attachments">Attachments</string>
 	<string name="infocenter_messages_empty">No messages</string>
 	<string name="infocenter_officehours_empty">No office hours</string>
 	<string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
 	<string name="infocenter_timeformat_sameday">%2$s - %4$s, %1$s</string>
+	<string name="infocenter_absence_unknown_reason">Unknown reason</string>
 	<string name="elementpicker_hint_search">Search…</string>
 	<string name="elementpicker_hint_search_classes">Search for classes…</string>
 	<string name="elementpicker_hint_search_rooms">Search for rooms…</string>
@@ -204,6 +207,7 @@
 	<string name="preference_theme_cyan">Cyan</string>
 	<string name="preference_theme_green">Green</string>
 	<string name="preference_theme_pink">Pink</string>
+	<string name="preference_theme_pixel">Pixel</string>
 	<string name="preference_theme_stock">Default</string>
 	<string name="preference_theme_untis">Original Untis-App</string>
 	<string name="preference_timetable_background_irregular">Consider item background</string>
@@ -211,6 +215,7 @@
 	<string name="preference_timetable_bold_lesson_name">Bold lesson name</string>
 	<string name="preference_timetable_centered_lesson_info">Center lesson infos</string>
 	<string name="preference_timetable_colors_reset">Reset colors</string>
+	<string name="preference_timetable_colors_reset_button_positive">Reset</string>
 	<string name="preference_timetable_hide_cancelled">Hide cancelled lessons</string>
 	<string name="preference_timetable_hide_cancelled_desc">You need to reload the timetable after you change this setting</string>
 	<string name="preference_timetable_hide_time_stamps">Hide timestamps</string>
@@ -237,7 +242,6 @@
 	<string name="preference_week_snap_to_days">Snap to days</string>
 	<string name="preference_week_snap_to_days_summary">instead of weeks</string>
 	<string name="preferences_connectivity">Connectivity</string>
-	<string name="preferences_contributors_contributions">%1$d contributions</string>
 	<string name="preferences_general">General</string>
 	<string name="preferences_infos">About</string>
 	<string name="preferences_notifications">Notifications</string>
@@ -308,5 +312,9 @@
 	<plurals name="roomfinder_item_desc">
 		<item quantity="one">This Room is free right now.</item>
 		<item quantity="other">This Room is free for %d hours.</item>
+	</plurals>
+	<plurals name="preferences_contributors_contributions">
+		<item quantity="one">%1$d contribution</item>
+		<item quantity="other">%1$d contributions</item>
 	</plurals>
 </resources>

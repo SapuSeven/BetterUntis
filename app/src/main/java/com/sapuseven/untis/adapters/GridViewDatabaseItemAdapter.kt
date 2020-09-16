@@ -1,15 +1,21 @@
 package com.sapuseven.untis.adapters
 
 import android.content.Context
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Filter
 import android.widget.Filterable
+import android.widget.TextView
+import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import java.util.*
 
 open class GridViewDatabaseItemAdapter(context: Context)
 	: ArrayAdapter<String>(context, android.R.layout.simple_list_item_1), Filterable {
+	private var inflater: LayoutInflater = LayoutInflater.from(context)
 	private var originalItems: List<PeriodElement> = emptyList()
 	private val filteredItems: MutableList<PeriodElement> = originalItems.toMutableList()
 	private val filter = ItemFilter()
@@ -19,7 +25,7 @@ open class GridViewDatabaseItemAdapter(context: Context)
 		field = value
 		originalItems = timetableDatabaseInterface?.getElements(type) ?: emptyList()
 		filteredItems.clear()
-		filteredItems.addAll(originalItems)
+		filteredItems.addAll(moveAllowedToFront(originalItems))
 	}
 
 	override fun getFilter(): Filter {
@@ -34,8 +40,29 @@ open class GridViewDatabaseItemAdapter(context: Context)
 		return timetableDatabaseInterface?.getShortName(filteredItems[position].id, type) ?: ""
 	}
 
+	override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+		val view = convertView ?: inflater.inflate(R.layout.item_gridview, parent, false)
+		val textView = Holder(view.findViewById(R.id.textView)).textView
+		textView.text = getItem(position)
+		textView.isEnabled = timetableDatabaseInterface?.isAllowed(filteredItems[position].id, type) ?: false
+		return view
+	}
+
 	fun itemAt(position: Int): PeriodElement {
 		return filteredItems[position]
+	}
+
+	private fun moveAllowedToFront(items: List<PeriodElement>): List<PeriodElement> {
+		val enabledItems: MutableList<PeriodElement> = mutableListOf()
+		val disabledItems: MutableList<PeriodElement> = mutableListOf()
+		for (item in items) {
+			if (timetableDatabaseInterface?.isAllowed(item.id, type) == true) {
+				enabledItems.add(item)
+			} else {
+				disabledItems.add(item)
+			}
+		}
+		return enabledItems + disabledItems
 	}
 
 	private inner class ItemFilter : Filter() {
@@ -70,4 +97,8 @@ open class GridViewDatabaseItemAdapter(context: Context)
 			return results
 		}
 	}
+
+	private data class Holder(
+			var textView: TextView
+	)
 }

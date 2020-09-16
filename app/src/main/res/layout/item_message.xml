@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	style="@style/DefaultItemStyle">
+
+	<TextView
+		android:id="@+id/textview_itemmessage_subject"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:textColor="?android:attr/textColorPrimary"
+		android:textSize="@dimen/textsize_listitem_line1"/>
+
+	<TextView
+		android:id="@+id/textview_itemmessage_body"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:textColor="?android:attr/textColorSecondary"
+		android:textSize="@dimen/textsize_listitem_line2"
+		android:layout_below="@id/textview_itemmessage_subject"/>
+
+	<Button
+		android:id="@+id/button_itemmessage_attachment"
+		style="@style/Widget.MaterialComponents.Button.TextButton"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="@string/infocenter_messages_attachments"
+		android:visibility="visible"
+		android:layout_below="@id/textview_itemmessage_body"
+		android:layout_alignParentEnd="true"/>
+</RelativeLayout>

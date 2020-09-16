@@ -6,12 +6,14 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.RectF
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -98,6 +100,8 @@ class MainActivity :
 		private const val UNTIS_DEFAULT_COLOR = "#f49f25"
 
 		private const val PERSISTENT_INT_ZOOM_LEVEL = "persistent_zoom_level"
+
+		private const val MESSENGER_PACKAGE_NAME = "com.untis.chat"
 
 		private const val FRAGMENT_TAG_LESSON_INFO = "com.sapuseven.untis.fragments.lessoninfo"
 		private const val FRAGMENT_TAG_ABSENCE_CHECK = "com.sapuseven.untis.fragments.absencecheck"
@@ -244,7 +248,7 @@ class MainActivity :
 		navigationview_main.setNavigationItemSelectedListener(this)
 		navigationview_main.setCheckedItem(R.id.nav_show_personal)
 
-		setupNavDrawerHeader(navigationview_main)
+		updateNavDrawer(navigationview_main)
 
 		val header = navigationview_main.getHeaderView(0)
 		val dropdown = header.findViewById<ConstraintLayout>(R.id.constraintlayout_mainactivitydrawer_dropdown)
@@ -265,20 +269,22 @@ class MainActivity :
 			toggleProfileDropdown(dropdownView, dropdownImage, dropdownList)
 		}
 
-		val profileListAdd = header.findViewById<LinearLayout>(R.id.linearlayout_mainactivitydrawer_add)
+		val profileListAdd = header.findViewById<ConstraintLayout>(R.id.constraintlayout_mainactivitydrawer_add)
 		profileListAdd.setOnClickListener {
 			closeDrawer()
 			addProfile()
 		}
 	}
 
-	private fun setupNavDrawerHeader(navigationView: NavigationView) {
+	private fun updateNavDrawer(navigationView: NavigationView) {
 		val line1 = if (profileUser.anonymous) getString(R.string.all_anonymous) else profileUser.userData.displayName
 		val line2 = profileUser.userData.schoolName
 		(navigationView.getHeaderView(0).findViewById<View>(R.id.textview_mainactivtydrawer_line1) as TextView).text =
 				if (line1.isBlank()) getString(R.string.app_name) else line1
 		(navigationView.getHeaderView(0).findViewById<View>(R.id.textview_mainactivitydrawer_line2) as TextView).text =
 				if (line2.isBlank()) getString(R.string.all_contact_email) else line2
+
+		navigationView.menu.findItem(R.id.nav_messenger).isVisible = false
 	}
 
 	private fun toggleProfileDropdown(dropdownView: ViewGroup, dropdownImage: ImageView, dropdownList: RecyclerView) {
@@ -313,7 +319,7 @@ class MainActivity :
 		preferences.reload(profileId)
 		if (!loadProfile()) finish() // TODO: Show error
 		else {
-			setupNavDrawerHeader(findViewById(R.id.navigationview_main))
+			updateNavDrawer(findViewById(R.id.navigationview_main))
 
 			closeDrawer()
 			setupTimetableLoader()
@@ -411,7 +417,7 @@ class MainActivity :
 		weekView.numberOfVisibleDays = preferences.defaultPrefs.getInt("preference_week_custom_display_length", 0).zeroToNull
 				?: weekView.weekLength
 		weekView.firstDayOfWeek = preferences.defaultPrefs.getStringSet("preference_week_custom_range", emptySet())?.map { MaterialDayPicker.Weekday.valueOf(it) }?.min()?.ordinal
-				?: DateTimeFormat.forPattern("E").withLocale(Locale.ENGLISH).parseDateTime((profileUser.timeGrid.days[0].day)).dayOfWeek
+				?: DateTimeFormat.forPattern("E").withLocale(Locale.ENGLISH).parseDateTime(profileUser.timeGrid.days[0].day).dayOfWeek
 
 		weekView.timeColumnVisibility = !PreferenceUtils.getPrefBool(preferences, "preference_timetable_hide_time_stamps")
 
@@ -488,6 +494,8 @@ class MainActivity :
 		val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar_main, R.string.main_drawer_open, R.string.main_drawer_close)
 		drawer_layout.addDrawerListener(toggle)
 		toggle.syncState()
+		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+		window.statusBarColor = Color.TRANSPARENT
 
 		supportFragmentManager.addOnBackStackChangedListener {
 			if (supportFragmentManager.backStackEntryCount > 0) {
@@ -603,7 +611,7 @@ class MainActivity :
 				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor.darken(0.25f) else examPastColor
 				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor.darken(0.25f) else cancelledPastColor
 				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(0.25f) else irregularPastColor
-				useTheme -> getAttr(R.attr.colorPrimaryDark)
+				useTheme -> if (currentTheme == "pixel") getAttr(R.attr.colorPrimary).darken(0.25f) else getAttr(R.attr.colorPrimaryDark)
 				else -> if (useDefault.contains("regular")) defaultColor.darken(0.25f) else regularPastColor
 			}
 		}
@@ -633,6 +641,17 @@ class MainActivity :
 				val i = Intent(this@MainActivity, InfoCenterActivity::class.java)
 				i.putExtra(InfoCenterActivity.EXTRA_LONG_PROFILE_ID, profileId)
 				startActivityForResult(i, REQUEST_CODE_ROOM_FINDER)
+			}
+			R.id.nav_messenger -> {
+				try {
+					startActivity(packageManager.getLaunchIntentForPackage(MESSENGER_PACKAGE_NAME))
+				} catch (e: Exception) {
+					try {
+						startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$MESSENGER_PACKAGE_NAME")))
+					} catch (e: Exception) {
+						startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$MESSENGER_PACKAGE_NAME")))
+					}
+				}
 			}
 			R.id.nav_free_rooms -> {
 				val i = Intent(this@MainActivity, RoomFinderActivity::class.java)
@@ -803,6 +822,13 @@ class MainActivity :
 	}
 
 	override fun addTimetableItems(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
+		for (item in items) {
+			if (item.periodData.element.messengerChannel != null) {
+				navigationview_main.menu.findItem(R.id.nav_messenger).isVisible = true
+				break
+			}
+		}
+
 		weeklyTimetableItems[convertDateTimeToWeekIndex(startDate.toLocalDate())]?.apply {
 			this.items = prepareItems(items).map { it.toWeekViewEvent() }
 			lastUpdated = timestamp

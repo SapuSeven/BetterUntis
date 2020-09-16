@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Patterns
 import android.view.View
 import android.widget.EditText
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -19,6 +20,7 @@ import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.models.UntisSchoolInfo
+import com.sapuseven.untis.models.untis.masterdata.TimeGrid
 import com.sapuseven.untis.models.untis.params.AppSharedSecretParams
 import com.sapuseven.untis.models.untis.params.SchoolSearchParams
 import com.sapuseven.untis.models.untis.params.UserDataParams
@@ -113,12 +115,20 @@ class LoginDataInputActivity : BaseActivity() {
 
 	private fun validate(): EditText? {
 		if (edittext_logindatainput_user?.text?.isEmpty() == true && !anonymous) {
-			edittext_logindatainput_user?.error = getString(R.string.logindatainput_error_field_empty)
+			edittext_logindatainput_user.error = getString(R.string.logindatainput_error_field_empty)
 			return edittext_logindatainput_user
 		}
 		if (edittext_logindatainput_school?.text?.isEmpty() == true) {
-			edittext_logindatainput_school?.error = getString(R.string.logindatainput_error_field_empty)
+			edittext_logindatainput_school.error = getString(R.string.logindatainput_error_field_empty)
 			return edittext_logindatainput_school
+		}
+
+		if (switch_logindatainput_advanced.isChecked) {
+			if (!edittext_logindatainput_api_url.text.isNullOrBlank()
+					&& !Patterns.WEB_URL.matcher(edittext_logindatainput_api_url.text.toString()).matches()) {
+				edittext_logindatainput_api_url.error = getString(R.string.logindatainput_error_invalid_url)
+				return edittext_logindatainput_api_url
+			}
 		}
 		return null
 	}
@@ -224,7 +234,7 @@ class LoginDataInputActivity : BaseActivity() {
 				else
 					return it.schools[0].schoolId.toString()
 			} ?: run {
-				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code, untisResponse.error?.message.orEmpty()))
+				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code, untisResponse.error?.message))
 			}
 		}, { error ->
 			stopLoadingAndShowError(getString(R.string.logindatainput_error_generic, error.message))
@@ -258,7 +268,7 @@ class LoginDataInputActivity : BaseActivity() {
 			if (untisResponse.error?.code == ErrorMessageDictionary.ERROR_CODE_INVALID_CREDENTIALS)
 				return edittext_logindatainput_key?.text.toString()
 			if (untisResponse.result.isNullOrEmpty())
-				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code))
+				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code, untisResponse.error?.message))
 			else
 				return untisResponse.result
 		}, { error ->
@@ -293,12 +303,12 @@ class LoginDataInputActivity : BaseActivity() {
 		val userDataResult = api.request(query)
 
 		userDataResult.fold({ data ->
-			val untisResponse = getJSON().parse(UserDataResponse.serializer(), data)
+			val untisResponse = getJSON().parse(UserDataResponse.serializer(), data) // TODO: Catch json parsing errors if response isn't valid json
 
 			if (untisResponse.result != null) {
 				return untisResponse.result
 			} else {
-				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code))
+				stopLoadingAndShowError(ErrorMessageDictionary.getErrorMessage(resources, untisResponse.error?.code, untisResponse.error?.message))
 			}
 
 			setElementsEnabled(true)
@@ -328,7 +338,7 @@ class LoginDataInputActivity : BaseActivity() {
 					if (!anonymous) username else null,
 					if (!anonymous) appSharedSecret else null,
 					anonymous,
-					response.masterData.timeGrid,
+					response.masterData.timeGrid ?: TimeGrid.generateDefault(),
 					response.masterData.timeStamp,
 					response.userData,
 					response.settings
@@ -392,7 +402,8 @@ class LoginDataInputActivity : BaseActivity() {
 	private fun getProxyHost(): String? = if (switch_logindatainput_advanced.isChecked) edittext_logindatainput_proxy_host?.text.toString() else null
 
 	private fun getApiUrl(): String? {
-		return if (switch_logindatainput_advanced.isChecked) edittext_logindatainput_api_url?.text.toString()
+		return if (switch_logindatainput_advanced.isChecked && !edittext_logindatainput_api_url.text.isNullOrBlank())
+			edittext_logindatainput_api_url?.text.toString()
 		else schoolInfo?.let {
 			if (it.useMobileServiceUrlAndroid) it.mobileServiceUrl else null
 		}

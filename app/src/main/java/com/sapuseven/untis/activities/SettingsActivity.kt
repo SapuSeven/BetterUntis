@@ -39,7 +39,7 @@ import kotlinx.android.synthetic.main.activity_settings.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.list
+import kotlinx.serialization.builtins.list
 import kotlin.math.min
 
 class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback {
@@ -146,7 +146,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 		override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
 			profileId = arguments?.getLong(EXTRA_LONG_PROFILE_ID) ?: 0
 			if (profileId == 0L) {
-				MaterialAlertDialogBuilder(context)
+				MaterialAlertDialogBuilder(requireContext())
 						.setMessage("Invalid profile ID")
 						.setPositiveButton("Exit") { _, _ ->
 							activity?.finish()
@@ -164,7 +164,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 									?: this.max
 						}
 
-						findPreference<CheckBoxPreference>("preference_automute_enable")?.setOnPreferenceChangeListener { _, newValue ->
+						findPreference<SwitchPreference>("preference_automute_enable")?.setOnPreferenceChangeListener { _, newValue ->
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && newValue == true) {
 								(activity?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
 									if (!isNotificationPolicyAccessGranted) {
@@ -202,10 +202,10 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 						}
 
 						findPreference<Preference>("preference_timetable_colors_reset")?.setOnPreferenceClickListener {
-							MaterialAlertDialogBuilder(context)
+							MaterialAlertDialogBuilder(requireContext())
 									.setTitle(R.string.preference_dialog_colors_reset_title)
 									.setMessage(R.string.preference_dialog_colors_reset_text)
-									.setPositiveButton(R.string.all_yes) { _, _ ->
+									.setPositiveButton(R.string.preference_timetable_colors_reset_button_positive) { _, _ ->
 										preferenceManager.sharedPreferences.edit().apply {
 											listOf(
 													"preference_background_regular", "preference_background_regular_past",
@@ -290,7 +290,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 					preferenceScreen.addPreference(Preference(context).apply {
 						GlobalScope.launch(Dispatchers.Main) { icon = loadProfileImage(user.avatar_url, resources) }
 						title = user.login
-						summary = resources.getString(R.string.preferences_contributors_contributions, user.contributions)
+						summary = resources.getQuantityString(R.plurals.preferences_contributors_contributions, user.contributions, user.contributions)
 						setOnPreferenceClickListener {
 							startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(user.html_url)))
 							true
@@ -351,7 +351,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 								// positive button not used
 							}
 						}
-				).show(fragmentManager!!, "elementPicker")
+				).show(requireFragmentManager(), "elementPicker")
 			}
 
 			return true

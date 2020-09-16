@@ -2,12 +2,13 @@
 <resources>
 	<attr name="dependentValue" format="string"/>
 	<attr name="colorDivider" format="reference"/>
+	<attr name="actionBarBackground" format="reference"/>
 
 	<declare-styleable name="UnitPreference">
 		<attr name="unit" format="string" />
 	</declare-styleable>
 
 	<declare-styleable name="DependentListPreference">
-		<attr name="disabledDependentValue"/>
+		<attr name="disabledDependentValue" format="string"/>
 	</declare-styleable>
 </resources>

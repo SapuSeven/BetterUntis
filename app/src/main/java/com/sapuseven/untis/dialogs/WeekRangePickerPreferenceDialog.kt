@@ -1,13 +1,14 @@
 package com.sapuseven.untis.dialogs
 
+import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AlertDialog
 import androidx.preference.PreferenceDialogFragmentCompat
 import ca.antonious.materialdaypicker.MaterialDayPicker
 import ca.antonious.materialdaypicker.SelectionMode
 import ca.antonious.materialdaypicker.SelectionState
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.sapuseven.untis.R
 import com.sapuseven.untis.preferences.WeekRangePickerPreference
 
@@ -35,20 +36,26 @@ class WeekRangePickerPreferenceDialog(private val onCloseListener: ((positiveRes
 		return root
 	}
 
-	override fun onPrepareDialogBuilder(builder: AlertDialog.Builder) {
-		super.onPrepareDialogBuilder(builder)
-		builder.setNeutralButton(R.string.all_reset) { dialog, _ ->
-			preference.persistStringSet(emptySet())
-			onCloseListener?.invoke(true, 0)
-			dialog.dismiss()
-		}
-	}
-
 	override fun onDialogClosed(positiveResult: Boolean) {
 		if (positiveResult) preference.persistStringSet(picker.selectedDays.map { it.name }.toSet())
 		(preference as? WeekRangePickerPreference)?.refreshSummary()
 
 		onCloseListener?.invoke(positiveResult, picker.selectedDays.size)
+	}
+
+	override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+		val builder = MaterialAlertDialogBuilder(requireContext())
+				.setTitle(preference.dialogTitle)
+				.setView(onCreateDialogView(context))
+				.setPositiveButton(preference.positiveButtonText, this)
+				.setNegativeButton(preference.negativeButtonText, this)
+				.setNeutralButton(R.string.all_reset) { dialog, _ ->
+					preference.persistStringSet(emptySet())
+					onCloseListener?.invoke(true, 0)
+					dialog.dismiss()
+				}
+
+		return builder.create()
 	}
 
 	class RangeSelectionMode(private val materialDayPicker: MaterialDayPicker) : SelectionMode {

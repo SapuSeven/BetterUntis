@@ -49,7 +49,7 @@ class UntisRequest {
 
 	@Serializable
 	class UntisRequestData {
-		var id: String = ""
+		var id: String = "-1"
 		var jsonrpc: String = "2.0"
 		var method: String = ""
 		var school: String? = null

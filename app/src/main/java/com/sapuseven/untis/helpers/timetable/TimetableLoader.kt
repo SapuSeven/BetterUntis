@@ -18,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonParsingException
+import kotlinx.serialization.json.JsonDecodingException
 import org.joda.time.Instant
 import java.lang.ref.WeakReference
 
@@ -56,8 +57,8 @@ class TimetableLoader(
 
 		if (cache.exists()) {
 			Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): cached file found")
-			cache.load()?.let {
-				timetableDisplay.addTimetableItems(it.items.map { periodToTimegridItem(it, target.type) }, target.startDate, target.endDate, it.timestamp)
+			cache.load()?.let { cacheObject ->
+				timetableDisplay.addTimetableItems(cacheObject.items.map { periodToTimegridItem(it, target.type) }, target.startDate, target.endDate, cacheObject.timestamp)
 			} ?: run {
 				cache.delete()
 				Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): cached file corrupted")
@@ -111,7 +112,7 @@ class TimetableLoader(
 				}
 			} catch (e: Exception) {
 				val msg = when (e) {
-					is JsonParsingException -> formatJsonParsingException(e, data)
+					is JsonDecodingException -> formatJsonParsingException(e, data)
 					else -> e.toString()
 				}
 				timetableDisplay.onTimetableLoadingError(requestId, CODE_REQUEST_PARSING_EXCEPTION, msg)
@@ -122,7 +123,7 @@ class TimetableLoader(
 		})
 	}
 
-	private fun formatJsonParsingException(e: JsonParsingException, jsonData: String): String {
+	private fun formatJsonParsingException(e: JsonDecodingException, jsonData: String): String {
 		val errorMargin = 20
 		val errorIndex: Int? = e.message?.let {
 			it.split(" ")[3].let { i ->
