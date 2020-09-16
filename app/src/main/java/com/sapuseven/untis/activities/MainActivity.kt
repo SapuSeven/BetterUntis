@@ -176,6 +176,7 @@ class MainActivity :
 	override fun onResume() {
 		super.onResume()
 		preferences.reload(profileId)
+		refreshMessages(profileUser, navigationview_main)
 
 		if (::weekView.isInitialized) {
 			proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
@@ -287,8 +288,6 @@ class MainActivity :
 				if (line1.isBlank()) getString(R.string.app_name) else line1
 		(navigationView.getHeaderView(0).findViewById<View>(R.id.textview_mainactivitydrawer_line2) as TextView).text =
 				if (line2.isBlank()) getString(R.string.all_contact_email) else line2
-
-		refreshMessages(profileUser, navigationView)
 
 		navigationView.menu.findItem(R.id.nav_messenger).isVisible = false
 	}
