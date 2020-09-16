@@ -17,7 +17,6 @@ import com.sapuseven.untis.models.untis.timetable.Period
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.JsonParsingException
 import kotlinx.serialization.json.JsonDecodingException
 import org.joda.time.Instant
 import java.lang.ref.WeakReference

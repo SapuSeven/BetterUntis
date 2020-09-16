@@ -2,7 +2,6 @@ package com.sapuseven.untis.models.untis
 
 import com.sapuseven.untis.helpers.DateTimeUtils
 import kotlinx.serialization.*
-import org.joda.time.LocalDate
 import org.joda.time.LocalTime
 
 @Serializable
@@ -19,8 +18,8 @@ class UntisTime(
 			return UntisTime(decoder.decodeString())
 		}
 
-		fun fromLocalDate(localDate: LocalDate): UntisTime {
-			return UntisTime(localDate.toString(DateTimeUtils.tTimeNoSeconds()))
+		fun fromLocalTime(localTime: LocalTime): UntisTime {
+			return UntisTime(localTime.toString(DateTimeUtils.tTimeNoSeconds()))
 		}
 	}
 
