@@ -34,6 +34,7 @@
 			android:textSize="13sp" />
 
 		<TextView
+			android:id="@+id/textview_lessontopic"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:text="@string/all_hint_tap_to_edit"

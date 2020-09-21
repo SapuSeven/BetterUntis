@@ -3,6 +3,7 @@ package com.sapuseven.untis.fragments
 import android.content.Context
 import android.graphics.Paint
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -23,8 +24,6 @@ import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.Period
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.viewmodels.TimetableItemDetailsViewModel
-import org.joda.time.format.DateTimeFormatter
-import org.joda.time.format.ISODateTimeFormat
 
 
 class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterface: TimetableDatabaseInterface?) : Fragment() {
@@ -33,14 +32,12 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 	private val viewModel by viewModels<TimetableItemDetailsViewModel> { TimetableItemDetailsViewModel.Factory(item, timetableDatabaseInterface) }
 	private lateinit var listener: TimetableItemDetailsDialogListener
 
-	companion object {
-		val HOMEWORK_DUE_TIME_FORMAT: DateTimeFormatter = ISODateTimeFormat.date()
-	}
-
 	interface TimetableItemDetailsDialogListener {
 		fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean)
 
 		fun onPeriodAbsencesClick(fragment: Fragment, element: Period)
+
+		fun onLessonTopicClick()
 	}
 
 	override fun onAttach(context: Context) {
@@ -49,6 +46,7 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 			listener = context
 		else
 			throw ClassCastException("$context must implement TimetableItemDetailsDialogListener")
+		Log.d("TimetableItemDetails", "onAttach")
 	}
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -80,7 +78,7 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 		}
 
 		periodData.element.homeWorks?.forEach {
-			val endDate = HOMEWORK_DUE_TIME_FORMAT.parseDateTime(it.endDate)
+			val endDate = it.endDate.toLocalDate()
 
 			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_homework, root).run {
 				(findViewById<TextView>(R.id.textview_roomfinder_name)).text = it.text
@@ -96,8 +94,14 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 				root.addView(this)
 			}
 
-		if (periodData.element.can.contains(CAN_READ_LESSON_TOPIC))
-			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_lessontopic, root)
+		if (periodData.element.can.contains(CAN_READ_LESSON_TOPIC)) {
+			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_lessontopic, root, false).run {
+				setOnClickListener {
+					listener.onLessonTopicClick()
+				}
+				root.addView(this)
+			}
+		}
 
 		val teacherList = root.findViewById<LinearLayout>(R.id.llTeacherList)
 		val klassenList = root.findViewById<LinearLayout>(R.id.llClassList)

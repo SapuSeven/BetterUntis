@@ -17,6 +17,7 @@ import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -33,6 +34,7 @@ import ca.antonious.materialdaypicker.MaterialDayPicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
 import com.sapuseven.untis.R
 import com.sapuseven.untis.adapters.ProfileListAdapter
 import com.sapuseven.untis.data.databases.UserDatabase
@@ -745,7 +747,14 @@ class MainActivity :
 	}
 
 	override fun onEventClick(data: TimegridItem, eventRect: RectF) {
-		showLessonInfo(data)
+		val fragment = TimetableItemDetailsFragment(data, timetableDatabaseInterface)
+
+		supportFragmentManager.beginTransaction().run {
+			setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+			add(R.id.content_main, fragment, FRAGMENT_TAG_LESSON_INFO)
+			addToBackStack(fragment.tag)
+			commit()
+		}
 	}
 
 	override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
@@ -773,6 +782,19 @@ class MainActivity :
 		}
 	}
 
+	override fun onLessonTopicClick() {
+		val dialogView = layoutInflater.inflate(R.layout.dialog_edit_lessontopic, null)
+		MaterialAlertDialogBuilder(this)
+				.setView(dialogView)
+				.setPositiveButton(R.string.all_ok) { dialog, _ ->
+					val lessonTopic = dialogView.findViewById<TextInputEditText>(R.id.edittext_dialog).text.toString()
+					Toast.makeText(this, lessonTopic, Toast.LENGTH_LONG).show()
+					// TODO: Save lesson topic to server
+					dialog.dismiss()
+				}
+				.show()
+	}
+
 	override fun onDialogDismissed(dialog: DialogInterface?) {
 		refreshNavigationViewSelection()
 	}
@@ -791,17 +813,6 @@ class MainActivity :
 			TimetableDatabaseInterface.Type.TEACHER.name -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_teachers)
 			TimetableDatabaseInterface.Type.ROOM.name -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_rooms)
 			else -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_personal)
-		}
-	}
-
-	private fun showLessonInfo(item: TimegridItem) {
-		val fragment = TimetableItemDetailsFragment(item, timetableDatabaseInterface)
-
-		supportFragmentManager.beginTransaction().run {
-			setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-			add(R.id.content_main, fragment, FRAGMENT_TAG_LESSON_INFO)
-			addToBackStack(fragment.tag)
-			commit()
 		}
 	}
 
