@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.MenuItem
 import android.view.View
+import androidx.core.content.pm.PackageInfoCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.*
@@ -244,12 +245,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 							val pInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
 							requireContext().getString(R.string.preference_info_app_version_desc,
 									pInfo.versionName,
-									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-										pInfo.longVersionCode
-									} else {
-										@Suppress("DEPRECATION")
-										pInfo.versionCode.toLong()
-									}
+									PackageInfoCompat.getLongVersionCode(pInfo)
 							)
 						}
 

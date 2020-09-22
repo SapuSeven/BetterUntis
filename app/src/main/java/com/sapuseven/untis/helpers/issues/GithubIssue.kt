@@ -4,12 +4,13 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import androidx.core.content.pm.PackageInfoCompat
 import com.sapuseven.untis.R
 
 
 class GithubIssue(type: Type, log: String) : Issue(type, log) {
 
-	private var c: Context? = null
+	private lateinit var c: Context
 
 	override fun launch(context: Context) {
 		c = context
@@ -32,22 +33,19 @@ class GithubIssue(type: Type, log: String) : Issue(type, log) {
 		Type.OTHER -> ""
 	}
 
-	private val version: String get() {
-		val pInfo = c?.packageManager?.getPackageInfo(c?.packageName ?: return "", 0)
-		return c?.getString(R.string.preference_info_app_version_desc,
-				pInfo?.versionName,
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-					pInfo?.longVersionCode
-				} else {
-					@Suppress("DEPRECATION")
-					pInfo?.versionCode?.toLong()
-				}
-		) ?: ""
-	}
+	private val version: String
+		get() {
+			val pInfo = c.packageManager.getPackageInfo(c.packageName ?: return "", 0)
+			return c.getString(R.string.preference_info_app_version_desc,
+					pInfo.versionName,
+					PackageInfoCompat.getLongVersionCode(pInfo)
+			)
+		}
 
-	private val installationSource: String get() {
-		return c?.packageManager?.getInstallerPackageName(c?.packageName ?:"") ?: ""
-	}
+	private val installationSource: String
+		get() {
+			return c.packageManager.getInstallerPackageName(c.packageName) ?: "(unknown)"
+		}
 
 	private fun generateBody() =
 		"<details>\n" +
