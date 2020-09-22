@@ -32,6 +32,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.sapuseven.untis.R
+import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_PROFILE_UPDATE
 import com.sapuseven.untis.adapters.ProfileListAdapter
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
@@ -145,6 +146,11 @@ class MainActivity :
 			setupActionBar()
 			setupNavDrawer()
 
+			if (checkForNewSchoolYear()) {
+				updateProfile()
+				return
+			}
+
 			setupViews()
 			setupHours()
 			setupHolidays()
@@ -155,6 +161,18 @@ class MainActivity :
 			showPersonalTimetable()
 			refreshNavigationViewSelection()
 		}
+	}
+
+	private fun checkForNewSchoolYear(): Boolean {
+		return false
+		//userDatabase.getAdditionalUserData<SchoolYear>(profileUser.id ?: -1, SchoolYear())?.values?.toList() ?: emptyList()
+	}
+
+	private fun updateProfile() {
+		val loginIntent = Intent(this, LoginDataInputActivity::class.java)
+				.putExtra(LoginDataInputActivity.EXTRA_LONG_PROFILE_ID, profileUser.id)
+				.putExtra(EXTRA_BOOLEAN_PROFILE_UPDATE, true)
+		startActivityForResult(loginIntent, REQUEST_CODE_LOGINDATAINPUT_EDIT)
 	}
 
 	override fun onPause() {
