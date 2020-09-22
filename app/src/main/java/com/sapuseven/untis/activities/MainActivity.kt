@@ -53,7 +53,6 @@ import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.Holiday
-import com.sapuseven.untis.models.untis.timetable.Period
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.ElementPickerPreference
 import com.sapuseven.untis.preferences.RangePreference
@@ -774,7 +773,7 @@ class MainActivity :
 		refreshNavigationViewSelection()
 	}
 
-	override fun onPeriodAbsencesClick(fragment: Fragment, element: Period) {
+	override fun onPeriodAbsencesClick() {
 		val absenceEditFragment = AbsenceCheckFragment()
 
 		supportFragmentManager.beginTransaction().run {
@@ -787,10 +786,14 @@ class MainActivity :
 
 	override fun onLessonTopicClick() {
 		val dialogView = layoutInflater.inflate(R.layout.dialog_edit_lessontopic, null)
+		val etLessonTopic = dialogView.findViewById<TextInputEditText>(R.id.edittext_dialog)
+
+		etLessonTopic.setText(timetableItemDetailsViewModel.periodData().value?.topic?.text ?: "")
+
 		MaterialAlertDialogBuilder(this)
 				.setView(dialogView)
 				.setPositiveButton(R.string.all_ok) { dialog, _ ->
-					val lessonTopic = dialogView.findViewById<TextInputEditText>(R.id.edittext_dialog).text.toString()
+					val lessonTopic = etLessonTopic.text.toString()
 					timetableItemDetailsViewModel.submitLessonTopic(lessonTopic)
 					dialog.dismiss()
 				}

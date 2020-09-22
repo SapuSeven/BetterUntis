@@ -24,7 +24,6 @@ import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.KotlinUtils.safeLet
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.models.untis.timetable.Period
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.viewmodels.PeriodDataViewModel
 
@@ -39,7 +38,7 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 	interface TimetableItemDetailsDialogListener {
 		fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean)
 
-		fun onPeriodAbsencesClick(fragment: Fragment, element: Period)
+		fun onPeriodAbsencesClick()
 
 		fun onLessonTopicClick()
 	}
@@ -104,7 +103,7 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 					)
 				})
 				setOnClickListener {
-					listener.onPeriodAbsencesClick(this@TimetableItemDetailsFragment, periodData.element)
+					listener.onPeriodAbsencesClick()
 				}
 				root.addView(this)
 			}
