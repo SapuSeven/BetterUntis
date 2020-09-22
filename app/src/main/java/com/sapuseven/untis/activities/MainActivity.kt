@@ -17,7 +17,7 @@ import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -59,6 +59,7 @@ import com.sapuseven.untis.preferences.ElementPickerPreference
 import com.sapuseven.untis.preferences.RangePreference
 import com.sapuseven.untis.receivers.NotificationSetup.Companion.EXTRA_BOOLEAN_MANUAL
 import com.sapuseven.untis.receivers.StartupReceiver
+import com.sapuseven.untis.viewmodels.PeriodDataViewModel
 import com.sapuseven.untis.views.weekview.HolidayChip
 import com.sapuseven.untis.views.weekview.WeekView
 import com.sapuseven.untis.views.weekview.WeekViewDisplayable
@@ -124,6 +125,8 @@ class MainActivity :
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 	private lateinit var timetableLoader: TimetableLoader
 	private lateinit var weekView: WeekView<TimegridItem>
+
+	private val timetableItemDetailsViewModel: PeriodDataViewModel by viewModels()
 
 	private val weekViewUpdate = object : Runnable {
 		override fun run() {
@@ -788,8 +791,7 @@ class MainActivity :
 				.setView(dialogView)
 				.setPositiveButton(R.string.all_ok) { dialog, _ ->
 					val lessonTopic = dialogView.findViewById<TextInputEditText>(R.id.edittext_dialog).text.toString()
-					Toast.makeText(this, lessonTopic, Toast.LENGTH_LONG).show()
-					// TODO: Save lesson topic to server
+					timetableItemDetailsViewModel.submitLessonTopic(lessonTopic)
 					dialog.dismiss()
 				}
 				.show()

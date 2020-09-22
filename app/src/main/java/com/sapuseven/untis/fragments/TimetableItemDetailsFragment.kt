@@ -111,6 +111,11 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 
 		if (periodData.element.can.contains(CAN_READ_LESSON_TOPIC)) {
 			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_lessontopic, root, false).run {
+				viewModel.periodData().observe(viewLifecycleOwner, Observer {
+					this.findViewById<TextView>(R.id.textview_timetableitemdetails_lessontopic).text =
+							if (it.topic.text.isBlank()) getString(R.string.all_hint_tap_to_edit)
+							else it.topic.text
+				})
 				setOnClickListener {
 					listener.onLessonTopicClick()
 				}

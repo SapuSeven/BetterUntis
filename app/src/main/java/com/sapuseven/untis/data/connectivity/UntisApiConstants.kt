@@ -18,6 +18,8 @@ object UntisApiConstants {
 	const val METHOD_GET_USER_DATA = "getUserData2017"
 	const val METHOD_SEARCH_SCHOOLS = "searchSchool"
 	const val METHOD_SUBMIT_ABSENCES_CHECKED = "submitAbsencesChecked2017"
+	const val METHOD_GET_LESSON_TOPIC = "getLessonTopic2017"
+	const val METHOD_SUBMIT_LESSON_TOPIC = "submitLessonTopic"
 
 	const val CAN_READ_STUDENT_ABSENCE = "READ_STUD_ABSENCE"
 	const val CAN_WRITE_STUDENT_ABSENCE = "WRITE_STUD_ABSENCE"

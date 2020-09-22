@@ -12,10 +12,7 @@ import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.UntisAbsence
 import com.sapuseven.untis.models.untis.UntisTime
-import com.sapuseven.untis.models.untis.params.AbsencesCheckedParams
-import com.sapuseven.untis.models.untis.params.CreateImmediateAbsenceParams
-import com.sapuseven.untis.models.untis.params.DeleteAbsenceParams
-import com.sapuseven.untis.models.untis.params.PeriodDataParams
+import com.sapuseven.untis.models.untis.params.*
 import com.sapuseven.untis.models.untis.response.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -133,6 +130,26 @@ class PeriodDataViewModel(
 		UntisRequest().request(query).fold({
 			// TODO: Handle Untis API errors (check if success==true)
 			periodLiveData.postValue(periodLiveData.value?.copy(absenceChecked = true))
+			onSuccess()
+		}, {
+			onFailure(it)
+			// TODO: Show network error
+		})
+	}
+
+	fun submitLessonTopic(lessonTopic: String, onSuccess: () -> Unit = {}, onFailure: (FuelError) -> Unit = {}) = viewModelScope.launch(Dispatchers.IO) {
+		query.data.method = UntisApiConstants.METHOD_SUBMIT_LESSON_TOPIC
+		query.data.params = listOf(SubmitLessonTopicParams(
+				lessonTopic,
+				period.id,
+				UntisAuthentication.createAuthObject(user)
+		))
+
+		UntisRequest().request(query).fold({
+			// TODO: Handle Untis API errors (check if success==true)
+			periodLiveData.postValue(periodLiveData.value?.let {
+				it.copy(topic = it.topic.copy(text = lessonTopic))
+			})
 			onSuccess()
 		}, {
 			onFailure(it)
