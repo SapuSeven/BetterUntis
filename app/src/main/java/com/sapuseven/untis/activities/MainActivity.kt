@@ -147,7 +147,7 @@ class MainActivity :
 			setupNavDrawer()
 
 			if (checkForNewSchoolYear()) {
-				updateProfile()
+				updateProfile(profileUser)
 				return
 			}
 
@@ -166,13 +166,6 @@ class MainActivity :
 	private fun checkForNewSchoolYear(): Boolean {
 		return false
 		//userDatabase.getAdditionalUserData<SchoolYear>(profileUser.id ?: -1, SchoolYear())?.values?.toList() ?: emptyList()
-	}
-
-	private fun updateProfile() {
-		val loginIntent = Intent(this, LoginDataInputActivity::class.java)
-				.putExtra(LoginDataInputActivity.EXTRA_LONG_PROFILE_ID, profileUser.id)
-				.putExtra(EXTRA_BOOLEAN_PROFILE_UPDATE, true)
-		startActivityForResult(loginIntent, REQUEST_CODE_LOGINDATAINPUT_EDIT)
 	}
 
 	override fun onPause() {
@@ -210,7 +203,7 @@ class MainActivity :
 				.setTitle(getString(R.string.main_dialog_update_profile_title))
 				.setMessage(getString(R.string.main_dialog_update_profile_message))
 				.setPositiveButton(getString(R.string.main_dialog_update_profile_button)) { _, _ ->
-					editProfile(profileUser)
+					updateProfile(profileUser)
 				}
 				.setCancelable(false)
 				.show()
@@ -319,7 +312,14 @@ class MainActivity :
 
 	private fun editProfile(user: UserDatabase.User) {
 		val loginIntent = Intent(this, LoginDataInputActivity::class.java)
-		loginIntent.putExtra(LoginDataInputActivity.EXTRA_LONG_PROFILE_ID, user.id)
+				.putExtra(LoginDataInputActivity.EXTRA_LONG_PROFILE_ID, user.id)
+		startActivityForResult(loginIntent, REQUEST_CODE_LOGINDATAINPUT_EDIT)
+	}
+
+	private fun updateProfile(user: UserDatabase.User) {
+		val loginIntent = Intent(this, LoginDataInputActivity::class.java)
+				.putExtra(LoginDataInputActivity.EXTRA_LONG_PROFILE_ID, user.id)
+				.putExtra(EXTRA_BOOLEAN_PROFILE_UPDATE, true)
 		startActivityForResult(loginIntent, REQUEST_CODE_LOGINDATAINPUT_EDIT)
 	}
 
