@@ -131,6 +131,8 @@ class PeriodDataViewModel(
 		))
 
 		UntisRequest().request(query).fold({
+			// TODO: Handle Untis API errors (check if success==true)
+			periodLiveData.postValue(periodLiveData.value?.copy(absenceChecked = true))
 			onSuccess()
 		}, {
 			onFailure(it)

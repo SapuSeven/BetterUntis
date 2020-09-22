@@ -8,6 +8,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -93,7 +94,14 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 		if (periodData.element.can.contains(CAN_READ_STUDENT_ABSENCE))
 			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_absences, root, false).run {
 				viewModel.periodData().observe(viewLifecycleOwner, Observer {
-					this.findViewById<TextView>(R.id.textview_timetableitemdetails_absencestatus).text = it.absenceChecked.toString()
+					this.findViewById<TextView>(R.id.textview_timetableitemdetails_absencestatus).text = getString(
+							if (it.absenceChecked) R.string.all_dialog_absences_checked
+							else R.string.all_dialog_absences_not_checked
+					)
+					this.findViewById<ImageView>(R.id.imageview_timetableitemdetails_absence).setImageResource(
+							if (it.absenceChecked) R.drawable.all_absences_checked
+							else R.drawable.all_absences
+					)
 				})
 				setOnClickListener {
 					listener.onPeriodAbsencesClick(this@TimetableItemDetailsFragment, periodData.element)
