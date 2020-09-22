@@ -1,6 +1,5 @@
 package com.sapuseven.untis.activities
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
@@ -32,6 +31,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.sapuseven.untis.R
+import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_PROFILE_UPDATE
 import com.sapuseven.untis.adapters.ProfileListAdapter
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
@@ -48,6 +48,7 @@ import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.Holiday
+import com.sapuseven.untis.models.untis.masterdata.SchoolYear
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.ElementPickerPreference
 import com.sapuseven.untis.preferences.RangePreference
@@ -145,6 +146,11 @@ class MainActivity :
 			setupActionBar()
 			setupNavDrawer()
 
+			if (checkForNewSchoolYear()) {
+				updateProfile(profileUser)
+				return
+			}
+
 			setupViews()
 			setupHours()
 			setupHolidays()
@@ -155,6 +161,24 @@ class MainActivity :
 			showPersonalTimetable()
 			refreshNavigationViewSelection()
 		}
+	}
+
+	private fun checkForNewSchoolYear(): Boolean {
+		val schoolYears = userDatabase.getAdditionalUserData<SchoolYear>(profileUser.id
+				?: -1, SchoolYear())?.values?.toList() ?: emptyList()
+
+		val currentSchoolYearId = schoolYears.find {
+			val now = LocalDate.now()
+			now.isAfter(LocalDate(it.startDate))
+		}?.id ?: -1
+
+		return if (preferences.defaultPrefs.getInt("school_year", -1) != currentSchoolYearId) {
+			val rVal = preferences.defaultPrefs.contains("school_year")
+			preferences.defaultPrefs.edit()
+					.putInt("school_year", currentSchoolYearId)
+					.apply()
+			rVal
+		} else false
 	}
 
 	override fun onPause() {
@@ -192,7 +216,7 @@ class MainActivity :
 				.setTitle(getString(R.string.main_dialog_update_profile_title))
 				.setMessage(getString(R.string.main_dialog_update_profile_message))
 				.setPositiveButton(getString(R.string.main_dialog_update_profile_button)) { _, _ ->
-					editProfile(profileUser)
+					updateProfile(profileUser)
 				}
 				.setCancelable(false)
 				.show()
@@ -301,11 +325,17 @@ class MainActivity :
 
 	private fun editProfile(user: UserDatabase.User) {
 		val loginIntent = Intent(this, LoginDataInputActivity::class.java)
-		loginIntent.putExtra(LoginDataInputActivity.EXTRA_LONG_PROFILE_ID, user.id)
+				.putExtra(LoginDataInputActivity.EXTRA_LONG_PROFILE_ID, user.id)
 		startActivityForResult(loginIntent, REQUEST_CODE_LOGINDATAINPUT_EDIT)
 	}
 
-	@SuppressLint("ApplySharedPref")
+	private fun updateProfile(user: UserDatabase.User) {
+		val loginIntent = Intent(this, LoginDataInputActivity::class.java)
+				.putExtra(LoginDataInputActivity.EXTRA_LONG_PROFILE_ID, user.id)
+				.putExtra(EXTRA_BOOLEAN_PROFILE_UPDATE, true)
+		startActivityForResult(loginIntent, REQUEST_CODE_LOGINDATAINPUT_EDIT)
+	}
+
 	private fun switchToProfile(user: UserDatabase.User) {
 		profileId = user.id!!
 		preferences.saveProfileId(profileId)

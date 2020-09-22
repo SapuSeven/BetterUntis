@@ -33,10 +33,10 @@ class TimetableItemDetailsDialog : DialogFragment() {
 		val HOMEWORK_DUE_TIME_FORMAT: DateTimeFormatter = ISODateTimeFormat.date()
 
 		fun createInstance(item: TimegridItem, timetableDatabaseInterface: TimetableDatabaseInterface?): TimetableItemDetailsDialog {
-			val fragment = TimetableItemDetailsDialog()
-			fragment.item = item
-			fragment.timetableDatabaseInterface = timetableDatabaseInterface
-			return fragment
+			return TimetableItemDetailsDialog().apply {
+				this.item = item
+				this.timetableDatabaseInterface = timetableDatabaseInterface
+			}
 		}
 	}
 
