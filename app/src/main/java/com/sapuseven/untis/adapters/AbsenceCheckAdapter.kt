@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
-import com.sapuseven.untis.viewmodels.AbsenceCheckViewModel
+import com.sapuseven.untis.viewmodels.PeriodDataViewModel
 
 class AbsenceCheckAdapter(
 		private val onClickListener: (item: AbsenceCheckAdapterItem) -> Unit
@@ -35,7 +35,7 @@ class AbsenceCheckAdapter(
 		val item = dataset[position]
 		holder.tvName.text = item.toString()
 		holder.tvDetails.text = item.absence.untisAbsence?.text ?: ""
-		if (item.absence is AbsenceCheckViewModel.PendingAbsence) {
+		if (item.absence is PeriodDataViewModel.PendingAbsence) {
 			holder.ivStatus.visibility = View.INVISIBLE
 			holder.pbLoading.visibility = View.VISIBLE
 		} else {

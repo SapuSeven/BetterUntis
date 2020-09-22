@@ -12,10 +12,12 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_LESSON_TOPIC
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_STUDENT_ABSENCE
+import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.ConversionUtils
@@ -23,13 +25,14 @@ import com.sapuseven.untis.helpers.KotlinUtils.safeLet
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.Period
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import com.sapuseven.untis.viewmodels.TimetableItemDetailsViewModel
+import com.sapuseven.untis.viewmodels.PeriodDataViewModel
 
 
-class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterface: TimetableDatabaseInterface?) : Fragment() {
-	constructor() : this(null, null)
+class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterface: TimetableDatabaseInterface?, user: UserDatabase.User?) : Fragment() {
+	constructor() : this(null, null, null)
 
-	private val viewModel by viewModels<TimetableItemDetailsViewModel> { TimetableItemDetailsViewModel.Factory(item, timetableDatabaseInterface) }
+	private val viewModel: PeriodDataViewModel by activityViewModels { PeriodDataViewModel.Factory(user, item, timetableDatabaseInterface) }
+
 	private lateinit var listener: TimetableItemDetailsDialogListener
 
 	interface TimetableItemDetailsDialogListener {
@@ -42,6 +45,7 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
+		activity?.viewModelStore?.clear() // TODO: Doesn't seem like the best solution. This could potentially interfere with other ViewModels scoped to the parent activity.
 		if (context is TimetableItemDetailsDialogListener)
 			listener = context
 		else
@@ -51,7 +55,7 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		return activity?.let { activity ->
-			safeLet(viewModel.item?.periodData, viewModel.timetableDatabaseInterface) { periodData, timetableDatabaseInterface ->
+			safeLet(viewModel.item.periodData, viewModel.timetableDatabaseInterface) { periodData, timetableDatabaseInterface ->
 				generateView(activity, container, periodData, timetableDatabaseInterface)
 			} ?: generateErrorView(activity, container)
 		} ?: throw IllegalStateException("Activity cannot be null")
@@ -88,6 +92,9 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 
 		if (periodData.element.can.contains(CAN_READ_STUDENT_ABSENCE))
 			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_absences, root, false).run {
+				viewModel.periodData().observe(viewLifecycleOwner, Observer {
+					this.findViewById<TextView>(R.id.textview_timetableitemdetails_absencestatus).text = it.absenceChecked.toString()
+				})
 				setOnClickListener {
 					listener.onPeriodAbsencesClick(this@TimetableItemDetailsFragment, periodData.element)
 				}

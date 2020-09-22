@@ -6,32 +6,49 @@ import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.SerializationUtils
+import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.UntisAbsence
 import com.sapuseven.untis.models.untis.UntisTime
 import com.sapuseven.untis.models.untis.params.AbsencesCheckedParams
 import com.sapuseven.untis.models.untis.params.CreateImmediateAbsenceParams
 import com.sapuseven.untis.models.untis.params.DeleteAbsenceParams
 import com.sapuseven.untis.models.untis.params.PeriodDataParams
-import com.sapuseven.untis.models.untis.response.CreateImmediateAbsenceResponse
-import com.sapuseven.untis.models.untis.response.DeleteAbsenceResponse
-import com.sapuseven.untis.models.untis.response.PeriodDataResponse
-import com.sapuseven.untis.models.untis.response.UntisStudent
-import com.sapuseven.untis.models.untis.timetable.Period
+import com.sapuseven.untis.models.untis.response.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class AbsenceCheckViewModel(private val user: UserDatabase.User, private val period: Period) : ViewModel() {
-	private val absenceListLiveData: MutableLiveData<Map<UntisStudent, Absence>> = liveData {
-		loadAbsenceList()?.let { emit(it) } // TODO: Show network error if null
-	} as MutableLiveData<Map<UntisStudent, Absence>>
+class PeriodDataViewModel(
+		private val user: UserDatabase.User,
+		val item: TimegridItem,
+		val timetableDatabaseInterface: TimetableDatabaseInterface?
+) : ViewModel() {
+	private val period = item.periodData.element
+
+	private val apiLiveData: MutableLiveData<PeriodDataResult> = liveData {
+		loadPeriodData()?.let { emit(it) } // TODO: Show network error if null
+	} as MutableLiveData<PeriodDataResult>
+
+	private val absenceLiveData = MediatorLiveData<Map<UntisStudent, Absence>>()
+
+	private val periodLiveData = MediatorLiveData<UntisPeriodData>()
 
 	private val query = UntisRequest.UntisRequestQuery(user).apply {
 		//proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null) // TODO: Implement
 	}
 
-	private suspend fun loadAbsenceList(): Map<UntisStudent, Absence>? {
+	init {
+		absenceLiveData.addSource(apiLiveData) { result ->
+			result?.let { absenceLiveData.value = absencesFromPeriodData(result.dataByTTId[period.id.toString()], result.referencedStudents) }
+		}
+		periodLiveData.addSource(apiLiveData) { result ->
+			result?.let { periodLiveData.value = result.dataByTTId[period.id.toString()] }
+		}
+	}
+
+	private suspend fun loadPeriodData(): PeriodDataResult? {
 		query.data.method = UntisApiConstants.METHOD_GET_PERIOD_DATA
 		query.data.params = listOf(PeriodDataParams(
 				listOf(period.id),
@@ -42,21 +59,23 @@ class AbsenceCheckViewModel(private val user: UserDatabase.User, private val per
 		return result.fold({ data ->
 			val untisResponse = SerializationUtils.getJSON().parse(PeriodDataResponse.serializer(), data)
 
-			untisResponse.result?.let { periodData ->
-				val absences = periodData.dataByTTId[period.id.toString()]?.absences
-				// TODO: Check for absenceChecked
-				periodData.referencedStudents.associateWith { student ->
-					Absence(absences?.find { it.studentId == student.id })
-				}
-			}
+			untisResponse.result
 		}, { null })
 	}
 
-	fun absenceList(): LiveData<Map<UntisStudent, Absence>> = absenceListLiveData
+	fun absenceData(): LiveData<Map<UntisStudent, Absence>> = absenceLiveData
+
+	fun periodData(): LiveData<UntisPeriodData> = periodLiveData
+
+	private fun absencesFromPeriodData(periodData: UntisPeriodData?, periodStudents: List<UntisStudent>): Map<UntisStudent, Absence> {
+		return periodStudents.associateWith { student ->
+			Absence(periodData?.absences?.find { it.studentId == student.id })
+		}
+	}
 
 	fun createAbsence(student: UntisStudent) = viewModelScope.launch(Dispatchers.IO) {
-		val originalValue = absenceListLiveData.value
-		absenceListLiveData.postValue(absenceListLiveData.value?.mapValues { if (it.key == student) PendingAbsence() else it.value })
+		val originalValue = absenceLiveData.value
+		absenceLiveData.postValue(absenceLiveData.value?.mapValues { if (it.key == student) PendingAbsence() else it.value })
 
 		query.data.method = UntisApiConstants.METHOD_CREATE_IMMEDIATE_ABSENCE
 		query.data.params = listOf(CreateImmediateAbsenceParams(
@@ -71,17 +90,17 @@ class AbsenceCheckViewModel(private val user: UserDatabase.User, private val per
 			val untisResponse = SerializationUtils.getJSON().parse(CreateImmediateAbsenceResponse.serializer(), data)
 
 			untisResponse.result?.let { result ->
-				absenceListLiveData.postValue(absenceListLiveData.value?.mapValues { if (it.key == student) Absence(result.absences[0]) else it.value })
+				absenceLiveData.postValue(absenceLiveData.value?.mapValues { if (it.key == student) Absence(result.absences[0]) else it.value })
 			}
 		}, {
-			absenceListLiveData.postValue(originalValue)
+			absenceLiveData.postValue(originalValue)
 			// TODO: Show network error
 		})
 	}
 
 	fun deleteAbsence(student: UntisStudent, absence: UntisAbsence) = viewModelScope.launch(Dispatchers.IO) {
-		val originalValue = absenceListLiveData.value
-		absenceListLiveData.postValue(absenceListLiveData.value?.mapValues { if (it.key == student) PendingAbsence() else it.value })
+		val originalValue = absenceLiveData.value
+		absenceLiveData.postValue(absenceLiveData.value?.mapValues { if (it.key == student) PendingAbsence() else it.value })
 
 		query.data.method = UntisApiConstants.METHOD_DELETE_ABSENCE
 		query.data.params = listOf(DeleteAbsenceParams(
@@ -94,12 +113,12 @@ class AbsenceCheckViewModel(private val user: UserDatabase.User, private val per
 
 			untisResponse.result?.let { result ->
 				if (result.success)
-					absenceListLiveData.postValue(absenceListLiveData.value?.mapValues { if (it.key == student) Absence() else it.value })
+					absenceLiveData.postValue(absenceLiveData.value?.mapValues { if (it.key == student) Absence() else it.value })
 				else
-					absenceListLiveData.postValue(originalValue) // TODO: show error
+					absenceLiveData.postValue(originalValue) // TODO: show error
 			}
 		}, {
-			absenceListLiveData.postValue(originalValue)
+			absenceLiveData.postValue(originalValue)
 			// TODO: Show network error
 		})
 	}
@@ -119,10 +138,10 @@ class AbsenceCheckViewModel(private val user: UserDatabase.User, private val per
 		})
 	}
 
-	class Factory(private val user: UserDatabase.User?, private val period: Period?) : ViewModelProvider.Factory {
+	class Factory(private val user: UserDatabase.User?, private val item: TimegridItem?, val timetableDatabaseInterface: TimetableDatabaseInterface?) : ViewModelProvider.Factory {
 		override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-			return modelClass.getConstructor(UserDatabase.User::class.java, Period::class.java)
-					.newInstance(user, period)
+			return modelClass.getConstructor(UserDatabase.User::class.java, TimegridItem::class.java, TimetableDatabaseInterface::class.java)
+					.newInstance(user, item, timetableDatabaseInterface)
 		}
 	}
 

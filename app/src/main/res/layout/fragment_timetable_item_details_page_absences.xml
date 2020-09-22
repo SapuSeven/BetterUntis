@@ -34,9 +34,10 @@
 			android:textSize="13sp" />
 
 		<TextView
+			android:id="@+id/textview_timetableitemdetails_absencestatus"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:text="@string/all_dialog_absences_not_checked"
+			android:text="@string/loading"
 			android:textColor="?android:attr/textColorSecondary"
 			android:textSize="13sp" />
 	</LinearLayout>

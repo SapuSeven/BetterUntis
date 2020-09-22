@@ -747,7 +747,7 @@ class MainActivity :
 	}
 
 	override fun onEventClick(data: TimegridItem, eventRect: RectF) {
-		val fragment = TimetableItemDetailsFragment(data, timetableDatabaseInterface)
+		val fragment = TimetableItemDetailsFragment(data, timetableDatabaseInterface, profileUser)
 
 		supportFragmentManager.beginTransaction().run {
 			setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
@@ -772,7 +772,7 @@ class MainActivity :
 	}
 
 	override fun onPeriodAbsencesClick(fragment: Fragment, element: Period) {
-		val absenceEditFragment = AbsenceCheckFragment(profileUser, element)
+		val absenceEditFragment = AbsenceCheckFragment()
 
 		supportFragmentManager.beginTransaction().run {
 			setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
