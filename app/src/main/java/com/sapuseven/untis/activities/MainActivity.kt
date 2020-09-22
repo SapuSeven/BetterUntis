@@ -1,6 +1,5 @@
 package com.sapuseven.untis.activities
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
@@ -49,6 +48,7 @@ import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.Holiday
+import com.sapuseven.untis.models.untis.masterdata.SchoolYear
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.ElementPickerPreference
 import com.sapuseven.untis.preferences.RangePreference
@@ -164,8 +164,21 @@ class MainActivity :
 	}
 
 	private fun checkForNewSchoolYear(): Boolean {
-		return false
-		//userDatabase.getAdditionalUserData<SchoolYear>(profileUser.id ?: -1, SchoolYear())?.values?.toList() ?: emptyList()
+		val schoolYears = userDatabase.getAdditionalUserData<SchoolYear>(profileUser.id
+				?: -1, SchoolYear())?.values?.toList() ?: emptyList()
+
+		val currentSchoolYearId = schoolYears.find {
+			val now = LocalDate.now()
+			now.isAfter(LocalDate(it.startDate))
+		}?.id ?: -1
+
+		return if (preferences.defaultPrefs.getInt("school_year", -1) != currentSchoolYearId) {
+			val rVal = preferences.defaultPrefs.contains("school_year")
+			preferences.defaultPrefs.edit()
+					.putInt("school_year", currentSchoolYearId)
+					.apply()
+			rVal
+		} else false
 	}
 
 	override fun onPause() {
@@ -323,7 +336,6 @@ class MainActivity :
 		startActivityForResult(loginIntent, REQUEST_CODE_LOGINDATAINPUT_EDIT)
 	}
 
-	@SuppressLint("ApplySharedPref")
 	private fun switchToProfile(user: UserDatabase.User) {
 		profileId = user.id!!
 		preferences.saveProfileId(profileId)
