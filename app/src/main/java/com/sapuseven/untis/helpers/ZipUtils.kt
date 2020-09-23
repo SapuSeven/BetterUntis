@@ -1,6 +1,5 @@
 package com.sapuseven.untis.helpers
 
-import android.util.Log
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -14,9 +13,7 @@ class ZipUtils {
 		fun zip(srcDir: File, zipFile: File) {
 			try {
 				val zipOutputStream = ZipOutputStream(FileOutputStream(zipFile))
-				Log.d("", "Zip directory: " + srcDir.name)
 				srcDir.listFiles()?.forEach {
-					Log.d("", "Adding file: " + it.name)
 					val buffer = ByteArray(BUFFER_SIZE)
 					val fileInputStream = FileInputStream(it)
 					zipOutputStream.putNextEntry(ZipEntry(it.name))
