@@ -3,6 +3,7 @@ package com.sapuseven.untis.widgets
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
+import androidx.core.text.HtmlCompat
 import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
@@ -168,7 +169,10 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 		return RemoteViews(applicationContext.packageName, R.layout.widget_base_item).apply {
 			items?.get(position)?.let { item: WidgetListItem ->
 				setTextViewText(R.id.textview_listitem_line1, item.firstLine)
-				setTextViewText(R.id.textview_listitem_line2, item.secondLine)
+				setTextViewText(
+						R.id.textview_listitem_line2,
+						HtmlCompat.fromHtml(item.secondLine, HtmlCompat.FROM_HTML_MODE_COMPACT)
+				)
 			}
 
 			val reloadIntent = Intent()
