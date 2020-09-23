@@ -88,7 +88,8 @@ jobs:
           command: |
             echo $SSH_DEPLOY_KEY_ENCODED | base64 --decode > id_rsa
             chmod 600 id_rsa
-            scp -r -P $SSH_DEPLOY_PORT -i id_rsa workspace/outputs/apk/release workspace/outputs/mapping/release "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG"
+            scp -r -P $SSH_DEPLOY_PORT -i id_rsa workspace/outputs/apk/release "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG"
+            scp -P $SSH_DEPLOY_PORT -i id_rsa workspace/outputs/mapping/release/* "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG/"
 
 workflows:
   version: 2
