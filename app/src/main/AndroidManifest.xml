@@ -18,9 +18,30 @@
 		android:theme="@style/AppTheme">
 
 		<activity
+			android:name=".activities.ShortcutConfigureActivity"
+			android:icon="@mipmap/ic_shortcut"
+			android:label="@string/widget_timetable_link">
+
+			<intent-filter>
+				<category android:name="android.intent.category.DEFAULT" />
+				<action android:name="android.intent.action.CREATE_SHORTCUT" />
+			</intent-filter>
+		</activity>
+
+		<activity
+			android:name=".activities.BaseWidgetConfigureActivity"
+			android:label="@string/widget_configuration">
+
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+			</intent-filter>
+		</activity>
+
+		<activity
 			android:name=".activities.MainActivity"
 			android:launchMode="singleTop"
 			android:theme="@style/AppTheme.Launcher.NoActionBar">
+
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 
@@ -36,6 +57,7 @@
 			android:name=".activities.ScanCodeActivity"
 			android:label="@string/login_scan_code"
 			android:parentActivityName=".activities.LoginActivity">
+
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
 				android:value=".activities.LoginActivity" />
@@ -45,6 +67,7 @@
 			android:name=".activities.RoomFinderActivity"
 			android:label="@string/activity_title_free_rooms"
 			android:parentActivityName=".activities.MainActivity">
+
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
 				android:value=".activities.MainActivity" />
@@ -54,6 +77,7 @@
 			android:name=".activities.InfoCenterActivity"
 			android:label="@string/activity_title_info_center"
 			android:parentActivityName=".activities.MainActivity">
+
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
 				android:value=".activities.MainActivity" />
@@ -63,6 +87,7 @@
 			android:name=".activities.LoginDataInputActivity"
 			android:parentActivityName=".activities.LoginActivity"
 			android:windowSoftInputMode="adjustResize">
+
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
 				android:value=".activities.LoginActivity" />
@@ -83,6 +108,7 @@
 			android:name=".activities.SettingsActivity"
 			android:label="@string/activity_title_settings"
 			android:parentActivityName=".activities.MainActivity">
+
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
 				android:value=".activities.MainActivity" />
@@ -105,5 +131,35 @@
 		<receiver android:name=".receivers.AutoMuteSetup" />
 
 		<receiver android:name=".receivers.AutoMuteReceiver" />
+
+		<receiver
+			android:name=".widgets.TimetableWidget"
+			android:label="@string/widget_timetable">
+
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+			</intent-filter>
+
+			<meta-data
+				android:name="android.appwidget.provider"
+				android:resource="@xml/widget_info" />
+		</receiver>
+
+		<receiver
+			android:name=".widgets.MessagesWidget"
+			android:label="@string/widget_daily_messages">
+
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+			</intent-filter>
+
+			<meta-data
+				android:name="android.appwidget.provider"
+				android:resource="@xml/widget_info" />
+		</receiver>
+
+		<service
+			android:name=".widgets.WidgetRemoteViewsService"
+			android:permission="android.permission.BIND_REMOTEVIEWS" />
 	</application>
 </manifest>

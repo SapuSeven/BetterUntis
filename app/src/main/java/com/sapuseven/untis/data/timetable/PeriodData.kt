@@ -56,7 +56,7 @@ class PeriodData(
 				timetableDatabaseInterface?.getLongName(it.id, type) ?: ELEMENT_NAME_UNKNOWN
 			}
 
-	fun getShortSpanned(list: HashSet<PeriodElement>, type: TimetableDatabaseInterface.Type): SpannableString {
+	fun getShortSpanned(list: HashSet<PeriodElement>, type: TimetableDatabaseInterface.Type, includeOrgIds: Boolean = true): SpannableString {
 		val builder = SpannableStringBuilder()
 
 		list.forEach {
@@ -64,7 +64,7 @@ class PeriodData(
 				builder.append(ELEMENT_NAME_SEPARATOR)
 			builder.append(timetableDatabaseInterface?.getShortName(it.id, type)
 					?: ELEMENT_NAME_UNKNOWN)
-			if (it.id != it.orgId && it.orgId != 0) {
+			if (includeOrgIds && it.id != it.orgId && it.orgId != 0) {
 				builder.append(ELEMENT_NAME_SEPARATOR)
 				builder.append(timetableDatabaseInterface?.getShortName(it.orgId, type)
 						?: ELEMENT_NAME_UNKNOWN,
