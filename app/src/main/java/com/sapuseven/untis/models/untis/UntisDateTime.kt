@@ -3,6 +3,7 @@ package com.sapuseven.untis.models.untis
 import com.sapuseven.untis.helpers.DateTimeUtils
 import kotlinx.serialization.*
 import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
 
@@ -30,7 +31,7 @@ class UntisDateTime(
 	}
 
 	fun toLocalDateTime(): LocalDateTime {
-		return DateTimeUtils.isoDateTimeNoSeconds().parseLocalDateTime(dateTime)
+		return DateTimeUtils.isoDateTimeNoSeconds().withZone(DateTimeZone.getDefault()).parseLocalDateTime(dateTime)
 	}
 
 	fun toDateTime(): DateTime {

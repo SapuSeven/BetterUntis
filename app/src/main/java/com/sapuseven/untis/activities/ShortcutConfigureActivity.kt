@@ -4,7 +4,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
@@ -45,7 +45,7 @@ class ShortcutConfigureActivity : BaseActivity(), ElementPickerDialog.ElementPic
 
 	override fun onDialogDismissed(dialog: DialogInterface?) {}
 
-	override fun onPeriodElementClick(dialog: DialogFragment, element: PeriodElement?, useOrgId: Boolean) {
+	override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
 		setupShortcut(userId, element, useOrgId)
 		finish()
 	}

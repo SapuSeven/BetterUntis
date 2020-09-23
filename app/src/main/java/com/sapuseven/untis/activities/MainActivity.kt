@@ -119,6 +119,7 @@ class MainActivity :
 	private var proxyHost: String? = null
 	private var profileUpdateDialog: AlertDialog? = null
 	private var currentWeekIndex = 0
+	private var currentSchoolYearId = -1
 	private val weekViewRefreshHandler = Handler(Looper.getMainLooper())
 	private lateinit var profileUser: UserDatabase.User
 	private lateinit var profileListAdapter: ProfileListAdapter
@@ -175,20 +176,18 @@ class MainActivity :
 	}
 
 	private fun checkForNewSchoolYear(): Boolean {
-		val schoolYears = userDatabase.getAdditionalUserData<SchoolYear>(profileUser.id
-				?: -1, SchoolYear())?.values?.toList() ?: emptyList()
+		if (currentSchoolYearId == -1) {
+			val schoolYears = userDatabase.getAdditionalUserData<SchoolYear>(profileUser.id
+					?: -1, SchoolYear())?.values?.toList() ?: emptyList()
 
-		val currentSchoolYearId = schoolYears.find {
-			val now = LocalDate.now()
-			now.isAfter(LocalDate(it.startDate))
-		}?.id ?: -1
+			currentSchoolYearId = schoolYears.find {
+				val now = LocalDate.now()
+				now.isAfter(LocalDate(it.startDate))
+			}?.id ?: -1
+		}
 
 		return if (preferences.defaultPrefs.getInt("school_year", -1) != currentSchoolYearId) {
-			val rVal = preferences.defaultPrefs.contains("school_year")
-			preferences.defaultPrefs.edit()
-					.putInt("school_year", currentSchoolYearId)
-					.apply()
-			rVal
+			preferences.defaultPrefs.contains("school_year")
 		} else false
 	}
 
@@ -746,8 +745,14 @@ class MainActivity :
 				if (resultCode == Activity.RESULT_OK)
 					recreate()
 			REQUEST_CODE_LOGINDATAINPUT_EDIT ->
-				if (resultCode == Activity.RESULT_OK)
+				if (resultCode == Activity.RESULT_OK) {
+					preferences.defaultPrefs.edit()
+							.putInt("school_year", currentSchoolYearId)
+							.apply()
 					recreate()
+				} else if (checkForNewSchoolYear()) {
+					finish()
+				}
 			REQUEST_CODE_ERRORS -> recreate()
 		}
 	}

@@ -10,5 +10,6 @@ data class UntisSettings(
 		val defaultAbsenceReasonId: Int,
 		val defaultLatenessReasonId: Int,
 		val defaultAbsenceEndTime: String,
-		val customAbsenceEndTime: String?
+		val customAbsenceEndTime: String?,
+		val showCalendarDetails: Boolean = false
 )

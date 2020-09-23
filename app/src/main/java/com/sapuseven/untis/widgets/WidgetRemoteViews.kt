@@ -3,11 +3,11 @@ package com.sapuseven.untis.widgets
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
-import androidx.core.text.HtmlCompat
 import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import android.widget.RemoteViewsService.RemoteViewsFactory
+import androidx.core.text.HtmlCompat
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
@@ -15,7 +15,6 @@ import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
-import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.UntisDate
@@ -25,7 +24,6 @@ import com.sapuseven.untis.models.untis.response.MessageResponse
 import com.sapuseven.untis.models.untis.response.TimetableResponse
 import com.sapuseven.untis.widgets.BaseWidget.Companion.EXTRA_INT_RELOAD
 import kotlinx.coroutines.runBlocking
-import org.joda.time.DateTimeZone
 import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
@@ -127,11 +125,11 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 			userDataResult.fold({ data ->
 				val untisResponse = SerializationUtils.getJSON().parse(TimetableResponse.serializer(), data)
 
-				untisResponse.result?.timetable?.periods?.sortedBy { it.startDateTime }?.map {
+				untisResponse.result?.timetable?.periods?.sortedBy { it.startDateTime.toString() }?.map {
 					TimegridItem(
 							it.id.toLong(),
-							DateTimeUtils.isoDateTimeNoSeconds().withZone(DateTimeZone.getDefault()).parseLocalDateTime(it.startDateTime).toDateTime(),
-							DateTimeUtils.isoDateTimeNoSeconds().withZone(DateTimeZone.getDefault()).parseLocalDateTime(it.endDateTime).toDateTime(),
+							it.startDateTime.toDateTime(),
+							it.endDateTime.toDateTime(),
 							params.type,
 							PeriodData(timetableDatabaseInterface, it),
 							includeOrgIds = false
