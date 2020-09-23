@@ -276,4 +276,8 @@
 		<item quantity="one">%1$d Beitrag</item>
 		<item quantity="other">%1$d Beiträge</item>
 	</plurals>
+	<string name="all_absences">Abwesenheiten</string>
+	<string name="all_teaching_content">Lehrstoff</string>
+	<string name="all_dialog_absences_checked">Anwesenheit kontrolliert.</string>
+	<string name="all_dialog_absences_not_checked">Anwesenheit noch nicht kontrolliert.</string>
 </resources>

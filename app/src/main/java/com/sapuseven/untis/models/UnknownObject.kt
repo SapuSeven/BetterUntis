@@ -19,7 +19,10 @@ class UnknownObject(val jsonString: String?) {
 		fun validate(fields: Map<String, UnknownObject?>) {
 			fields.forEach {
 				it.value?.let { value ->
-					if (value.jsonString?.isNotBlank() == true && value.jsonString.toIntOrNull() != 0 && value.jsonString != "[]")
+					if (value.jsonString?.isNotBlank() == true
+							&& value.jsonString.toIntOrNull() != 0
+							&& value.jsonString != "[]"
+							&& value.jsonString != "{}")
 						ErrorLogger.instance?.log("Unknown JSON object \"${it.key}\" encountered, value: ${value.jsonString}")
 				}
 			}

@@ -43,7 +43,7 @@ class SchoolSearchAdapter(private val onClickListener: View.OnClickListener) : R
 		return dataset[index]
 	}
 
-	class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+	class ViewHolder(rootView: View) : RecyclerView.ViewHolder(rootView) {
 		var tvSchool: TextView = itemView.findViewById(R.id.textview_listitem_line1)
 		var tvAddress: TextView = itemView.findViewById(R.id.textview_listitem_line2)
 	}

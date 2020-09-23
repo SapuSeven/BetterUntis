@@ -16,20 +16,24 @@ import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ca.antonious.materialdaypicker.MaterialDayPicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_PROFILE_UPDATE
 import com.sapuseven.untis.adapters.ProfileListAdapter
@@ -38,7 +42,8 @@ import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.dialogs.DatePickerDialog
 import com.sapuseven.untis.dialogs.ElementPickerDialog
 import com.sapuseven.untis.dialogs.ErrorReportingDialog
-import com.sapuseven.untis.dialogs.TimetableItemDetailsDialog
+import com.sapuseven.untis.fragments.AbsenceCheckFragment
+import com.sapuseven.untis.fragments.TimetableItemDetailsFragment
 import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
@@ -54,6 +59,7 @@ import com.sapuseven.untis.preferences.ElementPickerPreference
 import com.sapuseven.untis.preferences.RangePreference
 import com.sapuseven.untis.receivers.NotificationSetup.Companion.EXTRA_BOOLEAN_MANUAL
 import com.sapuseven.untis.receivers.StartupReceiver
+import com.sapuseven.untis.viewmodels.PeriodDataViewModel
 import com.sapuseven.untis.views.weekview.HolidayChip
 import com.sapuseven.untis.views.weekview.WeekView
 import com.sapuseven.untis.views.weekview.WeekViewDisplayable
@@ -80,7 +86,7 @@ class MainActivity :
 		EventClickListener<TimegridItem>,
 		TopLeftCornerClickListener,
 		TimetableDisplay,
-		TimetableItemDetailsDialog.TimetableItemDetailsDialogListener,
+		TimetableItemDetailsFragment.TimetableItemDetailsDialogListener,
 		ElementPickerDialog.ElementPickerDialogListener {
 
 	companion object {
@@ -99,6 +105,9 @@ class MainActivity :
 		private const val PERSISTENT_INT_ZOOM_LEVEL = "persistent_zoom_level"
 
 		private const val MESSENGER_PACKAGE_NAME = "com.untis.chat"
+
+		private const val FRAGMENT_TAG_LESSON_INFO = "com.sapuseven.untis.fragments.lessoninfo"
+		private const val FRAGMENT_TAG_ABSENCE_CHECK = "com.sapuseven.untis.fragments.absencecheck"
 	}
 
 	private val userDatabase = UserDatabase.createInstance(this)
@@ -116,6 +125,8 @@ class MainActivity :
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 	private lateinit var timetableLoader: TimetableLoader
 	private lateinit var weekView: WeekView<TimegridItem>
+
+	private val timetableItemDetailsViewModel: PeriodDataViewModel by viewModels()
 
 	private val weekViewUpdate = object : Runnable {
 		override fun run() {
@@ -433,7 +444,7 @@ class MainActivity :
 		weekView.setOnCornerClickListener(this)
 		weekView.setPeriodChangeListener(this)
 		weekView.scrollListener = object : ScrollListener {
-			override fun onFirstVisibleDayChanged(newFirstVisibleDay: DateTime, oldFirstVisibleDay: DateTime?) {
+			override fun onFirstVisibleDayChanged(newFirstVisibleDay: LocalDate, oldFirstVisibleDay: LocalDate?) {
 				currentWeekIndex = convertDateTimeToWeekIndex(newFirstVisibleDay)
 				setLastRefresh(weeklyTimetableItems[currentWeekIndex]?.lastUpdated
 						?: 0)
@@ -484,7 +495,7 @@ class MainActivity :
 		weekView.snapToWeek = !PreferenceUtils.getPrefBool(preferences, "preference_week_snap_to_days") && weekView.numberOfVisibleDays != 1
 	}
 
-	override fun onPeriodChange(startDate: DateTime, endDate: DateTime): List<WeekViewDisplayable<TimegridItem>> {
+	override fun onPeriodChange(startDate: LocalDate, endDate: LocalDate): List<WeekViewDisplayable<TimegridItem>> {
 		val weekIndex = convertDateTimeToWeekIndex(startDate)
 		return weeklyTimetableItems[weekIndex]?.items ?: run {
 			displayedElement?.let { displayedElement ->
@@ -498,7 +509,7 @@ class MainActivity :
 		}
 	}
 
-	private fun convertDateTimeToWeekIndex(date: DateTime) = date.year * 100 + date.dayOfYear / 7
+	private fun convertDateTimeToWeekIndex(date: LocalDate) = date.year * 100 + date.dayOfYear / 7
 
 	private fun setupHours() {
 		val lines = MutableList(0) { return@MutableList 0 }
@@ -507,8 +518,8 @@ class MainActivity :
 		profileUser.timeGrid.days.maxBy { it.units.size }?.units?.forEachIndexed { index, hour ->
 			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
 
-			val startTime = DateTimeUtils.tTimeNoSeconds().parseLocalTime(hour.startTime).toString(DateTimeUtils.shortDisplayableTime())
-			val endTime = DateTimeUtils.tTimeNoSeconds().parseLocalTime(hour.endTime).toString(DateTimeUtils.shortDisplayableTime())
+			val startTime = hour.startTime.toLocalTime().toString(DateTimeUtils.shortDisplayableTime())
+			val endTime = hour.endTime.toLocalTime().toString(DateTimeUtils.shortDisplayableTime())
 
 			val startTimeParts = startTime.split(":")
 			val endTimeParts = endTime.split(":")
@@ -537,13 +548,29 @@ class MainActivity :
 	}
 
 	private fun setupActionBar() {
-		val toolbar: Toolbar = findViewById(R.id.toolbar_main)
-		setSupportActionBar(toolbar)
-		val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.main_drawer_open, R.string.main_drawer_close)
+		setSupportActionBar(toolbar_main)
+		val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar_main, R.string.main_drawer_open, R.string.main_drawer_close)
 		drawer_layout.addDrawerListener(toggle)
 		toggle.syncState()
 		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
 		window.statusBarColor = Color.TRANSPARENT
+
+		supportFragmentManager.addOnBackStackChangedListener {
+			if (supportFragmentManager.backStackEntryCount > 0) {
+				toggle.isDrawerIndicatorEnabled = false
+				supportActionBar?.setDisplayHomeAsUpEnabled(true)
+				drawer_layout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START)
+				toolbar_main.setNavigationOnClickListener { onBackPressed() }
+				// TODO: Set actionBar title to match fragment
+			} else {
+				supportActionBar?.setDisplayHomeAsUpEnabled(false)
+				toggle.isDrawerIndicatorEnabled = true
+				toggle.syncState()
+				drawer_layout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
+				toolbar_main.setNavigationOnClickListener { openDrawer() }
+				// TODO: Set actionBar title to default
+			}
+		}
 	}
 
 	private fun prepareItems(items: List<TimegridItem>): List<TimegridItem> {
@@ -576,19 +603,19 @@ class MainActivity :
 
 		// Put all items into a two dimensional array depending on day and hour
 		items.forEach { item ->
-			val startDateTime = DateTimeUtils.isoDateTimeNoSeconds().parseLocalDateTime(item.periodData.element.startDateTime)
-			val endDateTime = DateTimeUtils.isoDateTimeNoSeconds().parseLocalDateTime(item.periodData.element.endDateTime)
+			val startDateTime = item.periodData.element.startDateTime.toLocalDateTime()
+			val endDateTime = item.periodData.element.endDateTime.toLocalDateTime()
 
 			val day = endDateTime.dayOfWeek - firstDayOfWeek
 
 			if (day < 0 || day >= days.size) return@forEach
 
 			val thisUnitStartIndex = days[day].units.indexOfFirst {
-				it.startTime == startDateTime.toString(DateTimeUtils.tTimeNoSeconds())
+				it.startTime.time == startDateTime.toString(DateTimeUtils.tTimeNoSeconds())
 			}
 
 			val thisUnitEndIndex = days[day].units.indexOfFirst {
-				it.endTime == endDateTime.toString(DateTimeUtils.tTimeNoSeconds())
+				it.endTime.time == endDateTime.toString(DateTimeUtils.tTimeNoSeconds())
 			}
 
 			if (thisUnitStartIndex != -1 && thisUnitEndIndex != -1)
@@ -728,6 +755,8 @@ class MainActivity :
 	override fun onBackPressed() {
 		if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
 			closeDrawer(drawer_layout)
+		} else if (supportFragmentManager.backStackEntryCount > 0) {
+			super.onBackPressed()
 		} else if (!showPersonalTimetable()) {
 			if (System.currentTimeMillis() - 2000 > lastBackPress && PreferenceUtils.getPrefBool(preferences, "preference_double_tap_to_exit")) {
 				Snackbar.make(content_main,
@@ -774,11 +803,21 @@ class MainActivity :
 	}
 
 	override fun onEventClick(data: TimegridItem, eventRect: RectF) {
-		showLessonInfo(data)
+		val fragment = TimetableItemDetailsFragment(data, timetableDatabaseInterface, profileUser)
+
+		supportFragmentManager.beginTransaction().run {
+			setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+			add(R.id.content_main, fragment, FRAGMENT_TAG_LESSON_INFO)
+			addToBackStack(fragment.tag)
+			commit()
+		}
 	}
 
-	override fun onPeriodElementClick(dialog: DialogFragment, element: PeriodElement?, useOrgId: Boolean) {
-		dialog.dismiss()
+	override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
+		if (fragment is DialogFragment)
+			fragment.dismiss()
+		else
+			removeFragment(fragment)
 		element?.let {
 			setTarget(if (useOrgId) element.orgId else element.id, element.type, timetableDatabaseInterface.getLongName(
 					if (useOrgId) element.orgId else element.id, TimetableDatabaseInterface.Type.valueOf(element.type)))
@@ -786,6 +825,33 @@ class MainActivity :
 			showPersonalTimetable()
 		}
 		refreshNavigationViewSelection()
+	}
+
+	override fun onPeriodAbsencesClick() {
+		val absenceEditFragment = AbsenceCheckFragment()
+
+		supportFragmentManager.beginTransaction().run {
+			setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+			add(R.id.content_main, absenceEditFragment, FRAGMENT_TAG_ABSENCE_CHECK)
+			addToBackStack(absenceEditFragment.tag)
+			commit()
+		}
+	}
+
+	override fun onLessonTopicClick() {
+		val dialogView = layoutInflater.inflate(R.layout.dialog_edit_lessontopic, null)
+		val etLessonTopic = dialogView.findViewById<TextInputEditText>(R.id.edittext_dialog)
+
+		etLessonTopic.setText(timetableItemDetailsViewModel.periodData().value?.topic?.text ?: "")
+
+		MaterialAlertDialogBuilder(this)
+				.setView(dialogView)
+				.setPositiveButton(R.string.all_ok) { dialog, _ ->
+					val lessonTopic = etLessonTopic.text.toString()
+					timetableItemDetailsViewModel.submitLessonTopic(lessonTopic)
+					dialog.dismiss()
+				}
+				.show()
 	}
 
 	override fun onDialogDismissed(dialog: DialogInterface?) {
@@ -796,6 +862,10 @@ class MainActivity :
 		dialog.dismiss() // unused, but just in case
 	}
 
+	private fun removeFragment(fragment: Fragment) {
+		supportFragmentManager.popBackStack(fragment.tag, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+	}
+
 	private fun refreshNavigationViewSelection() {
 		when (displayedElement?.type) {
 			TimetableDatabaseInterface.Type.CLASS.name -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_classes)
@@ -803,10 +873,6 @@ class MainActivity :
 			TimetableDatabaseInterface.Type.ROOM.name -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_rooms)
 			else -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_personal)
 		}
-	}
-
-	private fun showLessonInfo(item: TimegridItem) {
-		TimetableItemDetailsDialog.createInstance(item, timetableDatabaseInterface).show(supportFragmentManager, "itemDetails") // TODO: Remove hard-coded tag
 	}
 
 	private fun setLastRefresh(timestamp: Long) {
@@ -833,7 +899,7 @@ class MainActivity :
 			}
 		}
 
-		weeklyTimetableItems[convertDateTimeToWeekIndex(startDate.toDateTime())]?.apply {
+		weeklyTimetableItems[convertDateTimeToWeekIndex(startDate.toLocalDate())]?.apply {
 			this.items = prepareItems(items).map { it.toWeekViewEvent() }
 			lastUpdated = timestamp
 		}
@@ -883,7 +949,9 @@ class MainActivity :
 
 	override fun onCornerLongClick() = weekView.goToToday()
 
-	private fun closeDrawer(drawer: DrawerLayout = findViewById(R.id.drawer_layout)) = drawer.closeDrawer(GravityCompat.START)
+	private fun openDrawer(drawer: DrawerLayout = drawer_layout) = drawer.openDrawer(GravityCompat.START)
+
+	private fun closeDrawer(drawer: DrawerLayout = drawer_layout) = drawer.closeDrawer(GravityCompat.START)
 
 	private fun Int.darken(ratio: Float) = ColorUtils.blendARGB(this, Color.BLACK, ratio)
 

@@ -21,7 +21,7 @@ data class Klasse(
 		@field:TableColumn("VARCHAR(255)") val backColor: String? = "",
 		@field:TableColumn("BOOLEAN NOT NULL") val active: Boolean = false,
 		@field:TableColumn("BOOLEAN NOT NULL") val displayable: Boolean = false
-) : Comparable<String>, TableModel {
+) : Comparable<String>, TableModel, java.io.Serializable {
 	companion object {
 		const val TABLE_NAME = TABLE_NAME_KLASSEN
 	}

@@ -1,7 +1,6 @@
 package com.sapuseven.untis.models.untis
 
 import kotlinx.serialization.*
-import org.joda.time.DateTime
 import org.joda.time.LocalDate
 import org.joda.time.format.ISODateTimeFormat
 
@@ -29,7 +28,7 @@ class UntisDate(
 		return date
 	}
 
-	fun toDateTime(): DateTime {
-		return DateTime(date)
+	fun toLocalDate(): LocalDate {
+		return ISODateTimeFormat.date().parseLocalDate(date)
 	}
 }

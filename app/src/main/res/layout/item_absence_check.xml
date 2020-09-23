@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:layout_width="match_parent"
+	android:layout_height="64dp"
+	android:background="?android:attr/selectableItemBackground"
+	android:clickable="true"
+	android:focusable="true">
+
+	<androidx.appcompat.widget.AppCompatImageView
+		android:id="@+id/imageview_itemabsencecheck_status"
+		android:layout_width="32dp"
+		android:layout_height="32dp"
+		android:layout_marginStart="16dp"
+		android:layout_marginTop="16dp"
+		android:layout_marginBottom="16dp"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="parent"
+		app:srcCompat="@drawable/all_check" />
+
+	<ProgressBar
+		android:id="@+id/progressbar_itemabsencecheck_loading"
+		style="?android:attr/progressBarStyle"
+		android:layout_width="0dp"
+		android:layout_height="0dp"
+		app:layout_constraintBottom_toBottomOf="@+id/imageview_itemabsencecheck_status"
+		app:layout_constraintEnd_toEndOf="@+id/imageview_itemabsencecheck_status"
+		app:layout_constraintStart_toStartOf="@+id/imageview_itemabsencecheck_status"
+		app:layout_constraintTop_toTopOf="@+id/imageview_itemabsencecheck_status" />
+
+	<TextView
+		android:id="@+id/textview_itemabsencecheck_name"
+		android:layout_width="0dp"
+		android:layout_height="20dp"
+		android:layout_marginStart="16dp"
+		android:layout_marginTop="12dp"
+		android:layout_marginEnd="16dp"
+		android:gravity="center_vertical"
+		android:lines="1"
+		android:textColor="?android:attr/textColorPrimary"
+		android:textSize="@dimen/textsize_listitem_line1"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toEndOf="@+id/imageview_itemabsencecheck_status"
+		app:layout_constraintTop_toTopOf="parent" />
+
+	<TextView
+		android:id="@+id/textview_itemabsencecheck_details"
+		android:layout_width="0dp"
+		android:layout_height="20dp"
+		android:layout_marginStart="16dp"
+		android:layout_marginEnd="16dp"
+		android:layout_marginBottom="12dp"
+		android:gravity="center_vertical"
+		android:lines="1"
+		android:textColor="?android:attr/textColorSecondary"
+		android:textSize="@dimen/textsize_listitem_line2"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toEndOf="@+id/imageview_itemabsencecheck_status" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

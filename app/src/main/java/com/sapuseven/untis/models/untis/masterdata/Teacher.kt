@@ -22,7 +22,7 @@ data class Teacher(
 		@field:TableColumn("VARCHAR(255)") val exitDate: String? = null,
 		@field:TableColumn("BOOLEAN NOT NULL") val active: Boolean = false,
 		@field:TableColumn("BOOLEAN NOT NULL") val displayAllowed: Boolean = false
-) : Comparable<String>, TableModel {
+) : Comparable<String>, TableModel, java.io.Serializable {
 	companion object {
 		const val TABLE_NAME = TABLE_NAME_TEACHERS
 	}
