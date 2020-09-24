@@ -27,7 +27,7 @@ jobs:
             echo 'export KEY_RELEASE_PASSWORD=$(echo "$KEY_RELEASE_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
       - run:
           name: Initial build
-          command: ./gradlew clean assemble
+          command: ./gradlew clean assemble bundle
       - store_artifacts:
           name: Upload build artifacts
           path: app/build/outputs
@@ -91,6 +91,29 @@ jobs:
             scp -r -P $SSH_DEPLOY_PORT -i id_rsa workspace/outputs/apk/release "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG"
             scp -P $SSH_DEPLOY_PORT -i id_rsa workspace/outputs/mapping/release/* "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG/"
 
+  deploy_fastlane:
+    docker:
+      - image: cimg/ruby:2.7.1
+    working_directory: ~/betteruntis
+    steps:
+      - checkout
+      - restore_cache:
+          key: 1-gems-{{ checksum "Gemfile.lock" }}
+      - run:
+          name: Update Gems
+          command: bundle check || bundle install
+      - save_cache:
+          paths:
+            - vendor/bundle
+          key: 1-gems-{{ checksum "Gemfile.lock" }}
+      - attach_workspace:
+          at: workspace
+      - run:
+          name: Deploy to Play Store Beta track
+          command: |
+            echo $GOOGLE_PLAY_KEY_ENCODED | base64 --decode > fastlane/key.json
+            bundle exec fastlane deploy aab:'workspace/outputs/bundle/release/app-release.aab'
+
 workflows:
   version: 2
   build-and-deploy:
@@ -108,6 +131,14 @@ workflows:
             tags:
               only: /.*/
       - deploy_release:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
+      - deploy_fastlane:
           requires:
             - build
           filters:
