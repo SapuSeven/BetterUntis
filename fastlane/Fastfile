@@ -11,7 +11,7 @@ platform :android do
   desc "Deploy a built version to the Google Play Beta track"
   lane :deploy do |options|
     if options[:aab]
-	  upload_to_play_store(track: 'beta', aab: options[:aab], validate_only: true)
+	  upload_to_play_store(track: 'beta', aab: options[:aab])
     else
       UI.user_error!("Cannot deploy because no aab given - please specify :aab")
     end
