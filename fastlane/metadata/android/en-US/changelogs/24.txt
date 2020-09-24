@@ -1,0 +1,4 @@
+- Added widgets and shortcuts
+- Added absence checking
+- Added lesson topic editing
+- Fix crash when logging in with certain schools
