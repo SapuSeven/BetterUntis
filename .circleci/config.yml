@@ -101,7 +101,7 @@ jobs:
           key: 1-gems-{{ checksum "Gemfile.lock" }}
       - run:
           name: Update Gems
-          command: bundle check || bundle install --path vendor/bundle
+          command: bundle check || bundle install
       - save_cache:
           paths:
             - vendor/bundle
