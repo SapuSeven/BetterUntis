@@ -32,14 +32,14 @@ data class UntisPeriodData(
 		val absenceChecked: Boolean,
 		val studentIds: List<Int>?,
 		val absences: List<UntisAbsence>?,
-		val classRegEvents: List<UnknownObject>,
+		val classRegEvents: List<UnknownObject>?,
 		val exemptions: List<UnknownObject>?,
 		val prioritizedAttendances: List<UnknownObject>?,
 		val text: UnknownObject?,
 		val topic: UntisTopic,
-		val homeWorks: List<UntisHomework>,
+		val homeWorks: List<UntisHomework>?,
 		val seatingPlan: UnknownObject?,
-		val classRoles: List<UnknownObject>,
+		val classRoles: List<UnknownObject>?,
 		val channel: UnknownObject?,
 		val can: List<String>
 )
