@@ -36,7 +36,7 @@ data class UntisPeriodData(
 		val exemptions: List<UnknownObject>?,
 		val prioritizedAttendances: List<UnknownObject>?,
 		val text: UnknownObject?,
-		val topic: UntisTopic,
+		val topic: UntisTopic?,
 		val homeWorks: List<UntisHomework>?,
 		val seatingPlan: UnknownObject?,
 		val classRoles: List<UnknownObject>?,

@@ -17,6 +17,8 @@ import androidx.lifecycle.Observer
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_LESSON_TOPIC
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_STUDENT_ABSENCE
+import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_WRITE_LESSON_TOPIC
+import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_WRITE_STUDENT_ABSENCE
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
@@ -100,9 +102,11 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 							else R.drawable.all_absences
 					)
 				})
-				setOnClickListener {
-					listener.onPeriodAbsencesClick()
-				}
+
+				if (periodData.element.can.contains(CAN_WRITE_STUDENT_ABSENCE))
+					setOnClickListener {
+						listener.onPeriodAbsencesClick()
+					}
 				root.addView(this)
 			}
 
@@ -110,12 +114,18 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_lessontopic, root, false).run {
 				viewModel.periodData().observe(viewLifecycleOwner, Observer {
 					this.findViewById<TextView>(R.id.textview_timetableitemdetails_lessontopic).text =
-							if (it.topic.text.isBlank()) getString(R.string.all_hint_tap_to_edit)
-							else it.topic.text
+							if (it.topic?.text.isNullOrBlank())
+								if (periodData.element.can.contains(CAN_WRITE_LESSON_TOPIC))
+									getString(R.string.all_hint_tap_to_edit)
+								else
+									getString(R.string.all_lessontopic_none)
+							else
+								it.topic?.text
 				})
-				setOnClickListener {
-					listener.onLessonTopicClick()
-				}
+				if (periodData.element.can.contains(CAN_WRITE_LESSON_TOPIC))
+					setOnClickListener {
+						listener.onLessonTopicClick()
+					}
 				root.addView(this)
 			}
 		}

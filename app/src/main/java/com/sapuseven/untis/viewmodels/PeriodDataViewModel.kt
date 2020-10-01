@@ -148,7 +148,7 @@ class PeriodDataViewModel(
 		UntisRequest().request(query).fold({
 			// TODO: Handle Untis API errors (check if success==true)
 			periodLiveData.postValue(periodLiveData.value?.let {
-				it.copy(topic = it.topic.copy(text = lessonTopic))
+				it.copy(topic = it.topic?.copy(text = lessonTopic))
 			})
 			onSuccess()
 		}, {

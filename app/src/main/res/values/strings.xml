@@ -24,10 +24,11 @@
 	<string name="all_delete">Delete</string>
 	<string name="all_reset">Reset</string>
 	<string name="all_absences">Absences</string>
-	<string name="all_teaching_content">Teaching content</string>
 	<string name="all_lesson_cancelled">%1$s (cancelled)</string>
 	<string name="all_lesson_irregular">%1$s (irregular)</string>
 	<string name="all_lesson_exam">%1$s (exam!)</string>
+	<string name="all_lessontopic">Lesson topic</string>
+	<string name="all_lessontopic_none">(No topic)</string>
 	<string name="all_dialog_absences_checked">Absences checked.</string>
 	<string name="all_dialog_absences_not_checked">Absences not checked.</string>
 	<string name="all_dialog_datepicker_button_today">Today</string>
