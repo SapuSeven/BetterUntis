@@ -1,2 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="all_lesson_exam">%1$s (sınav!)</string>
+    <string name="all_lesson_irregular">%1$s (düzensiz)</string>
+    <string name="all_lesson_cancelled">%1$s (iptal edildi)</string>
+    <string name="all_teaching_content">Eğitim içeriği</string>
+    <string name="all_absences">Bulunmayanalar</string>
+    <string name="all_reset">Yenile</string>
+    <string name="all_delete">Sil</string>
+    <string name="all_add">Ekle</string>
+    <string name="all_report">Raporla</string>
+    <string name="all_error">Hata</string>
+    <string name="all_cancel">İptal</string>
+    <string name="all_close">Kapat</string>
+    <string name="all_no">Hayır</string>
+    <string name="all_yes">Evet</string>
+    <string name="all_ok">Tamam</string>
+    <string name="all_contact_email">betteruntis@sapuseven.com</string>
+    <string name="all_personal_timetable">Kişisel Ajanda</string>
+    <string name="all_anonymous">Anonim</string>
+    <string name="all_rooms">Odalar</string>
+    <string name="all_classes">Sınıflar</string>
+    <string name="all_teachers">Öğretmenler</string>
+    <string name="all_personal">Kişisel</string>
+    <string name="all_failed">başarısız</string>
+    <string name="all_success">başarılı</string>
+    <string name="app_desc">Untis ajanda sistemi için alternatif bir mobil istemci.</string>
+</resources>
