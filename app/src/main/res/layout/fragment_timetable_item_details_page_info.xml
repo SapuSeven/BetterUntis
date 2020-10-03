@@ -1,30 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/tvInfo"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
-	android:orientation="horizontal"
-	tools:ignore="UseCompoundDrawables">
-
-	<ImageView
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_marginStart="24dp"
-		android:layout_marginTop="12dp"
-		android:layout_marginEnd="24dp"
-		android:layout_marginBottom="12dp"
-		android:contentDescription="@string/main_dialog_itemdetails_image_infos"
-		android:tint="?android:attr/textColorPrimary"
-		app:srcCompat="@drawable/all_info" />
-
-	<TextView
-		android:id="@+id/tvInfo"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:layout_marginEnd="12dp"
-		android:gravity="center_vertical"
-		android:textColor="?android:attr/textColorPrimary"
-		android:tint="?android:attr/textColorPrimary" />
-</LinearLayout>
+	android:layout_margin="12dp"
+	android:drawablePadding="24dp"
+	android:drawableStart="@drawable/all_info"
+	android:textColor="?android:attr/textColorPrimary"
+	android:gravity="center_vertical" />

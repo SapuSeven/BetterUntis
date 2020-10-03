@@ -8,30 +8,22 @@
 	android:clickable="true"
 	android:focusable="true"
 	android:orientation="vertical"
-	android:paddingBottom="12dp">
+	android:padding="12dp">
 
 	<TextView
 		android:id="@+id/title"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginStart="12dp"
-		android:layout_marginTop="12dp"
-		android:layout_marginEnd="12dp"
-		android:layout_marginBottom="12dp"
-		android:paddingStart="12dp"
-		android:paddingLeft="12dp"
-		android:paddingEnd="12dp"
-		android:paddingRight="12dp"
+		android:layout_margin="12dp"
+		android:drawablePadding="24dp"
+		android:drawableStart="@drawable/all_subject"
 		android:textColor="?android:attr/textColorPrimary"
-		android:textSize="20sp"
-		android:textStyle="bold" />
+		android:gravity="center_vertical"/>
 
 	<LinearLayout
 		android:id="@+id/llTeachers"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginStart="12dp"
-		android:layout_marginEnd="12dp"
 		android:orientation="horizontal">
 
 		<ImageView
@@ -65,8 +57,6 @@
 		android:id="@+id/llClasses"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginStart="12dp"
-		android:layout_marginEnd="12dp"
 		android:orientation="horizontal">
 
 		<ImageView
@@ -100,8 +90,6 @@
 		android:id="@+id/llRooms"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginStart="12dp"
-		android:layout_marginEnd="12dp"
 		android:orientation="horizontal">
 
 		<ImageView
