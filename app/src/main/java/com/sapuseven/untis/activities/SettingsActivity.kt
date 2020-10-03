@@ -37,7 +37,7 @@ import com.sapuseven.untis.preferences.AlertPreference
 import com.sapuseven.untis.preferences.ElementPickerPreference
 import com.sapuseven.untis.preferences.WeekRangePickerPreference
 import kotlinx.android.synthetic.main.activity_settings.*
-import kotlinx.android.synthetic.main.banner_icons.*
+import kotlinx.android.synthetic.main.settings_banner.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -50,10 +50,10 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 	companion object {
 		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileId"
 
-		private const val DIALOG_DESIGNING_HIDE = "preference_dialog_designing_hide"
+		private const val DIALOG_RECOMMEND_HIDE = "preference_dialog_recommend_hide"
 
 		private const val REPOSITORY_URL_GITHUB = "https://github.com/SapuSeven/BetterUntis"
-		private const val WIKI_URL_DESIGNING = "$REPOSITORY_URL_GITHUB/wiki/Designing"
+		private const val FILE_URL_RECOMMEND = "$REPOSITORY_URL_GITHUB//blob/master/README.md"
 		private const val WIKI_URL_PROXY = "$REPOSITORY_URL_GITHUB/wiki/Proxy"
 	}
 
@@ -64,7 +64,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 
 		setupActionBar()
 		setContentView(R.layout.activity_settings)
-		setupDesigningDialog()
+		setupRecommendDialog()
 
 		if (savedInstanceState == null) {
 			// Create the fragment only when the activity is created for the first time.
@@ -89,20 +89,20 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 		return true
 	}
 
-	private fun setupDesigningDialog() {
+	private fun setupRecommendDialog() {
 		val prefs = PreferenceManager(this)
-		if (!prefs.defaultPrefs.getBoolean(DIALOG_DESIGNING_HIDE, false))
-			banner_settings_designing.visibility = View.VISIBLE
+		if (!prefs.defaultPrefs.getBoolean(DIALOG_RECOMMEND_HIDE, false))
+			banner_settings_recommend.visibility = View.VISIBLE
 
 		leftButton.setOnClickListener {
-			banner_settings_designing.visibility = View.GONE
+			banner_settings_recommend.visibility = View.GONE
 
 			val editor = prefs.defaultPrefs.edit()
-			editor.putBoolean(DIALOG_DESIGNING_HIDE, true)
+			editor.putBoolean(DIALOG_RECOMMEND_HIDE, true)
 			editor.apply()
 		}
 		rightButton.setOnClickListener {
-			startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(WIKI_URL_DESIGNING)))
+			startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(FILE_URL_RECOMMEND)))
 		}
 	}
 

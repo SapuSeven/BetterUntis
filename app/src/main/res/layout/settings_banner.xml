@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:paddingStart="0dp"
             android:paddingEnd="12dp"
-            android:text="@string/settings_designing_message"
+            android:text="@string/settings_recommend_message"
             android:textColor="?android:attr/textColorPrimaryInverse"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2" />
 
@@ -37,7 +37,7 @@
                 android:id="@+id/leftButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/settings_designing_hide"
+                android:text="@string/settings_recommend_hide"
                 android:textColor="?android:attr/textColorPrimaryInverse" />
 
             <Button
@@ -45,7 +45,7 @@
                 android:id="@+id/rightButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/settings_designing_info"
+                android:text="@string/settings_recommend_share"
                 android:textColor="?android:attr/textColorPrimaryInverse" />
         </LinearLayout>
     </LinearLayout>

@@ -7,7 +7,7 @@
 	tools:context="activities.SettingsActivity">
 
 	<FrameLayout
-		android:id="@+id/banner_settings_designing"
+		android:id="@+id/banner_settings_recommend"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:visibility="gone"
@@ -15,7 +15,7 @@
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent">
 
-		<include layout="@layout/banner_icons" />
+		<include layout="@layout/settings_banner" />
 	</FrameLayout>
 
 	<FrameLayout
@@ -25,5 +25,5 @@
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@+id/banner_settings_designing" />
+		app:layout_constraintTop_toBottomOf="@+id/banner_settings_recommend" />
 </androidx.constraintlayout.widget.ConstraintLayout>
