@@ -17,9 +17,11 @@ import com.sapuseven.untis.data.connectivity.UntisApiConstants.SCHOOL_SEARCH_URL
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.dialogs.ProfileUpdateDialog
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.models.UntisSchoolInfo
+import com.sapuseven.untis.models.untis.masterdata.TimeGrid
 import com.sapuseven.untis.models.untis.params.AppSharedSecretParams
 import com.sapuseven.untis.models.untis.params.SchoolSearchParams
 import com.sapuseven.untis.models.untis.params.UserDataParams
@@ -37,7 +39,10 @@ class LoginDataInputActivity : BaseActivity() {
 	companion object {
 		private const val BACKUP_PREF_NAME = "loginDataInputBackup"
 
+		private const val FRAGMENT_TAG_PROFILE_UPDATE = "profileUpdate"
+
 		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileId"
+		const val EXTRA_BOOLEAN_PROFILE_UPDATE = "com.sapuseven.untis.activities.profileupdate"
 	}
 
 	private var anonymous: Boolean = false
@@ -110,6 +115,15 @@ class LoginDataInputActivity : BaseActivity() {
 		focusFirstFreeField()
 
 		setElementsEnabled(true)
+
+		if (intent.getBooleanExtra(EXTRA_BOOLEAN_PROFILE_UPDATE, false)) {
+			supportFragmentManager
+					.beginTransaction()
+					.replace(android.R.id.content, ProfileUpdateDialog(), FRAGMENT_TAG_PROFILE_UPDATE)
+					.commit()
+
+			loadData()
+		}
 	}
 
 	private fun validate(): EditText? {
@@ -337,7 +351,7 @@ class LoginDataInputActivity : BaseActivity() {
 					if (!anonymous) username else null,
 					if (!anonymous) appSharedSecret else null,
 					anonymous,
-					response.masterData.timeGrid,
+					response.masterData.timeGrid ?: TimeGrid.generateDefault(),
 					response.masterData.timeStamp,
 					response.userData,
 					response.settings
@@ -391,6 +405,13 @@ class LoginDataInputActivity : BaseActivity() {
 		progressbar_logindatainput_loadingstatus?.visibility = View.GONE
 		imageview_logindatainput_loadingstatusfailed?.visibility = View.VISIBLE
 		setElementsEnabled(true)
+
+		supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_PROFILE_UPDATE)?.let {
+			supportFragmentManager
+					.beginTransaction()
+					.remove(it)
+					.commit()
+		}
 	}
 
 	override fun onBackPressed() {

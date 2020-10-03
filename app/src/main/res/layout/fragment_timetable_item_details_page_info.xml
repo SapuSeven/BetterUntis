@@ -11,22 +11,20 @@
 	<ImageView
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_marginBottom="12dp"
-		android:layout_marginEnd="24dp"
-		android:layout_marginStart="12dp"
+		android:layout_marginStart="24dp"
 		android:layout_marginTop="12dp"
+		android:layout_marginEnd="24dp"
+		android:layout_marginBottom="12dp"
 		android:contentDescription="@string/main_dialog_itemdetails_image_infos"
 		android:tint="?android:attr/textColorPrimary"
-		app:srcCompat="@drawable/all_info"/>
+		app:srcCompat="@drawable/all_info" />
 
 	<TextView
 		android:id="@+id/tvInfo"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
+		android:layout_marginEnd="12dp"
 		android:gravity="center_vertical"
-		android:paddingEnd="12dp"
-		android:paddingStart="0dp"
 		android:textColor="?android:attr/textColorPrimary"
-		android:tint="?android:attr/textColorPrimary"/>
-
+		android:tint="?android:attr/textColorPrimary" />
 </LinearLayout>

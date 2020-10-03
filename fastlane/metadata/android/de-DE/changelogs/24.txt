@@ -1,0 +1,4 @@
+- Neu: Widgets und Stundenplanverknüpfungen für den Startbildschirm
+- Neu (Lehrer): Anwesenheitskontrolle
+- Neu (Lehrer): Lehrstoff eintragen
+- Absturz bei Anmeldung mit bestimmten Schulen behoben

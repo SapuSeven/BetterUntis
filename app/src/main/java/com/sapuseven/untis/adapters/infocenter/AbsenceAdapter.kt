@@ -9,9 +9,7 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
 import com.sapuseven.untis.models.UntisAbsence
-import com.sapuseven.untis.models.untis.UntisDate
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
+import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -31,8 +29,8 @@ class AbsenceAdapter(
 		val absence = absenceList[position]
 
 		holder.tvTime.text = formatAbsenceTime(
-				UntisDate(absence.startDateTime).toDateTime().withZone(DateTimeZone.UTC),
-				UntisDate(absence.endDateTime).toDateTime().withZone(DateTimeZone.UTC)
+				absence.startDateTime.toLocalDateTime(),
+				absence.endDateTime.toLocalDateTime()
 		)
 		holder.tvTitle.text =
 				if (absence.absenceReason.isNotEmpty())
@@ -53,7 +51,7 @@ class AbsenceAdapter(
 		)
 	}
 
-	private fun formatAbsenceTime(startDateTime: DateTime, endDateTime: DateTime): String {
+	private fun formatAbsenceTime(startDateTime: LocalDateTime, endDateTime: LocalDateTime): String {
 		return context.getString(
 				if (startDateTime.dayOfYear == endDateTime.dayOfYear)
 					R.string.infocenter_timeformat_sameday

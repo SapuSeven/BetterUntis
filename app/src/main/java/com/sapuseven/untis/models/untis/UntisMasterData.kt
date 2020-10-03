@@ -19,5 +19,5 @@ data class UntisMasterData(
 		val teachers: List<Teacher>,
 		val teachingMethods: List<TeachingMethod>,
 		val schoolyears: List<SchoolYear>,
-		val timeGrid: TimeGrid
+		val timeGrid: TimeGrid?
 )

@@ -8,9 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
 import com.sapuseven.untis.models.UntisOfficeHour
-import com.sapuseven.untis.models.untis.UntisDate
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
+import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
 
 
@@ -28,8 +26,8 @@ class OfficeHourAdapter(
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 		val officeHour = officeHourList[position]
 		holder.tvTime.text = formatOfficeHourTime(
-				UntisDate(officeHour.startDateTime).toDateTime().withZone(DateTimeZone.UTC),
-				UntisDate(officeHour.endDateTime).toDateTime().withZone(DateTimeZone.UTC)
+				officeHour.startDateTime.toLocalDateTime(),
+				officeHour.endDateTime.toLocalDateTime()
 		)
 		holder.tvTitle.text = officeHour.displayNameTeacher
 
@@ -43,7 +41,7 @@ class OfficeHourAdapter(
 		holder.tvText.text = text
 	}
 
-	private fun formatOfficeHourTime(startDateTime: DateTime, endDateTime: DateTime): String {
+	private fun formatOfficeHourTime(startDateTime: LocalDateTime, endDateTime: LocalDateTime): String {
 		return context.getString(
 				if (startDateTime.dayOfYear == endDateTime.dayOfYear)
 					R.string.infocenter_timeformat_sameday

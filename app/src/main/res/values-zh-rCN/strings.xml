@@ -16,7 +16,6 @@
     <string name="all_no">不了</string>
     <string name="all_close">关闭</string>
     <string name="all_cancel">删除</string>
-    <string name="all_copy">复制</string>
     <string name="all_error">错误</string>
     <string name="all_report">报告</string>
     <string name="all_add">添加</string>
@@ -30,8 +29,6 @@
     <string name="all_dialog_error_message">请求ID: %1$d
 \n错误编码: %2$d
 \n错误信息: %3$s</string>
-    <string name="all_dialog_crash_title">发生崩溃</string>
-    <string name="all_dialog_crash_copied">复制崩溃日志到剪贴板。</string>
     <string name="activity_title_errors">错误</string>
     <string name="activity_title_free_rooms">空教室</string>
     <string name="activity_title_info_center">信息中心</string>
@@ -149,7 +146,6 @@
     <string name="errors_crash_title">似乎崩溃了。</string>
     <string name="notifications_channel_breakinfo_desc">显示当前休息及随后课程的信息</string>
     <string name="notifications_channel_breakinfo">信息中断</string>
-    <string name="preferences_contributors_contributions">%1$d 贡献</string>
     <string name="settings_designing_message">通过创建缺少的设置图标进行贡献！</string>
     <string name="preference_week_snap_to_days">切换到每天</string>
     <string name="preference_week_snap_to_days_summary">替换每周</string>

@@ -1,6 +1,6 @@
 package com.sapuseven.untis.views.weekview.listeners
 
-import org.joda.time.DateTime
+import org.joda.time.LocalDate
 
 interface ScrollListener {
 	/**
@@ -12,5 +12,5 @@ interface ScrollListener {
 	 * @param newFirstVisibleDay The new first visible day
 	 * @param oldFirstVisibleDay The old first visible day (is null on the first call).
 	 */
-	fun onFirstVisibleDayChanged(newFirstVisibleDay: DateTime, oldFirstVisibleDay: DateTime?)
+	fun onFirstVisibleDayChanged(newFirstVisibleDay: LocalDate, oldFirstVisibleDay: LocalDate?)
 }

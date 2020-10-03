@@ -16,6 +16,7 @@ und das Info-Center, um Abwesenheiten, Tests und mehr im Auge behalten zu könne
 
 Genieße eine schnelle und flüssige Erfahrung mit BetterUntis.
 
+
 Untis ist eine proprietäre Stundenplan-Software. Mehr Informationen über Untis
 findest du unter https://untis.at.
 Um Untis zu benutzen, muss deine Schule es zur Verfügung stellen.
@@ -26,4 +27,4 @@ Warum solltest du noch diese App anstatt der offiziellen benutzen?
 Die offizielle App ist proprietär und beinhaltet Tracking-Software und In-App-Käufe.
 BetterUntis ist kostenlos und Open Source, funktionsreich und schützt deine Privatsphäre.
 
-WebUntis ist ein nicht-freies Netzwerk.
+WebUntis ist ein propritäres Netzwerk.

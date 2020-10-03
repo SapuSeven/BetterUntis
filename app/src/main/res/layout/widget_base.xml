@@ -1,0 +1,43 @@
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:background="@android:color/white">
+
+	<LinearLayout
+		android:id="@+id/linearlayout_base_widget_top_bar"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:background="@color/colorPrimary"
+		android:orientation="vertical"
+		android:paddingStart="16dp"
+		android:paddingTop="4dp"
+		android:paddingEnd="16dp"
+		android:paddingBottom="8dp">
+
+		<TextView
+			android:id="@+id/textview_base_widget_account"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/loading"
+			android:textAppearance="@style/TextAppearance.AppCompat.Large"
+			android:textColor="@android:color/white"
+			android:textSize="18sp" />
+
+		<TextView
+			android:id="@+id/textview_base_widget_school"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/loading"
+			android:textAppearance="@style/TextAppearance.AppCompat.Small"
+			android:textColor="@android:color/white"
+			android:textSize="12sp" />
+	</LinearLayout>
+
+	<ListView
+		android:id="@+id/listview_widget_base_content"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_below="@id/linearlayout_base_widget_top_bar"
+		android:text="@string/loading" />
+</RelativeLayout>

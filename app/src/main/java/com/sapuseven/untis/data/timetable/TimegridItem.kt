@@ -9,15 +9,24 @@ class TimegridItem(
 		val startDateTime: DateTime,
 		val endDateTime: DateTime,
 		contextType: String,
-		val periodData: PeriodData
+		val periodData: PeriodData,
+		includeOrgIds: Boolean = true
 ) : WeekViewEvent<TimegridItem>(id, startTime = startDateTime, endTime = endDateTime) {
 
 	init {
 		periodData.setup()
 
-		title = periodData.getShortTitle()
-		top = if (contextType == TimetableDatabaseInterface.Type.TEACHER.name) periodData.getShortClasses() else periodData.getShortSpanned(periodData.teachers, TimetableDatabaseInterface.Type.TEACHER)
-		bottom = if (contextType == TimetableDatabaseInterface.Type.ROOM.name) periodData.getShortClasses() else periodData.getShortSpanned(periodData.rooms, TimetableDatabaseInterface.Type.ROOM)
+		title = periodData.getShort(periodData.subjects, TimetableDatabaseInterface.Type.SUBJECT)
+		top =
+				if (contextType == TimetableDatabaseInterface.Type.TEACHER.name)
+					periodData.getShortSpanned(periodData.classes, TimetableDatabaseInterface.Type.CLASS, includeOrgIds)
+				else
+					periodData.getShortSpanned(periodData.teachers, TimetableDatabaseInterface.Type.TEACHER, includeOrgIds)
+		bottom =
+				if (contextType == TimetableDatabaseInterface.Type.ROOM.name)
+					periodData.getShortSpanned(periodData.classes, TimetableDatabaseInterface.Type.CLASS, includeOrgIds)
+				else
+					periodData.getShortSpanned(periodData.rooms, TimetableDatabaseInterface.Type.ROOM, includeOrgIds)
 
 		hasIndicator = !periodData.element.homeWorks.isNullOrEmpty()
 				|| periodData.element.text.lesson.isNotEmpty()

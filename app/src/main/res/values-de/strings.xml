@@ -16,7 +16,6 @@
     <string name="all_no">Nein</string>
     <string name="all_close">Schließen</string>
     <string name="all_cancel">Abbrechen</string>
-    <string name="all_copy">Kopieren</string>
     <string name="all_error">Fehler</string>
     <string name="all_report">Melden</string>
     <string name="all_add">Hinzufügen</string>
@@ -28,15 +27,12 @@
     <string name="all_dialog_datepicker_button_today">Heute</string>
     <string name="all_dialog_error_title">Fehlerinformation</string>
     <string name="all_dialog_error_message">Anfragen-ID: %1$d\nFehlercode: %2$d\nFehlermeldung: %3$s</string>
-    <string name="all_dialog_crash_title">Absturzprotokoll gefunden</string>
-    <string name="all_dialog_crash_copied">Absturzprotokoll wurde in die Zwischenablage kopiert.</string>
     <string name="activity_title_errors">Fehler</string>
     <string name="activity_title_free_rooms">Freie Räume</string>
     <string name="activity_title_info_center">Info-Center</string>
     <string name="activity_title_messenger">Messenger</string>
     <string name="activity_title_settings">Einstellungen</string>
-    <string name="errors_github_attach_file_message">Bitte füge die komprimierten Log-Dateien als Anhang hinzu.
-\nDiese wurden hier gespeichert: `%1$s`</string>
+    <string name="errors_github_attach_file_message">Bitte füge die komprimierten Log-Dateien als Anhang hinzu.\nDiese wurden hier gespeichert: `%1$s`</string>
     <string name="menu_nav_timetables">Stundenpläne</string>
     <string name="menu_infocenter_messagesofday">Nachrichten</string>
     <string name="menu_infocenter_officehours">Sprechstunden</string>
@@ -229,7 +225,6 @@
     <string name="preference_week_display_length_summary">Auf 0 setzen, um die Wochenlänge zu verwenden</string>
     <string name="preference_week_snap_to_days">Tageweise scrollen</string>
     <string name="preference_week_snap_to_days_summary">statt wochenweise</string>
-    <string name="preferences_contributors_contributions">%1$d Beiträge</string>
     <string name="settings_designing_message">Trage zur Entwicklung bei, indem du die fehlenden Icons in den Einstellungen erstellst!</string>
     <string name="settings_designing_hide">Nicht mehr anzeigen</string>
     <string name="settings_designing_info">Mehr erfahren</string>
@@ -255,6 +250,12 @@
     <string name="errors_button_report">Alle melden</string>
     <string name="loading">Wird geladen</string>
     <string name="loading_failed">Ladevorgang fehlgeschlagen</string>
+    <string name="widget_configuration">Widget-Konfiguration</string>
+    <string name="widget_timetable">Stundenplan</string>
+    <string name="widget_timetable_empty">Kein Stundenplan für heute verfügbar</string>
+    <string name="widget_daily_messages">Tagesnachrichten</string>
+    <string name="widget_select_profile">Bitte wähle ein Profil für das Widget aus</string>
+    <string name="widget_timetable_link">Stundenplanlink</string>
     <plurals name="main_time_diff_minutes">
         <item quantity="one">vor einer Minute</item>
         <item quantity="other">vor %d Minuten</item>
@@ -271,4 +272,21 @@
         <item quantity="one">Dieser Raum ist gerade frei.</item>
         <item quantity="other">Dieser Raum ist die nächsten %d Stunden frei.</item>
     </plurals>
+    <plurals name="preferences_contributors_contributions">
+        <item quantity="one">%1$d Beitrag</item>
+        <item quantity="other">%1$d Beiträge</item>
+    </plurals>
+    <string name="all_absences">Abwesenheiten</string>
+    <string name="all_lessontopic">Lehrstoff</string>
+    <string name="all_dialog_absences_checked">Anwesenheit kontrolliert.</string>
+    <string name="all_dialog_absences_not_checked">Anwesenheit noch nicht kontrolliert.</string>
+    <string name="preference_theme_pixel">Pixel</string>
+    <string name="infocenter_messages_attachments">Anhänge</string>
+    <string name="logindatainput_skip_school_id">Schul-ID direkt verwenden</string>
+    <string name="logindatainput_skip_app_secret">Passwort direkt verwenden</string>
+    <string name="logindatainput_error_invalid_url">Ungültige URL!</string>
+    <string name="logindatainput_api_url">Untis-API-Pfad</string>
+    <string name="all_hint_tap_to_edit">(Durch Tippen hinzufügen)</string>
+    <string name="all_dialog_crash_copied">Absturzprotokoll wurde in die Zwischenablage kopiert.</string>
+    <string name="all_dialog_crash_title">Absturzprotokoll gefunden</string>
 </resources>

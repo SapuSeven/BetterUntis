@@ -1,1 +1,1 @@
-An alternative FLOSS Android client for the Untis timetable system.
+An alternative mobile client for the Untis timetable system.

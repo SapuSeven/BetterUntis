@@ -1,0 +1,31 @@
+skip_docs
+
+default_platform(:android)
+
+platform :android do
+  desc "Runs all the tests"
+  lane :test do
+    gradle(task: "test")
+  end
+
+  desc "Deploy a built version to the Google Play Beta track"
+  lane :deploy do |options|
+    if options[:aab]
+      upload_to_play_store(
+        track: 'beta',
+        aab: options[:aab],
+        skip_upload_metadata: 'true',
+        skip_upload_images: 'true',
+        skip_upload_screenshots: 'true'
+      )
+    else
+      UI.user_error!("Cannot deploy because no aab given - please specify :aab")
+    end
+  end
+
+  lane :screenshots do
+    gradle(task: "clean assembleDebug assembleAndroidTest")
+    capture_android_screenshots
+    #upload_to_play_store
+  end
+end

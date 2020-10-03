@@ -336,7 +336,7 @@ class WeekView<T>(
 
 		if (viewState.shouldRefreshEvents || oldFirstVisibleDay != newFirstVisibleDay) {
 			viewState.firstVisibleDay = newFirstVisibleDay
-			scrollListener?.onFirstVisibleDayChanged(newFirstVisibleDay, oldFirstVisibleDay)
+			scrollListener?.onFirstVisibleDayChanged(newFirstVisibleDay.toLocalDate(), oldFirstVisibleDay?.toLocalDate())
 		}
 	}
 

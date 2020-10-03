@@ -31,9 +31,6 @@
 	<color name="appBarColorThemePixel">#fff</color>
 	<color name="colorAccentThemePixel">@color/colorPrimaryThemePixel</color>
 
-	<color name="colorRoomOccupied">#fff44336</color>
-	<color name="colorRoomAvailable">#ff4caf50</color>
-
 	<color name="colorAbsenceUnexcused">#fff44336</color>
 	<color name="colorAbsenceExcused">#ff4caf50</color>
 
