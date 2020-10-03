@@ -24,6 +24,7 @@
 	<string name="all_delete">Delete</string>
 	<string name="all_reset">Reset</string>
 	<string name="all_absences">Absences</string>
+	<string name="all_lesson_details">Lesson details</string>
 	<string name="all_lesson_cancelled">%1$s (cancelled)</string>
 	<string name="all_lesson_irregular">%1$s (irregular)</string>
 	<string name="all_lesson_exam">%1$s (exam!)</string>

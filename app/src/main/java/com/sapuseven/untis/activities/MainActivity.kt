@@ -807,6 +807,18 @@ class MainActivity :
 		return true
 	}
 
+	private var displayNameCache: CharSequence = ""
+
+	fun setFullscreenDialogActionBar() {
+		displayNameCache = supportActionBar?.title ?: ""
+		supportActionBar?.setHomeAsUpIndicator(R.drawable.all_close)
+		supportActionBar?.setTitle(R.string.all_lesson_details)
+	}
+
+	fun setDefaultActionBar() {
+		supportActionBar?.title = displayNameCache
+	}
+
 	override fun onEventClick(data: TimegridItem, eventRect: RectF) {
 		val fragment = TimetableItemDetailsFragment(data, timetableDatabaseInterface, profileUser)
 
