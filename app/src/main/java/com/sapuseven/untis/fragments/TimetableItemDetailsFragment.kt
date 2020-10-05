@@ -63,16 +63,12 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 
 	override fun onStart() {
 		super.onStart()
-		if (activity is MainActivity) {
-			(activity as MainActivity).setFullscreenDialogActionBar()
-		}
+		if (activity is MainActivity) (activity as MainActivity).setFullscreenDialogActionBar()
 	}
 
 	override fun onStop() {
 		super.onStop()
-		if (activity is MainActivity) {
-			(activity as MainActivity).setDefaultActionBar()
-		}
+		if (activity is MainActivity) (activity as MainActivity).setDefaultActionBar()
 	}
 
 	private fun generateView(activity: FragmentActivity, container: ViewGroup?, periodData: PeriodData, timetableDatabaseInterface: TimetableDatabaseInterface): View {
