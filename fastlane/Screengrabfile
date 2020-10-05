@@ -1,0 +1,6 @@
+app_package_name('com.sapuseven.untis.debug')
+app_apk_path('app/build/outputs/apk/debug/app-debug.apk')
+tests_apk_path('app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk')
+locales(['en-US', 'de-DE'])
+clear_previous_screenshots(true)
+use_timestamp_suffix(false)

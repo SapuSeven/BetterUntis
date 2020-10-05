@@ -14,7 +14,9 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.MenuItem
 import android.view.View
+import androidx.core.content.pm.PackageInfoCompat
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.preference.*
 import com.github.kittinunf.fuel.coroutines.awaitByteArrayResult
@@ -244,12 +246,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 							val pInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
 							requireContext().getString(R.string.preference_info_app_version_desc,
 									pInfo.versionName,
-									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-										pInfo.longVersionCode
-									} else {
-										@Suppress("DEPRECATION")
-										pInfo.versionCode.toLong()
-									}
+									PackageInfoCompat.getLongVersionCode(pInfo)
 							)
 						}
 
@@ -337,13 +334,13 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 								// ignore
 							}
 
-							override fun onPeriodElementClick(dialog: DialogFragment, element: PeriodElement?, useOrgId: Boolean) {
+							override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
 								preference.setElement(
 										element,
 										element?.let {
 											timetableDatabaseInterface.getShortName(it.id, TimetableDatabaseInterface.Type.valueOf(it.type))
 										} ?: "")
-								dialog.dismiss()
+								(fragment as DialogFragment).dismiss()
 							}
 
 							override fun onPositiveButtonClicked(dialog: ElementPickerDialog) {

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	style="@style/DefaultItemStyle"
+	android:id="@+id/linearlayout_widget_listitem_root"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:orientation="vertical">
+
+	<TextView
+		android:id="@+id/textview_listitem_line1"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:textColor="?android:attr/textColorPrimary"
+		android:textSize="@dimen/textsize_listitem_line1" />
+
+	<TextView
+		android:id="@+id/textview_listitem_line2"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:textColor="?android:attr/textColorSecondary"
+		android:textSize="@dimen/textsize_listitem_line2" />
+</LinearLayout>

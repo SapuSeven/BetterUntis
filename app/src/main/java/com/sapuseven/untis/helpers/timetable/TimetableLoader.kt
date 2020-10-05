@@ -8,7 +8,6 @@ import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
-import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
@@ -19,7 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonDecodingException
-import org.joda.time.DateTimeZone
 import org.joda.time.Instant
 import java.lang.ref.WeakReference
 
@@ -140,8 +138,8 @@ class TimetableLoader(
 	private fun periodToTimegridItem(period: Period, type: String): TimegridItem {
 		return TimegridItem(
 				period.id.toLong(),
-				DateTimeUtils.isoDateTimeNoSeconds().withZone(DateTimeZone.getDefault()).parseLocalDateTime(period.startDateTime).toDateTime(),
-				DateTimeUtils.isoDateTimeNoSeconds().withZone(DateTimeZone.getDefault()).parseLocalDateTime(period.endDateTime).toDateTime(),
+				period.startDateTime.toLocalDateTime().toDateTime(),
+				period.endDateTime.toLocalDateTime().toDateTime(),
 				type,
 				PeriodData(timetableDatabaseInterface, period)
 		)

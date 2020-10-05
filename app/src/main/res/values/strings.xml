@@ -23,12 +23,20 @@
 	<string name="all_add">Add</string>
 	<string name="all_delete">Delete</string>
 	<string name="all_reset">Reset</string>
+	<string name="all_absences">Absences</string>
 	<string name="all_lesson_cancelled">%1$s (cancelled)</string>
 	<string name="all_lesson_irregular">%1$s (irregular)</string>
 	<string name="all_lesson_exam">%1$s (exam!)</string>
+	<string name="all_lessontopic">Lesson topic</string>
+	<string name="all_lessontopic_none">(No topic)</string>
+	<string name="all_dialog_absences_checked">Absences checked.</string>
+	<string name="all_dialog_absences_not_checked">Absences not checked.</string>
 	<string name="all_dialog_datepicker_button_today">Today</string>
 	<string name="all_dialog_error_title">Error information</string>
 	<string name="all_dialog_error_message">Request ID: %1$d\nError code: %2$d\nError message: %3$s</string>
+	<string name="all_dialog_crash_title">Crash log found</string>
+	<string name="all_dialog_crash_copied">Crash log copied to clipboard.</string>
+	<string name="all_hint_tap_to_edit">(Tap to edit)</string>
 
 	<string name="activity_title_errors">Errors</string>
 	<string name="activity_title_free_rooms">Free Rooms</string>
@@ -290,6 +298,13 @@
 	<string name="library_recyclerview" translatable="false">Android Support RecyclerView V7</string>
 	<string name="library_swiperefreshlayout" translatable="false">Android Support Library Custom View</string>
 	<string name="library_weekview" translatable="false">WeekView</string>
+
+	<string name="widget_configuration">Widget Configuration</string>
+	<string name="widget_timetable">Timetable</string>
+	<string name="widget_timetable_empty">No timetable available for today</string>
+	<string name="widget_daily_messages">Daily Messages</string>
+	<string name="widget_select_profile">Please select a profile for the widget</string>
+	<string name="widget_timetable_link">Timetable Link</string>
 
 	<plurals name="main_time_diff_minutes">
 		<item quantity="one">a minute ago</item>

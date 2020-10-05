@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
 import com.sapuseven.untis.adapters.infocenter.*
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
+import com.sapuseven.untis.data.connectivity.UntisApiConstants.RIGHT_ABSENCES
+import com.sapuseven.untis.data.connectivity.UntisApiConstants.RIGHT_OFFICEHOURS
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
@@ -60,16 +62,16 @@ class InfoCenterActivity : BaseActivity() {
 		userDatabase = UserDatabase.createInstance(this)
 		user = userDatabase.getUser(intent.getLongExtra(EXTRA_LONG_PROFILE_ID, -1))
 		user?.let {
-			if (!it.userData.rights.contains("R_OFFICEHOURS")) bottomnavigationview_infocenter.menu.removeItem(R.id.item_infocenter_officehours)
-			if (!it.userData.rights.contains("R_MY_ABSENCES")) bottomnavigationview_infocenter.menu.removeItem(R.id.item_infocenter_absences)
+			if (!it.userData.rights.contains(RIGHT_OFFICEHOURS)) bottomnavigationview_infocenter.menu.removeItem(R.id.item_infocenter_officehours)
+			if (!it.userData.rights.contains(RIGHT_ABSENCES)) bottomnavigationview_infocenter.menu.removeItem(R.id.item_infocenter_absences)
 
 			if (bottomnavigationview_infocenter.menu.size() <= 1) bottomnavigationview_infocenter.visibility = View.GONE
 
 			eventAdapter.timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, it.id!!)
 			refreshMessages(it)
-			if (it.userData.rights.contains("R_OFFICEHOURS")) refreshOfficeHours(it)
+			if (it.userData.rights.contains(RIGHT_OFFICEHOURS)) refreshOfficeHours(it)
 			refreshEvents(it)
-			if (it.userData.rights.contains("R_MY_ABSENCES")) refreshAbsences(it)
+			if (it.userData.rights.contains(RIGHT_ABSENCES)) refreshAbsences(it)
 		}
 
 		recyclerview_infocenter.layoutManager = LinearLayoutManager(this)
@@ -182,7 +184,7 @@ class InfoCenterActivity : BaseActivity() {
 		loadExams(user)?.let { events.addAll(it) }
 		loadHomeworks(user)?.let { events.addAll(it) }
 		return events.toList().sortedBy {
-			it.exam?.startDateTime ?: it.homework?.endDate
+			it.exam?.startDateTime?.toString() ?: it.homework?.endDate?.toString()
 		}
 	}
 

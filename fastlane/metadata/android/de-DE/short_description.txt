@@ -1,1 +1,1 @@
-Ein alternativer FLOSS Android Client für das Untis-Stundenplan-System.
+Eine mobile App für das Untis Stundenplansystem.

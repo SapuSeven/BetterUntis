@@ -7,11 +7,12 @@ import android.text.style.StrikethroughSpan
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.Period
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import java.io.Serializable
 
 class PeriodData(
 		private var timetableDatabaseInterface: TimetableDatabaseInterface? = null,
 		var element: Period
-) {
+) : Serializable {
 	val classes = HashSet<PeriodElement>()
 	val teachers = HashSet<PeriodElement>()
 	val subjects = HashSet<PeriodElement>()
@@ -56,7 +57,7 @@ class PeriodData(
 				timetableDatabaseInterface?.getLongName(it.id, type) ?: ELEMENT_NAME_UNKNOWN
 			}
 
-	fun getShortSpanned(list: HashSet<PeriodElement>, type: TimetableDatabaseInterface.Type): SpannableString {
+	fun getShortSpanned(list: HashSet<PeriodElement>, type: TimetableDatabaseInterface.Type, includeOrgIds: Boolean = true): SpannableString {
 		val builder = SpannableStringBuilder()
 
 		list.forEach {
@@ -64,7 +65,7 @@ class PeriodData(
 				builder.append(ELEMENT_NAME_SEPARATOR)
 			builder.append(timetableDatabaseInterface?.getShortName(it.id, type)
 					?: ELEMENT_NAME_UNKNOWN)
-			if (it.id != it.orgId && it.orgId != 0) {
+			if (includeOrgIds && it.id != it.orgId && it.orgId != 0) {
 				builder.append(ELEMENT_NAME_SEPARATOR)
 				builder.append(timetableDatabaseInterface?.getShortName(it.orgId, type)
 						?: ELEMENT_NAME_UNKNOWN,
