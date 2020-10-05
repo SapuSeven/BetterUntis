@@ -132,6 +132,7 @@ class MainActivity :
 	private var currentWeekIndex = 0
 	private var currentSchoolYearId = -1
 	private val weekViewRefreshHandler = Handler(Looper.getMainLooper())
+	private var displayNameCache: CharSequence = ""
 	private lateinit var profileUser: UserDatabase.User
 	private lateinit var profileListAdapter: ProfileListAdapter
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
@@ -853,15 +854,13 @@ class MainActivity :
 		return true
 	}
 
-	private var displayNameCache: CharSequence = ""
-
-	fun setFullscreenDialogActionBar() {
+	internal fun setFullscreenDialogActionBar() {
 		displayNameCache = supportActionBar?.title ?: ""
 		supportActionBar?.setHomeAsUpIndicator(R.drawable.all_close)
 		supportActionBar?.setTitle(R.string.all_lesson_details)
 	}
 
-	fun setDefaultActionBar() {
+	internal fun setDefaultActionBar() {
 		supportActionBar?.title = displayNameCache
 	}
 
