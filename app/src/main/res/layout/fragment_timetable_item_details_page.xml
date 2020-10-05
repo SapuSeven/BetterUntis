@@ -10,16 +10,31 @@
 		android:layout_height="wrap_content"
 		android:orientation="vertical">
 
+		<ImageView
+			android:layout_width="@dimen/size_header_icon"
+			android:layout_height="@dimen/size_header_icon"
+			android:layout_gravity="center"
+			android:layout_marginTop="16dp"
+			android:layout_marginBottom="8dp"
+			android:contentDescription="@null"
+			android:tint="?attr/colorAccent"
+			app:srcCompat="@drawable/all_subject" />
+
 		<TextView
 			android:id="@+id/title"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:paddingHorizontal="24dp"
-			android:paddingVertical="12dp"
-			android:drawablePadding="24dp"
-			android:drawableStart="@drawable/all_subject"
-			android:textColor="?android:attr/textColorPrimary"
-			android:gravity="center_vertical"/>
+			android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+			android:gravity="center"/>
+
+		<View
+			android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:layout_marginHorizontal="16dp"
+			android:layout_marginTop="16dp"
+			android:layout_marginBottom="12dp"
+			android:background="?android:attr/listDivider" />
 
 		<LinearLayout
 			android:id="@+id/llTeachers"
