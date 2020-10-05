@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -72,7 +73,8 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 	}
 
 	private fun generateView(activity: FragmentActivity, container: ViewGroup?, periodData: PeriodData, timetableDatabaseInterface: TimetableDatabaseInterface): View {
-		val root = activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page, container, false) as LinearLayout
+		val root = activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page, container, false) as ScrollView
+		val linearLayout = root.getChildAt(0) as LinearLayout
 
 		val attrs = intArrayOf(android.R.attr.textColorPrimary)
 		val ta = context?.obtainStyledAttributes(attrs)
@@ -85,23 +87,23 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 				periodData.element.text.info
 		).forEach {
 			if (it.isNotBlank())
-				activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_info, root, false).run {
+				activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_info, linearLayout, false).run {
 					(findViewById<TextView>(R.id.tvInfo)).text = it
-					root.addView(this)
+					linearLayout.addView(this)
 				}
 		}
 
 		periodData.element.homeWorks?.forEach {
 			val endDate = it.endDate.toLocalDate()
 
-			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_homework, root).run {
+			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_homework, linearLayout).run {
 				(findViewById<TextView>(R.id.textview_roomfinder_name)).text = it.text
 				(findViewById<TextView>(R.id.tvDate)).text = getString(R.string.homeworks_due_time, endDate.toString(getString(R.string.homeworks_due_time_format)))
 			}
 		}
 
 		if (periodData.element.can.contains(CAN_READ_STUDENT_ABSENCE))
-			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_absences, root, false).run {
+			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_absences, linearLayout, false).run {
 				viewModel.periodData().observe(viewLifecycleOwner, Observer {
 					this.findViewById<TextView>(R.id.textview_timetableitemdetails_absencestatus).text = getString(
 							if (it.absenceChecked) R.string.all_dialog_absences_checked
@@ -117,7 +119,7 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 					setOnClickListener {
 						listener.onPeriodAbsencesClick()
 					}
-				root.addView(this)
+				linearLayout.addView(this)
 			}
 
 		if (periodData.element.can.contains(CAN_READ_LESSON_TOPIC)) {
@@ -136,20 +138,20 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 					setOnClickListener {
 						listener.onLessonTopicClick()
 					}
-				root.addView(this)
+				linearLayout.addView(this)
 			}
 		}
 
-		val teacherList = root.findViewById<LinearLayout>(R.id.llTeacherList)
-		val klassenList = root.findViewById<LinearLayout>(R.id.llClassList)
-		val roomList = root.findViewById<LinearLayout>(R.id.llRoomList)
+		val teacherList = linearLayout.findViewById<LinearLayout>(R.id.llTeacherList)
+		val klassenList = linearLayout.findViewById<LinearLayout>(R.id.llClassList)
+		val roomList = linearLayout.findViewById<LinearLayout>(R.id.llRoomList)
 
 		if (populateList(timetableDatabaseInterface, teacherList, periodData.teachers.toList(), TimetableDatabaseInterface.Type.TEACHER, color))
-			root.findViewById<View>(R.id.llTeachers).visibility = View.GONE
+			linearLayout.findViewById<View>(R.id.llTeachers).visibility = View.GONE
 		if (populateList(timetableDatabaseInterface, klassenList, periodData.classes.toList(), TimetableDatabaseInterface.Type.CLASS, color))
-			root.findViewById<View>(R.id.llClasses).visibility = View.GONE
+			linearLayout.findViewById<View>(R.id.llClasses).visibility = View.GONE
 		if (populateList(timetableDatabaseInterface, roomList, periodData.rooms.toList(), TimetableDatabaseInterface.Type.ROOM, color))
-			root.findViewById<View>(R.id.llRooms).visibility = View.GONE
+			linearLayout.findViewById<View>(R.id.llRooms).visibility = View.GONE
 
 		if (periodData.subjects.size > 0) {
 			var title = periodData.getLong(periodData.subjects, TimetableDatabaseInterface.Type.SUBJECT)
@@ -160,9 +162,9 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 			if (periodData.isExam())
 				title = getString(R.string.all_lesson_exam, title)
 
-			(root.findViewById(R.id.title) as TextView).text = title
+			(linearLayout.findViewById(R.id.title) as TextView).text = title
 		} else {
-			root.findViewById<View>(R.id.title).visibility = View.GONE
+			linearLayout.findViewById<View>(R.id.title).visibility = View.GONE
 		}
 		return root
 	}
