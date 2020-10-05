@@ -841,6 +841,7 @@ class MainActivity :
 	}
 
 	private fun setTarget(id: Int, type: String, displayName: String?): Boolean {
+		displayNameCache = displayName ?: getString(R.string.app_name)
 		PeriodElement(type, id, id).let {
 			if (it == displayedElement) return false
 			displayedElement = it
@@ -850,12 +851,11 @@ class MainActivity :
 
 		weeklyTimetableItems.clear()
 		weekView.notifyDataSetChanged()
-		supportActionBar?.title = displayName ?: getString(R.string.app_name)
+		supportActionBar?.title = displayNameCache
 		return true
 	}
 
 	internal fun setFullscreenDialogActionBar() {
-		displayNameCache = supportActionBar?.title ?: ""
 		supportActionBar?.setHomeAsUpIndicator(R.drawable.all_close)
 		supportActionBar?.setTitle(R.string.all_lesson_details)
 	}
