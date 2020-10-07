@@ -65,6 +65,7 @@
 	<string name="main_dialog_itemdetails_error_not_found">Item not found</string>
 	<string name="main_dialog_itemdetails_image_infos">Info</string>
 	<string name="main_dialog_itemdetails_image_homeworks">Homework</string>
+	<string name="main_dialog_itemdetails_timeformat">%1$s - %2$s</string>
 	<string name="main_last_refreshed">Last refreshed: %1$s</string>
 	<string name="main_last_refreshed_never">never</string>
 	<string name="main_anonymous_login_info_text">You have to setup a personal timetable if you are logged in as an anonymous user.</string>

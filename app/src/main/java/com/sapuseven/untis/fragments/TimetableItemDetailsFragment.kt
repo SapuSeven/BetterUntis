@@ -29,6 +29,8 @@ import com.sapuseven.untis.helpers.KotlinUtils.safeLet
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.viewmodels.PeriodDataViewModel
+import org.joda.time.LocalDateTime
+import org.joda.time.format.DateTimeFormat
 
 class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterface: TimetableDatabaseInterface?, user: UserDatabase.User?) : Fragment() {
 	constructor() : this(null, null, null)
@@ -166,6 +168,8 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 		} else {
 			linearLayout.findViewById<View>(R.id.title).visibility = View.GONE
 		}
+
+		linearLayout.findViewById<TextView>(R.id.time).text = formatLessonTime(periodData.element.startDateTime.toLocalDateTime(), periodData.element.endDateTime.toLocalDateTime())
 		return root
 	}
 
@@ -211,6 +215,14 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 			listener.onPeriodElementClick(this, element, useOrgId)
 		}
 		return tv
+	}
+
+	private fun formatLessonTime(startDateTime: LocalDateTime, endDateTime: LocalDateTime): String {
+		return requireContext().getString(
+				R.string.main_dialog_itemdetails_timeformat,
+				startDateTime.toString(DateTimeFormat.shortTime()),
+				endDateTime.toString(DateTimeFormat.shortTime())
+		)
 	}
 }
 

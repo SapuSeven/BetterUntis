@@ -14,7 +14,7 @@
 			android:layout_width="@dimen/size_header_icon"
 			android:layout_height="@dimen/size_header_icon"
 			android:layout_gravity="center"
-			android:layout_marginTop="16dp"
+			android:layout_marginTop="24dp"
 			android:layout_marginBottom="8dp"
 			android:contentDescription="@null"
 			android:tint="?attr/colorAccent"
@@ -28,11 +28,19 @@
 			android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
 			android:gravity="center"/>
 
+		<TextView
+			android:id="@+id/time"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:paddingHorizontal="24dp"
+			android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+			android:gravity="center"/>
+
 		<View
 			android:layout_width="match_parent"
 			android:layout_height="1dp"
 			android:layout_marginHorizontal="16dp"
-			android:layout_marginTop="16dp"
+			android:layout_marginTop="24dp"
 			android:layout_marginBottom="12dp"
 			android:background="?android:attr/listDivider" />
 
