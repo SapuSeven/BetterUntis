@@ -132,6 +132,7 @@ class MainActivity :
 	private var currentWeekIndex = 0
 	private var currentSchoolYearId = -1
 	private val weekViewRefreshHandler = Handler(Looper.getMainLooper())
+	private var displayNameCache: CharSequence = ""
 	private lateinit var profileUser: UserDatabase.User
 	private lateinit var profileListAdapter: ProfileListAdapter
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
@@ -840,6 +841,7 @@ class MainActivity :
 	}
 
 	private fun setTarget(id: Int, type: String, displayName: String?): Boolean {
+		displayNameCache = displayName ?: getString(R.string.app_name)
 		PeriodElement(type, id, id).let {
 			if (it == displayedElement) return false
 			displayedElement = it
@@ -849,8 +851,17 @@ class MainActivity :
 
 		weeklyTimetableItems.clear()
 		weekView.notifyDataSetChanged()
-		supportActionBar?.title = displayName ?: getString(R.string.app_name)
+		supportActionBar?.title = displayNameCache
 		return true
+	}
+
+	internal fun setFullscreenDialogActionBar() {
+		supportActionBar?.setHomeAsUpIndicator(R.drawable.all_close)
+		supportActionBar?.setTitle(R.string.all_lesson_details)
+	}
+
+	internal fun setDefaultActionBar() {
+		supportActionBar?.title = displayNameCache
 	}
 
 	override fun onEventClick(data: TimegridItem, eventRect: RectF) {

@@ -1,133 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:background="?android:attr/windowBackground"
-	android:clickable="true"
-	android:focusable="true"
-	android:orientation="vertical"
-	android:paddingBottom="12dp">
-
-	<TextView
-		android:id="@+id/title"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_marginStart="12dp"
-		android:layout_marginTop="12dp"
-		android:layout_marginEnd="12dp"
-		android:layout_marginBottom="12dp"
-		android:paddingStart="12dp"
-		android:paddingLeft="12dp"
-		android:paddingEnd="12dp"
-		android:paddingRight="12dp"
-		android:textColor="?android:attr/textColorPrimary"
-		android:textSize="20sp"
-		android:textStyle="bold" />
+	android:background="?android:attr/windowBackground">
 
 	<LinearLayout
-		android:id="@+id/llTeachers"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginStart="12dp"
-		android:layout_marginEnd="12dp"
-		android:orientation="horizontal">
+		android:orientation="vertical">
 
 		<ImageView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_marginStart="12dp"
-			android:layout_marginTop="12dp"
-			android:layout_marginEnd="24dp"
-			android:layout_marginBottom="12dp"
-			android:contentDescription="@string/all_teachers"
-			android:tint="?android:attr/textColorPrimary"
-			app:srcCompat="@drawable/all_teacher" />
+			android:layout_width="@dimen/size_header_icon"
+			android:layout_height="@dimen/size_header_icon"
+			android:layout_gravity="center"
+			android:layout_marginTop="24dp"
+			android:layout_marginBottom="8dp"
+			android:contentDescription="@null"
+			android:tint="?attr/colorAccent"
+			app:srcCompat="@drawable/all_subject" />
 
-		<HorizontalScrollView
+		<TextView
+			android:id="@+id/title"
 			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:paddingStart="0dp"
-			android:paddingEnd="12dp">
-
-			<LinearLayout
-				android:id="@+id/llTeacherList"
-				android:layout_width="wrap_content"
-				android:layout_height="match_parent"
-				android:orientation="horizontal">
-
-			</LinearLayout>
-		</HorizontalScrollView>
-	</LinearLayout>
-
-	<LinearLayout
-		android:id="@+id/llClasses"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_marginStart="12dp"
-		android:layout_marginEnd="12dp"
-		android:orientation="horizontal">
-
-		<ImageView
-			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_marginStart="12dp"
-			android:layout_marginTop="12dp"
-			android:layout_marginEnd="24dp"
-			android:layout_marginBottom="12dp"
-			android:contentDescription="@string/all_classes"
-			android:tint="?android:attr/textColorPrimary"
-			app:srcCompat="@drawable/all_classes" />
+			android:paddingHorizontal="24dp"
+			android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+			android:gravity="center"/>
 
-		<HorizontalScrollView
+		<TextView
+			android:id="@+id/time"
 			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:paddingStart="0dp"
-			android:paddingEnd="12dp">
-
-			<LinearLayout
-				android:id="@+id/llClassList"
-				android:layout_width="wrap_content"
-				android:layout_height="match_parent"
-				android:orientation="horizontal">
-
-			</LinearLayout>
-		</HorizontalScrollView>
-	</LinearLayout>
-
-	<LinearLayout
-		android:id="@+id/llRooms"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_marginStart="12dp"
-		android:layout_marginEnd="12dp"
-		android:orientation="horizontal">
-
-		<ImageView
-			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_marginStart="12dp"
-			android:layout_marginTop="12dp"
-			android:layout_marginEnd="24dp"
-			android:layout_marginBottom="12dp"
-			android:contentDescription="@string/all_rooms"
-			android:tint="?android:attr/textColorPrimary"
-			app:srcCompat="@drawable/all_rooms" />
+			android:paddingHorizontal="24dp"
+			android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+			android:gravity="center"/>
 
-		<HorizontalScrollView
+		<View
 			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:paddingStart="0dp"
-			android:paddingEnd="12dp">
+			android:layout_height="1dp"
+			android:layout_marginHorizontal="16dp"
+			android:layout_marginTop="24dp"
+			android:layout_marginBottom="12dp"
+			android:background="?android:attr/listDivider" />
 
-			<LinearLayout
-				android:id="@+id/llRoomList"
+		<LinearLayout
+			android:id="@+id/llTeachers"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:paddingHorizontal="24dp">
+
+			<ImageView
 				android:layout_width="wrap_content"
-				android:layout_height="match_parent"
-				android:orientation="horizontal">
+				android:layout_height="wrap_content"
+				android:layout_marginTop="12dp"
+				android:layout_marginEnd="24dp"
+				android:layout_marginBottom="12dp"
+				android:contentDescription="@string/all_teachers"
+				android:tint="?android:attr/textColorPrimary"
+				app:srcCompat="@drawable/all_teacher" />
 
-			</LinearLayout>
-		</HorizontalScrollView>
+			<HorizontalScrollView
+				android:layout_width="match_parent"
+				android:layout_height="match_parent">
+
+				<LinearLayout
+					android:id="@+id/llTeacherList"
+					android:layout_width="wrap_content"
+					android:layout_height="match_parent"
+					android:orientation="horizontal">
+
+				</LinearLayout>
+			</HorizontalScrollView>
+		</LinearLayout>
+
+		<LinearLayout
+			android:id="@+id/llClasses"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:paddingHorizontal="24dp">
+
+			<ImageView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="12dp"
+				android:layout_marginEnd="24dp"
+				android:layout_marginBottom="12dp"
+				android:contentDescription="@string/all_classes"
+				android:tint="?android:attr/textColorPrimary"
+				app:srcCompat="@drawable/all_classes" />
+
+			<HorizontalScrollView
+				android:layout_width="match_parent"
+				android:layout_height="match_parent">
+
+				<LinearLayout
+					android:id="@+id/llClassList"
+					android:layout_width="wrap_content"
+					android:layout_height="match_parent"
+					android:orientation="horizontal">
+
+				</LinearLayout>
+			</HorizontalScrollView>
+		</LinearLayout>
+
+		<LinearLayout
+			android:id="@+id/llRooms"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:paddingHorizontal="24dp">
+
+			<ImageView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="12dp"
+				android:layout_marginEnd="24dp"
+				android:layout_marginBottom="12dp"
+				android:contentDescription="@string/all_rooms"
+				android:tint="?android:attr/textColorPrimary"
+				app:srcCompat="@drawable/all_rooms" />
+
+			<HorizontalScrollView
+				android:layout_width="match_parent"
+				android:layout_height="match_parent">
+
+				<LinearLayout
+					android:id="@+id/llRoomList"
+					android:layout_width="wrap_content"
+					android:layout_height="match_parent"
+					android:orientation="horizontal">
+
+				</LinearLayout>
+			</HorizontalScrollView>
+		</LinearLayout>
 	</LinearLayout>
-</LinearLayout>
+</ScrollView>
