@@ -49,7 +49,6 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
-		activity?.viewModelStore?.clear() // TODO: Doesn't seem like the best solution. This could potentially interfere with other ViewModels scoped to the parent activity.
 		if (context is TimetableItemDetailsDialogListener)
 			listener = context
 		else

@@ -58,9 +58,9 @@ import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.UntisMessage
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.Holiday
+import com.sapuseven.untis.models.untis.masterdata.SchoolYear
 import com.sapuseven.untis.models.untis.params.MessageParams
 import com.sapuseven.untis.models.untis.response.MessageResponse
-import com.sapuseven.untis.models.untis.masterdata.SchoolYear
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.ElementPickerPreference
 import com.sapuseven.untis.preferences.RangePreference
@@ -865,6 +865,7 @@ class MainActivity :
 	}
 
 	override fun onEventClick(data: TimegridItem, eventRect: RectF) {
+		viewModelStore.clear() // TODO: Doesn't seem like the best solution. This could potentially interfere with other ViewModels scoped to this activity.
 		val fragment = TimetableItemDetailsFragment(data, timetableDatabaseInterface, profileUser)
 
 		supportFragmentManager.beginTransaction().run {
