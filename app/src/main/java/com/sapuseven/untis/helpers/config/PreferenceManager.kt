@@ -13,9 +13,13 @@ class PreferenceManager(val context: Context, private var profileId: Long = 0) {
 		reload(profileId)
 	}
 
-	fun reload(profileId: Long) {
+	fun reload(profileId: Long = 0) {
 		this.profileId = if (profileId > 0L) profileId else androidx.preference.PreferenceManager.getDefaultSharedPreferences(context).getLong("profile", 0L)
-		defaultPrefs = context.getSharedPreferences("preferences_${this.profileId}", Context.MODE_PRIVATE)
+		defaultPrefs = prefsForProfile(this.profileId)
+	}
+
+	fun prefsForProfile(profileId: Long): SharedPreferences {
+		return context.getSharedPreferences("preferences_${profileId}", Context.MODE_PRIVATE)
 	}
 
 	fun saveProfileId(profileId: Long) {
