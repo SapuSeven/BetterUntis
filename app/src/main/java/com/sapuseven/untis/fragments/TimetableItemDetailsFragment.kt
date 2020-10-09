@@ -97,9 +97,10 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 		periodData.element.homeWorks?.forEach {
 			val endDate = it.endDate.toLocalDate()
 
-			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_homework, linearLayout).run {
+			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_homework, linearLayout, false).run {
 				(findViewById<TextView>(R.id.textview_roomfinder_name)).text = it.text
 				(findViewById<TextView>(R.id.tvDate)).text = getString(R.string.homeworks_due_time, endDate.toString(getString(R.string.homeworks_due_time_format)))
+				linearLayout.addView(this)
 			}
 		}
 
