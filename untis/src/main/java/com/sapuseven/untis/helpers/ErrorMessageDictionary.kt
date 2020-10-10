@@ -2,7 +2,7 @@ package com.sapuseven.untis.helpers
 
 import android.content.res.Resources
 
-import com.sapuseven.untis.R
+import com.sapuseven.untis.module.R
 
 object ErrorMessageDictionary {
 	/* Original app used the following error codes at the time of writing (may change over time):
