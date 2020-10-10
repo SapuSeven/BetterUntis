@@ -5,13 +5,12 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlinx-serialization'
 
 android {
-	compileSdkVersion 29
-	buildToolsVersion '29.0.3'
+	compileSdkVersion target_sdk_version
 
 	defaultConfig {
 		applicationId "com.sapuseven.untis"
 		minSdkVersion 21
-		targetSdkVersion 29
+		targetSdkVersion target_sdk_version
 		versionCode 27
 		versionName "3.4.3"
 		vectorDrawables.useSupportLibrary = true
