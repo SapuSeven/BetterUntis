@@ -282,7 +282,7 @@ class InfoCenterActivity : BaseActivity() {
 			return result.fold({ data ->
 				val untisResponse = getJSON().parse(HomeworkResponse.serializer(), data)
 
-				untisResponse.result?.homeWorks?.map { EventAdapterItem(null, it, untisResponse.result.lessonsById) }
+				untisResponse.result?.homeWorks?.map { EventAdapterItem(null, it, untisResponse.result?.lessonsById) }
 			}, { null })
 		}
 		return null
