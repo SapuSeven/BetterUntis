@@ -15,6 +15,7 @@
 		<item name="android:alertDialogTheme">@style/ThemeOverlay.MaterialAlertDialog.Rounded</item>
 		<item name="dialogCornerRadius">@dimen/radius_dialog_corner_rounded</item>
 		<item name="android:windowAnimationStyle">@style/WindowFadeTransition</item>
+		<item name="materialCalendarTheme">@style/ThemeMaterialCalendar</item>
 	</style>
 
 	<style name="ThemeOverlay.MaterialAlertDialog.Rounded" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
@@ -170,5 +171,9 @@
 		<item name="android:backgroundTint">?attr/colorPrimary</item>
 		<item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
 		<item name="android:gravity">center</item>
+	</style>
+	
+	<style name="ThemeMaterialCalendar" parent="ThemeOverlay.MaterialComponents.MaterialCalendar">
+		<item name="colorPrimary">?attr/colorAccent</item>
 	</style>
 </resources>
