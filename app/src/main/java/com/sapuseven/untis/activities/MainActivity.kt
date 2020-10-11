@@ -126,7 +126,6 @@ class MainActivity :
 	private var profileId: Long = -1
 	private val weeklyTimetableItems: MutableMap<Int, WeeklyTimetableItems?> = mutableMapOf()
 	private var displayedElement: PeriodElement? = null
-	private var lastPickedDate: DateTime? = null
 	private var proxyHost: String? = null
 	private var profileUpdateDialog: AlertDialog? = null
 	private var currentWeekIndex = 0
@@ -991,23 +990,12 @@ class MainActivity :
 	}
 
 	override fun onCornerClick() {
-		val fragment = DatePickerDialog()
+		val fragment = DatePickerDialog().createFragment()
 
-		lastPickedDate?.let {
-			val args = Bundle()
-			args.putInt("year", it.year)
-			args.putInt("month", it.monthOfYear)
-			args.putInt("day", it.dayOfMonth)
-			fragment.arguments = args
+		fragment.addOnPositiveButtonClickListener {
+			weekView.goToDate(DateTime(it))
 		}
-		fragment.dateSetListener = android.app.DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-			DateTime().withDate(year, month + 1, dayOfMonth).let {
-				// +1 compensates for conversion from Calendar to DateTime
-				weekView.goToDate(it)
-				lastPickedDate = it
-			}
-		}
-		fragment.show(supportFragmentManager, "datePicker")
+		fragment.show(supportFragmentManager, fragment.toString())
 	}
 
 	override fun onCornerLongClick() = weekView.goToToday()
