@@ -191,8 +191,6 @@
     <string name="notifications_text_error_title">加载课程表失败</string>
     <string name="notifications_channel_backgrounderrors_desc">显示后台任务错误信息</string>
     <string name="notifications_channel_backgrounderrors">后台错误</string>
-    <string name="settings_designing_info">了解更多</string>
-    <string name="settings_designing_hide">不再显示</string>
     <string name="preference_week_display_length_summary">一周范围设置为0</string>
     <string name="preference_week_display_length">显示天数</string>
     <string name="preference_week_custom_range">自定义一周范围</string>
