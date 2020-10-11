@@ -20,6 +20,7 @@ import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.dialogs.ProfileUpdateDialog
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
+import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.models.UntisSchoolInfo
 import com.sapuseven.untis.models.untis.masterdata.TimeGrid
 import com.sapuseven.untis.models.untis.params.AppSharedSecretParams
@@ -56,8 +57,10 @@ class LoginDataInputActivity : BaseActivity() {
 	private lateinit var userDatabase: UserDatabase
 
 	override fun onCreate(savedInstanceState: Bundle?) {
-		if (intent.hasExtra(EXTRA_LONG_PROFILE_ID))
+		if (intent.hasExtra(EXTRA_LONG_PROFILE_ID)) {
 			existingUserId = intent.getLongExtra(EXTRA_LONG_PROFILE_ID, 0)
+			preferences = PreferenceManager(this, existingUserId!!)
+		}
 
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_logindatainput)
@@ -196,8 +199,7 @@ class LoginDataInputActivity : BaseActivity() {
 		if (user.schoolId.isNotBlank()) edittext_logindatainput_school?.setText(user.schoolId)
 
 		user.id?.let { profileId ->
-			preferences.reload(profileId)
-			preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)?.let {
+			preferences.prefsForProfile(profileId).getString("preference_connectivity_proxy_host", null)?.let {
 				edittext_logindatainput_proxy_host?.setText(it)
 				if (it.isNotBlank()) {
 					switch_logindatainput_advanced?.isChecked = true

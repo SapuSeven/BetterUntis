@@ -30,7 +30,7 @@ open class BaseActivity : AppCompatActivity() {
 
 		Thread.setDefaultUncaughtExceptionHandler(CrashHandler(this, Thread.getDefaultUncaughtExceptionHandler()))
 
-		preferences = PreferenceManager(this)
+		if (!::preferences.isInitialized) preferences = PreferenceManager(this)
 		currentTheme = PreferenceUtils.getPrefString(preferences, "preference_theme")
 		currentDarkTheme = PreferenceUtils.getPrefString(preferences, "preference_dark_theme")
 		setAppTheme(hasOwnToolbar)
