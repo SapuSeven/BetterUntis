@@ -391,7 +391,7 @@ class LoginDataInputActivity : BaseActivity() {
 				.setNegativeButton(getString(R.string.all_cancel), null)
 				.setPositiveButton(getString(R.string.all_delete)) { _, _ ->
 					userDatabase.deleteUser(user.id!!)
-					preferences.deleteProfile(user.id)
+					preferences.deleteProfile(user.id!!)
 					setResult(RESULT_OK)
 					finish()
 				}

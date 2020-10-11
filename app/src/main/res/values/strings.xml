@@ -106,16 +106,6 @@
 	<string name="logindatainput_title_add">Add profile</string>
 	<string name="logindatainput_title_edit">Edit profile</string>
 	<string name="logindatainput_username">Username</string>
-	<string name="errormessagedictionary_generic">Unknown error</string>
-	<string name="errormessagedictionary_invalid_credentials">Wrong username or key!</string>
-	<string name="errormessagedictionary_invalid_school">The specified school doesn\'t exist!</string>
-	<string name="errormessagedictionary_invalid_server_url">Invalid server URL!</string>
-	<string name="errormessagedictionary_invalid_time_settings">Invalid date and/or time settings!</string>
-	<string name="errormessagedictionary_no_public_access">Anonymous access is disabled.</string>
-	<string name="errormessagedictionary_no_right">No right for timetable</string>
-	<string name="errormessagedictionary_server_webuntis_not_installed">The specified Server doesn\'t have WebUntis installed!</string>
-	<string name="errormessagedictionary_too_many_results">Too many results</string>
-	<string name="errormessagedictionary_user_locked">User locked!</string>
 	<string name="roomfinder_current_hour">%1$s, %2$d. Lesson</string>
 	<string name="roomfinder_current_hour_time">%1$s - %2$s</string>
 	<string name="roomfinder_delete_item">Delete item</string>
@@ -180,7 +170,6 @@
 	<string name="preference_double_tap_to_exit">Double tap back button to exit</string>
 	<string name="preference_flinging_enable">Enable flinging</string>
 	<string name="preference_info_app_version">App version</string>
-	<string name="preference_info_app_version_desc">%1$s (%2$d)</string>
 	<string name="preference_info_contributors">Contributors</string>
 	<string name="preference_info_contributors_desc">A list of the contributors</string>
 	<string name="preference_info_general">General</string>

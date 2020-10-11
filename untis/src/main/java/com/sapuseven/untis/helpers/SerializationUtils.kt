@@ -1,6 +1,6 @@
 package com.sapuseven.untis.helpers
 
-import com.sapuseven.untis.BuildConfig
+import com.sapuseven.untis.module.BuildConfig
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 

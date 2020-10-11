@@ -5,7 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import androidx.core.content.pm.PackageInfoCompat
-import com.sapuseven.untis.R
+import com.sapuseven.untis.module.R
 
 
 class GithubIssue(type: Type, log: String) : Issue(type, log) {
