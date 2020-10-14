@@ -264,4 +264,30 @@
     <string name="app_desc">En alternativ mobilklient for Untis-timeplanssystemet.</string>
     <string name="errors_report">Hjelp til å fikse programmet ved å rapportere inn feilene nedenfor:</string>
     <string name="preference_category_connectivity_proxy">WebUntis-mellomtjener</string>
+    <string name="logindatainput_skip_school_id">Hopp over skole-ID-utledelse</string>
+    <plurals name="preferences_contributors_contributions">
+        <item quantity="one">%1$d bidrag</item>
+        <item quantity="other">%1$d bidrag</item>
+    </plurals>
+    <string name="widget_timetable_link">Timeplan-lenke</string>
+    <string name="widget_select_profile">Velg en profil for miniprogrammet</string>
+    <string name="widget_daily_messages">Daglige meldinger</string>
+    <string name="widget_timetable_empty">Ingen timeplan i dag</string>
+    <string name="widget_timetable">Timeplan</string>
+    <string name="widget_configuration">Miniprogramsoppsett</string>
+    <string name="preference_timetable_colors_reset_button_positive">Tilbakestill</string>
+    <string name="preference_theme_pixel">Piksel</string>
+    <string name="infocenter_absence_unknown_reason">Ukjent grunn</string>
+    <string name="infocenter_messages_attachments">Vedlegg</string>
+    <string name="logindatainput_skip_app_secret">Hopp over programhemmeligehtsutledelse</string>
+    <string name="logindatainput_error_invalid_url">Ugyldig nettadresse.</string>
+    <string name="logindatainput_api_url">Untis-API-sti</string>
+    <string name="activity_title_messenger">Meldingstjeneste</string>
+    <string name="all_hint_tap_to_edit">(Trykk for å redigere)</string>
+    <string name="all_dialog_crash_copied">Krasjlogg kopiert til utklippstavle.</string>
+    <string name="all_dialog_crash_title">Krasjlogg funnet</string>
+    <string name="all_dialog_absences_not_checked">Fravær ikke sjekket.</string>
+    <string name="all_dialog_absences_checked">Fravær sjekket.</string>
+    <string name="all_teaching_content">Læringsmateriale</string>
+    <string name="all_absences">Fravær</string>
 </resources>
