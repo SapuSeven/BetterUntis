@@ -267,4 +267,14 @@
     <string name="all_failed">échec</string>
     <string name="all_success">succès</string>
     <string name="app_desc">Un client mobile alternatif pour le système d’emploi du temps Untis.</string>
+    <string name="logindatainput_error_invalid_url">URL non valable !</string>
+    <string name="activity_title_messenger">Messenger</string>
+    <string name="logindatainput_api_url">chemin de l\'API Untis</string>
+    <string name="all_hint_tap_to_edit">(Appuyez pour modifier)</string>
+    <string name="all_dialog_crash_copied">Journal des incidents copié dans le presse-papiers.</string>
+    <string name="all_dialog_crash_title">Journal des incidents trouvé</string>
+    <string name="all_dialog_absences_not_checked">Absences non vérifiées.</string>
+    <string name="all_dialog_absences_checked">Absences vérifiées.</string>
+    <string name="all_teaching_content">Contenu d\'enseignement</string>
+    <string name="all_absences">Absences</string>
 </resources>
