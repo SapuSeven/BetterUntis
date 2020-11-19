@@ -277,4 +277,20 @@
     <string name="all_dialog_absences_checked">Absences vérifiées.</string>
     <string name="all_teaching_content">Contenu d\'enseignement</string>
     <string name="all_absences">Absences</string>
+    <string name="logindatainput_skip_app_secret">Passer la résolution du secret de l\'appli</string>
+    <plurals name="preferences_contributors_contributions">
+        <item quantity="one">%1$d contribution</item>
+        <item quantity="other">%1$d contributions</item>
+    </plurals>
+    <string name="widget_timetable_link">Lien calendrier</string>
+    <string name="widget_select_profile">Veuillez choisir un profil pour le widget</string>
+    <string name="widget_daily_messages">Messages quotidiens</string>
+    <string name="widget_timetable_empty">Aucun calendrier disponible pour aujourd\'hui</string>
+    <string name="widget_timetable">Calendrier</string>
+    <string name="widget_configuration">Configuration du widget</string>
+    <string name="preference_timetable_colors_reset_button_positive">Réinitialiser</string>
+    <string name="preference_theme_pixel">Pixel</string>
+    <string name="infocenter_absence_unknown_reason">Raison inconnue</string>
+    <string name="infocenter_messages_attachments">Pièces jointes</string>
+    <string name="logindatainput_skip_school_id">Passer la résolution de l\'identifiant de l\'école</string>
 </resources>
