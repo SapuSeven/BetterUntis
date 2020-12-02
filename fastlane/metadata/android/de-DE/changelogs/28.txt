@@ -1,0 +1,2 @@
+- Stundendetails-Dialog verbessert
+- Abstürze und andere Bugs behoben
