@@ -288,6 +288,6 @@
     <string name="all_dialog_crash_title">Krasjlogg funnet</string>
     <string name="all_dialog_absences_not_checked">Fravær ikke sjekket.</string>
     <string name="all_dialog_absences_checked">Fravær sjekket.</string>
-    <string name="all_teaching_content">Læringsmateriale</string>
+    <string name="all_lessontopic">Læringsmateriale</string>
     <string name="all_absences">Fravær</string>
 </resources>

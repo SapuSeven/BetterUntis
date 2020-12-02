@@ -80,7 +80,7 @@
     <string name="all_lesson_exam">%1$s (azterketa!)</string>
     <string name="all_lesson_irregular">%1$s (irregularra)</string>
     <string name="all_lesson_cancelled">%1$s (bertan behera)</string>
-    <string name="all_teaching_content">Irakatsitako edukia</string>
+    <string name="all_lessontopic">Irakatsitako edukia</string>
     <string name="all_reset">Berrezarri</string>
     <string name="all_delete">Ezabatu</string>
     <string name="all_add">Gehitu</string>

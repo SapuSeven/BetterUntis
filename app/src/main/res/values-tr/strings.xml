@@ -3,7 +3,7 @@
     <string name="all_lesson_exam">%1$s (sınav!)</string>
     <string name="all_lesson_irregular">%1$s (düzensiz)</string>
     <string name="all_lesson_cancelled">%1$s (iptal edildi)</string>
-    <string name="all_teaching_content">Eğitim içeriği</string>
+    <string name="all_lessontopic">Eğitim içeriği</string>
     <string name="all_absences">Bulunmayanalar</string>
     <string name="all_reset">Yenile</string>
     <string name="all_delete">Sil</string>
