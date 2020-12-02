@@ -102,7 +102,7 @@
 	<string name="logindatainput_school">School name or ID</string>
 	<string name="logindatainput_show_advanced">Show advanced settings</string>
 	<string name="logindatainput_skip_app_secret">Skip app secret resolution</string>
-	<string name="logindatainput_skip_school_id">Skip school id resolution</string>
+    <string name="logindatainput_skip_school_id">Skip school ID resolution</string>
 	<string name="logindatainput_title_add">Add profile</string>
 	<string name="logindatainput_title_edit">Edit profile</string>
 	<string name="logindatainput_username">Username</string>

@@ -22,9 +22,9 @@
     <string name="all_delete">Löschen</string>
     <string name="all_reset">Zurücksetzen</string>
     <string name="all_lesson_details">Stundendetails</string>
-    <string name="all_lesson_cancelled">%1$s (entfallen)</string>
+    <string name="all_lesson_cancelled">%1$s (entfällt)</string>
     <string name="all_lesson_irregular">%1$s (irregulär)</string>
-    <string name="all_lesson_exam">%1$s (Test!)</string>
+    <string name="all_lesson_exam">%1$s (Klausur!)</string>
     <string name="all_dialog_datepicker_button_today">Heute</string>
     <string name="all_dialog_error_title">Fehlerinformation</string>
     <string name="all_dialog_error_message">Anfragen-ID: %1$d\nFehlercode: %2$d\nFehlermeldung: %3$s</string>
