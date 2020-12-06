@@ -40,7 +40,10 @@ class AutoMuteSetup : LessonEventSetup() {
 				alarmManager.setExact(AlarmManager.RTC_WAKEUP, item.startDateTime.millis, pendingMuteIntent)
 				Log.d("AutoMuteSetup", "${item.periodData.getShortTitle()} mute scheduled for ${item.startDateTime}")
 
-				if (item.endDateTime == it.second?.startDateTime) return@forEach // No break exists, don't unmute
+				val minimumBreakLengthMillis = PreferenceUtils.getPrefInt(preferenceManager, "preference_automute_minimum_break_length") * 60 * 1000
+				if (it.second != null
+						&& it.second!!.startDateTime.millisOfDay - item.endDateTime.millisOfDay < minimumBreakLengthMillis)
+							return@forEach // No break exists or break it's short, don't unmute
 				val unmuteIntent = Intent(context, AutoMuteReceiver::class.java)
 						.putExtra(EXTRA_INT_ID, id)
 						.putExtra(EXTRA_BOOLEAN_MUTE, false)
