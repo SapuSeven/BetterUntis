@@ -40,13 +40,15 @@ class AutoMuteSetup : LessonEventSetup() {
 				alarmManager.setExact(AlarmManager.RTC_WAKEUP, item.startDateTime.millis, pendingMuteIntent)
 				Log.d("AutoMuteSetup", "${item.periodData.getShortTitle()} mute scheduled for ${item.startDateTime}")
 
-				if (item.endDateTime == it.second?.startDateTime) return@forEach // No break exists, don't unmute
+				val delay = PreferenceUtils.getPrefInt(preferenceManager, "preference_automute_unmute_delay").toLong()
+				val endDateTimeWithDelay = item.endDateTime.withDurationAdded(delay, 1000 * 60)
+				if (it.second != null && endDateTimeWithDelay >= it.second!!.startDateTime) return@forEach // No break exists, don't unmute
 				val unmuteIntent = Intent(context, AutoMuteReceiver::class.java)
 						.putExtra(EXTRA_INT_ID, id)
 						.putExtra(EXTRA_BOOLEAN_MUTE, false)
-				val pendingUnmuteIntent = PendingIntent.getBroadcast(context, item.endDateTime.millisOfDay, unmuteIntent, 0)
-				alarmManager.setExact(AlarmManager.RTC_WAKEUP, item.endDateTime.millis, pendingUnmuteIntent)
-				Log.d("AutoMuteSetup", "${item.periodData.getShortTitle()} unmute scheduled for ${item.endDateTime}")
+				val pendingUnmuteIntent = PendingIntent.getBroadcast(context, endDateTimeWithDelay.millisOfDay, unmuteIntent, 0)
+				alarmManager.setExact(AlarmManager.RTC_WAKEUP, endDateTimeWithDelay.millis, pendingUnmuteIntent)
+				Log.d("AutoMuteSetup", "${item.periodData.getShortTitle()} unmute scheduled for $endDateTimeWithDelay")
 			}
 		}
 	}

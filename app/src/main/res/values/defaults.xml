@@ -38,6 +38,7 @@
 	<integer name="preference_timetable_item_corner_radius_default">4</integer>
 	<integer name="preference_timetable_lesson_name_font_size_default">14</integer>
 	<integer name="preference_timetable_lesson_info_font_size_default">10</integer>
+	<integer name="preference_automute_unmute_delay_default">0</integer>
 
 	<string name="preference_theme_default">default</string>
 	<string name="preference_dark_theme_default">off</string>

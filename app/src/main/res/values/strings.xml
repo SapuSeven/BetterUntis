@@ -144,6 +144,8 @@
 	<string name="preference_automute_cancelled_lessons">Also mute in cancelled lessons</string>
 	<string name="preference_automute_enable">Enable auto-mute</string>
 	<string name="preference_automute_enable_summary">Automatically turns on Do Not Disturb during lessons</string>
+	<string name="preference_automute_unmute_delay_summary">Delay in minutes after which auto-mute should unmute after lesson</string>
+	<string name="preference_automute_unmute_delay">Unmute delay</string>
 	<string name="preference_background_cancelled">Cancelled lessons</string>
 	<string name="preference_background_cancelled_past">Past cancelled lessons</string>
 	<string name="preference_background_exam">Lessons with tests</string>

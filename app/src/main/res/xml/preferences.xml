@@ -50,6 +50,14 @@
 				android:dependency="preference_automute_enable"
 				android:key="preference_automute_cancelled_lessons"
 				android:title="@string/preference_automute_cancelled_lessons" />
+			<SeekBarPreference
+				android:defaultValue="@integer/preference_automute_unmute_delay_default"
+				android:dependency="preference_automute_enable"
+				android:key="preference_automute_unmute_delay"
+				android:max="10"
+				android:summary="@string/preference_automute_unmute_delay_summary"
+				android:title="@string/preference_automute_unmute_delay"
+				app:showSeekBarValue="true" />
 		</PreferenceCategory>
 
 		<!-- TODO: Extract string resources -->
