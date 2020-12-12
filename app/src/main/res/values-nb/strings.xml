@@ -165,7 +165,7 @@
     <string name="preference_notifications_first_lesson_desc">Vis et varsel rett før skolen starter</string>
     <string name="preference_notifications_first_lesson_time">Tidspunkt for varsler</string>
     <string name="preference_notifications_first_lesson_time_unit">minutter før første leksjon</string>
-    <string name="preference_notifications_multiple">Aktiver i leksjon med flere timer</string>
+    <string name="preference_notifications_multiple">Aktiver i leksjon med flere leksjoner</string>
     <string name="preference_notifications_multiple_desc">Varsler vil vises i pauser under flertimede leksjoner.</string>
     <string name="preference_notifications_visibility_hidden">Skjult</string>
     <string name="preference_notifications_visibility_long">Langt navn</string>
@@ -242,10 +242,10 @@
         <item quantity="other">Dette rommet er ledig de neste %d timene.</item>
     </plurals>
     <string name="infocenter_officehours_empty">Ingen kontortid</string>
-    <string name="preference_schoolcolors_regular">For vanlige skoletimer</string>
-    <string name="preference_schoolcolors_exam">For skoletimer med tester</string>
-    <string name="preference_schoolcolors_irregular">For uvanlige skoletimer</string>
-    <string name="preference_schoolcolors_cancelled">For kansellerte skoletimer</string>
+    <string name="preference_schoolcolors_regular">For vanlige leksjoner</string>
+    <string name="preference_schoolcolors_exam">For leksjoner med tester</string>
+    <string name="preference_schoolcolors_irregular">For uvanlige leksjoner</string>
+    <string name="preference_schoolcolors_cancelled">For kansellerte leksjoner</string>
     <string name="preference_timetable_hide_time_stamps">Skjul tidsstempel</string>
     <string name="preference_timetable_hide_time_stamps_desc">Skjul tidsstempel ved siden av timeplanen</string>
     <string name="errors_crash_title">Det ser ut til at BetterUntis krasjet.</string>
@@ -288,6 +288,9 @@
     <string name="all_dialog_crash_title">Krasjlogg funnet</string>
     <string name="all_dialog_absences_not_checked">Fravær ikke sjekket.</string>
     <string name="all_dialog_absences_checked">Fravær sjekket.</string>
-    <string name="all_lessontopic">Læringsmateriale</string>
+    <string name="all_lessontopic">Leksjonsemne</string>
     <string name="all_absences">Fravær</string>
+    <string name="all_lesson_details">Leksjonsdetaljer</string>
+    <string name="all_lessontopic_none">(Uten emne)</string>
+    <string name="main_dialog_itemdetails_timeformat">%1$s - %2$s</string>
 </resources>
