@@ -59,4 +59,6 @@
     <string name="all_absences">Nieobecności</string>
     <string name="all_anonymous">Anonimowe</string>
     <string name="logindatainput_aquiring_schoolid">Trwa ładowanie szkoły…</string>
+    <string name="logindatainput_anonymous_login">Zaloguj się anonimowo</string>
+    <string name="activity_title_errors">Błędy</string>
 </resources>
