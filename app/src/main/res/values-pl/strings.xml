@@ -58,4 +58,5 @@
     <string name="all_lesson_details">Szczegóły lekcji</string>
     <string name="all_absences">Nieobecności</string>
     <string name="all_anonymous">Anonimowe</string>
+    <string name="logindatainput_aquiring_schoolid">Trwa ładowanie szkoły…</string>
 </resources>
