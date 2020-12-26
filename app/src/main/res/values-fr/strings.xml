@@ -293,4 +293,7 @@
     <string name="infocenter_absence_unknown_reason">Raison inconnue</string>
     <string name="infocenter_messages_attachments">Pièces jointes</string>
     <string name="logindatainput_skip_school_id">Passer la résolution de l\'identifiant de l\'école</string>
+    <string name="main_dialog_itemdetails_timeformat">%1$s - %2$s</string>
+    <string name="all_lessontopic_none">(Aucun sujet)</string>
+    <string name="all_lesson_details">Détails du cours</string>
 </resources>
