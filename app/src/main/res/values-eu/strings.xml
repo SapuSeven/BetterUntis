@@ -285,4 +285,12 @@
     <string name="widget_select_profile">Hautatu profila widget-erako</string>
     <string name="widget_configuration">Widget-en ezarpena</string>
     <string name="preference_timetable_range_desc">Ordu-tartea: %1$d-%2$d</string>
+    <string name="homeworks_due_time_format">EEE, MMM dd</string>
+    <string name="preference_timetable_substitutions_irregular_desc">Ordezkapenak dituzten eskolak ezohikotzat jo</string>
+    <string name="preference_timetable_range_index_reset">Berrezarri eskolen zenbaketa</string>
+    <string name="preference_timetable_item_padding_overlap">Elementuen betegarria gainjartzea</string>
+    <string name="preference_timetable_item_padding">Elementuen betegarria</string>
+    <string name="preference_connectivity_refresh_in_background_desc">Desgaitu datuak aurrezteko noizbehinkako ordutegien eguneratzeekin</string>
+    <string name="errors_github_attach_file_message">Erantsi konprimitutako egunkari-fitxategiak arazo honi.
+\n%1$s(e)n gorde dira</string>
 </resources>
