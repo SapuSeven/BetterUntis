@@ -561,7 +561,6 @@ class MainActivity :
 		val lines = MutableList(0) { return@MutableList 0 }
 		val labels = MutableList(0) { return@MutableList "" }
 		val range = RangePreference.convertToPair(PreferenceUtils.getPrefString(preferences, "preference_timetable_range", null))
-
 		profileUser.timeGrid.days.maxBy { it.units.size }?.units?.forEachIndexed { index, hour ->
 			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
 
@@ -582,7 +581,10 @@ class MainActivity :
 		if (!PreferenceUtils.getPrefBool(preferences, "preference_timetable_range_index_reset"))
 			weekView.hourIndexOffset = (range?.first ?: 1) - 1
 		weekView.hourLines = lines.toIntArray()
-		weekView.hourLabels = labels.toTypedArray()
+		weekView.hourLabels = labels.toTypedArray().let { hourLabelArray ->
+			if(hourLabelArray.joinToString("")=="") IntArray(labels.size, fun(idx:Int):Int{return idx+1}).map{it.toString()}.toTypedArray()
+			else hourLabelArray
+		}
 		weekView.startTime = lines.first()
 		weekView.endTime = lines.last() + 30 // TODO: Don't hard-code this offset
 	}
