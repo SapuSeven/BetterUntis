@@ -49,7 +49,7 @@ class TimeColumnDrawer(private val config: WeekViewConfig) : BaseDrawer {
 				}
 
 				if (i % 2 == 1)
-					canvas.drawText((i / 2 + 1 + config.hourIndexOffset).toString(), config.timeColumnPadding + drawConfig.timeTextWidth / 2, topCoordinate + (bottomCoordinate - topCoordinate + drawConfig.timeCaptionHeight + config.timeColumnPadding) / 2, drawConfig.timeCaptionPaint)
+					canvas.drawText(config.hourLabels[i / 2], config.timeColumnPadding + drawConfig.timeTextWidth / 2, topCoordinate + (bottomCoordinate - topCoordinate + drawConfig.timeCaptionHeight + config.timeColumnPadding) / 2, drawConfig.timeCaptionPaint)
 			}
 		}
 
