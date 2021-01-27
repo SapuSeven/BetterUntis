@@ -336,7 +336,7 @@ class LoginDataInputActivity : BaseActivity() {
 
 	private fun sendRequest() = GlobalScope.launch(Dispatchers.Main) {
 		updateLoadingStatus(getString(R.string.logindatainput_connecting))
-
+		val profileName = edittext_logindatainput_profilename?.text.toString()
 		val schoolId: String = acquireSchoolId() ?: return@launch
 		val username = edittext_logindatainput_user?.text.toString()
 		val password = edittext_logindatainput_key?.text.toString()
@@ -432,6 +432,7 @@ class LoginDataInputActivity : BaseActivity() {
 	}
 
 	private fun setElementsEnabled(enabled: Boolean) {
+		textinputlayout_logindatainput_profilename?.isEnabled = enabled
 		textinputlayout_logindatainput_school?.isEnabled = enabled && schoolInfo == null
 		textinputlayout_logindatainput_user?.isEnabled = enabled && switch_logindatainput_anonymouslogin?.isChecked == false
 		textinputlayout_logindatainput_key?.isEnabled = enabled && switch_logindatainput_anonymouslogin?.isChecked == false

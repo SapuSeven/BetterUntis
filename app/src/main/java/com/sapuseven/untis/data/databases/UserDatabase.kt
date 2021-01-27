@@ -327,7 +327,8 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 			val masterDataTimestamp: Long,
 			val userData: UntisUserData,
 			val settings: UntisSettings? = null,
-			val created: Long? = null
+			val created: Long? = null,
+			val profileName: String? = null
 	)
 }
 
