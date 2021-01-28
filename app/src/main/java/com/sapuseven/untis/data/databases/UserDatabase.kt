@@ -76,8 +76,17 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 					db.execSQL("ALTER TABLE ${UserDatabaseContract.Users.TABLE_NAME} RENAME TO ${UserDatabaseContract.Users.TABLE_NAME}_v4")
 					db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V5)
 					db.execSQL("ALTER TABLE ${UserDatabaseContract.Users.TABLE_NAME}_v4 ADD COLUMN ${UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME}")
-					db.execSQL("INSERT INTO ${UserDatabaseContract.Users.TABLE_NAME} SELECT * FROM ${UserDatabaseContract.Users.TABLE_NAME}_v4;")
+					db.execSQL("INSERT INTO ${UserDatabaseContract.Users.TABLE_NAME} SELECT _id, NULL, apiUrl, schoolId, user, auth, anonymous, timeGrid, masterDataTimestamp, userData, settings, time_created FROM ${UserDatabaseContract.Users.TABLE_NAME}_v4;")
 					db.execSQL("DROP TABLE ${UserDatabaseContract.Users.TABLE_NAME}_v4")
+					val cursor = db.query(UserDatabaseContract.Users.TABLE_NAME, arrayOf(UserDatabaseContract.Users.COLUMN_NAME_USERDATA, BaseColumns._ID), null, null, null, null, UserDatabaseContract.Users.COLUMN_NAME_CREATED + " DESC")
+					if(cursor.moveToFirst()) {
+						do {
+							val values = ContentValues()
+							values.put(UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME , getJSON().parse(UntisUserData.serializer(), cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USERDATA))).displayName)
+							db.update(UserDatabaseContract.Users.TABLE_NAME, values, BaseColumns._ID + "=?", arrayOf(cursor.getLongOrNull(cursor.getColumnIndex(BaseColumns._ID)).toString()))
+						} while (cursor.moveToNext())
+					}
+					cursor.close()
 				}
 			}
 
@@ -116,7 +125,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID, getJSON().stringify(TimeGrid.serializer(), user.timeGrid))
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP, user.masterDataTimestamp)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USERDATA, getJSON().stringify(UntisUserData.serializer(), user.userData))
-		user.settings?.let { values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().stringify(UntisSettings.serializer(), it)) }
+		user.settings?.let { values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().stringify(UntisSettings.serializer(), it))}
 
 		val id = db.insert(UserDatabaseContract.Users.TABLE_NAME, null, values)
 
