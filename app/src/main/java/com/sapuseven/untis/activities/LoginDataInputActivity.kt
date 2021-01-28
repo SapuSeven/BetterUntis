@@ -196,6 +196,7 @@ class LoginDataInputActivity : BaseActivity() {
 	}
 
 	private fun restoreInput(user: UserDatabase.User) {
+		edittext_logindatainput_profilename?.setText(user.profileName)
 		if (user.schoolId.isNotBlank()) edittext_logindatainput_school?.setText(user.schoolId)
 
 		user.id?.let { profileId ->
