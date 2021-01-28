@@ -18,7 +18,7 @@ import com.sapuseven.untis.models.untis.UntisSettings
 import com.sapuseven.untis.models.untis.UntisUserData
 import com.sapuseven.untis.models.untis.masterdata.*
 
-private const val DATABASE_VERSION = 4
+private const val DATABASE_VERSION = 5
 private const val DATABASE_NAME = "userdata.db"
 
 class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -33,8 +33,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 	}
 
 	override fun onCreate(db: SQLiteDatabase) {
-		db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V3)
-
+		db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V5)
 		db.execSQL(generateCreateTable<AbsenceReason>())
 		db.execSQL(generateCreateTable<Department>())
 		db.execSQL(generateCreateTable<Duty>())
@@ -73,6 +72,13 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 					db.execSQL("INSERT INTO ${UserDatabaseContract.Users.TABLE_NAME} SELECT * FROM ${UserDatabaseContract.Users.TABLE_NAME}_v3;")
 					db.execSQL("DROP TABLE ${UserDatabaseContract.Users.TABLE_NAME}_v3")
 				}
+				4 -> {
+					db.execSQL("ALTER TABLE ${UserDatabaseContract.Users.TABLE_NAME} RENAME TO ${UserDatabaseContract.Users.TABLE_NAME}_v4")
+					db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V5)
+					db.execSQL("ALTER TABLE ${UserDatabaseContract.Users.TABLE_NAME}_v4 ADD COLUMN ${UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME}")
+					db.execSQL("INSERT INTO ${UserDatabaseContract.Users.TABLE_NAME} SELECT * FROM ${UserDatabaseContract.Users.TABLE_NAME}_v4;")
+					db.execSQL("DROP TABLE ${UserDatabaseContract.Users.TABLE_NAME}_v4")
+				}
 			}
 
 			currentVersion++
@@ -102,6 +108,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 
 		val values = ContentValues()
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_APIURL, user.apiUrl)
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME, user.profileName)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID, user.schoolId)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USER, user.user)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_KEY, user.key)
@@ -126,6 +133,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 
 		val values = ContentValues()
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_APIURL, user.apiUrl)
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME, user.profileName)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID, user.schoolId)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USER, user.user)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_KEY, user.key)
@@ -154,6 +162,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 				UserDatabaseContract.Users.TABLE_NAME,
 				arrayOf(
 						UserDatabaseContract.Users.COLUMN_NAME_APIURL,
+						UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME,
 						UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID,
 						UserDatabaseContract.Users.COLUMN_NAME_USER,
 						UserDatabaseContract.Users.COLUMN_NAME_KEY,
@@ -173,6 +182,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		val user = User(
 				id,
 				cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_APIURL)),
+				cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME)),
 				cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID)),
 				cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USER)),
 				cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_KEY)),
@@ -199,6 +209,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 				arrayOf(
 						BaseColumns._ID,
 						UserDatabaseContract.Users.COLUMN_NAME_APIURL,
+						UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME,
 						UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID,
 						UserDatabaseContract.Users.COLUMN_NAME_USER,
 						UserDatabaseContract.Users.COLUMN_NAME_KEY,
@@ -215,6 +226,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 				users.add(User(
 						cursor.getLongOrNull(cursor.getColumnIndex(BaseColumns._ID)),
 						cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_APIURL)),
+						cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME)),
 						cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID)),
 						cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USER)),
 						cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_KEY)),
@@ -318,6 +330,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 
 	class User(
 			val id: Long? = null,
+			val profileName: String? = null,
 			val apiUrl: String? = null,
 			val schoolId: String,
 			val user: String? = null,
@@ -327,8 +340,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 			val masterDataTimestamp: Long,
 			val userData: UntisUserData,
 			val settings: UntisSettings? = null,
-			val created: Long? = null,
-			val profileName: String? = null
+			val created: Long? = null
 	)
 }
 

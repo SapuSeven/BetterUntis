@@ -347,6 +347,7 @@ class LoginDataInputActivity : BaseActivity() {
 		acquireUserData(schoolId, username, appSharedSecret)?.let { response ->
 			val user = UserDatabase.User(
 					existingUserId,
+					profileName,
 					getApiUrl()
 							?: if (schoolInfo?.useMobileServiceUrlAndroid == true) schoolInfo?.mobileServiceUrl else null,
 					schoolId,
