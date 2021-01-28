@@ -108,7 +108,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 
 		val values = ContentValues()
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_APIURL, user.apiUrl)
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME, user.profileName)
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME, if(user.profileName.isNullOrBlank()) user.userData.displayName else user.profileName)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID, user.schoolId)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USER, user.user)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_KEY, user.key)
@@ -133,7 +133,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 
 		val values = ContentValues()
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_APIURL, user.apiUrl)
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME, user.profileName)
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME, if(user.profileName.isNullOrBlank()) user.userData.displayName else user.profileName)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID, user.schoolId)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USER, user.user)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_KEY, user.key)
