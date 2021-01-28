@@ -107,8 +107,8 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		val db = writableDatabase
 
 		val values = ContentValues()
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_APIURL, user.apiUrl)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME, if(user.profileName.isNullOrBlank()) user.userData.displayName else user.profileName)
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_APIURL, user.apiUrl)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID, user.schoolId)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USER, user.user)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_KEY, user.key)
@@ -132,8 +132,8 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		val db = writableDatabase
 
 		val values = ContentValues()
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_APIURL, user.apiUrl)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME, if(user.profileName.isNullOrBlank()) user.userData.displayName else user.profileName)
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_APIURL, user.apiUrl)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID, user.schoolId)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USER, user.user)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_KEY, user.key)
@@ -161,8 +161,9 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		val cursor = db.query(
 				UserDatabaseContract.Users.TABLE_NAME,
 				arrayOf(
-						UserDatabaseContract.Users.COLUMN_NAME_APIURL,
+						BaseColumns._ID,
 						UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME,
+						UserDatabaseContract.Users.COLUMN_NAME_APIURL,
 						UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID,
 						UserDatabaseContract.Users.COLUMN_NAME_USER,
 						UserDatabaseContract.Users.COLUMN_NAME_KEY,
@@ -181,8 +182,8 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 
 		val user = User(
 				id,
-				cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_APIURL)),
 				cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME)),
+				cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_APIURL)),
 				cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID)),
 				cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USER)),
 				cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_KEY)),
@@ -208,8 +209,8 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 				UserDatabaseContract.Users.TABLE_NAME,
 				arrayOf(
 						BaseColumns._ID,
-						UserDatabaseContract.Users.COLUMN_NAME_APIURL,
 						UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME,
+						UserDatabaseContract.Users.COLUMN_NAME_APIURL,
 						UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID,
 						UserDatabaseContract.Users.COLUMN_NAME_USER,
 						UserDatabaseContract.Users.COLUMN_NAME_KEY,
@@ -225,8 +226,8 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 			do {
 				users.add(User(
 						cursor.getLongOrNull(cursor.getColumnIndex(BaseColumns._ID)),
-						cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_APIURL)),
 						cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME)),
+						cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_APIURL)),
 						cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID)),
 						cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USER)),
 						cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_KEY)),
