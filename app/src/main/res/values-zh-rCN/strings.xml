@@ -268,4 +268,9 @@
     <string name="preference_week_custom_range_summary_short">%1$s</string>
     <string name="preference_flinging_enable">允许翻页</string>
     <string name="all_absences">缺失</string>
+    <plurals name="preferences_contributors_contributions">
+        <item quantity="other">%1$d 贡献</item>
+    </plurals>
+    <string name="all_dialog_crash_copied">崩溃记录已复制到剪贴板。</string>
+    <string name="all_dialog_crash_title">找到了崩溃记录</string>
 </resources>
