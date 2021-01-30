@@ -80,9 +80,9 @@
     <string name="logindatainput_aquiring_schoolid">正在加载学校…</string>
     <string name="logindatainput_loading_user_data">正在加载用户资料…</string>
     <string name="logindatainput_adding_user_unknown_error">添加用户时发生未知错误。</string>
-    <string name="logindatainput_title_add">添加账号</string>
-    <string name="logindatainput_title_edit">编辑账号</string>
-    <string name="logindatainput_delete">删除账号</string>
+    <string name="logindatainput_title_add">添加配置</string>
+    <string name="logindatainput_title_edit">编辑配置</string>
+    <string name="logindatainput_delete">删除配置</string>
     <string name="logindatainput_proxy_host">代理服务器（可选）</string>
     <string name="logindatainput_show_advanced">高级设置</string>
     <string name="errormessagedictionary_generic">未知错误</string>
