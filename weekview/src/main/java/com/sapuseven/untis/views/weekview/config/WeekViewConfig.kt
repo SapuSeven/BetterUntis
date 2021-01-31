@@ -221,7 +221,7 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 			drawConfig.hourSeparatorPaint.color = value
 		}
 	var hourSeparatorStrokeWidth: Float
-        get() = drawConfig.hourSeparatorPaint.strokeWidth
+		get() = drawConfig.hourSeparatorPaint.strokeWidth
 		set(value) {
 			drawConfig.hourSeparatorPaint.strokeWidth = value
 		}
@@ -234,7 +234,7 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 			drawConfig.daySeparatorPaint.color = value
 		}
 	var daySeparatorStrokeWidth: Float
-        get() = drawConfig.daySeparatorPaint.strokeWidth
+		get() = drawConfig.daySeparatorPaint.strokeWidth
 		set(value) {
 			drawConfig.daySeparatorPaint.strokeWidth = value
 		}
@@ -254,7 +254,7 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 	var startTime: Int = 0 // in minutes
 	var endTime: Int = 0 // in minutes
 	var hourLines: IntArray = IntArray(0) // in minutes
-
+	lateinit var hourLabels: Array<String>
 	// Calculated values
 
 	val timeColumnWidth: Float
