@@ -217,6 +217,13 @@ class WeekView<T>(
 			invalidate()
 		}
 
+	var hourLabels: Array<String>
+		get() = config.hourLabels
+		set(labels) {
+			config.hourLabels = labels
+			invalidate()
+		}
+
 	var startTime: Int
 		get() = config.startTime
 		set(startTime) {
