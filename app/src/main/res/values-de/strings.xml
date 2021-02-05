@@ -206,6 +206,7 @@
     <string name="preference_timetable_item_corner_radius">Abgerundete Ecken</string>
     <string name="preference_timetable_item_padding">Abstand zwischen Stunden</string>
     <string name="preference_timetable_item_padding_overlap">Abstand zwischen gleichzeitigen Stunden</string>
+    <string name="preference_timetable_item_hide_subjects">Zu verbergende Fächer</string>
     <string name="preference_timetable_item_text_light">Weißer Stundentext</string>
     <string name="preference_timetable_lesson_info_font_size">Schriftgröße für Stundeninfo</string>
     <string name="preference_timetable_lesson_name_font_size">Schriftgröße für Stundenname</string>

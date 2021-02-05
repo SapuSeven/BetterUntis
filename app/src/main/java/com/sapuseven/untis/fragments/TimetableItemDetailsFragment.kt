@@ -85,7 +85,8 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 		setOf(
 				periodData.element.text.lesson,
 				periodData.element.text.substitution,
-				periodData.element.text.info
+				periodData.element.text.info,
+				periodData.element.lessonId.toString()
 		).forEach {
 			if (it.isNotBlank())
 				activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_info, linearLayout, false).run {

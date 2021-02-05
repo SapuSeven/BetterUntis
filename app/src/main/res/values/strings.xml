@@ -227,6 +227,7 @@
 	<string name="preference_timetable_item_corner_radius">Item corner radius</string>
 	<string name="preference_timetable_item_padding">Item padding</string>
 	<string name="preference_timetable_item_padding_overlap">Overlapping item padding</string>
+	<string name="preference_timetable_item_hide_subjects">Subjects to hide</string>
 	<string name="preference_timetable_item_text_light">Use white text for timetable items</string>
 	<string name="preference_timetable_lesson_info_font_size">Font size for lesson infos</string>
 	<string name="preference_timetable_lesson_name_font_size">Font size for lesson name</string>

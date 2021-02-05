@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -89,6 +90,7 @@ import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity :
 		BaseActivity(),
@@ -124,6 +126,7 @@ class MainActivity :
 	private val userDatabase = UserDatabase.createInstance(this)
 	private var lastBackPress: Long = 0
 	private var profileId: Long = -1
+	private var remove: ArrayList<String> = ArrayList()
 	private val weeklyTimetableItems: MutableMap<Int, WeeklyTimetableItems?> = mutableMapOf()
 	private var displayedElement: PeriodElement? = null
 	private var lastPickedDate: DateTime? = null
@@ -624,7 +627,11 @@ class MainActivity :
 	}
 
 	private fun prepareItems(items: List<TimegridItem>): List<TimegridItem> {
-		val newItems = mergeItems(items.mapNotNull { item ->
+		remove.clear()
+		PreferenceUtils.getPrefString(preferences, "preference_timetable_hide_subject_ids", "")?.trim()?.split(",")?.let { remove.addAll(it) }
+		val itemsMutable = items.toMutableList()
+		itemsMutable.removeIf { remove.contains(it.periodData.subjects.first().id.toString()) }
+		val newItems = mergeItems(itemsMutable.mapNotNull { item ->
 			if (PreferenceUtils.getPrefBool(preferences, "preference_timetable_hide_cancelled") && item.periodData.isCancelled()) return@mapNotNull null
 
 			if (PreferenceUtils.getPrefBool(preferences, "preference_timetable_substitutions_irregular")) {
