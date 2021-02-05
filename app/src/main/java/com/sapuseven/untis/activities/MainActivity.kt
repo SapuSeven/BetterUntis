@@ -628,7 +628,7 @@ class MainActivity :
 
 	private fun prepareItems(items: List<TimegridItem>): List<TimegridItem> {
 		remove.clear()
-		PreferenceUtils.getPrefString(preferences, "preference_timetable_hide_subject_ids", "")?.trim()?.split(",")?.let { remove.addAll(it) }
+		PreferenceUtils.getPrefString(preferences, "preference_timetable_hide_subjects${ElementPickerPreference.KEY_SUFFIX_ID}", "")?.split(",")?.let { remove.addAll(it) }
 		val itemsMutable = items.toMutableList()
 		itemsMutable.removeIf { remove.contains(it.periodData.subjects.first().id.toString()) }
 		val newItems = mergeItems(itemsMutable.mapNotNull { item ->

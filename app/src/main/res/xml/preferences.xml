@@ -212,7 +212,7 @@
 			android:key="preference_timetable_personal_timetable"
 			android:title="@string/preference_timetable_personal_timetable" />
 
-		<com.sapuseven.untis.preferences.SubjectPickerPreference
+		<com.sapuseven.untis.preferences.ElementPickerPreference
 				android:key="preference_timetable_hide_subjects"
 				android:defaultValue=""
 				android:title="@string/preference_timetable_item_hide_subjects"

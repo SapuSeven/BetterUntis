@@ -27,7 +27,6 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.dialogs.AlertPreferenceDialog
 import com.sapuseven.untis.dialogs.ElementPickerDialog
-import com.sapuseven.untis.dialogs.SubjectPickerDialog
 import com.sapuseven.untis.dialogs.WeekRangePickerPreferenceDialog
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.config.PreferenceManager
@@ -36,7 +35,6 @@ import com.sapuseven.untis.models.github.GithubUser
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.AlertPreference
 import com.sapuseven.untis.preferences.ElementPickerPreference
-import com.sapuseven.untis.preferences.SubjectPickerPreference
 import com.sapuseven.untis.preferences.WeekRangePickerPreference
 import kotlinx.android.synthetic.main.activity_settings.*
 import kotlinx.coroutines.Dispatchers
@@ -325,58 +323,60 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 		}
 
 		override fun onPreferenceTreeClick(preference: Preference): Boolean {
-			if (preference is ElementPickerPreference || preference is SubjectPickerPreference) {
+			if (preference is ElementPickerPreference) {
 				val userDatabase = UserDatabase.createInstance(requireContext())
 				val timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileId)
-				if (preference is ElementPickerPreference) ElementPickerDialog.newInstance(
-					timetableDatabaseInterface,
-					ElementPickerDialog.Companion.ElementPickerDialogConfig(TimetableDatabaseInterface.Type.valueOf(preference.getSavedType())),
-					object : ElementPickerDialog.ElementPickerDialogListener {
-						override fun onDialogDismissed(dialog: DialogInterface?) {
-							// ignore
-						}
-
-						override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
-							preference.setElement(
-								element,
-								element?.let {
-									timetableDatabaseInterface.getShortName(it.id, TimetableDatabaseInterface.Type.valueOf(it.type))
-								} ?: "")
-							(fragment as DialogFragment).dismiss()
-						}
-
-						override fun onPositiveButtonClicked(dialog: ElementPickerDialog) {
-							// positive button not used
-						}
-					}
-				).show(requireFragmentManager(), "elementPicker")
-				if (preference is SubjectPickerPreference) SubjectPickerDialog.newInstance(
-					timetableDatabaseInterface,
-					SubjectPickerDialog.Companion.SubjectPickerDialogConfig(preferenceManager.sharedPreferences),
-					object : SubjectPickerDialog.SubjectPickerDialogListener {
-						override fun onDialogDismissed(dialog: DialogInterface?) {
-							// ignore
-						}
-
-						override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
-							// ignore
-						}
-
-						override fun onPositiveButtonClicked(dialog: SubjectPickerDialog) {
-							if (dialog.getSelectedItems().isEmpty()) preference.setElement(emptyList(), "")
-							else {
-								var iterator = dialog.getSelectedItems().listIterator()
-								var names = StringBuilder()
-								names.append(timetableDatabaseInterface.getShortName(iterator.next().id, TimetableDatabaseInterface.Type.SUBJECT))
-								while (iterator.hasNext()) names.append(", ").append(timetableDatabaseInterface.getShortName(iterator.next().id, TimetableDatabaseInterface.Type.SUBJECT))
-								preference.setElement(dialog.getSelectedItems(), names.toString())
+				ElementPickerDialog.newInstance(
+						timetableDatabaseInterface,
+						ElementPickerDialog.Companion.ElementPickerDialogConfig(
+								if (preference.key.equals("preference_timetable_hide_subjects")) TimetableDatabaseInterface.Type.SUBJECT else TimetableDatabaseInterface.Type.valueOf(preference.getSavedType()),
+								multiSelect = preference.key.equals("preference_timetable_hide_subjects"),
+								hideTypeSelection = preference.key.equals("preference_timetable_hide_subjects"),
+								//TODO: String Positive Button
+								positiveButtonText = if (preference.key.equals("preference_timetable_hide_subjects")) "Done" else null,
+								items = if (preference.key.equals("preference_timetable_hide_subjects")) checkedSubjects(timetableDatabaseInterface, preference) else null
+						),
+						object : ElementPickerDialog.ElementPickerDialogListener {
+							override fun onDialogDismissed(dialog: DialogInterface?) {
 							}
-							dialog.dismiss()
+
+							override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
+								if (!preference.key.equals("preference_timetable_hide_subjects")) {
+									preference.setElement(
+											element,
+											element?.let {
+												timetableDatabaseInterface.getShortName(it.id, TimetableDatabaseInterface.Type.valueOf(it.type))
+											} ?: "")
+									(fragment as DialogFragment).dismiss()
+								}
+							}
+
+							override fun onPositiveButtonClicked(dialog: ElementPickerDialog) {
+								if (preference.key.equals("preference_timetable_hide_subjects")) {
+									if (dialog.getSelectedItems().isEmpty()) preference.setElement(emptyList(), TimetableDatabaseInterface.Type.SUBJECT, "")
+									else {
+										var iterator = dialog.getSelectedItems().listIterator()
+										var names = StringBuilder()
+										names.append(timetableDatabaseInterface.getShortName(iterator.next().id, TimetableDatabaseInterface.Type.SUBJECT))
+										while (iterator.hasNext()) names.append(", ").append(timetableDatabaseInterface.getShortName(iterator.next().id, TimetableDatabaseInterface.Type.SUBJECT))
+										preference.setElement(dialog.getSelectedItems(), TimetableDatabaseInterface.Type.SUBJECT, names.toString())
+									}
+									dialog.dismiss()
+								}
+							}
 						}
-					}
-				).show(requireFragmentManager(), "subjectPicker")
+				).show(requireFragmentManager(), "elementPicker")
 			}
 			return true
+		}
+
+		fun checkedSubjects(timetableDatabaseInterface: TimetableDatabaseInterface, preference: Preference) : List<PeriodElement> {
+			val checked = timetableDatabaseInterface.getElements(TimetableDatabaseInterface.Type.SUBJECT).toMutableList()
+			val selected: String = preference.sharedPreferences.getString("preference_timetable_hide_subjects${ElementPickerPreference.KEY_SUFFIX_ID}", "") ?: "";
+			checked.removeIf {
+				!selected.split(",").contains(it.id.toString())
+			}
+			return checked
 		}
 
 		override fun onDisplayPreferenceDialog(preference: Preference) {

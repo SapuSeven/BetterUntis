@@ -57,6 +57,7 @@ class ElementPickerDialog : DialogFragment() {
 			throw ClassCastException("$context must implement ElementPickerDialogListener if no listener is passed to initialize()")
 
 		adapter = if (config?.multiSelect == true) GridViewDatabaseItemCheckBoxAdapter(context) else GridViewDatabaseItemAdapter(context)
+		if (config?.multiSelect == true && config?.items != null) (adapter as GridViewDatabaseItemCheckBoxAdapter).selectItems(config?.items!!)
 		adapter.timetableDatabaseInterface = timetableDatabaseInterface
 		adapter.notifyDataSetChanged()
 	}
@@ -237,7 +238,8 @@ class ElementPickerDialog : DialogFragment() {
 				val startPage: TimetableDatabaseInterface.Type,
 				val multiSelect: Boolean = false,
 				val hideTypeSelection: Boolean = false,
-				val positiveButtonText: String? = null
+				val positiveButtonText: String? = null,
+				val items: List<PeriodElement>? = null
 		)
 	}
 }
