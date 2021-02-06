@@ -19,6 +19,10 @@
 					android:id="@+id/nav_show_rooms"
 					android:icon="@drawable/all_rooms"
 					android:title="@string/all_rooms"/>
+				<item
+					android:id="@+id/nav_show_subjects"
+					android:icon="@drawable/all_subject"
+					android:title="@string/all_subjects"/>
 			</group>
 		</menu>
 	</item>

@@ -44,14 +44,13 @@
 				style="@style/ElementPickerDialogSelectionItemStyle"/>
 
 		<TextView
-				android:id="@+id/textview_subjectpicker_subjects"
+				android:id="@+id/textview_elementpicker_subjects"
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:layout_weight="1"
 				android:drawableTop="@drawable/all_subject"
 				android:text="Subjects"
 				style="@style/ElementPickerDialogSelectionItemStyle"/>
-		<!-- TODO: -->
 
 		<TextView
 			android:id="@+id/textview_elementpicker_rooms"

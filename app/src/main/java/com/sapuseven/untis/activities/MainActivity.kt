@@ -747,6 +747,9 @@ class MainActivity :
 			R.id.nav_show_rooms -> {
 				showItemList(TimetableDatabaseInterface.Type.ROOM)
 			}
+			R.id.nav_show_subjects -> {
+				showItemList(TimetableDatabaseInterface.Type.SUBJECT)
+			}
 			R.id.nav_settings -> {
 				val i = Intent(this@MainActivity, SettingsActivity::class.java)
 				i.putExtra(SettingsActivity.EXTRA_LONG_PROFILE_ID, profileId)
@@ -945,6 +948,7 @@ class MainActivity :
 			TimetableDatabaseInterface.Type.CLASS.name -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_classes)
 			TimetableDatabaseInterface.Type.TEACHER.name -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_teachers)
 			TimetableDatabaseInterface.Type.ROOM.name -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_rooms)
+			TimetableDatabaseInterface.Type.SUBJECT.name -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_subjects)
 			else -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_personal)
 		}
 	}
