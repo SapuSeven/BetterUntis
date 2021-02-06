@@ -630,7 +630,7 @@ class MainActivity :
 		remove.clear()
 		PreferenceUtils.getPrefString(preferences, "preference_timetable_hide_subjects${ElementPickerPreference.KEY_SUFFIX_ID}", "")?.split(",")?.let { remove.addAll(it) }
 		val itemsMutable = items.toMutableList()
-		itemsMutable.removeIf { remove.contains(it.periodData.subjects.first().id.toString()) }
+		if (displayedElement?.type?.equals(TimetableDatabaseInterface.Type.SUBJECT.name) == false) itemsMutable.removeIf { remove.contains(it.periodData.subjects.first().id.toString()) }
 		val newItems = mergeItems(itemsMutable.mapNotNull { item ->
 			if (PreferenceUtils.getPrefBool(preferences, "preference_timetable_hide_cancelled") && item.periodData.isCancelled()) return@mapNotNull null
 
