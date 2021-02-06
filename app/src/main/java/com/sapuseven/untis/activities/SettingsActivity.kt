@@ -332,8 +332,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 								if (preference.key.equals("preference_timetable_hide_subjects")) TimetableDatabaseInterface.Type.SUBJECT else TimetableDatabaseInterface.Type.valueOf(preference.getSavedType()),
 								multiSelect = preference.key.equals("preference_timetable_hide_subjects"),
 								hideTypeSelection = preference.key.equals("preference_timetable_hide_subjects"),
-								//TODO: String Positive Button
-								positiveButtonText = if (preference.key.equals("preference_timetable_hide_subjects")) "Done" else null,
+								positiveButtonText = if (preference.key.equals("preference_timetable_hide_subjects")) preference.sharedPreferences.getString("hide_subjects_done_button", "Done") else null,
 								items = if (preference.key.equals("preference_timetable_hide_subjects")) checkedSubjects(timetableDatabaseInterface, preference) else null
 						),
 						object : ElementPickerDialog.ElementPickerDialogListener {

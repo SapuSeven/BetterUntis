@@ -127,6 +127,7 @@
 	<string name="roomfinder_item_desc_occupied">This Room is occupied.</string>
 	<string name="roomfinder_loading_data">Loading data…</string>
 	<string name="roomfinder_no_rooms">No rooms to display.\nTap + to add one!</string>
+	<string name="hide_subjects_done_button">Done</string>
 	<string name="infocenter_absences_empty">No absences</string>
 	<string name="infocenter_events_empty">No events</string>
 	<string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
