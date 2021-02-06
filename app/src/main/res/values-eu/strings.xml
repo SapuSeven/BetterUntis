@@ -293,4 +293,5 @@
     <string name="preference_connectivity_refresh_in_background_desc">Desgaitu datuak aurrezteko noizbehinkako ordutegien eguneratzeekin</string>
     <string name="errors_github_attach_file_message">Erantsi konprimitutako egunkari-fitxategiak arazo honi.
 \n%1$s(e)n gorde dira</string>
+    <string name="preference_timetable_background_irregular">Hartu kontuan elementuaren hondoa</string>
 </resources>
