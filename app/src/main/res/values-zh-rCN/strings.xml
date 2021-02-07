@@ -273,4 +273,20 @@
     </plurals>
     <string name="all_dialog_crash_copied">崩溃记录已复制到剪贴板。</string>
     <string name="all_dialog_crash_title">找到了崩溃记录</string>
+    <string name="preference_timetable_colors_reset_button_positive">重置</string>
+    <string name="preference_theme_pixel">像素</string>
+    <string name="infocenter_absence_unknown_reason">原因不明</string>
+    <string name="infocenter_messages_attachments">附件</string>
+    <string name="logindatainput_skip_school_id">跳过学校ID解析</string>
+    <string name="logindatainput_skip_app_secret">跳过应用程序秘密解析</string>
+    <string name="logindatainput_error_invalid_url">无效的 URL！</string>
+    <string name="logindatainput_api_url">不需要API路径</string>
+    <string name="main_dialog_itemdetails_timeformat">%1$s - %2$s</string>
+    <string name="activity_title_messenger">信使</string>
+    <string name="all_hint_tap_to_edit">（点击编辑）</string>
+    <string name="all_dialog_absences_not_checked">缺勤未查。</string>
+    <string name="all_dialog_absences_checked">缺勤检查。</string>
+    <string name="all_lessontopic_none">（无主题）</string>
+    <string name="all_lessontopic">课程主题</string>
+    <string name="all_lesson_details">课程详情</string>
 </resources>
