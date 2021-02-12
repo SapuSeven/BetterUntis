@@ -76,7 +76,7 @@
     <string name="logindatainput_error_generic">错误： %1$s</string>
     <string name="logindatainput_error_invalid_school">学校ID无效！</string>
     <string name="logindatainput_data_loaded">数据已加载。</string>
-    <string name="logindatainput_aquiring_app_secret">获取软件密钥…</string>
+    <string name="logindatainput_aquiring_app_secret">正在获取软件 secret…</string>
     <string name="logindatainput_aquiring_schoolid">正在加载学校…</string>
     <string name="logindatainput_loading_user_data">正在加载用户资料…</string>
     <string name="logindatainput_adding_user_unknown_error">添加用户时发生未知错误。</string>
@@ -280,7 +280,7 @@
     <string name="logindatainput_skip_school_id">跳过学校ID解析</string>
     <string name="logindatainput_skip_app_secret">跳过应用程序秘密解析</string>
     <string name="logindatainput_error_invalid_url">无效的 URL！</string>
-    <string name="logindatainput_api_url">不需要API路径</string>
+    <string name="logindatainput_api_url">Units API 路径</string>
     <string name="main_dialog_itemdetails_timeformat">%1$s - %2$s</string>
     <string name="activity_title_messenger">信使</string>
     <string name="all_hint_tap_to_edit">（点击编辑）</string>
