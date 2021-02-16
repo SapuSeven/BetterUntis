@@ -76,7 +76,6 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 				4 -> {
 					db.execSQL("ALTER TABLE ${UserDatabaseContract.Users.TABLE_NAME} RENAME TO ${UserDatabaseContract.Users.TABLE_NAME}_v4")
 					db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V5)
-					db.execSQL("ALTER TABLE ${UserDatabaseContract.Users.TABLE_NAME}_v4 ADD COLUMN ${UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME}")
 					db.execSQL("INSERT INTO ${UserDatabaseContract.Users.TABLE_NAME} SELECT _id, '', apiUrl, schoolId, user, auth, anonymous, timeGrid, masterDataTimestamp, userData, settings, time_created FROM ${UserDatabaseContract.Users.TABLE_NAME}_v4;")
 					db.execSQL("DROP TABLE ${UserDatabaseContract.Users.TABLE_NAME}_v4")
 				}
