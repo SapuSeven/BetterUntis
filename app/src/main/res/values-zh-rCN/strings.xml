@@ -289,4 +289,10 @@
     <string name="all_lessontopic_none">（无主题）</string>
     <string name="all_lessontopic">课程主题</string>
     <string name="all_lesson_details">课程详情</string>
+    <string name="widget_daily_messages">每日消息</string>
+    <string name="widget_timetable_link">课程表链接</string>
+    <string name="widget_select_profile">请选择小部件的配置文件</string>
+    <string name="widget_timetable_empty">今天没有课程表</string>
+    <string name="widget_timetable">课程表</string>
+    <string name="widget_configuration">小部件配置</string>
 </resources>
