@@ -145,6 +145,8 @@
 	<string name="preference_automute_cancelled_lessons">Also mute in cancelled lessons</string>
 	<string name="preference_automute_enable">Enable auto-mute</string>
 	<string name="preference_automute_enable_summary">Automatically turns on Do Not Disturb during lessons</string>
+	<string name="preference_automute_minimum_break_length_summary">Don\'t unmute the device during breaks shorter than the specified length (in minutes)</string>
+	<string name="preference_automute_minimum_break_length">Minimum break length</string>
 	<string name="preference_background_cancelled">Cancelled lessons</string>
 	<string name="preference_background_cancelled_past">Past cancelled lessons</string>
 	<string name="preference_background_exam">Lessons with tests</string>
