@@ -294,4 +294,5 @@
     <string name="errors_github_attach_file_message">Erantsi konprimitutako egunkari-fitxategiak arazo honi.
 \n%1$s(e)n gorde dira</string>
     <string name="preference_timetable_background_irregular">Hartu kontuan elementuaren hondoa</string>
+    <string name="preference_timetable_background_irregular_desc">Erabili hau irakasleenganako sarbiderik ez baduzu</string>
 </resources>
