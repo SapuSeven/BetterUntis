@@ -624,10 +624,10 @@ class MainActivity :
 	}
 
 	private fun prepareItems(items: List<TimegridItem>): List<TimegridItem> {
-		var blacklist = PreferenceUtils.getPrefString(preferences, "preference_timetable_hide_subjects${ElementPickerPreference.KEY_SUFFIX_ID}", "")?.split(",")
+		val blacklist = PreferenceUtils.getPrefString(preferences, "preference_timetable_hide_subjects${ElementPickerPreference.KEY_SUFFIX_ID}", "")?.split(",")
 		val newItems = mergeItems(items.mapNotNull { item ->
 			if (PreferenceUtils.getPrefBool(preferences, "preference_timetable_hide_cancelled") && item.periodData.isCancelled()) return@mapNotNull null
-			if (displayedElement?.type?.equals(TimetableDatabaseInterface.Type.SUBJECT.name) == false && blacklist?.contains(item.periodData.subjects.first().id.toString()) == true) return@mapNotNull null
+			if (displayedElement?.type?.equals(TimetableDatabaseInterface.Type.SUBJECT.name) == false && item.periodData.subjects.isNotEmpty() && blacklist?.contains(item.periodData.subjects.first().id.toString()) == true) return@mapNotNull null
 
 			if (PreferenceUtils.getPrefBool(preferences, "preference_timetable_substitutions_irregular")) {
 				item.periodData.apply {
