@@ -7,6 +7,7 @@ object UserDatabaseContract {
 	object Users : BaseColumns {
 		const val TABLE_NAME = "users"
 		const val COLUMN_NAME_APIURL = "apiUrl"
+		const val COLUMN_NAME_PROFILENAME = "profileName"
 		const val COLUMN_NAME_SCHOOL_ID = "schoolId"
 		const val COLUMN_NAME_USER = "user"
 		const val COLUMN_NAME_KEY = "auth"
@@ -48,6 +49,21 @@ object UserDatabaseContract {
 		const val SQL_CREATE_ENTRIES_V4 =
 				"CREATE TABLE $TABLE_NAME (" +
 						"${BaseColumns._ID} INTEGER PRIMARY KEY," +
+						"$COLUMN_NAME_APIURL VARCHAR(128)," +
+						"$COLUMN_NAME_SCHOOL_ID VARCHAR(64)," +
+						"$COLUMN_NAME_USER VARCHAR(64)," +
+						"$COLUMN_NAME_KEY VARCHAR(16)," +
+						"$COLUMN_NAME_ANONYMOUS INT(1) NOT NULL," +
+						"$COLUMN_NAME_TIMEGRID TEXT NOT NULL," +
+						"$COLUMN_NAME_MASTERDATATIMESTAMP LONG NOT NULL," +
+						"$COLUMN_NAME_USERDATA TEXT NOT NULL," +
+						"$COLUMN_NAME_SETTINGS TEXT," +
+						"$COLUMN_NAME_CREATED DATETIME DEFAULT CURRENT_TIMESTAMP)"
+
+		const val SQL_CREATE_ENTRIES_V5 =
+				"CREATE TABLE $TABLE_NAME (" +
+						"${BaseColumns._ID} INTEGER PRIMARY KEY," +
+						"$COLUMN_NAME_PROFILENAME VARCHAR(64)," +
 						"$COLUMN_NAME_APIURL VARCHAR(128)," +
 						"$COLUMN_NAME_SCHOOL_ID VARCHAR(64)," +
 						"$COLUMN_NAME_USER VARCHAR(64)," +

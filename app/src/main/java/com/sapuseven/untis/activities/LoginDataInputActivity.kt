@@ -196,6 +196,7 @@ class LoginDataInputActivity : BaseActivity() {
 	}
 
 	private fun restoreInput(user: UserDatabase.User) {
+		edittext_logindatainput_profilename?.setText(user.profileName)
 		if (user.schoolId.isNotBlank()) edittext_logindatainput_school?.setText(user.schoolId)
 
 		user.id?.let { profileId ->
@@ -336,7 +337,7 @@ class LoginDataInputActivity : BaseActivity() {
 
 	private fun sendRequest() = GlobalScope.launch(Dispatchers.Main) {
 		updateLoadingStatus(getString(R.string.logindatainput_connecting))
-
+		val profileName = edittext_logindatainput_profilename?.text.toString()
 		val schoolId: String = acquireSchoolId() ?: return@launch
 		val username = edittext_logindatainput_user?.text.toString()
 		val password = edittext_logindatainput_key?.text.toString()
@@ -347,6 +348,7 @@ class LoginDataInputActivity : BaseActivity() {
 		acquireUserData(schoolId, username, appSharedSecret)?.let { response ->
 			val user = UserDatabase.User(
 					existingUserId,
+					profileName,
 					getApiUrl()
 							?: if (schoolInfo?.useMobileServiceUrlAndroid == true) schoolInfo?.mobileServiceUrl else null,
 					schoolId,
@@ -387,7 +389,7 @@ class LoginDataInputActivity : BaseActivity() {
 	private fun deleteProfile(user: UserDatabase.User) {
 		MaterialAlertDialogBuilder(this)
 				.setTitle(getString(R.string.main_dialog_delete_profile_title))
-				.setMessage(getString(R.string.main_dialog_delete_profile_message, user.userData.displayName, user.userData.schoolName))
+				.setMessage(getString(R.string.main_dialog_delete_profile_message, user.getDisplayedName(applicationContext), user.userData.schoolName))
 				.setNegativeButton(getString(R.string.all_cancel), null)
 				.setPositiveButton(getString(R.string.all_delete)) { _, _ ->
 					userDatabase.deleteUser(user.id!!)
@@ -432,6 +434,7 @@ class LoginDataInputActivity : BaseActivity() {
 	}
 
 	private fun setElementsEnabled(enabled: Boolean) {
+		textinputlayout_logindatainput_profilename?.isEnabled = enabled
 		textinputlayout_logindatainput_school?.isEnabled = enabled && schoolInfo == null
 		textinputlayout_logindatainput_user?.isEnabled = enabled && switch_logindatainput_anonymouslogin?.isChecked == false
 		textinputlayout_logindatainput_key?.isEnabled = enabled && switch_logindatainput_anonymouslogin?.isChecked == false

@@ -32,7 +32,7 @@ class ProfileListAdapter(
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 		val item = dataset[position]
-		holder.tvName.text = if (item.anonymous) context.getString(R.string.all_anonymous) else item.userData.displayName
+		holder.tvName.text = item.getDisplayedName(context)
 		holder.tvSchool.text = item.userData.schoolName
 	}
 
