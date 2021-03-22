@@ -41,6 +41,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.list
+import java.lang.StringBuilder
 import kotlin.math.min
 
 class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback {
@@ -325,32 +326,56 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 			if (preference is ElementPickerPreference) {
 				val userDatabase = UserDatabase.createInstance(requireContext())
 				val timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileId)
-
 				ElementPickerDialog.newInstance(
 						timetableDatabaseInterface,
-						ElementPickerDialog.Companion.ElementPickerDialogConfig(TimetableDatabaseInterface.Type.valueOf(preference.getSavedType())),
+						ElementPickerDialog.Companion.ElementPickerDialogConfig(
+								if (preference.key.equals("preference_timetable_hide_subjects")) TimetableDatabaseInterface.Type.SUBJECT else TimetableDatabaseInterface.Type.valueOf(preference.getSavedType()),
+								multiSelect = preference.key.equals("preference_timetable_hide_subjects"),
+								hideTypeSelection = preference.key.equals("preference_timetable_hide_subjects"),
+								positiveButtonText = if (preference.key.equals("preference_timetable_hide_subjects")) preference.sharedPreferences.getString("hide_subjects_done_button", "Done") else null,
+								items = if (preference.key.equals("preference_timetable_hide_subjects")) checkedSubjects(timetableDatabaseInterface, preference) else null
+						),
 						object : ElementPickerDialog.ElementPickerDialogListener {
 							override fun onDialogDismissed(dialog: DialogInterface?) {
-								// ignore
 							}
 
 							override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
-								preference.setElement(
-										element,
-										element?.let {
-											timetableDatabaseInterface.getShortName(it.id, TimetableDatabaseInterface.Type.valueOf(it.type))
-										} ?: "")
-								(fragment as DialogFragment).dismiss()
+								if (!preference.key.equals("preference_timetable_hide_subjects")) {
+									preference.setElement(
+											element,
+											element?.let {
+												timetableDatabaseInterface.getShortName(it.id, TimetableDatabaseInterface.Type.valueOf(it.type))
+											} ?: "")
+									(fragment as DialogFragment).dismiss()
+								}
 							}
 
 							override fun onPositiveButtonClicked(dialog: ElementPickerDialog) {
-								// positive button not used
+								if (preference.key.equals("preference_timetable_hide_subjects")) {
+									if (dialog.getSelectedItems().isEmpty()) preference.setElement(emptyList(), TimetableDatabaseInterface.Type.SUBJECT, "")
+									else {
+										var iterator = dialog.getSelectedItems().listIterator()
+										var names = StringBuilder()
+										names.append(timetableDatabaseInterface.getShortName(iterator.next().id, TimetableDatabaseInterface.Type.SUBJECT))
+										while (iterator.hasNext()) names.append(", ").append(timetableDatabaseInterface.getShortName(iterator.next().id, TimetableDatabaseInterface.Type.SUBJECT))
+										preference.setElement(dialog.getSelectedItems(), TimetableDatabaseInterface.Type.SUBJECT, names.toString())
+									}
+									dialog.dismiss()
+								}
 							}
 						}
 				).show(requireFragmentManager(), "elementPicker")
 			}
-
 			return true
+		}
+
+		fun checkedSubjects(timetableDatabaseInterface: TimetableDatabaseInterface, preference: Preference) : List<PeriodElement> {
+			val checked = timetableDatabaseInterface.getElements(TimetableDatabaseInterface.Type.SUBJECT).toMutableList()
+			val selected: String = preference.sharedPreferences.getString("preference_timetable_hide_subjects${ElementPickerPreference.KEY_SUFFIX_ID}", "") ?: "";
+			checked.removeIf {
+				!selected.split(",").contains(it.id.toString())
+			}
+			return checked
 		}
 
 		override fun onDisplayPreferenceDialog(preference: Preference) {

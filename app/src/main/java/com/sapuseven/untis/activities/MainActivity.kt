@@ -624,8 +624,10 @@ class MainActivity :
 	}
 
 	private fun prepareItems(items: List<TimegridItem>): List<TimegridItem> {
+		val blacklist = PreferenceUtils.getPrefString(preferences, "preference_timetable_hide_subjects${ElementPickerPreference.KEY_SUFFIX_ID}", "")?.split(",")
 		val newItems = mergeItems(items.mapNotNull { item ->
 			if (PreferenceUtils.getPrefBool(preferences, "preference_timetable_hide_cancelled") && item.periodData.isCancelled()) return@mapNotNull null
+			if (displayedElement?.type?.equals(TimetableDatabaseInterface.Type.SUBJECT.name) == false && item.periodData.subjects.isNotEmpty() && blacklist?.contains(item.periodData.subjects.first().id.toString()) == true) return@mapNotNull null
 
 			if (PreferenceUtils.getPrefBool(preferences, "preference_timetable_substitutions_irregular")) {
 				item.periodData.apply {
@@ -739,6 +741,9 @@ class MainActivity :
 			}
 			R.id.nav_show_rooms -> {
 				showItemList(TimetableDatabaseInterface.Type.ROOM)
+			}
+			R.id.nav_show_subjects -> {
+				showItemList(TimetableDatabaseInterface.Type.SUBJECT)
 			}
 			R.id.nav_settings -> {
 				val i = Intent(this@MainActivity, SettingsActivity::class.java)
@@ -937,6 +942,7 @@ class MainActivity :
 			TimetableDatabaseInterface.Type.CLASS.name -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_classes)
 			TimetableDatabaseInterface.Type.TEACHER.name -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_teachers)
 			TimetableDatabaseInterface.Type.ROOM.name -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_rooms)
+			TimetableDatabaseInterface.Type.SUBJECT.name -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_subjects)
 			else -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_personal)
 		}
 	}

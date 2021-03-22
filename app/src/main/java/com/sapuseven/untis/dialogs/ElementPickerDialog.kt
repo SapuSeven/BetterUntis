@@ -28,6 +28,7 @@ import com.sapuseven.untis.adapters.GridViewDatabaseItemAdapter
 import com.sapuseven.untis.adapters.GridViewDatabaseItemCheckBoxAdapter
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import javax.security.auth.Subject
 
 class ElementPickerDialog : DialogFragment() {
 	private var timetableDatabaseInterface: TimetableDatabaseInterface? = null
@@ -57,6 +58,7 @@ class ElementPickerDialog : DialogFragment() {
 			throw ClassCastException("$context must implement ElementPickerDialogListener if no listener is passed to initialize()")
 
 		adapter = if (config?.multiSelect == true) GridViewDatabaseItemCheckBoxAdapter(context) else GridViewDatabaseItemAdapter(context)
+		if (config?.multiSelect == true && config?.items != null) (adapter as GridViewDatabaseItemCheckBoxAdapter).selectItems(config?.items!!)
 		adapter.timetableDatabaseInterface = timetableDatabaseInterface
 		adapter.notifyDataSetChanged()
 	}
@@ -96,7 +98,8 @@ class ElementPickerDialog : DialogFragment() {
 				tvTeachers = root.findViewById(R.id.textview_elementpicker_teachers),
 				tvPersonal = root.findViewById(R.id.textview_elementpicker_personal),
 				tvClasses = root.findViewById(R.id.textview_elementpicker_classes),
-				tvRooms = root.findViewById(R.id.textview_elementpicker_rooms))
+				tvRooms = root.findViewById(R.id.textview_elementpicker_rooms),
+				tvSubjects = root.findViewById(R.id.textview_elementpicker_subjects))
 
 		defaultTextColor = holder.tvPersonal.textColors
 
@@ -121,6 +124,13 @@ class ElementPickerDialog : DialogFragment() {
 		holder.tvRooms.setOnClickListener {
 			if (type != TimetableDatabaseInterface.Type.ROOM) {
 				type = TimetableDatabaseInterface.Type.ROOM
+				select(getTextViewFromElemType(type))
+			}
+		}
+
+		holder.tvSubjects.setOnClickListener {
+			if (type != TimetableDatabaseInterface.Type.SUBJECT) {
+				type = TimetableDatabaseInterface.Type.SUBJECT
 				select(getTextViewFromElemType(type))
 			}
 		}
@@ -159,6 +169,7 @@ class ElementPickerDialog : DialogFragment() {
 		deselect(holder.tvClasses)
 		deselect(holder.tvTeachers)
 		deselect(holder.tvRooms)
+		deselect(holder.tvSubjects)
 
 		context?.let {
 			tv.setTextColor(getAttrColor(R.attr.colorPrimary))
@@ -201,6 +212,7 @@ class ElementPickerDialog : DialogFragment() {
 			TimetableDatabaseInterface.Type.CLASS -> holder.tvClasses
 			TimetableDatabaseInterface.Type.TEACHER -> holder.tvTeachers
 			TimetableDatabaseInterface.Type.ROOM -> holder.tvRooms
+			TimetableDatabaseInterface.Type.SUBJECT -> holder.tvSubjects
 			else -> holder.tvPersonal
 		}
 	}
@@ -217,7 +229,8 @@ class ElementPickerDialog : DialogFragment() {
 			val tvTeachers: TextView,
 			val tvPersonal: TextView,
 			val tvClasses: TextView,
-			val tvRooms: TextView
+			val tvRooms: TextView,
+			val tvSubjects: TextView
 	)
 
 	companion object {
@@ -237,7 +250,8 @@ class ElementPickerDialog : DialogFragment() {
 				val startPage: TimetableDatabaseInterface.Type,
 				val multiSelect: Boolean = false,
 				val hideTypeSelection: Boolean = false,
-				val positiveButtonText: String? = null
+				val positiveButtonText: String? = null,
+				val items: List<PeriodElement>? = null
 		)
 	}
 }

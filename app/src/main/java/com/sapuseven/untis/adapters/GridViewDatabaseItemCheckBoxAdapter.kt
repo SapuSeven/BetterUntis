@@ -29,6 +29,10 @@ class GridViewDatabaseItemCheckBoxAdapter(context: Context) :
 		return view
 	}
 
+	fun selectItems(item: List<PeriodElement>) {
+		selectedItems.addAll(item);
+	}
+
 	fun getSelectedItems(): List<PeriodElement> {
 		return selectedItems.toList()
 	}

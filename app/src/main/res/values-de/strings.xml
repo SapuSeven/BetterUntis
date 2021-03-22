@@ -101,6 +101,7 @@
     <string name="roomfinder_image_availability_indicator">Freier-Raum-Anzeige</string>
     <string name="roomfinder_item_desc_occupied">Dieser Raum ist besetzt.</string>
     <string name="roomfinder_no_rooms">Keine Räume vorhanden.\nTippe auf +, um Räume hinzuzufügen!</string>
+    <string name="hide_subjects_done_button">Fertig</string>
     <string name="roomfinder_dialog_itemdelete_title">%1$s löschen</string>
     <string name="roomfinder_dialog_itemdelete_text">Soll der Raum wirklich von der Liste entfernt werden?</string>
     <string name="roomfinder_image_previous_hour">vorherige Stunde</string>
@@ -209,6 +210,7 @@
     <string name="preference_timetable_item_corner_radius">Abgerundete Ecken</string>
     <string name="preference_timetable_item_padding">Abstand zwischen Stunden</string>
     <string name="preference_timetable_item_padding_overlap">Abstand zwischen gleichzeitigen Stunden</string>
+    <string name="preference_timetable_item_hide_subjects">Zu verbergende Fächer</string>
     <string name="preference_timetable_item_text_light">Weißer Stundentext</string>
     <string name="preference_timetable_lesson_info_font_size">Schriftgröße für Stundeninfo</string>
     <string name="preference_timetable_lesson_name_font_size">Schriftgröße für Stundenname</string>
