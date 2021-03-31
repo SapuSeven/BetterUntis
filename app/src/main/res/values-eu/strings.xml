@@ -295,4 +295,5 @@
 \n%1$s(e)n gorde dira</string>
     <string name="preference_timetable_background_irregular">Hartu kontuan elementuaren hondoa</string>
     <string name="preference_timetable_background_irregular_desc">Erabili hau irakasleenganako sarbiderik ez baduzu</string>
+    <string name="preference_flinging_enable">Gaitu lerratze arina</string>
 </resources>
