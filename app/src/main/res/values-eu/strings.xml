@@ -244,7 +244,7 @@
     <string name="preference_category_styling_backgrounds">Elementuen koloreak</string>
     <string name="preference_category_notifications_visible_fields">Eremu ikusgarriak</string>
     <string name="preference_category_general_behaviour">Portaera</string>
-    <string name="preference_category_connectivity_proxy">WebUntis Proxy</string>
+    <string name="preference_category_connectivity_proxy">WebUntis Proxy-a</string>
     <string name="preference_background_regular_past">Iraganeko ohiko eskolak</string>
     <string name="preference_background_regular">Ohiko eskolak</string>
     <string name="preference_background_irregular_past">Iraganeko ezohiko eskolak</string>
