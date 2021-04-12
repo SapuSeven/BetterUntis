@@ -27,5 +27,5 @@
 		android:layout_gravity="bottom|right"
 		android:layout_margin="16dp"
 		app:srcCompat="@drawable/all_check"
-		app:tint="@color/white" />
+		app:tint="@android:color/white" />
 </FrameLayout>
