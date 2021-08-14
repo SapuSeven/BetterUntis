@@ -33,11 +33,17 @@ class AutoMuteReceiver : BroadcastReceiver() {
 			if (intent.getBooleanExtra(EXTRA_BOOLEAN_MUTE, false)) {
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 					val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+					val interruptionFilter =
+						if(PreferenceUtils.getPrefBool(preferenceManager, "preference_automute_mute_priority"))
+							NotificationManager.INTERRUPTION_FILTER_NONE
+						else
+							NotificationManager.INTERRUPTION_FILTER_PRIORITY
+
 					if (!prefs.contains(PREFERENCE_KEY_INTERRUPTION_FILTER)) {
 						editor.putInt(PREFERENCE_KEY_INTERRUPTION_FILTER, notificationManager.currentInterruptionFilter)
 						Log.d("AutoMuteReceiver", "Saved interruption filter: ${notificationManager.currentInterruptionFilter}")
 					}
-					notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE)
+					notificationManager.setInterruptionFilter(interruptionFilter)
 				} else {
 					val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 					editor.putInt(PREFERENCE_KEY_RINGER_MODE, audioManager.ringerMode)
