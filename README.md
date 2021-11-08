@@ -31,10 +31,10 @@ Another major change is the use of a custom WeekView (based on [Till Hellmund](h
 
 ### Update as of 2021:
 
-Due to me leaving school and starting to work, I don't have any access to Untis any more which greatly reduces my ability to test the app.
-Unfortunately, this and my lack of free time means that I currently don't actively work on this project.
+_Due to me leaving school and starting to work, I don't have access to Untis any more which greatly reduces my ability to test the app.
+Unfortunately, this and my lack of free time means that I currently don't actively work on this project._
 
-I'm very thankful to everyone who used and supported BetterUntis and hope it will still remain useful in the future.
+_I'm very thankful to everyone who used and supported BetterUntis and hope it will still remain useful in the future._
 
 ## New features
 - Select your school by name or ID, no URL needed
