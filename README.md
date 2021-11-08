@@ -17,15 +17,22 @@ You can download the latest automated debug build [from my website](https://sapu
 | <img src="https://raw.githubusercontent.com/SapuSeven/BetterUntis/master/fastlane/metadata/android/en-US/images/phoneScreenshots/1.jpg" alt="Screenshot" /> | <img src="https://raw.githubusercontent.com/SapuSeven/BetterUntis/master/fastlane/metadata/android/en-US/images/phoneScreenshots/2.jpg" alt="Screenshot" /> | <img src="https://raw.githubusercontent.com/SapuSeven/BetterUntis/master/fastlane/metadata/android/en-US/images/phoneScreenshots/3.jpg" alt="Screenshot" /> | <img src="https://raw.githubusercontent.com/SapuSeven/BetterUntis/master/fastlane/metadata/android/en-US/images/phoneScreenshots/4.jpg" alt="Screenshot" /> |
 | --- | --- | --- | --- |
 
-## Development history
-It was more and more obvious that my [original version](https://github.com/SapuSeven/BetterUntis-Legacy) of BetterUntis had many design and performance flaws.
+## Development notes
+My [original version](https://github.com/SapuSeven/BetterUntis-Legacy) of BetterUntis had many design and performance flaws.
 As a result, development became increasingly more difficult.
-So I came to the conclusion to scrap the project and start over from scratch.
+I came to the conclusion that it was best to scrap the project and start over from scratch.
 
 Although I reused some parts of the original code, my plan was to entirely switch to Kotlin.
 Kotlin has many features and libraries that immensely help to communicate with the Untis API and process the timetable data.
 
 Another major change is the use of a custom WeekView (based on [Till Hellmund](https://github.com/thellmund)'s fork of [Android-Week-View](https://github.com/alamkanak/Android-Week-View)) for the timetable display. This also improved performance by a lot.
+
+### Update as of 2021:
+
+Due to me leaving school and starting to work, I don't have any access to Untis any more which greatly reduces my ability to test the app.
+Unfortunately, this and my lack of free time means that I currently don't actively work on this project.
+
+I'm very thankful to everyone who used and supported BetterUntis and hope it will still remain useful in the future.
 
 ## New features
 - Select your school by name or ID, no URL needed
