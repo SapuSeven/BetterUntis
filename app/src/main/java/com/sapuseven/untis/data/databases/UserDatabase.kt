@@ -8,6 +8,7 @@ import android.database.Cursor.FIELD_TYPE_STRING
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
+import android.service.autofill.UserData
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.UserDatabaseQueryHelper.generateCreateTable
@@ -18,8 +19,10 @@ import com.sapuseven.untis.models.untis.UntisMasterData
 import com.sapuseven.untis.models.untis.UntisSettings
 import com.sapuseven.untis.models.untis.UntisUserData
 import com.sapuseven.untis.models.untis.masterdata.*
+import kotlinx.serialization.builtins.list
+import kotlinx.serialization.json.JsonArray
 
-private const val DATABASE_VERSION = 5
+private const val DATABASE_VERSION = 6
 private const val DATABASE_NAME = "userdata.db"
 
 class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -34,7 +37,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 	}
 
 	override fun onCreate(db: SQLiteDatabase) {
-		db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V5)
+		db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V6)
 		db.execSQL(generateCreateTable<AbsenceReason>())
 		db.execSQL(generateCreateTable<Department>())
 		db.execSQL(generateCreateTable<Duty>())
@@ -79,6 +82,12 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 					db.execSQL("INSERT INTO ${UserDatabaseContract.Users.TABLE_NAME} SELECT _id, '', apiUrl, schoolId, user, auth, anonymous, timeGrid, masterDataTimestamp, userData, settings, time_created FROM ${UserDatabaseContract.Users.TABLE_NAME}_v4;")
 					db.execSQL("DROP TABLE ${UserDatabaseContract.Users.TABLE_NAME}_v4")
 				}
+				5 -> {
+					db.execSQL("ALTER TABLE ${UserDatabaseContract.Users.TABLE_NAME} RENAME TO ${UserDatabaseContract.Users.TABLE_NAME}_v5")
+					db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V6)
+					db.execSQL("INSERT INTO ${UserDatabaseContract.Users.TABLE_NAME} SELECT *, NULL FROM ${UserDatabaseContract.Users.TABLE_NAME}_v5;")
+					db.execSQL("DROP TABLE ${UserDatabaseContract.Users.TABLE_NAME}_v5")
+				}
 			}
 
 			currentVersion++
@@ -87,7 +96,6 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 
 	fun resetDatabase(db: SQLiteDatabase) {
 		db.execSQL(UserDatabaseContract.Users.SQL_DELETE_ENTRIES)
-
 		db.execSQL(generateDropTable<AbsenceReason>())
 		db.execSQL(generateDropTable<Department>())
 		db.execSQL(generateDropTable<Duty>())
@@ -116,6 +124,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID, getJSON().stringify(TimeGrid.serializer(), user.timeGrid))
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP, user.masterDataTimestamp)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USERDATA, getJSON().stringify(UntisUserData.serializer(), user.userData))
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_BOOKMARK_TIMETABLES, getJSON().stringify(TimetableBookmark.serializer().list, user.bookmarks))
 		user.settings?.let { values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().stringify(UntisSettings.serializer(), it))}
 
 		val id = db.insert(UserDatabaseContract.Users.TABLE_NAME, null, values)
@@ -141,7 +150,9 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID, getJSON().stringify(TimeGrid.serializer(), user.timeGrid))
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP, user.masterDataTimestamp)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USERDATA, getJSON().stringify(UntisUserData.serializer(), user.userData))
-		user.settings?.let { values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().stringify(UntisSettings.serializer(), it)) }
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_BOOKMARK_TIMETABLES, getJSON().stringify(TimetableBookmark.serializer().list, user.bookmarks))
+
+				user.settings?.let { values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().stringify(UntisSettings.serializer(), it)) }
 
 		db.update(UserDatabaseContract.Users.TABLE_NAME, values, BaseColumns._ID + "=?", arrayOf(user.id.toString()))
 		db.close()
@@ -172,7 +183,8 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 						UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP,
 						UserDatabaseContract.Users.COLUMN_NAME_USERDATA,
 						UserDatabaseContract.Users.COLUMN_NAME_SETTINGS,
-						UserDatabaseContract.Users.COLUMN_NAME_CREATED
+						UserDatabaseContract.Users.COLUMN_NAME_CREATED,
+						UserDatabaseContract.Users.COLUMN_NAME_BOOKMARK_TIMETABLES
 				),
 				BaseColumns._ID + "=?",
 				arrayOf(id.toString()), null, null, UserDatabaseContract.Users.COLUMN_NAME_CREATED + " DESC")
@@ -192,7 +204,8 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 				cursor.getLong(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP)),
 				getJSON().parse(UntisUserData.serializer(), cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USERDATA))),
 				cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS))?.let { getJSON().parse(UntisSettings.serializer(), it) },
-				cursor.getLongOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_CREATED))
+				cursor.getLongOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_CREATED)),
+				getJSON().parse(TimetableBookmark.serializer().list, cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_BOOKMARK_TIMETABLES))).toCollection(ArrayList())
 		)
 		cursor.close()
 		db.close()
@@ -218,7 +231,8 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 						UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP,
 						UserDatabaseContract.Users.COLUMN_NAME_USERDATA,
 						UserDatabaseContract.Users.COLUMN_NAME_SETTINGS,
-						UserDatabaseContract.Users.COLUMN_NAME_CREATED
+						UserDatabaseContract.Users.COLUMN_NAME_CREATED,
+						UserDatabaseContract.Users.COLUMN_NAME_BOOKMARK_TIMETABLES
 				), null, null, null, null, UserDatabaseContract.Users.COLUMN_NAME_CREATED + " DESC")
 
 		if (cursor.moveToFirst()) {
@@ -235,7 +249,8 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 						cursor.getLong(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP)),
 						getJSON().parse(UntisUserData.serializer(), cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USERDATA))),
 						cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS))?.let { getJSON().parse(UntisSettings.serializer(), it) },
-						cursor.getLongOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_CREATED))
+						cursor.getLongOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_CREATED)),
+						getJSON().parse(TimetableBookmark.serializer().list, cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_BOOKMARK_TIMETABLES))).toCollection(ArrayList())
 				))
 			} while (cursor.moveToNext())
 		}
@@ -340,7 +355,8 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 			val masterDataTimestamp: Long,
 			val userData: UntisUserData,
 			val settings: UntisSettings? = null,
-			val created: Long? = null
+			val created: Long? = null,
+			val bookmarks: ArrayList<TimetableBookmark>
 	) {
 		fun getDisplayedName (context:Context):String{
 			return when{

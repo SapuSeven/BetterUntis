@@ -9,10 +9,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.sax.Element
+import android.util.Log
+import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -22,6 +21,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.GravityCompat
+import androidx.core.view.get
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -59,6 +59,7 @@ import com.sapuseven.untis.models.UntisMessage
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.Holiday
 import com.sapuseven.untis.models.untis.masterdata.SchoolYear
+import com.sapuseven.untis.models.untis.masterdata.TimetableBookmark
 import com.sapuseven.untis.models.untis.params.MessageParams
 import com.sapuseven.untis.models.untis.response.MessageResponse
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
@@ -78,6 +79,8 @@ import com.sapuseven.untis.views.weekview.listeners.TopLeftCornerClickListener
 import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
+import kotlinx.android.synthetic.main.activity_main_drawer_header.*
+import kotlinx.android.synthetic.main.item_profiles_add.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -97,8 +100,7 @@ class MainActivity :
 		EventClickListener<TimegridItem>,
 		TopLeftCornerClickListener,
 		TimetableDisplay,
-		TimetableItemDetailsFragment.TimetableItemDetailsDialogListener,
-		ElementPickerDialog.ElementPickerDialogListener {
+		TimetableItemDetailsFragment.TimetableItemDetailsDialogListener{
 
 	companion object {
 		private const val MINUTE_MILLIS: Int = 60 * 1000
@@ -119,6 +121,8 @@ class MainActivity :
 
 		private const val FRAGMENT_TAG_LESSON_INFO = "com.sapuseven.untis.fragments.lessoninfo"
 		private const val FRAGMENT_TAG_ABSENCE_CHECK = "com.sapuseven.untis.fragments.absencecheck"
+
+		private const val BOOKMARKS_ADD_ID = Menu.FIRST
 	}
 
 	private val userDatabase = UserDatabase.createInstance(this)
@@ -604,7 +608,6 @@ class MainActivity :
 		toggle.syncState()
 		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
 		window.statusBarColor = Color.TRANSPARENT
-
 		supportFragmentManager.addOnBackStackChangedListener {
 			if (supportFragmentManager.backStackEntryCount > 0) {
 				toggle.isDrawerIndicatorEnabled = false
@@ -621,6 +624,17 @@ class MainActivity :
 				// TODO: Set actionBar title to default
 			}
 		}
+	}
+
+	override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+		navigationview_main.menu.findItem(R.id.nav_personal_bookmarks_title).subMenu.let {
+			userDatabase.getUser(profileId)?.bookmarks?.forEach { bookmark ->
+				it.add(0, Menu.NONE, Menu.NONE, bookmark.displayName).setIcon(bookmark.drawableId)
+				// TODO: show class on click
+			}
+			it.add(0, BOOKMARKS_ADD_ID, Menu.NONE, getString(R.string.add_timetable)).setIcon(getDrawable(R.drawable.all_add))
+		}
+		return super.onPrepareOptionsMenu(menu)
 	}
 
 	private fun prepareItems(items: List<TimegridItem>): List<TimegridItem> {
@@ -647,7 +661,6 @@ class MainActivity :
 		val days = profileUser.timeGrid.days
 		val itemGrid: Array<Array<MutableList<TimegridItem>>> = Array(days.size) { Array(days.maxBy { it.units.size }!!.units.size) { mutableListOf<TimegridItem>() } }
 		val leftover: MutableList<TimegridItem> = mutableListOf()
-
 		// TODO: Check if the day from the untis API is always an english string
 		val firstDayOfWeek = DateTimeConstants.MONDAY //DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(days.first().day).dayOfWeek
 
@@ -731,6 +744,35 @@ class MainActivity :
 				showPersonalTimetable()
 				refreshNavigationViewSelection()
 			}
+			BOOKMARKS_ADD_ID -> {
+				ElementPickerDialog.newInstance(
+						timetableDatabaseInterface,
+						ElementPickerDialog.Companion.ElementPickerDialogConfig(TimetableDatabaseInterface.Type.CLASS),
+						object: ElementPickerDialog.ElementPickerDialogListener {
+							override fun onDialogDismissed(dialog: DialogInterface?) { /* ignore */ }
+
+							override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
+								if(fragment is DialogFragment)
+									fragment.dismiss()
+								else
+									removeFragment(fragment)
+								val user = userDatabase.getUser(profileId)
+								if(user != null) {
+									element?.let {
+										user.bookmarks.add(TimetableBookmark(it.id, it.type, R.drawable.all_rooms))
+										userDatabase.editUser(user)
+										// TODO: Reload Nav Menu
+										// TODO: Fetch the Class Name
+									}
+								}
+							}
+
+							override fun onPositiveButtonClicked(dialog: ElementPickerDialog) { /* not used */ }
+
+						}
+
+				).show(supportFragmentManager, "elementPicker")
+			}
 			R.id.nav_show_classes -> {
 				showItemList(TimetableDatabaseInterface.Type.CLASS)
 			}
@@ -775,7 +817,27 @@ class MainActivity :
 	private fun showItemList(type: TimetableDatabaseInterface.Type) {
 		ElementPickerDialog.newInstance(
 				timetableDatabaseInterface,
-				ElementPickerDialog.Companion.ElementPickerDialogConfig(type)
+				ElementPickerDialog.Companion.ElementPickerDialogConfig(type),
+				object: ElementPickerDialog.ElementPickerDialogListener {
+					override fun onDialogDismissed(dialog: DialogInterface?) { /* ignore */ }
+
+					override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
+						if (fragment is DialogFragment)
+							fragment.dismiss()
+						else
+							removeFragment(fragment)
+						element?.let {
+							setTarget(if (useOrgId) element.orgId else element.id, element.type, timetableDatabaseInterface.getLongName(
+									if (useOrgId) element.orgId else element.id, TimetableDatabaseInterface.Type.valueOf(element.type)))
+						} ?: run {
+							showPersonalTimetable()
+						}
+						refreshNavigationViewSelection()
+					}
+
+					override fun onPositiveButtonClicked(dialog: ElementPickerDialog) { /* not used */ }
+
+				}
 		).show(supportFragmentManager, "elementPicker") // TODO: Do not hard-code the tag
 	}
 
@@ -920,13 +982,6 @@ class MainActivity :
 				.show()
 	}
 
-	override fun onDialogDismissed(dialog: DialogInterface?) {
-		refreshNavigationViewSelection()
-	}
-
-	override fun onPositiveButtonClicked(dialog: ElementPickerDialog) {
-		dialog.dismiss() // unused, but just in case
-	}
 
 	private fun removeFragment(fragment: Fragment) {
 		supportFragmentManager.popBackStack(fragment.tag, FragmentManager.POP_BACK_STACK_INCLUSIVE)

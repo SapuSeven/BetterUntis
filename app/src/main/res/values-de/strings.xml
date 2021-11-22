@@ -294,4 +294,5 @@
     <string name="all_hint_tap_to_edit">(Durch Tippen hinzufügen)</string>
     <string name="all_dialog_crash_copied">Absturzprotokoll wurde in die Zwischenablage kopiert.</string>
     <string name="all_dialog_crash_title">Absturzprotokoll gefunden</string>
+    <string name="add_timetable">Stundenplan Hinzufügen</string>
 </resources>

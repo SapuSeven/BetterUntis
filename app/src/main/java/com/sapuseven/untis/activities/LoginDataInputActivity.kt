@@ -23,6 +23,7 @@ import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.models.UntisSchoolInfo
 import com.sapuseven.untis.models.untis.masterdata.TimeGrid
+import com.sapuseven.untis.models.untis.masterdata.TimetableBookmark
 import com.sapuseven.untis.models.untis.params.AppSharedSecretParams
 import com.sapuseven.untis.models.untis.params.SchoolSearchParams
 import com.sapuseven.untis.models.untis.params.UserDataParams
@@ -358,7 +359,9 @@ class LoginDataInputActivity : BaseActivity() {
 					response.masterData.timeGrid ?: TimeGrid.generateDefault(),
 					response.masterData.timeStamp,
 					response.userData,
-					response.settings
+					response.settings,
+					null,
+					arrayListOf()
 			)
 
 			val userId = if (existingUserId == null) userDatabase.addUser(user) else userDatabase.editUser(user)
