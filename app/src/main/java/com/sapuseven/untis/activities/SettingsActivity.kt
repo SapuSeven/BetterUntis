@@ -354,8 +354,8 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 								if (preference.key.equals("preference_timetable_hide_subjects")) {
 									if (dialog.getSelectedItems().isEmpty()) preference.setElement(emptyList(), TimetableDatabaseInterface.Type.SUBJECT, "")
 									else {
-										var iterator = dialog.getSelectedItems().listIterator()
-										var names = StringBuilder()
+										val iterator = dialog.getSelectedItems().listIterator()
+										val names = StringBuilder()
 										names.append(timetableDatabaseInterface.getShortName(iterator.next().id, TimetableDatabaseInterface.Type.SUBJECT))
 										while (iterator.hasNext()) names.append(", ").append(timetableDatabaseInterface.getShortName(iterator.next().id, TimetableDatabaseInterface.Type.SUBJECT))
 										preference.setElement(dialog.getSelectedItems(), TimetableDatabaseInterface.Type.SUBJECT, names.toString())
@@ -364,15 +364,15 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 								}
 							}
 						}
-				).show(requireFragmentManager(), "elementPicker")
+				).show(parentFragmentManager, "elementPicker")
 			}
 			return true
 		}
 
-		fun checkedSubjects(timetableDatabaseInterface: TimetableDatabaseInterface, preference: Preference) : List<PeriodElement> {
+		private fun checkedSubjects(timetableDatabaseInterface: TimetableDatabaseInterface, preference: Preference) : List<PeriodElement> {
 			val checked = timetableDatabaseInterface.getElements(TimetableDatabaseInterface.Type.SUBJECT).toMutableList()
-			val selected: String = preference.sharedPreferences.getString("preference_timetable_hide_subjects${ElementPickerPreference.KEY_SUFFIX_ID}", "") ?: "";
-			checked.removeIf {
+			val selected: String = preference.sharedPreferences.getString("preference_timetable_hide_subjects${ElementPickerPreference.KEY_SUFFIX_ID}", "") ?: ""
+			checked.removeAll {
 				!selected.split(",").contains(it.id.toString())
 			}
 			return checked
