@@ -34,11 +34,7 @@ class StartupReceiver : BroadcastReceiver() {
 					putExtra(EXTRA_LONG_PROFILE_ID, preferenceManager.currentProfileId())
 				}
 		).forEach {
-			val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-				PendingIntent.getBroadcast(context, 0, it, PendingIntent.FLAG_IMMUTABLE)
-			} else {
-				PendingIntent.getBroadcast(context, 0, it, 0)
-			}
+			val pendingIntent = PendingIntent.getBroadcast(context, 0, it, PendingIntent.FLAG_IMMUTABLE)
 			val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 			am.setInexactRepeating(AlarmManager.RTC_WAKEUP, dateTime.millis, AlarmManager.INTERVAL_DAY, pendingIntent)
 
