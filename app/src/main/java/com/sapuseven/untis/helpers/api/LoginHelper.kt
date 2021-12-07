@@ -45,10 +45,16 @@ class LoginHelper(val loginData: LoginDataInfo, val onStatusUpdate: (statusStrin
 			val untisResponse = SerializationUtils.getJSON().decodeFromString<SchoolSearchResponse>(data)
 
 			untisResponse.result?.let {
-				if (it.schools.size != 1)
-					onError(LoginErrorInfo(errorMessageStringRes = R.string.logindatainput_error_invalid_school))
-				else
-					return it.schools[0]
+				if (it.schools.isNotEmpty()) {
+					val schoolResult = it.schools.find { schoolInfoResult ->
+						schoolInfoResult.schoolId == schoolId || schoolInfoResult.loginName.equals(school, true)
+					}
+
+					// TODO: Show manual selection dialog when there are more than one results are returned
+					if (schoolResult != null)
+						return schoolResult
+				}
+				onError(LoginErrorInfo(errorMessageStringRes = R.string.logindatainput_error_invalid_school))
 			} ?: run {
 				onError(LoginErrorInfo(errorCode = untisResponse.error?.code, errorMessage = untisResponse.error?.message))
 			}
