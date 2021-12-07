@@ -21,6 +21,8 @@ data class Period(
 		val `is`: List<String>,
 		val homeWorks: List<UntisHomework>?,
 		val exam: UnknownObject? = null, // This element is currently not being used by BetterUntis. More data required
+		val isOnlinePeriod: Boolean? = null,
+		val onlinePeriodLink: String? = null,
 		val messengerChannel: PeriodMessengerChannel? = null
 ) {
 	companion object {
@@ -28,6 +30,10 @@ data class Period(
 		const val CODE_CANCELLED = "CANCELLED"
 		const val CODE_IRREGULAR = "IRREGULAR"
 		const val CODE_EXAM = "EXAM"
+	}
+
+	init {
+		UnknownObject.validate(mapOf("exam" to exam))
 	}
 
 	fun equalsIgnoreTime(second: Period): Boolean {
