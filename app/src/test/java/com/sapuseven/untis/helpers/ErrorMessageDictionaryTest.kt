@@ -5,15 +5,12 @@ import com.sapuseven.untis.R
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.runners.MockitoJUnitRunner
 
 private const val INVALID_CREDENTIALS_STRING = "invalid_credentials_string"
 private const val ERROR_MESSAGE_GENERIC_STRING = "error_message_generic_string"
 
-@RunWith(MockitoJUnitRunner::class)
 class ErrorMessageDictionaryTest {
 	@Mock
 	private lateinit var mockResources: Resources

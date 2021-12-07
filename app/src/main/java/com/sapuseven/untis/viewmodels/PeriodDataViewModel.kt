@@ -16,6 +16,7 @@ import com.sapuseven.untis.models.untis.params.*
 import com.sapuseven.untis.models.untis.response.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
 
 class PeriodDataViewModel(
 		private val user: UserDatabase.User,
@@ -54,7 +55,7 @@ class PeriodDataViewModel(
 
 		val result = UntisRequest().request(query)
 		return result.fold({ data ->
-			val untisResponse = SerializationUtils.getJSON().parse(PeriodDataResponse.serializer(), data)
+			val untisResponse = SerializationUtils.getJSON().decodeFromString<PeriodDataResponse>(data)
 
 			untisResponse.result
 		}, { null })
@@ -84,7 +85,7 @@ class PeriodDataViewModel(
 		))
 
 		UntisRequest().request(query).fold({ data ->
-			val untisResponse = SerializationUtils.getJSON().parse(CreateImmediateAbsenceResponse.serializer(), data)
+			val untisResponse = SerializationUtils.getJSON().decodeFromString<CreateImmediateAbsenceResponse>(data)
 
 			untisResponse.result?.let { result ->
 				absenceLiveData.postValue(absenceLiveData.value?.mapValues { if (it.key == student) Absence(result.absences[0]) else it.value })
@@ -106,7 +107,7 @@ class PeriodDataViewModel(
 		))
 
 		UntisRequest().request(query).fold({ data ->
-			val untisResponse = SerializationUtils.getJSON().parse(DeleteAbsenceResponse.serializer(), data)
+			val untisResponse = SerializationUtils.getJSON().decodeFromString<DeleteAbsenceResponse>(data)
 
 			untisResponse.result?.let { result ->
 				if (result.success)

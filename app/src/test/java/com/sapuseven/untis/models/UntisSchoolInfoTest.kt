@@ -1,6 +1,8 @@
 package com.sapuseven.untis.models
 
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -8,7 +10,7 @@ import org.junit.Test
 class UntisSchoolInfoTest {
 	@Test
 	fun untisSchoolInfo_serialization() {
-		assertThat(getJSON().stringify(UntisSchoolInfo.serializer(), UntisSchoolInfo(
+		assertThat(getJSON().encodeToString<UntisSchoolInfo>(UntisSchoolInfo(
 				server = "server",
 				useMobileServiceUrlAndroid = true,
 				useMobileServiceUrlIos = false,
@@ -23,7 +25,7 @@ class UntisSchoolInfoTest {
 
 	@Test
 	fun untisSchoolInfo_deserialization() {
-		val schoolInfo = getJSON().parse(UntisSchoolInfo.serializer(), """{"server":"server","useMobileServiceUrlAndroid":true,"useMobileServiceUrlIos":false,"address":"123","displayName":"school display name","loginName":"LOGIN_NAME","schoolId":123,"serverUrl":"http://","mobileServiceUrl":"http://"}""")
+		val schoolInfo = getJSON().decodeFromString<UntisSchoolInfo>("""{"server":"server","useMobileServiceUrlAndroid":true,"useMobileServiceUrlIos":false,"address":"123","displayName":"school display name","loginName":"LOGIN_NAME","schoolId":123,"serverUrl":"http://","mobileServiceUrl":"http://"}""")
 
 		assertThat(schoolInfo.server , `is`("server"))
 		assertThat(schoolInfo.server, `is`("server"))
