@@ -236,7 +236,7 @@ class LoginDataInputActivity : BaseActivity() {
 			val schoolInfo = (
 					if (schoolInfoFromSearch != null) schoolInfoFromSearch
 					else loadSchoolInfo(
-							edittext_logindatainput_school?.text.toString().toIntOrNull() ?: 0
+							edittext_logindatainput_school?.text.toString()
 					)) ?: return@run
 			val apiUrl =
 					if (switch_logindatainput_advanced.isChecked && !edittext_logindatainput_api_url.text.isNullOrBlank())

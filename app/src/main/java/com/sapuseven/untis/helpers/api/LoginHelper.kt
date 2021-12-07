@@ -14,6 +14,7 @@ import com.sapuseven.untis.models.untis.response.AppSharedSecretResponse
 import com.sapuseven.untis.models.untis.response.SchoolSearchResponse
 import com.sapuseven.untis.models.untis.response.UserDataResponse
 import com.sapuseven.untis.models.untis.response.UserDataResult
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import java.net.UnknownHostException
 
@@ -25,15 +26,19 @@ class LoginHelper(val loginData: LoginDataInfo, val onStatusUpdate: (statusStrin
 		onStatusUpdate(R.string.logindatainput_connecting)
 	}
 
-	suspend fun loadSchoolInfo(schoolId: Int): UntisSchoolInfo? {
+	@ExperimentalSerializationApi
+	suspend fun loadSchoolInfo(school: String): UntisSchoolInfo? {
 		onStatusUpdate(R.string.logindatainput_aquiring_schoolid)
 
+		val schoolId = school.toIntOrNull()
 		val query = UntisRequest.UntisRequestQuery()
 
 		query.data.method = UntisApiConstants.METHOD_SEARCH_SCHOOLS
 		query.url = UntisApiConstants.SCHOOL_SEARCH_URL
 		query.proxyHost = proxyHost
-		query.data.params = listOf(SchoolSearchParams(schoolid = schoolId))
+		query.data.params =
+				if (schoolId != null) listOf(SchoolSearchParams(schoolid = schoolId))
+				else listOf(SchoolSearchParams(search = school))
 
 		val result = api.request(query)
 		result.fold({ data ->

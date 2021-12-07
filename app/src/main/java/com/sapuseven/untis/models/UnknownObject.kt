@@ -18,7 +18,7 @@ class UnknownObject(val jsonString: String?) {
 		override fun serialize(encoder: Encoder, obj: UnknownObject) {}
 
 		override fun deserialize(decoder: Decoder): UnknownObject {
-			return UnknownObject((decoder as? JsonDecoder)?.decodeString())
+			return UnknownObject((decoder as? JsonDecoder)?.decodeJsonElement().toString())
 		}
 
 		fun validate(fields: Map<String, UnknownObject?>) {
@@ -26,6 +26,7 @@ class UnknownObject(val jsonString: String?) {
 				it.value?.let { value ->
 					if (value.jsonString?.isNotBlank() == true
 							&& value.jsonString.toIntOrNull() != 0
+							&& value.jsonString != "\"\""
 							&& value.jsonString != "[]"
 							&& value.jsonString != "{}")
 						ErrorLogger.instance?.log("Unknown JSON object \"${it.key}\" encountered, value: ${value.jsonString}")
