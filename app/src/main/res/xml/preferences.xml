@@ -50,6 +50,11 @@
 				android:dependency="preference_automute_enable"
 				android:key="preference_automute_cancelled_lessons"
 				android:title="@string/preference_automute_cancelled_lessons" />
+			<SwitchPreference
+				android:defaultValue="@bool/preference_automute_mute_priority_default"
+				android:dependency="preference_automute_enable"
+				android:key="preference_automute_mute_priority"
+				android:title="@string/preference_automute_mute_priority" />
 			<SeekBarPreference
 				android:defaultValue="@integer/preference_automute_minimum_break_length_default"
 				android:dependency="preference_automute_enable"

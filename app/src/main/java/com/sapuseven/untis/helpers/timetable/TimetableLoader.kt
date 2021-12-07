@@ -17,7 +17,7 @@ import com.sapuseven.untis.models.untis.timetable.Period
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.JsonDecodingException
+import kotlinx.serialization.decodeFromString
 import org.joda.time.Instant
 import java.lang.ref.WeakReference
 
@@ -93,7 +93,7 @@ class TimetableLoader(
 		val userDataResult = api.request(query)
 		userDataResult.fold({ data ->
 			try {
-				val untisResponse = getJSON().parse(TimetableResponse.serializer(), data)
+				val untisResponse = getJSON().decodeFromString<TimetableResponse>(data)
 
 				if (untisResponse.result != null) {
 					Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): network request success, returning")
@@ -111,7 +111,7 @@ class TimetableLoader(
 				}
 			} catch (e: Exception) {
 				val msg = when (e) {
-					is JsonDecodingException -> formatJsonParsingException(e, data)
+					//is JsonDecodingException -> formatJsonParsingException(e, data)
 					else -> e.toString()
 				}
 				timetableDisplay.onTimetableLoadingError(requestId, CODE_REQUEST_PARSING_EXCEPTION, msg)
@@ -122,7 +122,7 @@ class TimetableLoader(
 		})
 	}
 
-	private fun formatJsonParsingException(e: JsonDecodingException, jsonData: String): String {
+	/*private fun formatJsonParsingException(e: JsonDecodingException, jsonData: String): String {
 		val errorMargin = 20
 		val errorIndex: Int? = e.message?.let {
 			it.split(" ")[3].let { i ->
@@ -133,7 +133,7 @@ class TimetableLoader(
 		return e.toString() + if (errorIndex != null)
 			"\n(near " + jsonData.substring((errorIndex - errorMargin).coerceAtLeast(0), (errorIndex + errorMargin).coerceAtMost(jsonData.length)) + ")"
 		else ""
-	}
+	}*/
 
 	private fun periodToTimegridItem(period: Period, type: String): TimegridItem {
 		return TimegridItem(

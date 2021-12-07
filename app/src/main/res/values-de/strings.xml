@@ -82,6 +82,7 @@
     <string name="logindatainput_title_add">Profil hinzufügen</string>
     <string name="logindatainput_title_edit">Profil bearbeiten</string>
     <string name="logindatainput_delete">Profil löschen</string>
+    <string name="logindatainput_profilename">Profilname (optional)</string>
     <string name="logindatainput_proxy_host">Proxy-Server (optional)</string>
     <string name="logindatainput_show_advanced">Erweiterte Einstellungen anzeigen</string>
     <string name="errormessagedictionary_generic">Unbekannter Fehler</string>
@@ -138,6 +139,7 @@
     <string name="preference_automute_enable">Automatisches Stummschalten</string>
     <string name="preference_automute_enable_summary">Aktiviert während jeder Stunde automatisch den „Bitte nicht stören“-Modus</string>
     <string name="preference_automute_cancelled_lessons">Auch in entfallenen Stunden stumm schalten</string>
+    <string name="preference_automute_mute_priority">Ausnahmen für \"Bitte nicht Stören\" ignorieren</string>
     <string name="preference_automute_minimum_break_length_summary">Stummschaltung nicht aufheben, wenn die Pause kürzer als die angegebene Dauer ist (in Minuten)</string>
     <string name="preference_automute_minimum_break_length">Mindestpausendauer</string>
     <string name="preference_background_cancelled">Entfallene Stunden</string>

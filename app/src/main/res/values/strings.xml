@@ -98,11 +98,12 @@
 	<string name="logindatainput_key">Key or Password</string>
 	<string name="logindatainput_loading_user_data">Loading user data…</string>
 	<string name="logindatainput_login">Login</string>
+	<string name="logindatainput_profilename">Profile name (optional)</string>
 	<string name="logindatainput_proxy_host">Proxy server (optional)</string>
 	<string name="logindatainput_school">School name or ID</string>
 	<string name="logindatainput_show_advanced">Show advanced settings</string>
 	<string name="logindatainput_skip_app_secret">Skip app secret resolution</string>
-    <string name="logindatainput_skip_school_id">Skip school ID resolution</string>
+	<string name="logindatainput_skip_school_id">Skip school ID resolution</string>
 	<string name="logindatainput_title_add">Add profile</string>
 	<string name="logindatainput_title_edit">Edit profile</string>
 	<string name="logindatainput_username">Username</string>
@@ -145,6 +146,7 @@
 	<string name="preference_automute_cancelled_lessons">Also mute in cancelled lessons</string>
 	<string name="preference_automute_enable">Enable auto-mute</string>
 	<string name="preference_automute_enable_summary">Automatically turns on Do Not Disturb during lessons</string>
+	<string name="preference_automute_mute_priority">Don\'t allow priority events to ignore aute-mute</string>
 	<string name="preference_automute_minimum_break_length_summary">Don\'t unmute the device during breaks shorter than the specified length (in minutes)</string>
 	<string name="preference_automute_minimum_break_length">Minimum break length</string>
 	<string name="preference_background_cancelled">Cancelled lessons</string>
