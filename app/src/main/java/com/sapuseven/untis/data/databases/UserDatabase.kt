@@ -17,6 +17,8 @@ import com.sapuseven.untis.models.untis.UntisMasterData
 import com.sapuseven.untis.models.untis.UntisSettings
 import com.sapuseven.untis.models.untis.UntisUserData
 import com.sapuseven.untis.models.untis.masterdata.*
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 
 private const val DATABASE_VERSION = 4
 private const val DATABASE_NAME = "userdata.db"
@@ -106,10 +108,10 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USER, user.user)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_KEY, user.key)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS, user.anonymous)
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID, getJSON().stringify(TimeGrid.serializer(), user.timeGrid))
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID, getJSON().encodeToString<TimeGrid>(user.timeGrid))
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP, user.masterDataTimestamp)
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_USERDATA, getJSON().stringify(UntisUserData.serializer(), user.userData))
-		user.settings?.let { values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().stringify(UntisSettings.serializer(), it)) }
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_USERDATA, getJSON().encodeToString<UntisUserData>(user.userData))
+		user.settings?.let { values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().encodeToString<UntisSettings>(it)) }
 
 		val id = db.insert(UserDatabaseContract.Users.TABLE_NAME, null, values)
 
@@ -130,10 +132,10 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USER, user.user)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_KEY, user.key)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS, user.anonymous)
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID, getJSON().stringify(TimeGrid.serializer(), user.timeGrid))
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID, getJSON().encodeToString<TimeGrid>(user.timeGrid))
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP, user.masterDataTimestamp)
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_USERDATA, getJSON().stringify(UntisUserData.serializer(), user.userData))
-		user.settings?.let { values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().stringify(UntisSettings.serializer(), it)) }
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_USERDATA, getJSON().encodeToString<UntisUserData>(user.userData))
+		user.settings?.let { values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().encodeToString<UntisSettings>(it)) }
 
 		db.update(UserDatabaseContract.Users.TABLE_NAME, values, BaseColumns._ID + "=?", arrayOf(user.id.toString()))
 		db.close()
@@ -177,10 +179,10 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 				cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USER)),
 				cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_KEY)),
 				cursor.getIntOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS)) == 1,
-				getJSON().parse(TimeGrid.serializer(), cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID))),
+				getJSON().decodeFromString(cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID))),
 				cursor.getLong(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP)),
-				getJSON().parse(UntisUserData.serializer(), cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USERDATA))),
-				cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS))?.let { getJSON().parse(UntisSettings.serializer(), it) },
+				getJSON().decodeFromString<UntisUserData>(cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USERDATA))),
+				cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS))?.let { getJSON().decodeFromString<UntisSettings>(it) },
 				cursor.getLongOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_CREATED))
 		)
 
@@ -219,10 +221,10 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 						cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USER)),
 						cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_KEY)),
 						cursor.getInt(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS)) == 1,
-						getJSON().parse(TimeGrid.serializer(), cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID))),
+						getJSON().decodeFromString<TimeGrid>(cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID))),
 						cursor.getLong(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP)),
-						getJSON().parse(UntisUserData.serializer(), cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USERDATA))),
-						cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS))?.let { getJSON().parse(UntisSettings.serializer(), it) },
+						getJSON().decodeFromString<UntisUserData>(cursor.getString(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_USERDATA))),
+						cursor.getStringOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS))?.let { getJSON().decodeFromString<UntisSettings>(it) },
 						cursor.getLongOrNull(cursor.getColumnIndex(UserDatabaseContract.Users.COLUMN_NAME_CREATED))
 				))
 			} while (cursor.moveToNext())

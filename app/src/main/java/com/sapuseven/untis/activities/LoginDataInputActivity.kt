@@ -34,7 +34,7 @@ import kotlinx.android.synthetic.main.activity_logindatainput.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.net.UnknownHostException
+import kotlinx.serialization.decodeFromString
 
 class LoginDataInputActivity : BaseActivity() {
 	companion object {
@@ -109,7 +109,7 @@ class LoginDataInputActivity : BaseActivity() {
 				edittext_logindatainput_user?.setText(appLinkData.getQueryParameter("user"))
 				edittext_logindatainput_key?.setText(appLinkData.getQueryParameter("key"))
 			} else {
-				appLinkData.getQueryParameter("schoolInfo")?.let { schoolInfo = getJSON().parse(UntisSchoolInfo.serializer(), it) }
+				appLinkData.getQueryParameter("schoolInfo")?.let { schoolInfoFromSearch = getJSON().decodeFromString<UntisSchoolInfo>(it) }
 
 				edittext_logindatainput_school?.setText(schoolInfo?.schoolId.toString())
 			}

@@ -81,6 +81,7 @@ import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
 import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants
 import org.joda.time.Instant
@@ -428,7 +429,7 @@ class MainActivity :
 
 		val result = UntisRequest().request(query)
 		return result.fold({ data ->
-			val untisResponse = SerializationUtils.getJSON().parse(MessageResponse.serializer(), data)
+			val untisResponse = SerializationUtils.getJSON().decodeFromString<MessageResponse>(data)
 
 			untisResponse.result?.messages
 		}, { null })
@@ -520,7 +521,7 @@ class MainActivity :
 				?: profileUser.timeGrid.days.size
 		weekView.numberOfVisibleDays = preferences.defaultPrefs.getInt("preference_week_custom_display_length", 0).zeroToNull
 				?: weekView.weekLength
-		weekView.firstDayOfWeek = preferences.defaultPrefs.getStringSet("preference_week_custom_range", emptySet())?.map { MaterialDayPicker.Weekday.valueOf(it) }?.min()?.ordinal
+		weekView.firstDayOfWeek = preferences.defaultPrefs.getStringSet("preference_week_custom_range", emptySet())?.map { MaterialDayPicker.Weekday.valueOf(it) }?.minOrNull()?.ordinal
 				?: DateTimeFormat.forPattern("E").withLocale(Locale.ENGLISH).parseDateTime(profileUser.timeGrid.days[0].day).dayOfWeek
 
 		weekView.timeColumnVisibility = !PreferenceUtils.getPrefBool(preferences, "preference_timetable_hide_time_stamps")
@@ -561,7 +562,7 @@ class MainActivity :
 		val lines = MutableList(0) { return@MutableList 0 }
 		val range = RangePreference.convertToPair(PreferenceUtils.getPrefString(preferences, "preference_timetable_range", null))
 
-		profileUser.timeGrid.days.maxBy { it.units.size }?.units?.forEachIndexed { index, hour ->
+		profileUser.timeGrid.days.maxByOrNull { it.units.size }?.units?.forEachIndexed { index, hour ->
 			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
 
 			val startTime = hour.startTime.toLocalTime().toString(DateTimeUtils.shortDisplayableTime())
@@ -641,7 +642,7 @@ class MainActivity :
 
 	private fun mergeItems(items: List<TimegridItem>): List<TimegridItem> {
 		val days = profileUser.timeGrid.days
-		val itemGrid: Array<Array<MutableList<TimegridItem>>> = Array(days.size) { Array(days.maxBy { it.units.size }!!.units.size) { mutableListOf<TimegridItem>() } }
+		val itemGrid: Array<Array<MutableList<TimegridItem>>> = Array(days.size) { Array(days.maxByOrNull { it.units.size }!!.units.size) { mutableListOf<TimegridItem>() } }
 		val leftover: MutableList<TimegridItem> = mutableListOf()
 
 		// TODO: Check if the day from the untis API is always an english string
