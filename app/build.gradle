@@ -5,14 +5,14 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlinx-serialization'
 
 android {
-	compileSdkVersion 29
-	buildToolsVersion '29.0.3'
+	compileSdkVersion 31
+	buildToolsVersion '31.0.0'
 
 	defaultConfig {
 		applicationId "com.sapuseven.untis"
 		minSdkVersion 21
-		targetSdkVersion 29
-		versionCode 29
+		targetSdkVersion 31
+		versionCode 31
 		versionName "3.4.5"
 		vectorDrawables.useSupportLibrary = true
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
