@@ -292,8 +292,8 @@ class LoginDataInputActivity : BaseActivity() {
 					}) ?: return@run
 			val apiUrl =
 				if (switch_logindatainput_advanced.isChecked && !edittext_logindatainput_api_url.text.isNullOrBlank())
-					edittext_logindatainput_api_url?.text.toString()
-				else if (schoolInfo.useMobileServiceUrlAndroid) schoolInfo.mobileServiceUrl
+					edittext_logindatainput_api_url.text.toString()
+				else if (schoolInfo.useMobileServiceUrlAndroid && !schoolInfo.mobileServiceUrl.isNullOrBlank()) schoolInfo.mobileServiceUrl!!
 				else Uri.parse(schoolInfo.serverUrl).buildUpon()
 					.appendEncodedPath("jsonrpc_intern.do")
 					.build().toString()
