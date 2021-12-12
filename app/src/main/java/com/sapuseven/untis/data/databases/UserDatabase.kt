@@ -21,7 +21,7 @@ import com.sapuseven.untis.models.untis.masterdata.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
-private const val DATABASE_VERSION = 5
+private const val DATABASE_VERSION = 6
 private const val DATABASE_NAME = "userdata.db"
 
 class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -78,8 +78,44 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 				4 -> {
 					db.execSQL("ALTER TABLE ${UserDatabaseContract.Users.TABLE_NAME} RENAME TO ${UserDatabaseContract.Users.TABLE_NAME}_v4")
 					db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V5)
-					db.execSQL("INSERT INTO ${UserDatabaseContract.Users.TABLE_NAME} SELECT _id, '', apiUrl, schoolId, user, auth, anonymous, timeGrid, masterDataTimestamp, userData, settings, time_created FROM ${UserDatabaseContract.Users.TABLE_NAME}_v4;")
+					db.execSQL(
+						"INSERT INTO ${UserDatabaseContract.Users.TABLE_NAME} SELECT " +
+								"${BaseColumns._ID}," +
+								"'', " +
+								"${UserDatabaseContract.Users.COLUMN_NAME_APIURL}, " +
+								"${UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID}, " +
+								"${UserDatabaseContract.Users.COLUMN_NAME_USER}, " +
+								"${UserDatabaseContract.Users.COLUMN_NAME_KEY}, " +
+								"${UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS}, " +
+								"${UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID}, " +
+								"${UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP}, " +
+								"${UserDatabaseContract.Users.COLUMN_NAME_USERDATA}, " +
+								"${UserDatabaseContract.Users.COLUMN_NAME_SETTINGS}, " +
+								"${UserDatabaseContract.Users.COLUMN_NAME_CREATED} " +
+								"FROM ${UserDatabaseContract.Users.TABLE_NAME}_v4;"
+					)
 					db.execSQL("DROP TABLE ${UserDatabaseContract.Users.TABLE_NAME}_v4")
+				}
+				5 -> {
+					db.execSQL("ALTER TABLE ${UserDatabaseContract.Users.TABLE_NAME} RENAME TO ${UserDatabaseContract.Users.TABLE_NAME}_v5")
+					db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V6)
+					db.execSQL(
+						"INSERT INTO ${UserDatabaseContract.Users.TABLE_NAME} SELECT " +
+								"${BaseColumns._ID}," +
+								"${UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME}, " +
+								"'', " +
+								"${UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID}, " +
+								"${UserDatabaseContract.Users.COLUMN_NAME_USER}, " +
+								"${UserDatabaseContract.Users.COLUMN_NAME_KEY}, " +
+								"${UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS}, " +
+								"${UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID}, " +
+								"${UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP}, " +
+								"${UserDatabaseContract.Users.COLUMN_NAME_USERDATA}, " +
+								"${UserDatabaseContract.Users.COLUMN_NAME_SETTINGS}, " +
+								"${UserDatabaseContract.Users.COLUMN_NAME_CREATED} " +
+								"FROM ${UserDatabaseContract.Users.TABLE_NAME}_v5;"
+					)
+					db.execSQL("DROP TABLE ${UserDatabaseContract.Users.TABLE_NAME}_v5")
 				}
 			}
 
@@ -185,18 +221,31 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 			return null
 
 		val user = User(
-				id,
-				cursor.getString(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME)),
-				cursor.getStringOrNull(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_APIURL)),
-				cursor.getString(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID)),
-				cursor.getStringOrNull(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_USER)),
-				cursor.getStringOrNull(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_KEY)),
-				cursor.getIntOrNull(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS)) == 1,
-				getJSON().decodeFromString(cursor.getString(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID))),
-				cursor.getLong(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP)),
-				getJSON().decodeFromString<UntisUserData>(cursor.getString(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_USERDATA))),
-				cursor.getStringOrNull(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS))?.let { getJSON().decodeFromString<UntisSettings>(it) },
-				cursor.getLongOrNull(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_CREATED))
+			id,
+			cursor.getString(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME)),
+			cursor.getString(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_APIURL)),
+			cursor.getString(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID)),
+			cursor.getStringOrNull(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_USER)),
+			cursor.getStringOrNull(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_KEY)),
+			cursor.getIntOrNull(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS)) == 1,
+			getJSON().decodeFromString(
+				cursor.getString(
+					cursor.getColumnIndexOrThrow(
+						UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID
+					)
+				)
+			),
+			cursor.getLong(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP)),
+			getJSON().decodeFromString<UntisUserData>(
+				cursor.getString(
+					cursor.getColumnIndexOrThrow(
+						UserDatabaseContract.Users.COLUMN_NAME_USERDATA
+					)
+				)
+			),
+			cursor.getStringOrNull(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS))
+				?.let { getJSON().decodeFromString<UntisSettings>(it) },
+			cursor.getLongOrNull(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_CREATED))
 		)
 		cursor.close()
 		db.close()
@@ -228,18 +277,31 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		if (cursor.moveToFirst()) {
 			do {
 				users.add(User(
-						cursor.getLongOrNull(cursor.getColumnIndexOrThrow(BaseColumns._ID)),
-						cursor.getString(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME)),
-						cursor.getStringOrNull(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_APIURL)),
-						cursor.getString(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID)),
-						cursor.getStringOrNull(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_USER)),
-						cursor.getStringOrNull(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_KEY)),
-						cursor.getInt(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS)) == 1,
-						getJSON().decodeFromString<TimeGrid>(cursor.getString(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID))),
-						cursor.getLong(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP)),
-						getJSON().decodeFromString<UntisUserData>(cursor.getString(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_USERDATA))),
-						cursor.getStringOrNull(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS))?.let { getJSON().decodeFromString<UntisSettings>(it) },
-						cursor.getLongOrNull(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_CREATED))
+					cursor.getLongOrNull(cursor.getColumnIndexOrThrow(BaseColumns._ID)),
+					cursor.getString(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME)),
+					cursor.getString(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_APIURL)),
+					cursor.getString(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID)),
+					cursor.getStringOrNull(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_USER)),
+					cursor.getStringOrNull(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_KEY)),
+					cursor.getInt(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS)) == 1,
+					getJSON().decodeFromString<TimeGrid>(
+						cursor.getString(
+							cursor.getColumnIndexOrThrow(
+								UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID
+							)
+						)
+					),
+					cursor.getLong(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP)),
+					getJSON().decodeFromString<UntisUserData>(
+						cursor.getString(
+							cursor.getColumnIndexOrThrow(
+								UserDatabaseContract.Users.COLUMN_NAME_USERDATA
+							)
+						)
+					),
+					cursor.getStringOrNull(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS))
+						?.let { getJSON().decodeFromString<UntisSettings>(it) },
+					cursor.getLongOrNull(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_CREATED))
 				))
 			} while (cursor.moveToNext())
 		}
@@ -333,18 +395,18 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 	}
 
 	class User(
-			val id: Long? = null,
-			val profileName: String = "",
-			val apiUrl: String? = null,
-			val schoolId: String,
-			val user: String? = null,
-			val key: String? = null,
-			val anonymous: Boolean = false,
-			val timeGrid: TimeGrid,
-			val masterDataTimestamp: Long,
-			val userData: UntisUserData,
-			val settings: UntisSettings? = null,
-			val created: Long? = null
+		val id: Long? = null,
+		val profileName: String = "",
+		val apiUrl: String,
+		val schoolId: String,
+		val user: String? = null,
+		val key: String? = null,
+		val anonymous: Boolean = false,
+		val timeGrid: TimeGrid,
+		val masterDataTimestamp: Long,
+		val userData: UntisUserData,
+		val settings: UntisSettings? = null,
+		val created: Long? = null
 	) {
 		fun getDisplayedName(context: Context): String {
 			return when {

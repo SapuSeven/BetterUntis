@@ -2,27 +2,27 @@
 <resources>
     <string name="all_success">pomyślnie</string>
     <string name="all_failed">nieudane</string>
-	<string name="all_personal">Osobiste</string>
-	<string name="all_teachers">Nauczyciele</string>
-	<string name="all_classes">Klasy</string>
-	<string name="all_rooms">Pokoje</string>
-	<string name="all_contact_email">betteruntis@sapuseven.com</string>
-	<string name="all_ok">OK</string>
-	<string name="all_yes">Tak</string>
-	<string name="all_no">Nie</string>
-	<string name="all_close">Zamknij</string>
-	<string name="all_cancel">Anuluj</string>
-	<string name="all_error">Błąd</string>
-	<string name="all_report">Raport</string>
-	<string name="all_add">Dodaj</string>
-	<string name="all_delete">Usuń</string>
-	<string name="all_reset">Reset</string>
-	<string name="all_dialog_datepicker_button_today">Dzisiaj</string>
-	<string name="activity_title_free_rooms">Wolne pokoje</string>
-	<string name="activity_title_settings">Ustawienia</string>
-	<string name="menu_infocenter_messagesofday">Wiadomości</string>
-	<string name="menu_infocenter_events">Wydarzenia</string>
-	<string name="mainactivitydrawer_profile_add">Dodaj profil</string>
+    <string name="all_personal">Osobiste</string>
+    <string name="all_teachers">Nauczyciele</string>
+    <string name="all_classes">Klasy</string>
+    <string name="all_rooms">Pokoje</string>
+    <string name="all_contact_email">betteruntis@sapuseven.com</string>
+    <string name="all_ok">OK</string>
+    <string name="all_yes">Tak</string>
+    <string name="all_no">Nie</string>
+    <string name="all_close">Zamknij</string>
+    <string name="all_cancel">Anuluj</string>
+    <string name="all_error">Błąd</string>
+    <string name="all_report">Raport</string>
+    <string name="all_add">Dodaj</string>
+    <string name="all_delete">Usuń</string>
+    <string name="all_reset">Reset</string>
+    <string name="all_dialog_datepicker_button_today">Dzisiaj</string>
+    <string name="activity_title_free_rooms">Wolne pokoje</string>
+    <string name="activity_title_settings">Ustawienia</string>
+    <string name="menu_infocenter_messagesofday">Wiadomości</string>
+    <string name="menu_infocenter_events">Wydarzenia</string>
+    <string name="mainactivitydrawer_profile_add">Dodaj profil</string>
     <string name="main_dialog_delete_profile_title">Usunąć profil\?</string>
     <string name="main_dialog_update_profile_button">Zaktualizuj profil</string>
     <string name="main_dialog_itemdetails_image_infos">Info</string>
@@ -42,4 +42,25 @@
         <item quantity="many">Ten Pokój jest wolny przez %d godzin.</item>
     </plurals>
     <string name="logindatainput_login">Zaloguj</string>
+    <string name="all_dialog_crash_copied">Skopiowano dziennik awarii do schowka.</string>
+    <string name="all_dialog_error_message">Nr ID zapytania: %1$d
+\nKod błędu: %2$d
+\nTreść błędu: %3$s</string>
+    <string name="all_dialog_error_title">Informacja o błędzie</string>
+    <string name="all_lesson_exam">%1$s (egzamin!)</string>
+    <string name="all_lesson_cancelled">%1$s (odwołano)</string>
+    <string name="all_personal_timetable">Osobisty harmonogram</string>
+    <string name="app_desc">Alternatywna aplikacja mobilna systemu harmonogramów Untis.</string>
+    <string name="all_dialog_absences_not_checked">Obecność nie została sprawdzona.</string>
+    <string name="all_dialog_absences_checked">Sprawdzono obecność.</string>
+    <string name="all_lessontopic_none">(Brak tematu)</string>
+    <string name="all_lessontopic">Temat lekcji</string>
+    <string name="all_lesson_details">Szczegóły lekcji</string>
+    <string name="all_absences">Nieobecności</string>
+    <string name="all_anonymous">Anonimowe</string>
+    <string name="logindatainput_aquiring_schoolid">Trwa ładowanie szkoły…</string>
+    <string name="logindatainput_anonymous_login">Zaloguj się anonimowo</string>
+    <string name="activity_title_errors">Błędy</string>
+    <string name="all_subjects">Przedmioty</string>
+    <string name="activity_title_info_center">Centrum informacji</string>
 </resources>

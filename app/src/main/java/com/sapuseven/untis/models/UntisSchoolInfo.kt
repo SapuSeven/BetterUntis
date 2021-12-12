@@ -12,5 +12,5 @@ data class UntisSchoolInfo(
 	var loginName: String,
 	var schoolId: Int,
 	var serverUrl: String,
-	var mobileServiceUrl: String
+	var mobileServiceUrl: String?
 )

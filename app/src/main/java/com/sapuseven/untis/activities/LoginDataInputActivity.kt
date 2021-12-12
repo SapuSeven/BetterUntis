@@ -65,7 +65,8 @@ class LoginDataInputActivity : BaseActivity() {
 			}
 		}
 
-		title = getString(if (existingUserId == null) R.string.logindatainput_title_add else R.string.logindatainput_title_edit)
+		title =
+			getString(if (existingUserId == null) R.string.logindatainput_title_add else R.string.logindatainput_title_edit)
 
 		button_logindatainput_login?.setOnClickListener {
 			validate()?.requestFocus() ?: run { loadData() }
@@ -86,7 +87,8 @@ class LoginDataInputActivity : BaseActivity() {
 		}
 
 		switch_logindatainput_advanced?.setOnCheckedChangeListener { _, isChecked ->
-			linearlayout_logindatainput_advanced?.visibility = if (isChecked) View.VISIBLE else View.GONE
+			linearlayout_logindatainput_advanced?.visibility =
+				if (isChecked) View.VISIBLE else View.GONE
 		}
 
 		val appLinkData = intent.data
@@ -97,7 +99,8 @@ class LoginDataInputActivity : BaseActivity() {
 				edittext_logindatainput_user?.setText(appLinkData.getQueryParameter("user"))
 				edittext_logindatainput_key?.setText(appLinkData.getQueryParameter("key"))
 			} else {
-				appLinkData.getQueryParameter("schoolInfo")?.let { schoolInfoFromSearch = getJSON().decodeFromString<UntisSchoolInfo>(it) }
+				appLinkData.getQueryParameter("schoolInfo")
+					?.let { schoolInfoFromSearch = getJSON().decodeFromString<UntisSchoolInfo>(it) }
 
 				edittext_logindatainput_school?.setText(schoolInfoFromSearch?.schoolId.toString())
 			}
@@ -109,9 +112,9 @@ class LoginDataInputActivity : BaseActivity() {
 
 		if (intent.getBooleanExtra(EXTRA_BOOLEAN_PROFILE_UPDATE, false)) {
 			supportFragmentManager
-					.beginTransaction()
-					.replace(android.R.id.content, ProfileUpdateDialog(), FRAGMENT_TAG_PROFILE_UPDATE)
-					.commit()
+				.beginTransaction()
+				.replace(android.R.id.content, ProfileUpdateDialog(), FRAGMENT_TAG_PROFILE_UPDATE)
+				.commit()
 
 			loadData()
 		}
@@ -119,18 +122,23 @@ class LoginDataInputActivity : BaseActivity() {
 
 	private fun validate(): EditText? {
 		if (edittext_logindatainput_user?.text?.isEmpty() == true && !anonymous) {
-			edittext_logindatainput_user.error = getString(R.string.logindatainput_error_field_empty)
+			edittext_logindatainput_user.error =
+				getString(R.string.logindatainput_error_field_empty)
 			return edittext_logindatainput_user
 		}
 		if (edittext_logindatainput_school?.text?.isEmpty() == true) {
-			edittext_logindatainput_school.error = getString(R.string.logindatainput_error_field_empty)
+			edittext_logindatainput_school.error =
+				getString(R.string.logindatainput_error_field_empty)
 			return edittext_logindatainput_school
 		}
 
 		if (switch_logindatainput_advanced.isChecked) {
 			if (!edittext_logindatainput_api_url.text.isNullOrBlank()
-					&& !Patterns.WEB_URL.matcher(edittext_logindatainput_api_url.text.toString()).matches()) {
-				edittext_logindatainput_api_url.error = getString(R.string.logindatainput_error_invalid_url)
+				&& !Patterns.WEB_URL.matcher(edittext_logindatainput_api_url.text.toString())
+					.matches()
+			) {
+				edittext_logindatainput_api_url.error =
+					getString(R.string.logindatainput_error_invalid_url)
 				return edittext_logindatainput_api_url
 			}
 		}
@@ -158,16 +166,33 @@ class LoginDataInputActivity : BaseActivity() {
 
 	private fun backupInput(prefs: SharedPreferences) {
 		val editor = prefs.edit()
-		editor.putString("edittext_logindatainput_school", edittext_logindatainput_school?.text.toString())
-		editor.putBoolean("switch_logindatainput_anonymouslogin", switch_logindatainput_anonymouslogin.isChecked)
-		editor.putString("edittext_logindatainput_user", edittext_logindatainput_user?.text.toString())
-		editor.putString("edittext_logindatainput_key", edittext_logindatainput_key?.text.toString())
+		editor.putString(
+			"edittext_logindatainput_school",
+			edittext_logindatainput_school?.text.toString()
+		)
+		editor.putBoolean(
+			"switch_logindatainput_anonymouslogin",
+			switch_logindatainput_anonymouslogin.isChecked
+		)
+		editor.putString(
+			"edittext_logindatainput_user",
+			edittext_logindatainput_user?.text.toString()
+		)
+		editor.putString(
+			"edittext_logindatainput_key",
+			edittext_logindatainput_key?.text.toString()
+		)
 		editor.putString("edittext_logindatainput_proxy_host", getProxyHost())
 		editor.apply()
 	}
 
 	private fun restoreInput(prefs: SharedPreferences) {
-		edittext_logindatainput_school?.setText(prefs.getString("edittext_logindatainput_school", ""))
+		edittext_logindatainput_school?.setText(
+			prefs.getString(
+				"edittext_logindatainput_school",
+				""
+			)
+		)
 		prefs.getString("edittext_logindatainput_proxy_host", "").let {
 			edittext_logindatainput_proxy_host?.setText(it)
 			if (it?.isNotBlank() == true) {
@@ -178,7 +203,12 @@ class LoginDataInputActivity : BaseActivity() {
 		anonymous = prefs.getBoolean("switch_logindatainput_anonymouslogin", false)
 		switch_logindatainput_anonymouslogin?.isChecked = anonymous
 		if (!anonymous) {
-			edittext_logindatainput_user?.setText(prefs.getString("edittext_logindatainput_user", ""))
+			edittext_logindatainput_user?.setText(
+				prefs.getString(
+					"edittext_logindatainput_user",
+					""
+				)
+			)
 			edittext_logindatainput_key?.setText(prefs.getString("edittext_logindatainput_key", ""))
 		}
 	}
@@ -188,13 +218,14 @@ class LoginDataInputActivity : BaseActivity() {
 		if (user.schoolId.isNotBlank()) edittext_logindatainput_school?.setText(user.schoolId)
 
 		user.id?.let { profileId ->
-			preferences.prefsForProfile(profileId).getString("preference_connectivity_proxy_host", null)?.let {
-				edittext_logindatainput_proxy_host?.setText(it)
-				if (it.isNotBlank()) {
-					switch_logindatainput_advanced?.isChecked = true
-					linearlayout_logindatainput_advanced?.visibility = View.VISIBLE
+			preferences.prefsForProfile(profileId)
+				.getString("preference_connectivity_proxy_host", null)?.let {
+					edittext_logindatainput_proxy_host?.setText(it)
+					if (it.isNotBlank()) {
+						switch_logindatainput_advanced?.isChecked = true
+						linearlayout_logindatainput_advanced?.visibility = View.VISIBLE
+					}
 				}
-			}
 		}
 
 		anonymous = user.anonymous
@@ -217,59 +248,89 @@ class LoginDataInputActivity : BaseActivity() {
 
 	private suspend fun sendRequest() {
 		LoginHelper(
-				loginData = LoginDataInfo(
-						edittext_logindatainput_user?.text.toString(),
-						edittext_logindatainput_key?.text.toString(),
-						anonymous
-				),
-				onStatusUpdate = { status ->
-					updateLoadingStatus(getString(status))
-				},
-				onError = { error ->
-					val errorMessage = when {
-						error.errorCode != null -> ErrorMessageDictionary.getErrorMessage(resources, error.errorCode, error.errorMessage)
-						error.errorMessageStringRes != null -> getString(error.errorMessageStringRes, error.errorMessage)
-						else -> error.errorMessage ?: getString(R.string.all_error)
-					}
-					stopLoadingAndShowError(errorMessage)
-				}).run {
+			loginData = LoginDataInfo(
+				edittext_logindatainput_user?.text.toString(),
+				edittext_logindatainput_key?.text.toString(),
+				anonymous
+			),
+			onStatusUpdate = { status ->
+				updateLoadingStatus(getString(status))
+			},
+			onError = { error ->
+				val errorMessage = when {
+					error.errorCode != null -> ErrorMessageDictionary.getErrorMessage(
+						resources,
+						error.errorCode,
+						error.errorMessage
+					)
+					error.errorMessageStringRes != null -> getString(
+						error.errorMessageStringRes,
+						error.errorMessage
+					)
+					else -> error.errorMessage ?: getString(R.string.all_error)
+				}
+				stopLoadingAndShowError(errorMessage)
+			}).run {
 			val schoolInfo = (
-					if (schoolInfoFromSearch != null) schoolInfoFromSearch
-					else loadSchoolInfo(
+					when {
+						schoolInfoFromSearch != null -> schoolInfoFromSearch
+						switch_logindatainput_advanced.isChecked && !edittext_logindatainput_api_url.text.isNullOrBlank() -> UntisSchoolInfo(
+							server = "",
+							useMobileServiceUrlAndroid = true,
+							useMobileServiceUrlIos = true,
+							address = "",
+							displayName = edittext_logindatainput_school.text.toString(),
+							loginName = edittext_logindatainput_school.text.toString(),
+							schoolId = edittext_logindatainput_school.text.toString().toIntOrNull()
+								?: 0,
+							serverUrl = edittext_logindatainput_api_url.text.toString(),
+							mobileServiceUrl = edittext_logindatainput_api_url.text.toString()
+						)
+						else -> loadSchoolInfo(
 							edittext_logindatainput_school?.text.toString()
-					)) ?: return@run
+						)
+					}) ?: return@run
 			val apiUrl =
-					if (switch_logindatainput_advanced.isChecked && !edittext_logindatainput_api_url.text.isNullOrBlank())
-						edittext_logindatainput_api_url?.text.toString()
-					else if (schoolInfo.useMobileServiceUrlAndroid) schoolInfo.mobileServiceUrl
-					else Uri.parse(schoolInfo.serverUrl).buildUpon()
-							.appendEncodedPath("jsonrpc_intern.do")
-							.build().toString()
-			val appSharedSecret = if (loginData.anonymous) "" else loadAppSharedSecret(apiUrl)
-					?: return@run
+				if (switch_logindatainput_advanced.isChecked && !edittext_logindatainput_api_url.text.isNullOrBlank())
+					edittext_logindatainput_api_url.text.toString()
+				else if (schoolInfo.useMobileServiceUrlAndroid && !schoolInfo.mobileServiceUrl.isNullOrBlank()) schoolInfo.mobileServiceUrl!!
+				else Uri.parse(schoolInfo.serverUrl).buildUpon()
+					.appendEncodedPath("jsonrpc_intern.do")
+					.build().toString()
+			val appSharedSecret =
+				when {
+					loginData.anonymous -> ""
+					checkbox_logindatainput_skip_app_secret.isChecked -> loginData.password
+					else -> loadAppSharedSecret(apiUrl)
+						?: return@run
+				}
 			val userDataResponse = loadUserData(apiUrl, appSharedSecret) ?: return@run
 			val user = UserDatabase.User(
-					existingUserId,
-					edittext_logindatainput_profilename?.text.toString(),
-					apiUrl,
-					schoolInfo.schoolId.toString(),
-					if (!anonymous) loginData.user else null,
-					if (!anonymous) appSharedSecret else null,
-					anonymous,
-					userDataResponse.masterData.timeGrid ?: TimeGrid.generateDefault(),
-					userDataResponse.masterData.timeStamp,
-					userDataResponse.userData,
-					userDataResponse.settings
+				existingUserId,
+				edittext_logindatainput_profilename?.text.toString(),
+				apiUrl,
+				schoolInfo.schoolId.toString(),
+				if (!anonymous) loginData.user else null,
+				if (!anonymous) appSharedSecret else null,
+				anonymous,
+				userDataResponse.masterData.timeGrid ?: TimeGrid.generateDefault(),
+				userDataResponse.masterData.timeStamp,
+				userDataResponse.userData,
+				userDataResponse.settings
 			)
 
-			val userId = if (existingUserId == null) userDatabase.addUser(user) else userDatabase.editUser(user)
+			val userId =
+				if (existingUserId == null) userDatabase.addUser(user) else userDatabase.editUser(
+					user
+				)
 
 			userId?.let {
 				userDatabase.setAdditionalUserData(userId, userDataResponse.masterData)
 
 				progressbar_logindatainput_loadingstatus?.visibility = View.GONE
 				imageview_logindatainput_loadingstatussuccess?.visibility = View.VISIBLE
-				textview_logindatainput_loadingstatus?.text = getString(R.string.logindatainput_data_loaded)
+				textview_logindatainput_loadingstatus?.text =
+					getString(R.string.logindatainput_data_loaded)
 
 				preferences.saveProfileId(userId.toLong())
 
@@ -291,16 +352,22 @@ class LoginDataInputActivity : BaseActivity() {
 
 	private fun deleteProfile(user: UserDatabase.User) {
 		MaterialAlertDialogBuilder(this)
-				.setTitle(getString(R.string.main_dialog_delete_profile_title))
-				.setMessage(getString(R.string.main_dialog_delete_profile_message, user.getDisplayedName(applicationContext), user.userData.schoolName))
-				.setNegativeButton(getString(R.string.all_cancel), null)
-				.setPositiveButton(getString(R.string.all_delete)) { _, _ ->
-					userDatabase.deleteUser(user.id!!)
-					preferences.deleteProfile(user.id)
-					setResult(RESULT_OK)
-					finish()
-				}
-				.show()
+			.setTitle(getString(R.string.main_dialog_delete_profile_title))
+			.setMessage(
+				getString(
+					R.string.main_dialog_delete_profile_message,
+					user.getDisplayedName(applicationContext),
+					user.userData.schoolName
+				)
+			)
+			.setNegativeButton(getString(R.string.all_cancel), null)
+			.setPositiveButton(getString(R.string.all_delete)) { _, _ ->
+				userDatabase.deleteUser(user.id!!)
+				preferences.deleteProfile(user.id)
+				setResult(RESULT_OK)
+				finish()
+			}
+			.show()
 	}
 
 	private fun updateLoadingStatus(msg: String) {
@@ -315,9 +382,9 @@ class LoginDataInputActivity : BaseActivity() {
 
 		supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_PROFILE_UPDATE)?.let {
 			supportFragmentManager
-					.beginTransaction()
-					.remove(it)
-					.commit()
+				.beginTransaction()
+				.remove(it)
+				.commit()
 		}
 	}
 
@@ -326,13 +393,16 @@ class LoginDataInputActivity : BaseActivity() {
 		super.onBackPressed()
 	}
 
-	private fun getProxyHost(): String? = if (switch_logindatainput_advanced.isChecked) edittext_logindatainput_proxy_host?.text.toString() else null
+	private fun getProxyHost(): String? =
+		if (switch_logindatainput_advanced.isChecked) edittext_logindatainput_proxy_host?.text.toString() else null
 
 	private fun setElementsEnabled(enabled: Boolean) {
 		textinputlayout_logindatainput_profilename?.isEnabled = enabled
 		textinputlayout_logindatainput_school?.isEnabled = enabled && schoolInfoFromSearch == null
-		textinputlayout_logindatainput_user?.isEnabled = enabled && switch_logindatainput_anonymouslogin?.isChecked == false
-		textinputlayout_logindatainput_key?.isEnabled = enabled && switch_logindatainput_anonymouslogin?.isChecked == false
+		textinputlayout_logindatainput_user?.isEnabled =
+			enabled && switch_logindatainput_anonymouslogin?.isChecked == false
+		textinputlayout_logindatainput_key?.isEnabled =
+			enabled && switch_logindatainput_anonymouslogin?.isChecked == false
 		textinputlayout_logindatainput_proxy_host?.isEnabled = enabled
 		button_logindatainput_login?.isEnabled = enabled
 		button_logindatainput_delete?.isEnabled = enabled

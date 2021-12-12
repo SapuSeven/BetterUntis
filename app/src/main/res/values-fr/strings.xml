@@ -203,7 +203,7 @@
     <string name="logindatainput_username">Nom d’utilisateur</string>
     <string name="logindatainput_school">Nom de l’école ou identifiant</string>
     <string name="login_manual_data_input">Saisie manuelle</string>
-    <string name="login_search_by_school_name_or_address">Chercher par nom de l’école ou par adresse</string>
+    <string name="login_search_by_school_name_or_address">Chercher par nom d’école ou par adresse</string>
     <string name="login_no_results">Aucun résultat</string>
     <string name="login_please_log_in">Choisissez une des options suivantes pour vous connecter :</string>
     <string name="login_welcome">Bienvenue sur BetterUntis !</string>
@@ -223,9 +223,9 @@
     <string name="main_dialog_update_profile_button">Mettre à jour le profil</string>
     <string name="main_dialog_update_profile_message">Une récente mise à jour de l’appli a changé la manière dont les données utilisateur sont enregistrées. Veuillez mettre à jour votre profil actuel pour continuer à utiliser l’appli.</string>
     <string name="main_dialog_update_profile_title">Mise à jour du profil nécessaire</string>
-    <string name="main_dialog_delete_profile_message">Êtes-vous sûr·e de vouloir supprimer votre profil avec l’utilisateur %1$s à l’école %2$s \?</string>
+    <string name="main_dialog_delete_profile_message">Êtes-vous sûr·e de vouloir supprimer votre profil avec l’utilisateur %1$s de l’école %2$s \?</string>
     <string name="main_dialog_delete_profile_title">Supprimer le profil \?</string>
-    <string name="mainactivitydrawer_profile_delete_hint">Rester appuyé sur un profil pour le modifier</string>
+    <string name="mainactivitydrawer_profile_delete_hint">Restez appuyé sur un profil pour le modifier</string>
     <string name="mainactivitydrawer_profile_add">Ajouter un profil</string>
     <string name="mainactivitydrawer_dropdown_show">Afficher la liste des profils</string>
     <string name="menu_infocenter_absences">Absences</string>
@@ -240,9 +240,9 @@
     <string name="activity_title_free_rooms">Salles libres</string>
     <string name="activity_title_errors">Erreurs</string>
     <string name="all_dialog_error_message">Identifiant de la demande : %1$d
-\nCode de l’erreur : %2$d
+\nCode d’erreur : %2$d
 \nMessage d’erreur : %3$s</string>
-    <string name="all_dialog_error_title">Infos de l’erreur</string>
+    <string name="all_dialog_error_title">Infos d’erreur</string>
     <string name="all_dialog_datepicker_button_today">Aujourd’hui</string>
     <string name="all_lesson_exam">%1$s (examen !)</string>
     <string name="all_lesson_irregular">%1$s (irrégulier)</string>
@@ -262,7 +262,7 @@
     <string name="all_anonymous">Anonyme</string>
     <string name="all_rooms">Salles</string>
     <string name="all_teachers">Enseignants</string>
-    <string name="all_subjects">Matières</string>
+    <string name="all_subjects">Sujets</string>
     <string name="all_personal">Personnel</string>
     <string name="all_failed">échec</string>
     <string name="all_success">succès</string>
@@ -293,4 +293,7 @@
     <string name="infocenter_absence_unknown_reason">Raison inconnue</string>
     <string name="infocenter_messages_attachments">Pièces jointes</string>
     <string name="logindatainput_skip_school_id">Passer la résolution de l\'identifiant de l\'école</string>
+    <string name="main_dialog_itemdetails_timeformat">%1$s - %2$s</string>
+    <string name="all_lessontopic_none">(Aucun sujet)</string>
+    <string name="all_lesson_details">Détails du cours</string>
 </resources>
