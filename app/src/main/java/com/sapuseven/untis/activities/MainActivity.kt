@@ -957,7 +957,6 @@ class MainActivity :
 										updateNavDrawer(findViewById(R.id.navigationview_main))
 										refreshNavigationViewSelection()
 										recreate()
-										setTarget(it.id,it.type,timetableDatabaseInterface.getLongName(it.id, TimetableDatabaseInterface.Type.valueOf(it.type)) )
 									}
 								}
 							}
