@@ -1,6 +1,11 @@
 package com.sapuseven.untis.models.untis
 
 import kotlinx.serialization.*
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import org.joda.time.LocalDate
 import org.joda.time.format.ISODateTimeFormat
 
@@ -11,6 +16,8 @@ class UntisDate(
 ) {
 	@Serializer(forClass = UntisDate::class)
 	companion object : KSerializer<UntisDate> {
+		override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("UntisDate", PrimitiveKind.STRING)
+
 		override fun serialize(encoder: Encoder, obj: UntisDate) {
 			encoder.encodeString(obj.date)
 		}

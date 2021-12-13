@@ -40,7 +40,7 @@ import kotlinx.android.synthetic.main.activity_settings.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.builtins.list
+import kotlinx.serialization.decodeFromString
 import kotlin.math.min
 
 class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback {
@@ -82,8 +82,8 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 		}
 	}
 
-	override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-		if (item?.itemId == android.R.id.home)
+	override fun onOptionsItemSelected(item: MenuItem): Boolean {
+		if (item.itemId == android.R.id.home)
 			onBackPressed()
 		return true
 	}
@@ -278,7 +278,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 			val preferenceScreen = this.preferenceScreen
 			val indicator = findPreference<Preference>("preferences_contributors_indicator")
 			if (success) {
-				val contributors = getJSON().parse(GithubUser.serializer().list, data)
+				val contributors = getJSON().decodeFromString<List<GithubUser>>(data)
 
 				preferenceScreen.removePreference(indicator)
 

@@ -32,6 +32,8 @@ import com.sapuseven.untis.models.untis.response.SchoolSearchResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
 
 class LoginActivity : BaseActivity(), View.OnClickListener {
 	companion object {
@@ -128,7 +130,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 
 		val result = api.request(query)
 		result.fold({ data ->
-			untisResponse = getJSON().parse(SchoolSearchResponse.serializer(), data)
+			untisResponse = getJSON().decodeFromString(data)
 		}, { error ->
 			println("An error of type ${error.exception} happened: ${error.message}") // TODO: Implement proper error handling
 		})
@@ -170,7 +172,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 			val schoolInfo = itemPosition?.let { pos -> adapter?.getDatasetItem(pos)?.untisSchoolInfo }
 
 			schoolInfo?.let {
-				val builder = Uri.Builder().appendQueryParameter("schoolInfo", getJSON().stringify(UntisSchoolInfo.serializer(), schoolInfo))
+				val builder = Uri.Builder().appendQueryParameter("schoolInfo", getJSON().encodeToString(schoolInfo))
 
 				val intent = Intent(this, LoginDataInputActivity::class.java)
 				intent.data = builder.build()

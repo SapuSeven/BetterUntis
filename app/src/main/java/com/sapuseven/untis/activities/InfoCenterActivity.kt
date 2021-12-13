@@ -26,6 +26,7 @@ import kotlinx.android.synthetic.main.activity_infocenter.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
 import org.joda.time.LocalDate
 import java.text.SimpleDateFormat
 import java.util.*
@@ -209,7 +210,7 @@ class InfoCenterActivity : BaseActivity() {
 
 		val result = api.request(query)
 		return result.fold({ data ->
-			val untisResponse = getJSON().parse(MessageResponse.serializer(), data)
+			val untisResponse = getJSON().decodeFromString<MessageResponse>(data)
 
 			untisResponse.result?.messages
 		}, { null })
@@ -230,7 +231,7 @@ class InfoCenterActivity : BaseActivity() {
 
 		val result = api.request(query)
 		return result.fold({ data ->
-			val untisResponse = getJSON().parse(OfficeHoursResponse.serializer(), data)
+			val untisResponse = getJSON().decodeFromString<OfficeHoursResponse>(data)
 
 			untisResponse.result?.officeHours
 		}, { null })
@@ -254,7 +255,7 @@ class InfoCenterActivity : BaseActivity() {
 
 			val result = api.request(query)
 			return result.fold({ data ->
-				val untisResponse = getJSON().parse(ExamResponse.serializer(), data)
+				val untisResponse = getJSON().decodeFromString<ExamResponse>(data)
 
 				untisResponse.result?.exams?.map { EventAdapterItem(it, null, null) }
 			}, { null })
@@ -280,7 +281,7 @@ class InfoCenterActivity : BaseActivity() {
 
 			val result = api.request(query)
 			return result.fold({ data ->
-				val untisResponse = getJSON().parse(HomeworkResponse.serializer(), data)
+				val untisResponse = getJSON().decodeFromString<HomeworkResponse>(data)
 
 				untisResponse.result?.homeWorks?.map { EventAdapterItem(null, it, untisResponse.result.lessonsById) }
 			}, { null })
@@ -305,7 +306,7 @@ class InfoCenterActivity : BaseActivity() {
 
 		val result = api.request(query)
 		return result.fold({ data ->
-			val untisResponse = getJSON().parse(AbsenceResponse.serializer(), data)
+			val untisResponse = getJSON().decodeFromString<AbsenceResponse>(data)
 
 			untisResponse.result?.absences?.sortedBy { it.excused }
 		}, { null })

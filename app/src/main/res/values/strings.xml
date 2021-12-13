@@ -47,7 +47,7 @@
 
 	<string name="errors_github_attach_file_message">Please attach the compressed log files to this issue.\nThey have been saved to `%1$s`</string>
 
-	<string name="menu_nav_timetables">Timetables</string>
+	<string name="nav_all_timetables">Timetables</string>
 	<string name="menu_infocenter_messagesofday">Messages</string>
 	<string name="menu_infocenter_officehours">Office Hours</string>
 	<string name="menu_infocenter_events">Events</string>

@@ -37,7 +37,7 @@ data class Teacher(
 		values.put("name", name)
 		values.put("firstName", firstName)
 		values.put("lastName", lastName)
-		values.put("departmentIds", ""/*getJSON().stringify(departmentIds)*/) // TODO: Fix this to work with Lists
+		values.put("departmentIds", ""/*getJSON().encodeToString<departmentIds)*/) // TODO: Fix this to work with Lists
 		values.put("foreColor", foreColor)
 		values.put("backColor", backColor)
 		values.put("entryDate", entryDate)

@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.Log
 import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.helpers.config.PreferenceUtils
@@ -33,7 +34,7 @@ class StartupReceiver : BroadcastReceiver() {
 					putExtra(EXTRA_LONG_PROFILE_ID, preferenceManager.currentProfileId())
 				}
 		).forEach {
-			val pendingIntent = PendingIntent.getBroadcast(context, 0, it, 0)
+			val pendingIntent = PendingIntent.getBroadcast(context, 0, it, PendingIntent.FLAG_IMMUTABLE)
 			val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 			am.setInexactRepeating(AlarmManager.RTC_WAKEUP, dateTime.millis, AlarmManager.INTERVAL_DAY, pendingIntent)
 
