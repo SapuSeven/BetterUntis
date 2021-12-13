@@ -227,7 +227,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 				val endDate = UntisDate.fromLocalDate(LocalDate.now().withDayOfWeek(
 						DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(user.timeGrid.days.last().day).dayOfWeek
 				))
-				val proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
+				val proxyHost: String = preferences["preference_connectivity_proxy_host", null]
 
 				TimetableLoader(WeakReference(this), object : TimetableDisplay {
 					override fun addTimetableItems(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
