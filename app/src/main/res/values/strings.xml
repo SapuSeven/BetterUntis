@@ -311,7 +311,7 @@
 	<string name="widget_daily_messages">Daily Messages</string>
 	<string name="widget_select_profile">Please select a profile for the widget</string>
 	<string name="widget_timetable_link">Timetable Link</string>
-	<string name="add_timetable">Add Timetable</string>
+	<string name="maindrawer_bookmarks_add">Add Timetable</string>
 
 	<plurals name="main_time_diff_minutes">
 		<item quantity="one">a minute ago</item>
@@ -333,4 +333,5 @@
 		<item quantity="one">%1$d contribution</item>
 		<item quantity="other">%1$d contributions</item>
 	</plurals>
+    <string name="main_dialog_delete_bookmark">Would you like to delete this bookmark?</string>
 </resources>

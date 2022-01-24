@@ -296,4 +296,6 @@
     <string name="all_dialog_crash_title">Absturzprotokoll gefunden</string>
     <string name="all_lessontopic_none">(Kein Lehrstoff)</string>
     <string name="main_dialog_itemdetails_timeformat">%1$s - %2$s</string>
+    <string name="main_dialog_delete_bookmark">Dieses Lesezeichen löschen?</string>
+    <string name="maindrawer_bookmarks_add">Stundenplan hinzufügen</string>
 </resources>

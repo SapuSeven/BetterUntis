@@ -20,6 +20,7 @@ import com.sapuseven.untis.helpers.api.LoginHelper
 import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.models.UntisSchoolInfo
 import com.sapuseven.untis.models.untis.masterdata.TimeGrid
+import com.sapuseven.untis.models.untis.masterdata.TimetableBookmark
 import kotlinx.android.synthetic.main.activity_logindatainput.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -305,6 +306,11 @@ class LoginDataInputActivity : BaseActivity() {
 						?: return@run
 				}
 			val userDataResponse = loadUserData(apiUrl, appSharedSecret) ?: return@run
+			val bookmarks = if (existingUserId == null){
+				ArrayList()
+			} else {
+				userDatabase.getUser(existingUserId!!)!!.bookmarks
+			}
 			val user = UserDatabase.User(
 				existingUserId,
 				edittext_logindatainput_profilename?.text.toString(),
@@ -317,7 +323,7 @@ class LoginDataInputActivity : BaseActivity() {
 				userDataResponse.masterData.timeStamp,
 				userDataResponse.userData,
 				userDataResponse.settings,
-					bookmarks = ArrayList()
+					bookmarks = bookmarks
 			)
 
 			val userId =

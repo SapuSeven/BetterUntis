@@ -9,12 +9,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.sax.Element
 import android.util.Log
 import android.view.*
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
@@ -143,6 +140,7 @@ class MainActivity :
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 	private lateinit var weekView: WeekView<TimegridItem>
 	private var BOOKMARKS_ADD_ID = Menu.FIRST
+	private var bookmarksHasNew = false
 
 	private val timetableItemDetailsViewModel: PeriodDataViewModel by viewModels()
 
@@ -758,6 +756,7 @@ class MainActivity :
 			R.string.main_drawer_close
 		)
 		drawer_layout.addDrawerListener(toggle)
+		toolbar_main.setNavigationOnClickListener { setBookmarksLongClickListeners() ; openDrawer() }
 		toggle.syncState()
 		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
 		window.statusBarColor = Color.TRANSPARENT
@@ -779,7 +778,7 @@ class MainActivity :
 					DrawerLayout.LOCK_MODE_UNLOCKED,
 					GravityCompat.START
 				)
-				toolbar_main.setNavigationOnClickListener { openDrawer() }
+				toolbar_main.setNavigationOnClickListener {  setBookmarksLongClickListeners() ; openDrawer() }
 				// TODO: Set actionBar title to default
 			}
 		}
@@ -788,13 +787,24 @@ class MainActivity :
 	override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
 		var i = 0
 		navigationview_main.menu.findItem(R.id.nav_personal_bookmarks_title).subMenu.let {
+			// remove everything except personal timetable (in case menu has been invalidated)
+			for(index in 0 until it.size()){
+				it.removeItem(index)
+			}
 			userDatabase.getUser(profileId)?.bookmarks?.forEach { bookmark ->
 				it.add(0, i, Menu.FIRST + i, bookmark.displayName).setIcon(bookmark.drawableId).isCheckable = true
 				++i
 			}
-			BOOKMARKS_ADD_ID = Menu.FIRST + i;
-			it.add(0, BOOKMARKS_ADD_ID, Menu.FIRST + i, getString(R.string.add_timetable)).setIcon(getDrawable(R.drawable.all_add))
+			BOOKMARKS_ADD_ID = Menu.FIRST + i
+			it.add(0, BOOKMARKS_ADD_ID, Menu.FIRST + i, getString(R.string.maindrawer_bookmarks_add)).setIcon(getDrawable(R.drawable.all_add))
+			// Not ideal, but this needs to be in onPrepareOptionsMenu() because the function is called asynchronously
+
+			if(bookmarksHasNew){
+				navigationview_main.setCheckedItem(i-1)
+				bookmarksHasNew = false
+			}
 		}
+		setBookmarksLongClickListeners()
 		return super.onPrepareOptionsMenu(menu)
 	}
 
@@ -955,8 +965,9 @@ class MainActivity :
 										user.bookmarks.add(TimetableBookmark(it.id, it.type, timetableDatabaseInterface.getShortName(it.id, TimetableDatabaseInterface.Type.valueOf(it.type)), R.drawable.all_rooms))
 										userDatabase.editUser(user)
 										updateNavDrawer(findViewById(R.id.navigationview_main))
-										refreshNavigationViewSelection()
-										recreate()
+										bookmarksHasNew = true
+										invalidateOptionsMenu()
+										setTarget(it.id,it.type,timetableDatabaseInterface.getLongName(it.id, TimetableDatabaseInterface.Type.valueOf(it.type)))
 									}
 								}
 							}
@@ -1022,7 +1033,6 @@ class MainActivity :
 				}
 			}
 		}
-
 		closeDrawer()
 		return true
 	}
@@ -1364,6 +1374,36 @@ class MainActivity :
 		var items: List<WeekViewEvent<TimegridItem>> = emptyList()
 		var lastUpdated: Long = 0
 		var dateRange: Pair<UntisDate, UntisDate>? = null
+	}
+
+	private fun setBookmarksLongClickListeners() {
+		(navigationview_main[0] as RecyclerView).let { rv ->
+			rv.post {
+				for (index in 3..rv.layoutManager?.itemCount!!) {
+					val bookmarks = userDatabase.getUser(profileId)?.bookmarks
+					if(bookmarks != null){
+						if(index-3 < bookmarks.size) {
+							rv.layoutManager?.findViewByPosition(index)?.setOnLongClickListener {
+								Log.d("Bookmark", "$index")
+								closeDrawer()
+								MaterialAlertDialogBuilder(this).setMessage(getString(R.string.main_dialog_delete_bookmark))
+										.setPositiveButton(getString(R.string.all_yes)) { _, _ ->
+											userDatabase.getUser(profileId)?.let { user ->
+												user.bookmarks.removeAt(index - 3)
+												userDatabase.editUser(user)
+												invalidateOptionsMenu()
+											}
+										}
+										.setNegativeButton(getString(R.string.all_no)) { _, _ -> }
+										.show()
+								true
+							}
+						}
+					}
+
+				}
+			}
+		}
 	}
 }
 
