@@ -804,7 +804,6 @@ class MainActivity :
 				bookmarksHasNew = false
 			}
 		}
-		setBookmarksLongClickListeners()
 		return super.onPrepareOptionsMenu(menu)
 	}
 
