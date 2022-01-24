@@ -90,6 +90,7 @@ import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.properties.Delegates
 
 class MainActivity :
 		BaseActivity(),
@@ -139,9 +140,8 @@ class MainActivity :
 	private lateinit var profileListAdapter: ProfileListAdapter
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 	private lateinit var weekView: WeekView<TimegridItem>
-	private var BOOKMARKS_ADD_ID = Menu.FIRST
+	private var BOOKMARKS_ADD_ID: Int = 0
 	private var bookmarksHasNew = false
-
 	private val timetableItemDetailsViewModel: PeriodDataViewModel by viewModels()
 
 	private val weekViewUpdate = object : Runnable {
@@ -795,7 +795,7 @@ class MainActivity :
 				it.add(0, i, Menu.FIRST + i, bookmark.displayName).setIcon(bookmark.drawableId).isCheckable = true
 				++i
 			}
-			BOOKMARKS_ADD_ID = Menu.FIRST + i
+			BOOKMARKS_ADD_ID = i
 			it.add(0, BOOKMARKS_ADD_ID, Menu.FIRST + i, getString(R.string.maindrawer_bookmarks_add)).setIcon(getDrawable(R.drawable.all_add))
 			// Not ideal, but this needs to be in onPrepareOptionsMenu() because the function is called asynchronously
 
