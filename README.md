@@ -4,8 +4,8 @@ An alternative mobile client for the Untis timetable system.
 
 <a href="https://circleci.com/gh/SapuSeven/BetterUntis"><img src="https://img.shields.io/circleci/build/gh/SapuSeven/BetterUntis?style=for-the-badge" alt="CircleCI"></a>
 <a href="https://hosted.weblate.org/engage/betteruntis/?utm_source=widget"><img src="https://img.shields.io/badge/dynamic/xml?color=green&label=localized&query=%2F%2F%2A%5Blocal-name%28%29%3D%27text%27%5D%5Blast%28%29%5D%2Ftext%28%29&url=https%3A%2F%2Fhosted.weblate.org%2Fwidgets%2Fbetteruntis%2F-%2Fsvg-badge.svg&style=for-the-badge" alt="Translation status" width=147.5 height=28/></a>
-<a href="https://gitter.im/SapuSeven/BetterUntis"><img src="https://img.shields.io/gitter/room/SapuSeven/BetterUntis?color=blueviolet&style=for-the-badge" alt="Gitter"></a>
-<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=A9CN6R4FTY5EQ"><img src="https://img.shields.io/badge/Donate-PayPal-yellow?style=for-the-badge" alt="Donate with PayPal" /></a>
+<a href="https://matrix.to/#/#github:sapuseven.com"><img src="https://img.shields.io/badge/chat-on matrix-blueviolet?style=for-the-badge" alt="Matrix"></a>
+<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=A9CN6R4FTY5EQ"><img src="https://img.shields.io/badge/Donate-PayPal-blue?style=for-the-badge" alt="Donate with PayPal" /></a>
 
 You can download the latest automated debug build [from my website](https://sapuseven.com/app/BetterUntis).
 
@@ -33,8 +33,6 @@ Another major change is the use of a custom WeekView (based on [Till Hellmund](h
 
 _Due to me leaving school and starting to work, I don't have access to Untis any more which greatly reduces my ability to test the app.
 Unfortunately, this and my lack of free time means that I currently don't actively work on this project._
-
-_I'm very thankful to everyone who used and supported BetterUntis and hope it will still remain useful in the future._
 
 ## New features
 - Select your school by name or ID, no URL needed
