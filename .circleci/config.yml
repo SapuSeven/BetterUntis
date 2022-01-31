@@ -135,7 +135,7 @@ workflows:
             - build
           filters:
             branches:
-              ignore: /^(?!master).*$/
+              ignore: /.*/
             tags:
               only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
       - deploy_fastlane:
@@ -143,6 +143,6 @@ workflows:
             - build
           filters:
             branches:
-              ignore: /^(?!master).*$/
+              ignore: /.*/
             tags:
               only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
