@@ -8,7 +8,7 @@ data class PeriodText(
 		val lesson: String,
 		val substitution: String,
 		val info: String,
-		val staffInfo: UnknownObject?, // Type is probably String, but UnknownObject is used for now to determine possible contents
+		val staffInfo: UnknownObject? = null, // Type is probably String, but UnknownObject is used for now to determine possible contents
 		val attachments: UnknownObject? = null,
 		val staffAttachments: UnknownObject? = null
 ) {
