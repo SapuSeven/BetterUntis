@@ -35,6 +35,7 @@ data class Period(
 
 	init {
 		UnknownObject.validate(mapOf("exam" to exam))
+		UnknownObject.validate(mapOf("blockHash" to blockHash))
 	}
 
 	fun equalsIgnoreTime(second: Period): Boolean {
