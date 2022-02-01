@@ -114,8 +114,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 								"${UserDatabaseContract.Users.COLUMN_NAME_USERDATA}, " +
 								"${UserDatabaseContract.Users.COLUMN_NAME_SETTINGS}, " +
 								"${UserDatabaseContract.Users.COLUMN_NAME_CREATED} " +
-								"FROM ${UserDatabaseContract.Users.TABLE_NAME}_v5;" +
-								"NULL"
+								"FROM ${UserDatabaseContract.Users.TABLE_NAME}_v5;"
 					)
 					db.execSQL("DROP TABLE ${UserDatabaseContract.Users.TABLE_NAME}_v5")
 				}
