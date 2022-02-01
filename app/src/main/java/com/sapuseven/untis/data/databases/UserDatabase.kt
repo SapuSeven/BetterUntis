@@ -37,7 +37,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 	}
 
 	override fun onCreate(db: SQLiteDatabase) {
-		db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V6)
+		db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V7)
 		db.execSQL(generateCreateTable<AbsenceReason>())
 		db.execSQL(generateCreateTable<Department>())
 		db.execSQL(generateCreateTable<Duty>())
