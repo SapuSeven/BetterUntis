@@ -8,13 +8,13 @@ import android.database.Cursor.FIELD_TYPE_STRING
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
-import android.service.autofill.UserData
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.UserDatabaseQueryHelper.generateCreateTable
 import com.sapuseven.untis.helpers.UserDatabaseQueryHelper.generateDropTable
 import com.sapuseven.untis.helpers.UserDatabaseQueryHelper.generateValues
 import com.sapuseven.untis.interfaces.TableModel
+import com.sapuseven.untis.models.TimetableBookmark
 import com.sapuseven.untis.models.untis.UntisMasterData
 import com.sapuseven.untis.models.untis.UntisSettings
 import com.sapuseven.untis.models.untis.UntisUserData
@@ -22,7 +22,7 @@ import com.sapuseven.untis.models.untis.masterdata.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
-private const val DATABASE_VERSION = 6
+private const val DATABASE_VERSION = 7
 private const val DATABASE_NAME = "userdata.db"
 
 class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -118,6 +118,28 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 					)
 					db.execSQL("DROP TABLE ${UserDatabaseContract.Users.TABLE_NAME}_v5")
 				}
+				6 -> {
+					db.execSQL("ALTER TABLE ${UserDatabaseContract.Users.TABLE_NAME} RENAME TO ${UserDatabaseContract.Users.TABLE_NAME}_v6")
+					db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V5)
+					db.execSQL(
+							"INSERT INTO ${UserDatabaseContract.Users.TABLE_NAME} SELECT " +
+									"${BaseColumns._ID}," +
+									"'', " +
+									"${UserDatabaseContract.Users.COLUMN_NAME_APIURL}, " +
+									"${UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID}, " +
+									"${UserDatabaseContract.Users.COLUMN_NAME_USER}, " +
+									"${UserDatabaseContract.Users.COLUMN_NAME_KEY}, " +
+									"${UserDatabaseContract.Users.COLUMN_NAME_ANONYMOUS}, " +
+									"${UserDatabaseContract.Users.COLUMN_NAME_TIMEGRID}, " +
+									"${UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP}, " +
+									"${UserDatabaseContract.Users.COLUMN_NAME_USERDATA}, " +
+									"${UserDatabaseContract.Users.COLUMN_NAME_SETTINGS}, " +
+									"${UserDatabaseContract.Users.COLUMN_NAME_CREATED}, " +
+									"NULL " +
+									"FROM ${UserDatabaseContract.Users.TABLE_NAME}_v6;"
+					)
+					db.execSQL("DROP TABLE ${UserDatabaseContract.Users.TABLE_NAME}_v6")
+				}
 			}
 
 			currentVersion++
@@ -158,7 +180,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		user.settings?.let { values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().encodeToString<UntisSettings>(it)) }
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USERDATA, getJSON().encodeToString<UntisUserData>(user.userData))
 		user.settings?.let { values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().encodeToString<UntisSettings>(it)) }
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_BOOKMARK_TIMETABLES, getJSON().encodeToString<ArrayList<TimetableBookmark>>(user.bookmarks))
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_BOOKMARK_TIMETABLES, getJSON().encodeToString<List<TimetableBookmark>>(user.bookmarks))
 
 		val id = db.insert(UserDatabaseContract.Users.TABLE_NAME, null, values)
 
@@ -184,7 +206,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP, user.masterDataTimestamp)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USERDATA, getJSON().encodeToString<UntisUserData>(user.userData))
 		user.settings?.let { values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().encodeToString<UntisSettings>(it)) }
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_BOOKMARK_TIMETABLES, getJSON().encodeToString<ArrayList<TimetableBookmark>>(user.bookmarks))
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_BOOKMARK_TIMETABLES, getJSON().encodeToString<List<TimetableBookmark>>(user.bookmarks))
 
 
 		db.update(UserDatabaseContract.Users.TABLE_NAME, values, BaseColumns._ID + "=?", arrayOf(user.id.toString()))
@@ -415,19 +437,19 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 	}
 
 	class User(
-		val id: Long? = null,
-		val profileName: String = "",
-		val apiUrl: String,
-		val schoolId: String,
-		val user: String? = null,
-		val key: String? = null,
-		val anonymous: Boolean = false,
-		val timeGrid: TimeGrid,
-		val masterDataTimestamp: Long,
-		val userData: UntisUserData,
-		val settings: UntisSettings? = null,
-		val created: Long? = null,
-		val bookmarks: ArrayList<TimetableBookmark>
+			val id: Long? = null,
+			val profileName: String = "",
+			val apiUrl: String,
+			val schoolId: String,
+			val user: String? = null,
+			val key: String? = null,
+			val anonymous: Boolean = false,
+			val timeGrid: TimeGrid,
+			val masterDataTimestamp: Long,
+			val userData: UntisUserData,
+			val settings: UntisSettings? = null,
+			val created: Long? = null,
+			val bookmarks: List<TimetableBookmark>
 	) {
 		fun getDisplayedName(context: Context): String {
 			return when {

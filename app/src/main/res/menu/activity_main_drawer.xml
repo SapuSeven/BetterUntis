@@ -10,7 +10,7 @@
 			</group>
 		</menu>
 	</item>
-	<group android:id="@+id/nav_more_timetables">
+	<group android:id="@+id/nav_more_timetables" android:checkableBehavior="single">
 		<item
 			android:id="@+id/nav_show_classes"
 			android:icon="@drawable/all_classes"

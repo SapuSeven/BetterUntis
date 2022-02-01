@@ -1,4 +1,4 @@
-package com.sapuseven.untis.models.untis.masterdata
+package com.sapuseven.untis.models
 
 import kotlinx.serialization.Serializable
 

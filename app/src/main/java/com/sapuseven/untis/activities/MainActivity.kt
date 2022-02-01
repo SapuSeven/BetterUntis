@@ -56,7 +56,7 @@ import com.sapuseven.untis.models.UntisMessage
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.Holiday
 import com.sapuseven.untis.models.untis.masterdata.SchoolYear
-import com.sapuseven.untis.models.untis.masterdata.TimetableBookmark
+import com.sapuseven.untis.models.TimetableBookmark
 import com.sapuseven.untis.models.untis.params.MessageParams
 import com.sapuseven.untis.models.untis.response.MessageResponse
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
@@ -90,7 +90,6 @@ import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.properties.Delegates
 
 class MainActivity :
 		BaseActivity(),
@@ -961,7 +960,7 @@ class MainActivity :
 								val user = userDatabase.getUser(profileId)
 								if(user != null) {
 									element?.let {
-										user.bookmarks.add(TimetableBookmark(it.id, it.type, timetableDatabaseInterface.getShortName(it.id, TimetableDatabaseInterface.Type.valueOf(it.type)), R.drawable.all_rooms))
+										user.bookmarks.plus(TimetableBookmark(it.id, it.type, timetableDatabaseInterface.getShortName(it.id, TimetableDatabaseInterface.Type.valueOf(it.type)), R.drawable.all_rooms))
 										userDatabase.editUser(user)
 										updateNavDrawer(findViewById(R.id.navigationview_main))
 										bookmarksHasNew = true
@@ -1388,7 +1387,7 @@ class MainActivity :
 								MaterialAlertDialogBuilder(this).setMessage(getString(R.string.main_dialog_delete_bookmark))
 										.setPositiveButton(getString(R.string.all_yes)) { _, _ ->
 											userDatabase.getUser(profileId)?.let { user ->
-												user.bookmarks.removeAt(index - 3)
+												user.bookmarks.drop(index - 3)
 												userDatabase.editUser(user)
 												invalidateOptionsMenu()
 											}
