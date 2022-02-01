@@ -23,7 +23,8 @@ data class Period(
 		val exam: UnknownObject? = null, // This element is currently not being used by BetterUntis. More data required
 		val isOnlinePeriod: Boolean? = null,
 		val onlinePeriodLink: String? = null,
-		val messengerChannel: PeriodMessengerChannel? = null
+		val messengerChannel: PeriodMessengerChannel? = null,
+		val blockHash: UnknownObject? = null
 ) {
 	companion object {
 		const val CODE_REGULAR = "REGULAR"
