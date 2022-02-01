@@ -960,7 +960,7 @@ class MainActivity :
 								val user = userDatabase.getUser(profileId)
 								if(user != null) {
 									element?.let {
-										user.bookmarks.plus(TimetableBookmark(it.id, it.type, timetableDatabaseInterface.getShortName(it.id, TimetableDatabaseInterface.Type.valueOf(it.type)), R.drawable.all_rooms))
+										user.bookmarks = user.bookmarks.plus(TimetableBookmark(it.id, it.type, timetableDatabaseInterface.getShortName(it.id, TimetableDatabaseInterface.Type.valueOf(it.type)), R.drawable.all_rooms))
 										userDatabase.editUser(user)
 										updateNavDrawer(findViewById(R.id.navigationview_main))
 										bookmarksHasNew = true
@@ -1387,7 +1387,7 @@ class MainActivity :
 								MaterialAlertDialogBuilder(this).setMessage(getString(R.string.main_dialog_delete_bookmark))
 										.setPositiveButton(getString(R.string.all_yes)) { _, _ ->
 											userDatabase.getUser(profileId)?.let { user ->
-												user.bookmarks.drop(index - 3)
+												user.bookmarks = user.bookmarks.minus(bookmarks[index-3])
 												userDatabase.editUser(user)
 												invalidateOptionsMenu()
 											}

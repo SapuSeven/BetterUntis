@@ -120,7 +120,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 				}
 				6 -> {
 					db.execSQL("ALTER TABLE ${UserDatabaseContract.Users.TABLE_NAME} RENAME TO ${UserDatabaseContract.Users.TABLE_NAME}_v6")
-					db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V5)
+					db.execSQL(UserDatabaseContract.Users.SQL_CREATE_ENTRIES_V7)
 					db.execSQL(
 							"INSERT INTO ${UserDatabaseContract.Users.TABLE_NAME} SELECT " +
 									"${BaseColumns._ID}," +
@@ -135,7 +135,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 									"${UserDatabaseContract.Users.COLUMN_NAME_USERDATA}, " +
 									"${UserDatabaseContract.Users.COLUMN_NAME_SETTINGS}, " +
 									"${UserDatabaseContract.Users.COLUMN_NAME_CREATED}, " +
-									"NULL " +
+									"'[]' " +
 									"FROM ${UserDatabaseContract.Users.TABLE_NAME}_v6;"
 					)
 					db.execSQL("DROP TABLE ${UserDatabaseContract.Users.TABLE_NAME}_v6")
@@ -449,7 +449,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 			val userData: UntisUserData,
 			val settings: UntisSettings? = null,
 			val created: Long? = null,
-			val bookmarks: List<TimetableBookmark>
+			var bookmarks: List<TimetableBookmark>
 	) {
 		fun getDisplayedName(context: Context): String {
 			return when {
