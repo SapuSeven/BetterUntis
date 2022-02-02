@@ -960,7 +960,13 @@ class MainActivity :
 								val user = userDatabase.getUser(profileId)
 								if(user != null) {
 									element?.let {
-										user.bookmarks = user.bookmarks.plus(TimetableBookmark(it.id, it.type, timetableDatabaseInterface.getShortName(it.id, TimetableDatabaseInterface.Type.valueOf(it.type)), R.drawable.all_rooms))
+										user.bookmarks = user.bookmarks.plus(TimetableBookmark(it.id, it.type, timetableDatabaseInterface.getShortName(it.id,
+												TimetableDatabaseInterface.Type.valueOf(it.type)),
+												when(TimetableDatabaseInterface.Type.valueOf(it.type)) {
+													TimetableDatabaseInterface.Type.CLASS -> R.drawable.all_classes
+													TimetableDatabaseInterface.Type.ROOM -> R.drawable.all_rooms
+													TimetableDatabaseInterface.Type.TEACHER -> R.drawable.all_teacher
+													TimetableDatabaseInterface.Type.SUBJECT -> R.drawable.all_subject }))
 										userDatabase.editUser(user)
 										updateNavDrawer(findViewById(R.id.navigationview_main))
 										bookmarksHasNew = true
@@ -1040,7 +1046,7 @@ class MainActivity :
 				timetableDatabaseInterface,
 				ElementPickerDialog.Companion.ElementPickerDialogConfig(type),
 				object: ElementPickerDialog.ElementPickerDialogListener {
-					override fun onDialogDismissed(dialog: DialogInterface?) { /* ignore */ }
+					override fun onDialogDismissed(dialog: DialogInterface?) { refreshNavigationViewSelection() }
 
 					override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
 						if (fragment is DialogFragment)
