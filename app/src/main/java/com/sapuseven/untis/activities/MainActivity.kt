@@ -127,6 +127,7 @@ class MainActivity :
 	private var profileId: Long = -1
 	private val weeklyTimetableItems: MutableMap<Int, WeeklyTimetableItems?> = mutableMapOf()
 	private var displayedElement: PeriodElement? = null
+	private var selectedElement: Int? = null
 	private var lastPickedDate: DateTime? = null
 	private var proxyHost: String? = null
 	private var profileUpdateDialog: AlertDialog? = null
@@ -140,7 +141,6 @@ class MainActivity :
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 	private lateinit var weekView: WeekView<TimegridItem>
 	private var BOOKMARKS_ADD_ID: Int = 0
-	private var bookmarksHasNew = false
 	private val timetableItemDetailsViewModel: PeriodDataViewModel by viewModels()
 
 	private val weekViewUpdate = object : Runnable {
@@ -259,7 +259,7 @@ class MainActivity :
 				TimetableDatabaseInterface.Type.SUBJECT.toString()
 			) ?: TimetableDatabaseInterface.Type.SUBJECT.toString()
 		)
-
+		selectedElement = R.id.nav_show_personal
 		if (customType === TimetableDatabaseInterface.Type.SUBJECT) {
 			profileUser.userData.elemType?.let { type ->
 				return setTarget(
@@ -796,12 +796,7 @@ class MainActivity :
 			}
 			BOOKMARKS_ADD_ID = i
 			it.add(0, BOOKMARKS_ADD_ID, Menu.FIRST + i, getString(R.string.maindrawer_bookmarks_add)).setIcon(getDrawable(R.drawable.all_add))
-			// Not ideal, but this needs to be in onPrepareOptionsMenu() because the function is called asynchronously
-
-			if(bookmarksHasNew){
-				navigationview_main.setCheckedItem(i-1)
-				bookmarksHasNew = false
-			}
+			refreshNavigationViewSelection()
 		}
 		return super.onPrepareOptionsMenu(menu)
 	}
@@ -969,7 +964,7 @@ class MainActivity :
 													TimetableDatabaseInterface.Type.SUBJECT -> R.drawable.all_subject }))
 										userDatabase.editUser(user)
 										updateNavDrawer(findViewById(R.id.navigationview_main))
-										bookmarksHasNew = true
+										selectedElement = user.bookmarks.size - 1
 										invalidateOptionsMenu()
 										setTarget(it.id,it.type,timetableDatabaseInterface.getLongName(it.id, TimetableDatabaseInterface.Type.valueOf(it.type)))
 									}
@@ -1032,6 +1027,7 @@ class MainActivity :
 				if (bookmarks != null) {
 					if(item.itemId < bookmarks.size){
 						val target = bookmarks[item.itemId]
+						selectedElement = item.itemId
 						setTarget(target.classId,target.type,timetableDatabaseInterface.getLongName(target.classId, TimetableDatabaseInterface.Type.valueOf(target.type)))
 					}
 				}
@@ -1058,6 +1054,12 @@ class MainActivity :
 									if (useOrgId) element.orgId else element.id, TimetableDatabaseInterface.Type.valueOf(element.type)))
 						} ?: run {
 							showPersonalTimetable()
+						}
+						selectedElement = when (element?.type) {
+							TimetableDatabaseInterface.Type.CLASS.name -> R.id.nav_show_classes
+							TimetableDatabaseInterface.Type.TEACHER.name -> R.id.nav_show_teachers
+							TimetableDatabaseInterface.Type.ROOM.name -> R.id.nav_show_rooms
+							else -> {R.id.nav_show_personal}
 						}
 						refreshNavigationViewSelection()
 					}
@@ -1238,18 +1240,7 @@ class MainActivity :
 	}
 
 	private fun refreshNavigationViewSelection() {
-		when (displayedElement?.type) {
-			TimetableDatabaseInterface.Type.CLASS.name -> (navigationview_main as NavigationView).setCheckedItem(
-				R.id.nav_show_classes
-			)
-			TimetableDatabaseInterface.Type.TEACHER.name -> (navigationview_main as NavigationView).setCheckedItem(
-				R.id.nav_show_teachers
-			)
-			TimetableDatabaseInterface.Type.ROOM.name -> (navigationview_main as NavigationView).setCheckedItem(
-				R.id.nav_show_rooms
-			)
-			else -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_personal)
-		}
+		selectedElement?.let { (navigationview_main as NavigationView).setCheckedItem(it) }
 	}
 
 	private fun setLastRefresh(timestamp: Long) {
@@ -1393,7 +1384,13 @@ class MainActivity :
 								MaterialAlertDialogBuilder(this).setMessage(getString(R.string.main_dialog_delete_bookmark))
 										.setPositiveButton(getString(R.string.all_yes)) { _, _ ->
 											userDatabase.getUser(profileId)?.let { user ->
+												if(selectedElement == index-3) {
+													showPersonalTimetable()
+												}
 												user.bookmarks = user.bookmarks.minus(bookmarks[index-3])
+												if(selectedElement!! < bookmarks.size && selectedElement!! > index-3){
+													selectedElement = selectedElement!! - 1
+												}
 												userDatabase.editUser(user)
 												invalidateOptionsMenu()
 											}
