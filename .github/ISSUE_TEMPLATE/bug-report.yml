@@ -63,6 +63,6 @@ body:
     attributes:
       label: Additional information
       description: |-
-        Add additional information that doesn't fit the categories above here.
+        Add additional information that doesn't fit the categories above.
     validations:
       required: false
