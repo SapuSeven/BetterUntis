@@ -138,7 +138,7 @@
     <string name="menu_infocenter_messagesofday">Mesajlar</string>
     <string name="errors_github_attach_file_message">Lütfen sıkıştırılmış rapor dosyasını buraya ekleyin.
 \nŞuraya kaydedildiler \'%1$s\'</string>
-    <string name="menu_nav_timetables">Ders programı</string>
+    <string name="nav_all_timetables">Ders programı</string>
     <string name="activity_title_free_rooms">Müsait Odalar</string>
     <string name="activity_title_settings">Ayarlar</string>
     <string name="activity_title_info_center">Bilgi Merkezi</string>
