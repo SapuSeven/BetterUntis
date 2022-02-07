@@ -5,12 +5,12 @@ An alternative mobile client for the Untis timetable system.
 <a href="https://circleci.com/gh/SapuSeven/BetterUntis"><img src="https://img.shields.io/circleci/build/gh/SapuSeven/BetterUntis?style=for-the-badge" alt="CircleCI"></a>
 <a href="https://hosted.weblate.org/engage/betteruntis/?utm_source=widget"><img src="https://img.shields.io/badge/dynamic/xml?color=green&label=localized&query=%2F%2F%2A%5Blocal-name%28%29%3D%27text%27%5D%5Blast%28%29%5D%2Ftext%28%29&url=https%3A%2F%2Fhosted.weblate.org%2Fwidgets%2Fbetteruntis%2F-%2Fsvg-badge.svg&style=for-the-badge" alt="Translation status" width=147.5 height=28/></a>
 <a href="https://matrix.to/#/#github:sapuseven.com"><img src="https://img.shields.io/badge/chat-on matrix-blueviolet?style=for-the-badge" alt="Matrix"></a>
-<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=A9CN6R4FTY5EQ"><img src="https://img.shields.io/badge/Donate-PayPal-blue?style=for-the-badge" alt="Donate with PayPal" /></a>
-
-You can download the latest automated debug build [from my website](https://sapuseven.com/app/BetterUntis).
+<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=A9CN6R4FTY5EQ"><img src="https://img.shields.io/badge/Support-On Ko--fi-%2313C3FF?style=for-the-badge" alt="Support on Ko-fi"/></a>
 
 <a href="https://f-droid.org/packages/com.sapuseven.untis"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80"></a>
 <a href="https://play.google.com/store/apps/details?id=com.sapuseven.untis&utm_source=github&utm_campaign=badge"><img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="80"/></a>
+
+You can also download the latest automated build [from my website](https://sapuseven.com/app/BetterUntis).
 
 ## Screenshots
 
