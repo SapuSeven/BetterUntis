@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.content.ContextCompat
@@ -84,7 +85,11 @@ open class BaseWidget : AppWidgetProvider() {
 
 		val updateIntent = Intent(context, this.javaClass)
 				.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
-		val pendingIntent = PendingIntent.getBroadcast(context, 0, updateIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+		val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			PendingIntent.getBroadcast(context, 0, updateIntent, PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE)
+		} else {
+			PendingIntent.getBroadcast(context, 0, updateIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+		}
 		remoteViews.setPendingIntentTemplate(R.id.listview_widget_base_content, pendingIntent)
 
 		return remoteViews
