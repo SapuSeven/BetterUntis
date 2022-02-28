@@ -35,7 +35,7 @@
     <string name="activity_title_settings">设置</string>
     <string name="errors_github_attach_file_message">请将压缩文件附在问题后。
 \n这些压缩文件已存至 `%1$s`</string>
-    <string name="menu_nav_timetables">课程表</string>
+    <string name="nav_all_timetables">课程表</string>
     <string name="menu_infocenter_messagesofday">消息</string>
     <string name="menu_infocenter_officehours">办公时间</string>
     <string name="menu_infocenter_events">活动</string>

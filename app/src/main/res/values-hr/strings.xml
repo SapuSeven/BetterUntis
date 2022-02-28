@@ -235,7 +235,7 @@
     <string name="menu_infocenter_events">Događaji</string>
     <string name="menu_infocenter_officehours">Radno vrijeme</string>
     <string name="menu_infocenter_messagesofday">Poruke</string>
-    <string name="menu_nav_timetables">Raspored sati</string>
+    <string name="nav_all_timetables">Raspored sati</string>
     <string name="errors_github_attach_file_message">Priloži komprimirane datoteke zapisa ovog problema.
 \nSpremljene su u „%1$s”</string>
     <string name="activity_title_settings">Postavke</string>

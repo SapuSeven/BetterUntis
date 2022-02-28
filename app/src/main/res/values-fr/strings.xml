@@ -232,7 +232,7 @@
     <string name="menu_infocenter_events">Évènements</string>
     <string name="menu_infocenter_officehours">Heures de permanence</string>
     <string name="menu_infocenter_messagesofday">Messages</string>
-    <string name="menu_nav_timetables">Emploi du temps</string>
+    <string name="nav_all_timetables">Emploi du temps</string>
     <string name="errors_github_attach_file_message">Veuillez mettre les fichiers de journalisation compressés en pièce-jointe.
 \nIls ont été enregistrés ici : « %1$s »</string>
     <string name="activity_title_settings">Réglages</string>
