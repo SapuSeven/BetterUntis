@@ -86,7 +86,7 @@ open class BaseWidget : AppWidgetProvider() {
 		val updateIntent = Intent(context, this.javaClass)
 				.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
 		val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			PendingIntent.getBroadcast(context, 0, updateIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE)
+			PendingIntent.getBroadcast(context, 0, updateIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 		} else {
 			PendingIntent.getBroadcast(context, 0, updateIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 		}
