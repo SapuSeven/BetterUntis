@@ -4,15 +4,13 @@ An alternative mobile client for the Untis timetable system.
 
 <a href="https://circleci.com/gh/SapuSeven/BetterUntis"><img src="https://img.shields.io/circleci/build/gh/SapuSeven/BetterUntis?style=for-the-badge" alt="CircleCI"></a>
 <a href="https://hosted.weblate.org/engage/betteruntis/?utm_source=widget"><img src="https://img.shields.io/badge/dynamic/xml?color=green&label=localized&query=%2F%2F%2A%5Blocal-name%28%29%3D%27text%27%5D%5Blast%28%29%5D%2Ftext%28%29&url=https%3A%2F%2Fhosted.weblate.org%2Fwidgets%2Fbetteruntis%2F-%2Fsvg-badge.svg&style=for-the-badge" alt="Translation status" width=147.5 height=28/></a>
-<a href="https://gitter.im/SapuSeven/BetterUntis"><img src="https://img.shields.io/gitter/room/SapuSeven/BetterUntis?color=blueviolet&style=for-the-badge" alt="Gitter"></a>
-<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=A9CN6R4FTY5EQ"><img src="https://img.shields.io/badge/Donate-PayPal-yellow?style=for-the-badge" alt="Donate with PayPal" /></a>
-
-You can download the latest automated debug build [from my website](https://sapuseven.com/app/BetterUntis).
+<a href="https://matrix.to/#/#github-betteruntis:sapuseven.com"><img src="https://img.shields.io/badge/chat-on matrix-blueviolet?style=for-the-badge" alt="Matrix"></a>
+<a href="https://ko-fi.com/sapuseven"><img src="https://img.shields.io/badge/Support-On Ko--fi-%2313C3FF?style=for-the-badge" alt="Support on Ko-fi"/></a>
 
 <a href="https://f-droid.org/packages/com.sapuseven.untis"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80"></a>
 <a href="https://play.google.com/store/apps/details?id=com.sapuseven.untis&utm_source=github&utm_campaign=badge"><img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="80"/></a>
 
-_This project has been archived and will no longer be updated. Please look at the section [Development notes](#development-notes) below for more information._
+You can also download the latest automated build [from my website](https://sapuseven.com/app/BetterUntis).
 
 ## Screenshots
 
@@ -28,13 +26,6 @@ Although I reused some parts of the original code, my plan was to entirely switc
 Kotlin has many features and libraries that immensely help to communicate with the Untis API and process the timetable data.
 
 Another major change is the use of a custom WeekView (based on [Till Hellmund](https://github.com/thellmund)'s fork of [Android-Week-View](https://github.com/alamkanak/Android-Week-View)) for the timetable display. This also improved performance by a lot.
-
-### Update as of 2021:
-
-_Due to me leaving school and starting to work, I don't have access to Untis any more which greatly reduces my ability to test the app.
-Unfortunately, this and my lack of free time means that I currently don't actively work on this project._
-
-_I'm very thankful to everyone who used and supported BetterUntis and hope it will still remain useful in the future._
 
 ## New features
 - Select your school by name or ID, no URL needed
