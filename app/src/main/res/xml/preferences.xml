@@ -68,7 +68,7 @@
 		<!-- TODO: Extract string resources -->
 		<PreferenceCategory android:title="Error Reporting">
 			<SwitchPreference
-				android:defaultValue="preference_additional_error_messages_default"
+				android:defaultValue="@bool/preference_additional_error_messages_default"
 				android:key="preference_additional_error_messages"
 				android:summary="This is used for non-critical background errors"
 				android:title="Enable additional error messages" />
