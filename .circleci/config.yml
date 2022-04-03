@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/betteruntis
     docker:
-      - image: cimg/android:2022.3.1
+      - image: cimg/android:2022.03
     environment:
       JVM_OPTS: -Xmx3200m
     steps:
