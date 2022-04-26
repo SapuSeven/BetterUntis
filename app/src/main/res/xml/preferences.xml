@@ -446,6 +446,12 @@
 				android:key="preference_info_github"
 				android:title="@string/preference_info_github" />
 
+			<Preference
+				android:icon="@drawable/settings_info_github"
+				android:key="preference_info_license"
+				android:summary="@string/preference_info_license_desc"
+				android:title="@string/preference_info_license" />
+
 			<PreferenceScreen
 				android:icon="@drawable/settings_about_contributor"
 				android:key="preferences_contributors"

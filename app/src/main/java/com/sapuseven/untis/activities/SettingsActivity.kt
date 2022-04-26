@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -242,33 +243,76 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 						}
 					}
 					"preferences_info" -> {
-						findPreference<Preference>("preference_info_app_version")?.summary = let {
-							val pInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
-							requireContext().getString(R.string.preference_info_app_version_desc,
-									pInfo.versionName,
-									PackageInfoCompat.getLongVersionCode(pInfo)
+						findPreference<Preference>("preference_info_app_version")?.apply {
+							val pInfo =
+								requireContext().packageManager.getPackageInfo(
+									requireContext().packageName,
+									0
+								)
+							summary = requireContext().getString(
+								R.string.preference_info_app_version_desc,
+								pInfo.versionName,
+								PackageInfoCompat.getLongVersionCode(pInfo)
 							)
-						}
-
-						findPreference<Preference>("preference_info_github")?.apply {
-							summary = REPOSITORY_URL_GITHUB
 							setOnPreferenceClickListener {
-								startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(REPOSITORY_URL_GITHUB)))
+								startActivity(
+									Intent(
+										Intent.ACTION_VIEW,
+										Uri.parse("$REPOSITORY_URL_GITHUB/releases")
+									)
+								)
 								true
 							}
 						}
+						findPreference<Preference>("preference_info_github")?.apply {
+							summary = REPOSITORY_URL_GITHUB
+							setOnPreferenceClickListener {
+								startActivity(
+									Intent(
+										Intent.ACTION_VIEW,
+										Uri.parse(REPOSITORY_URL_GITHUB)
+									)
+								)
+								true
+							}
+						}
+						findPreference<Preference>("preference_info_license")?.setOnPreferenceClickListener {
+							startActivity(
+								Intent(
+									Intent.ACTION_VIEW,
+									Uri.parse("$REPOSITORY_URL_GITHUB/blob/master/LICENSE")
+								)
+							)
+							true
+						}
 					}
 					"preferences_contributors" -> {
-						GlobalScope.launch(Dispatchers.Main) {
-							"https://api.github.com/repos/sapuseven/betteruntis/contributors"
-									.httpGet()
-									.awaitStringResult()
-									.fold({ data ->
-										showContributorList(true, data)
-									}, {
-										showContributorList(false)
-									})
-						}
+						AlertDialog.Builder(requireContext())
+							.setTitle(R.string.preference_info_privacy)
+							.setMessage(R.string.preference_info_privacy_desc)
+							.setPositiveButton(android.R.string.ok) { _, _ ->
+								GlobalScope.launch(Dispatchers.Main) {
+									"https://api.github.com/repos/sapuseven/betteruntis/contributors"
+										.httpGet()
+										.awaitStringResult()
+										.fold({ data ->
+											showContributorList(true, data)
+										}, {
+											showContributorList(false)
+										})
+								}
+							}
+							.setNegativeButton(android.R.string.cancel) { _, _ -> }
+							.setNeutralButton(R.string.preference_info_privacy_policy) { _, _ ->
+								startActivity(
+									Intent(
+										Intent.ACTION_VIEW, Uri.parse(
+											"https://docs.github.com/en/github/site-policy/github-privacy-statement"
+										)
+									)
+								)
+							}
+							.show()
 					}
 				}
 			}
