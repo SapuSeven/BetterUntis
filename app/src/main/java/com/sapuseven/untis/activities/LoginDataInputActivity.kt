@@ -305,6 +305,7 @@ class LoginDataInputActivity : BaseActivity() {
 						?: return@run
 				}
 			val userDataResponse = loadUserData(apiUrl, appSharedSecret) ?: return@run
+			val bookmarks = existingUserId?.let { user -> userDatabase.getUser(user)?.bookmarks } ?: emptyList()
 			val user = UserDatabase.User(
 				existingUserId,
 				edittext_logindatainput_profilename?.text.toString(),
@@ -316,7 +317,8 @@ class LoginDataInputActivity : BaseActivity() {
 				userDataResponse.masterData.timeGrid ?: TimeGrid.generateDefault(),
 				userDataResponse.masterData.timeStamp,
 				userDataResponse.userData,
-				userDataResponse.settings
+				userDataResponse.settings,
+					bookmarks = bookmarks
 			)
 
 			val userId =

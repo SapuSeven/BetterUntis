@@ -9,19 +9,16 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.util.Log
+import android.view.*
+import android.widget.*
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.GravityCompat
+import androidx.core.view.get
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -59,6 +56,7 @@ import com.sapuseven.untis.models.UntisMessage
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.Holiday
 import com.sapuseven.untis.models.untis.masterdata.SchoolYear
+import com.sapuseven.untis.models.TimetableBookmark
 import com.sapuseven.untis.models.untis.params.MessageParams
 import com.sapuseven.untis.models.untis.response.MessageResponse
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
@@ -78,6 +76,8 @@ import com.sapuseven.untis.views.weekview.listeners.TopLeftCornerClickListener
 import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
+import kotlinx.android.synthetic.main.activity_main_drawer_header.*
+import kotlinx.android.synthetic.main.item_profiles_add.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -92,14 +92,13 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity :
-	BaseActivity(),
-	NavigationView.OnNavigationItemSelectedListener,
-	WeekViewLoader.PeriodChangeListener<TimegridItem>,
-	EventClickListener<TimegridItem>,
-	TopLeftCornerClickListener,
-	TimetableDisplay,
-	TimetableItemDetailsFragment.TimetableItemDetailsDialogListener,
-	ElementPickerDialog.ElementPickerDialogListener {
+		BaseActivity(),
+		NavigationView.OnNavigationItemSelectedListener,
+		WeekViewLoader.PeriodChangeListener<TimegridItem>,
+		EventClickListener<TimegridItem>,
+		TopLeftCornerClickListener,
+		TimetableDisplay,
+		TimetableItemDetailsFragment.TimetableItemDetailsDialogListener{
 
 	companion object {
 		private const val MINUTE_MILLIS: Int = 60 * 1000
@@ -120,6 +119,7 @@ class MainActivity :
 
 		private const val FRAGMENT_TAG_LESSON_INFO = "com.sapuseven.untis.fragments.lessoninfo"
 		private const val FRAGMENT_TAG_ABSENCE_CHECK = "com.sapuseven.untis.fragments.absencecheck"
+
 	}
 
 	private val userDatabase = UserDatabase.createInstance(this)
@@ -127,6 +127,7 @@ class MainActivity :
 	private var profileId: Long = -1
 	private val weeklyTimetableItems: MutableMap<Int, WeeklyTimetableItems?> = mutableMapOf()
 	private var displayedElement: PeriodElement? = null
+	private var selectedElement: Int? = null
 	private var lastPickedDate: DateTime? = null
 	private var proxyHost: String? = null
 	private var profileUpdateDialog: AlertDialog? = null
@@ -139,7 +140,7 @@ class MainActivity :
 	private lateinit var profileListAdapter: ProfileListAdapter
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 	private lateinit var weekView: WeekView<TimegridItem>
-
+	private var BOOKMARKS_ADD_ID: Int = 0
 	private val timetableItemDetailsViewModel: PeriodDataViewModel by viewModels()
 
 	private val weekViewUpdate = object : Runnable {
@@ -258,7 +259,7 @@ class MainActivity :
 				TimetableDatabaseInterface.Type.SUBJECT.toString()
 			) ?: TimetableDatabaseInterface.Type.SUBJECT.toString()
 		)
-
+		selectedElement = R.id.nav_show_personal
 		if (customType === TimetableDatabaseInterface.Type.SUBJECT) {
 			profileUser.userData.elemType?.let { type ->
 				return setTarget(
@@ -754,10 +755,10 @@ class MainActivity :
 			R.string.main_drawer_close
 		)
 		drawer_layout.addDrawerListener(toggle)
+		toolbar_main.setNavigationOnClickListener { setBookmarksLongClickListeners() ; openDrawer() }
 		toggle.syncState()
 		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
 		window.statusBarColor = Color.TRANSPARENT
-
 		supportFragmentManager.addOnBackStackChangedListener {
 			if (supportFragmentManager.backStackEntryCount > 0) {
 				toggle.isDrawerIndicatorEnabled = false
@@ -776,10 +777,28 @@ class MainActivity :
 					DrawerLayout.LOCK_MODE_UNLOCKED,
 					GravityCompat.START
 				)
-				toolbar_main.setNavigationOnClickListener { openDrawer() }
+				toolbar_main.setNavigationOnClickListener {  setBookmarksLongClickListeners() ; openDrawer() }
 				// TODO: Set actionBar title to default
 			}
 		}
+	}
+
+	override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+		var i = 0
+		navigationview_main.menu.findItem(R.id.nav_personal_bookmarks_title).subMenu.let {
+			// remove everything except personal timetable (in case menu has been invalidated)
+			for(index in 0 until it.size()){
+				it.removeItem(index)
+			}
+			userDatabase.getUser(profileId)?.bookmarks?.forEach { bookmark ->
+				it.add(0, i, Menu.FIRST + i, bookmark.displayName).setIcon(bookmark.drawableId).isCheckable = true
+				++i
+			}
+			BOOKMARKS_ADD_ID = i
+			it.add(0, BOOKMARKS_ADD_ID, Menu.FIRST + i, getString(R.string.maindrawer_bookmarks_add)).setIcon(getDrawable(R.drawable.all_add))
+			refreshNavigationViewSelection()
+		}
+		return super.onPrepareOptionsMenu(menu)
 	}
 
 	private fun prepareItems(items: List<TimegridItem>): List<TimegridItem> {
@@ -921,6 +940,43 @@ class MainActivity :
 				showPersonalTimetable()
 				refreshNavigationViewSelection()
 			}
+			BOOKMARKS_ADD_ID -> {
+				ElementPickerDialog.newInstance(
+						timetableDatabaseInterface,
+						ElementPickerDialog.Companion.ElementPickerDialogConfig(TimetableDatabaseInterface.Type.CLASS),
+						object: ElementPickerDialog.ElementPickerDialogListener {
+							override fun onDialogDismissed(dialog: DialogInterface?) { /* ignore */ }
+
+							override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
+								if(fragment is DialogFragment)
+									fragment.dismiss()
+								else
+									removeFragment(fragment)
+								val user = userDatabase.getUser(profileId)
+								if(user != null) {
+									element?.let {
+										user.bookmarks = user.bookmarks.plus(TimetableBookmark(it.id, it.type, timetableDatabaseInterface.getShortName(it.id,
+												TimetableDatabaseInterface.Type.valueOf(it.type)),
+												when(TimetableDatabaseInterface.Type.valueOf(it.type)) {
+													TimetableDatabaseInterface.Type.CLASS -> R.drawable.all_classes
+													TimetableDatabaseInterface.Type.ROOM -> R.drawable.all_rooms
+													TimetableDatabaseInterface.Type.TEACHER -> R.drawable.all_teacher
+													TimetableDatabaseInterface.Type.SUBJECT -> R.drawable.all_subject }))
+										userDatabase.editUser(user)
+										updateNavDrawer(findViewById(R.id.navigationview_main))
+										selectedElement = user.bookmarks.size - 1
+										invalidateOptionsMenu()
+										setTarget(it.id,it.type,timetableDatabaseInterface.getLongName(it.id, TimetableDatabaseInterface.Type.valueOf(it.type)))
+									}
+								}
+							}
+
+							override fun onPositiveButtonClicked(dialog: ElementPickerDialog) { /* not used */ }
+
+						}
+
+				).show(supportFragmentManager, "elementPicker")
+			}
 			R.id.nav_show_classes -> {
 				showItemList(TimetableDatabaseInterface.Type.CLASS)
 			}
@@ -966,16 +1022,51 @@ class MainActivity :
 				i.putExtra(RoomFinderActivity.EXTRA_LONG_PROFILE_ID, profileId)
 				startActivityForResult(i, REQUEST_CODE_ROOM_FINDER)
 			}
+			else -> {
+				val bookmarks = userDatabase.getUser(profileId)?.bookmarks
+				if (bookmarks != null) {
+					if(item.itemId < bookmarks.size){
+						val target = bookmarks[item.itemId]
+						selectedElement = item.itemId
+						setTarget(target.classId,target.type,timetableDatabaseInterface.getLongName(target.classId, TimetableDatabaseInterface.Type.valueOf(target.type)))
+					}
+				}
+			}
 		}
-
 		closeDrawer()
 		return true
 	}
 
 	private fun showItemList(type: TimetableDatabaseInterface.Type) {
 		ElementPickerDialog.newInstance(
-			timetableDatabaseInterface,
-			ElementPickerDialog.Companion.ElementPickerDialogConfig(type)
+				timetableDatabaseInterface,
+				ElementPickerDialog.Companion.ElementPickerDialogConfig(type),
+				object: ElementPickerDialog.ElementPickerDialogListener {
+					override fun onDialogDismissed(dialog: DialogInterface?) { refreshNavigationViewSelection() }
+
+					override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
+						if (fragment is DialogFragment)
+							fragment.dismiss()
+						else
+							removeFragment(fragment)
+						element?.let {
+							setTarget(if (useOrgId) element.orgId else element.id, element.type, timetableDatabaseInterface.getLongName(
+									if (useOrgId) element.orgId else element.id, TimetableDatabaseInterface.Type.valueOf(element.type)))
+						} ?: run {
+							showPersonalTimetable()
+						}
+						selectedElement = when (element?.type) {
+							TimetableDatabaseInterface.Type.CLASS.name -> R.id.nav_show_classes
+							TimetableDatabaseInterface.Type.TEACHER.name -> R.id.nav_show_teachers
+							TimetableDatabaseInterface.Type.ROOM.name -> R.id.nav_show_rooms
+							else -> {R.id.nav_show_personal}
+						}
+						refreshNavigationViewSelection()
+					}
+
+					override fun onPositiveButtonClicked(dialog: ElementPickerDialog) { /* not used */ }
+
+				}
 		).show(supportFragmentManager, "elementPicker") // TODO: Do not hard-code the tag
 	}
 
@@ -1143,31 +1234,13 @@ class MainActivity :
 			.show()
 	}
 
-	override fun onDialogDismissed(dialog: DialogInterface?) {
-		refreshNavigationViewSelection()
-	}
-
-	override fun onPositiveButtonClicked(dialog: ElementPickerDialog) {
-		dialog.dismiss() // unused, but just in case
-	}
 
 	private fun removeFragment(fragment: Fragment) {
 		supportFragmentManager.popBackStack(fragment.tag, FragmentManager.POP_BACK_STACK_INCLUSIVE)
 	}
 
 	private fun refreshNavigationViewSelection() {
-		when (displayedElement?.type) {
-			TimetableDatabaseInterface.Type.CLASS.name -> (navigationview_main as NavigationView).setCheckedItem(
-				R.id.nav_show_classes
-			)
-			TimetableDatabaseInterface.Type.TEACHER.name -> (navigationview_main as NavigationView).setCheckedItem(
-				R.id.nav_show_teachers
-			)
-			TimetableDatabaseInterface.Type.ROOM.name -> (navigationview_main as NavigationView).setCheckedItem(
-				R.id.nav_show_rooms
-			)
-			else -> (navigationview_main as NavigationView).setCheckedItem(R.id.nav_show_personal)
-		}
+		selectedElement?.let { (navigationview_main as NavigationView).setCheckedItem(it) }
 	}
 
 	private fun setLastRefresh(timestamp: Long) {
@@ -1296,6 +1369,42 @@ class MainActivity :
 		var items: List<WeekViewEvent<TimegridItem>> = emptyList()
 		var lastUpdated: Long = 0
 		var dateRange: Pair<UntisDate, UntisDate>? = null
+	}
+
+	private fun setBookmarksLongClickListeners() {
+		(navigationview_main[0] as RecyclerView).let { rv ->
+			rv.post {
+				for (index in 3..rv.layoutManager?.itemCount!!) {
+					val bookmarks = userDatabase.getUser(profileId)?.bookmarks
+					if(bookmarks != null){
+						if(index-3 < bookmarks.size) {
+							rv.layoutManager?.findViewByPosition(index)?.setOnLongClickListener {
+								Log.d("Bookmark", "$index")
+								closeDrawer()
+								MaterialAlertDialogBuilder(this).setMessage(getString(R.string.main_dialog_delete_bookmark))
+										.setPositiveButton(getString(R.string.all_yes)) { _, _ ->
+											userDatabase.getUser(profileId)?.let { user ->
+												if(selectedElement == index-3) {
+													showPersonalTimetable()
+												}
+												user.bookmarks = user.bookmarks.minus(bookmarks[index-3])
+												if(selectedElement!! < bookmarks.size && selectedElement!! > index-3){
+													selectedElement = selectedElement!! - 1
+												}
+												userDatabase.editUser(user)
+												invalidateOptionsMenu()
+											}
+										}
+										.setNegativeButton(getString(R.string.all_no)) { _, _ -> }
+										.show()
+								true
+							}
+						}
+					}
+
+				}
+			}
+		}
 	}
 }
 
