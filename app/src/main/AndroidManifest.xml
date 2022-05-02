@@ -17,6 +17,13 @@
 		android:supportsRtl="true"
 		android:theme="@style/AppTheme">
 
+		<meta-data
+			android:name="io.sentry.dsn"
+			android:value="https://d3b77222abce4fcfa74fda2185e0f8dc@o1136770.ingest.sentry.io/6188900" />
+		<meta-data
+			android:name="io.sentry.traces.sample-rate"
+			android:value="1.0" />
+
 		<activity
 			android:name=".activities.ShortcutConfigureActivity"
 			android:icon="@mipmap/ic_shortcut"

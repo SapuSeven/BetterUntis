@@ -104,6 +104,7 @@ dependencies {
 	implementation 'com.github.cesarferreira:MaterialComponent.Banner:0.13.0'
 	implementation 'com.budiyev.android:code-scanner:2.1.0'
 	implementation 'ca.antonious:materialdaypicker:0.6.0'
+	implementation 'io.sentry:sentry-android:5.7.3'
 	testImplementation 'junit:junit:4.13'
 	testImplementation 'org.mockito:mockito-core:4.1.0'
 	androidTestImplementation 'androidx.test:runner:1.3.0'
