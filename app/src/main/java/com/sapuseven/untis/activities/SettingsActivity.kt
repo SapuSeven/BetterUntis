@@ -176,11 +176,6 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 							}
 							true
 						}
-
-						findPreference<Preference>("preference_errors")?.setOnPreferenceClickListener {
-							startActivity(Intent(context, ErrorsActivity::class.java))
-							true
-						}
 					}
 					"preferences_styling" -> {
 						findPreference<MultiSelectListPreference>("preference_school_background")?.apply {

@@ -245,16 +245,6 @@ class MainActivity :
 		}
 	}
 
-	override fun onErrorLogFound() {
-		// TODO: Extract string resources
-		if (PreferenceUtils.getPrefBool(preferences, "preference_additional_error_messages"))
-			Snackbar.make(content_main, "Some errors have been found.", Snackbar.LENGTH_INDEFINITE)
-				.setAction("Show") {
-					startActivity(Intent(this, ErrorsActivity::class.java))
-				}
-				.show()
-	}
-
 	private fun showProfileUpdateRequired() {
 		profileUpdateDialog = MaterialAlertDialogBuilder(this)
 			.setTitle(getString(R.string.main_dialog_update_profile_title))

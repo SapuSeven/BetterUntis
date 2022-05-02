@@ -29,15 +29,6 @@ open class BaseActivity : AppCompatActivity() {
 		super.onCreate(savedInstanceState)
 	}
 
-	/**
-	 * Gets called if any error logs are found.
-	 *
-	 * Override this function in your actual activity.
-	 */
-	open fun onErrorLogFound() {
-		return
-	}
-
 	override fun onStart() {
 		super.onStart()
 		setBlackBackground(PreferenceUtils.getPrefBool(preferences, "preference_dark_theme_oled"))
