@@ -173,6 +173,10 @@
     <string name="preference_info_contributors_desc">Eine Liste aller Mitwirkenden am Projekt</string>
     <string name="preference_info_libraries">Bibliotheken</string>
     <string name="preference_info_libraries_desc">Eine Liste aller verwendeten Software-Bibliotheken</string>
+    <string name="preference_info_license">Lizenz</string>
+    <string name="preference_info_privacy">Externe Inhalte</string>
+    <string name="preference_info_privacy_desc">Mitwirkende werden von GitHub geladen. Lesen Sie deren Datenschutzrichtlinie für weitere Informationen.</string>
+    <string name="preference_info_privacy_policy">Datenschutz-Bestimmungen</string>
     <string name="preference_marker">Zeitanzeige</string>
     <string name="preference_notifications_clear">Alle Benachrichtigungen löschen</string>
     <string name="preference_notifications_enable">Benachrichtigungen aktivieren</string>
