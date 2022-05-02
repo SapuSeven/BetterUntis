@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="all_no">No</string>
+    <string name="all_yes">Sí</string>
+    <string name="all_ok">Aceptar</string>
+    <string name="all_contact_email">betteruntis@sapuseven.com</string>
+    <string name="all_personal_timetable">Horario personal</string>
+    <string name="all_anonymous">Anónimos</string>
+    <string name="all_rooms">Salones</string>
+    <string name="all_classes">Clases</string>
+    <string name="all_teachers">Profesores</string>
+    <string name="all_subjects">Materias</string>
+    <string name="all_personal">Personal</string>
+    <string name="all_failed">falló</string>
+    <string name="all_success">éxito</string>
+    <string name="app_desc">Un cliente alternativo móvil para el cronograma Untis.</string>
+</resources>

@@ -3,7 +3,6 @@ package com.sapuseven.untis.receivers
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -12,11 +11,10 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.MainActivity
-import com.sapuseven.untis.helpers.config.PreferenceManager
-import com.sapuseven.untis.helpers.config.PreferenceUtils
+import com.sapuseven.untis.helpers.config.PreferenceHelper
 import org.joda.time.LocalDateTime
 
-class NotificationReceiver : BroadcastReceiver() {
+class NotificationReceiver : BaseReceiver() {
 	companion object {
 		const val CHANNEL_ID_BREAKINFO = "notifications.breakinfo"
 
@@ -37,9 +35,7 @@ class NotificationReceiver : BroadcastReceiver() {
 
 	override fun onReceive(context: Context, intent: Intent) {
 		Log.d("NotificationReceiver", "NotificationReceiver received")
-
-		val preferenceManager = PreferenceManager(context)
-		if (!PreferenceUtils.getPrefBool(preferenceManager, "preference_notifications_enable")) return
+		super.onReceive(context, intent)
 
 		if (intent.hasExtra(EXTRA_STRING_BREAK_END_TIME)) {
 			if (LocalDateTime.now().millisOfDay >= intent.getIntExtra(EXTRA_INT_BREAK_END_TIME, 0)) return // Notification delayed for too long
@@ -52,8 +48,8 @@ class NotificationReceiver : BroadcastReceiver() {
 					if (intent.getBooleanExtra(EXTRA_BOOLEAN_FIRST, false)) R.string.notifications_text_first_title else R.string.notifications_text_title,
 					intent.getStringExtra(EXTRA_STRING_BREAK_END_TIME)
 			)
-			val message = buildMessage(null, intent, preferenceManager, context.getString(R.string.notifications_text_message_separator))
-			val longMessage = buildMessage(context, intent, preferenceManager, "\n")
+			val message = buildMessage(null, intent, context.getString(R.string.notifications_text_message_separator))
+			val longMessage = buildMessage(context, intent, "\n")
 
 			val builder = NotificationCompat.Builder(context, CHANNEL_ID_BREAKINFO)
 					.setContentTitle(title)
@@ -77,9 +73,9 @@ class NotificationReceiver : BroadcastReceiver() {
 		}
 	}
 
-	private fun buildMessage(context: Context?, intent: Intent, preferenceManager: PreferenceManager, separator: String) = listOfNotNull(
+	private fun buildMessage(context: Context?, intent: Intent, separator: String) = listOfNotNull(
 			if (intent.getStringExtra(EXTRA_STRING_NEXT_SUBJECT)?.isBlank() != false) null else
-				when (PreferenceUtils.getPrefString(preferenceManager, "preference_notifications_visibility_subjects")) {
+				when (preferences.get<String>("preference_notifications_visibility_subjects")) {
 					"short" -> context?.getString(R.string.notifications_text_message_subjects, intent.getStringExtra(EXTRA_STRING_NEXT_SUBJECT))
 							?: intent.getStringExtra(EXTRA_STRING_NEXT_SUBJECT)
 					"long" -> context?.getString(R.string.notifications_text_message_subjects, intent.getStringExtra(EXTRA_STRING_NEXT_SUBJECT_LONG))
@@ -87,7 +83,7 @@ class NotificationReceiver : BroadcastReceiver() {
 					else -> null
 				},
 			if (intent.getStringExtra(EXTRA_STRING_NEXT_ROOM)?.isBlank() != false) null else
-				when (PreferenceUtils.getPrefString(preferenceManager, "preference_notifications_visibility_rooms")) {
+				when (preferences.get<String>("preference_notifications_visibility_rooms")) {
 					"short" -> context?.getString(R.string.notifications_text_message_rooms, intent.getStringExtra(EXTRA_STRING_NEXT_ROOM))
 							?: intent.getStringExtra(EXTRA_STRING_NEXT_ROOM)
 					"long" -> context?.getString(R.string.notifications_text_message_rooms, intent.getStringExtra(EXTRA_STRING_NEXT_ROOM_LONG))
@@ -95,7 +91,7 @@ class NotificationReceiver : BroadcastReceiver() {
 					else -> null
 				},
 			if (intent.getStringExtra(EXTRA_STRING_NEXT_TEACHER)?.isBlank() != false) null else
-				when (PreferenceUtils.getPrefString(preferenceManager, "preference_notifications_visibility_teachers")) {
+				when (preferences.get<String>("preference_notifications_visibility_teachers")) {
 					"short" -> context?.getString(R.string.notifications_text_message_teachers, intent.getStringExtra(EXTRA_STRING_NEXT_TEACHER))
 							?: intent.getStringExtra(EXTRA_STRING_NEXT_TEACHER)
 					"long" -> context?.getString(R.string.notifications_text_message_teachers, intent.getStringExtra(EXTRA_STRING_NEXT_TEACHER_LONG))
@@ -103,7 +99,7 @@ class NotificationReceiver : BroadcastReceiver() {
 					else -> null
 				},
 			if (intent.getStringExtra(EXTRA_STRING_NEXT_CLASS)?.isBlank() != false) null else
-				when (PreferenceUtils.getPrefString(preferenceManager, "preference_notifications_visibility_classes")) {
+				when (preferences.get<String>("preference_notifications_visibility_classes")) {
 					"short" -> context?.getString(R.string.notifications_text_message_classes, intent.getStringExtra(EXTRA_STRING_NEXT_CLASS))
 							?: intent.getStringExtra(EXTRA_STRING_NEXT_CLASS)
 					"long" -> context?.getString(R.string.notifications_text_message_classes, intent.getStringExtra(EXTRA_STRING_NEXT_CLASS_LONG))

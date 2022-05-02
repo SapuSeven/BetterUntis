@@ -50,12 +50,25 @@
 				android:dependency="preference_automute_enable"
 				android:key="preference_automute_cancelled_lessons"
 				android:title="@string/preference_automute_cancelled_lessons" />
+			<SwitchPreference
+				android:defaultValue="@bool/preference_automute_mute_priority_default"
+				android:dependency="preference_automute_enable"
+				android:key="preference_automute_mute_priority"
+				android:title="@string/preference_automute_mute_priority" />
+			<SeekBarPreference
+				android:defaultValue="@integer/preference_automute_minimum_break_length_default"
+				android:dependency="preference_automute_enable"
+				android:key="preference_automute_minimum_break_length"
+				android:max="20"
+				android:summary="@string/preference_automute_minimum_break_length_summary"
+				android:title="@string/preference_automute_minimum_break_length"
+				app:showSeekBarValue="true" />
 		</PreferenceCategory>
 
 		<!-- TODO: Extract string resources -->
 		<PreferenceCategory android:title="Error Reporting">
 			<SwitchPreference
-				android:defaultValue="preference_additional_error_messages_default"
+				android:defaultValue="@bool/preference_additional_error_messages_default"
 				android:key="preference_additional_error_messages"
 				android:summary="This is used for non-critical background errors"
 				android:title="Enable additional error messages" />
@@ -432,6 +445,12 @@
 				android:icon="@drawable/settings_info_github"
 				android:key="preference_info_github"
 				android:title="@string/preference_info_github" />
+
+			<Preference
+				android:icon="@drawable/settings_info_github"
+				android:key="preference_info_license"
+				android:summary="@string/preference_info_license_desc"
+				android:title="@string/preference_info_license" />
 
 			<PreferenceScreen
 				android:icon="@drawable/settings_about_contributor"

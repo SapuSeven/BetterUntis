@@ -31,7 +31,7 @@ class WeekRangePickerPreferenceDialog(private val onCloseListener: ((positiveRes
 		picker.apply {
 			selectionMode = RangeSelectionMode(this)
 			val savedDays = preference.getPersistedStringSet(emptySet()).toList().map { MaterialDayPicker.Weekday.valueOf(it) }
-			setSelectedDays(if (savedDays.size == 1) listOf(savedDays.first()) else listOfNotNull(savedDays.min(), savedDays.max()))
+			setSelectedDays(if (savedDays.size == 1) listOf(savedDays.first()) else listOfNotNull(savedDays.minOrNull(), savedDays.maxOrNull()))
 		}
 		return root
 	}
@@ -78,8 +78,8 @@ class WeekRangePickerPreferenceDialog(private val onCloseListener: ((positiveRes
 			val orderedWeekdays = MaterialDayPicker.Weekday.getOrderedDaysOfWeek(materialDayPicker.locale)
 			val ordinalsOfPreviouslySelectedDays = previouslySelectedDays.map { orderedWeekdays.indexOf(it) }
 
-			val ordinalOfFirstDayInPreviousRange = ordinalsOfPreviouslySelectedDays.min()
-			val ordinalOfLastDayInPreviousRange = ordinalsOfPreviouslySelectedDays.max()
+			val ordinalOfFirstDayInPreviousRange = ordinalsOfPreviouslySelectedDays.minOrNull()
+			val ordinalOfLastDayInPreviousRange = ordinalsOfPreviouslySelectedDays.maxOrNull()
 			val ordinalOfSelectedDay = orderedWeekdays.indexOf(dayPressed)
 
 			return when {

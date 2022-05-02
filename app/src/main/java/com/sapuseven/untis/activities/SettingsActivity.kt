@@ -29,7 +29,6 @@ import com.sapuseven.untis.dialogs.AlertPreferenceDialog
 import com.sapuseven.untis.dialogs.ElementPickerDialog
 import com.sapuseven.untis.dialogs.WeekRangePickerPreferenceDialog
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
-import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.github.GithubUser
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
@@ -41,7 +40,7 @@ import kotlinx.android.synthetic.main.settings_banner.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.builtins.list
+import kotlinx.serialization.decodeFromString
 import kotlin.math.min
 
 class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback {
@@ -83,23 +82,20 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 		}
 	}
 
-	override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-		if (item?.itemId == android.R.id.home)
+	override fun onOptionsItemSelected(item: MenuItem): Boolean {
+		if (item.itemId == android.R.id.home)
 			onBackPressed()
 		return true
 	}
-
+  
 	private fun setupRecommendDialog() {
-		val prefs = PreferenceManager(this)
-		if (!prefs.defaultPrefs.getBoolean(DIALOG_RECOMMEND_HIDE, false))
+		if (!preferences[DIALOG_RECOMMEND_HIDE, false])
 			banner_settings_recommend.visibility = View.VISIBLE
 
 		leftButton.setOnClickListener {
 			banner_settings_recommend.visibility = View.GONE
 
-			val editor = prefs.defaultPrefs.edit()
-			editor.putBoolean(DIALOG_RECOMMEND_HIDE, true)
-			editor.apply()
+			preferences[DIALOG_RECOMMEND_HIDE] = true
 		}
 		rightButton.setOnClickListener {
 			startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(FILE_URL_RECOMMEND)))
@@ -243,33 +239,79 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 						}
 					}
 					"preferences_info" -> {
-						findPreference<Preference>("preference_info_app_version")?.summary = let {
-							val pInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
-							requireContext().getString(R.string.preference_info_app_version_desc,
-									pInfo.versionName,
-									PackageInfoCompat.getLongVersionCode(pInfo)
+						findPreference<Preference>("preference_info_app_version")?.apply {
+							val pInfo =
+								requireContext().packageManager.getPackageInfo(
+									requireContext().packageName,
+									0
+								)
+							summary = requireContext().getString(
+								R.string.preference_info_app_version_desc,
+								pInfo.versionName,
+								PackageInfoCompat.getLongVersionCode(pInfo)
 							)
-						}
-
-						findPreference<Preference>("preference_info_github")?.apply {
-							summary = REPOSITORY_URL_GITHUB
 							setOnPreferenceClickListener {
-								startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(REPOSITORY_URL_GITHUB)))
+								startActivity(
+									Intent(
+										Intent.ACTION_VIEW,
+										Uri.parse("$REPOSITORY_URL_GITHUB/releases")
+									)
+								)
 								true
 							}
 						}
+						findPreference<Preference>("preference_info_github")?.apply {
+							summary = REPOSITORY_URL_GITHUB
+							setOnPreferenceClickListener {
+								startActivity(
+									Intent(
+										Intent.ACTION_VIEW,
+										Uri.parse(REPOSITORY_URL_GITHUB)
+									)
+								)
+								true
+							}
+						}
+						findPreference<Preference>("preference_info_license")?.setOnPreferenceClickListener {
+							startActivity(
+								Intent(
+									Intent.ACTION_VIEW,
+									Uri.parse("$REPOSITORY_URL_GITHUB/blob/master/LICENSE")
+								)
+							)
+							true
+						}
 					}
 					"preferences_contributors" -> {
-						GlobalScope.launch(Dispatchers.Main) {
-							"https://api.github.com/repos/sapuseven/betteruntis/contributors"
-									.httpGet()
-									.awaitStringResult()
-									.fold({ data ->
-										showContributorList(true, data)
-									}, {
-										showContributorList(false)
-									})
-						}
+						MaterialAlertDialogBuilder(requireContext())
+							.setTitle(R.string.preference_info_privacy)
+							.setMessage(R.string.preference_info_privacy_desc)
+							.setPositiveButton(android.R.string.ok) { _, _ ->
+								GlobalScope.launch(Dispatchers.Main) {
+									"https://api.github.com/repos/sapuseven/betteruntis/contributors"
+										.httpGet()
+										.awaitStringResult()
+										.fold({ data ->
+											showContributorList(true, data)
+										}, {
+											showContributorList(false)
+										})
+								}
+							}
+							.setNegativeButton(android.R.string.cancel) { _, _ ->
+								parentFragmentManager.popBackStackImmediate()
+							}
+							.setNeutralButton(R.string.preference_info_privacy_policy) { _, _ ->
+								parentFragmentManager.popBackStackImmediate()
+								startActivity(
+									Intent(
+										Intent.ACTION_VIEW, Uri.parse(
+											"https://docs.github.com/en/github/site-policy/github-privacy-statement"
+										)
+									)
+								)
+							}
+							.show()
 					}
 				}
 			}
@@ -279,7 +321,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 			val preferenceScreen = this.preferenceScreen
 			val indicator = findPreference<Preference>("preferences_contributors_indicator")
 			if (success) {
-				val contributors = getJSON().parse(GithubUser.serializer().list, data)
+				val contributors = getJSON().decodeFromString<List<GithubUser>>(data)
 
 				preferenceScreen.removePreference(indicator)
 

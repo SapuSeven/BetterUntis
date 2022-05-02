@@ -20,7 +20,8 @@
 		<activity
 			android:name=".activities.ShortcutConfigureActivity"
 			android:icon="@mipmap/ic_shortcut"
-			android:label="@string/widget_timetable_link">
+			android:label="@string/widget_timetable_link"
+			android:exported="false">
 
 			<intent-filter>
 				<category android:name="android.intent.category.DEFAULT" />
@@ -30,7 +31,8 @@
 
 		<activity
 			android:name=".activities.BaseWidgetConfigureActivity"
-			android:label="@string/widget_configuration">
+			android:label="@string/widget_configuration"
+			android:exported="true">
 
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
@@ -40,7 +42,8 @@
 		<activity
 			android:name=".activities.MainActivity"
 			android:launchMode="singleTop"
-			android:theme="@style/AppTheme.Launcher.NoActionBar">
+			android:theme="@style/AppTheme.Launcher.NoActionBar"
+			android:exported="true">
 
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
@@ -86,7 +89,8 @@
 		<activity
 			android:name=".activities.LoginDataInputActivity"
 			android:parentActivityName=".activities.LoginActivity"
-			android:windowSoftInputMode="adjustResize">
+			android:windowSoftInputMode="adjustResize"
+			android:exported="true">
 
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
@@ -118,7 +122,8 @@
 			android:name=".activities.ErrorsActivity"
 			android:label="@string/activity_title_errors" />
 
-		<receiver android:name=".receivers.StartupReceiver">
+		<receiver android:name=".receivers.StartupReceiver"
+			android:exported="true">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 			</intent-filter>
@@ -134,7 +139,8 @@
 
 		<receiver
 			android:name=".widgets.TimetableWidget"
-			android:label="@string/widget_timetable">
+			android:label="@string/widget_timetable"
+			android:exported="true">
 
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -147,7 +153,8 @@
 
 		<receiver
 			android:name=".widgets.MessagesWidget"
-			android:label="@string/widget_daily_messages">
+			android:label="@string/widget_daily_messages"
+			android:exported="true">
 
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

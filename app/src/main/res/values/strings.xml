@@ -47,7 +47,7 @@
 
 	<string name="errors_github_attach_file_message">Please attach the compressed log files to this issue.\nThey have been saved to `%1$s`</string>
 
-	<string name="menu_nav_timetables">Timetables</string>
+	<string name="nav_all_timetables">Timetables</string>
 	<string name="menu_infocenter_messagesofday">Messages</string>
 	<string name="menu_infocenter_officehours">Office Hours</string>
 	<string name="menu_infocenter_events">Events</string>
@@ -98,11 +98,12 @@
 	<string name="logindatainput_key">Key or Password</string>
 	<string name="logindatainput_loading_user_data">Loading user data…</string>
 	<string name="logindatainput_login">Login</string>
+	<string name="logindatainput_profilename">Profile name (optional)</string>
 	<string name="logindatainput_proxy_host">Proxy server (optional)</string>
 	<string name="logindatainput_school">School name or ID</string>
 	<string name="logindatainput_show_advanced">Show advanced settings</string>
 	<string name="logindatainput_skip_app_secret">Skip app secret resolution</string>
-	<string name="logindatainput_skip_school_id">Skip school id resolution</string>
+	<string name="logindatainput_skip_school_id">Skip school ID resolution</string>
 	<string name="logindatainput_title_add">Add profile</string>
 	<string name="logindatainput_title_edit">Edit profile</string>
 	<string name="logindatainput_username">Username</string>
@@ -144,6 +145,9 @@
 	<string name="preference_automute_cancelled_lessons">Also mute in cancelled lessons</string>
 	<string name="preference_automute_enable">Enable auto-mute</string>
 	<string name="preference_automute_enable_summary">Automatically turns on Do Not Disturb during lessons</string>
+	<string name="preference_automute_mute_priority">Don\'t allow priority events to ignore aute-mute</string>
+	<string name="preference_automute_minimum_break_length_summary">Don\'t unmute the device during breaks shorter than the specified length (in minutes)</string>
+	<string name="preference_automute_minimum_break_length">Minimum break length</string>
 	<string name="preference_background_cancelled">Cancelled lessons</string>
 	<string name="preference_background_cancelled_past">Past cancelled lessons</string>
 	<string name="preference_background_exam">Lessons with tests</string>
@@ -185,6 +189,11 @@
 	<string name="preference_info_contributors_desc">A list of the contributors</string>
 	<string name="preference_info_general">General</string>
 	<string name="preference_info_github">GitHub repository</string>
+	<string name="preference_info_privacy">External Content</string>
+	<string name="preference_info_privacy_desc">Contributors are loaded from GitHub. Read their privacy policy for further information.</string>
+	<string name="preference_info_privacy_policy">Privacy Policy</string>
+	<string name="preference_info_license">License</string>
+	<string name="preference_info_license_desc" translatable="false">GPL-3.0</string>
 	<string name="preference_info_libraries">Libraries</string>
 	<string name="preference_info_libraries_desc">A list of all used libraries</string>
 	<string name="preference_marker">Time indicator</string>
@@ -268,7 +277,7 @@
 	<string name="notifications_text_message_teachers">Teacher: %1$s</string>
 	<string name="notifications_text_message_classes">Class: %1$s</string>
 	<string name="notifications_text_message_separator"> / </string>
-	<string name="homeworks_due_time">until %1$s</string>
+	<string name="homeworks_due_time">due %1$s</string>
 	<string name="homeworks_due_time_format">EEE, dd. MMM</string>
 	<string name="errors_crash_title">It looks like BetterUntis crashed.</string>
 	<string name="errors_crash_message">Sorry for that.</string>
@@ -307,6 +316,7 @@
 	<string name="widget_daily_messages">Daily Messages</string>
 	<string name="widget_select_profile">Please select a profile for the widget</string>
 	<string name="widget_timetable_link">Timetable Link</string>
+	<string name="maindrawer_bookmarks_add">Add Timetable</string>
 
 	<plurals name="main_time_diff_minutes">
 		<item quantity="one">a minute ago</item>
@@ -328,4 +338,5 @@
 		<item quantity="one">%1$d contribution</item>
 		<item quantity="other">%1$d contributions</item>
 	</plurals>
+    <string name="main_dialog_delete_bookmark">Would you like to delete this bookmark?</string>
 </resources>

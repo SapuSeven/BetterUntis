@@ -29,7 +29,7 @@
     <string name="activity_title_free_rooms">Ledige rom</string>
     <string name="activity_title_info_center">Infosenter</string>
     <string name="activity_title_settings">Innstillinger</string>
-    <string name="menu_nav_timetables">Timeplaner</string>
+    <string name="nav_all_timetables">Timeplaner</string>
     <string name="menu_infocenter_messagesofday">Meldinger</string>
     <string name="menu_infocenter_officehours">Kontortid</string>
     <string name="menu_infocenter_events">Hendelser</string>
@@ -165,7 +165,7 @@
     <string name="preference_notifications_first_lesson_desc">Vis et varsel rett før skolen starter</string>
     <string name="preference_notifications_first_lesson_time">Tidspunkt for varsler</string>
     <string name="preference_notifications_first_lesson_time_unit">minutter før første leksjon</string>
-    <string name="preference_notifications_multiple">Aktiver i leksjon med flere timer</string>
+    <string name="preference_notifications_multiple">Aktiver i leksjon med flere leksjoner</string>
     <string name="preference_notifications_multiple_desc">Varsler vil vises i pauser under flertimede leksjoner.</string>
     <string name="preference_notifications_visibility_hidden">Skjult</string>
     <string name="preference_notifications_visibility_long">Langt navn</string>
@@ -239,13 +239,13 @@
         <item quantity="other">Dette rommet er ledig de neste %d timene.</item>
     </plurals>
     <string name="infocenter_officehours_empty">Ingen kontortid</string>
-    <string name="preference_schoolcolors_regular">For vanlige skoletimer</string>
-    <string name="preference_schoolcolors_exam">For skoletimer med tester</string>
-    <string name="preference_schoolcolors_irregular">For uvanlige skoletimer</string>
-    <string name="preference_schoolcolors_cancelled">For kansellerte skoletimer</string>
+    <string name="preference_schoolcolors_regular">For vanlige leksjoner</string>
+    <string name="preference_schoolcolors_exam">For leksjoner med tester</string>
+    <string name="preference_schoolcolors_irregular">For uvanlige leksjoner</string>
+    <string name="preference_schoolcolors_cancelled">For kansellerte leksjoner</string>
     <string name="preference_timetable_hide_time_stamps">Skjul tidsstempel</string>
     <string name="preference_timetable_hide_time_stamps_desc">Skjul tidsstempel ved siden av timeplanen</string>
-    <string name="errors_crash_title">Det ser ut til at BetterUntis kræsjet.</string>
+    <string name="errors_crash_title">Det ser ut til at BetterUntis krasjet.</string>
     <string name="loading_failed">Innlasting mislyktes</string>
     <string name="loading">Laster</string>
     <string name="errors_crash_message">Dette beklages.</string>
@@ -261,4 +261,33 @@
     <string name="app_desc">En alternativ mobilklient for Untis-timeplanssystemet.</string>
     <string name="errors_report">Hjelp til å fikse programmet ved å rapportere inn feilene nedenfor:</string>
     <string name="preference_category_connectivity_proxy">WebUntis-mellomtjener</string>
+    <string name="logindatainput_skip_school_id">Hopp over skole-ID-utledelse</string>
+    <plurals name="preferences_contributors_contributions">
+        <item quantity="one">%1$d bidrag</item>
+        <item quantity="other">%1$d bidrag</item>
+    </plurals>
+    <string name="widget_timetable_link">Timeplan-lenke</string>
+    <string name="widget_select_profile">Velg en profil for miniprogrammet</string>
+    <string name="widget_daily_messages">Daglige meldinger</string>
+    <string name="widget_timetable_empty">Ingen timeplan i dag</string>
+    <string name="widget_timetable">Timeplan</string>
+    <string name="widget_configuration">Miniprogramsoppsett</string>
+    <string name="preference_timetable_colors_reset_button_positive">Tilbakestill</string>
+    <string name="preference_theme_pixel">Piksel</string>
+    <string name="infocenter_absence_unknown_reason">Ukjent grunn</string>
+    <string name="infocenter_messages_attachments">Vedlegg</string>
+    <string name="logindatainput_skip_app_secret">Hopp over programhemmeligehtsutledelse</string>
+    <string name="logindatainput_error_invalid_url">Ugyldig nettadresse.</string>
+    <string name="logindatainput_api_url">Untis-API-sti</string>
+    <string name="activity_title_messenger">Meldingstjeneste</string>
+    <string name="all_hint_tap_to_edit">(Trykk for å redigere)</string>
+    <string name="all_dialog_crash_copied">Krasjlogg kopiert til utklippstavle.</string>
+    <string name="all_dialog_crash_title">Krasjlogg funnet</string>
+    <string name="all_dialog_absences_not_checked">Fravær ikke sjekket.</string>
+    <string name="all_dialog_absences_checked">Fravær sjekket.</string>
+    <string name="all_lessontopic">Leksjonsemne</string>
+    <string name="all_absences">Fravær</string>
+    <string name="all_lesson_details">Leksjonsdetaljer</string>
+    <string name="all_lessontopic_none">(Uten emne)</string>
+    <string name="main_dialog_itemdetails_timeformat">%1$s - %2$s</string>
 </resources>

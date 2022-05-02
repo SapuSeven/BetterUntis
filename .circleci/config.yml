@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/betteruntis
     docker:
-      - image: circleci/android:api-29
+      - image: cimg/android:2022.03
     environment:
       JVM_OPTS: -Xmx3200m
     steps:
@@ -52,8 +52,8 @@ jobs:
           paths:
             - outputs
   deploy_debug:
-    machine:
-      enabled: true
+    docker:
+      - image: cimg/base:2022.03
     working_directory: ~/betteruntis
     steps:
       - run:
@@ -69,10 +69,10 @@ jobs:
           command: |
             echo $SSH_DEPLOY_KEY_ENCODED | base64 --decode > id_rsa
             chmod 600 id_rsa
-            scp -r -P $SSH_DEPLOY_PORT -i id_rsa workspace/outputs/apk/debug "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/debug/$CIRCLE_BUILD_NUM"
+            scp -r -P $SSH_DEPLOY_PORT -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null workspace/outputs/apk/debug "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/debug/$CIRCLE_BUILD_NUM"
   deploy_release:
-    machine:
-      enabled: true
+    docker:
+      - image: cimg/base:2022.03
     working_directory: ~/betteruntis
     steps:
       - run:
@@ -88,12 +88,12 @@ jobs:
           command: |
             echo $SSH_DEPLOY_KEY_ENCODED | base64 --decode > id_rsa
             chmod 600 id_rsa
-            scp -r -P $SSH_DEPLOY_PORT -i id_rsa workspace/outputs/apk/release "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG"
-            scp -P $SSH_DEPLOY_PORT -i id_rsa workspace/outputs/mapping/release/* "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG/"
+            scp -r -P $SSH_DEPLOY_PORT -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null workspace/outputs/apk/release "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG"
+            scp -P $SSH_DEPLOY_PORT -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null workspace/outputs/mapping/release/* "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG/"
 
   deploy_fastlane:
     docker:
-      - image: cimg/ruby:2.7.1
+      - image: cimg/ruby:3.1.2
     working_directory: ~/betteruntis
     steps:
       - checkout

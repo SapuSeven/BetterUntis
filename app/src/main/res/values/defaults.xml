@@ -19,6 +19,7 @@
 	<bool name="preference_week_snap_to_days_default">false</bool>
 	<bool name="preference_automute_enable_default">false</bool>
 	<bool name="preference_automute_cancelled_lessons_default">true</bool>
+	<bool name="preference_automute_mute_priority_default">true</bool>
 	<bool name="preference_additional_error_messages_default">false</bool>
 
 	<integer name="preference_background_regular_default">0xFFF44336</integer>
@@ -38,6 +39,7 @@
 	<integer name="preference_timetable_item_corner_radius_default">4</integer>
 	<integer name="preference_timetable_lesson_name_font_size_default">14</integer>
 	<integer name="preference_timetable_lesson_info_font_size_default">10</integer>
+	<integer name="preference_automute_minimum_break_length_default">0</integer>
 
 	<string name="preference_theme_default">default</string>
 	<string name="preference_dark_theme_default">off</string>

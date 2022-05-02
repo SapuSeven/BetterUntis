@@ -1,0 +1,19 @@
+name: Feature Request
+description: Suggest an idea for this project
+title: "[Feature Request] "
+labels: enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem does BetterUntis currently have?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solution Ideas
+      description: Add any ideas you have that may help solve the problem.
+    validations:
+      required: false

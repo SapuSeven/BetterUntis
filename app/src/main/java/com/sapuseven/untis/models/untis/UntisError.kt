@@ -5,9 +5,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UntisError(
-		val code: Int,
-		val message: String?,
-		val data: UnknownObject? = null // TODO: Change back to UntisErrorData if needed. Not using the proper object simplifies the testing API.
+	val code: Int,
+	val message: String? = null, // Added default value to prevent crashes
+	val data: UnknownObject? = null // TODO: Change back to UntisErrorData if needed. Not using the proper object simplifies the testing API.
 )
 
 /*@Serializable

@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UntisExam(
 		val id: Int,
-		val examType: String,
+		val examType: String?,
 		val startDateTime: UntisDateTime,
 		val endDateTime: UntisDateTime,
 		val departmentId: Int,

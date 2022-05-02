@@ -24,6 +24,7 @@ import com.sapuseven.untis.models.untis.response.MessageResponse
 import com.sapuseven.untis.models.untis.response.TimetableResponse
 import com.sapuseven.untis.widgets.BaseWidget.Companion.EXTRA_INT_RELOAD
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.decodeFromString
 import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
@@ -81,7 +82,7 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 		return runBlocking {
 			val result = UntisRequest().request(query)
 			result.fold({ data ->
-				val untisResponse = SerializationUtils.getJSON().parse(MessageResponse.serializer(), data)
+				val untisResponse = SerializationUtils.getJSON().decodeFromString<MessageResponse>(data)
 				untisResponse.result?.messages?.map {
 					WidgetListItem(it.id.toLong(), it.subject, it.body)
 				}?.let {
@@ -123,7 +124,7 @@ class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: 
 		return runBlocking {
 			val userDataResult = UntisRequest().request(query)
 			userDataResult.fold({ data ->
-				val untisResponse = SerializationUtils.getJSON().parse(TimetableResponse.serializer(), data)
+				val untisResponse = SerializationUtils.getJSON().decodeFromString<TimetableResponse>(data)
 
 				untisResponse.result?.timetable?.periods?.sortedBy { it.startDateTime.toString() }?.map {
 					TimegridItem(

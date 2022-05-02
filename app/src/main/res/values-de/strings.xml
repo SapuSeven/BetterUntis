@@ -22,9 +22,9 @@
     <string name="all_delete">Löschen</string>
     <string name="all_reset">Zurücksetzen</string>
     <string name="all_lesson_details">Stundendetails</string>
-    <string name="all_lesson_cancelled">%1$s (entfallen)</string>
+    <string name="all_lesson_cancelled">%1$s (entfällt)</string>
     <string name="all_lesson_irregular">%1$s (irregulär)</string>
-    <string name="all_lesson_exam">%1$s (Test!)</string>
+    <string name="all_lesson_exam">%1$s (Klausur!)</string>
     <string name="all_dialog_datepicker_button_today">Heute</string>
     <string name="all_dialog_error_title">Fehlerinformation</string>
     <string name="all_dialog_error_message">Anfragen-ID: %1$d\nFehlercode: %2$d\nFehlermeldung: %3$s</string>
@@ -34,7 +34,7 @@
     <string name="activity_title_messenger">Messenger</string>
     <string name="activity_title_settings">Einstellungen</string>
     <string name="errors_github_attach_file_message">Bitte füge die komprimierten Log-Dateien als Anhang hinzu.\nDiese wurden hier gespeichert: `%1$s`</string>
-    <string name="menu_nav_timetables">Stundenpläne</string>
+    <string name="nav_all_timetables">Stundenpläne</string>
     <string name="menu_infocenter_messagesofday">Nachrichten</string>
     <string name="menu_infocenter_officehours">Sprechstunden</string>
     <string name="menu_infocenter_events">Termine</string>
@@ -82,6 +82,7 @@
     <string name="logindatainput_title_add">Profil hinzufügen</string>
     <string name="logindatainput_title_edit">Profil bearbeiten</string>
     <string name="logindatainput_delete">Profil löschen</string>
+    <string name="logindatainput_profilename">Profilname (optional)</string>
     <string name="logindatainput_proxy_host">Proxy-Server (optional)</string>
     <string name="logindatainput_show_advanced">Erweiterte Einstellungen anzeigen</string>
     <string name="errormessagedictionary_generic">Unbekannter Fehler</string>
@@ -137,6 +138,9 @@
     <string name="preference_automute_enable">Automatisches Stummschalten</string>
     <string name="preference_automute_enable_summary">Aktiviert während jeder Stunde automatisch den „Bitte nicht stören“-Modus</string>
     <string name="preference_automute_cancelled_lessons">Auch in entfallenen Stunden stumm schalten</string>
+    <string name="preference_automute_mute_priority">Ausnahmen für \"Bitte nicht Stören\" ignorieren</string>
+    <string name="preference_automute_minimum_break_length_summary">Stummschaltung nicht aufheben, wenn die Pause kürzer als die angegebene Dauer ist (in Minuten)</string>
+    <string name="preference_automute_minimum_break_length">Mindestpausendauer</string>
     <string name="preference_background_cancelled">Entfallene Stunden</string>
     <string name="preference_background_cancelled_past">Vergangene entfallene Stunden</string>
     <string name="preference_background_exam">Stunden mit Tests</string>
@@ -169,6 +173,10 @@
     <string name="preference_info_contributors_desc">Eine Liste aller Mitwirkenden am Projekt</string>
     <string name="preference_info_libraries">Bibliotheken</string>
     <string name="preference_info_libraries_desc">Eine Liste aller verwendeten Software-Bibliotheken</string>
+    <string name="preference_info_license">Lizenz</string>
+    <string name="preference_info_privacy">Externe Inhalte</string>
+    <string name="preference_info_privacy_desc">Mitwirkende werden von GitHub geladen. Lesen Sie deren Datenschutzrichtlinie für weitere Informationen.</string>
+    <string name="preference_info_privacy_policy">Datenschutz-Bestimmungen</string>
     <string name="preference_marker">Zeitanzeige</string>
     <string name="preference_notifications_clear">Alle Benachrichtigungen löschen</string>
     <string name="preference_notifications_enable">Benachrichtigungen aktivieren</string>
@@ -290,4 +298,8 @@
     <string name="all_hint_tap_to_edit">(Durch Tippen hinzufügen)</string>
     <string name="all_dialog_crash_copied">Absturzprotokoll wurde in die Zwischenablage kopiert.</string>
     <string name="all_dialog_crash_title">Absturzprotokoll gefunden</string>
+    <string name="all_lessontopic_none">(Kein Lehrstoff)</string>
+    <string name="main_dialog_itemdetails_timeformat">%1$s - %2$s</string>
+    <string name="main_dialog_delete_bookmark">Dieses Lesezeichen löschen?</string>
+    <string name="maindrawer_bookmarks_add">Stundenplan hinzufügen</string>
 </resources>

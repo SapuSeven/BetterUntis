@@ -1,17 +1,13 @@
 package com.sapuseven.untis.receivers
 
 import android.app.NotificationManager
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.os.Build
 import android.util.Log
-import com.sapuseven.untis.helpers.config.PreferenceManager
-import com.sapuseven.untis.helpers.config.PreferenceUtils
 
-
-class AutoMuteReceiver : BroadcastReceiver() {
+class AutoMuteReceiver : BaseReceiver() {
 	companion object {
 		const val EXTRA_INT_ID = "com.sapuseven.untis.automute.id"
 		const val EXTRA_BOOLEAN_MUTE = "com.sapuseven.untis.automute.mute"
@@ -22,9 +18,9 @@ class AutoMuteReceiver : BroadcastReceiver() {
 
 	override fun onReceive(context: Context, intent: Intent) {
 		Log.d("AutoMuteReceiver", "AutoMuteReceiver received, mute = ${intent.getBooleanExtra(EXTRA_BOOLEAN_MUTE, false)}")
+		super.onReceive(context, intent)
 
-		val preferenceManager = PreferenceManager(context)
-		if (!PreferenceUtils.getPrefBool(preferenceManager, "preference_automute_enable")) return
+		if (!preferences.get<Boolean>("preference_automute_enable")) return
 
 		if (intent.hasExtra(EXTRA_BOOLEAN_MUTE)) {
 			val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
@@ -33,11 +29,17 @@ class AutoMuteReceiver : BroadcastReceiver() {
 			if (intent.getBooleanExtra(EXTRA_BOOLEAN_MUTE, false)) {
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 					val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+					val interruptionFilter =
+						if (preferences["preference_automute_mute_priority"])
+							NotificationManager.INTERRUPTION_FILTER_NONE
+						else
+							NotificationManager.INTERRUPTION_FILTER_PRIORITY
+
 					if (!prefs.contains(PREFERENCE_KEY_INTERRUPTION_FILTER)) {
 						editor.putInt(PREFERENCE_KEY_INTERRUPTION_FILTER, notificationManager.currentInterruptionFilter)
 						Log.d("AutoMuteReceiver", "Saved interruption filter: ${notificationManager.currentInterruptionFilter}")
 					}
-					notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE)
+					notificationManager.setInterruptionFilter(interruptionFilter)
 				} else {
 					val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 					editor.putInt(PREFERENCE_KEY_RINGER_MODE, audioManager.ringerMode)

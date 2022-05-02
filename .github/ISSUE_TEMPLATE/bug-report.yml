@@ -1,0 +1,68 @@
+name: Bug Report
+description: Create a report to help improving the app
+title: "[Bug Report] "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to Reproduce
+      description: |-
+        Add steps to reproduce the behavior.
+        If your school supports anonymous login, you may also provide the school id for easier debugging.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Result
+      description: |-
+        Explain what should happen.
+        Add Screenshots of the original Untis Mobile app for comparison if applicable.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Result
+      description: |-
+        Explain what actually happened.
+        Add Screenshots and Logs if applicable.
+    validations:
+      required: true
+  - type: input
+    id: android-version
+    attributes:
+      label: Android Version
+      description: System Settings -> About -> Android version (may differ on your device)
+      placeholder: ex. Android 11
+    validations:
+      required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: BetterUntis Version
+      description: BetterUntis Settings -> About -> App version
+      placeholder: ex. 1.0.0 (1)
+    validations:
+      required: true
+  - type: dropdown
+    id: install-source
+    attributes:
+      label: Installation Source
+      options:
+        - Google Play
+        - F-Droid
+        - SapuSeven.com
+        - Own Build
+    validations:
+      required: false
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional information
+      description: |-
+        Add additional information that doesn't fit the categories above.
+    validations:
+      required: false
