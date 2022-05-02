@@ -189,6 +189,11 @@
 	<string name="preference_info_contributors_desc">A list of the contributors</string>
 	<string name="preference_info_general">General</string>
 	<string name="preference_info_github">GitHub repository</string>
+	<string name="preference_info_privacy">External Content</string>
+	<string name="preference_info_privacy_desc">Contributors are loaded from GitHub. Read their privacy policy for further information.</string>
+	<string name="preference_info_privacy_policy">Privacy Policy</string>
+	<string name="preference_info_license">License</string>
+	<string name="preference_info_license_desc" translatable="false">GPL-3.0</string>
 	<string name="preference_info_libraries">Libraries</string>
 	<string name="preference_info_libraries_desc">A list of all used libraries</string>
 	<string name="preference_marker">Time indicator</string>
