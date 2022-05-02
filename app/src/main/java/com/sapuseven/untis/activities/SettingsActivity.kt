@@ -88,7 +88,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 	}
 
 	private fun setupDesigningDialog() {
-		if (preferences[DIALOG_DESIGNING_HIDE, false])
+		if (!preferences[DIALOG_DESIGNING_HIDE, false])
 			banner_settings_designing.visibility = View.VISIBLE
 
 		banner_settings_designing.setLeftButtonAction {
