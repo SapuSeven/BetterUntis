@@ -207,9 +207,6 @@
     <string name="preference_week_display_length_summary">Sett til 0 for å bruke ukelengde</string>
     <string name="preference_week_snap_to_days">Sett visning på linje med dagene</string>
     <string name="preference_week_snap_to_days_summary">i stedet for uker</string>
-    <string name="settings_designing_message">Bidra ved å opprette de manglende innstillingsikonene!</string>
-    <string name="settings_designing_hide">Ikke vis igjen</string>
-    <string name="settings_designing_info">Finn ut mer</string>
     <string name="notifications_channel_breakinfo">Pause-info</string>
     <string name="notifications_channel_breakinfo_desc">Viser informasjon om den gjeldende pausen og den følgende leksjonen</string>
     <string name="notifications_channel_backgrounderrors">Feil fra bakgrunnsoppgaver</string>

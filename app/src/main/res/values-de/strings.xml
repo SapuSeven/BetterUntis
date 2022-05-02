@@ -234,9 +234,11 @@
     <string name="preference_week_display_length_summary">Auf 0 setzen, um die Wochenlänge zu verwenden</string>
     <string name="preference_week_snap_to_days">Tageweise scrollen</string>
     <string name="preference_week_snap_to_days_summary">statt wochenweise</string>
-    <string name="settings_designing_message">Trage zur Entwicklung bei, indem du die fehlenden Icons in den Einstellungen erstellst!</string>
-    <string name="settings_designing_hide">Nicht mehr anzeigen</string>
-    <string name="settings_designing_info">Mehr erfahren</string>
+    <string name="settings_recommend_message">Wenn dir BetterUntis gefällt, empfiehl es deinen Freunden weiter!</string>
+    <string name="settings_recommend_hide">Nicht mehr anzeigen</string>
+    <string name="settings_recommend_share">Teilen</string>
+    <string name="settings_recommend_title">BetterUntis weiterempfehlen</string>
+    <string name="settings_recommend_text">Entdecke BetterUntis - Eine bessere Alternative zu Untis Mobile! Hier herunterladen: %1$s</string>
     <string name="notifications_channel_breakinfo">Pauseninfo</string>
     <string name="notifications_channel_breakinfo_desc">Zeigt Informationen der aktuellen Pause und der nächsten Stunde an</string>
     <string name="notifications_channel_backgrounderrors">Fehler im Hintergrund</string>

@@ -144,9 +144,6 @@
     <string name="notifications_text_error_title">Ezin izan da ordutegia kargatu</string>
     <string name="notifications_channel_breakinfo_desc">Uneko atsedenaldiari eta hurrengo eskolari buruzko informazioa erakusten du</string>
     <string name="notifications_channel_breakinfo">Atsedenaren informazioa</string>
-    <string name="settings_designing_info">Informazio gehiago</string>
-    <string name="settings_designing_hide">Ez erakutsi berriro</string>
-    <string name="settings_designing_message">Lagundu ezarpenen ikonoak sortuz!</string>
     <string name="preferences_timetable">Ordutegiak</string>
     <string name="preferences_styling">Pertsonalizazioa</string>
     <string name="preferences_notifications">Jakinarazpenak</string>
