@@ -277,7 +277,7 @@
 	<string name="notifications_text_message_teachers">Teacher: %1$s</string>
 	<string name="notifications_text_message_classes">Class: %1$s</string>
 	<string name="notifications_text_message_separator"> / </string>
-	<string name="homeworks_due_time">until %1$s</string>
+	<string name="homeworks_due_time">due %1$s</string>
 	<string name="homeworks_due_time_format">EEE, dd. MMM</string>
 	<string name="errors_crash_title">It looks like BetterUntis crashed.</string>
 	<string name="errors_crash_message">Sorry for that.</string>
