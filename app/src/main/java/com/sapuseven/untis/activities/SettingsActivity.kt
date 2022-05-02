@@ -14,7 +14,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -287,7 +286,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 						}
 					}
 					"preferences_contributors" -> {
-						AlertDialog.Builder(requireContext())
+						MaterialAlertDialogBuilder(requireContext())
 							.setTitle(R.string.preference_info_privacy)
 							.setMessage(R.string.preference_info_privacy_desc)
 							.setPositiveButton(android.R.string.ok) { _, _ ->
@@ -302,8 +301,11 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 										})
 								}
 							}
-							.setNegativeButton(android.R.string.cancel) { _, _ -> }
+							.setNegativeButton(android.R.string.cancel) { _, _ ->
+								parentFragmentManager.popBackStackImmediate()
+							}
 							.setNeutralButton(R.string.preference_info_privacy_policy) { _, _ ->
+								parentFragmentManager.popBackStackImmediate()
 								startActivity(
 									Intent(
 										Intent.ACTION_VIEW, Uri.parse(
