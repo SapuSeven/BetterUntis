@@ -19,7 +19,6 @@ open class BaseActivity : AppCompatActivity() {
 	protected var hasOwnToolbar: Boolean = false
 	protected var currentTheme: String = ""
 	private var currentDarkTheme: String = ""
-	private var themeId = -1
 
 	protected lateinit var preferences: PreferenceHelper
 
@@ -93,11 +92,6 @@ open class BaseActivity : AppCompatActivity() {
 		currentDarkTheme = darkTheme
 	}
 
-	override fun setTheme(resid: Int) {
-		super.setTheme(resid)
-		themeId = resid
-	}
-
 	private fun setAppTheme(hasOwnToolbar: Boolean) {
 		when (currentTheme) {
 			"untis" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_ThemeUntis_NoActionBar else R.style.AppTheme_ThemeUntis)
@@ -108,16 +102,20 @@ open class BaseActivity : AppCompatActivity() {
 			"pixel" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_ThemePixel_NoActionBar else R.style.AppTheme_ThemePixel)
 			else -> setTheme(if (hasOwnToolbar) R.style.AppTheme_NoActionBar else R.style.AppTheme)
 		}
-		delegate.localNightMode = when (preferences["preference_dark_theme", currentDarkTheme]) {
-			"on" -> AppCompatDelegate.MODE_NIGHT_YES
-			"auto" -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
-			else -> AppCompatDelegate.MODE_NIGHT_NO
-		}
+
+		AppCompatDelegate.setDefaultNightMode(
+			when (preferences["preference_dark_theme", currentDarkTheme]) {
+				"on" -> AppCompatDelegate.MODE_NIGHT_YES
+				"off" -> AppCompatDelegate.MODE_NIGHT_NO
+				else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+			}
+		)
 	}
 
 	private fun setBlackBackground(blackBackground: Boolean) {
 		if (blackBackground
-				&& resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES)
+			&& resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+		)
 			window.decorView.setBackgroundColor(Color.BLACK)
 		else {
 			val typedValue = TypedValue()
@@ -133,7 +131,8 @@ open class BaseActivity : AppCompatActivity() {
 		return typedValue.data
 	}
 
-	private class CrashHandler(private val defaultUncaughtExceptionHandler: Thread.UncaughtExceptionHandler?) : Thread.UncaughtExceptionHandler {
+	private class CrashHandler(private val defaultUncaughtExceptionHandler: Thread.UncaughtExceptionHandler?) :
+		Thread.UncaughtExceptionHandler {
 		override fun uncaughtException(t: Thread, e: Throwable) {
 			Log.e("BetterUntis", "Application crashed!", e)
 			saveCrash(e)

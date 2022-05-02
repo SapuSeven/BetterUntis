@@ -139,7 +139,6 @@
     <string name="preference_dark_theme_oled_desc">Korisno za OLED-ekrane</string>
     <string name="preference_dark_theme_oled">Koristi potpuno crnu pozadinu</string>
     <string name="preference_dark_theme_off">Uvijek isključeno</string>
-    <string name="preference_dark_theme_auto">Aktiviraj kad je baterija slaba</string>
     <string name="preference_dark_theme">Tamna tema</string>
     <string name="preference_connectivity_refresh_in_background_desc">Deaktiviraj spremanje podataka s rjeđim aktualiziranjima rasporeda sati</string>
     <string name="preference_connectivity_refresh_in_background">Uvijek aktualiziraj raspored sati</string>

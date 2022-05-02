@@ -144,7 +144,6 @@
     <string name="preference_connectivity_refresh_in_background">Oppdater alltid timeplanen</string>
     <string name="preference_connectivity_refresh_in_background_desc">Deaktiver for å lagre data sjeldnere med mindre hyppige timeplan-oppdateringer</string>
     <string name="preference_dark_theme">Mørkt tema</string>
-    <string name="preference_dark_theme_auto">Aktiver på lavt batteri</string>
     <string name="preference_dark_theme_off">Alltid av</string>
     <string name="preference_dark_theme_oled">Bruk helt svart bakgrunn</string>
     <string name="preference_dark_theme_oled_desc">Nyttig for OLED-skjermer</string>

@@ -231,7 +231,6 @@
     <string name="preference_dark_theme_on">Beti piztuta</string>
     <string name="preference_dark_theme_oled_desc">Erabilgarria OLED pantailetarako</string>
     <string name="preference_dark_theme_off">Beti itzalita</string>
-    <string name="preference_dark_theme_auto">Gaitu bateria gutxirekin</string>
     <string name="preference_dark_theme">Gai iluna</string>
     <string name="preference_connectivity_refresh_in_background">Freskatu ordutegia beti</string>
     <string name="preference_connectivity_proxy_host">Proxy zerbitzariaren ostalaria</string>

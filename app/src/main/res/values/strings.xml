@@ -174,7 +174,7 @@
 	<string name="preference_connectivity_refresh_in_background">Always refresh timetable</string>
 	<string name="preference_connectivity_refresh_in_background_desc">Disable to save data with less frequent timetable updates</string>
 	<string name="preference_dark_theme">Dark theme</string>
-	<string name="preference_dark_theme_auto">Enable on low battery</string>
+	<string name="preference_dark_theme_auto">Follow system</string>
 	<string name="preference_dark_theme_off">Always off</string>
 	<string name="preference_dark_theme_oled">Use total black background</string>
 	<string name="preference_dark_theme_oled_desc">Useful for OLED-screens</string>

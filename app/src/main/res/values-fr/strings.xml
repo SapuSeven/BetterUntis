@@ -115,7 +115,6 @@
     <string name="preference_dark_theme_oled_desc">Utile pour les écrans OLED</string>
     <string name="preference_dark_theme_oled">Utiliser un arrière-plan totalement noir</string>
     <string name="preference_dark_theme_off">Toujours désactivé</string>
-    <string name="preference_dark_theme_auto">Activer quand la batterie est faible</string>
     <string name="preference_dark_theme">Thème sombre</string>
     <string name="preference_connectivity_refresh_in_background_desc">Désactiver pour enregistrer des données avec des mises à jour moins fréquentes</string>
     <string name="preference_connectivity_refresh_in_background">Toujours rafraîchir l’emploi du temps</string>

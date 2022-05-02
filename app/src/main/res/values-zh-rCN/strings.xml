@@ -251,7 +251,6 @@
     <string name="preference_dark_theme_on">总是开启</string>
     <string name="preference_dark_theme_oled">使用全黑背景</string>
     <string name="preference_dark_theme_off">总是关闭</string>
-    <string name="preference_dark_theme_auto">低电量可用</string>
     <string name="preference_dark_theme">黑暗主题</string>
     <string name="preference_connectivity_refresh_in_background_desc">更新频率较低的课程表无法保存数据</string>
     <string name="preference_connectivity_refresh_in_background">总是更新课程表</string>

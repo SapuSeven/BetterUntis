@@ -156,7 +156,7 @@
     <string name="preference_connectivity_refresh_in_background">Stundenplan immer aktualisieren</string>
     <string name="preference_connectivity_refresh_in_background_desc">Ausschalten, um Datenvolumen zu sparen</string>
     <string name="preference_dark_theme">Dunkles Design</string>
-    <string name="preference_dark_theme_auto">Bei niedrigem Akkustand aktivieren</string>
+    <string name="preference_dark_theme_auto">Systemeinstellung folgen</string>
     <string name="preference_dark_theme_off">Immer aus</string>
     <string name="preference_dark_theme_oled">Schwarzen Hintergrund verwenden</string>
     <string name="preference_dark_theme_oled_desc">Nützlich für OLED-Bildschirme</string>
