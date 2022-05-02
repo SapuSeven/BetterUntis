@@ -29,7 +29,6 @@ import com.sapuseven.untis.dialogs.AlertPreferenceDialog
 import com.sapuseven.untis.dialogs.ElementPickerDialog
 import com.sapuseven.untis.dialogs.WeekRangePickerPreferenceDialog
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
-import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.github.GithubUser
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
@@ -89,16 +88,13 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 	}
 
 	private fun setupDesigningDialog() {
-		val prefs = PreferenceManager(this)
-		if (!prefs.defaultPrefs.getBoolean(DIALOG_DESIGNING_HIDE, false))
+		if (preferences[DIALOG_DESIGNING_HIDE, false])
 			banner_settings_designing.visibility = View.VISIBLE
 
 		banner_settings_designing.setLeftButtonAction {
 			banner_settings_designing.dismiss()
 
-			val editor = prefs.defaultPrefs.edit()
-			editor.putBoolean(DIALOG_DESIGNING_HIDE, true)
-			editor.apply()
+			preferences[DIALOG_DESIGNING_HIDE] = true
 		}
 		banner_settings_designing.setRightButtonAction {
 			startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(WIKI_URL_DESIGNING)))

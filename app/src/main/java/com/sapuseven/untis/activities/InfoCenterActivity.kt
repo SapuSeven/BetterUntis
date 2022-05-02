@@ -124,10 +124,8 @@ class InfoCenterActivity : BaseActivity() {
 			messageList.addAll(it)
 			messageAdapter.notifyDataSetChanged()
 
-			preferences.defaultPrefs.edit()
-					.putInt("preference_last_messages_count", it.size)
-					.putString("preference_last_messages_date", SimpleDateFormat("dd-MM-yyyy", Locale.US).format(Calendar.getInstance().time))
-					.apply()
+			preferences["preference_last_messages_count"] = it.size
+			preferences["preference_last_messages_date"] = SimpleDateFormat("dd-MM-yyyy", Locale.US).format(Calendar.getInstance().time)
 		}
 		messagesLoading = false
 		if (bottomnavigationview_infocenter.selectedItemId == R.id.item_infocenter_messages) {
@@ -202,7 +200,7 @@ class InfoCenterActivity : BaseActivity() {
 		val query = UntisRequest.UntisRequestQuery(user)
 
 		query.data.method = UntisApiConstants.METHOD_GET_MESSAGES
-		query.proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
+		query.proxyHost = preferences["preference_connectivity_proxy_host", null]
 		query.data.params = listOf(MessageParams(
 				UntisDate.fromLocalDate(LocalDate.now()),
 				auth = UntisAuthentication.createAuthObject(user)
@@ -222,7 +220,7 @@ class InfoCenterActivity : BaseActivity() {
 		val query = UntisRequest.UntisRequestQuery(user)
 
 		query.data.method = UntisApiConstants.METHOD_GET_OFFICEHOURS
-		query.proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
+		query.proxyHost = preferences["preference_connectivity_proxy_host", null]
 		query.data.params = listOf(OfficeHoursParams(
 				-1,
 				UntisDate.fromLocalDate(LocalDate.now()),
@@ -244,7 +242,7 @@ class InfoCenterActivity : BaseActivity() {
 			val query = UntisRequest.UntisRequestQuery(user)
 
 			query.data.method = UntisApiConstants.METHOD_GET_EXAMS
-			query.proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
+			query.proxyHost = preferences["preference_connectivity_proxy_host", null]
 			query.data.params = listOf(ExamParams(
 					user.userData.elemId,
 					user.userData.elemType ?: "",
@@ -270,7 +268,7 @@ class InfoCenterActivity : BaseActivity() {
 			val query = UntisRequest.UntisRequestQuery(user)
 
 			query.data.method = UntisApiConstants.METHOD_GET_HOMEWORKS
-			query.proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
+			query.proxyHost = preferences["preference_connectivity_proxy_host", null]
 			query.data.params = listOf(HomeworkParams(
 					user.userData.elemId,
 					user.userData.elemType ?: "",
@@ -295,7 +293,7 @@ class InfoCenterActivity : BaseActivity() {
 		val query = UntisRequest.UntisRequestQuery(user)
 
 		query.data.method = UntisApiConstants.METHOD_GET_ABSENCES
-		query.proxyHost = preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
+		query.proxyHost = preferences["preference_connectivity_proxy_host", null]
 		query.data.params = listOf(AbsenceParams(
 				UntisDate.fromLocalDate(LocalDate.now().minusYears(1)),
 				UntisDate.fromLocalDate(LocalDate.now().plusMonths(1)),

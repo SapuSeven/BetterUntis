@@ -1,7 +1,6 @@
 package com.sapuseven.untis.activities
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
@@ -12,27 +11,28 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.ErrorLogger
-import com.sapuseven.untis.helpers.config.PreferenceManager
-import com.sapuseven.untis.helpers.config.PreferenceUtils
+import com.sapuseven.untis.helpers.config.PreferenceHelper
 import java.io.File
 
 @SuppressLint("Registered") // This activity is not intended to be used directly
 open class BaseActivity : AppCompatActivity() {
+	protected var hasOwnToolbar: Boolean = false
 	protected var currentTheme: String = ""
 	private var currentDarkTheme: String = ""
-	protected lateinit var preferences: PreferenceManager
-	protected var hasOwnToolbar: Boolean = false
-
 	private var themeId = -1
+
+	protected lateinit var preferences: PreferenceHelper
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		ErrorLogger.initialize(this)
 
-		Thread.setDefaultUncaughtExceptionHandler(CrashHandler(this, Thread.getDefaultUncaughtExceptionHandler()))
+		Thread.setDefaultUncaughtExceptionHandler(CrashHandler(Thread.getDefaultUncaughtExceptionHandler()))
 
-		if (!::preferences.isInitialized) preferences = PreferenceManager(this)
-		currentTheme = PreferenceUtils.getPrefString(preferences, "preference_theme")
-		currentDarkTheme = PreferenceUtils.getPrefString(preferences, "preference_dark_theme")
+		preferences = PreferenceHelper(this)
+		preferences.loadSavedProfile()
+
+		currentTheme = preferences["preference_theme"]
+		currentDarkTheme = preferences["preference_dark_theme"]
 		setAppTheme(hasOwnToolbar)
 		super.onCreate(savedInstanceState)
 	}
@@ -78,13 +78,13 @@ open class BaseActivity : AppCompatActivity() {
 
 	override fun onStart() {
 		super.onStart()
-		setBlackBackground(PreferenceUtils.getPrefBool(preferences, "preference_dark_theme_oled"))
+		setBlackBackground(preferences["preference_dark_theme_oled"])
 	}
 
 	override fun onResume() {
 		super.onResume()
-		val theme = PreferenceUtils.getPrefString(preferences, "preference_theme")
-		val darkTheme = PreferenceUtils.getPrefString(preferences, "preference_dark_theme")
+		val theme: String = preferences["preference_theme"]
+		val darkTheme: String = preferences["preference_dark_theme"]
 
 		if (currentTheme != theme || currentDarkTheme != darkTheme)
 			recreate()
@@ -108,7 +108,7 @@ open class BaseActivity : AppCompatActivity() {
 			"pixel" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_ThemePixel_NoActionBar else R.style.AppTheme_ThemePixel)
 			else -> setTheme(if (hasOwnToolbar) R.style.AppTheme_NoActionBar else R.style.AppTheme)
 		}
-		delegate.localNightMode = when (PreferenceUtils.getPrefString(preferences, "preference_dark_theme", currentDarkTheme)) {
+		delegate.localNightMode = when (preferences["preference_dark_theme", currentDarkTheme]) {
 			"on" -> AppCompatDelegate.MODE_NIGHT_YES
 			"auto" -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 			else -> AppCompatDelegate.MODE_NIGHT_NO
@@ -133,7 +133,7 @@ open class BaseActivity : AppCompatActivity() {
 		return typedValue.data
 	}
 
-	private class CrashHandler(val context: Context, private val defaultUncaughtExceptionHandler: Thread.UncaughtExceptionHandler?) : Thread.UncaughtExceptionHandler {
+	private class CrashHandler(private val defaultUncaughtExceptionHandler: Thread.UncaughtExceptionHandler?) : Thread.UncaughtExceptionHandler {
 		override fun uncaughtException(t: Thread, e: Throwable) {
 			Log.e("BetterUntis", "Application crashed!", e)
 			saveCrash(e)
