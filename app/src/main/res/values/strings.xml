@@ -47,7 +47,7 @@
 
 	<string name="errors_github_attach_file_message">Please attach the compressed log files to this issue.\nThey have been saved to `%1$s`</string>
 
-	<string name="menu_nav_timetables">Timetables</string>
+	<string name="nav_all_timetables">Timetables</string>
 	<string name="menu_infocenter_messagesofday">Messages</string>
 	<string name="menu_infocenter_officehours">Office Hours</string>
 	<string name="menu_infocenter_events">Events</string>
@@ -189,6 +189,11 @@
 	<string name="preference_info_contributors_desc">A list of the contributors</string>
 	<string name="preference_info_general">General</string>
 	<string name="preference_info_github">GitHub repository</string>
+	<string name="preference_info_privacy">External Content</string>
+	<string name="preference_info_privacy_desc">Contributors are loaded from GitHub. Read their privacy policy for further information.</string>
+	<string name="preference_info_privacy_policy">Privacy Policy</string>
+	<string name="preference_info_license">License</string>
+	<string name="preference_info_license_desc" translatable="false">GPL-3.0</string>
 	<string name="preference_info_libraries">Libraries</string>
 	<string name="preference_info_libraries_desc">A list of all used libraries</string>
 	<string name="preference_marker">Time indicator</string>
@@ -311,6 +316,7 @@
 	<string name="widget_daily_messages">Daily Messages</string>
 	<string name="widget_select_profile">Please select a profile for the widget</string>
 	<string name="widget_timetable_link">Timetable Link</string>
+	<string name="maindrawer_bookmarks_add">Add Timetable</string>
 
 	<plurals name="main_time_diff_minutes">
 		<item quantity="one">a minute ago</item>
@@ -332,4 +338,5 @@
 		<item quantity="one">%1$d contribution</item>
 		<item quantity="other">%1$d contributions</item>
 	</plurals>
+    <string name="main_dialog_delete_bookmark">Would you like to delete this bookmark?</string>
 </resources>

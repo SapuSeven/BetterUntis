@@ -29,7 +29,7 @@
     <string name="activity_title_free_rooms">Ledige rom</string>
     <string name="activity_title_info_center">Infosenter</string>
     <string name="activity_title_settings">Innstillinger</string>
-    <string name="menu_nav_timetables">Timeplaner</string>
+    <string name="nav_all_timetables">Timeplaner</string>
     <string name="menu_infocenter_messagesofday">Meldinger</string>
     <string name="menu_infocenter_officehours">Kontortid</string>
     <string name="menu_infocenter_events">Hendelser</string>

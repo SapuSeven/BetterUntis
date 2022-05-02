@@ -1,0 +1,4 @@
+- Added ability to create timetable bookmarks
+- Updated info page
+- Fixed widgets on Android 12
+- Fixed bugs and crashes

@@ -66,7 +66,7 @@
     <string name="mainactivitydrawer_dropdown_show">Erakutsi profil-zerrenda</string>
     <string name="menu_infocenter_events">Gertaerak</string>
     <string name="menu_infocenter_messagesofday">Mezuak</string>
-    <string name="menu_nav_timetables">Ordutegiak</string>
+    <string name="nav_all_timetables">Ordutegiak</string>
     <string name="activity_title_settings">Ezarpenak</string>
     <string name="activity_title_info_center">Informazio-zentroa</string>
     <string name="activity_title_free_rooms">Gela libreak</string>

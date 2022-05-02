@@ -73,7 +73,7 @@ class BackgroundGridDrawer(private val config: WeekViewConfig) : BaseDrawer {
 			val isWithinVisibleRange = top < height
 			val isVisibleHorizontally = startPixel + widthPerDay - startX > 0
 
-			if (isNotHiddenByHeader && isWithinVisibleRange && isVisibleHorizontally) {
+			if (isNotHiddenByHeader && isWithinVisibleRange && isVisibleHorizontally && i < (hourLines.size / 4)) {
 				hourLines[i * 4] = 0f
 				hourLines[i * 4 + 1] = top
 				hourLines[i * 4 + 2] = canvas.width.toFloat()
