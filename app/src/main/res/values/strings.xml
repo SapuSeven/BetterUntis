@@ -261,9 +261,11 @@
 	<string name="preferences_styling">Customization</string>
 	<string name="preferences_timetable">Timetable</string>
 
-	<string name="settings_recommend_message">If you are enjoying BetterUntis, consider recommending it to your friends!</string>
+	<string name="settings_recommend_message">If you are enjoying BetterUntis, spread the word and tell your friends!</string>
 	<string name="settings_recommend_hide">Don\'t show again</string>
 	<string name="settings_recommend_share">Share</string>
+	<string name="settings_recommend_title">Recommend BetterUntis</string>
+	<string name="settings_recommend_text">Try BetterUntis - A better alternative to Untis Mobile! Download at %1$s</string>
 	<string name="notifications_channel_breakinfo">Break info</string>
 	<string name="notifications_channel_breakinfo_desc">Shows information about the current break and the following lesson</string>
 	<string name="notifications_channel_backgrounderrors">Background errors</string>

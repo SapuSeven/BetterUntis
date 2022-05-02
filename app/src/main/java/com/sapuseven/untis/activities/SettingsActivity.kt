@@ -52,8 +52,8 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 		private const val DIALOG_RECOMMEND_HIDE = "preference_dialog_recommend_hide"
 
 		private const val REPOSITORY_URL_GITHUB = "https://github.com/SapuSeven/BetterUntis"
-		private const val FILE_URL_RECOMMEND = "$REPOSITORY_URL_GITHUB//blob/master/README.md"
 		private const val WIKI_URL_PROXY = "$REPOSITORY_URL_GITHUB/wiki/Proxy"
+		private const val URL_RECOMMEND = "https://sapuseven.com/app/BetterUntis"
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,8 +89,9 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 	}
   
 	private fun setupRecommendDialog() {
-		if (!preferences[DIALOG_RECOMMEND_HIDE, false])
-			banner_settings_recommend.visibility = View.VISIBLE
+		if (preferences[DIALOG_RECOMMEND_HIDE, false]) return
+
+		banner_settings_recommend.visibility = View.VISIBLE
 
 		leftButton.setOnClickListener {
 			banner_settings_recommend.visibility = View.GONE
@@ -98,7 +99,13 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 			preferences[DIALOG_RECOMMEND_HIDE] = true
 		}
 		rightButton.setOnClickListener {
-			startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(FILE_URL_RECOMMEND)))
+			startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
+				type = "text/plain"
+				putExtra(
+					Intent.EXTRA_TEXT,
+					getString(R.string.settings_recommend_text, URL_RECOMMEND)
+				)
+			}, getString(R.string.settings_recommend_title)))
 		}
 	}
 
