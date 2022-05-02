@@ -11,7 +11,9 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.*
-import android.widget.*
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
@@ -52,11 +54,11 @@ import com.sapuseven.untis.helpers.config.PreferenceUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.interfaces.TimetableDisplay
+import com.sapuseven.untis.models.TimetableBookmark
 import com.sapuseven.untis.models.UntisMessage
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.Holiday
 import com.sapuseven.untis.models.untis.masterdata.SchoolYear
-import com.sapuseven.untis.models.TimetableBookmark
 import com.sapuseven.untis.models.untis.params.MessageParams
 import com.sapuseven.untis.models.untis.response.MessageResponse
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
@@ -74,10 +76,11 @@ import com.sapuseven.untis.views.weekview.listeners.ScaleListener
 import com.sapuseven.untis.views.weekview.listeners.ScrollListener
 import com.sapuseven.untis.views.weekview.listeners.TopLeftCornerClickListener
 import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
+import io.sentry.Sentry
+import io.sentry.SentryOptions
+import io.sentry.android.core.SentryAndroid
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
-import kotlinx.android.synthetic.main.activity_main_drawer_header.*
-import kotlinx.android.synthetic.main.item_profiles_add.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -87,18 +90,19 @@ import org.joda.time.DateTimeConstants
 import org.joda.time.Instant
 import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
+import java.io.File
 import java.lang.ref.WeakReference
 import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity :
-		BaseActivity(),
-		NavigationView.OnNavigationItemSelectedListener,
-		WeekViewLoader.PeriodChangeListener<TimegridItem>,
-		EventClickListener<TimegridItem>,
-		TopLeftCornerClickListener,
-		TimetableDisplay,
-		TimetableItemDetailsFragment.TimetableItemDetailsDialogListener{
+	BaseActivity(),
+	NavigationView.OnNavigationItemSelectedListener,
+	WeekViewLoader.PeriodChangeListener<TimegridItem>,
+	EventClickListener<TimegridItem>,
+	TopLeftCornerClickListener,
+	TimetableDisplay,
+	TimetableItemDetailsFragment.TimetableItemDetailsDialogListener {
 
 	companion object {
 		private const val MINUTE_MILLIS: Int = 60 * 1000
@@ -155,6 +159,20 @@ class MainActivity :
 
 		super.onCreate(savedInstanceState)
 
+		SentryAndroid.init(this) { options ->
+			options.dsn =
+				"https://d3b77222abce4fcfa74fda2185e0f8dc@o1136770.ingest.sentry.io/6188900"
+			options.tracesSampleRate = 1.0
+			options.cacheDirPath = File(filesDir, "logs").absolutePath
+			options.beforeSend = SentryOptions.BeforeSendCallback { event, hint ->
+				val editor =
+					androidx.preference.PreferenceManager.getDefaultSharedPreferences(this).edit()
+				editor.putString("crash", event.eventId.toString())
+				editor.apply()
+				event
+			}
+		}
+
 		if (!loadProfile())
 			return
 
@@ -162,9 +180,12 @@ class MainActivity :
 
 		setContentView(R.layout.activity_main)
 
-		if (checkForCrashes()) {
+		val sentryId = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
+			.getString("crash", null)
+		if (savedInstanceState != null && Sentry.isCrashedLastRun() == true && sentryId != null) {
 			startActivityForResult(Intent(this, ErrorsActivity::class.java).apply {
 				putExtra(ErrorsActivity.EXTRA_BOOLEAN_SHOW_CRASH_MESSAGE, true)
+				putExtra(ErrorsActivity.EXTRA_BOOLEAN_SENTRY_ID, sentryId)
 			}, REQUEST_CODE_ERRORS)
 		} else {
 			setupActionBar()
@@ -755,7 +776,7 @@ class MainActivity :
 			R.string.main_drawer_close
 		)
 		drawer_layout.addDrawerListener(toggle)
-		toolbar_main.setNavigationOnClickListener { setBookmarksLongClickListeners() ; openDrawer() }
+		toolbar_main.setNavigationOnClickListener { setBookmarksLongClickListeners(); openDrawer() }
 		toggle.syncState()
 		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
 		window.statusBarColor = Color.TRANSPARENT
@@ -777,7 +798,7 @@ class MainActivity :
 					DrawerLayout.LOCK_MODE_UNLOCKED,
 					GravityCompat.START
 				)
-				toolbar_main.setNavigationOnClickListener {  setBookmarksLongClickListeners() ; openDrawer() }
+				toolbar_main.setNavigationOnClickListener { setBookmarksLongClickListeners(); openDrawer() }
 				// TODO: Set actionBar title to default
 			}
 		}
@@ -787,15 +808,21 @@ class MainActivity :
 		var i = 0
 		navigationview_main.menu.findItem(R.id.nav_personal_bookmarks_title).subMenu.let {
 			// remove everything except personal timetable (in case menu has been invalidated)
-			for(index in 0 until it.size()){
+			for (index in 0 until it.size()) {
 				it.removeItem(index)
 			}
 			userDatabase.getUser(profileId)?.bookmarks?.forEach { bookmark ->
-				it.add(0, i, Menu.FIRST + i, bookmark.displayName).setIcon(bookmark.drawableId).isCheckable = true
+				it.add(0, i, Menu.FIRST + i, bookmark.displayName)
+					.setIcon(bookmark.drawableId).isCheckable = true
 				++i
 			}
 			BOOKMARKS_ADD_ID = i
-			it.add(0, BOOKMARKS_ADD_ID, Menu.FIRST + i, getString(R.string.maindrawer_bookmarks_add)).setIcon(getDrawable(R.drawable.all_add))
+			it.add(
+				0,
+				BOOKMARKS_ADD_ID,
+				Menu.FIRST + i,
+				getString(R.string.maindrawer_bookmarks_add)
+			).setIcon(getDrawable(R.drawable.all_add))
 			refreshNavigationViewSelection()
 		}
 		return super.onPrepareOptionsMenu(menu)
@@ -942,38 +969,60 @@ class MainActivity :
 			}
 			BOOKMARKS_ADD_ID -> {
 				ElementPickerDialog.newInstance(
-						timetableDatabaseInterface,
-						ElementPickerDialog.Companion.ElementPickerDialogConfig(TimetableDatabaseInterface.Type.CLASS),
-						object: ElementPickerDialog.ElementPickerDialogListener {
-							override fun onDialogDismissed(dialog: DialogInterface?) { /* ignore */ }
+					timetableDatabaseInterface,
+					ElementPickerDialog.Companion.ElementPickerDialogConfig(
+						TimetableDatabaseInterface.Type.CLASS
+					),
+					object : ElementPickerDialog.ElementPickerDialogListener {
+						override fun onDialogDismissed(dialog: DialogInterface?) { /* ignore */
+						}
 
-							override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
-								if(fragment is DialogFragment)
-									fragment.dismiss()
-								else
-									removeFragment(fragment)
-								val user = userDatabase.getUser(profileId)
-								if(user != null) {
-									element?.let {
-										user.bookmarks = user.bookmarks.plus(TimetableBookmark(it.id, it.type, timetableDatabaseInterface.getShortName(it.id,
-												TimetableDatabaseInterface.Type.valueOf(it.type)),
-												when(TimetableDatabaseInterface.Type.valueOf(it.type)) {
-													TimetableDatabaseInterface.Type.CLASS -> R.drawable.all_classes
-													TimetableDatabaseInterface.Type.ROOM -> R.drawable.all_rooms
-													TimetableDatabaseInterface.Type.TEACHER -> R.drawable.all_teacher
-													TimetableDatabaseInterface.Type.SUBJECT -> R.drawable.all_subject }))
-										userDatabase.editUser(user)
-										updateNavDrawer(findViewById(R.id.navigationview_main))
-										selectedElement = user.bookmarks.size - 1
-										invalidateOptionsMenu()
-										setTarget(it.id,it.type,timetableDatabaseInterface.getLongName(it.id, TimetableDatabaseInterface.Type.valueOf(it.type)))
-									}
+						override fun onPeriodElementClick(
+							fragment: Fragment,
+							element: PeriodElement?,
+							useOrgId: Boolean
+						) {
+							if (fragment is DialogFragment)
+								fragment.dismiss()
+							else
+								removeFragment(fragment)
+							val user = userDatabase.getUser(profileId)
+							if (user != null) {
+								element?.let {
+									user.bookmarks = user.bookmarks.plus(
+										TimetableBookmark(
+											it.id, it.type, timetableDatabaseInterface.getShortName(
+												it.id,
+												TimetableDatabaseInterface.Type.valueOf(it.type)
+											),
+											when (TimetableDatabaseInterface.Type.valueOf(it.type)) {
+												TimetableDatabaseInterface.Type.CLASS -> R.drawable.all_classes
+												TimetableDatabaseInterface.Type.ROOM -> R.drawable.all_rooms
+												TimetableDatabaseInterface.Type.TEACHER -> R.drawable.all_teacher
+												TimetableDatabaseInterface.Type.SUBJECT -> R.drawable.all_subject
+											}
+										)
+									)
+									userDatabase.editUser(user)
+									updateNavDrawer(findViewById(R.id.navigationview_main))
+									selectedElement = user.bookmarks.size - 1
+									invalidateOptionsMenu()
+									setTarget(
+										it.id,
+										it.type,
+										timetableDatabaseInterface.getLongName(
+											it.id,
+											TimetableDatabaseInterface.Type.valueOf(it.type)
+										)
+									)
 								}
 							}
-
-							override fun onPositiveButtonClicked(dialog: ElementPickerDialog) { /* not used */ }
-
 						}
+
+						override fun onPositiveButtonClicked(dialog: ElementPickerDialog) { /* not used */
+						}
+
+					}
 
 				).show(supportFragmentManager, "elementPicker")
 			}
@@ -1025,10 +1074,17 @@ class MainActivity :
 			else -> {
 				val bookmarks = userDatabase.getUser(profileId)?.bookmarks
 				if (bookmarks != null) {
-					if(item.itemId < bookmarks.size){
+					if (item.itemId < bookmarks.size) {
 						val target = bookmarks[item.itemId]
 						selectedElement = item.itemId
-						setTarget(target.classId,target.type,timetableDatabaseInterface.getLongName(target.classId, TimetableDatabaseInterface.Type.valueOf(target.type)))
+						setTarget(
+							target.classId,
+							target.type,
+							timetableDatabaseInterface.getLongName(
+								target.classId,
+								TimetableDatabaseInterface.Type.valueOf(target.type)
+							)
+						)
 					}
 				}
 			}
@@ -1039,34 +1095,49 @@ class MainActivity :
 
 	private fun showItemList(type: TimetableDatabaseInterface.Type) {
 		ElementPickerDialog.newInstance(
-				timetableDatabaseInterface,
-				ElementPickerDialog.Companion.ElementPickerDialogConfig(type),
-				object: ElementPickerDialog.ElementPickerDialogListener {
-					override fun onDialogDismissed(dialog: DialogInterface?) { refreshNavigationViewSelection() }
-
-					override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
-						if (fragment is DialogFragment)
-							fragment.dismiss()
-						else
-							removeFragment(fragment)
-						element?.let {
-							setTarget(if (useOrgId) element.orgId else element.id, element.type, timetableDatabaseInterface.getLongName(
-									if (useOrgId) element.orgId else element.id, TimetableDatabaseInterface.Type.valueOf(element.type)))
-						} ?: run {
-							showPersonalTimetable()
-						}
-						selectedElement = when (element?.type) {
-							TimetableDatabaseInterface.Type.CLASS.name -> R.id.nav_show_classes
-							TimetableDatabaseInterface.Type.TEACHER.name -> R.id.nav_show_teachers
-							TimetableDatabaseInterface.Type.ROOM.name -> R.id.nav_show_rooms
-							else -> {R.id.nav_show_personal}
-						}
-						refreshNavigationViewSelection()
-					}
-
-					override fun onPositiveButtonClicked(dialog: ElementPickerDialog) { /* not used */ }
-
+			timetableDatabaseInterface,
+			ElementPickerDialog.Companion.ElementPickerDialogConfig(type),
+			object : ElementPickerDialog.ElementPickerDialogListener {
+				override fun onDialogDismissed(dialog: DialogInterface?) {
+					refreshNavigationViewSelection()
 				}
+
+				override fun onPeriodElementClick(
+					fragment: Fragment,
+					element: PeriodElement?,
+					useOrgId: Boolean
+				) {
+					if (fragment is DialogFragment)
+						fragment.dismiss()
+					else
+						removeFragment(fragment)
+					element?.let {
+						setTarget(
+							if (useOrgId) element.orgId else element.id,
+							element.type,
+							timetableDatabaseInterface.getLongName(
+								if (useOrgId) element.orgId else element.id,
+								TimetableDatabaseInterface.Type.valueOf(element.type)
+							)
+						)
+					} ?: run {
+						showPersonalTimetable()
+					}
+					selectedElement = when (element?.type) {
+						TimetableDatabaseInterface.Type.CLASS.name -> R.id.nav_show_classes
+						TimetableDatabaseInterface.Type.TEACHER.name -> R.id.nav_show_teachers
+						TimetableDatabaseInterface.Type.ROOM.name -> R.id.nav_show_rooms
+						else -> {
+							R.id.nav_show_personal
+						}
+					}
+					refreshNavigationViewSelection()
+				}
+
+				override fun onPositiveButtonClicked(dialog: ElementPickerDialog) { /* not used */
+				}
+
+			}
 		).show(supportFragmentManager, "elementPicker") // TODO: Do not hard-code the tag
 	}
 
@@ -1102,7 +1173,13 @@ class MainActivity :
 				} else if (checkForNewSchoolYear()) {
 					finish()
 				}
-			REQUEST_CODE_ERRORS -> recreate()
+			REQUEST_CODE_ERRORS -> {
+				val editor =
+					androidx.preference.PreferenceManager.getDefaultSharedPreferences(this).edit()
+				editor.remove("crash")
+				editor.apply()
+				recreate()
+			}
 		}
 	}
 
@@ -1376,27 +1453,28 @@ class MainActivity :
 			rv.post {
 				for (index in 3..rv.layoutManager?.itemCount!!) {
 					val bookmarks = userDatabase.getUser(profileId)?.bookmarks
-					if(bookmarks != null){
-						if(index-3 < bookmarks.size) {
+					if (bookmarks != null) {
+						if (index - 3 < bookmarks.size) {
 							rv.layoutManager?.findViewByPosition(index)?.setOnLongClickListener {
 								Log.d("Bookmark", "$index")
 								closeDrawer()
 								MaterialAlertDialogBuilder(this).setMessage(getString(R.string.main_dialog_delete_bookmark))
-										.setPositiveButton(getString(R.string.all_yes)) { _, _ ->
-											userDatabase.getUser(profileId)?.let { user ->
-												if(selectedElement == index-3) {
-													showPersonalTimetable()
-												}
-												user.bookmarks = user.bookmarks.minus(bookmarks[index-3])
-												if(selectedElement!! < bookmarks.size && selectedElement!! > index-3){
-													selectedElement = selectedElement!! - 1
-												}
-												userDatabase.editUser(user)
-												invalidateOptionsMenu()
+									.setPositiveButton(getString(R.string.all_yes)) { _, _ ->
+										userDatabase.getUser(profileId)?.let { user ->
+											if (selectedElement == index - 3) {
+												showPersonalTimetable()
 											}
+											user.bookmarks =
+												user.bookmarks.minus(bookmarks[index - 3])
+											if (selectedElement!! < bookmarks.size && selectedElement!! > index - 3) {
+												selectedElement = selectedElement!! - 1
+											}
+											userDatabase.editUser(user)
+											invalidateOptionsMenu()
 										}
-										.setNegativeButton(getString(R.string.all_no)) { _, _ -> }
-										.show()
+									}
+									.setNegativeButton(getString(R.string.all_no)) { _, _ -> }
+									.show()
 								true
 							}
 						}

@@ -127,8 +127,6 @@
     <string name="widget_timetable">Ordutegia</string>
     <string name="loading_failed">Ezin izan da kargatu</string>
     <string name="loading">Kargatzen</string>
-    <string name="errors_button_report">Eman guztien berri</string>
-    <string name="errors_button_dismiss">Baztertu guztiak</string>
     <string name="errors_report">Mesedez, lagundu aplikazioa konpontzen beheko akatsen berri emanez:</string>
     <string name="errors_crash_message">Barkatu eragozpenak.</string>
     <string name="errors_crash_title">Badirudi BetterUntisek huts egin duela.</string>

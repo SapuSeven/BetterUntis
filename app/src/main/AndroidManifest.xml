@@ -18,17 +18,14 @@
 		android:theme="@style/AppTheme">
 
 		<meta-data
-			android:name="io.sentry.dsn"
-			android:value="https://d3b77222abce4fcfa74fda2185e0f8dc@o1136770.ingest.sentry.io/6188900" />
-		<meta-data
-			android:name="io.sentry.traces.sample-rate"
-			android:value="1.0" />
+			android:name="io.sentry.auto-init"
+			android:value="false" />
 
 		<activity
 			android:name=".activities.ShortcutConfigureActivity"
+			android:exported="false"
 			android:icon="@mipmap/ic_shortcut"
-			android:label="@string/widget_timetable_link"
-			android:exported="false">
+			android:label="@string/widget_timetable_link">
 
 			<intent-filter>
 				<category android:name="android.intent.category.DEFAULT" />
@@ -38,8 +35,8 @@
 
 		<activity
 			android:name=".activities.BaseWidgetConfigureActivity"
-			android:label="@string/widget_configuration"
-			android:exported="true">
+			android:exported="true"
+			android:label="@string/widget_configuration">
 
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
@@ -48,9 +45,9 @@
 
 		<activity
 			android:name=".activities.MainActivity"
+			android:exported="true"
 			android:launchMode="singleTop"
-			android:theme="@style/AppTheme.Launcher.NoActionBar"
-			android:exported="true">
+			android:theme="@style/AppTheme.Launcher.NoActionBar">
 
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
@@ -95,9 +92,9 @@
 
 		<activity
 			android:name=".activities.LoginDataInputActivity"
+			android:exported="true"
 			android:parentActivityName=".activities.LoginActivity"
-			android:windowSoftInputMode="adjustResize"
-			android:exported="true">
+			android:windowSoftInputMode="adjustResize">
 
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
@@ -129,7 +126,8 @@
 			android:name=".activities.ErrorsActivity"
 			android:label="@string/activity_title_errors" />
 
-		<receiver android:name=".receivers.StartupReceiver"
+		<receiver
+			android:name=".receivers.StartupReceiver"
 			android:exported="true">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -146,8 +144,8 @@
 
 		<receiver
 			android:name=".widgets.TimetableWidget"
-			android:label="@string/widget_timetable"
-			android:exported="true">
+			android:exported="true"
+			android:label="@string/widget_timetable">
 
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -160,8 +158,8 @@
 
 		<receiver
 			android:name=".widgets.MessagesWidget"
-			android:label="@string/widget_daily_messages"
-			android:exported="true">
+			android:exported="true"
+			android:label="@string/widget_daily_messages">
 
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

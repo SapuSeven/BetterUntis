@@ -20,8 +20,6 @@
     </plurals>
     <string name="loading_failed">Échec du chargement</string>
     <string name="loading">Chargement</string>
-    <string name="errors_button_report">Signaler tout</string>
-    <string name="errors_button_dismiss">Rejeter tout</string>
     <string name="errors_report">Aidez-nous à corriger l’appli en signalant les erreurs ci-dessous :</string>
     <string name="errors_crash_message">Désolé.</string>
     <string name="errors_crash_title">On dirait que BetterUntis a planté.</string>

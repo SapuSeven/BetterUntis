@@ -121,7 +121,8 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 				false
 			).run {
 				findViewById<TextView>(R.id.textview_timetableitemdetails_line1).text = it.name
-				findViewById<TextView>(R.id.textview_timetableitemdetails_line2).text = it.text
+				findViewById<TextView>(R.id.textview_timetableitemdetails_line2).text =
+					if (it.text.isNullOrBlank()) it.examtype else it.text
 				findViewById<ImageView>(R.id.imageview_timetableitemdetails_image).setImageResource(
 					R.drawable.infocenter_exam
 				)

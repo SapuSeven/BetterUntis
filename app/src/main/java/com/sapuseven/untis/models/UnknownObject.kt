@@ -1,7 +1,10 @@
 package com.sapuseven.untis.models
 
-import com.sapuseven.untis.helpers.ErrorLogger
-import kotlinx.serialization.*
+import io.sentry.Sentry
+import io.sentry.SentryLevel
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -13,9 +16,10 @@ import kotlinx.serialization.json.JsonDecoder
 class UnknownObject(val jsonString: String?) {
 	@Serializer(forClass = UnknownObject::class)
 	companion object : KSerializer<UnknownObject> {
-		override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("UnknownObject", PrimitiveKind.STRING)
+		override val descriptor: SerialDescriptor =
+			PrimitiveSerialDescriptor("UnknownObject", PrimitiveKind.STRING)
 
-		override fun serialize(encoder: Encoder, obj: UnknownObject) {}
+		override fun serialize(encoder: Encoder, value: UnknownObject) {}
 
 		override fun deserialize(decoder: Decoder): UnknownObject {
 			return UnknownObject((decoder as? JsonDecoder)?.decodeJsonElement().toString())
@@ -25,11 +29,16 @@ class UnknownObject(val jsonString: String?) {
 			fields.forEach {
 				it.value?.let { value ->
 					if (value.jsonString?.isNotBlank() == true
-							&& value.jsonString.toIntOrNull() != 0
-							&& value.jsonString != "\"\""
-							&& value.jsonString != "[]"
-							&& value.jsonString != "{}")
-						ErrorLogger.instance?.log("Unknown JSON object \"${it.key}\" encountered, value: ${value.jsonString}")
+						&& value.jsonString.toIntOrNull() != 0
+						&& value.jsonString != "\"\""
+						&& value.jsonString != "[]"
+						&& value.jsonString != "{}"
+						&& value.jsonString != "null"
+					)
+						Sentry.captureMessage(
+							"Unknown JSON object \"${it.key}\" encountered, value: ${value.jsonString}",
+							SentryLevel.DEBUG
+						)
 				}
 			}
 		}

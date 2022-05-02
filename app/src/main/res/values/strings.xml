@@ -281,9 +281,13 @@
 	<string name="homeworks_due_time_format">EEE, dd. MMM</string>
 	<string name="errors_crash_title">It looks like BetterUntis crashed.</string>
 	<string name="errors_crash_message">Sorry for that.</string>
-	<string name="errors_report">Please help to fix the app by reporting the errors below:</string>
-	<string name="errors_button_dismiss">Dismiss all</string>
-	<string name="errors_button_report">Report all</string>
+	<string name="errors_crash_id">Crash ID: %1$s</string>
+	<string name="errors_report">A crash report has already been submitted. If you want to include additional details, please use the form below.</string>
+	<string name="errors_report_name">Your Name</string>
+	<string name="errors_report_email">Your contact e-mail address</string>
+	<string name="errors_report_feedback">Additional feedback</string>
+	<string name="errors_button_dismiss">Close</string>
+	<string name="errors_button_report">Send</string>
 
 	<string name="loading">Loading</string>
 	<string name="loading_failed">Loading failed</string>
