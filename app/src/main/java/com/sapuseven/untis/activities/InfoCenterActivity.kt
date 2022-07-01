@@ -14,6 +14,7 @@ import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
+import com.sapuseven.untis.helpers.config.PreferenceHelper
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.UntisAbsence
 import com.sapuseven.untis.models.UntisMessage
@@ -54,6 +55,28 @@ class InfoCenterActivity : BaseActivity() {
 
 	companion object {
 		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileid"
+
+		suspend fun loadMessages(
+			preferences: PreferenceHelper,
+			api: UntisRequest,
+			user: UserDatabase.User
+		): List<UntisMessage>? {
+			val query = UntisRequest.UntisRequestQuery(user)
+
+			query.data.method = UntisApiConstants.METHOD_GET_MESSAGES
+			query.proxyHost = preferences["preference_connectivity_proxy_host", null]
+			query.data.params = listOf(MessageParams(
+				UntisDate.fromLocalDate(LocalDate.now()),
+				auth = UntisAuthentication.createAuthObject(user)
+			))
+
+			val result = api.request(query)
+			return result.fold({ data ->
+				val untisResponse = getJSON().decodeFromString<MessageResponse>(data)
+
+				untisResponse.result?.messages
+			}, { null })
+		}
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -196,22 +219,7 @@ class InfoCenterActivity : BaseActivity() {
 
 	private suspend fun loadMessages(user: UserDatabase.User): List<UntisMessage>? {
 		messagesLoading = true
-
-		val query = UntisRequest.UntisRequestQuery(user)
-
-		query.data.method = UntisApiConstants.METHOD_GET_MESSAGES
-		query.proxyHost = preferences["preference_connectivity_proxy_host", null]
-		query.data.params = listOf(MessageParams(
-				UntisDate.fromLocalDate(LocalDate.now()),
-				auth = UntisAuthentication.createAuthObject(user)
-		))
-
-		val result = api.request(query)
-		return result.fold({ data ->
-			val untisResponse = getJSON().decodeFromString<MessageResponse>(data)
-
-			untisResponse.result?.messages
-		}, { null })
+		return loadMessages(preferences, api, user)
 	}
 
 	private suspend fun loadOfficeHours(user: UserDatabase.User): List<UntisOfficeHour>? {
