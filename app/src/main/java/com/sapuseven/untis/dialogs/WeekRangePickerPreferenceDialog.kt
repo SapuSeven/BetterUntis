@@ -25,13 +25,19 @@ class WeekRangePickerPreferenceDialog(private val onCloseListener: ((positiveRes
 		}
 	}
 
-	override fun onCreateDialogView(context: Context?): View {
+	override fun onCreateDialogView(context: Context): View {
 		val root = super.onCreateDialogView(context)
-		picker = root.findViewById(R.id.day_picker)
+		picker = root!!.findViewById(R.id.day_picker)
 		picker.apply {
 			selectionMode = RangeSelectionMode(this)
-			val savedDays = preference.getPersistedStringSet(emptySet()).toList().map { MaterialDayPicker.Weekday.valueOf(it) }
-			setSelectedDays(if (savedDays.size == 1) listOf(savedDays.first()) else listOfNotNull(savedDays.minOrNull(), savedDays.maxOrNull()))
+			val savedDays = preference.getPersistedStringSet(emptySet()).toList()
+				.map { MaterialDayPicker.Weekday.valueOf(it) }
+			setSelectedDays(
+				if (savedDays.size == 1) listOf(savedDays.first()) else listOfNotNull(
+					savedDays.minOrNull(),
+					savedDays.maxOrNull()
+				)
+			)
 		}
 		return root
 	}
@@ -45,8 +51,8 @@ class WeekRangePickerPreferenceDialog(private val onCloseListener: ((positiveRes
 
 	override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 		val builder = MaterialAlertDialogBuilder(requireContext())
-				.setTitle(preference.dialogTitle)
-				.setView(onCreateDialogView(context))
+			.setTitle(preference.dialogTitle)
+			.setView(onCreateDialogView(requireContext()))
 				.setPositiveButton(preference.positiveButtonText, this)
 				.setNegativeButton(preference.negativeButtonText, this)
 				.setNeutralButton(R.string.all_reset) { dialog, _ ->

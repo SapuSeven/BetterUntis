@@ -13,29 +13,26 @@ class ElementPickerPreference(context: Context, attrs: AttributeSet) : Preferenc
 	}
 
 	override fun onAttached() {
-		summary = sharedPreferences.getString(key, "")
+		summary = sharedPreferences?.getString(key, "")
 	}
 
 	fun setElement(element: PeriodElement?, displayName: String) {
 		summary = displayName
 
-		val editor = sharedPreferences.edit()
-		element?.let {
-			editor.apply {
+		val editor = sharedPreferences?.edit()?.run {
+			element?.let {
 				putString(key, displayName)
 				putInt(key + KEY_SUFFIX_ID, element.id)
 				putString(key + KEY_SUFFIX_TYPE, element.type)
-			}
-		} ?: run {
-			editor.apply {
+			} ?: run {
 				remove(key)
 				remove(key + KEY_SUFFIX_ID)
 				remove(key + KEY_SUFFIX_TYPE)
 			}
+			apply()
 		}
-		editor.apply()
 	}
 
-	fun getSavedType() = sharedPreferences.getString(key + KEY_SUFFIX_TYPE, null)
-			?: TimetableDatabaseInterface.Type.CLASS.toString()
+	fun getSavedType() = sharedPreferences?.getString(key + KEY_SUFFIX_TYPE, null)
+		?: TimetableDatabaseInterface.Type.CLASS.toString()
 }

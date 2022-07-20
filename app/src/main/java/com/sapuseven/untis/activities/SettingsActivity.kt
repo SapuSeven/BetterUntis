@@ -68,17 +68,22 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 		if (savedInstanceState == null) {
 			// Create the fragment only when the activity is created for the first time.
 			// ie. not after orientation changes
-			val fragment = supportFragmentManager.findFragmentByTag(PreferencesFragment.FRAGMENT_TAG)
+			val fragment =
+				supportFragmentManager.findFragmentByTag(PreferencesFragment.FRAGMENT_TAG)
 					?: PreferencesFragment()
 			val args = Bundle()
 			profileId?.let { args.putLong(EXTRA_LONG_PROFILE_ID, it) }
 			fragment.arguments = args
 
 			supportFragmentManager
-					.beginTransaction()
-					.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-					.replace(R.id.framelayout_settings_content, fragment, PreferencesFragment.FRAGMENT_TAG)
-					.commit()
+				.beginTransaction()
+				.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+				.replace(
+					R.id.framelayout_settings_content,
+					fragment,
+					PreferencesFragment.FRAGMENT_TAG
+				)
+				.commit()
 		}
 	}
 
@@ -87,7 +92,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 			onBackPressed()
 		return true
 	}
-  
+
 	private fun setupRecommendDialog() {
 		if (preferences[DIALOG_RECOMMEND_HIDE, false]) return
 
@@ -113,8 +118,10 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 		supportActionBar?.setDisplayHomeAsUpEnabled(true)
 	}
 
-	override fun onPreferenceStartScreen(preferenceFragmentCompat: PreferenceFragmentCompat,
-	                                     preferenceScreen: PreferenceScreen): Boolean {
+	override fun onPreferenceStartScreen(
+		preferenceFragmentCompat: PreferenceFragmentCompat,
+		preferenceScreen: PreferenceScreen
+	): Boolean {
 		val fragment = PreferencesFragment()
 		val args = Bundle()
 		args.putString(PreferenceFragmentCompat.ARG_PREFERENCE_ROOT, preferenceScreen.key)
@@ -122,11 +129,11 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 		fragment.arguments = args
 
 		supportFragmentManager
-				.beginTransaction()
-				.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-				.replace(R.id.framelayout_settings_content, fragment, preferenceScreen.key)
-				.addToBackStack(preferenceScreen.title.toString())
-				.commit()
+			.beginTransaction()
+			.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+			.replace(R.id.framelayout_settings_content, fragment, preferenceScreen.key)
+			.addToBackStack(preferenceScreen.title.toString())
+			.commit()
 
 		supportActionBar?.title = preferenceScreen.title
 		return true
@@ -136,7 +143,10 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 		super.onBackPressed()
 
 		supportFragmentManager.run {
-			supportActionBar?.title = if (backStackEntryCount > 0) getBackStackEntryAt(backStackEntryCount - 1).name else getString(R.string.activity_title_settings)
+			supportActionBar?.title =
+				if (backStackEntryCount > 0) getBackStackEntryAt(backStackEntryCount - 1).name else getString(
+					R.string.activity_title_settings
+				)
 		}
 	}
 
@@ -152,11 +162,11 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 			profileId = arguments?.getLong(EXTRA_LONG_PROFILE_ID) ?: 0
 			if (profileId == 0L) {
 				MaterialAlertDialogBuilder(requireContext())
-						.setMessage("Invalid profile ID")
-						.setPositiveButton("Exit") { _, _ ->
-							activity?.finish()
-						}
-						.show()
+					.setMessage("Invalid profile ID")
+					.setPositiveButton("Exit") { _, _ ->
+						activity?.finish()
+					}
+					.show()
 			} else {
 				preferenceManager.sharedPreferencesName = "preferences_$profileId"
 
@@ -165,7 +175,10 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 				when (rootKey) {
 					"preferences_general" -> {
 						findPreference<SeekBarPreference>("preference_week_custom_display_length")?.apply {
-							max = findPreference<WeekRangePickerPreference>("preference_week_custom_range")?.getPersistedStringSet(emptySet())?.size?.zeroToNull
+							max =
+								findPreference<WeekRangePickerPreference>("preference_week_custom_range")?.getPersistedStringSet(
+									emptySet()
+								)?.size?.zeroToNull
 									?: this.max
 						}
 
@@ -199,7 +212,11 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 							refreshColorPreferences(values)
 						}
 
-						listOf("preference_theme", "preference_dark_theme", "preference_dark_theme_oled").forEach { key ->
+						listOf(
+							"preference_theme",
+							"preference_dark_theme",
+							"preference_dark_theme_oled"
+						).forEach { key ->
 							findPreference<Preference>(key)?.setOnPreferenceChangeListener { _, _ ->
 								activity?.recreate()
 								true
@@ -208,24 +225,28 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 
 						findPreference<Preference>("preference_timetable_colors_reset")?.setOnPreferenceClickListener {
 							MaterialAlertDialogBuilder(requireContext())
-									.setTitle(R.string.preference_dialog_colors_reset_title)
-									.setMessage(R.string.preference_dialog_colors_reset_text)
-									.setPositiveButton(R.string.preference_timetable_colors_reset_button_positive) { _, _ ->
-										preferenceManager.sharedPreferences.edit().apply {
-											listOf(
-													"preference_background_regular", "preference_background_regular_past",
-													"preference_background_exam", "preference_background_exam_past",
-													"preference_background_irregular", "preference_background_irregular_past",
-													"preference_background_cancelled", "preference_background_cancelled_past"
-											).forEach {
-												remove(it)
-											}
-											apply()
+								.setTitle(R.string.preference_dialog_colors_reset_title)
+								.setMessage(R.string.preference_dialog_colors_reset_text)
+								.setPositiveButton(R.string.preference_timetable_colors_reset_button_positive) { _, _ ->
+									preferenceManager.sharedPreferences?.edit()?.apply {
+										listOf(
+											"preference_background_regular",
+											"preference_background_regular_past",
+											"preference_background_exam",
+											"preference_background_exam_past",
+											"preference_background_irregular",
+											"preference_background_irregular_past",
+											"preference_background_cancelled",
+											"preference_background_cancelled_past"
+										).forEach {
+											remove(it)
 										}
-										activity?.recreate()
+										apply()
 									}
-									.setNegativeButton(R.string.all_cancel) { _, _ -> }
-									.show()
+									activity?.recreate()
+								}
+								.setNegativeButton(R.string.all_cancel) { _, _ -> }
+								.show()
 							true
 						}
 					}
@@ -330,18 +351,33 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 			if (success) {
 				val contributors = getJSON().decodeFromString<List<GithubUser>>(data)
 
-				preferenceScreen.removePreference(indicator)
+				indicator?.let { preferenceScreen.removePreference(it) }
 
 				contributors.forEach { user ->
-					preferenceScreen.addPreference(Preference(context).apply {
-						GlobalScope.launch(Dispatchers.Main) { icon = loadProfileImage(user.avatar_url, resources) }
-						title = user.login
-						summary = resources.getQuantityString(R.plurals.preferences_contributors_contributions, user.contributions, user.contributions)
-						setOnPreferenceClickListener {
-							startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(user.html_url)))
-							true
-						}
-					})
+					context?.let {
+						preferenceScreen.addPreference(
+							Preference(it).apply {
+								GlobalScope.launch(Dispatchers.Main) {
+									icon = loadProfileImage(user.avatar_url, resources)
+								}
+								title = user.login
+								summary = resources.getQuantityString(
+									R.plurals.preferences_contributors_contributions,
+									user.contributions,
+									user.contributions
+								)
+								setOnPreferenceClickListener {
+									startActivity(
+										Intent(
+											Intent.ACTION_VIEW,
+											Uri.parse(user.html_url)
+										)
+									)
+									true
+								}
+							}
+						)
+					}
 				}
 			} else {
 				indicator?.title = resources.getString(R.string.loading_failed)
@@ -350,25 +386,40 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 
 		private suspend fun loadProfileImage(avatarUrl: String, resources: Resources): Drawable? {
 			return avatarUrl
-					.httpGet()
-					.awaitByteArrayResult()
-					.fold({
-						BitmapDrawable(resources, BitmapFactory.decodeByteArray(it, 0, it.size))
-					}, { null })
+				.httpGet()
+				.awaitByteArrayResult()
+				.fold({
+					BitmapDrawable(resources, BitmapFactory.decodeByteArray(it, 0, it.size))
+				}, { null })
 		}
 
-		private fun clearNotifications() = (context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancelAll()
+		private fun clearNotifications() =
+			(context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancelAll()
 
 		private fun refreshColorPreferences(newValue: Set<*>) {
-			val regularColors = listOf("preference_background_regular", "preference_background_regular_past", "preference_use_theme_background")
-			val irregularColors = listOf("preference_background_irregular", "preference_background_irregular_past")
-			val cancelledColors = listOf("preference_background_cancelled", "preference_background_cancelled_past")
+			val regularColors = listOf(
+				"preference_background_regular",
+				"preference_background_regular_past",
+				"preference_use_theme_background"
+			)
+			val irregularColors =
+				listOf("preference_background_irregular", "preference_background_irregular_past")
+			val cancelledColors =
+				listOf("preference_background_cancelled", "preference_background_cancelled_past")
 			val examColors = listOf("preference_background_exam", "preference_background_exam_past")
 
-			regularColors.forEach { findPreference<Preference>(it)?.isEnabled = !newValue.contains("regular") }
-			irregularColors.forEach { findPreference<Preference>(it)?.isEnabled = !newValue.contains("irregular") }
-			cancelledColors.forEach { findPreference<Preference>(it)?.isEnabled = !newValue.contains("cancelled") }
-			examColors.forEach { findPreference<Preference>(it)?.isEnabled = !newValue.contains("exam") }
+			regularColors.forEach {
+				findPreference<Preference>(it)?.isEnabled = !newValue.contains("regular")
+			}
+			irregularColors.forEach {
+				findPreference<Preference>(it)?.isEnabled = !newValue.contains("irregular")
+			}
+			cancelledColors.forEach {
+				findPreference<Preference>(it)?.isEnabled = !newValue.contains("cancelled")
+			}
+			examColors.forEach {
+				findPreference<Preference>(it)?.isEnabled = !newValue.contains("exam")
+			}
 		}
 
 		override fun onPreferenceTreeClick(preference: Preference): Boolean {
@@ -377,26 +428,35 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 				val timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileId)
 
 				ElementPickerDialog.newInstance(
-						timetableDatabaseInterface,
-						ElementPickerDialog.Companion.ElementPickerDialogConfig(TimetableDatabaseInterface.Type.valueOf(preference.getSavedType())),
-						object : ElementPickerDialog.ElementPickerDialogListener {
-							override fun onDialogDismissed(dialog: DialogInterface?) {
-								// ignore
-							}
-
-							override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
-								preference.setElement(
-										element,
-										element?.let {
-											timetableDatabaseInterface.getShortName(it.id, TimetableDatabaseInterface.Type.valueOf(it.type))
-										} ?: "")
-								(fragment as DialogFragment).dismiss()
-							}
-
-							override fun onPositiveButtonClicked(dialog: ElementPickerDialog) {
-								// positive button not used
-							}
+					timetableDatabaseInterface,
+					ElementPickerDialog.Companion.ElementPickerDialogConfig(
+						TimetableDatabaseInterface.Type.valueOf(preference.getSavedType())
+					),
+					object : ElementPickerDialog.ElementPickerDialogListener {
+						override fun onDialogDismissed(dialog: DialogInterface?) {
+							// ignore
 						}
+
+						override fun onPeriodElementClick(
+							fragment: Fragment,
+							element: PeriodElement?,
+							useOrgId: Boolean
+						) {
+							preference.setElement(
+								element,
+								element?.let {
+									timetableDatabaseInterface.getShortName(
+										it.id,
+										TimetableDatabaseInterface.Type.valueOf(it.type)
+									)
+								} ?: "")
+							(fragment as DialogFragment).dismiss()
+						}
+
+						override fun onPositiveButtonClicked(dialog: ElementPickerDialog) {
+							// positive button not used
+						}
+					}
 				).show(requireFragmentManager(), "elementPicker")
 			}
 
@@ -414,14 +474,18 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 						f.show(manager, DIALOG_FRAGMENT_TAG)
 					}
 					is WeekRangePickerPreference -> {
-						val f: DialogFragment = WeekRangePickerPreferenceDialog.newInstance(preference.key) { positiveResult, selectedDays ->
-							val visibleDaysPreference = findPreference<SeekBarPreference>("preference_week_custom_display_length")
-							if (positiveResult) {
-								visibleDaysPreference?.max = selectedDays.zeroToNull ?: 7
-								visibleDaysPreference?.value = min(visibleDaysPreference?.value
-										?: 0, selectedDays.zeroToNull ?: 7)
+						val f: DialogFragment =
+							WeekRangePickerPreferenceDialog.newInstance(preference.key) { positiveResult, selectedDays ->
+								val visibleDaysPreference =
+									findPreference<SeekBarPreference>("preference_week_custom_display_length")
+								if (positiveResult) {
+									visibleDaysPreference?.max = selectedDays.zeroToNull ?: 7
+									visibleDaysPreference?.value = min(
+										visibleDaysPreference?.value
+											?: 0, selectedDays.zeroToNull ?: 7
+									)
+								}
 							}
-						}
 						f.setTargetFragment(this, 0)
 						f.show(manager, DIALOG_FRAGMENT_TAG)
 					}

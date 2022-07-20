@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -21,8 +20,16 @@ import java.text.Collator
 class AbsenceCheckFragment : Fragment() {
 	private val viewModel: PeriodDataViewModel by activityViewModels()
 
-	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-		val rootView = activity?.layoutInflater?.inflate(R.layout.fragment_timetable_absence_check, container, false) as ViewGroup
+	override fun onCreateView(
+		inflater: LayoutInflater,
+		container: ViewGroup?,
+		savedInstanceState: Bundle?
+	): View {
+		val rootView = activity?.layoutInflater?.inflate(
+			R.layout.fragment_timetable_absence_check,
+			container,
+			false
+		) as ViewGroup
 
 		val rvAbsenceCheck = rootView.findViewById<RecyclerView>(R.id.recyclerview_absence_check)
 		val adapter = AbsenceCheckAdapter {
@@ -36,14 +43,19 @@ class AbsenceCheckFragment : Fragment() {
 		rvAbsenceCheck.layoutManager = LinearLayoutManager(context)
 		rvAbsenceCheck.adapter = adapter
 
-		viewModel.absenceData().observe(viewLifecycleOwner, Observer { absenceList ->
-			rootView.findViewById<ProgressBar>(R.id.progressbar_absencecheck_loading).visibility = View.GONE
+		viewModel.absenceData().observe(viewLifecycleOwner) { absenceList ->
+			rootView.findViewById<ProgressBar>(R.id.progressbar_absencecheck_loading).visibility =
+				View.GONE
 			adapter.clear()
-			adapter.addItems(absenceList.map { AbsenceCheckAdapterItem(it.key, it.value) }.sortedWith(Comparator { s1, s2 ->
-				Collator.getInstance().compare(s1.student.fullName(), s2.student.fullName())
-			}))
+			if (absenceList != null)
+				adapter.addItems(absenceList
+					.map { AbsenceCheckAdapterItem(it.key, it.value) }
+					.sortedWith { s1, s2 ->
+						Collator.getInstance().compare(s1.student.fullName(), s2.student.fullName())
+					}
+				)
 			adapter.notifyDataSetChanged()
-		})
+		}
 
 		rootView.findViewById<FloatingActionButton>(R.id.fab_absencecheck_save).setOnClickListener {
 			viewModel.submitAbsencesChecked(

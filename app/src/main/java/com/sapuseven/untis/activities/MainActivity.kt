@@ -11,7 +11,9 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.*
-import android.widget.*
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
@@ -51,11 +53,11 @@ import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.interfaces.TimetableDisplay
+import com.sapuseven.untis.models.TimetableBookmark
 import com.sapuseven.untis.models.UntisMessage
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.Holiday
 import com.sapuseven.untis.models.untis.masterdata.SchoolYear
-import com.sapuseven.untis.models.TimetableBookmark
 import com.sapuseven.untis.models.untis.params.MessageParams
 import com.sapuseven.untis.models.untis.response.MessageResponse
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
@@ -75,8 +77,6 @@ import com.sapuseven.untis.views.weekview.listeners.TopLeftCornerClickListener
 import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
-import kotlinx.android.synthetic.main.activity_main_drawer_header.*
-import kotlinx.android.synthetic.main.item_profiles_add.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -731,15 +731,16 @@ class MainActivity :
 		}
 	}
 
-	override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+	override fun onPrepareOptionsMenu(menu: Menu): Boolean {
 		var i = 0
 		navigationview_main.menu.findItem(R.id.nav_personal_bookmarks_title).subMenu.let {
 			// remove everything except personal timetable (in case menu has been invalidated)
-			for(index in 0 until it.size()){
+			for (index in 0 until it.size()) {
 				it.removeItem(index)
 			}
 			userDatabase.getUser(profileId)?.bookmarks?.forEach { bookmark ->
-				it.add(0, i, Menu.FIRST + i, bookmark.displayName).setIcon(bookmark.drawableId).isCheckable = true
+				it.add(0, i, Menu.FIRST + i, bookmark.displayName)
+					.setIcon(bookmark.drawableId).isCheckable = true
 				++i
 			}
 			BOOKMARKS_ADD_ID = i

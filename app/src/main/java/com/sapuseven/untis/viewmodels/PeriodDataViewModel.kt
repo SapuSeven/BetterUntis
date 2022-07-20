@@ -29,7 +29,7 @@ class PeriodDataViewModel(
 		loadPeriodData()?.let { emit(it) } // TODO: Show network error if null
 	} as MutableLiveData<PeriodDataResult>
 
-	private val absenceLiveData = MediatorLiveData<Map<UntisStudent, Absence>>()
+	private val absenceLiveData = MediatorLiveData<Map<UntisStudent, Absence>?>()
 
 	private val periodLiveData = MediatorLiveData<UntisPeriodData>()
 
@@ -61,7 +61,7 @@ class PeriodDataViewModel(
 		}, { null })
 	}
 
-	fun absenceData(): LiveData<Map<UntisStudent, Absence>> = absenceLiveData
+	fun absenceData(): LiveData<Map<UntisStudent, Absence>?> = absenceLiveData
 
 	fun periodData(): LiveData<UntisPeriodData> = periodLiveData
 
@@ -158,15 +158,23 @@ class PeriodDataViewModel(
 		})
 	}
 
-	class Factory(private val user: UserDatabase.User?, private val item: TimegridItem?, val timetableDatabaseInterface: TimetableDatabaseInterface?) : ViewModelProvider.Factory {
-		override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-			return modelClass.getConstructor(UserDatabase.User::class.java, TimegridItem::class.java, TimetableDatabaseInterface::class.java)
-					.newInstance(user, item, timetableDatabaseInterface)
+	class Factory(
+		private val user: UserDatabase.User?,
+		private val item: TimegridItem?,
+		val timetableDatabaseInterface: TimetableDatabaseInterface?
+	) : ViewModelProvider.NewInstanceFactory() {
+		override fun <T : ViewModel> create(modelClass: Class<T>): T {
+			return modelClass.getConstructor(
+				UserDatabase.User::class.java,
+				TimegridItem::class.java,
+				TimetableDatabaseInterface::class.java
+			)
+				.newInstance(user, item, timetableDatabaseInterface)
 		}
 	}
 
 	open class Absence(
-			val untisAbsence: UntisAbsence? = null
+		val untisAbsence: UntisAbsence? = null
 	)
 
 	class PendingAbsence : Absence()
