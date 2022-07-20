@@ -56,9 +56,6 @@
     <string name="notifications_channel_backgrounderrors">Greške u pozadini</string>
     <string name="notifications_channel_breakinfo_desc">Prikazuje podatke o trenutačnoj pauzi i sljedećem satu nastave</string>
     <string name="notifications_channel_breakinfo">Podaci pauze</string>
-    <string name="settings_designing_info">Saznaj više</string>
-    <string name="settings_designing_hide">Nemoj više prikazivati</string>
-    <string name="settings_designing_message">Doprinesi stvaranjem ikona postavki koje nedostaju!</string>
     <string name="preferences_timetable">Raspored sati</string>
     <string name="preferences_styling">Prilagođavanje</string>
     <string name="preferences_notifications">Obavještavanja</string>
