@@ -9,6 +9,5 @@
 		<item name="android:statusBarColor">@color/appBarColorThemePixel</item>
 		<item name="actionBarBackground">@color/appBarColorThemePixel</item>
 		<item name="actionBarTheme">@style/PixelActionBarTheme</item>
-		<item name="actionBarStyle">@style/PixelActionBarStyle</item>
 	</style>
 </resources>

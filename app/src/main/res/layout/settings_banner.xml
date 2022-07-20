@@ -33,16 +33,16 @@
             android:orientation="horizontal">
 
             <Button
-                style="@style/Widget.MaterialComponents.Button.TextButton.Dialog"
-                android:id="@+id/leftButton"
+                style="@style/Widget.Material3.Button.TextButton.Dialog"
+	            android:id="@+id/leftButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/settings_recommend_hide"
                 android:textColor="?android:attr/textColorPrimaryInverse" />
 
             <Button
-                style="@style/Widget.MaterialComponents.Button.TextButton.Dialog"
-                android:id="@+id/rightButton"
+	            style="@style/Widget.Material3.Button.TextButton.Dialog"
+	            android:id="@+id/rightButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/settings_recommend_share"

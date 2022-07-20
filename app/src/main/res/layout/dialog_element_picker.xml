@@ -56,7 +56,7 @@
 
 	<com.google.android.material.textfield.TextInputLayout
 		android:id="@+id/textinputlayout_elementpicker_search"
-		style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+		style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_marginTop="4dp"
@@ -80,7 +80,7 @@
 		android:numColumns="3"/>
 
 	<Button
-		style="@style/Widget.MaterialComponents.Button.TextButton"
+		style="@style/Widget.Material3.Button.TextButton"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_margin="8dp"

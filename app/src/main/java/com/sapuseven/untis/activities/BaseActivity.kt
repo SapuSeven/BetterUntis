@@ -9,6 +9,7 @@ import android.util.TypedValue
 import androidx.annotation.AttrRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import com.google.android.material.color.DynamicColors
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.ErrorLogger
 import com.sapuseven.untis.helpers.config.PreferenceHelper
@@ -34,6 +35,7 @@ open class BaseActivity : AppCompatActivity() {
 		currentDarkTheme = preferences["preference_dark_theme"]
 		setAppTheme(hasOwnToolbar)
 		super.onCreate(savedInstanceState)
+		DynamicColors.applyToActivitiesIfAvailable(application);
 	}
 
 	/**
