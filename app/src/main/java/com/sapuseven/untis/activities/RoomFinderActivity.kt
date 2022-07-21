@@ -1,47 +1,27 @@
 package com.sapuseven.untis.activities
 
-import android.app.Activity
-import android.content.DialogInterface
-import android.content.Intent
 import android.os.Bundle
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.style.ImageSpan
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.sapuseven.untis.R
-import com.sapuseven.untis.adapters.RoomFinderAdapter
-import com.sapuseven.untis.adapters.RoomFinderAdapterItem
-import com.sapuseven.untis.data.databases.RoomfinderDatabase
-import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.data.timetable.TimegridItem
-import com.sapuseven.untis.dialogs.ElementPickerDialog
-import com.sapuseven.untis.dialogs.ErrorReportingDialog
-import com.sapuseven.untis.helpers.ErrorMessageDictionary
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.helpers.timetable.TimetableLoader
-import com.sapuseven.untis.interfaces.TimetableDisplay
-import com.sapuseven.untis.models.RoomFinderItem
-import com.sapuseven.untis.models.untis.UntisDate
-import com.sapuseven.untis.models.untis.masterdata.timegrid.Day
-import com.sapuseven.untis.models.untis.masterdata.timegrid.Unit
-import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import kotlinx.android.synthetic.main.activity_roomfinder.*
-import org.joda.time.LocalDate
-import org.joda.time.LocalDateTime
-import org.joda.time.format.DateTimeFormat
-import java.lang.ref.WeakReference
-import java.util.*
-import kotlin.collections.ArrayList
+import com.sapuseven.untis.ui.theme.AppTheme
 
-class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDialogListener, RoomFinderAdapter.RoomFinderClickListener {
-	private var roomListMargins: Int = 0
+class RoomFinderActivity : BaseComposeActivity()/*, ElementPickerDialog.ElementPickerDialogListener,
+	RoomFinderAdapter.RoomFinderClickListener*/ {
+	/*private var roomListMargins: Int = 0
 	private var hourIndex: Int = 0
 	private var maxHourIndex = 0
 	private var roomList: MutableList<RoomFinderAdapterItem> = ArrayList()
@@ -49,7 +29,7 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 	private var profileUser: UserDatabase.User? = null
 	private lateinit var userDatabase: UserDatabase
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
-	private lateinit var roomFinderDatabase: RoomfinderDatabase
+	private lateinit var roomFinderDatabase: RoomfinderDatabase*/
 
 	companion object {
 		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileid"
@@ -60,8 +40,13 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		setContentView(R.layout.activity_roomfinder)
-		supportActionBar?.setDisplayHomeAsUpEnabled(true)
+		setContent {
+			AppTheme {
+				RoomFinder_Main()
+			}
+		}
+
+		/*supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
 		roomListMargins = (12 * resources.displayMetrics.density + 0.5f).toInt()
 
@@ -73,10 +58,10 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 
 		swiperefreshlayout_roomfinder_roomlist.setOnRefreshListener {
 			updateRooms()
-		}
+		}*/
 	}
 
-	private fun updateRooms() {
+	/*private fun updateRooms() {
 		val roomsToLoad = roomList.map {
 			@Suppress("RemoveRedundantQualifierName")
 			PeriodElement(TimetableDatabaseInterface.Type.ROOM.toString(), it.id, it.id)
@@ -149,7 +134,8 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 			var index = 0
 
 			it.timeGrid.days.forEach { day ->
-				val dayDate = DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseLocalDate(day.day)
+				val dayDate = DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH)
+					.parseLocalDate(day.day)
 				if (dayDate.dayOfWeek == now.dayOfWeek)
 					day.units.forEach { unit ->
 						if (unit.endTime.toLocalTime().millisOfDay > now.millisOfDay)
@@ -170,8 +156,10 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 			val img = ContextCompat.getDrawable(this, R.drawable.all_add)
 			if (img != null) {
 				img.setBounds(0, 0, img.intrinsicWidth, img.intrinsicHeight)
-				ss.setSpan(ImageSpan(img, ImageSpan.ALIGN_BOTTOM),
-						text.indexOf("+"), text.indexOf("+") + 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+				ss.setSpan(
+					ImageSpan(img, ImageSpan.ALIGN_BOTTOM),
+					text.indexOf("+"), text.indexOf("+") + 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+				)
 			}
 			textview_roomfinder_roomlistempty.text = ss
 		}
@@ -191,7 +179,11 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 		// Nothing to do
 	}
 
-	override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
+	override fun onPeriodElementClick(
+		fragment: Fragment,
+		element: PeriodElement?,
+		useOrgId: Boolean
+	) {
 		// Ignore single clicks, wait for onPositiveButtonClick instead
 	}
 
@@ -201,7 +193,10 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 
 	override fun onClick(v: View) {
 		val intent = Intent()
-		intent.putExtra(EXTRA_INT_ROOM_ID, roomList[recyclerview_roomfinder_roomlist.getChildLayoutPosition(v)].id)
+		intent.putExtra(
+			EXTRA_INT_ROOM_ID,
+			roomList[recyclerview_roomfinder_roomlist.getChildLayoutPosition(v)].id
+		)
 		setResult(Activity.RESULT_OK, intent)
 		finish()
 	}
@@ -212,7 +207,10 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 
 	private fun addRooms(rooms: List<PeriodElement>) {
 		rooms.forEach { room ->
-			val roomName = timetableDatabaseInterface.getShortName(room.id, TimetableDatabaseInterface.Type.ROOM)
+			val roomName = timetableDatabaseInterface.getShortName(
+				room.id,
+				TimetableDatabaseInterface.Type.ROOM
+			)
 			val item = RoomFinderAdapterItem(roomName, room.id, true)
 			item.hourIndex = hourIndex
 
@@ -221,21 +219,34 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 			roomList.add(item)
 
 			profileUser?.let { user ->
-				val startDate = UntisDate.fromLocalDate(LocalDate.now().withDayOfWeek(
-						DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(user.timeGrid.days.first().day).dayOfWeek
-				))
-				val endDate = UntisDate.fromLocalDate(LocalDate.now().withDayOfWeek(
-						DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(user.timeGrid.days.last().day).dayOfWeek
-				))
+				val startDate = UntisDate.fromLocalDate(
+					LocalDate.now().withDayOfWeek(
+						DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH)
+							.parseDateTime(user.timeGrid.days.first().day).dayOfWeek
+					)
+				)
+				val endDate = UntisDate.fromLocalDate(
+					LocalDate.now().withDayOfWeek(
+						DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH)
+							.parseDateTime(user.timeGrid.days.last().day).dayOfWeek
+					)
+				)
 				val proxyHost: String = preferences["preference_connectivity_proxy_host", null]
 
 				TimetableLoader(WeakReference(this), object : TimetableDisplay {
-					override fun addTimetableItems(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
+					override fun addTimetableItems(
+						items: List<TimegridItem>,
+						startDate: UntisDate,
+						endDate: UntisDate,
+						timestamp: Long
+					) {
 						val states = mutableListOf<Boolean>()
 
 						profileUser?.let {
 							it.timeGrid.days.forEach { day ->
-								val dayDateTime = DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(day.day)
+								val dayDateTime =
+									DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH)
+										.parseDateTime(day.day)
 
 								day.units.forEach { unit ->
 									val unitStartDateTime = unit.startTime.toLocalTime()
@@ -245,7 +256,8 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 									items.forEach allItems@{ item ->
 										if (item.startDateTime.dayOfWeek == dayDateTime.dayOfWeek)
 											if (item.startDateTime.millisOfDay <= unitEndDateTime.millisOfDay
-													&& item.endDateTime.millisOfDay >= unitStartDateTime.millisOfDay) {
+												&& item.endDateTime.millisOfDay >= unitStartDateTime.millisOfDay
+											) {
 												isOccupied = true
 												return@allItems
 											}
@@ -261,23 +273,49 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 
 						refreshRoomList()
 
-						roomFinderDatabase.addRoom(RoomFinderItem(
+						roomFinderDatabase.addRoom(
+							RoomFinderItem(
 								room.id,
 								roomName,
 								item.states
-						))
+							)
+						)
 					}
 
-					override fun onTimetableLoadingError(requestId: Int, code: Int?, message: String?) {
+					override fun onTimetableLoadingError(
+						requestId: Int,
+						code: Int?,
+						message: String?
+					) {
 						roomList.remove(item)
 						refreshRoomList()
-						Snackbar.make(content_roomfinder, if (code != null) ErrorMessageDictionary.getErrorMessage(resources, code) else message
-								?: getString(R.string.all_error), Snackbar.LENGTH_INDEFINITE)
-								.setAction("Show") { ErrorReportingDialog(this@RoomFinderActivity).showRequestErrorDialog(requestId, code, message) }
-								.show()
+						Snackbar.make(
+							content_roomfinder,
+							if (code != null) ErrorMessageDictionary.getErrorMessage(
+								resources,
+								code
+							) else message
+								?: getString(R.string.all_error),
+							Snackbar.LENGTH_INDEFINITE
+						)
+							.setAction("Show") {
+								ErrorReportingDialog(this@RoomFinderActivity).showRequestErrorDialog(
+									requestId,
+									code,
+									message
+								)
+							}
+							.show()
 					}
 				}, user, timetableDatabaseInterface)
-						.load(TimetableLoader.TimetableLoaderTarget(startDate, endDate, room.id, room.type), TimetableLoader.FLAG_LOAD_SERVER, proxyHost)
+					.load(
+						TimetableLoader.TimetableLoaderTarget(
+							startDate,
+							endDate,
+							room.id,
+							room.type
+						), TimetableLoader.FLAG_LOAD_SERVER, proxyHost
+					)
 			}
 		}
 
@@ -285,12 +323,13 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 	}
 
 	private fun refreshRoomList() {
-		if (roomList.isNotEmpty())
+		/*if (roomList.isNotEmpty())
 			textview_roomfinder_roomlistempty.visibility = View.GONE
 		else // default to visible if empty
-			textview_roomfinder_roomlistempty.visibility = View.VISIBLE
+			textview_roomfinder_roomlistempty.visibility = View.VISIBLE*/
 
-		if (roomList.find { it.loading } == null) swiperefreshlayout_roomfinder_roomlist.isRefreshing = false
+		if (roomList.find { it.loading } == null) swiperefreshlayout_roomfinder_roomlist.isRefreshing =
+			false
 
 		roomListAdapter.currentHourIndex = hourIndex
 		roomList.sort()
@@ -299,38 +338,43 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 
 	private fun showItemList() {
 		ElementPickerDialog.newInstance(
-				timetableDatabaseInterface,
-				ElementPickerDialog.Companion.ElementPickerDialogConfig(
-						TimetableDatabaseInterface.Type.ROOM,
-						multiSelect = true,
-						hideTypeSelection = true,
-						positiveButtonText = getString(R.string.all_add))
+			timetableDatabaseInterface,
+			ElementPickerDialog.Companion.ElementPickerDialogConfig(
+				TimetableDatabaseInterface.Type.ROOM,
+				multiSelect = true,
+				hideTypeSelection = true,
+				positiveButtonText = getString(R.string.all_add)
+			)
 		).show(supportFragmentManager, EVENT_PICKER_TAG)
 	}
 
 	private fun showDeleteItemDialog(position: Int) {
 		MaterialAlertDialogBuilder(this)
-				.setTitle(getString(R.string.roomfinder_dialog_itemdelete_title, roomList[position]))
-				.setMessage(R.string.roomfinder_dialog_itemdelete_text)
-				.setPositiveButton(R.string.all_yes) { _, _ ->
-					if (roomFinderDatabase.deleteRoom(roomList[position].id)) {
-						roomList.removeAt(position)
-						roomListAdapter.notifyItemRemoved(position)
-						refreshRoomList()
-					}
+			.setTitle(getString(R.string.roomfinder_dialog_itemdelete_title, roomList[position]))
+			.setMessage(R.string.roomfinder_dialog_itemdelete_text)
+			.setPositiveButton(R.string.all_yes) { _, _ ->
+				if (roomFinderDatabase.deleteRoom(roomList[position].id)) {
+					roomList.removeAt(position)
+					roomListAdapter.notifyItemRemoved(position)
+					refreshRoomList()
 				}
-				.setNegativeButton(R.string.all_no) { dialog, _ -> dialog.dismiss() }
-				.show()
+			}
+			.setNegativeButton(R.string.all_no) { dialog, _ -> dialog.dismiss() }
+			.show()
 	}
 
 	private fun refreshHourSelector() {
 		val unit = getUnitFromIndex(hourIndex)
 		unit?.let {
-			textview_roomfinder_currenthour.text = getString(R.string.roomfinder_current_hour, translateDay(unit.first.day), unit.second)
+			textview_roomfinder_currenthour.text = getString(
+				R.string.roomfinder_current_hour,
+				translateDay(unit.first.day),
+				unit.second
+			)
 			textview_roomfinder_currenthourtime.text = getString(
-					R.string.roomfinder_current_hour_time,
-					unit.third.startTime.toLocalTime().toString(DateTimeFormat.shortTime()),
-					unit.third.endTime.toLocalTime().toString(DateTimeFormat.shortTime())
+				R.string.roomfinder_current_hour_time,
+				unit.third.startTime.toLocalTime().toString(DateTimeFormat.shortTime()),
+				unit.third.endTime.toLocalTime().toString(DateTimeFormat.shortTime())
 			)
 		}
 
@@ -339,7 +383,8 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 	}
 
 	private fun translateDay(day: String): String {
-		return DateTimeFormat.forPattern("EEEE").print(DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(day))
+		return DateTimeFormat.forPattern("EEEE")
+			.print(DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(day))
 	}
 
 	/**
@@ -356,5 +401,51 @@ class RoomFinderActivity : BaseActivity(), ElementPickerDialog.ElementPickerDial
 			}
 		}
 		return null
-	}
+	}*/
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+fun RoomFinder_Main() {
+	val swipeRefreshState = rememberSwipeRefreshState(false)
+	val navController = rememberNavController()
+
+	Scaffold(
+		/*topBar = {
+			CenterAlignedTopAppBar(
+				title = { Text("Free Rooms") },
+				navigationIcon = {
+					IconButton(onClick = { navController.popBackStack() }) {
+						Icon(
+							imageVector = Icons.Filled.ArrowBack,
+							contentDescription = "Back"
+						)
+					}
+				}
+			)
+		},*/
+		content = {
+			Box(Modifier.fillMaxSize())
+			{
+				SwipeRefresh(
+					state = swipeRefreshState,
+					onRefresh = { /* todo */ },
+				) {
+					LazyColumn(
+						Modifier.fillMaxSize()
+					) {
+						items(50) { index ->
+							Text("Test")
+						}
+					}
+				}
+
+				Text(
+					text = stringResource(R.string.roomfinder_no_rooms),
+					modifier = Modifier.align(Alignment.Center)
+				)
+			}
+		}
+	)
 }

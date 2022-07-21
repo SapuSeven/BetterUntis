@@ -46,7 +46,11 @@
 		<activity
 			android:name=".activities.MainActivity"
 			android:launchMode="singleTop"
-			android:theme="@style/AppTheme.Launcher.NoActionBar"
+			android:exported="true"></activity>
+
+		<activity
+			android:name=".activities.LoginActivity"
+			android:launchMode="singleTop"
 			android:exported="true">
 
 			<intent-filter>
@@ -55,10 +59,6 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-
-		<activity
-			android:name=".activities.LoginActivity"
-			android:launchMode="singleTop" />
 
 		<activity
 			android:name=".activities.ScanCodeActivity"

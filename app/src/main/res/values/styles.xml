@@ -1,16 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-	<style name="AppTheme" parent="Theme.Material3.DayNight">
-		<item name="colorDivider">@color/colorDivider</item>
-		<item name="colorOnPrimary">@android:color/white</item>
-		<item name="actionBarBackground">?attr/colorPrimary</item>
-		<item name="actionBarTheme">@style/ThemeOverlay.MaterialComponents.Dark.ActionBar</item>
-		<item name="materialAlertDialogTheme">@style/ThemeOverlay.MaterialAlertDialog.Rounded</item>
-		<item name="android:dialogTheme">@style/ThemeOverlay.MaterialAlertDialog.Rounded</item>
-		<item name="android:alertDialogTheme">@style/ThemeOverlay.MaterialAlertDialog.Rounded</item>
-		<item name="dialogCornerRadius">@dimen/radius_dialog_corner_rounded</item>
-		<item name="android:windowAnimationStyle">@style/WindowFadeTransition</item>
-	</style>
+	<style name="AppTheme" parent="Theme.Material3.Light.NoActionBar"></style>
 
 	<style name="ThemeOverlay.MaterialAlertDialog.Rounded" parent="ThemeOverlay.Material3.MaterialAlertDialog">
 		<item name="alertDialogStyle">@style/MaterialAlertDialog.Rounded</item>

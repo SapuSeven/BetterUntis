@@ -1,21 +1,24 @@
 package com.sapuseven.untis.activities
 
-import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.recyclerview.widget.RecyclerView
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.ScanCodeActivity.Companion.EXTRA_STRING_SCAN_RESULT
@@ -29,13 +32,14 @@ import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.models.UntisSchoolInfo
 import com.sapuseven.untis.models.untis.params.SchoolSearchParams
 import com.sapuseven.untis.models.untis.response.SchoolSearchResponse
+import com.sapuseven.untis.ui.theme.AppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 
-class LoginActivity : BaseActivity(), View.OnClickListener {
+class LoginActivity : BaseComposeActivity(), View.OnClickListener {
 	companion object {
 		const val PERMISSION_REQUEST_CAMERA = 1
 
@@ -61,7 +65,24 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		setContentView(R.layout.activity_login)
+
+		setContent {
+			AppTheme {
+				Surface(
+					modifier = Modifier.fillMaxSize(),
+					color = MaterialTheme.colorScheme.background
+				) {
+					Column {
+						Text(stringResource(id = R.string.login_welcome))
+						Button(onClick = {/*todo*/ }) {
+							Text("Test")
+						}
+					}
+				}
+			}
+		}
+
+		/*setContentView(R.layout.activity_login)
 
 		llWelcome = findViewById(R.id.linearlayout_login_welcome)
 		tvSearchMessage = findViewById(R.id.textview_login_search_message)
@@ -103,7 +124,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 		rvSearchResults?.layoutManager = layoutManager
 
 		adapter = SchoolSearchAdapter(this)
-		rvSearchResults?.adapter = adapter
+		rvSearchResults?.adapter = adapter*/
 	}
 
 	override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -224,7 +245,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 			etSearch?.let { hideDefaultKeyboard(it) }
 		}
 
-		supportActionBar?.setDisplayHomeAsUpEnabled(enable)
+		//supportActionBar?.setDisplayHomeAsUpEnabled(enable)
 	}
 
 	private fun hideDefaultKeyboard(editText: EditText) {
