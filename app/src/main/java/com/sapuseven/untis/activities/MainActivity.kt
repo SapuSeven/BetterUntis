@@ -733,7 +733,7 @@ class MainActivity :
 
 	override fun onPrepareOptionsMenu(menu: Menu): Boolean {
 		var i = 0
-		navigationview_main.menu.findItem(R.id.nav_personal_bookmarks_title).subMenu.let {
+		navigationview_main.menu.findItem(R.id.nav_personal_bookmarks_title).subMenu?.let {
 			// remove everything except personal timetable (in case menu has been invalidated)
 			for (index in 0 until it.size()) {
 				it.removeItem(index)
