@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-
-	<style name="AppTheme" parent="Theme.Material3.Light.NoActionBar" />
+	<style name="AppTheme" parent="Theme.Material3.Light.NoActionBar">
+		<item name="android:windowBackground">?attr/colorSurface</item>
+	</style>
 
 	<style name="ThemeOverlay.MaterialAlertDialog.Rounded" parent="ThemeOverlay.Material3.MaterialAlertDialog">
 		<item name="alertDialogStyle">@style/MaterialAlertDialog.Rounded</item>
