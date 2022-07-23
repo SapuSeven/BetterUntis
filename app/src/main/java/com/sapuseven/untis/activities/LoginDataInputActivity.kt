@@ -48,6 +48,7 @@ import com.sapuseven.untis.models.untis.masterdata.TimeGrid
 import com.sapuseven.untis.ui.common.LabeledCheckbox
 import com.sapuseven.untis.ui.common.LabeledSwitch
 import com.sapuseven.untis.ui.theme.AppTheme
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
@@ -160,6 +161,126 @@ class LoginDataInputActivity : BaseComposeActivity() {
 					}
 				}
 
+				fun loadData() {
+					coroutineScope.launch {
+						LoginHelper(
+							loginData = LoginDataInfo(
+								username.value ?: "",
+								password.value ?: "",
+								anonymous.value ?: false
+							),
+							onStatusUpdate = { status ->
+								Log.d(
+									LoginDataInputActivity::class.java.simpleName,
+									getString(status)
+								)
+							},
+							onError = { error ->
+								val errorMessage = when {
+									error.errorCode != null -> ErrorMessageDictionary.getErrorMessage(
+										resources,
+										error.errorCode,
+										error.errorMessage
+									)
+									error.errorMessageStringRes != null -> getString(
+										error.errorMessageStringRes,
+										error.errorMessage
+									)
+									else -> error.errorMessage
+										?: getString(R.string.all_error)
+								}
+
+								loading = false
+								coroutineScope.launch {
+									snackbarHostState.showSnackbar(errorMessage)
+								}
+							}).run {
+							val schoolInfo = (
+									when {
+										schoolInfoFromSearch != null -> schoolInfoFromSearch
+										advanced && !apiUrl.value.isNullOrBlank() -> UntisSchoolInfo(
+											server = "",
+											useMobileServiceUrlAndroid = true,
+											useMobileServiceUrlIos = true,
+											address = "",
+											displayName = schoolId.value ?: "",
+											loginName = schoolId.value ?: "",
+											schoolId = schoolId.value?.toIntOrNull()
+												?: 0,
+											serverUrl = apiUrl.value ?: "",
+											mobileServiceUrl = apiUrl.value
+										)
+										else -> loadSchoolInfo(
+											schoolId.value ?: ""
+										)
+									}) ?: return@run
+							val untisApiUrl =
+								if (advanced && !apiUrl.value.isNullOrBlank())
+									apiUrl.value ?: ""
+								else if (schoolInfo.useMobileServiceUrlAndroid && !schoolInfo.mobileServiceUrl.isNullOrBlank()) schoolInfo.mobileServiceUrl!!
+								else Uri.parse(schoolInfo.serverUrl).buildUpon()
+									.appendEncodedPath("jsonrpc_intern.do")
+									.build().toString()
+							val appSharedSecret =
+								when {
+									loginData.anonymous -> ""
+									skipAppSecret.value == true -> loginData.password
+									else -> loadAppSharedSecret(untisApiUrl)
+										?: return@run
+								}
+							val userDataResponse =
+								loadUserData(untisApiUrl, appSharedSecret)
+									?: return@run
+							val bookmarks =
+								existingUserId?.let { user ->
+									userDatabase.getUser(
+										user
+									)?.bookmarks
+								}
+									?: emptyList()
+							val user = UserDatabase.User(
+								existingUserId,
+								profileName.value ?: "",
+								untisApiUrl,
+								schoolInfo.schoolId.toString(),
+								if (anonymous.value != true) loginData.user else null,
+								if (anonymous.value != true) appSharedSecret else null,
+								anonymous.value == true,
+								userDataResponse.masterData.timeGrid
+									?: TimeGrid.generateDefault(),
+								userDataResponse.masterData.timeStamp,
+								userDataResponse.userData,
+								userDataResponse.settings,
+								bookmarks = bookmarks
+							)
+
+							val userId =
+								if (existingUserId == null) userDatabase.addUser(
+									user
+								) else userDatabase.editUser(
+									user
+								)
+
+							userId?.let {
+								userDatabase.setAdditionalUserData(
+									userId,
+									userDataResponse.masterData
+								)
+								preferences.saveProfileId(userId.toLong())
+
+								if (advanced && !proxyUrl.value.isNullOrEmpty())
+									preferences["preference_connectivity_proxy_host"] =
+										proxyUrl.value ?: ""
+
+								setResult(Activity.RESULT_OK)
+								finish()
+							} ?: run {
+								onError(LoginErrorInfo(errorMessageStringRes = R.string.logindatainput_adding_user_unknown_error))
+							}
+						}
+					}
+				}
+
 				if (intent.getBooleanExtra(EXTRA_BOOLEAN_PROFILE_UPDATE, false))
 					Surface {
 						Column(
@@ -183,6 +304,8 @@ class LoginDataInputActivity : BaseComposeActivity() {
 								modifier = Modifier.padding(top = 16.dp)
 							)
 						}
+
+						loadData()
 					}
 				else
 					Scaffold(
@@ -205,124 +328,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 									if (!anyError) {
 										loading = true
 										snackbarHostState.currentSnackbarData?.dismiss()
-
-										coroutineScope.launch {
-											LoginHelper(
-												loginData = LoginDataInfo(
-													username.value ?: "",
-													password.value ?: "",
-													anonymous.value ?: false
-												),
-												onStatusUpdate = { status ->
-													Log.d(
-														LoginDataInputActivity::class.java.simpleName,
-														getString(status)
-													)
-												},
-												onError = { error ->
-													val errorMessage = when {
-														error.errorCode != null -> ErrorMessageDictionary.getErrorMessage(
-															resources,
-															error.errorCode,
-															error.errorMessage
-														)
-														error.errorMessageStringRes != null -> getString(
-															error.errorMessageStringRes,
-															error.errorMessage
-														)
-														else -> error.errorMessage
-															?: getString(R.string.all_error)
-													}
-
-													loading = false
-													coroutineScope.launch {
-														snackbarHostState.showSnackbar(errorMessage)
-													}
-												}).run {
-												val schoolInfo = (
-														when {
-															schoolInfoFromSearch != null -> schoolInfoFromSearch
-															advanced && !apiUrl.value.isNullOrBlank() -> UntisSchoolInfo(
-																server = "",
-																useMobileServiceUrlAndroid = true,
-																useMobileServiceUrlIos = true,
-																address = "",
-																displayName = schoolId.value ?: "",
-																loginName = schoolId.value ?: "",
-																schoolId = schoolId.value?.toIntOrNull()
-																	?: 0,
-																serverUrl = apiUrl.value ?: "",
-																mobileServiceUrl = apiUrl.value
-															)
-															else -> loadSchoolInfo(
-																schoolId.value ?: ""
-															)
-														}) ?: return@run
-												val untisApiUrl =
-													if (advanced && !apiUrl.value.isNullOrBlank())
-														apiUrl.value ?: ""
-													else if (schoolInfo.useMobileServiceUrlAndroid && !schoolInfo.mobileServiceUrl.isNullOrBlank()) schoolInfo.mobileServiceUrl!!
-													else Uri.parse(schoolInfo.serverUrl).buildUpon()
-														.appendEncodedPath("jsonrpc_intern.do")
-														.build().toString()
-												val appSharedSecret =
-													when {
-														loginData.anonymous -> ""
-														skipAppSecret.value == true -> loginData.password
-														else -> loadAppSharedSecret(untisApiUrl)
-															?: return@run
-													}
-												val userDataResponse =
-													loadUserData(untisApiUrl, appSharedSecret)
-														?: return@run
-												val bookmarks =
-													existingUserId?.let { user ->
-														userDatabase.getUser(
-															user
-														)?.bookmarks
-													}
-														?: emptyList()
-												val user = UserDatabase.User(
-													existingUserId,
-													profileName.value ?: "",
-													untisApiUrl,
-													schoolInfo.schoolId.toString(),
-													if (anonymous.value != true) loginData.user else null,
-													if (anonymous.value != true) appSharedSecret else null,
-													anonymous.value == true,
-													userDataResponse.masterData.timeGrid
-														?: TimeGrid.generateDefault(),
-													userDataResponse.masterData.timeStamp,
-													userDataResponse.userData,
-													userDataResponse.settings,
-													bookmarks = bookmarks
-												)
-
-												val userId =
-													if (existingUserId == null) userDatabase.addUser(
-														user
-													) else userDatabase.editUser(
-														user
-													)
-
-												userId?.let {
-													userDatabase.setAdditionalUserData(
-														userId,
-														userDataResponse.masterData
-													)
-													preferences.saveProfileId(userId.toLong())
-
-													if (advanced && !proxyUrl.value.isNullOrEmpty())
-														preferences["preference_connectivity_proxy_host"] =
-															proxyUrl.value ?: ""
-
-													setResult(Activity.RESULT_OK)
-													finish()
-												} ?: run {
-													onError(LoginErrorInfo(errorMessageStringRes = R.string.logindatainput_adding_user_unknown_error))
-												}
-											}
-										}
+										loadData()
 									}
 								}
 							)
@@ -583,6 +589,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 		PersistentState(state, prefKey)
 	}
 
+	@OptIn(DelicateCoroutinesApi::class)
 	@Composable
 	fun <T> PersistentState(
 		state: MutableState<T?>,
