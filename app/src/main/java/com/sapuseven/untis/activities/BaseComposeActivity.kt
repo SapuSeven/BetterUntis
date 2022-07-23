@@ -3,24 +3,25 @@ package com.sapuseven.untis.activities
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import com.sapuseven.untis.helpers.config.PreferenceHelper
 
 @SuppressLint("Registered") // This activity is not intended to be used directly
 open class BaseComposeActivity : ComponentActivity() {
 	/*protected var hasOwnToolbar: Boolean = false
 	protected var currentTheme: String = ""
-	private var currentDarkTheme: String = ""
+	private var currentDarkTheme: String = ""*/
 
-	protected lateinit var preferences: PreferenceHelper*/
+	protected lateinit var preferences: PreferenceHelper
 
 	override fun onCreate(savedInstanceState: Bundle?) {
-		/*ErrorLogger.initialize(this)
+		//ErrorLogger.initialize(this)
 
-		Thread.setDefaultUncaughtExceptionHandler(CrashHandler(Thread.getDefaultUncaughtExceptionHandler()))
+		//Thread.setDefaultUncaughtExceptionHandler(CrashHandler(Thread.getDefaultUncaughtExceptionHandler()))
 
 		preferences = PreferenceHelper(this)
 		preferences.loadSavedProfile()
 
-		currentTheme = preferences["preference_theme"]
+		/*currentTheme = preferences["preference_theme"]
 		currentDarkTheme = preferences["preference_dark_theme"]
 		setAppTheme(hasOwnToolbar)*/
 		super.onCreate(savedInstanceState)

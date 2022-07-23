@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -23,7 +24,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.content.ContextCompat
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.ScanCodeActivity.Companion.EXTRA_STRING_SCAN_RESULT
@@ -74,8 +74,8 @@ class LoginActivity : BaseComposeActivity() {
 
 		setContent {
 			AppTheme {
-				var searchText by remember { mutableStateOf(TextFieldValue()) }
-				var searchMode by remember { mutableStateOf(false) }
+				var searchText by rememberSaveable { mutableStateOf("") }
+				var searchMode by rememberSaveable { mutableStateOf(false) }
 
 				val focusManager = LocalFocusManager.current
 
@@ -83,7 +83,7 @@ class LoginActivity : BaseComposeActivity() {
 					enabled = searchMode
 				) {
 					focusManager.clearFocus()
-					searchText = TextFieldValue("")
+					searchText = ""
 					searchMode = false
 				}
 
@@ -103,7 +103,7 @@ class LoginActivity : BaseComposeActivity() {
 								if (searchMode)
 									IconButton(onClick = {
 										focusManager.clearFocus()
-										searchText = TextFieldValue("")
+										searchText = ""
 										searchMode = false
 									}) {
 										Icon(
@@ -148,7 +148,7 @@ class LoginActivity : BaseComposeActivity() {
 								modifier = Modifier
 									.fillMaxWidth()
 									.weight(1.0f),
-								searchText = searchText.text
+								searchText = searchText
 							)
 						Column(
 							modifier = Modifier
@@ -157,6 +157,7 @@ class LoginActivity : BaseComposeActivity() {
 							OutlinedTextField(
 								value = searchText,
 								onValueChange = { searchText = it },
+								singleLine = true,
 								modifier = Modifier
 									.fillMaxWidth()
 									.padding(horizontal = dimensionResource(id = R.dimen.margin_login_input_horizontal))
@@ -219,9 +220,13 @@ class LoginActivity : BaseComposeActivity() {
 		val composableScope = rememberCoroutineScope()
 
 		LaunchedEffect(searchText) {
-			loading = true
 			error = null
 			items = emptyList()
+
+			if (searchText.isEmpty())
+				return@LaunchedEffect
+
+			loading = true
 
 			composableScope.launch {
 				var untisResponse = SchoolSearchResponse()
@@ -280,9 +285,10 @@ class LoginActivity : BaseComposeActivity() {
 			) {
 				if (loading)
 					CircularProgressIndicator()
-
-				if (!error.isNullOrEmpty())
+				else if (!error.isNullOrEmpty())
 					Text(text = error!!)
+				else if (items.isEmpty())
+					Text(text = stringResource(id = R.string.login_no_results))
 			}
 	}
 }

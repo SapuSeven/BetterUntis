@@ -53,14 +53,18 @@ class LoginHelper(
 
 				untisResponse.result?.let {
 					if (it.schools.isNotEmpty()) {
-						val schoolResult = it.schools.find { schoolInfoResult ->
-							schoolInfoResult.schoolId == schoolId || schoolInfoResult.loginName.equals(
-								school,
-								true
-							)
-						}
+						val schoolResult =
+							if (it.schools.size == 1)
+								it.schools.first()
+							else
+							// TODO: Show manual selection dialog when more than one results are returned
+								it.schools.find { schoolInfoResult ->
+									schoolInfoResult.schoolId == schoolId || schoolInfoResult.loginName.equals(
+										school,
+										true
+									)
+								}
 
-						// TODO: Show manual selection dialog when there are more than one results are returned
 						if (schoolResult != null)
 							return schoolResult
 					}
