@@ -160,26 +160,29 @@ class WeekViewDrawConfig(context: Context) {
 		timeCaptionHeight = rect.height().toFloat()
 	}
 
-	internal fun calculateHeaderTextHeight() {
+	internal fun calculateHeaderTextHeight(config: WeekViewConfig) {
 		val rect = Rect()
 
 		headerTextPaint.getTextBounds("00 PM", 0, "00 PM".length, rect)
 		headerTextHeight = rect.height().toFloat()
+		calculateHeaderHeight(config)
 	}
 
-	internal fun calculateHeaderSecondaryTextHeight() {
+	internal fun calculateHeaderSecondaryTextHeight(config: WeekViewConfig) {
 		val rect = Rect()
 
 		headerSecondaryTextPaint.getTextBounds("00 PM", 0, "00 PM".length, rect)
 		headerSecondaryTextHeight = rect.height().toFloat()
+		calculateHeaderHeight(config)
 	}
 
-	internal fun calculateHeaderHeight(config: WeekViewConfig) {
+	fun calculateHeaderHeight(config: WeekViewConfig) {
 		var headerRowBottomLine = 0
 		if (config.showHeaderRowBottomLine)
 			headerRowBottomLine = config.headerRowBottomLineWidth
 
-		headerHeight = headerTextHeight + headerSecondaryTextHeight + config.headerRowTextSpacing.toFloat() + headerRowBottomLine.toFloat() + config.headerRowPadding * 2
+		headerHeight =
+			headerTextHeight + headerSecondaryTextHeight + config.headerRowTextSpacing.toFloat() + headerRowBottomLine.toFloat() + config.headerRowPadding * 2
 	}
 
 	internal fun calculateTimeTextWidth() {

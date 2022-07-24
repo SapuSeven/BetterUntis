@@ -66,7 +66,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 
 		//private const val FRAGMENT_TAG_PROFILE_UPDATE = "profileUpdate"
 
-		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileId"
+		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileid"
 		const val EXTRA_BOOLEAN_PROFILE_UPDATE = "com.sapuseven.untis.activities.profileupdate"
 
 		val PREFS_BACKUP_SCHOOLID = stringPreferencesKey("logindatainput_backup_schoolid")

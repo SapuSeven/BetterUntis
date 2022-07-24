@@ -47,7 +47,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 	private var profileId: Long? = null
 
 	companion object {
-		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileId"
+		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileid"
 
 		private const val DIALOG_RECOMMEND_HIDE = "preference_dialog_recommend_hide"
 

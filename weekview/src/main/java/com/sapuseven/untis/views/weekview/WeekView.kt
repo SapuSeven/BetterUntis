@@ -27,7 +27,7 @@ class WeekView<T>(
 		View(context, attrs),
 		WeekViewGestureHandler.Listener,
 		WeekViewViewState.UpdateListener {
-	private val config: WeekViewConfig = WeekViewConfig(context, attrs)
+	val config: WeekViewConfig = WeekViewConfig(context, attrs)
 	private val data: WeekViewData<T> = WeekViewData()
 
 	private val viewState: WeekViewViewState = WeekViewViewState()
@@ -252,6 +252,8 @@ class WeekView<T>(
 			invalidate()
 		}
 
+	var onMotionEvent: ((MotionEvent) -> Unit)? = null
+
 	init {
 		gestureHandler = WeekViewGestureHandler(context, this, config, data)
 
@@ -385,6 +387,7 @@ class WeekView<T>(
 
 	@SuppressLint("ClickableViewAccessibility")
 	override fun onTouchEvent(event: MotionEvent): Boolean {
+		onMotionEvent?.invoke(event)
 		return gestureHandler.onTouchEvent(event)
 	}
 

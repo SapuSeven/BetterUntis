@@ -16,7 +16,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.MainActivity
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_LESSON_TOPIC
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_STUDENT_ABSENCE
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_WRITE_LESSON_TOPIC
@@ -65,12 +64,12 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 
 	override fun onStart() {
 		super.onStart()
-		if (activity is MainActivity) (activity as MainActivity).setFullscreenDialogActionBar()
+		//if (activity is MainActivity) (activity as MainActivity).setFullscreenDialogActionBar()
 	}
 
 	override fun onStop() {
 		super.onStop()
-		if (activity is MainActivity) (activity as MainActivity).setDefaultActionBar()
+		//if (activity is MainActivity) (activity as MainActivity).setDefaultActionBar()
 	}
 
 	private fun generateView(activity: FragmentActivity, container: ViewGroup?, periodData: PeriodData, timetableDatabaseInterface: TimetableDatabaseInterface): View {

@@ -1,103 +1,59 @@
 package com.sapuseven.untis.activities
 
-import android.app.Activity
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.RectF
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
-import android.view.*
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.view.MotionEvent
+import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.graphics.ColorUtils
-import androidx.core.view.GravityCompat
-import androidx.core.view.get
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import ca.antonious.materialdaypicker.MaterialDayPicker
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.textfield.TextInputEditText
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_PROFILE_UPDATE
 import com.sapuseven.untis.adapters.ProfileListAdapter
-import com.sapuseven.untis.data.connectivity.UntisApiConstants
-import com.sapuseven.untis.data.connectivity.UntisAuthentication
-import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
-import com.sapuseven.untis.dialogs.DatePickerDialog
-import com.sapuseven.untis.dialogs.ElementPickerDialog
-import com.sapuseven.untis.dialogs.ErrorReportingDialog
-import com.sapuseven.untis.fragments.AbsenceCheckFragment
-import com.sapuseven.untis.fragments.TimetableItemDetailsFragment
 import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.DateTimeUtils
-import com.sapuseven.untis.helpers.ErrorMessageDictionary
-import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
-import com.sapuseven.untis.interfaces.TimetableDisplay
-import com.sapuseven.untis.models.TimetableBookmark
-import com.sapuseven.untis.models.UntisMessage
-import com.sapuseven.untis.models.untis.UntisDate
-import com.sapuseven.untis.models.untis.masterdata.Holiday
-import com.sapuseven.untis.models.untis.masterdata.SchoolYear
-import com.sapuseven.untis.models.untis.params.MessageParams
-import com.sapuseven.untis.models.untis.response.MessageResponse
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import com.sapuseven.untis.preferences.ElementPickerPreference
 import com.sapuseven.untis.preferences.RangePreference
-import com.sapuseven.untis.receivers.NotificationSetup.Companion.EXTRA_BOOLEAN_MANUAL
-import com.sapuseven.untis.receivers.StartupReceiver
+import com.sapuseven.untis.ui.theme.AppTheme
 import com.sapuseven.untis.viewmodels.PeriodDataViewModel
-import com.sapuseven.untis.views.weekview.HolidayChip
+import com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
 import com.sapuseven.untis.views.weekview.WeekView
-import com.sapuseven.untis.views.weekview.WeekViewDisplayable
-import com.sapuseven.untis.views.weekview.WeekViewEvent
-import com.sapuseven.untis.views.weekview.listeners.EventClickListener
-import com.sapuseven.untis.views.weekview.listeners.ScaleListener
-import com.sapuseven.untis.views.weekview.listeners.ScrollListener
-import com.sapuseven.untis.views.weekview.listeners.TopLeftCornerClickListener
-import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main_content.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
 import org.joda.time.DateTime
-import org.joda.time.DateTimeConstants
-import org.joda.time.Instant
-import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
-import java.lang.ref.WeakReference
-import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity :
-		BaseActivity(),
+	BaseComposeActivity()/*,
 		NavigationView.OnNavigationItemSelectedListener,
 		WeekViewLoader.PeriodChangeListener<TimegridItem>,
 		EventClickListener<TimegridItem>,
 		TopLeftCornerClickListener,
 		TimetableDisplay,
-		TimetableItemDetailsFragment.TimetableItemDetailsDialogListener{
+		TimetableItemDetailsFragment.TimetableItemDetailsDialogListener*/ {
 
 	companion object {
 		private const val MINUTE_MILLIS: Int = 60 * 1000
@@ -119,12 +75,14 @@ class MainActivity :
 		private const val FRAGMENT_TAG_LESSON_INFO = "com.sapuseven.untis.fragments.lessoninfo"
 		private const val FRAGMENT_TAG_ABSENCE_CHECK = "com.sapuseven.untis.fragments.absencecheck"
 
+		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileid"
 	}
 
 	private val userDatabase = UserDatabase.createInstance(this)
 	private var lastBackPress: Long = 0
 	private var profileId: Long = -1
-	private val weeklyTimetableItems: MutableMap<Int, WeeklyTimetableItems?> = mutableMapOf()
+
+	//private val weeklyTimetableItems: MutableMap<Int, WeeklyTimetableItems?> = mutableMapOf()
 	private var displayedElement: PeriodElement? = null
 	private var selectedElement: Int? = null
 	private var lastPickedDate: DateTime? = null
@@ -148,19 +106,303 @@ class MainActivity :
 		}
 	}
 
-	override fun onCreate(savedInstanceState: Bundle?) {
-		hasOwnToolbar = true
+	private val shortcutLauncher =
+		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+			// TODO: Look at it.data for potential actions (e.g. show a specific timetable)
+		}
 
+	@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
 		if (!loadProfile())
 			return
 
-		setupNotifications()
+		//setupNotifications()
 
-		setContentView(R.layout.activity_main)
+		setContent {
+			AppTheme {
+				/*weekView.setOnEventClickListener(this)
+				weekView.setOnCornerClickListener(this)
+				weekView.setPeriodChangeListener(this)
+				weekView.scrollListener = object : ScrollListener {
+					override fun onFirstVisibleDayChanged(
+						newFirstVisibleDay: LocalDate,
+						oldFirstVisibleDay: LocalDate?
+					) {
+						currentWeekIndex = convertDateTimeToWeekIndex(newFirstVisibleDay)
+						setLastRefresh(
+							weeklyTimetableItems[currentWeekIndex]?.lastUpdated
+								?: 0
+						)
+					}
+				}
+				weekView.scaleListener = object : ScaleListener {
+					override fun onScaleFinished() {
+						saveZoomLevel()
+					}
+				}*/
 
-		if (checkForCrashes()) {
+				val drawerState = rememberDrawerState(DrawerValue.Closed)
+				val coroutineScope = rememberCoroutineScope()
+
+				var drawerGestures by remember { mutableStateOf(true) }
+
+				val items = listOf(Icons.Default.Favorite, Icons.Default.Face, Icons.Default.Email)
+
+				val navItemsElementTypes = listOf(
+					NavItemTimetable(
+						icon = painterResource(id = R.drawable.all_classes),
+						label = stringResource(id = R.string.all_classes),
+						elementType = TimetableDatabaseInterface.Type.CLASS
+					),
+					NavItemTimetable(
+						icon = painterResource(id = R.drawable.all_teacher),
+						label = stringResource(id = R.string.all_teachers),
+						elementType = TimetableDatabaseInterface.Type.TEACHER
+					),
+					NavItemTimetable(
+						icon = painterResource(id = R.drawable.all_rooms),
+						label = stringResource(id = R.string.all_rooms),
+						elementType = TimetableDatabaseInterface.Type.ROOM
+					),
+				)
+
+				val navItemsShortcuts = listOf(
+					NavItemShortcut(
+						icon = painterResource(id = R.drawable.all_infocenter),
+						label = stringResource(id = R.string.activity_title_info_center),
+						InfoCenterActivity::class.java
+					),
+					/*NavItemShortcut(
+						icon = painterResource(id = R.drawable.all_messenger),
+						label = stringResource(id = R.string.activity_title_messenger)
+					),*/
+					NavItemShortcut(
+						icon = painterResource(id = R.drawable.all_search_rooms),
+						label = stringResource(id = R.string.activity_title_free_rooms),
+						RoomFinderActivity::class.java
+					),
+					NavItemShortcut(
+						icon = painterResource(id = R.drawable.all_settings),
+						label = stringResource(id = R.string.activity_title_settings),
+						SettingsActivity::class.java
+					)
+				)
+
+				val selectedItem = remember { mutableStateOf(items[0]) }
+
+				ModalNavigationDrawer(
+					gesturesEnabled = drawerGestures || drawerState.isOpen,
+					drawerState = drawerState,
+					drawerContent = {
+						/*Text(
+							text = profileUser.getDisplayedName(applicationContext)
+								.ifBlank { stringResource(R.string.app_name) },
+							modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+						)
+						Text(
+							text = profileUser.userData.schoolName.ifBlank { stringResource(R.string.all_contact_email) },
+							modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+						)*/
+						Spacer(modifier = Modifier.height(24.dp))
+
+						DrawerText("Favourites")
+
+						NavigationDrawerItem(
+							icon = {
+								Icon(
+									painterResource(id = R.drawable.all_prefs_personal),
+									contentDescription = null
+								)
+							},
+							label = { Text(stringResource(id = R.string.all_personal_timetable)) },
+							selected = true,
+							onClick = {
+								coroutineScope.launch { drawerState.close() }
+								//selectedItem.value = item
+							},
+							modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+						)
+
+						NavigationDrawerItem(
+							icon = {
+								Icon(
+									painterResource(id = R.drawable.all_add),
+									contentDescription = null
+								)
+							},
+							label = { Text(stringResource(id = R.string.maindrawer_bookmarks_add)) },
+							selected = false,
+							onClick = {
+								coroutineScope.launch { drawerState.close() }
+								//selectedItem.value = item
+							},
+							modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+						)
+
+						DrawerText("Timetables")
+
+						navItemsElementTypes.forEach { item ->
+							NavigationDrawerItem(
+								icon = { Icon(item.icon, contentDescription = null) },
+								label = { Text(item.label) },
+								selected = false,
+								onClick = {
+									coroutineScope.launch { drawerState.close() }
+									//selectedItem.value = item
+								},
+								modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+							)
+						}
+
+						DrawerDivider()
+
+						navItemsShortcuts.forEach { item ->
+							NavigationDrawerItem(
+								icon = { Icon(item.icon, contentDescription = null) },
+								label = { Text(item.label) },
+								selected = false,
+								onClick = {
+									coroutineScope.launch { drawerState.close() }
+									//selectedItem.value = item
+
+									shortcutLauncher.launch(
+										Intent(
+											this@MainActivity,
+											item.target
+										).apply {
+											putExtra(EXTRA_LONG_PROFILE_ID, profileId)
+										}
+									)
+								},
+								modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+							)
+						}
+					}
+				) {
+					Scaffold(
+						topBar = {
+							CenterAlignedTopAppBar(
+								title = { Text("BetterUntis") },
+								navigationIcon = {
+									IconButton(onClick = {
+										coroutineScope.launch { drawerState.open() }
+									}) {
+										Icon(
+											imageVector = Icons.Filled.Menu,
+											contentDescription = "TODO"//stringResource(id = R.string.login_scan_code)
+										)
+									}
+								},
+								actions = {
+									IconButton(onClick = { /*TODO*/ }) {
+										Icon(
+											imageVector = Icons.Filled.AccountCircle,
+											contentDescription = "TODO"//stringResource(id = R.string.login_scan_code)
+										)
+									}
+								}
+							)
+						},
+					) { innerPadding ->
+						Box(
+							modifier = Modifier
+								.padding(innerPadding)
+								.fillMaxSize()
+						) {
+							val colorScheme = MaterialTheme.colorScheme
+							val currentDensity = LocalDensity.current
+							val outlineAlpha = 0.4f
+
+							AndroidView(factory = {
+								val weekViewSwipeRefresh = WeekViewSwipeRefreshLayout(it)
+								val weekView = WeekView<TimegridItem>(it)
+
+								weekViewSwipeRefresh.setOnRefreshListener {
+									/*displayedElement?.let { element ->
+										weeklyTimetableItems[currentWeekIndex]?.dateRange?.let { dateRange ->
+											loadTimetable(
+												TimetableLoader.TimetableLoaderTarget(
+													dateRange.first,
+													dateRange.second,
+													element.id,
+													element.type
+												), true
+											)
+										}
+									}*/
+								}
+
+								weekView.config.apply {
+									with(currentDensity) {
+										daySeparatorColor =
+											colorScheme.outline.copy(alpha = outlineAlpha).toArgb()
+										defaultEventColor = colorScheme.primary.toArgb()
+										eventMarginVertical = 4.dp.roundToPx()
+										eventPadding = 4.dp.roundToPx()
+										headerRowBackgroundColor = Color.TRANSPARENT
+										headerRowPadding = 8.dp.roundToPx()
+										headerRowSecondaryTextColor =
+											colorScheme.onSurfaceVariant.toArgb()
+										headerRowSecondaryTextSize = 12.sp.toPx()
+										headerRowTextColor = colorScheme.onSurface.toArgb()
+										headerRowTextSize = 18.sp.toPx()
+										headerRowTextSpacing = 10.dp.roundToPx()
+										holidayTextColor = colorScheme.onSurface.toArgb()
+										holidayTextSize = 16.sp.toPx()
+										hourHeight = 72.dp.roundToPx()
+										hourSeparatorColor =
+											colorScheme.outline.copy(alpha = outlineAlpha).toArgb()
+										nowLineStrokeWidth = 2.dp.toPx()
+										scrollDuration = 100
+										showHourSeparator = true
+										showNowLine = true
+										timeColumnBackground = Color.TRANSPARENT
+										timeColumnCaptionColor = colorScheme.onSurface.toArgb()
+										timeColumnCaptionSize = 16.sp.toPx()
+										timeColumnPadding = 4.dp.roundToPx()
+										timeColumnTextColor = colorScheme.onSurfaceVariant.toArgb()
+										timeColumnTextSize = 12.sp.toPx()
+										todayHeaderTextColor = colorScheme.primary.toArgb()
+										topLeftCornerDrawable = AppCompatResources.getDrawable(
+											this@MainActivity,
+											R.drawable.all_calendar_adjusted
+										)
+										topLeftCornerPadding = 4.dp.roundToPx()
+										topLeftCornerTint = colorScheme.onSurface.toArgb()
+									}
+								}
+
+								weekView.apply {
+									setupCustomization()
+									setupHours()
+
+									// Workaround to enable drawer gestures only when swiping from the left edge (won't work with RTL layout)
+									onMotionEvent = { event ->
+										when (event.action) {
+											MotionEvent.ACTION_DOWN -> {
+												drawerGestures =
+													event.x < with(currentDensity) { 48.dp.toPx() }
+											}
+											MotionEvent.ACTION_UP -> {
+												drawerGestures = true
+											}
+										}
+									}
+								}
+
+								weekViewSwipeRefresh.apply {
+									addView(weekView)
+								}
+							}, modifier = Modifier.fillMaxSize())
+						}
+					}
+				}
+			}
+		}
+
+		/*if (checkForCrashes()) {
 			startActivityForResult(Intent(this, ErrorsActivity::class.java).apply {
 				putExtra(ErrorsActivity.EXTRA_BOOLEAN_SHOW_CRASH_MESSAGE, true)
 			}, REQUEST_CODE_ERRORS)
@@ -175,10 +417,44 @@ class MainActivity :
 			setupTimetableLoader()
 			if (!checkShortcut()) showPersonalTimetable()
 			refreshNavigationViewSelection()
-		}
+		}*/
 	}
 
-	private fun checkForProfileUpdateRequired(): Boolean {
+	@Composable
+	fun DrawerDivider() {
+		Divider(
+			color = MaterialTheme.colorScheme.outline,
+			modifier = Modifier.padding(vertical = 8.dp)
+		)
+	}
+
+	@Composable
+	fun DrawerText(text: String) {
+		Text(
+			text = text,
+			style = MaterialTheme.typography.labelMedium,
+			modifier = Modifier.padding(start = 28.dp, top = 16.dp, bottom = 8.dp)
+		)
+	}
+
+	abstract class NavItem(
+		open val icon: Painter,
+		open val label: String
+	)
+
+	data class NavItemTimetable(
+		override val icon: Painter,
+		override val label: String,
+		val elementType: TimetableDatabaseInterface.Type
+	) : NavItem(icon, label)
+
+	data class NavItemShortcut(
+		override val icon: Painter,
+		override val label: String,
+		val target: Class<*>
+	) : NavItem(icon, label)
+
+	/*private fun checkForProfileUpdateRequired(): Boolean {
 		return profileUser.schoolId.isBlank() || profileUser.apiUrl.isBlank()
 	}
 
@@ -243,7 +519,7 @@ class MainActivity :
 			}
 			.setCancelable(false)
 			.show()
-	}
+	}*/
 
 	private fun login() {
 		val loginIntent = Intent(this, LoginActivity::class.java)
@@ -251,7 +527,7 @@ class MainActivity :
 		finish()
 	}
 
-	private fun showPersonalTimetable(): Boolean {
+	/*private fun showPersonalTimetable(): Boolean {
 		val customType = TimetableDatabaseInterface.Type.valueOf(
 				preferences["preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_TYPE}",
 					TimetableDatabaseInterface.Type.SUBJECT.toString()]
@@ -509,7 +785,7 @@ class MainActivity :
 		val flags =
 			(if (!forceRefresh) TimetableLoader.FLAG_LOAD_CACHE else 0) or (if (alwaysLoad || forceRefresh) TimetableLoader.FLAG_LOAD_SERVER else 0)
 		timetableLoader!!.load(target, flags, proxyHost)
-	}
+	}*/
 
 	private fun loadProfile(): Boolean {
 		if (userDatabase.getUsersCount() < 1) {
@@ -527,7 +803,7 @@ class MainActivity :
 		preferences.loadProfile(profileId)
 		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileUser.id ?: 0)
 
-		if (checkForProfileUpdateRequired()) {
+		/*if (checkForProfileUpdateRequired()) {
 			showProfileUpdateRequired()
 			return false
 		}
@@ -535,12 +811,12 @@ class MainActivity :
 		if (checkForNewSchoolYear()) {
 			updateProfile(profileUser)
 			return false
-		}
+		}*/
 
 		return true
 	}
 
-	private fun setupWeekView() {
+	/*private fun setupWeekView() {
 		weekView = findViewById(R.id.weekview_main_timetable)
 		weekView.setOnEventClickListener(this)
 		weekView.setOnCornerClickListener(this)
@@ -573,49 +849,6 @@ class MainActivity :
 		weekView.hourHeight = preferences[PERSISTENT_INT_ZOOM_LEVEL, weekView.hourHeight]
 	}
 
-	private fun setupWeekViewConfig() {
-		weekView.weekLength = preferences.sharedPrefs!!.getStringSet(
-			"preference_week_custom_range",
-			emptySet()
-		)?.size?.zeroToNull
-			?: profileUser.timeGrid.days.size
-		weekView.numberOfVisibleDays =
-			preferences["preference_week_custom_display_length", 0].zeroToNull
-				?: weekView.weekLength
-		weekView.firstDayOfWeek =
-			preferences.sharedPrefs!!.getStringSet("preference_week_custom_range", emptySet())
-				?.map { MaterialDayPicker.Weekday.valueOf(it) }?.minOrNull()?.ordinal
-				?: DateTimeFormat.forPattern("E").withLocale(Locale.ENGLISH)
-					.parseDateTime(profileUser.timeGrid.days[0].day).dayOfWeek
-
-		weekView.timeColumnVisibility = !preferences.get<Boolean>("preference_timetable_hide_time_stamps")
-
-		weekView.columnGap = ConversionUtils.dpToPx(
-				preferences.get<Int>("preference_timetable_item_padding").toFloat(), this
-		).toInt()
-		weekView.overlappingEventGap = ConversionUtils.dpToPx(
-				preferences.get<Int>("preference_timetable_item_padding_overlap").toFloat(), this
-		).toInt()
-		weekView.eventCornerRadius = ConversionUtils.dpToPx(
-				preferences.get<Int>("preference_timetable_item_corner_radius").toFloat(), this
-		).toInt()
-		weekView.eventSecondaryTextCentered = preferences["preference_timetable_centered_lesson_info"]
-		weekView.eventTextBold = preferences["preference_timetable_bold_lesson_name"]
-		weekView.eventTextSize = ConversionUtils.spToPx(
-				preferences.get<Int>("preference_timetable_lesson_name_font_size").toFloat(), this
-		)
-		weekView.eventSecondaryTextSize = ConversionUtils.spToPx(
-				preferences.get<Int>("preference_timetable_lesson_info_font_size").toFloat(), this
-		)
-		weekView.eventTextColor = if (preferences["preference_timetable_item_text_light"]) Color.WHITE else Color.BLACK
-		weekView.pastBackgroundColor = preferences["preference_background_past"]
-		weekView.futureBackgroundColor = preferences["preference_background_future"]
-		weekView.nowLineColor = preferences["preference_marker"]
-
-		weekView.horizontalFlingEnabled = preferences["preference_fling_enable"]
-		weekView.snapToWeek = !preferences.get<Boolean>("preference_week_snap_to_days") && weekView.numberOfVisibleDays != 1
-	}
-
 	override fun onPeriodChange(
 		startDate: LocalDate,
 		endDate: LocalDate
@@ -644,42 +877,6 @@ class MainActivity :
 	}
 
 	private fun convertDateTimeToWeekIndex(date: LocalDate) = date.year * 100 + date.dayOfYear / 7
-
-	private fun setupHours() {
-		val lines = MutableList(0) { return@MutableList 0 }
-		val labels = MutableList(0) { return@MutableList "" }
-		val range = RangePreference.convertToPair(preferences.get<String>("preference_timetable_range", null))
-
-		profileUser.timeGrid.days.maxByOrNull { it.units.size }?.units?.forEachIndexed { index, hour ->
-			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
-
-			val startTime =
-				hour.startTime.toLocalTime().toString(DateTimeUtils.shortDisplayableTime())
-			val endTime = hour.endTime.toLocalTime().toString(DateTimeUtils.shortDisplayableTime())
-
-			val startTimeParts = startTime.split(":")
-			val endTimeParts = endTime.split(":")
-
-			val startTimeInt = startTimeParts[0].toInt() * 60 + startTimeParts[1].toInt()
-			val endTimeInt = endTimeParts[0].toInt() * 60 + endTimeParts[1].toInt()
-
-			lines.add(startTimeInt)
-			lines.add(endTimeInt)
-			labels.add(hour.label)
-		}
-
-		if (!preferences.get<Boolean>("preference_timetable_range_index_reset"))
-			weekView.hourIndexOffset = (range?.first ?: 1) - 1
-		weekView.hourLines = lines.toIntArray()
-		weekView.hourLabels = labels.toTypedArray().let { hourLabelArray ->
-			if (hourLabelArray.joinToString("") == "") IntArray(
-				labels.size,
-				fun(idx: Int): Int { return idx + 1 }).map { it.toString() }.toTypedArray()
-			else hourLabelArray
-		}
-		weekView.startTime = lines.first()
-		weekView.endTime = lines.last() + 30 // TODO: Don't hard-code this offset
-	}
 
 	private fun setupHolidays() {
 		userDatabase.getAdditionalUserData<Holiday>(profileUser.id!!, Holiday())?.let { item ->
@@ -1335,6 +1532,105 @@ class MainActivity :
 				}
 			}
 		}
+	}*/
+
+	private fun <T> WeekView<T>.setupCustomization() {
+		weekLength = preferences.sharedPrefs!!.getStringSet(
+			"preference_week_custom_range",
+			emptySet()
+		)?.size?.zeroToNull ?: profileUser.timeGrid.days.size
+		numberOfVisibleDays =
+			preferences["preference_week_custom_display_length", 0].zeroToNull
+				?: weekLength
+		firstDayOfWeek = preferences.sharedPrefs!!.getStringSet(
+			"preference_week_custom_range",
+			emptySet()
+		)?.map { MaterialDayPicker.Weekday.valueOf(it) }
+			?.minOrNull()?.ordinal ?: DateTimeFormat.forPattern("E")
+			.withLocale(Locale.ENGLISH) // TODO: Correct locale?
+			.parseDateTime(profileUser.timeGrid.days[0].day).dayOfWeek
+		timeColumnVisibility =
+			!preferences.get<Boolean>("preference_timetable_hide_time_stamps")
+		columnGap = ConversionUtils.dpToPx(
+			preferences.get<Int>("preference_timetable_item_padding")
+				.toFloat(), this@MainActivity
+		).toInt()
+		overlappingEventGap = ConversionUtils.dpToPx(
+			preferences.get<Int>("preference_timetable_item_padding_overlap")
+				.toFloat(), this@MainActivity
+		).toInt()
+		eventCornerRadius = ConversionUtils.dpToPx(
+			preferences.get<Int>("preference_timetable_item_corner_radius")
+				.toFloat(), this@MainActivity
+		).toInt()
+		eventSecondaryTextCentered =
+			preferences["preference_timetable_centered_lesson_info"]
+		eventTextBold =
+			preferences["preference_timetable_bold_lesson_name"]
+		eventTextSize = ConversionUtils.spToPx(
+			preferences.get<Int>("preference_timetable_lesson_name_font_size")
+				.toFloat(), this@MainActivity
+		)
+		eventSecondaryTextSize = ConversionUtils.spToPx(
+			preferences.get<Int>("preference_timetable_lesson_info_font_size")
+				.toFloat(), this@MainActivity
+		)
+		eventTextColor =
+			if (preferences["preference_timetable_item_text_light"]) Color.WHITE else Color.BLACK
+		pastBackgroundColor = preferences["preference_background_past"]
+		futureBackgroundColor =
+			preferences["preference_background_future"]
+		nowLineColor = preferences["preference_marker"]
+		horizontalFlingEnabled = preferences["preference_fling_enable"]
+		snapToWeek =
+			!preferences.get<Boolean>("preference_week_snap_to_days") && numberOfVisibleDays != 1
+	}
+
+	private fun <T> WeekView<T>.setupHours() {
+		val lines = MutableList(0) { return@MutableList 0 }
+		val labels = MutableList(0) { return@MutableList "" }
+		val range = RangePreference.convertToPair(
+			preferences.get<String>(
+				"preference_timetable_range",
+				null
+			)
+		)
+
+		profileUser.timeGrid.days.maxByOrNull { it.units.size }?.units?.forEachIndexed { index, hour ->
+			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
+
+			val startTime =
+				hour.startTime.toLocalTime()
+					.toString(DateTimeUtils.shortDisplayableTime())
+			val endTime = hour.endTime.toLocalTime()
+				.toString(DateTimeUtils.shortDisplayableTime())
+
+			val startTimeParts = startTime.split(":")
+			val endTimeParts = endTime.split(":")
+
+			val startTimeInt =
+				startTimeParts[0].toInt() * 60 + startTimeParts[1].toInt()
+			val endTimeInt =
+				endTimeParts[0].toInt() * 60 + endTimeParts[1].toInt()
+
+			lines.add(startTimeInt)
+			lines.add(endTimeInt)
+			labels.add(hour.label)
+		}
+
+		if (!preferences.get<Boolean>("preference_timetable_range_index_reset"))
+			hourIndexOffset = (range?.first ?: 1) - 1
+		hourLines = lines.toIntArray()
+		hourLabels = labels.toTypedArray().let { hourLabelArray ->
+			if (hourLabelArray.joinToString("") == "") IntArray(
+				labels.size,
+				fun(idx: Int): Int { return idx + 1 }).map { it.toString() }
+				.toTypedArray()
+			else hourLabelArray
+		}
+		startTime = lines.first()
+		endTime =
+			lines.last() + 30 // TODO: Don't hard-code this offset
 	}
 }
 
