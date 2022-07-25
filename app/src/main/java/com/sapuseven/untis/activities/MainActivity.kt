@@ -18,7 +18,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -37,6 +36,8 @@ import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.RangePreference
+import com.sapuseven.untis.ui.models.NavItemShortcut
+import com.sapuseven.untis.ui.models.NavItemTimetable
 import com.sapuseven.untis.ui.theme.AppTheme
 import com.sapuseven.untis.viewmodels.PeriodDataViewModel
 import com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
@@ -152,16 +153,19 @@ class MainActivity :
 
 				val navItemsElementTypes = listOf(
 					NavItemTimetable(
+						id = 1,
 						icon = painterResource(id = R.drawable.all_classes),
 						label = stringResource(id = R.string.all_classes),
 						elementType = TimetableDatabaseInterface.Type.CLASS
 					),
 					NavItemTimetable(
+						id = 2,
 						icon = painterResource(id = R.drawable.all_teacher),
 						label = stringResource(id = R.string.all_teachers),
 						elementType = TimetableDatabaseInterface.Type.TEACHER
 					),
 					NavItemTimetable(
+						id = 3,
 						icon = painterResource(id = R.drawable.all_rooms),
 						label = stringResource(id = R.string.all_rooms),
 						elementType = TimetableDatabaseInterface.Type.ROOM
@@ -170,20 +174,24 @@ class MainActivity :
 
 				val navItemsShortcuts = listOf(
 					NavItemShortcut(
+						id = 1,
 						icon = painterResource(id = R.drawable.all_infocenter),
 						label = stringResource(id = R.string.activity_title_info_center),
 						InfoCenterActivity::class.java
 					),
 					/*NavItemShortcut(
+						id = 2,
 						icon = painterResource(id = R.drawable.all_messenger),
 						label = stringResource(id = R.string.activity_title_messenger)
 					),*/
 					NavItemShortcut(
+						id = 3,
 						icon = painterResource(id = R.drawable.all_search_rooms),
 						label = stringResource(id = R.string.activity_title_free_rooms),
 						RoomFinderActivity::class.java
 					),
 					NavItemShortcut(
+						id = 4,
 						icon = painterResource(id = R.drawable.all_settings),
 						label = stringResource(id = R.string.activity_title_settings),
 						SettingsActivity::class.java
@@ -436,23 +444,6 @@ class MainActivity :
 			modifier = Modifier.padding(start = 28.dp, top = 16.dp, bottom = 8.dp)
 		)
 	}
-
-	abstract class NavItem(
-		open val icon: Painter,
-		open val label: String
-	)
-
-	data class NavItemTimetable(
-		override val icon: Painter,
-		override val label: String,
-		val elementType: TimetableDatabaseInterface.Type
-	) : NavItem(icon, label)
-
-	data class NavItemShortcut(
-		override val icon: Painter,
-		override val label: String,
-		val target: Class<*>
-	) : NavItem(icon, label)
 
 	/*private fun checkForProfileUpdateRequired(): Boolean {
 		return profileUser.schoolId.isBlank() || profileUser.apiUrl.isBlank()

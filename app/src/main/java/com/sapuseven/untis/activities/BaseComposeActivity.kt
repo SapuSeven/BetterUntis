@@ -13,6 +13,10 @@ open class BaseComposeActivity : ComponentActivity() {
 
 	protected lateinit var preferences: PreferenceHelper
 
+	companion object {
+		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileid"
+	}
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		//ErrorLogger.initialize(this)
 

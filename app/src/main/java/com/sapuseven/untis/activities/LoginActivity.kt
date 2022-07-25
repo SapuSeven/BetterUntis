@@ -9,6 +9,7 @@ import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -35,7 +36,6 @@ import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.models.UntisSchoolInfo
 import com.sapuseven.untis.models.untis.params.SchoolSearchParams
 import com.sapuseven.untis.models.untis.response.SchoolSearchResponse
-import com.sapuseven.untis.ui.common.ListItem_TwoLine
 import com.sapuseven.untis.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -125,7 +125,7 @@ class LoginActivity : BaseComposeActivity() {
 								verticalArrangement = Arrangement.Center,
 								modifier = Modifier
 									.fillMaxWidth()
-									.weight(1.0f)
+									.weight(1f)
 							) {
 								Icon(
 									painter = painterResource(id = R.drawable.settings_about_app_icon),
@@ -147,7 +147,7 @@ class LoginActivity : BaseComposeActivity() {
 							SchoolSearch(
 								modifier = Modifier
 									.fillMaxWidth()
-									.weight(1.0f),
+									.weight(1f),
 								searchText = searchText
 							)
 						Column(
@@ -206,7 +206,7 @@ class LoginActivity : BaseComposeActivity() {
 			scanCodeLauncher.launch(Intent(this, ScanCodeActivity::class.java))
 	}
 
-	@OptIn(ExperimentalSerializationApi::class)
+	@OptIn(ExperimentalSerializationApi::class, ExperimentalMaterial3Api::class)
 	@Composable
 	fun SchoolSearch(
 		modifier: Modifier,
@@ -259,10 +259,10 @@ class LoginActivity : BaseComposeActivity() {
 		if (items.isNotEmpty())
 			LazyColumn(modifier) {
 				items(items) {
-					ListItem_TwoLine(
-						line1 = it.displayName,
-						line2 = it.address,
-						onClick = {
+					ListItem(
+						headlineText = { Text(it.displayName) },
+						supportingText = { Text(it.address) },
+						modifier = Modifier.clickable {
 							val builder = Uri.Builder()
 								.appendQueryParameter("schoolInfo", getJSON().encodeToString(it))
 
