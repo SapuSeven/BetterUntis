@@ -276,15 +276,16 @@ class InfoCenterActivity : BaseComposeActivity() {
 		ListItem(
 			headlineText = { Text(item.subject) },
 			supportingText = { Text(item.body) },
-			trailingContent = {
-				if (item.attachments.isNotEmpty())
+			trailingContent = if (item.attachments.isNotEmpty()) {
+				{
 					IconButton(onClick = { /*TODO*/ }) {
 						Icon(
 							painter = painterResource(id = R.drawable.infocenter_attachment),
 							contentDescription = stringResource(id = R.string.infocenter_messages_attachments)
 						)
 					}
-			}
+				}
+			} else null
 		)
 	}
 
