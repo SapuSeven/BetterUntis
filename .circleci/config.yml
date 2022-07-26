@@ -4,8 +4,7 @@ jobs:
     working_directory: ~/betteruntis
     docker:
       - image: cimg/android:2022.06.1
-    environment:
-      _JAVA_OPTIONS: -Xmx3200m
+    resource_class: large
     steps:
       - checkout
       - restore_cache:
