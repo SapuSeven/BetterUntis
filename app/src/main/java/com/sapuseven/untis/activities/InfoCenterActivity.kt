@@ -93,6 +93,7 @@ class InfoCenterActivity : BaseComposeActivity() {
 						val showAbsences = user.userData.rights.contains(RIGHT_ABSENCES)
 
 						var selectedItem by rememberSaveable { mutableStateOf(ID_MESSAGES) }
+
 						var messages by remember { mutableStateOf<List<UntisMessage>?>(null) }
 						var officeHours by remember { mutableStateOf<List<UntisOfficeHour>?>(null) }
 						var events by remember { mutableStateOf<List<EventListItem>?>(null) }

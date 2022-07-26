@@ -2,20 +2,18 @@ package com.sapuseven.untis.activities
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.sapuseven.untis.R
 import com.sapuseven.untis.ui.theme.AppTheme
 
@@ -32,7 +30,6 @@ class RoomFinderActivity : BaseComposeActivity()/*, ElementPickerDialog.ElementP
 	private lateinit var roomFinderDatabase: RoomfinderDatabase*/
 
 	companion object {
-		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileid"
 		const val EXTRA_INT_ROOM_ID = "com.sapuseven.untis.activities.roomid"
 
 		const val EVENT_PICKER_TAG = "com.sapuseven.untis.activities.elementPicker"
@@ -59,6 +56,122 @@ class RoomFinderActivity : BaseComposeActivity()/*, ElementPickerDialog.ElementP
 		swiperefreshlayout_roomfinder_roomlist.setOnRefreshListener {
 			updateRooms()
 		}*/
+	}
+
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	@Preview(showBackground = true)
+	@Composable
+	fun RoomFinder_Main() {
+		Scaffold(
+			topBar = {
+				CenterAlignedTopAppBar(
+					title = {
+						Text(stringResource(id = R.string.activity_title_free_rooms))
+					},
+					navigationIcon = {
+						IconButton(onClick = { finish() }) {
+							Icon(
+								imageVector = Icons.Filled.ArrowBack,
+								contentDescription = "TODO"
+							)
+						}
+					},
+					actions = {
+						IconButton(onClick = { /* TODO */ }) {
+							Icon(
+								imageVector = Icons.Filled.Add,
+								contentDescription = stringResource(id = R.string.all_add)
+							)
+						}
+					}
+				)
+			}
+		) { innerPadding ->
+			Column(
+				modifier = Modifier
+					.padding(innerPadding)
+					.fillMaxSize()
+			) {
+				var roomList by remember { mutableStateOf(emptyList<RoomStatusData>()) }
+
+				Box(
+					contentAlignment = Alignment.Center,
+					modifier = Modifier
+						.fillMaxWidth()
+						.weight(1f)
+				) {
+					LazyColumn(
+						Modifier.fillMaxSize()
+					) {
+						items(roomList) {
+							RoomListItem(it)
+						}
+					}
+
+					Text(
+						text = stringResource(R.string.roomfinder_no_rooms),
+						modifier = Modifier.align(Alignment.Center)
+					)
+				}
+			}
+		}
+	}
+
+	@Composable
+	fun RoomListItem(item: RoomStatusData) {
+		var isLoading by remember { mutableStateOf(true) }
+	}
+
+	class RoomStatusData(
+		val name: String,
+		val id: Int,
+		var loading: Boolean,
+		var states: List<Boolean> = emptyList()
+	) : Comparable<RoomStatusData> {
+		//private var startDate: LocalDate = LocalDate.now()
+		var hourIndex: Int = 0
+
+		fun getState(): Int {
+			if (loading)
+				return STATE_LOADING
+			var i = 0
+			var hours = 0
+			while (hourIndex + i < states.size && !states[hourIndex + i]) {
+				hours++
+				i++
+			}
+			return hours
+		}
+
+		override fun compareTo(other: RoomStatusData): Int {
+			val state1 = getState()
+			val state2 = other.getState()
+
+			return when {
+				state2 > state1 -> 1
+				state1 > state2 -> -1
+				else -> name.compareTo(other.name)
+			}
+		}
+
+		override fun hashCode(): Int {
+			return name.hashCode()
+		}
+
+		override fun equals(other: Any?): Boolean {
+			return other is RoomStatusData && other.name == name
+		}
+
+		override fun toString(): String {
+			return name
+		}
+
+		companion object {
+			const val STATE_OCCUPIED = 0
+			const val STATE_FREE = 1
+			const val STATE_LOADING = -1
+		}
 	}
 
 	/*private fun updateRooms() {
@@ -402,50 +515,4 @@ class RoomFinderActivity : BaseComposeActivity()/*, ElementPickerDialog.ElementP
 		}
 		return null
 	}*/
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
-@Composable
-fun RoomFinder_Main() {
-	val swipeRefreshState = rememberSwipeRefreshState(false)
-	val navController = rememberNavController()
-
-	Scaffold(
-		/*topBar = {
-			CenterAlignedTopAppBar(
-				title = { Text("Free Rooms") },
-				navigationIcon = {
-					IconButton(onClick = { navController.popBackStack() }) {
-						Icon(
-							imageVector = Icons.Filled.ArrowBack,
-							contentDescription = "Back"
-						)
-					}
-				}
-			)
-		},*/
-		content = {
-			Box(Modifier.fillMaxSize())
-			{
-				SwipeRefresh(
-					state = swipeRefreshState,
-					onRefresh = { /* todo */ },
-				) {
-					LazyColumn(
-						Modifier.fillMaxSize()
-					) {
-						items(50) { index ->
-							Text("Test")
-						}
-					}
-				}
-
-				Text(
-					text = stringResource(R.string.roomfinder_no_rooms),
-					modifier = Modifier.align(Alignment.Center)
-				)
-			}
-		}
-	)
 }
