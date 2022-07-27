@@ -212,10 +212,7 @@ class MainActivity :
 						title = { /*TODO*/ },
 						timetableDatabaseInterface = timetableDatabaseInterface,
 						onDismiss = { showElementPicker = null },
-						onSelect = { item ->
-							displayedElement = item
-							showElementPicker = null
-						},
+						onSelect = { item -> displayedElement = item },
 						initialType = type
 					)
 				} ?: ModalNavigationDrawer(

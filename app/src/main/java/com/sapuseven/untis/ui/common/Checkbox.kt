@@ -34,7 +34,7 @@ fun LabeledCheckbox(
 			.clickable(
 				interactionSource = interactionSource,
 				indication = null,
-				role = Role.Switch
+				role = Role.Checkbox
 			) { onCheckedChange?.invoke(!checked) }
 		)
 	) {

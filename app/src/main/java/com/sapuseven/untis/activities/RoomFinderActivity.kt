@@ -10,24 +10,28 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.sapuseven.untis.R
+import com.sapuseven.untis.data.connectivity.UntisRequest
+import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import com.sapuseven.untis.ui.common.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.theme.AppTheme
 
-class RoomFinderActivity : BaseComposeActivity()/*, ElementPickerDialog.ElementPickerDialogListener,
-	RoomFinderAdapter.RoomFinderClickListener*/ {
+class RoomFinderActivity : BaseComposeActivity() {
 	/*private var roomListMargins: Int = 0
 	private var hourIndex: Int = 0
-	private var maxHourIndex = 0
-	private var roomList: MutableList<RoomFinderAdapterItem> = ArrayList()
-	private var roomListAdapter = RoomFinderAdapter(this, this)
-	private var profileUser: UserDatabase.User? = null
+	private var maxHourIndex = 0*/
+
+	private var api: UntisRequest = UntisRequest()
+
 	private lateinit var userDatabase: UserDatabase
+	private lateinit var user: UserDatabase.User
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
-	private lateinit var roomFinderDatabase: RoomfinderDatabase*/
 
 	companion object {
 		const val EXTRA_INT_ROOM_ID = "com.sapuseven.untis.activities.roomid"
@@ -37,6 +41,13 @@ class RoomFinderActivity : BaseComposeActivity()/*, ElementPickerDialog.ElementP
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+
+		userDatabase = UserDatabase.createInstance(this)
+		userDatabase.getUser(intent.getLongExtra(EXTRA_LONG_PROFILE_ID, -1))?.let { user = it }
+		// TODO: Move this part to BaseComposeActivity and check if user is set
+
+		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, user.id!!)
+
 		setContent {
 			AppTheme {
 				RoomFinder_Main()
@@ -63,59 +74,73 @@ class RoomFinderActivity : BaseComposeActivity()/*, ElementPickerDialog.ElementP
 	@Preview(showBackground = true)
 	@Composable
 	fun RoomFinder_Main() {
-		Scaffold(
-			topBar = {
-				CenterAlignedTopAppBar(
-					title = {
-						Text(stringResource(id = R.string.activity_title_free_rooms))
-					},
-					navigationIcon = {
-						IconButton(onClick = { finish() }) {
-							Icon(
-								imageVector = Icons.Filled.ArrowBack,
-								contentDescription = "TODO"
-							)
-						}
-					},
-					actions = {
-						IconButton(onClick = { /* TODO */ }) {
-							Icon(
-								imageVector = Icons.Filled.Add,
-								contentDescription = stringResource(id = R.string.all_add)
-							)
-						}
-					}
-				)
-			}
-		) { innerPadding ->
-			Column(
-				modifier = Modifier
-					.padding(innerPadding)
-					.fillMaxSize()
-			) {
-				var roomList by remember { mutableStateOf(emptyList<RoomStatusData>()) }
+		var showElementPicker by rememberSaveable { mutableStateOf(false) }
 
-				Box(
-					contentAlignment = Alignment.Center,
-					modifier = Modifier
-						.fillMaxWidth()
-						.weight(1f)
-				) {
-					LazyColumn(
-						Modifier.fillMaxSize()
-					) {
-						items(roomList) {
-							RoomListItem(it)
+		if (showElementPicker)
+			ElementPickerDialogFullscreen(
+				title = { Text(stringResource(id = R.string.all_add)) }, // TODO: Proper string resource
+				multiSelect = true,
+				hideTypeSelection = true,
+				initialType = TimetableDatabaseInterface.Type.ROOM,
+				timetableDatabaseInterface = timetableDatabaseInterface,
+				onDismiss = { showElementPicker = false },
+				onSelect = {
+				}
+			)
+		else
+			Scaffold(
+				topBar = {
+					CenterAlignedTopAppBar(
+						title = {
+							Text(stringResource(id = R.string.activity_title_free_rooms))
+						},
+						navigationIcon = {
+							IconButton(onClick = { finish() }) {
+								Icon(
+									imageVector = Icons.Filled.ArrowBack,
+									contentDescription = "TODO"
+								)
+							}
+						},
+						actions = {
+							IconButton(onClick = { showElementPicker = true }) {
+								Icon(
+									imageVector = Icons.Filled.Add,
+									contentDescription = stringResource(id = R.string.all_add)
+								)
+							}
 						}
-					}
-
-					Text(
-						text = stringResource(R.string.roomfinder_no_rooms),
-						modifier = Modifier.align(Alignment.Center)
 					)
 				}
+			) { innerPadding ->
+				Column(
+					modifier = Modifier
+						.padding(innerPadding)
+						.fillMaxSize()
+				) {
+					val roomList by remember { mutableStateOf(emptyList<RoomStatusData>()) }
+
+					Box(
+						contentAlignment = Alignment.Center,
+						modifier = Modifier
+							.fillMaxWidth()
+							.weight(1f)
+					) {
+						LazyColumn(
+							Modifier.fillMaxSize()
+						) {
+							items(roomList) {
+								RoomListItem(it)
+							}
+						}
+
+						Text(
+							text = stringResource(R.string.roomfinder_no_rooms),
+							modifier = Modifier.align(Alignment.Center)
+						)
+					}
+				}
 			}
-		}
 	}
 
 	@Composable
