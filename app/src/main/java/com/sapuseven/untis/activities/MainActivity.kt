@@ -36,6 +36,7 @@ import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.RangePreference
+import com.sapuseven.untis.ui.common.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.models.NavItemShortcut
 import com.sapuseven.untis.ui.models.NavItemTimetable
 import com.sapuseven.untis.ui.theme.AppTheme
@@ -143,6 +144,14 @@ class MainActivity :
 						saveZoomLevel()
 					}
 				}*/
+				var showElementPicker by remember {
+					mutableStateOf<TimetableDatabaseInterface.Type?>(
+						null
+					)
+				}
+
+				var displayedElement by remember { mutableStateOf<PeriodElement?>(null) }
+				val isPersonalTimetable = false
 
 				val drawerState = rememberDrawerState(DrawerValue.Closed)
 				val coroutineScope = rememberCoroutineScope()
@@ -198,9 +207,18 @@ class MainActivity :
 					)
 				)
 
-				val selectedItem = remember { mutableStateOf(items[0]) }
-
-				ModalNavigationDrawer(
+				showElementPicker?.let { type ->
+					ElementPickerDialogFullscreen(
+						title = { /*TODO*/ },
+						timetableDatabaseInterface = timetableDatabaseInterface,
+						onDismiss = { showElementPicker = null },
+						onSelect = { item ->
+							displayedElement = item
+							showElementPicker = null
+						},
+						initialType = type
+					)
+				} ?: ModalNavigationDrawer(
 					gesturesEnabled = drawerGestures || drawerState.isOpen,
 					drawerState = drawerState,
 					drawerContent = {
@@ -225,10 +243,9 @@ class MainActivity :
 								)
 							},
 							label = { Text(stringResource(id = R.string.all_personal_timetable)) },
-							selected = true,
+							selected = isPersonalTimetable,
 							onClick = {
 								coroutineScope.launch { drawerState.close() }
-								//selectedItem.value = item
 							},
 							modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 						)
@@ -255,10 +272,10 @@ class MainActivity :
 							NavigationDrawerItem(
 								icon = { Icon(item.icon, contentDescription = null) },
 								label = { Text(item.label) },
-								selected = false,
+								selected = !isPersonalTimetable && item.elementType.name == displayedElement?.type,
 								onClick = {
 									coroutineScope.launch { drawerState.close() }
-									//selectedItem.value = item
+									showElementPicker = item.elementType
 								},
 								modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 							)
@@ -273,7 +290,6 @@ class MainActivity :
 								selected = false,
 								onClick = {
 									coroutineScope.launch { drawerState.close() }
-									//selectedItem.value = item
 
 									shortcutLauncher.launch(
 										Intent(
@@ -345,7 +361,8 @@ class MainActivity :
 								weekView.config.apply {
 									with(currentDensity) {
 										daySeparatorColor =
-											colorScheme.outline.copy(alpha = outlineAlpha).toArgb()
+											colorScheme.outline.copy(alpha = outlineAlpha)
+												.toArgb()
 										defaultEventColor = colorScheme.primary.toArgb()
 										eventMarginVertical = 4.dp.roundToPx()
 										eventPadding = 4.dp.roundToPx()
@@ -361,7 +378,8 @@ class MainActivity :
 										holidayTextSize = 16.sp.toPx()
 										hourHeight = 72.dp.roundToPx()
 										hourSeparatorColor =
-											colorScheme.outline.copy(alpha = outlineAlpha).toArgb()
+											colorScheme.outline.copy(alpha = outlineAlpha)
+												.toArgb()
 										nowLineStrokeWidth = 2.dp.toPx()
 										scrollDuration = 100
 										showHourSeparator = true
@@ -370,7 +388,8 @@ class MainActivity :
 										timeColumnCaptionColor = colorScheme.onSurface.toArgb()
 										timeColumnCaptionSize = 16.sp.toPx()
 										timeColumnPadding = 4.dp.roundToPx()
-										timeColumnTextColor = colorScheme.onSurfaceVariant.toArgb()
+										timeColumnTextColor =
+											colorScheme.onSurfaceVariant.toArgb()
 										timeColumnTextSize = 12.sp.toPx()
 										todayHeaderTextColor = colorScheme.primary.toArgb()
 										topLeftCornerDrawable = AppCompatResources.getDrawable(

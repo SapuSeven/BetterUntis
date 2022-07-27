@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.VisualTransformation
@@ -34,7 +35,7 @@ fun ElementPickerDialogFullscreen(
 	initialType: TimetableDatabaseInterface.Type? = null,
 	multiSelect: Boolean = false,
 	hideTypeSelection: Boolean = false,
-	onDismiss: () -> Unit,
+	onDismiss: () -> Unit = {},
 	onSelect: (PeriodElement?) -> Unit
 ) {
 	var showSearch by remember { mutableStateOf(false) }
@@ -53,6 +54,7 @@ fun ElementPickerDialogFullscreen(
 					else {
 						val focusRequester = remember { FocusRequester() }
 
+						// TODO: Text color is wrong
 						BasicTextField(
 							value = search,
 							onValueChange = { search = it },
@@ -68,6 +70,8 @@ fun ElementPickerDialogFullscreen(
 									contentPadding = PaddingValues(horizontal = 0.dp)
 								)
 							},
+							textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+							cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
 							modifier = Modifier
 								.fillMaxWidth()
 								.padding(20.dp)
@@ -81,7 +85,10 @@ fun ElementPickerDialogFullscreen(
 				},
 				navigationIcon = {
 					if (showSearch)
-						IconButton(onClick = { showSearch = false }) {
+						IconButton(onClick = {
+							showSearch = false
+							search = ""
+						}) {
 							Icon(
 								imageVector = Icons.Filled.ArrowBack,
 								contentDescription = "TODO"
@@ -127,15 +134,21 @@ fun ElementPickerDialogFullscreen(
 					modifier = Modifier.fillMaxHeight()
 				) {
 					items(items) {
-						if (multiSelect)
-							LabeledCheckbox(checked = false, onCheckedChange = {}) {
-								Text(timetableDatabaseInterface.getShortName(it.id, selectedType))
-							}
-						else
-							Text(
-								text = timetableDatabaseInterface.getShortName(it.id, selectedType),
-								modifier = Modifier.clickable { onSelect(it) }
-							)
+						ListItem(
+							headlineText = {
+								Text(
+									timetableDatabaseInterface.getShortName(
+										it.id,
+										selectedType
+									)
+								)
+							},
+							leadingContent = if (multiSelect) {
+								{ Checkbox(checked = false, onCheckedChange = {}) }
+							} else null,
+							modifier = Modifier
+								.clickable { onSelect(it) }
+						)
 					}
 				}
 			}
