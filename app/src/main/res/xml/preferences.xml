@@ -379,7 +379,7 @@
 				android:dependency="preference_notifications_enable"
 				android:entries="@array/preference_notifications_visibility"
 				android:entryValues="@array/preference_notifications_visibility_values"
-				android:icon="@drawable/all_teacher"
+				android:icon="@drawable/all_teachers"
 				android:key="preference_notifications_visibility_teachers"
 				android:summary="%s"
 				android:title="@string/all_teachers" />

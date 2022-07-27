@@ -160,7 +160,7 @@ class MainActivity :
 					),
 					NavItemTimetable(
 						id = 2,
-						icon = painterResource(id = R.drawable.all_teacher),
+						icon = painterResource(id = R.drawable.all_teachers),
 						label = stringResource(id = R.string.all_teachers),
 						elementType = TimetableDatabaseInterface.Type.TEACHER
 					),

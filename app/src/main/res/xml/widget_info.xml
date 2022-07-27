@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:configure="com.sapuseven.untis.activities.BaseWidgetConfigureActivity"
+	android:configure="com.sapuseven.untis.activities.WidgetConfigureActivity"
 	android:initialKeyguardLayout="@layout/widget_base"
 	android:initialLayout="@layout/widget_base"
 	android:minWidth="180dp"
