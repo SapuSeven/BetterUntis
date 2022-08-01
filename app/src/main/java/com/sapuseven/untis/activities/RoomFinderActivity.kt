@@ -12,9 +12,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -172,7 +172,7 @@ class RoomFinderActivity : BaseComposeActivity() {
 								navigationIcon = {
 									IconButton(onClick = { finish() }) {
 										Icon(
-											imageVector = Icons.Filled.ArrowBack,
+											imageVector = Icons.Outlined.ArrowBack,
 											contentDescription = stringResource(id = R.string.all_back)
 										)
 									}
@@ -180,7 +180,7 @@ class RoomFinderActivity : BaseComposeActivity() {
 								actions = {
 									IconButton(onClick = { showElementPicker = true }) {
 										Icon(
-											imageVector = Icons.Filled.Add,
+											imageVector = Icons.Outlined.Add,
 											contentDescription = stringResource(id = R.string.all_add)
 										)
 									}
@@ -252,7 +252,7 @@ class RoomFinderActivity : BaseComposeActivity() {
 											)
 										) {
 											Icon(
-												imageVector = Icons.Default.Add, // TODO: Replace all Filled with Default
+												imageVector = Icons.Outlined.Add, // TODO: Replace all Filled with Default
 												modifier = Modifier.fillMaxSize(),
 												contentDescription = "+"
 											)
@@ -519,7 +519,7 @@ class RoomFinderActivity : BaseComposeActivity() {
 				{
 					IconButton(onClick = onDelete) {
 						Icon(
-							imageVector = Icons.Filled.Delete,
+							imageVector = Icons.Outlined.Delete,
 							contentDescription = stringResource(id = R.string.roomfinder_delete_item)
 						)
 					}

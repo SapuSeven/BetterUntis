@@ -13,7 +13,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -157,8 +158,6 @@ class MainActivity :
 				val coroutineScope = rememberCoroutineScope()
 
 				var drawerGestures by remember { mutableStateOf(true) }
-
-				val items = listOf(Icons.Default.Favorite, Icons.Default.Face, Icons.Default.Email)
 
 				val navItemsElementTypes = listOf(
 					NavItemTimetable(
@@ -311,7 +310,7 @@ class MainActivity :
 										coroutineScope.launch { drawerState.open() }
 									}) {
 										Icon(
-											imageVector = Icons.Filled.Menu,
+											imageVector = Icons.Outlined.Menu,
 											contentDescription = stringResource(id = R.string.all_back)
 										)
 									}
@@ -319,7 +318,7 @@ class MainActivity :
 								actions = {
 									IconButton(onClick = { /*TODO*/ }) {
 										Icon(
-											imageVector = Icons.Filled.AccountCircle,
+											imageVector = Icons.Outlined.AccountCircle,
 											contentDescription = "TODO"//stringResource(id = R.string.login_scan_code)
 										)
 									}

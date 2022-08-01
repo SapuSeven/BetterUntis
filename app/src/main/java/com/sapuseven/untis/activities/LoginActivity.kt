@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -107,7 +107,7 @@ class LoginActivity : BaseComposeActivity() {
 										searchMode = false
 									}) {
 										Icon(
-											imageVector = Icons.Filled.ArrowBack,
+											imageVector = Icons.Outlined.ArrowBack,
 											contentDescription = stringResource(id = R.string.all_back)
 										)
 									}

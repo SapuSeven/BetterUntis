@@ -9,10 +9,10 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.*
 import androidx.compose.material3.TextFieldDefaults.TextFieldDecorationBox
 import androidx.compose.runtime.*
@@ -106,14 +106,14 @@ fun ElementPickerDialogFullscreen(
 							search = ""
 						}) {
 							Icon(
-								imageVector = Icons.Filled.ArrowBack,
+								imageVector = Icons.Outlined.ArrowBack,
 								contentDescription = stringResource(id = R.string.all_back)
 							)
 						}
 					else
 						IconButton(onClick = { onDismiss(false) }) {
 							Icon(
-								imageVector = Icons.Filled.Close,
+								imageVector = Icons.Outlined.Close,
 								contentDescription = "TODO"
 							)
 						}
@@ -122,7 +122,7 @@ fun ElementPickerDialogFullscreen(
 					if (!showSearch) {
 						IconButton(onClick = { showSearch = true }) {
 							Icon(
-								imageVector = Icons.Filled.Search,
+								imageVector = Icons.Outlined.Search,
 								contentDescription = "TODO"
 							)
 						}
@@ -133,7 +133,7 @@ fun ElementPickerDialogFullscreen(
 							onDismiss(true)
 						}) {
 							Icon(
-								imageVector = Icons.Filled.Check,
+								imageVector = Icons.Outlined.Check,
 								contentDescription = "TODO"
 							)
 						}
