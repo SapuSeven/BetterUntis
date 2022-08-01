@@ -108,7 +108,7 @@ class LoginActivity : BaseComposeActivity() {
 									}) {
 										Icon(
 											imageVector = Icons.Filled.ArrowBack,
-											contentDescription = stringResource(id = R.string.login_scan_code)
+											contentDescription = stringResource(id = R.string.login_scan_code) // TODO: Wrong value
 										)
 									}
 							}

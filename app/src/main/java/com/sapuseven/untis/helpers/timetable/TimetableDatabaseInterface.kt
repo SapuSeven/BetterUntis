@@ -44,6 +44,10 @@ class TimetableDatabaseInterface(@Transient val database: UserDatabase, id: Long
 		return getShortName(id, type?.let { Type.valueOf(it) })
 	}
 
+	fun getShortName(periodElement: PeriodElement): String {
+		return getShortName(periodElement.id, periodElement.type)
+	}
+
 	fun getLongName(id: Int, type: Type): String {
 		return when (type) {
 			Type.CLASS -> allClasses[id]?.longName
@@ -55,6 +59,10 @@ class TimetableDatabaseInterface(@Transient val database: UserDatabase, id: Long
 
 	fun getLongName(id: Int, type: String): String {
 		return getLongName(id, Type.valueOf(type))
+	}
+
+	fun getLongName(periodElement: PeriodElement): String {
+		return getShortName(periodElement.id, periodElement.type)
 	}
 
 	fun isAllowed(id: Int, type: Type?): Boolean {

@@ -39,10 +39,22 @@ fun ElementPickerDialogFullscreen(
 	multiSelect: Boolean = false,
 	hideTypeSelection: Boolean = false,
 	onDismiss: (success: Boolean) -> Unit = {},
-	onSelect: (PeriodElement?) -> Unit
+	onSelect: (selectedItem: PeriodElement?) -> Unit = {},
+	onMultiSelect: (selectedItems: List<PeriodElement>) -> Unit = {}
 ) {
+	var selectedType by remember { mutableStateOf(initialType) }
 	var showSearch by remember { mutableStateOf(false) }
 	var search by remember { mutableStateOf("") }
+
+	val items = remember(selectedType) {
+		mutableStateMapOf<PeriodElement, Boolean>().apply {
+			timetableDatabaseInterface.getElements(selectedType)
+				.associateWith { false }
+				.also {
+					putAll(it)
+				}
+		}
+	}
 
 	/*userDatabase = UserDatabase.createInstance(this)
 	userDatabase.getUser(intent.getLongExtra(EXTRA_LONG_PROFILE_ID, -1))?.let { user = it }
@@ -116,7 +128,10 @@ fun ElementPickerDialogFullscreen(
 						}
 					}
 					if (multiSelect) {
-						IconButton(onClick = { onDismiss(true) }) {
+						IconButton(onClick = {
+							onMultiSelect(items.filter { it.value }.keys.toList())
+							onDismiss(true)
+						}) {
 							Icon(
 								imageVector = Icons.Filled.Check,
 								contentDescription = "TODO"
@@ -127,8 +142,6 @@ fun ElementPickerDialogFullscreen(
 			)
 		}
 	) { innerPadding ->
-		var selectedType by remember { mutableStateOf(initialType) }
-
 		Column(
 			modifier = Modifier
 				.padding(innerPadding)
@@ -141,14 +154,86 @@ fun ElementPickerDialogFullscreen(
 					.weight(1f)
 			) {
 				selectedType?.let {
-					ElementList(
-						timetableDatabaseInterface = timetableDatabaseInterface,
-						type = it,
-						search = search,
-						multiSelect = multiSelect,
-						onDismiss = onDismiss,
-						onSelect = onSelect
-					)
+					LazyVerticalGrid(
+						columns = GridCells.Adaptive(if (multiSelect) 128.dp else 96.dp),
+						modifier = Modifier.fillMaxHeight()
+					) {
+						items(
+							items = items.keys
+								.associateWith {
+									timetableDatabaseInterface.getShortName(
+										it.id,
+										selectedType
+									)
+								}
+								.toList()
+								.filter { it.second.contains(search, true) }
+								.sortedBy { it.second },
+							key = { it.hashCode() }
+						) { (item, displayName) ->
+							val interactionSource = remember { MutableInteractionSource() }
+
+							Row(
+								verticalAlignment = Alignment.CenterVertically
+							) {
+								if (multiSelect)
+									Checkbox(
+										checked = items[item] ?: false,
+										onCheckedChange = { items[item] = it },
+										interactionSource = interactionSource
+									)
+
+								Text(
+									text = displayName,
+									style = MaterialTheme.typography.bodyLarge,
+									modifier = Modifier
+										.clickable(
+											interactionSource = interactionSource,
+											indication = if (!multiSelect) LocalIndication.current else null,
+											role = Role.Checkbox
+										) {
+											onSelect(item)
+											if (multiSelect)
+												items[item] = items[item] == false
+											else
+												onDismiss(true)
+										}
+										.weight(1f)
+										.padding(
+											vertical = 16.dp,
+											horizontal = if (!multiSelect) 16.dp else 0.dp
+										)
+								)
+							}
+
+							/*ListItem(
+								headlineText = {
+									Text(displayName)
+								},
+								leadingContent = if (multiSelect) {
+									{
+										Checkbox(
+											checked = items[item] ?: false,
+											onCheckedChange = { items[item] = it },
+											interactionSource = interactionSource
+										)
+									}
+								} else null,
+								modifier = Modifier
+									.clickable(
+										interactionSource = interactionSource,
+										indication = null,
+										role = Role.Checkbox
+									) {
+										onSelect(item)
+										if (multiSelect)
+											items[item] = items[item] == false
+										else
+											onDismiss(true)
+									}
+							)*/
+						}
+					}
 				}
 			}
 
@@ -202,100 +287,6 @@ fun ElementPickerDialogFullscreen(
 						onClick = { selectedType = TimetableDatabaseInterface.Type.ROOM }
 					)
 				}
-		}
-	}
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun ElementList(
-	timetableDatabaseInterface: TimetableDatabaseInterface,
-	type: TimetableDatabaseInterface.Type,
-	search: String = "",
-	multiSelect: Boolean = false,
-	onDismiss: (success: Boolean) -> Unit = {},
-	onSelect: (PeriodElement?) -> Unit
-) {
-	val items = remember(type) {
-		mutableStateMapOf<PeriodElement, Boolean>().apply {
-			timetableDatabaseInterface.getElements(type)
-				.associateWith { false }
-				.also {
-					putAll(it)
-				}
-		}
-	}
-
-	LazyVerticalGrid(
-		columns = GridCells.Adaptive(if (multiSelect) 128.dp else 96.dp),
-		modifier = Modifier.fillMaxHeight()
-	) {
-		items(
-			items = items.keys
-				.associateWith { timetableDatabaseInterface.getShortName(it.id, type) }
-				.toList()
-				.filter { it.second.contains(search, true) }
-				.sortedBy { it.second },
-			key = { it.hashCode() }
-		) { (item, displayName) ->
-			val interactionSource = remember { MutableInteractionSource() }
-
-			Row(
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				if (multiSelect)
-					Checkbox(
-						checked = items[item] ?: false,
-						onCheckedChange = { items[item] = it },
-						interactionSource = interactionSource
-					)
-
-				Text(
-					text = displayName,
-					style = MaterialTheme.typography.bodyLarge,
-					modifier = Modifier
-						.clickable(
-							interactionSource = interactionSource,
-							indication = if (!multiSelect) LocalIndication.current else null,
-							role = Role.Checkbox
-						) {
-							onSelect(item)
-							if (multiSelect)
-								items[item] = items[item] == false
-							else
-								onDismiss(true)
-						}
-						.weight(1f)
-						.padding(vertical = 16.dp, horizontal = if (!multiSelect) 16.dp else 0.dp)
-				)
-			}
-
-			/*ListItem(
-				headlineText = {
-					Text(displayName)
-				},
-				leadingContent = if (multiSelect) {
-					{
-						Checkbox(
-							checked = items[item] ?: false,
-							onCheckedChange = { items[item] = it },
-							interactionSource = interactionSource
-						)
-					}
-				} else null,
-				modifier = Modifier
-					.clickable(
-						interactionSource = interactionSource,
-						indication = null,
-						role = Role.Checkbox
-					) {
-						onSelect(item)
-						if (multiSelect)
-							items[item] = items[item] == false
-						else
-							onDismiss(true)
-					}
-			)*/
 		}
 	}
 }
