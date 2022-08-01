@@ -75,7 +75,7 @@ class InfoCenterActivity : BaseComposeActivity() {
 								IconButton(onClick = { finish() }) {
 									Icon(
 										imageVector = Icons.Filled.ArrowBack,
-										contentDescription = "TODO"
+										contentDescription = stringResource(id = R.string.all_back)
 									)
 								}
 							}

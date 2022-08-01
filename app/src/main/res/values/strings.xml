@@ -23,6 +23,7 @@
 	<string name="all_add">Add</string>
 	<string name="all_delete">Delete</string>
 	<string name="all_reset">Reset</string>
+	<string name="all_back">Back</string>
 	<string name="all_absences">Absences</string>
 	<string name="all_lesson_details">Lesson details</string>
 	<string name="all_lesson_cancelled">%1$s (cancelled)</string>

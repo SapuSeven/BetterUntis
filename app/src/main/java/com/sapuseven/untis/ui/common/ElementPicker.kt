@@ -107,7 +107,7 @@ fun ElementPickerDialogFullscreen(
 						}) {
 							Icon(
 								imageVector = Icons.Filled.ArrowBack,
-								contentDescription = "TODO"
+								contentDescription = stringResource(id = R.string.all_back)
 							)
 						}
 					else

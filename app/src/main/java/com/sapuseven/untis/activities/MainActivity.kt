@@ -312,7 +312,7 @@ class MainActivity :
 									}) {
 										Icon(
 											imageVector = Icons.Filled.Menu,
-											contentDescription = "TODO"//stringResource(id = R.string.login_scan_code)
+											contentDescription = stringResource(id = R.string.all_back)
 										)
 									}
 								},
