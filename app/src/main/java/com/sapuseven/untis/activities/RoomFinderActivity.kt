@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.RoomfinderDatabase
 import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.models.RoomFinderItem
@@ -124,17 +125,20 @@ class RoomFinderActivity : BaseComposeActivity() {
 											timetableDatabaseInterface
 										)
 										roomList.add(item)
-										val states = try {
+										val (states, error) = try {
 											loadStates(
 												periodElement.id,
 												preferences.get<String>(
 													"preference_connectivity_proxy_host",
 													null
 												)
-											)
+											) to null
 										} catch (e: TimetableLoader.TimetableLoaderException) {
-											// TODO: Show error message
-											emptyList()
+											emptyList<Boolean>() to ErrorMessageDictionary.getErrorMessage(
+												resources,
+												e.untisErrorCode,
+												e.untisErrorMessage
+											)
 										}
 
 										roomFinderDatabase.addRoom(
@@ -148,9 +152,10 @@ class RoomFinderActivity : BaseComposeActivity() {
 										roomList.remove(item)
 										roomList.add(
 											RoomStatusData(
-												periodElement,
-												timetableDatabaseInterface,
-												states
+												periodElement = periodElement,
+												timetableDatabaseInterface = timetableDatabaseInterface,
+												states = states,
+												errorMessage = error
 											)
 										)
 									}
@@ -443,6 +448,7 @@ class RoomFinderActivity : BaseComposeActivity() {
 		val timetableDatabaseInterface: TimetableDatabaseInterface? = null,
 		val states: List<Boolean>? = null,
 		val name: String = timetableDatabaseInterface?.getShortName(periodElement) ?: "",
+		val errorMessage: String? = null,
 		var isLoading: Boolean = states == null,
 		var isError: Boolean = states?.isEmpty() ?: false
 	) {
@@ -482,7 +488,9 @@ class RoomFinderActivity : BaseComposeActivity() {
 						isOccupied -> stringResource(R.string.roomfinder_item_desc_occupied)
 						isFree -> pluralStringResource(R.plurals.roomfinder_item_desc, state, state)
 						item.isLoading -> stringResource(R.string.roomfinder_loading_data)
-						else -> stringResource(R.string.roomfinder_error)
+						else -> item.errorMessage?.let {
+							stringResource(R.string.roomfinder_error_details, it)
+						} ?: stringResource(R.string.roomfinder_error)
 					}
 				)
 			},

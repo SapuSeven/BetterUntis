@@ -88,8 +88,11 @@ class TimetableLoader(
 		val timestamp: Long
 	)
 
-	class TimetableLoaderException(requestId: Int, code: Int?, message: String?) : Throwable() {
-	}
+	class TimetableLoaderException(
+		val requestId: Int,
+		val untisErrorCode: Int?,
+		val untisErrorMessage: String?
+	) : Throwable()
 
 	@Throws(TimetableLoaderException::class)
 	suspend fun loadAsync(
