@@ -72,14 +72,14 @@ class ShortcutConfigureActivity : BaseComposeActivity() {
 
 	private fun setupShortcut(
 		timetableDatabaseInterface: TimetableDatabaseInterface,
-		user: Long,
+		userId: Long,
 		element: PeriodElement?
 	) {
 		val shortcutIntent = Intent(this, MainActivity::class.java)
 			.setAction("")
 			.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
 			.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-			.putExtra("user", user)
+			.putExtra("user", userId)
 			.putExtra("type", element?.type)
 			.putExtra("id", element?.id)
 			.putExtra("orgId", element?.orgId)
@@ -94,7 +94,6 @@ class ShortcutConfigureActivity : BaseComposeActivity() {
 					"${element?.type}-${element?.id}-${element?.orgId}"
 				)
 					.setIntent(shortcutIntent)
-					//.setActivity(MainActivity)
 					.setShortLabel(
 						if (element == null) resources.getString(R.string.all_personal)
 						else timetableDatabaseInterface.getShortName(
