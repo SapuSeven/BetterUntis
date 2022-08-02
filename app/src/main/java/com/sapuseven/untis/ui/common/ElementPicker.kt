@@ -9,10 +9,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.material3.TextFieldDefaults.TextFieldDecorationBox
 import androidx.compose.runtime.*
@@ -40,7 +37,8 @@ fun ElementPickerDialogFullscreen(
 	hideTypeSelection: Boolean = false,
 	onDismiss: (success: Boolean) -> Unit = {},
 	onSelect: (selectedItem: PeriodElement?) -> Unit = {},
-	onMultiSelect: (selectedItems: List<PeriodElement>) -> Unit = {}
+	onMultiSelect: (selectedItems: List<PeriodElement>) -> Unit = {},
+	additionalActions: (@Composable () -> Unit) = {}
 ) {
 	var selectedType by remember { mutableStateOf(initialType) }
 	var showSearch by remember { mutableStateOf(false) }
@@ -127,6 +125,9 @@ fun ElementPickerDialogFullscreen(
 							)
 						}
 					}
+
+					additionalActions()
+
 					if (multiSelect) {
 						IconButton(onClick = {
 							onMultiSelect(items.filter { it.value }.keys.toList())
@@ -233,6 +234,21 @@ fun ElementPickerDialogFullscreen(
 									}
 							)*/
 						}
+					}
+				}
+
+				if (selectedType == null) {
+					Column(
+						horizontalAlignment = Alignment.CenterHorizontally
+					) {
+						Icon(
+							imageVector = Icons.Outlined.Info,
+							contentDescription = null,
+							modifier = Modifier
+								.size(96.dp)
+								.padding(bottom = 24.dp)
+						)
+						Text("Select a Timetable")
 					}
 				}
 			}

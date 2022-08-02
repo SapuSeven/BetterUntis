@@ -3,14 +3,9 @@ package com.sapuseven.untis.activities
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -27,7 +22,6 @@ import com.sapuseven.untis.ui.common.ProfileSelectorAction
 import com.sapuseven.untis.ui.theme.AppTheme
 
 class ShortcutConfigureActivity : BaseComposeActivity() {
-	@OptIn(ExperimentalMaterial3Api::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setResult(RESULT_CANCELED)
@@ -37,18 +31,12 @@ class ShortcutConfigureActivity : BaseComposeActivity() {
 
 		setContent {
 			AppTheme {
-				var showElementPicker by rememberSaveable { mutableStateOf(false) }
 				var selectedUserId by rememberSaveable {
-					mutableStateOf<Long>(
-						users.firstOrNull()?.id ?: -1
-					)
+					mutableStateOf(users.firstOrNull()?.id ?: -1)
 				}
-				var selectedElement by remember { mutableStateOf<PeriodElement?>(null) }
 
 				var timetableDatabaseInterface by remember {
-					mutableStateOf<TimetableDatabaseInterface?>(
-						null
-					)
+					mutableStateOf(TimetableDatabaseInterface(userDatabase, selectedUserId))
 				}
 
 				LaunchedEffect(selectedUserId) {
@@ -56,63 +44,27 @@ class ShortcutConfigureActivity : BaseComposeActivity() {
 						TimetableDatabaseInterface(userDatabase, selectedUserId)
 				}
 
-				Scaffold(
-					topBar = {
-						CenterAlignedTopAppBar(
-							title = { Text(stringResource(id = R.string.widget_timetable_link)) },
-							navigationIcon = {
-								IconButton(onClick = {
-									finish()
-								}) {
-									Icon(
-										imageVector = Icons.Outlined.ArrowBack,
-										contentDescription = stringResource(id = R.string.all_back)
-									)
-								}
-							},
-							actions = {
-								ProfileSelectorAction(
-									userDatabase = userDatabase,
-									currentSelectionId = selectedUserId,
-									hideIfSingleProfile = true
-								) {
-									selectedUserId = it.id ?: -1
-								}
+				Surface(
+					modifier = Modifier.fillMaxSize()
+				) {
+					ElementPickerDialogFullscreen(
+						title = { Text(stringResource(id = R.string.widget_timetable_link)) },
+						timetableDatabaseInterface = timetableDatabaseInterface,
+						onDismiss = { finish() },
+						onSelect = { element ->
+							setupShortcut(timetableDatabaseInterface, selectedUserId, element)
+							finish()
+						},
+						additionalActions = {
+							ProfileSelectorAction(
+								userDatabase = userDatabase,
+								currentSelectionId = selectedUserId,
+								hideIfSingleProfile = true
+							) {
+								selectedUserId = it.id ?: -1
 							}
-						)
-					},
-				) { innerPadding ->
-					Box(
-						modifier = Modifier
-							.padding(innerPadding)
-							.fillMaxSize()
-					) {
-						Column {
-							ListItem(
-								headlineText = { Text("Select Timetable") },
-								supportingText = selectedElement?.let { item ->
-									timetableDatabaseInterface?.getLongName(
-										item
-									)?.let { { Text(it) } }
-								},
-								modifier = Modifier.clickable { showElementPicker = true }
-							)
 						}
-
-						timetableDatabaseInterface?.let {
-							if (showElementPicker)
-								ElementPickerDialogFullscreen(
-									title = { Text(stringResource(id = R.string.widget_configuration)) },
-									timetableDatabaseInterface = it,
-									onDismiss = { finish() },
-									onSelect = { item ->
-										showElementPicker = false
-										selectedElement = item
-										finish()
-									}
-								)
-						}
-					}
+					)
 				}
 			}
 		}
@@ -148,7 +100,7 @@ class ShortcutConfigureActivity : BaseComposeActivity() {
 						else timetableDatabaseInterface.getShortName(
 							element.id,
 							TimetableDatabaseInterface.Type.valueOf(element.type)
-						) ?: "Timetable"
+						).ifBlank { resources.getString(R.string.widget_timetable) }
 					)
 					.setIcon(IconCompat.createWithResource(this, R.mipmap.ic_shortcut))
 					.build()
