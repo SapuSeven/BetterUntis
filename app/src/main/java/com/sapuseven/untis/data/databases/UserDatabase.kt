@@ -8,6 +8,8 @@ import android.database.Cursor.FIELD_TYPE_STRING
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.UserDatabaseQueryHelper.generateCreateTable
@@ -455,6 +457,15 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 			return when {
 				profileName.isNotBlank() -> profileName
 				anonymous -> context.getString(R.string.all_anonymous)
+				else -> userData.displayName
+			}
+		}
+
+		@Composable
+		fun getDisplayedName(): String {
+			return when {
+				profileName.isNotBlank() -> profileName
+				anonymous -> stringResource(R.string.all_anonymous)
 				else -> userData.displayName
 			}
 		}

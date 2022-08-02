@@ -13,7 +13,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -38,6 +37,7 @@ import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.RangePreference
 import com.sapuseven.untis.ui.common.ElementPickerDialogFullscreen
+import com.sapuseven.untis.ui.common.ProfileSelectorAction
 import com.sapuseven.untis.ui.models.NavItemShortcut
 import com.sapuseven.untis.ui.models.NavItemTimetable
 import com.sapuseven.untis.ui.theme.AppTheme
@@ -304,24 +304,23 @@ class MainActivity :
 					Scaffold(
 						topBar = {
 							CenterAlignedTopAppBar(
-								title = { Text("BetterUntis") },
+								title = { Text(stringResource(id = R.string.app_name)) },
 								navigationIcon = {
 									IconButton(onClick = {
 										coroutineScope.launch { drawerState.open() }
 									}) {
 										Icon(
 											imageVector = Icons.Outlined.Menu,
-											contentDescription = stringResource(id = R.string.all_back)
+											contentDescription = stringResource(id = R.string.main_drawer_open)
 										)
 									}
 								},
 								actions = {
-									IconButton(onClick = { /*TODO*/ }) {
-										Icon(
-											imageVector = Icons.Outlined.AccountCircle,
-											contentDescription = "TODO"//stringResource(id = R.string.login_scan_code)
-										)
-									}
+									ProfileSelectorAction(
+										userDatabase = userDatabase,
+										currentSelectionId = profileId,
+										showProfileActions = true
+									) {}
 								}
 							)
 						},
