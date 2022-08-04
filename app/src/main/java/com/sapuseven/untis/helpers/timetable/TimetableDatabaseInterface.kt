@@ -75,6 +75,14 @@ class TimetableDatabaseInterface(@Transient val database: UserDatabase, id: Long
 		} ?: false
 	}
 
+	fun isAllowed(id: Int, type: String): Boolean {
+		return isAllowed(id, Type.valueOf(type))
+	}
+
+	fun isAllowed(periodElement: PeriodElement): Boolean {
+		return isAllowed(periodElement.id, periodElement.type)
+	}
+
 	private fun tableModelToPeriodElement(values: Collection<TableModel>): List<PeriodElement> {
 		return values.map { item: TableModel ->
 			when (item) {

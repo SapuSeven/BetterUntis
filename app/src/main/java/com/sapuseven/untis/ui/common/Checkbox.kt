@@ -10,7 +10,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,7 +45,7 @@ fun LabeledCheckbox(
 			colors = colors
 		)
 
-		Box(modifier = if (enabled) Modifier else Modifier.alpha(0.38f)) {
+		Box(modifier = Modifier.disabled(!enabled)) {
 			label()
 		}
 	}

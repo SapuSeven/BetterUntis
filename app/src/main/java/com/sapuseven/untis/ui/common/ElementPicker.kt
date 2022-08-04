@@ -161,17 +161,17 @@ fun ElementPickerDialogFullscreen(
 					) {
 						items(
 							items = items.keys
-								.associateWith {
-									timetableDatabaseInterface.getShortName(
-										it.id,
-										selectedType
-									)
+								.map {
+									object {
+										val element = it
+										val name = timetableDatabaseInterface.getShortName(it)
+										val enabled = timetableDatabaseInterface.isAllowed(it)
+									}
 								}
-								.toList()
-								.filter { it.second.contains(search, true) }
-								.sortedBy { it.second },
+								.filter { it.name.contains(search, true) }
+								.sortedWith(compareBy({ !it.enabled }, { it.name })),
 							key = { it.hashCode() }
-						) { (item, displayName) ->
+						) { item ->
 							val interactionSource = remember { MutableInteractionSource() }
 
 							Row(
@@ -179,23 +179,25 @@ fun ElementPickerDialogFullscreen(
 							) {
 								if (multiSelect)
 									Checkbox(
-										checked = items[item] ?: false,
-										onCheckedChange = { items[item] = it },
-										interactionSource = interactionSource
+										checked = items[item.element] ?: false,
+										onCheckedChange = { items[item.element] = it },
+										interactionSource = interactionSource,
+										enabled = item.enabled
 									)
 
 								Text(
-									text = displayName,
+									text = item.name,
 									style = MaterialTheme.typography.bodyLarge,
 									modifier = Modifier
 										.clickable(
 											interactionSource = interactionSource,
 											indication = if (!multiSelect) LocalIndication.current else null,
-											role = Role.Checkbox
+											role = Role.Checkbox,
+											enabled = item.enabled
 										) {
-											onSelect(item)
+											onSelect(item.element)
 											if (multiSelect)
-												items[item] = items[item] == false
+												items[item.element] = items[item.element] == false
 											else
 												onDismiss(true)
 										}
@@ -204,6 +206,7 @@ fun ElementPickerDialogFullscreen(
 											vertical = 16.dp,
 											horizontal = if (!multiSelect) 16.dp else 0.dp
 										)
+										.disabled(!item.enabled)
 								)
 							}
 
