@@ -3,6 +3,7 @@ package com.sapuseven.untis.ui.common
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -39,6 +40,14 @@ fun ProfileSelectorAction(
 		users.forEach {
 			DropdownMenuItem(
 				text = { Text(it.getDisplayedName()) },
+				leadingIcon = {
+					if (currentSelectionId == it.id) {
+						Icon(
+							Icons.Outlined.Check,
+							contentDescription = null
+						)
+					}
+				},
 				onClick = {
 					expanded = false
 					onSelectionChange(it)
