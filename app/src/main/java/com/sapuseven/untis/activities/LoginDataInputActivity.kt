@@ -479,7 +479,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 										)
 									},
 									confirmButton = {
-										Button(
+										TextButton(
 											onClick = {
 												user.id?.let {
 													userDatabase.deleteUser(it)
@@ -494,7 +494,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 										}
 									},
 									dismissButton = {
-										Button(
+										TextButton(
 											onClick = {
 												deleteDialog = null
 											}) {

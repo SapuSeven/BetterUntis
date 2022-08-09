@@ -345,7 +345,7 @@ class RoomFinderActivity : BaseComposeActivity() {
 								Text(stringResource(id = R.string.roomfinder_dialog_itemdelete_text))
 							},
 							confirmButton = {
-								Button(
+								TextButton(
 									onClick = {
 										deleteItem = DELETE_ITEM_NONE
 
@@ -356,7 +356,7 @@ class RoomFinderActivity : BaseComposeActivity() {
 								}
 							},
 							dismissButton = {
-								Button(
+								TextButton(
 									onClick = {
 										deleteItem = DELETE_ITEM_NONE
 									}) {
