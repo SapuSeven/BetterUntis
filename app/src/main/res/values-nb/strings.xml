@@ -111,7 +111,7 @@
     <string name="elementpicker_hint_search_teachers">Søk etter lærere…</string>
     <string name="elementpicker_hint_search_rooms">Søk etter rom…</string>
     <string name="preferences_connectivity">Tilkobling</string>
-    <string name="preferences_infos">Om</string>
+    <string name="preferences_info">Om</string>
     <string name="preferences_notifications">Varsler</string>
     <string name="preferences_styling">Tilpasning</string>
     <string name="preferences_timetable">Timeplan</string>

@@ -509,6 +509,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 		}
 	}
 
+	@OptIn(ExperimentalMaterial3Api::class)
 	@Composable
 	private fun InputField(
 		state: MutableState<String?>,

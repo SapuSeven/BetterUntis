@@ -59,7 +59,7 @@
     <string name="preferences_timetable">Raspored sati</string>
     <string name="preferences_styling">Prilagođavanje</string>
     <string name="preferences_notifications">Obavještavanja</string>
-    <string name="preferences_infos">Informacije</string>
+    <string name="preferences_info">Informacije</string>
     <string name="preferences_general">Opće</string>
     <string name="preferences_connectivity">Povezanost</string>
     <string name="preference_week_snap_to_days_summary">umjesto po tjednima</string>

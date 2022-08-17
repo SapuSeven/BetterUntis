@@ -145,7 +145,7 @@
     <string name="preferences_timetable">Emploi du temps</string>
     <string name="preferences_styling">Personnalisation</string>
     <string name="preferences_notifications">Notifications</string>
-    <string name="preferences_infos">À propos</string>
+    <string name="preferences_info">À propos</string>
     <string name="preferences_connectivity">Connectivité</string>
     <string name="elementpicker_hint_search_rooms">Rechercher des salles…</string>
     <string name="elementpicker_hint_search_teachers">Rechercher des enseignants…</string>

@@ -115,7 +115,7 @@
     <string name="elementpicker_hint_search_teachers">搜索教师…</string>
     <string name="elementpicker_hint_search_rooms">搜索教室…</string>
     <string name="preferences_connectivity">连接</string>
-    <string name="preferences_infos">关于</string>
+    <string name="preferences_info">关于</string>
     <string name="preferences_notifications">提示</string>
     <string name="preferences_styling">自定义</string>
     <string name="preferences_timetable">课程表</string>

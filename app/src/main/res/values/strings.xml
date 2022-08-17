@@ -263,7 +263,7 @@
 	<string name="preference_week_snap_to_days_summary">instead of weeks</string>
 	<string name="preferences_connectivity">Connectivity</string>
 	<string name="preferences_general">General</string>
-	<string name="preferences_infos">About</string>
+	<string name="preferences_info">About</string>
 	<string name="preferences_notifications">Notifications</string>
 	<string name="preferences_styling">Customization</string>
 	<string name="preferences_timetable">Timetable</string>

@@ -11,7 +11,6 @@ import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
-import com.sapuseven.untis.preferences.ElementPickerPreference
 import org.joda.time.LocalDate
 import java.lang.ref.WeakReference
 
@@ -77,7 +76,7 @@ abstract class LessonEventSetup : BroadcastReceiver() {
 	private fun createPersonalTimetable(): Pair<String, Int>? {
 		@Suppress("RemoveRedundantQualifierName")
 		val customType = TimetableDatabaseInterface.Type.valueOf(
-				preferences["preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_TYPE}", TimetableDatabaseInterface.Type.SUBJECT.toString()]
+			TimetableDatabaseInterface.Type.SUBJECT.toString()//preferences["preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_TYPE}", TimetableDatabaseInterface.Type.SUBJECT.toString()]
 		)
 
 		if (customType === TimetableDatabaseInterface.Type.SUBJECT) {
@@ -87,7 +86,7 @@ abstract class LessonEventSetup : BroadcastReceiver() {
 				return null
 			}
 		} else {
-			val customId = preferences["preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_ID}", -1]
+			val customId = -1//preferences["preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_ID}", -1]
 			return customType.toString() to customId
 		}
 	}

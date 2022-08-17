@@ -25,7 +25,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import ca.antonious.materialdaypicker.MaterialDayPicker
 import com.sapuseven.untis.R
 import com.sapuseven.untis.adapters.ProfileListAdapter
 import com.sapuseven.untis.data.databases.UserDatabase
@@ -35,9 +34,9 @@ import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import com.sapuseven.untis.preferences.RangePreference
 import com.sapuseven.untis.ui.common.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
+import com.sapuseven.untis.ui.common.Weekday
 import com.sapuseven.untis.ui.models.NavItemShortcut
 import com.sapuseven.untis.ui.models.NavItemTimetable
 import com.sapuseven.untis.ui.theme.AppTheme
@@ -114,7 +113,7 @@ class MainActivity :
 			// TODO: Look at it.data for potential actions (e.g. show a specific timetable)
 		}
 
-	@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+	@OptIn(ExperimentalMaterial3Api::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
@@ -1550,7 +1549,7 @@ class MainActivity :
 		firstDayOfWeek = preferences.sharedPrefs!!.getStringSet(
 			"preference_week_custom_range",
 			emptySet()
-		)?.map { MaterialDayPicker.Weekday.valueOf(it) }
+		)?.map { Weekday.valueOf(it) }
 			?.minOrNull()?.ordinal ?: DateTimeFormat.forPattern("E")
 			.withLocale(Locale.ENGLISH) // TODO: Correct locale?
 			.parseDateTime(profileUser.timeGrid.days[0].day).dayOfWeek
@@ -1594,12 +1593,12 @@ class MainActivity :
 	private fun <T> WeekView<T>.setupHours() {
 		val lines = MutableList(0) { return@MutableList 0 }
 		val labels = MutableList(0) { return@MutableList "" }
-		val range = RangePreference.convertToPair(
+		val range: Pair<Int, Int>? = null/*RangePreference.convertToPair(
 			preferences.get<String>(
 				"preference_timetable_range",
 				null
 			)
-		)
+		)*/
 
 		profileUser.timeGrid.days.maxByOrNull { it.units.size }?.units?.forEachIndexed { index, hour ->
 			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed

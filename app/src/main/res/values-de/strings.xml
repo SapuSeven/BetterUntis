@@ -121,7 +121,7 @@
     <string name="elementpicker_hint_search_teachers">Lehrer durchsuchen…</string>
     <string name="elementpicker_hint_search_rooms">Räume durchsuchen…</string>
     <string name="preferences_connectivity">Verbindungseinstellungen</string>
-    <string name="preferences_infos">Informationen</string>
+    <string name="preferences_info">Informationen</string>
     <string name="preferences_notifications">Benachrichtigungen</string>
     <string name="preferences_styling">Anpassung</string>
     <string name="preferences_timetable">Stundenplan</string>

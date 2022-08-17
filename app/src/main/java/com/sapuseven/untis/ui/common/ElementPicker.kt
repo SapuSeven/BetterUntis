@@ -13,6 +13,7 @@ import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.material3.TextFieldDefaults.TextFieldDecorationBox
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -23,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
@@ -54,10 +56,6 @@ fun ElementPickerDialogFullscreen(
 		}
 	}
 
-	/*userDatabase = UserDatabase.createInstance(this)
-	userDatabase.getUser(intent.getLongExtra(EXTRA_LONG_PROFILE_ID, -1))?.let { user = it }
-	val timetableDatabase = rememberTimetableDatabase(userDatabase, user.id!!)*/
-
 	Scaffold(
 		topBar = {
 			CenterAlignedTopAppBar(
@@ -67,7 +65,6 @@ fun ElementPickerDialogFullscreen(
 					else {
 						val focusRequester = remember { FocusRequester() }
 
-						// TODO: Text color is wrong
 						BasicTextField(
 							value = search,
 							onValueChange = { search = it },
@@ -148,164 +145,244 @@ fun ElementPickerDialogFullscreen(
 				.padding(innerPadding)
 				.fillMaxSize()
 		) {
-			Box(
-				contentAlignment = Alignment.Center,
+			ElementPickerElements(
+				timetableDatabaseInterface = timetableDatabaseInterface,
+				selectedType = selectedType,
+				multiSelect = multiSelect,
+				onDismiss = onDismiss,
+				onSelect = onSelect,
+				items = items,
+				filter = search,
 				modifier = Modifier
 					.fillMaxWidth()
 					.weight(1f)
-			) {
-				selectedType?.let {
-					LazyVerticalGrid(
-						columns = GridCells.Adaptive(if (multiSelect) 128.dp else 96.dp),
-						modifier = Modifier.fillMaxHeight()
-					) {
-						items(
-							items = items.keys
-								.map {
-									object {
-										val element = it
-										val name = timetableDatabaseInterface.getShortName(it)
-										val enabled = timetableDatabaseInterface.isAllowed(it)
-									}
-								}
-								.filter { it.name.contains(search, true) }
-								.sortedWith(compareBy({ !it.enabled }, { it.name })),
-							key = { it.hashCode() }
-						) { item ->
-							val interactionSource = remember { MutableInteractionSource() }
+			)
 
-							Row(
-								verticalAlignment = Alignment.CenterVertically
-							) {
-								if (multiSelect)
-									Checkbox(
-										checked = items[item.element] ?: false,
-										onCheckedChange = { items[item.element] = it },
-										interactionSource = interactionSource,
-										enabled = item.enabled
-									)
+			if (!hideTypeSelection)
+				ElementPickerTypeSelection(
+					selectedType = selectedType,
+					onTypeChange = { selectedType = it },
+					onDismiss = onDismiss,
+					onSelect = onSelect
+				)
+		}
+	}
+}
 
-								Text(
-									text = item.name,
-									style = MaterialTheme.typography.bodyLarge,
-									modifier = Modifier
-										.clickable(
-											interactionSource = interactionSource,
-											indication = if (!multiSelect) LocalIndication.current else null,
-											role = Role.Checkbox,
-											enabled = item.enabled
-										) {
-											onSelect(item.element)
-											if (multiSelect)
-												items[item.element] = items[item.element] == false
-											else
-												onDismiss(true)
-										}
-										.weight(1f)
-										.padding(
-											vertical = 16.dp,
-											horizontal = if (!multiSelect) 16.dp else 0.dp
-										)
-										.disabled(!item.enabled)
-								)
-							}
+/**
+ * A minimal dialog version of the element picker.
+ * Missing features currently are: search, toolbar actions, multi select (due to missing confirm button), close button.
+ */
+@Composable
+fun ElementPickerDialog(
+	title: (@Composable () -> Unit)?,
+	timetableDatabaseInterface: TimetableDatabaseInterface,
+	initialType: TimetableDatabaseInterface.Type? = null,
+	hideTypeSelection: Boolean = false,
+	onDismiss: (success: Boolean) -> Unit = {},
+	onSelect: (selectedItem: PeriodElement?) -> Unit = {}
+) {
+	var selectedType by remember { mutableStateOf(initialType) }
 
-							/*ListItem(
-								headlineText = {
-									Text(displayName)
-								},
-								leadingContent = if (multiSelect) {
-									{
-										Checkbox(
-											checked = items[item] ?: false,
-											onCheckedChange = { items[item] = it },
-											interactionSource = interactionSource
-										)
-									}
-								} else null,
-								modifier = Modifier
-									.clickable(
-										interactionSource = interactionSource,
-										indication = null,
-										role = Role.Checkbox
-									) {
-										onSelect(item)
-										if (multiSelect)
-											items[item] = items[item] == false
-										else
-											onDismiss(true)
-									}
-							)*/
+	val items = remember(selectedType) {
+		mutableStateMapOf<PeriodElement, Boolean>().apply {
+			timetableDatabaseInterface.getElements(selectedType)
+				.associateWith { false }
+				.also {
+					putAll(it)
+				}
+		}
+	}
+
+	Dialog(onDismissRequest = { onDismiss(false) }) {
+		Surface(
+			modifier = Modifier.padding(vertical = 24.dp),
+			shape = AlertDialogDefaults.shape,
+			color = AlertDialogDefaults.containerColor,
+			tonalElevation = AlertDialogDefaults.TonalElevation
+		) {
+			Column {
+				title?.let {
+					ProvideTextStyle(value = MaterialTheme.typography.headlineSmall) {
+						Box(
+							Modifier
+								.padding(top = 24.dp, bottom = 16.dp)
+								.padding(horizontal = 24.dp)
+						) {
+							title()
 						}
 					}
 				}
 
-				if (selectedType == null) {
-					Column(
-						horizontalAlignment = Alignment.CenterHorizontally
+				ElementPickerElements(
+					timetableDatabaseInterface = timetableDatabaseInterface,
+					selectedType = selectedType,
+					onDismiss = onDismiss,
+					onSelect = onSelect,
+					items = items,
+					modifier = Modifier
+						.fillMaxWidth()
+						.weight(1f)
+						.padding(horizontal = 24.dp)
+				)
+
+				if (!hideTypeSelection)
+					ElementPickerTypeSelection(
+						selectedType = selectedType,
+						onTypeChange = { selectedType = it },
+						onDismiss = onDismiss,
+						onSelect = onSelect
+					)
+			}
+		}
+	}
+}
+
+@Composable
+fun ElementPickerElements(
+	timetableDatabaseInterface: TimetableDatabaseInterface,
+	selectedType: TimetableDatabaseInterface.Type?,
+	multiSelect: Boolean = false,
+	modifier: Modifier,
+	onDismiss: (success: Boolean) -> Unit = {},
+	onSelect: (selectedItem: PeriodElement?) -> Unit = {},
+	items: SnapshotStateMap<PeriodElement, Boolean>,
+	filter: String = ""
+) {
+	Box(
+		contentAlignment = Alignment.Center,
+		modifier = modifier
+	) {
+		selectedType?.let {
+			LazyVerticalGrid(
+				columns = GridCells.Adaptive(if (multiSelect) 104.dp else 72.dp),
+				modifier = Modifier.fillMaxHeight()
+			) {
+				items(
+					items = items.keys
+						.map {
+							object {
+								val element = it
+								val name = timetableDatabaseInterface.getShortName(it)
+								val enabled = timetableDatabaseInterface.isAllowed(it)
+							}
+						}
+						.filter { it.name.contains(filter, true) }
+						.sortedWith(compareBy({ !it.enabled }, { it.name })),
+					key = { it.hashCode() }
+				) { item ->
+					val interactionSource = remember { MutableInteractionSource() }
+
+					Row(
+						verticalAlignment = Alignment.CenterVertically
 					) {
-						Icon(
-							imageVector = Icons.Outlined.Info,
-							contentDescription = null,
+						if (multiSelect)
+							Checkbox(
+								checked = items[item.element] ?: false,
+								onCheckedChange = { items[item.element] = it },
+								interactionSource = interactionSource,
+								enabled = item.enabled
+							)
+
+						Text(
+							text = item.name,
+							style = MaterialTheme.typography.bodyLarge,
 							modifier = Modifier
-								.size(96.dp)
-								.padding(bottom = 24.dp)
+								.clickable(
+									interactionSource = interactionSource,
+									indication = if (!multiSelect) LocalIndication.current else null,
+									role = Role.Checkbox,
+									enabled = item.enabled
+								) {
+									onSelect(item.element)
+									if (multiSelect)
+										items[item.element] = items[item.element] == false
+									else
+										onDismiss(true)
+								}
+								.weight(1f)
+								.padding(
+									vertical = 16.dp,
+									horizontal = if (!multiSelect) 16.dp else 0.dp
+								)
+								.disabled(!item.enabled)
 						)
-						Text("Select a Timetable")
 					}
 				}
 			}
-
-			if (!hideTypeSelection)
-				NavigationBar {
-					NavigationBarItem(
-						icon = {
-							Icon(
-								painterResource(id = R.drawable.all_prefs_personal),
-								contentDescription = null
-							)
-						},
-						label = { Text(stringResource(id = R.string.all_personal)) },
-						selected = false,
-						onClick = {
-							onSelect(null)
-							onDismiss(true)
-						}
-					)
-					NavigationBarItem(
-						icon = {
-							Icon(
-								painterResource(id = R.drawable.all_classes),
-								contentDescription = null
-							)
-						},
-						label = { Text(stringResource(id = R.string.all_classes)) },
-						selected = selectedType == TimetableDatabaseInterface.Type.CLASS,
-						onClick = { selectedType = TimetableDatabaseInterface.Type.CLASS }
-					)
-					NavigationBarItem(
-						icon = {
-							Icon(
-								painterResource(id = R.drawable.all_teachers),
-								contentDescription = null
-							)
-						},
-						label = { Text(stringResource(id = R.string.all_teachers)) },
-						selected = selectedType == TimetableDatabaseInterface.Type.TEACHER,
-						onClick = { selectedType = TimetableDatabaseInterface.Type.TEACHER }
-					)
-					NavigationBarItem(
-						icon = {
-							Icon(
-								painterResource(id = R.drawable.all_rooms),
-								contentDescription = null
-							)
-						},
-						label = { Text(stringResource(id = R.string.all_rooms)) },
-						selected = selectedType == TimetableDatabaseInterface.Type.ROOM,
-						onClick = { selectedType = TimetableDatabaseInterface.Type.ROOM }
-					)
-				}
 		}
+
+		if (selectedType == null) {
+			Column(
+				horizontalAlignment = Alignment.CenterHorizontally
+			) {
+				Icon(
+					imageVector = Icons.Outlined.Info,
+					contentDescription = null,
+					modifier = Modifier
+						.size(96.dp)
+						.padding(bottom = 24.dp)
+				)
+				Text("Select a Timetable")
+			}
+		}
+	}
+}
+
+@Composable
+fun ElementPickerTypeSelection(
+	selectedType: TimetableDatabaseInterface.Type?,
+	onTypeChange: (TimetableDatabaseInterface.Type?) -> Unit,
+	onDismiss: (success: Boolean) -> Unit = {},
+	onSelect: (selectedItem: PeriodElement?) -> Unit = {}
+) {
+	NavigationBar {
+		NavigationBarItem(
+			icon = {
+				Icon(
+					painterResource(id = R.drawable.all_prefs_personal),
+					contentDescription = null
+				)
+			},
+			label = { Text(stringResource(id = R.string.all_personal)) },
+			selected = false,
+			onClick = {
+				onSelect(null)
+				onDismiss(true)
+			}
+		)
+		NavigationBarItem(
+			icon = {
+				Icon(
+					painterResource(id = R.drawable.all_classes),
+					contentDescription = null
+				)
+			},
+			label = { Text(stringResource(id = R.string.all_classes)) },
+			selected = selectedType == TimetableDatabaseInterface.Type.CLASS,
+			onClick = { onTypeChange(TimetableDatabaseInterface.Type.CLASS) }
+		)
+		NavigationBarItem(
+			icon = {
+				Icon(
+					painterResource(id = R.drawable.all_teachers),
+					contentDescription = null
+				)
+			},
+			label = { Text(stringResource(id = R.string.all_teachers)) },
+			selected = selectedType == TimetableDatabaseInterface.Type.TEACHER,
+			onClick = { onTypeChange(TimetableDatabaseInterface.Type.TEACHER) }
+		)
+		NavigationBarItem(
+			icon = {
+				Icon(
+					painterResource(id = R.drawable.all_rooms),
+					contentDescription = null
+				)
+			},
+			label = { Text(stringResource(id = R.string.all_rooms)) },
+			selected = selectedType == TimetableDatabaseInterface.Type.ROOM,
+			onClick = { onTypeChange(TimetableDatabaseInterface.Type.ROOM) }
+		)
 	}
 }
