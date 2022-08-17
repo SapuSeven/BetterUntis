@@ -252,7 +252,7 @@ class RoomFinderActivity : BaseComposeActivity() {
 											)
 										) {
 											Icon(
-												imageVector = Icons.Outlined.Add, // TODO: Replace all Filled with Default
+												imageVector = Icons.Outlined.Add,
 												modifier = Modifier.fillMaxSize(),
 												contentDescription = "+"
 											)
@@ -400,7 +400,7 @@ class RoomFinderActivity : BaseComposeActivity() {
 		for (i in 0..10)
 			states.add(Random.nextBoolean())*/
 
-		val result = TimetableLoader(
+		val resultChannel = TimetableLoader(
 			context = WeakReference(this@RoomFinderActivity),
 			user = user,
 			timetableDatabaseInterface = timetableDatabaseInterface
@@ -424,14 +424,18 @@ class RoomFinderActivity : BaseComposeActivity() {
 				val unitEndDateTime = unit.endTime.toLocalTime()
 
 				var occupied = false
-				result.items.forEach allItems@{ item ->
-					if (item.startDateTime.dayOfWeek == dayDateTime.dayOfWeek)
-						if (item.startDateTime.millisOfDay <= unitEndDateTime.millisOfDay
-							&& item.endDateTime.millisOfDay >= unitStartDateTime.millisOfDay
-						) {
-							occupied = true
-							return@allItems
+				resultChannel.collect { result ->
+					result.onSuccess {
+						it.items.forEach allItems@{ item ->
+							if (item.startDateTime.dayOfWeek == dayDateTime.dayOfWeek)
+								if (item.startDateTime.millisOfDay <= unitEndDateTime.millisOfDay
+									&& item.endDateTime.millisOfDay >= unitStartDateTime.millisOfDay
+								) {
+									occupied = true
+									return@allItems
+								}
 						}
+					}
 				}
 
 				loadedStates.add(occupied)
@@ -480,6 +484,7 @@ class RoomFinderActivity : BaseComposeActivity() {
 		val isFree = !item.isError && state >= ROOM_STATE_FREE
 		val isOccupied = !item.isError && state == ROOM_STATE_OCCUPIED
 
+		// TODO: Show "Free for the rest of the day/week" (if applicable)
 		ListItem(
 			headlineText = { Text(item.name) },
 			supportingText = {

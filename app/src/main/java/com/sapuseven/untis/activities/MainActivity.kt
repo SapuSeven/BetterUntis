@@ -16,7 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
@@ -25,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.graphics.ColorUtils
 import com.sapuseven.untis.R
 import com.sapuseven.untis.adapters.ProfileListAdapter
 import com.sapuseven.untis.data.databases.UserDatabase
@@ -33,6 +34,7 @@ import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
+import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.ui.common.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
@@ -43,9 +45,17 @@ import com.sapuseven.untis.ui.theme.AppTheme
 import com.sapuseven.untis.viewmodels.PeriodDataViewModel
 import com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
 import com.sapuseven.untis.views.weekview.WeekView
+import com.sapuseven.untis.views.weekview.WeekViewDisplayable
+import com.sapuseven.untis.views.weekview.WeekViewEvent
+import com.sapuseven.untis.views.weekview.listeners.ScaleListener
+import com.sapuseven.untis.views.weekview.listeners.ScrollListener
+import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
+import org.joda.time.DateTimeConstants
+import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
+import java.lang.ref.WeakReference
 import java.util.*
 
 class MainActivity :
@@ -84,13 +94,10 @@ class MainActivity :
 	private var lastBackPress: Long = 0
 	private var profileId: Long = -1
 
-	//private val weeklyTimetableItems: MutableMap<Int, WeeklyTimetableItems?> = mutableMapOf()
-	private var displayedElement: PeriodElement? = null
 	private var selectedElement: Int? = null
 	private var lastPickedDate: DateTime? = null
 	private var proxyHost: String? = null
 	private var profileUpdateDialog: AlertDialog? = null
-	private var currentWeekIndex = 0
 	private val weekViewRefreshHandler = Handler(Looper.getMainLooper())
 	private var displayNameCache: CharSequence = ""
 	private var timetableLoader: TimetableLoader? = null
@@ -122,6 +129,12 @@ class MainActivity :
 
 		//setupNotifications()
 
+		timetableLoader = TimetableLoader(
+			context = WeakReference(this),
+			user = profileUser,
+			timetableDatabaseInterface = timetableDatabaseInterface
+		)
+
 		setContent {
 			AppTheme {
 				/*weekView.setOnEventClickListener(this)
@@ -150,8 +163,12 @@ class MainActivity :
 					)
 				}
 
-				var displayedElement by remember { mutableStateOf<PeriodElement?>(null) }
+				var displayedElement by remember { mutableStateOf<PeriodElement?>(null) } // TODO: Make saveable
 				val isPersonalTimetable = false
+				var currentWeekIndex by rememberSaveable { mutableStateOf(0) }
+				var lastRefreshTimestamp by remember { mutableStateOf(0L) }
+				val weeklyTimetableItems =
+					remember { mutableStateMapOf<Int, WeeklyTimetableItems?>() }
 
 				val drawerState = rememberDrawerState(DrawerValue.Closed)
 				val coroutineScope = rememberCoroutineScope()
@@ -335,7 +352,6 @@ class MainActivity :
 
 							AndroidView(factory = {
 								val weekViewSwipeRefresh = WeekViewSwipeRefreshLayout(it)
-								val weekView = WeekView<TimegridItem>(it)
 
 								weekViewSwipeRefresh.setOnRefreshListener {
 									/*displayedElement?.let { element ->
@@ -352,50 +368,7 @@ class MainActivity :
 									}*/
 								}
 
-								weekView.config.apply {
-									with(currentDensity) {
-										daySeparatorColor =
-											colorScheme.outline.copy(alpha = outlineAlpha)
-												.toArgb()
-										defaultEventColor = colorScheme.primary.toArgb()
-										eventMarginVertical = 4.dp.roundToPx()
-										eventPadding = 4.dp.roundToPx()
-										headerRowBackgroundColor = Color.TRANSPARENT
-										headerRowPadding = 8.dp.roundToPx()
-										headerRowSecondaryTextColor =
-											colorScheme.onSurfaceVariant.toArgb()
-										headerRowSecondaryTextSize = 12.sp.toPx()
-										headerRowTextColor = colorScheme.onSurface.toArgb()
-										headerRowTextSize = 18.sp.toPx()
-										headerRowTextSpacing = 10.dp.roundToPx()
-										holidayTextColor = colorScheme.onSurface.toArgb()
-										holidayTextSize = 16.sp.toPx()
-										hourHeight = 72.dp.roundToPx()
-										hourSeparatorColor =
-											colorScheme.outline.copy(alpha = outlineAlpha)
-												.toArgb()
-										nowLineStrokeWidth = 2.dp.toPx()
-										scrollDuration = 100
-										showHourSeparator = true
-										showNowLine = true
-										timeColumnBackground = Color.TRANSPARENT
-										timeColumnCaptionColor = colorScheme.onSurface.toArgb()
-										timeColumnCaptionSize = 16.sp.toPx()
-										timeColumnPadding = 4.dp.roundToPx()
-										timeColumnTextColor =
-											colorScheme.onSurfaceVariant.toArgb()
-										timeColumnTextSize = 12.sp.toPx()
-										todayHeaderTextColor = colorScheme.primary.toArgb()
-										topLeftCornerDrawable = AppCompatResources.getDrawable(
-											this@MainActivity,
-											R.drawable.all_calendar_adjusted
-										)
-										topLeftCornerPadding = 4.dp.roundToPx()
-										topLeftCornerTint = colorScheme.onSurface.toArgb()
-									}
-								}
-
-								weekView.apply {
+								weekView = WeekView<TimegridItem>(it).apply {
 									setupCustomization()
 									setupHours()
 
@@ -411,6 +384,90 @@ class MainActivity :
 											}
 										}
 									}
+
+									setPeriodChangeListener(object :
+										WeekViewLoader.PeriodChangeListener<TimegridItem> {
+										override fun onPeriodChange(
+											startDate: LocalDate,
+											endDate: LocalDate
+										): List<WeekViewDisplayable<TimegridItem>> {
+											val weekIndex = convertDateTimeToWeekIndex(startDate)
+											return weeklyTimetableItems[weekIndex]?.items ?: run {
+												displayedElement?.let { displayedElement ->
+													coroutineScope.launch {
+														weeklyTimetableItems[weekIndex] = loadWeeklyTimetableItems(
+															startDate,
+															endDate,
+															displayedElement
+														)
+													}
+												}
+												emptyList()
+											}
+										}
+									})
+
+									scrollListener = object : ScrollListener {
+										override fun onFirstVisibleDayChanged(
+											newFirstVisibleDay: LocalDate,
+											oldFirstVisibleDay: LocalDate?
+										) {
+											currentWeekIndex =
+												convertDateTimeToWeekIndex(newFirstVisibleDay)
+											lastRefreshTimestamp =
+												weeklyTimetableItems[currentWeekIndex]?.lastUpdated
+													?: 0
+										}
+									}
+
+									scaleListener = object : ScaleListener {
+										override fun onScaleFinished() {
+											//saveZoomLevel()
+										}
+									}
+
+									config.apply {
+										with(currentDensity) {
+											daySeparatorColor =
+												colorScheme.outline.copy(alpha = outlineAlpha)
+													.toArgb()
+											defaultEventColor = colorScheme.primary.toArgb()
+											eventMarginVertical = 4.dp.roundToPx()
+											eventPadding = 4.dp.roundToPx()
+											headerRowBackgroundColor = Color.TRANSPARENT
+											headerRowPadding = 8.dp.roundToPx()
+											headerRowSecondaryTextColor =
+												colorScheme.onSurfaceVariant.toArgb()
+											headerRowSecondaryTextSize = 12.sp.toPx()
+											headerRowTextColor = colorScheme.onSurface.toArgb()
+											headerRowTextSize = 18.sp.toPx()
+											headerRowTextSpacing = 10.dp.roundToPx()
+											holidayTextColor = colorScheme.onSurface.toArgb()
+											holidayTextSize = 16.sp.toPx()
+											hourHeight = 72.dp.roundToPx()
+											hourSeparatorColor =
+												colorScheme.outline.copy(alpha = outlineAlpha)
+													.toArgb()
+											nowLineStrokeWidth = 2.dp.toPx()
+											scrollDuration = 100
+											showHourSeparator = true
+											showNowLine = true
+											timeColumnBackground = Color.TRANSPARENT
+											timeColumnCaptionColor = colorScheme.onSurface.toArgb()
+											timeColumnCaptionSize = 16.sp.toPx()
+											timeColumnPadding = 4.dp.roundToPx()
+											timeColumnTextColor =
+												colorScheme.onSurfaceVariant.toArgb()
+											timeColumnTextSize = 12.sp.toPx()
+											todayHeaderTextColor = colorScheme.primary.toArgb()
+											topLeftCornerDrawable = AppCompatResources.getDrawable(
+												this@MainActivity,
+												R.drawable.all_calendar_adjusted
+											)
+											topLeftCornerPadding = 4.dp.roundToPx()
+											topLeftCornerTint = colorScheme.onSurface.toArgb()
+										}
+									}
 								}
 
 								weekViewSwipeRefresh.apply {
@@ -419,6 +476,11 @@ class MainActivity :
 							}, modifier = Modifier.fillMaxSize())
 						}
 					}
+				}
+
+				LaunchedEffect(displayedElement) {
+					weeklyTimetableItems.clear()
+					weekView.notifyDataSetChanged()
 				}
 			}
 		}
@@ -441,6 +503,51 @@ class MainActivity :
 		}*/
 	}
 
+	private suspend fun loadWeeklyTimetableItems(
+		startDate: LocalDate,
+		endDate: LocalDate,
+		element: PeriodElement
+	): WeeklyTimetableItems = WeeklyTimetableItems()
+		.apply {
+			dateRange =
+				(UntisDate.fromLocalDate(
+					LocalDate(
+						startDate
+					)
+				) to UntisDate.fromLocalDate(
+					LocalDate(endDate)
+				)).also { dateRange ->
+					loadTimetable(
+						TimetableLoader.TimetableLoaderTarget(
+							dateRange.first,
+							dateRange.second,
+							element.id,
+							element.type
+						)
+					)?.collect { result ->
+						result
+							.onSuccess { timetableItems ->
+								/*for (item in timetableItems.items) {
+									if (item.periodData.element.messengerChannel != null) {
+										navigationview_main.menu.findItem(R.id.nav_messenger).isVisible = true
+										break
+									}
+								}*/
+
+								items = prepareItems(timetableItems.items).map { item -> item.toWeekViewEvent() }
+								lastUpdated = timetableItems.timestamp
+								weekView.notifyDataSetChanged()
+							}
+							.onFailure {
+								// TODO
+							}
+
+						// TODO: Only disable these loading indicators when everything finished loading
+						//loading = false
+					}
+				}
+		}
+
 	@Composable
 	fun DrawerDivider() {
 		Divider(
@@ -457,6 +564,8 @@ class MainActivity :
 			modifier = Modifier.padding(start = 28.dp, top = 16.dp, bottom = 8.dp)
 		)
 	}
+
+	private fun convertDateTimeToWeekIndex(date: LocalDate) = date.year * 100 + date.dayOfYear / 7
 
 	/*private fun checkForProfileUpdateRequired(): Boolean {
 		return profileUser.schoolId.isBlank() || profileUser.apiUrl.isBlank()
@@ -774,22 +883,20 @@ class MainActivity :
 				}
 			}
 		}
-	}
+	}*/
 
-	private fun loadTimetable(
+	private suspend fun loadTimetable(
 		target: TimetableLoader.TimetableLoaderTarget,
 		forceRefresh: Boolean = false
-	) {
-		if (timetableLoader == null) return
-
+	) = timetableLoader?.let {
 		weekView.notifyDataSetChanged()
-		if (!forceRefresh) showLoading(true)
+		//if (!forceRefresh) showLoading(true)
 
 		val alwaysLoad: Boolean = preferences["preference_connectivity_refresh_in_background"]
 		val flags =
 			(if (!forceRefresh) TimetableLoader.FLAG_LOAD_CACHE else 0) or (if (alwaysLoad || forceRefresh) TimetableLoader.FLAG_LOAD_SERVER else 0)
-		timetableLoader!!.load(target, flags, proxyHost)
-	}*/
+		it.loadAsync(target, flags, proxyHost)
+	}
 
 	private fun loadProfile(): Boolean {
 		if (userDatabase.getUsersCount() < 1) {
@@ -852,35 +959,6 @@ class MainActivity :
 	private fun restoreZoomLevel() {
 		weekView.hourHeight = preferences[PERSISTENT_INT_ZOOM_LEVEL, weekView.hourHeight]
 	}
-
-	override fun onPeriodChange(
-		startDate: LocalDate,
-		endDate: LocalDate
-	): List<WeekViewDisplayable<TimegridItem>> {
-		val weekIndex = convertDateTimeToWeekIndex(startDate)
-		return weeklyTimetableItems[weekIndex]?.items ?: run {
-			displayedElement?.let { displayedElement ->
-				weeklyTimetableItems[weekIndex] = WeeklyTimetableItems().apply {
-					dateRange =
-						(UntisDate.fromLocalDate(LocalDate(startDate)) to UntisDate.fromLocalDate(
-							LocalDate(endDate)
-						)).also { dateRange ->
-							loadTimetable(
-								TimetableLoader.TimetableLoaderTarget(
-									dateRange.first,
-									dateRange.second,
-									displayedElement.id,
-									displayedElement.type
-								)
-							)
-						}
-				}
-			}
-			emptyList()
-		}
-	}
-
-	private fun convertDateTimeToWeekIndex(date: LocalDate) = date.year * 100 + date.dayOfYear / 7
 
 	private fun setupHolidays() {
 		userDatabase.getAdditionalUserData<Holiday>(profileUser.id!!, Holiday())?.let { item ->
@@ -949,7 +1027,7 @@ class MainActivity :
 			refreshNavigationViewSelection()
 		}
 		return super.onPrepareOptionsMenu(menu)
-	}
+	}*/
 
 	private fun prepareItems(items: List<TimegridItem>): List<TimegridItem> {
 		val newItems = mergeItems(items.mapNotNull { item ->
@@ -1041,7 +1119,8 @@ class MainActivity :
 		val useDefault =
 			preferences.sharedPrefs!!.getStringSet("preference_school_background", emptySet())
 				?: emptySet()
-		val useTheme = if (!useDefault.contains("regular")) preferences["preference_use_theme_background"] else false
+		val useTheme =
+			if (!useDefault.contains("regular")) preferences["preference_use_theme_background"] else false
 
 		items.forEach { item ->
 			val defaultColor = Color.parseColor(item.periodData.element.backColor)
@@ -1050,7 +1129,7 @@ class MainActivity :
 				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor else examColor
 				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else cancelledColor
 				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else irregularColor
-				useTheme -> getAttr(R.attr.colorPrimary)
+				//useTheme -> getAttr(R.attr.colorPrimary)
 				else -> if (useDefault.contains("regular")) defaultColor else regularColor
 			}
 
@@ -1064,15 +1143,15 @@ class MainActivity :
 				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(
 					0.25f
 				) else irregularPastColor
-				useTheme -> if (currentTheme == "pixel") getAttr(R.attr.colorPrimary).darken(0.25f) else getAttr(
+				/*useTheme -> if (currentTheme == "pixel") getAttr(R.attr.colorPrimary).darken(0.25f) else getAttr(
 					R.attr.colorPrimaryDark
-				)
+				)*/
 				else -> if (useDefault.contains("regular")) defaultColor.darken(0.25f) else regularPastColor
 			}
 		}
 	}
 
-	override fun onNavigationItemSelected(item: MenuItem): Boolean {
+	/*override fun onNavigationItemSelected(item: MenuItem): Boolean {
 		when (item.itemId) {
 			R.id.nav_show_personal -> {
 				showPersonalTimetable()
@@ -1492,7 +1571,7 @@ class MainActivity :
 		drawer.openDrawer(GravityCompat.START)
 
 	private fun closeDrawer(drawer: DrawerLayout = drawer_layout) =
-		drawer.closeDrawer(GravityCompat.START)
+		drawer.closeDrawer(GravityCompat.START)*/
 
 	private fun Int.darken(ratio: Float) = ColorUtils.blendARGB(this, Color.BLACK, ratio)
 
@@ -1502,7 +1581,7 @@ class MainActivity :
 		var dateRange: Pair<UntisDate, UntisDate>? = null
 	}
 
-	private fun setBookmarksLongClickListeners() {
+	/*private fun setBookmarksLongClickListeners() {
 		(navigationview_main[0] as RecyclerView).let { rv ->
 			rv.post {
 				for (index in 3..rv.layoutManager?.itemCount!!) {
