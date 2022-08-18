@@ -2,6 +2,7 @@ package com.sapuseven.untis.activities
 
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.RectF
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -28,6 +29,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.ColorUtils
 import com.sapuseven.untis.R
+import com.sapuseven.untis.activities.main.DrawerItems
+import com.sapuseven.untis.activities.main.DrawerText
 import com.sapuseven.untis.adapters.ProfileListAdapter
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
@@ -41,14 +44,13 @@ import com.sapuseven.untis.preferences.preference.decodeStoredTimetableValue
 import com.sapuseven.untis.ui.common.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
 import com.sapuseven.untis.ui.common.Weekday
-import com.sapuseven.untis.ui.models.NavItemShortcut
-import com.sapuseven.untis.ui.models.NavItemTimetable
 import com.sapuseven.untis.ui.theme.AppTheme
 import com.sapuseven.untis.viewmodels.PeriodDataViewModel
 import com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
 import com.sapuseven.untis.views.weekview.WeekView
 import com.sapuseven.untis.views.weekview.WeekViewDisplayable
 import com.sapuseven.untis.views.weekview.WeekViewEvent
+import com.sapuseven.untis.views.weekview.listeners.EventClickListener
 import com.sapuseven.untis.views.weekview.listeners.ScaleListener
 import com.sapuseven.untis.views.weekview.listeners.ScrollListener
 import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
@@ -101,7 +103,6 @@ class MainActivity :
 	private var proxyHost: String? = null
 	private var profileUpdateDialog: AlertDialog? = null
 	private val weekViewRefreshHandler = Handler(Looper.getMainLooper())
-	private var displayNameCache: CharSequence = ""
 	private var timetableLoader: TimetableLoader? = null
 	private lateinit var profileUser: UserDatabase.User
 	private lateinit var profileListAdapter: ProfileListAdapter
@@ -139,209 +140,46 @@ class MainActivity :
 
 		setContent {
 			AppTheme {
-				/*weekView.setOnEventClickListener(this)
-				weekView.setOnCornerClickListener(this)*/
-				var showElementPicker by remember {
-					mutableStateOf<TimetableDatabaseInterface.Type?>(
-						null
-					)
-				}
+				/*weekView.setOnCornerClickListener(this)*/
+
 				val coroutineScope = rememberCoroutineScope()
 
+				val personalTimetable = remember { getPersonalTimetableElement() }
+				var isPersonalTimetable by remember { mutableStateOf(true) }
 				val defaultDisplayedName = stringResource(id = R.string.app_name)
 
-				var displayedElement by remember { mutableStateOf<PeriodElement?>(null) } // TODO: Make saveable
-				var displayedName by rememberSaveable { mutableStateOf(defaultDisplayedName) }
+				var displayedElement by remember { mutableStateOf(personalTimetable?.first) } // TODO: Make saveable
+				var displayedName by rememberSaveable {
+					mutableStateOf(
+						personalTimetable?.second ?: defaultDisplayedName
+					)
+				}
 				var loading by rememberSaveable { mutableStateOf(0) }
-				val isPersonalTimetable = false
 				var currentWeekIndex by rememberSaveable { mutableStateOf(0) }
 				var lastRefreshTimestamp by remember { mutableStateOf(0L) }
 				val weeklyTimetableItems =
 					remember { mutableStateMapOf<Int, WeeklyTimetableItems?>() }
 
 				val drawerState = rememberDrawerState(DrawerValue.Closed)
-
 				var drawerGestures by remember { mutableStateOf(true) }
-
-				val navItemsElementTypes = listOf(
-					NavItemTimetable(
-						id = 1,
-						icon = painterResource(id = R.drawable.all_classes),
-						label = stringResource(id = R.string.all_classes),
-						elementType = TimetableDatabaseInterface.Type.CLASS
-					),
-					NavItemTimetable(
-						id = 2,
-						icon = painterResource(id = R.drawable.all_teachers),
-						label = stringResource(id = R.string.all_teachers),
-						elementType = TimetableDatabaseInterface.Type.TEACHER
-					),
-					NavItemTimetable(
-						id = 3,
-						icon = painterResource(id = R.drawable.all_rooms),
-						label = stringResource(id = R.string.all_rooms),
-						elementType = TimetableDatabaseInterface.Type.ROOM
-					),
-				)
-
-				val navItemsShortcuts = listOf(
-					NavItemShortcut(
-						id = 1,
-						icon = painterResource(id = R.drawable.all_infocenter),
-						label = stringResource(id = R.string.activity_title_info_center),
-						InfoCenterActivity::class.java
-					),
-					/*NavItemShortcut(
-						id = 2,
-						icon = painterResource(id = R.drawable.all_messenger),
-						label = stringResource(id = R.string.activity_title_messenger)
-					),*/
-					NavItemShortcut(
-						id = 3,
-						icon = painterResource(id = R.drawable.all_search_rooms),
-						label = stringResource(id = R.string.activity_title_free_rooms),
-						RoomFinderActivity::class.java
-					),
-					NavItemShortcut(
-						id = 4,
-						icon = painterResource(id = R.drawable.all_settings),
-						label = stringResource(id = R.string.activity_title_settings),
-						SettingsActivity::class.java
-					)
-				)
-
-				fun showPersonalTimetable() {
-					val customTimetable = preferences["preference_timetable_personal_timetable", ""]
-
-					if (customTimetable.isEmpty()) {
-						profileUser.userData.elemType?.let { type ->
-							displayedElement = PeriodElement(
-								type = type,
-								id = profileUser.userData.elemId,
-								orgId = profileUser.userData.elemId,
-							)
-							displayedName = profileUser.getDisplayedName(applicationContext)
-						} ?: run {
-							loading = 0
-							// TODO: Show anonymous
-							//return setTarget(true, profileUser.getDisplayedName(applicationContext))
-						}
-					} else {
-						displayedElement = decodeStoredTimetableValue(customTimetable)
-						displayedName = displayedElement?.let {
-							timetableDatabaseInterface.getLongName(it)
-						} ?: defaultDisplayedName
-					}
-				}
-
-				if (displayedElement == null)
-					showPersonalTimetable()
 
 				LaunchedEffect(displayedElement) {
 					weeklyTimetableItems.clear()
 					weekView.notifyDataSetChanged()
 				}
-
-				showElementPicker?.let { type ->
-					ElementPickerDialogFullscreen(
-						title = { /*TODO*/ },
-						timetableDatabaseInterface = timetableDatabaseInterface,
-						onDismiss = { showElementPicker = null },
-						onSelect = { item ->
-							displayedElement = item
-							displayedName = displayedElement?.let {
-								timetableDatabaseInterface.getLongName(it)
-							} ?: defaultDisplayedName
-						},
-						initialType = type
-					)
-				} ?: ModalNavigationDrawer(
-					gesturesEnabled = drawerGestures || drawerState.isOpen,
+				Drawer(
 					drawerState = drawerState,
-					drawerContent = {
-						/*Text(
-							text = profileUser.getDisplayedName(applicationContext)
-								.ifBlank { stringResource(R.string.app_name) },
-							modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-						)
-						Text(
-							text = profileUser.userData.schoolName.ifBlank { stringResource(R.string.all_contact_email) },
-							modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-						)*/
-						Spacer(modifier = Modifier.height(24.dp))
+					drawerGestures = drawerGestures,
+					displayedElement = displayedElement,
+					isPersonalTimetable = isPersonalTimetable,
+					onShowTimetable = { it, isPersonal ->
+						isPersonalTimetable = isPersonal
 
-						DrawerText("Favourites")
-
-						NavigationDrawerItem(
-							icon = {
-								Icon(
-									painterResource(id = R.drawable.all_prefs_personal),
-									contentDescription = null
-								)
-							},
-							label = { Text(stringResource(id = R.string.all_personal_timetable)) },
-							selected = isPersonalTimetable,
-							onClick = {
-								coroutineScope.launch {
-									drawerState.close()
-									showPersonalTimetable()
-								}
-							},
-							modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-						)
-
-						NavigationDrawerItem(
-							icon = {
-								Icon(
-									painterResource(id = R.drawable.all_add),
-									contentDescription = null
-								)
-							},
-							label = { Text(stringResource(id = R.string.maindrawer_bookmarks_add)) },
-							selected = false,
-							onClick = {
-								coroutineScope.launch { drawerState.close() }
-								//selectedItem.value = item
-							},
-							modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-						)
-
-						DrawerText("Timetables")
-
-						navItemsElementTypes.forEach { item ->
-							NavigationDrawerItem(
-								icon = { Icon(item.icon, contentDescription = null) },
-								label = { Text(item.label) },
-								selected = !isPersonalTimetable && item.elementType.name == displayedElement?.type,
-								onClick = {
-									coroutineScope.launch { drawerState.close() }
-									showElementPicker = item.elementType
-								},
-								modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-							)
-						}
-
-						DrawerDivider()
-
-						navItemsShortcuts.forEach { item ->
-							NavigationDrawerItem(
-								icon = { Icon(item.icon, contentDescription = null) },
-								label = { Text(item.label) },
-								selected = false,
-								onClick = {
-									coroutineScope.launch { drawerState.close() }
-
-									shortcutLauncher.launch(
-										Intent(
-											this@MainActivity,
-											item.target
-										).apply {
-											putExtra(EXTRA_LONG_PROFILE_ID, profileId)
-										}
-									)
-								},
-								modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-							)
+						it?.let { element ->
+							displayedElement = element.first
+							displayedName = element.second ?: defaultDisplayedName
+						} ?: run {
+							// TODO: Show anonymous
 						}
 					}
 				) {
@@ -391,8 +229,9 @@ class MainActivity :
 													element,
 													colorScheme,
 													forceRefresh = true,
-													onItemsChanged = {
-														weeklyTimetableItems[currentWeekIndex] = it
+													onItemsChanged = { items ->
+														weeklyTimetableItems[currentWeekIndex] =
+															items
 														weekView.notifyDataSetChanged()
 													}
 												)
@@ -437,8 +276,9 @@ class MainActivity :
 															endDate,
 															displayedElement,
 															colorScheme,
-															onItemsChanged = {
-																weeklyTimetableItems[weekIndex] = it
+															onItemsChanged = { items ->
+																weeklyTimetableItems[weekIndex] =
+																	items
 																weekView.notifyDataSetChanged()
 															}
 														)
@@ -447,6 +287,16 @@ class MainActivity :
 												}
 												emptyList()
 											}
+										}
+									})
+
+									setOnEventClickListener(object :
+										EventClickListener<TimegridItem> {
+										override fun onEventClick(
+											data: TimegridItem,
+											eventRect: RectF
+										) {
+											//timetableItemDetailsDialog = data
 										}
 									})
 
@@ -537,6 +387,16 @@ class MainActivity :
 										.align(Alignment.BottomEnd)
 										.padding(8.dp)
 								)
+
+							/*viewModelStore.clear() // TODO: Doesn't seem like the best solution. This could potentially interfere with other ViewModels scoped to this activity.
+							val fragment = TimetableItemDetailsFragment(data, timetableDatabaseInterface, profileUser)
+
+							supportFragmentManager.beginTransaction().run {
+								setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+								add(R.id.content_main, fragment, FRAGMENT_TAG_LESSON_INFO)
+								addToBackStack(fragment.tag)
+								commit()
+							}*/
 						}
 					}
 				}
@@ -559,6 +419,139 @@ class MainActivity :
 			if (!checkShortcut()) showPersonalTimetable()
 			refreshNavigationViewSelection()
 		}*/
+	}
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	@Composable
+	private fun Drawer(
+		drawerState: DrawerState,
+		drawerGestures: Boolean,
+		isPersonalTimetable: Boolean,
+		displayedElement: PeriodElement? = null,
+		onShowTimetable: (Pair<PeriodElement?, String?>?, isPersonal: Boolean) -> Unit,
+		content: @Composable () -> Unit
+	) {
+		val scope = rememberCoroutineScope()
+
+		var showElementPicker by remember {
+			mutableStateOf<TimetableDatabaseInterface.Type?>(
+				null
+			)
+		}
+
+		showElementPicker?.let { type ->
+			ElementPickerDialogFullscreen(
+				title = { /*TODO*/ },
+				timetableDatabaseInterface = timetableDatabaseInterface,
+				onDismiss = { showElementPicker = null },
+				onSelect = { item ->
+					onShowTimetable(
+						item to item?.let { timetableDatabaseInterface.getLongName(it) },
+						false
+					)
+				},
+				initialType = type
+			)
+		} ?: ModalNavigationDrawer(
+			gesturesEnabled = drawerGestures || drawerState.isOpen,
+			drawerState = drawerState,
+			drawerContent = {
+				/*Text(
+					text = profileUser.getDisplayedName(applicationContext)
+						.ifBlank { stringResource(R.string.app_name) },
+					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+				)
+				Text(
+					text = profileUser.userData.schoolName.ifBlank { stringResource(R.string.all_contact_email) },
+					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+				)*/
+
+				Spacer(modifier = Modifier.height(24.dp))
+
+				DrawerText("Favourites")
+
+				NavigationDrawerItem(
+					icon = {
+						Icon(
+							painterResource(id = R.drawable.all_prefs_personal),
+							contentDescription = null
+						)
+					},
+					label = { Text(stringResource(id = R.string.all_personal_timetable)) },
+					selected = isPersonalTimetable,
+					onClick = {
+						scope.launch {
+							drawerState.close()
+						}
+						onShowTimetable(getPersonalTimetableElement(), true)
+					},
+					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+				)
+
+				NavigationDrawerItem(
+					icon = {
+						Icon(
+							painterResource(id = R.drawable.all_add),
+							contentDescription = null
+						)
+					},
+					label = { Text(stringResource(id = R.string.maindrawer_bookmarks_add)) },
+					selected = false,
+					onClick = {
+						scope.launch { drawerState.close() }
+						//selectedItem.value = item
+					},
+					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+				)
+
+				DrawerText("Timetables")
+
+				DrawerItems(
+					isPersonalTimetableSelected = isPersonalTimetable,
+					displayedElement = displayedElement,
+					onTimetableClick = { item ->
+						scope.launch { drawerState.close() }
+						showElementPicker = item.elementType
+					},
+					onShortcutClick = { item ->
+						scope.launch { drawerState.close() }
+
+						shortcutLauncher.launch(
+							Intent(
+								this@MainActivity,
+								item.target
+							).apply {
+								putExtra(EXTRA_LONG_PROFILE_ID, profileId)
+							}
+						)
+					}
+				)
+			},
+			content = content
+		)
+	}
+
+	private fun getPersonalTimetableElement(): Pair<PeriodElement?, String?>? {
+		val customTimetable = preferences["preference_timetable_personal_timetable", ""]
+
+		return if (customTimetable.isEmpty()) {
+			profileUser.userData.elemType?.let { type ->
+				PeriodElement(
+					type = type,
+					id = profileUser.userData.elemId,
+					orgId = profileUser.userData.elemId,
+				) to profileUser.getDisplayedName(applicationContext)
+			} /*?: run {
+				// TODO: Show anonymous
+				//return setTarget(true, profileUser.getDisplayedName(applicationContext))
+			}*/
+		} else {
+			val displayedElement = decodeStoredTimetableValue(customTimetable)
+
+			displayedElement to displayedElement?.let {
+				timetableDatabaseInterface.getLongName(it)
+			}
+		}
 	}
 
 	private suspend fun loadWeeklyTimetableItems(
@@ -635,23 +628,6 @@ class MainActivity :
 					}
 				}
 		}
-	}
-
-	@Composable
-	fun DrawerDivider() {
-		Divider(
-			color = MaterialTheme.colorScheme.outline,
-			modifier = Modifier.padding(vertical = 8.dp)
-		)
-	}
-
-	@Composable
-	fun DrawerText(text: String) {
-		Text(
-			text = text,
-			style = MaterialTheme.typography.labelMedium,
-			modifier = Modifier.padding(start = 28.dp, top = 16.dp, bottom = 8.dp)
-		)
 	}
 
 	private fun convertDateTimeToWeekIndex(date: LocalDate) = date.year * 100 + date.dayOfYear / 7
