@@ -102,13 +102,20 @@ class TimetableLoader(
 		flags: Int = 0,
 		proxyHost: String? = null
 	): Flow<Result<TimetableItems>> = callbackFlow {
+		//delay(1500) // TODO: Artificial delay
+		/*Log.d(
+			"TimetableLoaderDebug",
+			"target $target (requestId TBD) requested"
+		)*/
 		val timetableDisplay = TimetableLoaderCoroutineWrapper(this)
 		requestList.add(target)
 
-		if (flags and FLAG_LOAD_CACHE > 0)
-			loadFromCache(target, requestList.size - 1, timetableDisplay)
+		var shouldLoadFromServer = flags and FLAG_LOAD_SERVER > 0
 
-		if (flags and FLAG_LOAD_SERVER > 0)
+		if (flags and FLAG_LOAD_CACHE > 0)
+			shouldLoadFromServer = shouldLoadFromServer or !loadFromCache(target, requestList.size - 1, timetableDisplay)
+
+		if (shouldLoadFromServer)
 			loadFromServer(target, requestList.size - 1, proxyHost, timetableDisplay)
 
 		close()
@@ -118,11 +125,11 @@ class TimetableLoader(
 		target: TimetableLoaderTarget,
 		requestId: Int,
 		timetableDisplay: TimetableDisplay? = this.timetableDisplay
-	) {
+	): Boolean {
 		val cache = TimetableCache(context)
 		cache.setTarget(target.startDate, target.endDate, target.id, target.type)
 
-		if (cache.exists()) {
+		return if (cache.exists()) {
 			Log.d(
 				"TimetableLoaderDebug",
 				"target $target (requestId $requestId): cached file found"
@@ -134,6 +141,7 @@ class TimetableLoader(
 						target.type
 					)
 				}, target.startDate, target.endDate, cacheObject.timestamp)
+				true
 			} ?: run {
 				cache.delete()
 				Log.d(
@@ -145,6 +153,7 @@ class TimetableLoader(
 					CODE_CACHE_MISSING,
 					"cached timetable corrupted"
 				)
+				false
 			}
 		} else {
 			Log.d(
@@ -156,6 +165,7 @@ class TimetableLoader(
 				CODE_CACHE_MISSING,
 				"no cached timetable found"
 			)
+			false
 		}
 	}
 

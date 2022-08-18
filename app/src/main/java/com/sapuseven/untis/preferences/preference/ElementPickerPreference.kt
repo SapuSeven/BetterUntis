@@ -19,15 +19,6 @@ fun ElementPickerPreference(
 	dataStore: UntisPreferenceDataStore<String>,
 	timetableDatabaseInterface: TimetableDatabaseInterface
 ) {
-	fun encodeValue(value: PeriodElement): String =
-		SerializationUtils.getJSON().encodeToString(value)
-
-	fun decodeValue(value: String): PeriodElement? = try {
-		SerializationUtils.getJSON().decodeFromString(value)
-	} catch (e: Throwable) {
-		null
-	}
-
 	val value = remember { mutableStateOf(dataStore.defaultValue) }
 	var showDialog by remember { mutableStateOf(false) }
 
@@ -40,7 +31,7 @@ fun ElementPickerPreference(
 
 	Preference(
 		title = title,
-		summary = decodeValue(value.value)?.let {
+		summary = decodeStoredTimetableValue(value.value)?.let {
 			{ Text(generateSummary(it)) }
 		},
 		icon = icon,
@@ -60,10 +51,18 @@ fun ElementPickerPreference(
 				showDialog = false
 			},
 			onSelect = { element ->
-				scope.launch { dataStore.saveValue(element?.let { encodeValue(it) } ?: "") }
+				scope.launch { dataStore.saveValue(element?.let { encodeStoredTimetableValue(it) } ?: "") }
 				showDialog = false
 			},
-			initialType = decodeValue(value.value)?.let { TimetableDatabaseInterface.Type.valueOf(it.type) }
+			initialType = decodeStoredTimetableValue(value.value)?.let { TimetableDatabaseInterface.Type.valueOf(it.type) }
 		)
 }
 
+fun encodeStoredTimetableValue(value: PeriodElement): String =
+	SerializationUtils.getJSON().encodeToString(value)
+
+fun decodeStoredTimetableValue(value: String): PeriodElement? = try {
+	SerializationUtils.getJSON().decodeFromString(value)
+} catch (e: Throwable) {
+	null
+}

@@ -20,7 +20,8 @@ class TimetableDatabaseInterface(@Transient val database: UserDatabase, id: Long
 		CLASS,
 		TEACHER,
 		SUBJECT,
-		ROOM
+		ROOM,
+		STUDENT
 	}
 
 	init {
@@ -54,6 +55,7 @@ class TimetableDatabaseInterface(@Transient val database: UserDatabase, id: Long
 			Type.TEACHER -> allTeachers[id]?.firstName + " " + allTeachers[id]?.lastName
 			Type.SUBJECT -> allSubjects[id]?.longName
 			Type.ROOM -> allRooms[id]?.longName
+			else -> null
 		} ?: ""
 	}
 
@@ -101,6 +103,7 @@ class TimetableDatabaseInterface(@Transient val database: UserDatabase, id: Long
 			Type.TEACHER -> allTeachers[element.id]?.compareTo(other)
 			Type.SUBJECT -> allSubjects[element.id]?.compareTo(other)
 			Type.ROOM -> allRooms[element.id]?.compareTo(other)
+			else -> null
 		} == 0
 	}
 
