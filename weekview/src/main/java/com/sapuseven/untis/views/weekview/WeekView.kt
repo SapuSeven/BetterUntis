@@ -359,8 +359,7 @@ class WeekView<T>(
 
 	private fun calculateWidthPerDay() {
 		// Calculate the available width for each day
-		config.drawConfig.widthPerDay = width - config.drawConfig.timeColumnWidth
-		config.drawConfig.widthPerDay = config.drawConfig.widthPerDay / config.visibleDays
+		config.drawConfig.widthPerDay = (width - config.drawConfig.timeColumnWidth + config.drawConfig.daySeparatorPaint.strokeWidth) / config.visibleDays
 	}
 
 	private fun clipEventsRect(canvas: Canvas) {
