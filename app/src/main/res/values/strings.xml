@@ -70,7 +70,7 @@
 	<string name="main_dialog_itemdetails_timeformat">%1$s - %2$s</string>
 	<string name="main_last_refreshed">Last refreshed: %1$s</string>
 	<string name="main_last_refreshed_never">never</string>
-	<string name="main_anonymous_login_info_text">You have to setup a personal timetable if you are logged in as an anonymous user.</string>
+	<string name="main_anonymous_login_info_text">You have to setup a custom personal timetable for anonymous profiles.</string>
 	<string name="main_go_to_settings">Go to settings</string>
 	<string name="main_drawer_open">Open navigation drawer</string>
 	<string name="main_drawer_close">Close navigation drawer</string>

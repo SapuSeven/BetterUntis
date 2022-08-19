@@ -1,18 +1,20 @@
 package com.sapuseven.untis.preferences.preference
 
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
+import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.common.disabled
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,13 +28,27 @@ fun <T> Preference(
 	supportingContent: @Composable ((value: T, enabled: Boolean) -> Unit)? = null,
 	trailingContent: @Composable ((value: T, enabled: Boolean) -> Unit)? = null,
 	scope: CoroutineScope = rememberCoroutineScope(),
-	onClick: (value: T) -> Unit = {}
+	onClick: (value: T) -> Unit = {},
+	highlight: Boolean = false
 ) {
 	var enabled by remember {
 		mutableStateOf(
 			dependency?.isDefaultEnabled() ?: true
 		)
 	} // TODO: Make configurable
+
+	val interactionSource = remember { MutableInteractionSource() }
+
+	if (highlight)
+		LaunchedEffect(Unit) {
+			scope.launch {
+				val press = PressInteraction.Press(Offset.Zero)
+				delay(100)
+				interactionSource.emit(press)
+				delay(3000)
+				interactionSource.emit(PressInteraction.Release(press))
+			}
+		}
 
 	scope.launch {
 		awaitAll(
@@ -66,6 +82,12 @@ fun <T> Preference(
 			}
 		},
 		trailingContent = { trailingContent?.invoke(value.value, enabled) },
-		modifier = if (!enabled) Modifier else Modifier.clickable { onClick(value.value) }
+		modifier = Modifier
+			.conditional(enabled) {
+				Modifier.clickable(
+					interactionSource = interactionSource,
+					indication = LocalIndication.current
+				) { onClick(value.value) }
+			}
 	)
 }

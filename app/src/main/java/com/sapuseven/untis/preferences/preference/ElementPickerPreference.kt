@@ -17,7 +17,8 @@ fun ElementPickerPreference(
 	icon: (@Composable () -> Unit)? = null,
 	dependency: UntisPreferenceDataStore<*>? = null,
 	dataStore: UntisPreferenceDataStore<String>,
-	timetableDatabaseInterface: TimetableDatabaseInterface
+	timetableDatabaseInterface: TimetableDatabaseInterface,
+	highlight: Boolean = false
 ) {
 	val value = remember { mutableStateOf(dataStore.defaultValue) }
 	var showDialog by remember { mutableStateOf(false) }
@@ -41,6 +42,7 @@ fun ElementPickerPreference(
 		onClick = {
 			showDialog = true
 		},
+		highlight = highlight
 	)
 
 	if (showDialog)

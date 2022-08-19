@@ -43,6 +43,8 @@ val Context.dataStore: DataStore<Preferences> by androidx.datastore.preferences.
 class SettingsActivity : BaseComposeActivity() {
 	companion object {
 		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileid"
+		const val EXTRA_STRING_PREFERENCE_ROUTE = "com.sapuseven.untis.activities.settings.route"
+		const val EXTRA_STRING_PREFERENCE_HIGHLIGHT = "com.sapuseven.untis.activities.settings.highlight"
 
 		private const val DIALOG_RECOMMEND_HIDE = "preference_dialog_recommend_hide"
 
@@ -55,6 +57,8 @@ class SettingsActivity : BaseComposeActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		val profileId = (intent.extras?.getLong(EXTRA_LONG_PROFILE_ID)) ?: -1 // TODO
+		val preferencePath = (intent.extras?.getString(EXTRA_STRING_PREFERENCE_ROUTE)) ?: "preferences"
+		val preferenceHighlight = (intent.extras?.getString(EXTRA_STRING_PREFERENCE_HIGHLIGHT))
 
 		val userDatabase = UserDatabase.createInstance(this)
 		val timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileId)
@@ -95,7 +99,7 @@ class SettingsActivity : BaseComposeActivity() {
 						profileId?.let { args.putLong(EXTRA_LONG_PROFILE_ID, it) }
 						fragment.arguments = args*/
 
-						NavHost(navController, startDestination = "preferences") {
+						NavHost(navController, startDestination = preferencePath) {
 							composable("preferences") {
 								title = null
 
@@ -595,7 +599,8 @@ class SettingsActivity : BaseComposeActivity() {
 											prefKey = stringPreferencesKey("preference_timetable_personal_timetable"),
 											defaultValue = ""
 										),
-										timetableDatabaseInterface = timetableDatabaseInterface
+										timetableDatabaseInterface = timetableDatabaseInterface,
+										highlight = preferenceHighlight == "preference_timetable_personal_timetable"
 									)
 
 									SwitchPreference(

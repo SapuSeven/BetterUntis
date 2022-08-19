@@ -24,11 +24,14 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.ColorUtils
 import com.sapuseven.untis.R
+import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_HIGHLIGHT
+import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_ROUTE
 import com.sapuseven.untis.activities.main.DrawerItems
 import com.sapuseven.untis.activities.main.DrawerText
 import com.sapuseven.untis.adapters.ProfileListAdapter
@@ -44,6 +47,7 @@ import com.sapuseven.untis.preferences.preference.decodeStoredTimetableValue
 import com.sapuseven.untis.ui.common.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
 import com.sapuseven.untis.ui.common.Weekday
+import com.sapuseven.untis.ui.common.disabled
 import com.sapuseven.untis.ui.theme.AppTheme
 import com.sapuseven.untis.viewmodels.PeriodDataViewModel
 import com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
@@ -123,6 +127,11 @@ class MainActivity :
 			// TODO: Look at it.data for potential actions (e.g. show a specific timetable)
 		}
 
+	private val settingsLauncher =
+		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+			// TODO: Look at it.data for potential actions (e.g. show a specific timetable)
+		}
+
 	@OptIn(ExperimentalMaterial3Api::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -163,10 +172,13 @@ class MainActivity :
 				val drawerState = rememberDrawerState(DrawerValue.Closed)
 				var drawerGestures by remember { mutableStateOf(true) }
 
+				val anonymous = displayedElement == null
+
 				LaunchedEffect(displayedElement) {
 					weeklyTimetableItems.clear()
 					weekView.notifyDataSetChanged()
 				}
+
 				Drawer(
 					drawerState = drawerState,
 					drawerGestures = drawerGestures,
@@ -175,11 +187,9 @@ class MainActivity :
 					onShowTimetable = { it, isPersonal ->
 						isPersonalTimetable = isPersonal
 
-						it?.let { element ->
-							displayedElement = element.first
-							displayedName = element.second ?: defaultDisplayedName
-						} ?: run {
-							// TODO: Show anonymous
+						it.let { element ->
+							displayedElement = element?.first
+							displayedName = element?.second ?: defaultDisplayedName
 						}
 					}
 				) {
@@ -216,157 +226,165 @@ class MainActivity :
 							val currentDensity = LocalDensity.current
 							val outlineAlpha = 0.4f
 
-							AndroidView(factory = {
-								val weekViewSwipeRefresh = WeekViewSwipeRefreshLayout(it)
+							AndroidView(
+								factory = {
+									val weekViewSwipeRefresh = WeekViewSwipeRefreshLayout(it)
 
-								weekViewSwipeRefresh.setOnRefreshListener {
-									displayedElement?.let { element ->
-										weeklyTimetableItems[currentWeekIndex]?.dateRange?.let { dateRange ->
-											coroutineScope.launch {
-												loadWeeklyTimetableItems(
-													dateRange.first.toLocalDate(),
-													dateRange.second.toLocalDate(),
-													element,
-													colorScheme,
-													forceRefresh = true,
-													onItemsChanged = { items ->
-														weeklyTimetableItems[currentWeekIndex] =
-															items
-														weekView.notifyDataSetChanged()
-													}
-												)
-												weekViewSwipeRefresh.isRefreshing = false
-											}
-										}
-									}
-								}
-
-								weekView = WeekView<TimegridItem>(it).apply {
-									setupCustomization()
-									setupHours()
-
-									// Workaround to enable drawer gestures only when swiping from the left edge (won't work with RTL layout)
-									onMotionEvent = { event ->
-										when (event.action) {
-											MotionEvent.ACTION_DOWN -> {
-												drawerGestures =
-													event.x < with(currentDensity) { 48.dp.toPx() }
-											}
-											MotionEvent.ACTION_UP -> {
-												drawerGestures = true
-											}
-										}
-									}
-
-									setPeriodChangeListener(object :
-										WeekViewLoader.PeriodChangeListener<TimegridItem> {
-										override fun onPeriodChange(
-											startDate: LocalDate,
-											endDate: LocalDate
-										): List<WeekViewDisplayable<TimegridItem>> {
-											val weekIndex = convertDateTimeToWeekIndex(startDate)
-											return weeklyTimetableItems[weekIndex]?.items ?: run {
-												weeklyTimetableItems[weekIndex] =
-													WeeklyTimetableItems()
-												displayedElement?.let { displayedElement ->
-													coroutineScope.launch {
-														loading++
-														loadWeeklyTimetableItems(
-															startDate,
-															endDate,
-															displayedElement,
-															colorScheme,
-															onItemsChanged = { items ->
-																weeklyTimetableItems[weekIndex] =
-																	items
-																weekView.notifyDataSetChanged()
-															}
-														)
-														loading--
-													}
+									weekViewSwipeRefresh.setOnRefreshListener {
+										displayedElement?.let { element ->
+											weeklyTimetableItems[currentWeekIndex]?.dateRange?.let { dateRange ->
+												coroutineScope.launch {
+													loadWeeklyTimetableItems(
+														dateRange.first.toLocalDate(),
+														dateRange.second.toLocalDate(),
+														element,
+														colorScheme,
+														forceRefresh = true,
+														onItemsChanged = { items ->
+															weeklyTimetableItems[currentWeekIndex] =
+																items
+															weekView.notifyDataSetChanged()
+														}
+													)
+													weekViewSwipeRefresh.isRefreshing = false
 												}
-												emptyList()
 											}
 										}
-									})
+									}
 
-									setOnEventClickListener(object :
-										EventClickListener<TimegridItem> {
-										override fun onEventClick(
-											data: TimegridItem,
-											eventRect: RectF
-										) {
-											//timetableItemDetailsDialog = data
+									weekView = WeekView<TimegridItem>(it).apply {
+										setupCustomization()
+										setupHours()
+
+										// Workaround to enable drawer gestures only when swiping from the left edge (won't work with RTL layout)
+										onMotionEvent = { event ->
+											when (event.action) {
+												MotionEvent.ACTION_DOWN -> {
+													drawerGestures =
+														event.x < with(currentDensity) { 48.dp.toPx() }
+												}
+												MotionEvent.ACTION_UP -> {
+													drawerGestures = true
+												}
+											}
 										}
-									})
 
-									scrollListener = object : ScrollListener {
-										override fun onFirstVisibleDayChanged(
-											newFirstVisibleDay: LocalDate,
-											oldFirstVisibleDay: LocalDate?
-										) {
-											currentWeekIndex =
-												convertDateTimeToWeekIndex(newFirstVisibleDay)
-											lastRefreshTimestamp =
-												weeklyTimetableItems[currentWeekIndex]?.lastUpdated
-													?: 0
+										setPeriodChangeListener(object :
+											WeekViewLoader.PeriodChangeListener<TimegridItem> {
+											override fun onPeriodChange(
+												startDate: LocalDate,
+												endDate: LocalDate
+											): List<WeekViewDisplayable<TimegridItem>> {
+												val weekIndex =
+													convertDateTimeToWeekIndex(startDate)
+												return weeklyTimetableItems[weekIndex]?.items
+													?: run {
+														weeklyTimetableItems[weekIndex] =
+															WeeklyTimetableItems()
+														displayedElement?.let { displayedElement ->
+															coroutineScope.launch {
+																loading++
+																loadWeeklyTimetableItems(
+																	startDate,
+																	endDate,
+																	displayedElement,
+																	colorScheme,
+																	onItemsChanged = { items ->
+																		weeklyTimetableItems[weekIndex] =
+																			items
+																		weekView.notifyDataSetChanged()
+																	}
+																)
+																loading--
+															}
+														}
+														emptyList()
+													}
+											}
+										})
+
+										setOnEventClickListener(object :
+											EventClickListener<TimegridItem> {
+											override fun onEventClick(
+												data: TimegridItem,
+												eventRect: RectF
+											) {
+												//timetableItemDetailsDialog = data
+											}
+										})
+
+										scrollListener = object : ScrollListener {
+											override fun onFirstVisibleDayChanged(
+												newFirstVisibleDay: LocalDate,
+												oldFirstVisibleDay: LocalDate?
+											) {
+												currentWeekIndex =
+													convertDateTimeToWeekIndex(newFirstVisibleDay)
+												lastRefreshTimestamp =
+													weeklyTimetableItems[currentWeekIndex]?.lastUpdated
+														?: 0
+											}
+										}
+
+										scaleListener = object : ScaleListener {
+											override fun onScaleFinished() {
+												//saveZoomLevel()
+											}
+										}
+
+										config.apply {
+											with(currentDensity) {
+												daySeparatorColor =
+													colorScheme.outline.copy(alpha = outlineAlpha)
+														.toArgb()
+												defaultEventColor = colorScheme.primary.toArgb()
+												eventMarginVertical = 4.dp.roundToPx()
+												eventPadding = 4.dp.roundToPx()
+												headerRowBackgroundColor = Color.TRANSPARENT
+												headerRowPadding = 8.dp.roundToPx()
+												headerRowSecondaryTextColor =
+													colorScheme.onSurfaceVariant.toArgb()
+												headerRowSecondaryTextSize = 12.sp.toPx()
+												headerRowTextColor = colorScheme.onSurface.toArgb()
+												headerRowTextSize = 18.sp.toPx()
+												headerRowTextSpacing = 10.dp.roundToPx()
+												holidayTextColor = colorScheme.onSurface.toArgb()
+												holidayTextSize = 16.sp.toPx()
+												hourHeight = 72.dp.roundToPx()
+												hourSeparatorColor =
+													colorScheme.outline.copy(alpha = outlineAlpha)
+														.toArgb()
+												nowLineStrokeWidth = 2.dp.toPx()
+												scrollDuration = 100
+												showHourSeparator = true
+												showNowLine = true
+												timeColumnBackground = Color.TRANSPARENT
+												timeColumnCaptionColor =
+													colorScheme.onSurface.toArgb()
+												timeColumnCaptionSize = 16.sp.toPx()
+												timeColumnPadding = 4.dp.roundToPx()
+												timeColumnTextColor =
+													colorScheme.onSurfaceVariant.toArgb()
+												timeColumnTextSize = 12.sp.toPx()
+												todayHeaderTextColor = colorScheme.primary.toArgb()
+												topLeftCornerDrawable =
+													AppCompatResources.getDrawable(
+														this@MainActivity,
+														R.drawable.all_calendar_adjusted
+													)
+												topLeftCornerPadding = 4.dp.roundToPx()
+												topLeftCornerTint = colorScheme.onSurface.toArgb()
+											}
 										}
 									}
 
-									scaleListener = object : ScaleListener {
-										override fun onScaleFinished() {
-											//saveZoomLevel()
-										}
+									weekViewSwipeRefresh.apply {
+										addView(weekView)
 									}
-
-									config.apply {
-										with(currentDensity) {
-											daySeparatorColor =
-												colorScheme.outline.copy(alpha = outlineAlpha)
-													.toArgb()
-											defaultEventColor = colorScheme.primary.toArgb()
-											eventMarginVertical = 4.dp.roundToPx()
-											eventPadding = 4.dp.roundToPx()
-											headerRowBackgroundColor = Color.TRANSPARENT
-											headerRowPadding = 8.dp.roundToPx()
-											headerRowSecondaryTextColor =
-												colorScheme.onSurfaceVariant.toArgb()
-											headerRowSecondaryTextSize = 12.sp.toPx()
-											headerRowTextColor = colorScheme.onSurface.toArgb()
-											headerRowTextSize = 18.sp.toPx()
-											headerRowTextSpacing = 10.dp.roundToPx()
-											holidayTextColor = colorScheme.onSurface.toArgb()
-											holidayTextSize = 16.sp.toPx()
-											hourHeight = 72.dp.roundToPx()
-											hourSeparatorColor =
-												colorScheme.outline.copy(alpha = outlineAlpha)
-													.toArgb()
-											nowLineStrokeWidth = 2.dp.toPx()
-											scrollDuration = 100
-											showHourSeparator = true
-											showNowLine = true
-											timeColumnBackground = Color.TRANSPARENT
-											timeColumnCaptionColor = colorScheme.onSurface.toArgb()
-											timeColumnCaptionSize = 16.sp.toPx()
-											timeColumnPadding = 4.dp.roundToPx()
-											timeColumnTextColor =
-												colorScheme.onSurfaceVariant.toArgb()
-											timeColumnTextSize = 12.sp.toPx()
-											todayHeaderTextColor = colorScheme.primary.toArgb()
-											topLeftCornerDrawable = AppCompatResources.getDrawable(
-												this@MainActivity,
-												R.drawable.all_calendar_adjusted
-											)
-											topLeftCornerPadding = 4.dp.roundToPx()
-											topLeftCornerTint = colorScheme.onSurface.toArgb()
-										}
-									}
-								}
-
-								weekViewSwipeRefresh.apply {
-									addView(weekView)
-								}
-							}, modifier = Modifier.fillMaxSize())
+								}, modifier = Modifier
+									.fillMaxSize()
+									.disabled(anonymous)
+							)
 
 							Text(
 								text = stringResource(
@@ -379,7 +397,50 @@ class MainActivity :
 								modifier = Modifier
 									.align(Alignment.BottomStart)
 									.padding(start = 48.dp, bottom = 8.dp)
+									.disabled(anonymous)
 							)
+
+							if (anonymous) {
+								Column(
+									verticalArrangement = Arrangement.Center,
+									horizontalAlignment = Alignment.CenterHorizontally,
+									modifier = Modifier
+										.fillMaxSize()
+										.absolutePadding(left = 16.dp)
+								) {
+									Text(
+										text = stringResource(id = R.string.main_anonymous_login_info_text),
+										textAlign = TextAlign.Center,
+										modifier = Modifier
+											.padding(horizontal = 32.dp)
+									)
+
+									Button(
+										onClick = {
+											settingsLauncher.launch(
+												Intent(
+													this@MainActivity,
+													SettingsActivity::class.java
+												).apply {
+													putExtra(EXTRA_LONG_PROFILE_ID, profileId)
+													putExtra(
+														EXTRA_STRING_PREFERENCE_ROUTE,
+														"preferences_timetable"
+													)
+													putExtra(
+														EXTRA_STRING_PREFERENCE_HIGHLIGHT,
+														"preference_timetable_personal_timetable"
+													)
+												}
+											)
+										},
+										modifier = Modifier
+											.padding(top = 16.dp)
+									) {
+										Text(text = stringResource(id = R.string.main_go_to_settings))
+									}
+								}
+							}
 
 							if (loading > 0)
 								CircularProgressIndicator(
@@ -541,10 +602,7 @@ class MainActivity :
 					id = profileUser.userData.elemId,
 					orgId = profileUser.userData.elemId,
 				) to profileUser.getDisplayedName(applicationContext)
-			} /*?: run {
-				// TODO: Show anonymous
-				//return setTarget(true, profileUser.getDisplayedName(applicationContext))
-			}*/
+			}
 		} else {
 			val displayedElement = decodeStoredTimetableValue(customTimetable)
 
