@@ -6,6 +6,7 @@ import android.graphics.RectF
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.MotionEvent
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -694,6 +695,8 @@ class MainActivity :
 				.onFailure {
 					when (it) {
 						is TimetableLoader.TimetableLoaderException -> {
+							Log.e("MainActivity", it.untisErrorMessage ?: it.message ?: "unknown error")
+
 							when (it.untisErrorCode) {
 								/*TimetableLoader.CODE_CACHE_MISSING -> timetableLoader!!.repeat(
 									it.requestId,
@@ -701,8 +704,7 @@ class MainActivity :
 									proxyHost
 								)*/
 								else -> {
-									/*showLoading(false)
-									Snackbar.make(
+									/*Snackbar.make(
 										content_main,
 										if (code != null) ErrorMessageDictionary.getErrorMessage(
 											resources,
@@ -1267,7 +1269,7 @@ override fun onPrepareOptionsMenu(menu: Menu): Boolean {
 				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor else examColor
 				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else cancelledColor
 				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else irregularColor
-				useTheme -> colorScheme.primary.toArgb()
+				useTheme -> colorScheme.primaryContainer.toArgb()
 				else -> if (useDefault.contains("regular")) defaultColor else regularColor
 			}
 
@@ -1281,11 +1283,13 @@ override fun onPrepareOptionsMenu(menu: Menu): Boolean {
 				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(
 					0.25f
 				) else irregularPastColor
-				useTheme -> colorScheme.primaryContainer.toArgb()/*if (currentTheme == "pixel") getAttr(R.attr.colorPrimary).darken(0.25f) else getAttr(
+				useTheme -> colorScheme.primaryContainer.copy(alpha = .7f).toArgb()/*if (currentTheme == "pixel") getAttr(R.attr.colorPrimary).darken(0.25f) else getAttr(
 					R.attr.colorPrimaryDark
 				)*/
 				else -> if (useDefault.contains("regular")) defaultColor.darken(0.25f) else regularPastColor
 			}
+
+			item.textColor = colorScheme.onPrimaryContainer.toArgb()
 		}
 	}
 

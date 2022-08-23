@@ -13,6 +13,7 @@ open class WeekViewEvent<T>(
 		var endTime: DateTime,
 		var color: Int = 0,
 		var pastColor: Int = 0,
+		var textColor: Int = 0,
 		var data: T? = null,
 		var hasIndicator: Boolean = false
 ) : WeekViewDisplayable<T>, Comparable<WeekViewEvent<*>> {
@@ -25,6 +26,9 @@ open class WeekViewEvent<T>(
 
 	internal val pastColorOrDefault: Int
 		get() = if (pastColor != 0) pastColor else DEFAULT_COLOR
+
+	internal val textColorOrDefault: Int
+		get() = if (textColor != 0) textColor else Color.BLACK
 
 	internal fun isSameDay(other: DateTime?) = if (other == null) false else DateUtils.isSameDay(startTime, other)
 
