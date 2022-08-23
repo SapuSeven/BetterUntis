@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
@@ -373,17 +374,30 @@ private fun TimetableDatabaseInterface.TimetableItemDetailsDialogElement(
 				Row(
 					modifier = Modifier.horizontalScroll(rememberScrollState())
 				) {
-					elements.forEach {
-						// TODO: Handle id != orgId for substitutions
+					elements.forEach { element ->
 						Text(
-							text = if (useLongName) getLongName(it) else getShortName(it),
+							text = if (useLongName) getLongName(element) else getShortName(element),
 							modifier = Modifier
 								.clip(RoundedCornerShape(50))
 								.clickable {
-									onElementClick(it)
+									onElementClick(element)
 								}
 								.padding(8.dp)
 						)
+
+						if (element.id != element.orgId)
+							element.copy(id = element.orgId).let { orgElement ->
+								Text(
+									text = if (useLongName) getLongName(orgElement) else getShortName(orgElement),
+									style = LocalTextStyle.current.copy(textDecoration = TextDecoration.LineThrough),
+									modifier = Modifier
+										.clip(RoundedCornerShape(50))
+										.clickable {
+											onElementClick(orgElement)
+										}
+										.padding(8.dp)
+								)
+							}
 					}
 				}
 			},
