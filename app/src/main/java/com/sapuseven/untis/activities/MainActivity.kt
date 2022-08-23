@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
@@ -48,6 +49,7 @@ import com.sapuseven.untis.ui.common.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
 import com.sapuseven.untis.ui.common.Weekday
 import com.sapuseven.untis.ui.common.disabled
+import com.sapuseven.untis.ui.dialogs.TimetableItemDetailsDialog
 import com.sapuseven.untis.ui.theme.AppTheme
 import com.sapuseven.untis.viewmodels.PeriodDataViewModel
 import com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
@@ -163,6 +165,7 @@ class MainActivity :
 						personalTimetable?.second ?: defaultDisplayedName
 					)
 				}
+
 				var loading by rememberSaveable { mutableStateOf(0) }
 				var currentWeekIndex by rememberSaveable { mutableStateOf(0) }
 				var lastRefreshTimestamp by remember { mutableStateOf(0L) }
@@ -172,7 +175,21 @@ class MainActivity :
 				val drawerState = rememberDrawerState(DrawerValue.Closed)
 				var drawerGestures by remember { mutableStateOf(true) }
 
+				// TODO: Implement saveable
+				var timetableItemDetailsDialog by rememberSaveable {
+					mutableStateOf<TimegridItem?>(
+						null
+					)
+				}
+
 				val anonymous = displayedElement == null
+
+				fun displayElement(element: PeriodElement?, name: String? = null) {
+					displayedElement = element
+					displayedName =
+						name ?: element?.let { timetableDatabaseInterface.getLongName(it) }
+								?: defaultDisplayedName
+				}
 
 				LaunchedEffect(displayedElement) {
 					weeklyTimetableItems.clear()
@@ -188,8 +205,7 @@ class MainActivity :
 						isPersonalTimetable = isPersonal
 
 						it.let { element ->
-							displayedElement = element?.first
-							displayedName = element?.second ?: defaultDisplayedName
+							displayElement(element?.first, element?.second)
 						}
 					}
 				) {
@@ -309,7 +325,7 @@ class MainActivity :
 												data: TimegridItem,
 												eventRect: RectF
 											) {
-												//timetableItemDetailsDialog = data
+												timetableItemDetailsDialog = data
 											}
 										})
 
@@ -461,6 +477,26 @@ class MainActivity :
 						}
 					}
 				}
+
+				val density = LocalDensity.current
+				val offsetY = { _: Int ->
+					with(density) { 40.dp.roundToPx() }
+				}
+				// TODO: Implement a smoother animation (see https://m3.material.io/components/dialogs/guidelines#007536b9-76b1-474a-a152-2f340caaff6f)
+				AnimatedVisibility(
+					visible = timetableItemDetailsDialog != null,
+					enter = slideInVertically(initialOffsetY = offsetY) + fadeIn(),
+					exit = slideOutVertically(targetOffsetY = offsetY) + fadeOut()
+				) {
+					TimetableItemDetailsDialog(
+						timegridItem = remember { timetableItemDetailsDialog!! },
+						timetableDatabaseInterface = timetableDatabaseInterface,
+						onDismiss = {
+							timetableItemDetailsDialog = null
+							it?.let { displayElement(it) }
+						}
+					)
+				}
 			}
 		}
 
@@ -506,10 +542,14 @@ class MainActivity :
 				timetableDatabaseInterface = timetableDatabaseInterface,
 				onDismiss = { showElementPicker = null },
 				onSelect = { item ->
-					onShowTimetable(
-						item to item?.let { timetableDatabaseInterface.getLongName(it) },
-						false
-					)
+					item?.let {
+						onShowTimetable(
+							item to timetableDatabaseInterface.getLongName(it),
+							false
+						)
+					} ?: run {
+						onShowTimetable(getPersonalTimetableElement(), true)
+					}
 				},
 				initialType = type
 			)

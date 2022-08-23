@@ -10,7 +10,7 @@ import com.sapuseven.untis.models.untis.masterdata.Teacher
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import java.io.Serializable
 
-class TimetableDatabaseInterface(@Transient val database: UserDatabase, id: Long) : Serializable {
+class TimetableDatabaseInterface(@Transient val database: UserDatabase, @Transient val id: Long) : Serializable {
 	private var allClasses: Map<Int, Klasse> = mapOf()
 	private var allTeachers: Map<Int, Teacher> = mapOf()
 	private var allSubjects: Map<Int, Subject> = mapOf()
@@ -64,7 +64,7 @@ class TimetableDatabaseInterface(@Transient val database: UserDatabase, id: Long
 	}
 
 	fun getLongName(periodElement: PeriodElement): String {
-		return getShortName(periodElement.id, periodElement.type)
+		return getLongName(periodElement.id, periodElement.type)
 	}
 
 	fun isAllowed(id: Int, type: Type?): Boolean {

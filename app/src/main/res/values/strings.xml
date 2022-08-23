@@ -348,4 +348,7 @@
 		<item quantity="other">%1$d contributions</item>
 	</plurals>
     <string name="main_dialog_delete_bookmark">Would you like to delete this bookmark?</string>
+    <string name="all_lesson_info">Info</string>
+	<string name="all_homework">Homework</string>
+	<string name="all_exam">Exam</string>
 </resources>
