@@ -83,8 +83,6 @@ class MainActivity :
 		private const val HOUR_MILLIS: Int = 60 * MINUTE_MILLIS
 		private const val DAY_MILLIS: Int = 24 * HOUR_MILLIS
 
-		private const val REQUEST_CODE_ROOM_FINDER = 1
-		private const val REQUEST_CODE_SETTINGS = 2
 		private const val REQUEST_CODE_LOGINDATAINPUT_ADD = 3
 		private const val REQUEST_CODE_LOGINDATAINPUT_EDIT = 4
 		private const val REQUEST_CODE_ERRORS = 5
@@ -185,6 +183,7 @@ class MainActivity :
 				val anonymous = displayedElement == null
 
 				fun displayElement(element: PeriodElement?, name: String? = null) {
+					isPersonalTimetable = false
 					displayedElement = element
 					displayedName =
 						name ?: element?.let { timetableDatabaseInterface.getLongName(it) }
@@ -202,11 +201,11 @@ class MainActivity :
 					displayedElement = displayedElement,
 					isPersonalTimetable = isPersonalTimetable,
 					onShowTimetable = { it, isPersonal ->
-						isPersonalTimetable = isPersonal
-
 						it.let { element ->
 							displayElement(element?.first, element?.second)
 						}
+
+						isPersonalTimetable = isPersonal
 					}
 				) {
 					Scaffold(
