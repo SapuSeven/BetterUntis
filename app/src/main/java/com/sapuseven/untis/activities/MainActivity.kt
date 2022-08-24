@@ -100,18 +100,15 @@ class MainActivity :
 		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileid"
 	}
 
-	private val userDatabase = UserDatabase.createInstance(this)
 	private var lastBackPress: Long = 0
-	private var profileId: Long = -1
+	//private var profileId: Long = -1
 
 	private var lastPickedDate: DateTime? = null
 	private var proxyHost: String? = null
 	private var profileUpdateDialog: AlertDialog? = null
 	private val weekViewRefreshHandler = Handler(Looper.getMainLooper())
 	private var timetableLoader: TimetableLoader? = null
-	private lateinit var profileUser: UserDatabase.User
 	private lateinit var profileListAdapter: ProfileListAdapter
-	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 	private lateinit var weekView: WeekView<TimegridItem>
 	private var BOOKMARKS_ADD_ID: Int = 0
 	private val timetableItemDetailsViewModel: PeriodDataViewModel by viewModels()
@@ -137,7 +134,7 @@ class MainActivity :
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
-		if (!loadProfile())
+		if (!checkProfile())
 			return
 
 		//setupNotifications()
@@ -1042,7 +1039,6 @@ private fun setupSwipeRefresh() {
 		if (profileId == 0L || userDatabase.getUser(profileId) == null)
 			profileId = userDatabase.getAllUsers()[0].id
 				?: 0 // Fall back to the first user if an invalid user id is saved
-		profileUser = userDatabase.getUser(profileId) ?: return false
 
 		preferences.saveProfileId(profileId)
 		preferences.loadProfile(profileId)

@@ -3,15 +3,31 @@ package com.sapuseven.untis.activities
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.sapuseven.untis.R
+import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.config.PreferenceHelper
+import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import com.sapuseven.untis.ui.theme.AppTheme
 
 @SuppressLint("Registered") // This activity is not intended to be used directly
-open class BaseComposeActivity : ComponentActivity() {
+open class BaseComposeActivity() : ComponentActivity() {
 	/*protected var hasOwnToolbar: Boolean = false
 	protected var currentTheme: String = ""
 	private var currentDarkTheme: String = ""*/
 
 	protected lateinit var preferences: PreferenceHelper
+	internal var profileId: Long = -1
+	protected lateinit var userDatabase: UserDatabase
+	protected lateinit var profileUser: UserDatabase.User
+	protected lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 
 	companion object {
 		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileid"
@@ -23,13 +39,54 @@ open class BaseComposeActivity : ComponentActivity() {
 		//Thread.setDefaultUncaughtExceptionHandler(CrashHandler(Thread.getDefaultUncaughtExceptionHandler()))
 
 		preferences = PreferenceHelper(this)
-		preferences.loadSavedProfile()
+		userDatabase = UserDatabase.createInstance(this)
+
+		profileId = (intent.extras?.getLong(EXTRA_LONG_PROFILE_ID)) ?: preferences.loadProfileId()
+		userDatabase.getUser(profileId)?.let { profileUser = it }
+
+		if (checkProfile(false))
+			timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileId)
+
+		super.onCreate(savedInstanceState)
 
 		/*currentTheme = preferences["preference_theme"]
 		currentDarkTheme = preferences["preference_dark_theme"]
 		setAppTheme(hasOwnToolbar)*/
-		super.onCreate(savedInstanceState)
 	}
+
+	fun checkProfile(showDialog: Boolean = true): Boolean {
+		if (!this::profileUser.isInitialized || profileId < 0) {
+			if (showDialog)
+				setContent {
+					AppTheme {
+						Surface(
+							modifier = Modifier.fillMaxSize()
+						) {
+							AlertDialog(
+								onDismissRequest = {
+									finish()
+								},
+								text = {
+									Text("Invalid profile ID") // TODO: Localize
+								},
+								confirmButton = {
+									TextButton(
+										onClick = {
+											finish()
+										}) {
+										Text(stringResource(id = R.string.all_exit))
+									}
+								}
+							)
+						}
+					}
+				}
+
+			return false
+		}
+		return true
+	}
+
 /*
 	/**
 	 * Checks for saved crashes. Calls [onErrorLogFound] if logs are found.

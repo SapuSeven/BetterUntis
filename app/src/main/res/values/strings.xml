@@ -351,4 +351,5 @@
     <string name="all_lesson_info">Info</string>
 	<string name="all_homework">Homework</string>
 	<string name="all_exam">Exam</string>
+    <string name="all_exit">Exit</string>
 </resources>

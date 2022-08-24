@@ -18,13 +18,7 @@ class UntisPreferenceDataStore<T>(
 	val dataStore: DataStore<Preferences>?,
 	val prefKey: Preferences.Key<T>,
 	val defaultValue: T,
-	val dependencyValue: (prefValue: T) -> Boolean = {
-		when (it) {
-			is Boolean -> it
-			is String -> it.isNotEmpty()
-			else -> true
-		}
-	},
+	val dependencyValue: (prefValue: T) -> Boolean = { true },
 	val subDependency: UntisPreferenceDataStore<*>? = null
 ) {
 	companion object {
