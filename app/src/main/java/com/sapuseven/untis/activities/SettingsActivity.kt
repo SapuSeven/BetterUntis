@@ -18,17 +18,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.*
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.core.Preferences
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.helpers.config.*
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.preferences.PreferenceCategory
 import com.sapuseven.untis.preferences.PreferenceScreen
@@ -44,20 +44,19 @@ class SettingsActivity : BaseComposeActivity() {
 	companion object {
 		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileid"
 		const val EXTRA_STRING_PREFERENCE_ROUTE = "com.sapuseven.untis.activities.settings.route"
-		const val EXTRA_STRING_PREFERENCE_HIGHLIGHT = "com.sapuseven.untis.activities.settings.highlight"
+		const val EXTRA_STRING_PREFERENCE_HIGHLIGHT =
+			"com.sapuseven.untis.activities.settings.highlight"
 
-		private const val DIALOG_RECOMMEND_HIDE = "preference_dialog_recommend_hide"
-
-		private const val REPOSITORY_URL_GITHUB = "https://github.com/SapuSeven/BetterUntis"
-		private const val WIKI_URL_PROXY = "$REPOSITORY_URL_GITHUB/wiki/Proxy"
-		private const val URL_RECOMMEND = "https://sapuseven.com/app/BetterUntis"
+		private const val URL_GITHUB_REPOSITORY = "https://github.com/SapuSeven/BetterUntis"
+		private const val URL_WIKI_PROXY = "$URL_GITHUB_REPOSITORY/wiki/Proxy"
 	}
 
-	@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+	@OptIn(ExperimentalMaterial3Api::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		val profileId = (intent.extras?.getLong(EXTRA_LONG_PROFILE_ID)) ?: -1 // TODO
-		val preferencePath = (intent.extras?.getString(EXTRA_STRING_PREFERENCE_ROUTE)) ?: "preferences"
+		val preferencePath =
+			(intent.extras?.getString(EXTRA_STRING_PREFERENCE_ROUTE)) ?: "preferences"
 		val preferenceHighlight = (intent.extras?.getString(EXTRA_STRING_PREFERENCE_HIGHLIGHT))
 
 		val userDatabase = UserDatabase.createInstance(this)
@@ -92,13 +91,6 @@ class SettingsActivity : BaseComposeActivity() {
 							.padding(innerPadding)
 							.fillMaxSize()
 					) {
-						/*val fragment =
-							supportFragmentManager.findFragmentByTag(PreferencesFragment.FRAGMENT_TAG)
-								?: PreferencesFragment()
-						val args = Bundle()
-						profileId?.let { args.putLong(EXTRA_LONG_PROFILE_ID, it) }
-						fragment.arguments = args*/
-
 						NavHost(navController, startDestination = preferencePath) {
 							composable("preferences") {
 								title = null
@@ -187,7 +179,10 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_double_tap_to_exit)) },
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = booleanPreferencesKey("preference_double_tap_to_exit"),
+												prefKey = booleanPreferenceKey(
+													profileId,
+													"preference_double_tap_to_exit"
+												),
 												defaultValue = booleanResource(R.bool.preference_double_tap_to_exit_default)
 											)
 										)
@@ -196,7 +191,10 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_flinging_enable)) },
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = booleanPreferencesKey("preference_fling_enable"),
+												prefKey = booleanPreferenceKey(
+													profileId,
+													"preference_fling_enable"
+												),
 												defaultValue = booleanResource(R.bool.preference_fling_enable_default)
 											)
 										)
@@ -208,7 +206,10 @@ class SettingsActivity : BaseComposeActivity() {
 											summary = { Text(stringResource(R.string.preference_week_snap_to_days_summary)) },
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = booleanPreferencesKey("preference_week_snap_to_days"),
+												prefKey = booleanPreferenceKey(
+													profileId,
+													"preference_week_snap_to_days"
+												),
 												defaultValue = booleanResource(R.bool.preference_week_snap_to_days_default)
 											)
 										)
@@ -217,7 +218,10 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_week_custom_range)) },
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringSetPreferencesKey("preference_week_custom_range"),
+												prefKey = stringSetPreferenceKey(
+													profileId,
+													"preference_week_custom_range"
+												),
 												defaultValue = emptySet()
 											)
 										)
@@ -230,7 +234,10 @@ class SettingsActivity : BaseComposeActivity() {
 											showSeekBarValue = true,
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = floatPreferencesKey("preference_week_custom_display_length"),
+												prefKey = floatPreferenceKey(
+													profileId,
+													"preference_week_custom_display_length"
+												),
 												defaultValue = 0f
 											)
 										)
@@ -243,7 +250,10 @@ class SettingsActivity : BaseComposeActivity() {
 											summary = { Text(stringResource(R.string.preference_automute_enable_summary)) },
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = booleanPreferencesKey("preference_automute_enable"),
+												prefKey = booleanPreferenceKey(
+													profileId,
+													"preference_automute_enable"
+												),
 												defaultValue = booleanResource(R.bool.preference_automute_enable_default)
 											)
 										)
@@ -251,12 +261,18 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_automute_cancelled_lessons)) },
 											dependency = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = booleanPreferencesKey("preference_automute_enable"),
+												prefKey = booleanPreferenceKey(
+													profileId,
+													"preference_automute_enable"
+												),
 												defaultValue = booleanResource(R.bool.preference_automute_enable_default)
 											),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = booleanPreferencesKey("preference_automute_cancelled_lessons"),
+												prefKey = booleanPreferenceKey(
+													profileId,
+													"preference_automute_cancelled_lessons"
+												),
 												defaultValue = booleanResource(R.bool.preference_automute_cancelled_lessons_default)
 											)
 										)
@@ -264,12 +280,18 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_automute_mute_priority)) },
 											dependency = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = booleanPreferencesKey("preference_automute_enable"),
+												prefKey = booleanPreferenceKey(
+													profileId,
+													"preference_automute_enable"
+												),
 												defaultValue = booleanResource(R.bool.preference_automute_enable_default)
 											),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = booleanPreferencesKey("preference_automute_mute_priority"),
+												prefKey = booleanPreferenceKey(
+													profileId,
+													"preference_automute_mute_priority"
+												),
 												defaultValue = booleanResource(R.bool.preference_automute_mute_priority_default)
 											)
 										)
@@ -282,12 +304,18 @@ class SettingsActivity : BaseComposeActivity() {
 											showSeekBarValue = true,
 											dependency = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = booleanPreferencesKey("preference_automute_enable"),
+												prefKey = booleanPreferenceKey(
+													profileId,
+													"preference_automute_enable"
+												),
 												defaultValue = booleanResource(R.bool.preference_automute_enable_default)
 											),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = floatPreferencesKey("preference_automute_minimum_break_length"),
+												prefKey = floatPreferenceKey(
+													profileId,
+													"preference_automute_minimum_break_length"
+												),
 												defaultValue = integerResource(id = R.integer.preference_automute_minimum_break_length_default).toFloat()
 											)
 										)
@@ -300,7 +328,10 @@ class SettingsActivity : BaseComposeActivity() {
 											summary = { Text("This is used for non-critical background errors") },
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = booleanPreferencesKey("preference_additional_error_messages"),
+												prefKey = booleanPreferenceKey(
+													profileId,
+													"preference_additional_error_messages"
+												),
 												defaultValue = booleanResource(R.bool.preference_additional_error_messages_default)
 											)
 										)
@@ -324,7 +355,10 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_timetable_item_text_light)) },
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = booleanPreferencesKey("preference_timetable_item_text_light"),
+												prefKey = booleanPreferenceKey(
+													profileId,
+													"preference_timetable_item_text_light"
+												),
 												defaultValue = booleanResource(R.bool.preference_timetable_item_text_light_default)
 											)
 										)
@@ -334,7 +368,10 @@ class SettingsActivity : BaseComposeActivity() {
 											showAlphaSlider = true,
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = intPreferencesKey("preference_background_future"),
+												prefKey = intPreferenceKey(
+													profileId,
+													"preference_background_future"
+												),
 												defaultValue = integerResource(R.integer.preference_background_future_default)
 											)
 										)
@@ -344,7 +381,10 @@ class SettingsActivity : BaseComposeActivity() {
 											showAlphaSlider = true,
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = intPreferencesKey("preference_background_past"),
+												prefKey = intPreferenceKey(
+													profileId,
+													"preference_background_past"
+												),
 												defaultValue = integerResource(R.integer.preference_background_past_default)
 											)
 										)
@@ -353,7 +393,10 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_marker)) },
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = intPreferencesKey("preference_marker"),
+												prefKey = intPreferenceKey(
+													profileId,
+													"preference_marker"
+												),
 												defaultValue = integerResource(R.integer.preference_marker_default)
 											)
 										)
@@ -367,7 +410,10 @@ class SettingsActivity : BaseComposeActivity() {
 											entryLabels = stringArrayResource(id = R.array.preference_schoolcolors),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringSetPreferencesKey("preference_school_background"),
+												prefKey = stringSetPreferenceKey(
+													profileId,
+													"preference_school_background"
+												),
 												defaultValue = emptySet()
 											)
 										)
@@ -376,13 +422,19 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_use_theme_background)) },
 											dependency = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringSetPreferencesKey("preference_school_background"),
+												prefKey = stringSetPreferenceKey(
+													profileId,
+													"preference_school_background"
+												),
 												defaultValue = emptySet(),
 												dependencyValue = { !it.contains("regular") }
 											),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = booleanPreferencesKey("preference_use_theme_background"),
+												prefKey = booleanPreferenceKey(
+													profileId,
+													"preference_use_theme_background"
+												),
 												defaultValue = booleanResource(R.bool.preference_use_theme_background_default)
 											)
 										)
@@ -391,19 +443,28 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_background_regular)) },
 											dependency = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringSetPreferencesKey("preference_school_background"),
+												prefKey = stringSetPreferenceKey(
+													profileId,
+													"preference_school_background"
+												),
 												defaultValue = emptySet(),
 												dependencyValue = { !it.contains("regular") },
 												subDependency = UntisPreferenceDataStore(
 													dataStore = dataStore,
-													prefKey = booleanPreferencesKey("preference_use_theme_background"),
+													prefKey = booleanPreferenceKey(
+														profileId,
+														"preference_use_theme_background"
+													),
 													defaultValue = booleanResource(R.bool.preference_use_theme_background_default),
 													dependencyValue = { !it }
 												)
 											),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = intPreferencesKey("preference_background_regular"),
+												prefKey = intPreferenceKey(
+													profileId,
+													"preference_background_regular"
+												),
 												defaultValue = integerResource(R.integer.preference_background_regular_default)
 											)
 										)
@@ -412,19 +473,28 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_background_regular_past)) },
 											dependency = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringSetPreferencesKey("preference_school_background"),
+												prefKey = stringSetPreferenceKey(
+													profileId,
+													"preference_school_background"
+												),
 												defaultValue = emptySet(),
 												dependencyValue = { !it.contains("regular") },
 												subDependency = UntisPreferenceDataStore(
 													dataStore = dataStore,
-													prefKey = booleanPreferencesKey("preference_use_theme_background"),
+													prefKey = booleanPreferenceKey(
+														profileId,
+														"preference_use_theme_background"
+													),
 													defaultValue = booleanResource(R.bool.preference_use_theme_background_default),
 													dependencyValue = { !it }
 												)
 											),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = intPreferencesKey("preference_background_regular_past"),
+												prefKey = intPreferenceKey(
+													profileId,
+													"preference_background_regular_past"
+												),
 												defaultValue = integerResource(R.integer.preference_background_regular_past_default)
 											)
 										)
@@ -433,13 +503,19 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_background_exam)) },
 											dependency = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringSetPreferencesKey("preference_school_background"),
+												prefKey = stringSetPreferenceKey(
+													profileId,
+													"preference_school_background"
+												),
 												defaultValue = emptySet(),
 												dependencyValue = { !it.contains("exam") }
 											),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = intPreferencesKey("preference_background_exam"),
+												prefKey = intPreferenceKey(
+													profileId,
+													"preference_background_exam"
+												),
 												defaultValue = integerResource(R.integer.preference_background_exam_default)
 											)
 										)
@@ -448,13 +524,19 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_background_exam_past)) },
 											dependency = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringSetPreferencesKey("preference_school_background"),
+												prefKey = stringSetPreferenceKey(
+													profileId,
+													"preference_school_background"
+												),
 												defaultValue = emptySet(),
 												dependencyValue = { !it.contains("exam") }
 											),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = intPreferencesKey("preference_background_exam_past"),
+												prefKey = intPreferenceKey(
+													profileId,
+													"preference_background_exam_past"
+												),
 												defaultValue = integerResource(R.integer.preference_background_exam_past_default)
 											)
 										)
@@ -463,13 +545,19 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_background_irregular)) },
 											dependency = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringSetPreferencesKey("preference_school_background"),
+												prefKey = stringSetPreferenceKey(
+													profileId,
+													"preference_school_background"
+												),
 												defaultValue = emptySet(),
 												dependencyValue = { !it.contains("irregular") }
 											),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = intPreferencesKey("preference_background_irregular"),
+												prefKey = intPreferenceKey(
+													profileId,
+													"preference_background_irregular"
+												),
 												defaultValue = integerResource(R.integer.preference_background_irregular_default)
 											)
 										)
@@ -478,13 +566,19 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_background_irregular_past)) },
 											dependency = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringSetPreferencesKey("preference_school_background"),
+												prefKey = stringSetPreferenceKey(
+													profileId,
+													"preference_school_background"
+												),
 												defaultValue = emptySet(),
 												dependencyValue = { !it.contains("irregular") }
 											),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = intPreferencesKey("preference_background_irregular_past"),
+												prefKey = intPreferenceKey(
+													profileId,
+													"preference_background_irregular_past"
+												),
 												defaultValue = integerResource(R.integer.preference_background_irregular_past_default)
 											)
 										)
@@ -493,13 +587,19 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_background_cancelled)) },
 											dependency = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringSetPreferencesKey("preference_school_background"),
+												prefKey = stringSetPreferenceKey(
+													profileId,
+													"preference_school_background"
+												),
 												defaultValue = emptySet(),
 												dependencyValue = { !it.contains("cancelled") }
 											),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = intPreferencesKey("preference_background_cancelled"),
+												prefKey = intPreferenceKey(
+													profileId,
+													"preference_background_cancelled"
+												),
 												defaultValue = integerResource(R.integer.preference_background_cancelled_default)
 											)
 										)
@@ -508,13 +608,19 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_background_cancelled_past)) },
 											dependency = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringSetPreferencesKey("preference_school_background"),
+												prefKey = stringSetPreferenceKey(
+													profileId,
+													"preference_school_background"
+												),
 												defaultValue = emptySet(),
 												dependencyValue = { !it.contains("cancelled") }
 											),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = intPreferencesKey("preference_background_cancelled_past"),
+												prefKey = intPreferenceKey(
+													profileId,
+													"preference_background_cancelled_past"
+												),
 												defaultValue = integerResource(R.integer.preference_background_cancelled_past_default)
 											)
 										)
@@ -540,7 +646,10 @@ class SettingsActivity : BaseComposeActivity() {
 											entryLabels = stringArrayResource(id = R.array.preference_themes),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringPreferencesKey("preference_theme"),
+												prefKey = stringPreferenceKey(
+													profileId,
+													"preference_theme"
+												),
 												defaultValue = stringResource(R.string.preference_theme_default)
 											)
 										)
@@ -558,7 +667,10 @@ class SettingsActivity : BaseComposeActivity() {
 											entryLabels = stringArrayResource(id = R.array.preference_dark_theme),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringPreferencesKey("preference_dark_theme"),
+												prefKey = stringPreferenceKey(
+													profileId,
+													"preference_dark_theme"
+												),
 												defaultValue = stringResource(R.string.preference_dark_theme_default)
 											)
 										)
@@ -574,13 +686,19 @@ class SettingsActivity : BaseComposeActivity() {
 											},
 											dependency = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringPreferencesKey("preference_dark_theme"),
+												prefKey = stringPreferenceKey(
+													profileId,
+													"preference_dark_theme"
+												),
 												defaultValue = stringResource(R.string.preference_dark_theme_default),
 												dependencyValue = { it != "off" }
 											),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = booleanPreferencesKey("preference_dark_theme_oled"),
+												prefKey = booleanPreferenceKey(
+													profileId,
+													"preference_dark_theme_oled"
+												),
 												defaultValue = booleanResource(R.bool.preference_dark_theme_oled_default)
 											)
 										)
@@ -596,7 +714,10 @@ class SettingsActivity : BaseComposeActivity() {
 										title = { Text(stringResource(R.string.preference_timetable_personal_timetable)) },
 										dataStore = UntisPreferenceDataStore(
 											dataStore = dataStore,
-											prefKey = stringPreferencesKey("preference_timetable_personal_timetable"),
+											prefKey = stringPreferenceKey(
+												profileId,
+												"preference_timetable_personal_timetable"
+											),
 											defaultValue = ""
 										),
 										timetableDatabaseInterface = timetableDatabaseInterface,
@@ -608,7 +729,10 @@ class SettingsActivity : BaseComposeActivity() {
 										summary = { Text(stringResource(R.string.preference_timetable_hide_time_stamps_desc)) },
 										dataStore = UntisPreferenceDataStore(
 											dataStore = dataStore,
-											prefKey = booleanPreferencesKey("preference_timetable_hide_time_stamps"),
+											prefKey = booleanPreferenceKey(
+												profileId,
+												"preference_timetable_hide_time_stamps"
+											),
 											defaultValue = booleanResource(R.bool.preference_timetable_hide_time_stamps_default)
 										)
 									)
@@ -618,7 +742,10 @@ class SettingsActivity : BaseComposeActivity() {
 										summary = { Text(stringResource(R.string.preference_timetable_hide_cancelled_desc)) },
 										dataStore = UntisPreferenceDataStore(
 											dataStore = dataStore,
-											prefKey = booleanPreferencesKey("preference_timetable_hide_cancelled"),
+											prefKey = booleanPreferenceKey(
+												profileId,
+												"preference_timetable_hide_cancelled"
+											),
 											defaultValue = booleanResource(R.bool.preference_timetable_hide_cancelled_default)
 										)
 									)
@@ -628,7 +755,10 @@ class SettingsActivity : BaseComposeActivity() {
 										summary = { Text(stringResource(R.string.preference_timetable_substitutions_irregular_desc)) },
 										dataStore = UntisPreferenceDataStore(
 											dataStore = dataStore,
-											prefKey = booleanPreferencesKey("preference_timetable_substitutions_irregular"),
+											prefKey = booleanPreferenceKey(
+												profileId,
+												"preference_timetable_substitutions_irregular"
+											),
 											defaultValue = booleanResource(R.bool.preference_timetable_substitutions_irregular_default)
 										)
 									)
@@ -638,12 +768,18 @@ class SettingsActivity : BaseComposeActivity() {
 										summary = { Text(stringResource(R.string.preference_timetable_background_irregular_desc)) },
 										dependency = UntisPreferenceDataStore(
 											dataStore = dataStore,
-											prefKey = booleanPreferencesKey("preference_timetable_substitutions_irregular"),
+											prefKey = booleanPreferenceKey(
+												profileId,
+												"preference_timetable_substitutions_irregular"
+											),
 											defaultValue = booleanResource(R.bool.preference_timetable_substitutions_irregular_default)
 										),
 										dataStore = UntisPreferenceDataStore(
 											dataStore = dataStore,
-											prefKey = booleanPreferencesKey("preference_timetable_background_irregular"),
+											prefKey = booleanPreferenceKey(
+												profileId,
+												"preference_timetable_background_irregular"
+											),
 											defaultValue = booleanResource(R.bool.preference_timetable_background_irregular_default)
 										)
 									)
@@ -653,7 +789,10 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_timetable_range)) },
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringPreferencesKey("preference_timetable_range"),
+												prefKey = stringPreferenceKey(
+													profileId,
+													"preference_timetable_range"
+												),
 												defaultValue = ""
 											)
 										)
@@ -662,12 +801,18 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_timetable_range_index_reset)) },
 											dependency = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringPreferencesKey("preference_timetable_range"),
+												prefKey = stringPreferenceKey(
+													profileId,
+													"preference_timetable_range"
+												),
 												defaultValue = ""
 											),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = booleanPreferencesKey("preference_timetable_range_index_reset"),
+												prefKey = booleanPreferenceKey(
+													profileId,
+													"preference_timetable_range_index_reset"
+												),
 												defaultValue = booleanResource(R.bool.preference_timetable_range_index_reset_default)
 											)
 										)
@@ -691,7 +836,10 @@ class SettingsActivity : BaseComposeActivity() {
 											unit = "dp",
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = intPreferencesKey("preference_timetable_item_padding_overlap"),
+												prefKey = intPreferenceKey(
+													profileId,
+													"preference_timetable_item_padding_overlap"
+												),
 												defaultValue = integerResource(R.integer.preference_timetable_item_padding_overlap_default)
 											)
 										)
@@ -707,7 +855,10 @@ class SettingsActivity : BaseComposeActivity() {
 											unit = "dp",
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = intPreferencesKey("preference_timetable_item_padding"),
+												prefKey = intPreferenceKey(
+													profileId,
+													"preference_timetable_item_padding"
+												),
 												defaultValue = integerResource(R.integer.preference_timetable_item_padding_default)
 											)
 										)
@@ -723,7 +874,10 @@ class SettingsActivity : BaseComposeActivity() {
 											unit = "dp",
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = intPreferencesKey("preference_timetable_item_corner_radius"),
+												prefKey = intPreferenceKey(
+													profileId,
+													"preference_timetable_item_corner_radius"
+												),
 												defaultValue = integerResource(R.integer.preference_timetable_item_corner_radius_default)
 											)
 										)
@@ -740,7 +894,10 @@ class SettingsActivity : BaseComposeActivity() {
 											},
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = booleanPreferencesKey("preference_timetable_centered_lesson_info"),
+												prefKey = booleanPreferenceKey(
+													profileId,
+													"preference_timetable_centered_lesson_info"
+												),
 												defaultValue = booleanResource(R.bool.preference_timetable_centered_lesson_info_default)
 											)
 										)
@@ -755,7 +912,10 @@ class SettingsActivity : BaseComposeActivity() {
 											},
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = booleanPreferencesKey("preference_timetable_bold_lesson_name"),
+												prefKey = booleanPreferenceKey(
+													profileId,
+													"preference_timetable_bold_lesson_name"
+												),
 												defaultValue = booleanResource(R.bool.preference_timetable_bold_lesson_name_default)
 											)
 										)
@@ -771,7 +931,10 @@ class SettingsActivity : BaseComposeActivity() {
 											unit = "sp",
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = intPreferencesKey("preference_timetable_lesson_name_font_size"),
+												prefKey = intPreferenceKey(
+													profileId,
+													"preference_timetable_lesson_name_font_size"
+												),
 												defaultValue = integerResource(R.integer.preference_timetable_lesson_name_font_size_default)
 											)
 										)
@@ -787,7 +950,10 @@ class SettingsActivity : BaseComposeActivity() {
 											unit = "sp",
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = intPreferencesKey("preference_timetable_lesson_info_font_size"),
+												prefKey = intPreferenceKey(
+													profileId,
+													"preference_timetable_lesson_info_font_size"
+												),
 												defaultValue = integerResource(R.integer.preference_timetable_lesson_info_font_size_default)
 											)
 										)
@@ -810,7 +976,10 @@ class SettingsActivity : BaseComposeActivity() {
 										},*/
 										dataStore = UntisPreferenceDataStore(
 											dataStore = dataStore,
-											prefKey = booleanPreferencesKey("preference_notifications_enable"),
+											prefKey = booleanPreferenceKey(
+												profileId,
+												"preference_notifications_enable"
+											),
 											defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
 										)
 									)
@@ -820,12 +989,18 @@ class SettingsActivity : BaseComposeActivity() {
 										summary = { Text(stringResource(R.string.preference_notifications_multiple_desc)) },
 										dependency = UntisPreferenceDataStore(
 											dataStore = dataStore,
-											prefKey = booleanPreferencesKey("preference_notifications_enable"),
+											prefKey = booleanPreferenceKey(
+												profileId,
+												"preference_notifications_enable"
+											),
 											defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
 										),
 										dataStore = UntisPreferenceDataStore(
 											dataStore = dataStore,
-											prefKey = booleanPreferencesKey("preference_notifications_in_multiple"),
+											prefKey = booleanPreferenceKey(
+												profileId,
+												"preference_notifications_in_multiple"
+											),
 											defaultValue = booleanResource(R.bool.preference_notifications_in_multiple_default)
 										)
 									)
@@ -835,12 +1010,18 @@ class SettingsActivity : BaseComposeActivity() {
 										summary = { Text(stringResource(R.string.preference_notifications_first_lesson_desc)) },
 										dependency = UntisPreferenceDataStore(
 											dataStore = dataStore,
-											prefKey = booleanPreferencesKey("preference_notifications_enable"),
+											prefKey = booleanPreferenceKey(
+												profileId,
+												"preference_notifications_enable"
+											),
 											defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
 										),
 										dataStore = UntisPreferenceDataStore(
 											dataStore = dataStore,
-											prefKey = booleanPreferencesKey("preference_notifications_before_first"),
+											prefKey = booleanPreferenceKey(
+												profileId,
+												"preference_notifications_before_first"
+											),
 											defaultValue = booleanResource(R.bool.preference_notifications_before_first_default)
 										)
 									)
@@ -850,12 +1031,18 @@ class SettingsActivity : BaseComposeActivity() {
 										unit = stringResource(R.string.preference_notifications_first_lesson_time_unit),
 										dependency = UntisPreferenceDataStore(
 											dataStore = dataStore,
-											prefKey = booleanPreferencesKey("preference_notifications_before_first"),
+											prefKey = booleanPreferenceKey(
+												profileId,
+												"preference_notifications_before_first"
+											),
 											defaultValue = booleanResource(R.bool.preference_notifications_before_first_default)
 										),
 										dataStore = UntisPreferenceDataStore(
 											dataStore = dataStore,
-											prefKey = intPreferencesKey("preference_notifications_before_first_time"),
+											prefKey = intPreferenceKey(
+												profileId,
+												"preference_notifications_before_first_time"
+											),
 											defaultValue = integerResource(R.integer.preference_notifications_before_first_time_default)
 										)
 									)
@@ -886,12 +1073,18 @@ class SettingsActivity : BaseComposeActivity() {
 											entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
 											dependency = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = booleanPreferencesKey("preference_notifications_enable"),
+												prefKey = booleanPreferenceKey(
+													profileId,
+													"preference_notifications_enable"
+												),
 												defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
 											),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringPreferencesKey("preference_notifications_visibility_subjects"),
+												prefKey = stringPreferenceKey(
+													profileId,
+													"preference_notifications_visibility_subjects"
+												),
 												defaultValue = stringResource(R.string.preference_notifications_visibility_subjects_default)
 											)
 										)
@@ -909,12 +1102,18 @@ class SettingsActivity : BaseComposeActivity() {
 											entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
 											dependency = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = booleanPreferencesKey("preference_notifications_enable"),
+												prefKey = booleanPreferenceKey(
+													profileId,
+													"preference_notifications_enable"
+												),
 												defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
 											),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringPreferencesKey("preference_notifications_visibility_rooms"),
+												prefKey = stringPreferenceKey(
+													profileId,
+													"preference_notifications_visibility_rooms"
+												),
 												defaultValue = stringResource(R.string.preference_notifications_visibility_rooms_default)
 											)
 										)
@@ -932,12 +1131,18 @@ class SettingsActivity : BaseComposeActivity() {
 											entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
 											dependency = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = booleanPreferencesKey("preference_notifications_enable"),
+												prefKey = booleanPreferenceKey(
+													profileId,
+													"preference_notifications_enable"
+												),
 												defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
 											),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringPreferencesKey("preference_notifications_visibility_teachers"),
+												prefKey = stringPreferenceKey(
+													profileId,
+													"preference_notifications_visibility_teachers"
+												),
 												defaultValue = stringResource(R.string.preference_notifications_visibility_teachers_default)
 											)
 										)
@@ -955,12 +1160,18 @@ class SettingsActivity : BaseComposeActivity() {
 											entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
 											dependency = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = booleanPreferencesKey("preference_notifications_enable"),
+												prefKey = booleanPreferenceKey(
+													profileId,
+													"preference_notifications_enable"
+												),
 												defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
 											),
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringPreferencesKey("preference_notifications_visibility_classes"),
+												prefKey = stringPreferenceKey(
+													profileId,
+													"preference_notifications_visibility_classes"
+												),
 												defaultValue = stringResource(R.string.preference_notifications_visibility_classes_default)
 											)
 										)
@@ -977,7 +1188,10 @@ class SettingsActivity : BaseComposeActivity() {
 										summary = { Text(stringResource(R.string.preference_connectivity_refresh_in_background_desc)) },
 										dataStore = UntisPreferenceDataStore(
 											dataStore = dataStore,
-											prefKey = booleanPreferencesKey("preference_connectivity_refresh_in_background"),
+											prefKey = booleanPreferenceKey(
+												profileId,
+												"preference_connectivity_refresh_in_background"
+											),
 											defaultValue = booleanResource(R.bool.preference_connectivity_refresh_in_background_default)
 										)
 									)
@@ -993,14 +1207,24 @@ class SettingsActivity : BaseComposeActivity() {
 											},
 											dataStore = UntisPreferenceDataStore(
 												dataStore = dataStore,
-												prefKey = stringPreferencesKey("preference_connectivity_proxy_host"),
+												prefKey = stringPreferenceKey(
+													profileId,
+													"preference_connectivity_proxy_host"
+												),
 												defaultValue = ""
 											)
 										)
 
 										Preference(
 											title = { Text(stringResource(R.string.preference_connectivity_proxy_about)) },
-											onClick = { /*TODO*/ },
+											onClick = {
+												startActivity(
+													Intent(
+														Intent.ACTION_VIEW,
+														Uri.parse(URL_WIKI_PROXY)
+													)
+												)
+											},
 											icon = {
 												Icon(
 													painter = painterResource(R.drawable.settings_info),
@@ -1047,7 +1271,7 @@ class SettingsActivity : BaseComposeActivity() {
 												startActivity(
 													Intent(
 														Intent.ACTION_VIEW,
-														Uri.parse("$REPOSITORY_URL_GITHUB/releases")
+														Uri.parse("$URL_GITHUB_REPOSITORY/releases")
 													)
 												)
 											},
@@ -1062,12 +1286,12 @@ class SettingsActivity : BaseComposeActivity() {
 
 										Preference(
 											title = { Text(stringResource(R.string.preference_info_github)) },
-											summary = { Text(REPOSITORY_URL_GITHUB) },
+											summary = { Text(URL_GITHUB_REPOSITORY) },
 											onClick = {
 												startActivity(
 													Intent(
 														Intent.ACTION_VIEW,
-														Uri.parse(REPOSITORY_URL_GITHUB)
+														Uri.parse(URL_GITHUB_REPOSITORY)
 													)
 												)
 											},
@@ -1087,7 +1311,7 @@ class SettingsActivity : BaseComposeActivity() {
 												startActivity(
 													Intent(
 														Intent.ACTION_VIEW,
-														Uri.parse("$REPOSITORY_URL_GITHUB/blob/master/LICENSE")
+														Uri.parse("$URL_GITHUB_REPOSITORY/blob/master/LICENSE")
 													)
 												)
 											},
@@ -1135,88 +1359,7 @@ class SettingsActivity : BaseComposeActivity() {
 		}
 	}
 
-	/*fun onCreate2(savedInstanceState: Bundle?) {
-		super.onCreate(savedInstanceState)
-
-		setContentView(R.layout.activity_settings)
-		setupRecommendDialog()
-
-		/*if (savedInstanceState == null) {
-			// Create the fragment only when the activity is created for the first time.
-			// ie. not after orientation changes
-
-			supportFragmentManager
-				.beginTransaction()
-				.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-				.replace(
-					R.id.framelayout_settings_content,
-					fragment,
-					PreferencesFragment.FRAGMENT_TAG
-				)
-				.commit()
-		}*/
-	}
-
-	override fun onOptionsItemSelected(item: MenuItem): Boolean {
-		if (item.itemId == android.R.id.home)
-			onBackPressed()
-		return true
-	}
-
-	private fun setupRecommendDialog() {
-		if (preferences[DIALOG_RECOMMEND_HIDE, false]) return
-
-		banner_settings_recommend.visibility = View.VISIBLE
-
-		leftButton.setOnClickListener {
-			banner_settings_recommend.visibility = View.GONE
-
-			preferences[DIALOG_RECOMMEND_HIDE] = true
-		}
-		rightButton.setOnClickListener {
-			startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
-				type = "text/plain"
-				putExtra(
-					Intent.EXTRA_TEXT,
-					getString(R.string.settings_recommend_text, URL_RECOMMEND)
-				)
-			}, getString(R.string.settings_recommend_title)))
-		}
-	}
-
-	override fun onPreferenceStartScreen(
-		preferenceFragmentCompat: PreferenceFragmentCompat,
-		preferenceScreen: com.sapuseven.untis.preferences.PreferenceScreen
-	): Boolean {
-		val fragment = PreferencesFragment()
-		val args = Bundle()
-		args.putString(PreferenceFragmentCompat.ARG_PREFERENCE_ROOT, preferenceScreen.key)
-		profileId?.let { args.putLong(EXTRA_LONG_PROFILE_ID, it) }
-		fragment.arguments = args
-
-		supportFragmentManager
-			.beginTransaction()
-			.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-			.replace(R.id.framelayout_settings_content, fragment, preferenceScreen.key)
-			.addToBackStack(preferenceScreen.title.toString())
-			.commit()
-
-		supportActionBar?.title = preferenceScreen.title
-		return true
-	}
-
-	override fun onBackPressed() {
-		super.onBackPressed()
-
-		supportFragmentManager.run {
-			supportActionBar?.title =
-				if (backStackEntryCount > 0) getBackStackEntryAt(backStackEntryCount - 1).name else getString(
-					R.string.activity_title_settings
-				)
-		}
-	}
-
-	class PreferencesFragment : PreferenceFragmentCompat() {
+	/*class PreferencesFragment : PreferenceFragmentCompat() {
 		companion object {
 			const val FRAGMENT_TAG = "preference_fragment"
 			const val DIALOG_FRAGMENT_TAG = "preference_dialog_fragment"
@@ -1596,6 +1739,3 @@ class SettingsActivity : BaseComposeActivity() {
 		method.invoke(this, view)
 	}*/
 }
-
-private val Int.zeroToNull: Int?
-	get() = if (this != 0) this else null
