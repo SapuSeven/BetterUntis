@@ -12,7 +12,7 @@ data class UntisMasterData(
 		val eventReasons: List<EventReason>,
 		val eventReasonGroups: List<EventReasonGroup>,
 		val excuseStatuses: List<ExcuseStatus>,
-		val holidays: List<Holiday>,
+		val holidays: List<Holiday>?,
 		val klassen: List<Klasse>,
 		val rooms: List<Room>,
 		val subjects: List<Subject>,

@@ -404,9 +404,9 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		db.close()
 	}
 
-	private fun refreshAdditionalUserData(db: SQLiteDatabase, userId: Long, tableName: String, items: List<TableModel>) {
+	private fun refreshAdditionalUserData(db: SQLiteDatabase, userId: Long, tableName: String, items: List<TableModel>?) {
 		db.delete(tableName, "$COLUMN_NAME_USER_ID=?", arrayOf(userId.toString()))
-		items.forEach { data -> db.insert(tableName, null, generateValues(userId, data)) }
+		items?.forEach { data -> db.insert(tableName, null, generateValues(userId, data)) }
 	}
 
 
