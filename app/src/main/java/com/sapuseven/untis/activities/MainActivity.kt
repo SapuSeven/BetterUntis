@@ -1,5 +1,7 @@
 package com.sapuseven.untis.activities
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.RectF
@@ -8,6 +10,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.MotionEvent
+import android.view.View
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -19,14 +22,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -41,6 +48,7 @@ import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.DateTimeUtils
+import com.sapuseven.untis.helpers.config.PreferenceHelper
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.models.untis.UntisDate
@@ -50,6 +58,7 @@ import com.sapuseven.untis.ui.common.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
 import com.sapuseven.untis.ui.common.Weekday
 import com.sapuseven.untis.ui.common.disabled
+import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
 import com.sapuseven.untis.ui.dialogs.TimetableItemDetailsDialog
 import com.sapuseven.untis.ui.theme.AppTheme
 import com.sapuseven.untis.viewmodels.PeriodDataViewModel
@@ -61,6 +70,8 @@ import com.sapuseven.untis.views.weekview.listeners.EventClickListener
 import com.sapuseven.untis.views.weekview.listeners.ScaleListener
 import com.sapuseven.untis.views.weekview.listeners.ScrollListener
 import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants
@@ -96,8 +107,6 @@ class MainActivity :
 
 		private const val FRAGMENT_TAG_LESSON_INFO = "com.sapuseven.untis.fragments.lessoninfo"
 		private const val FRAGMENT_TAG_ABSENCE_CHECK = "com.sapuseven.untis.fragments.absencecheck"
-
-		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileid"
 	}
 
 	private var lastBackPress: Long = 0
@@ -107,18 +116,17 @@ class MainActivity :
 	private var proxyHost: String? = null
 	private var profileUpdateDialog: AlertDialog? = null
 	private val weekViewRefreshHandler = Handler(Looper.getMainLooper())
-	private var timetableLoader: TimetableLoader? = null
 	private lateinit var profileListAdapter: ProfileListAdapter
-	private lateinit var weekView: WeekView<TimegridItem>
 	private var BOOKMARKS_ADD_ID: Int = 0
 	private val timetableItemDetailsViewModel: PeriodDataViewModel by viewModels()
 
-	private val weekViewUpdate = object : Runnable {
+	// TODO
+	/*private val weekViewUpdate = object : Runnable {
 		override fun run() {
 			weekView.invalidate()
 			weekViewRefreshHandler.postDelayed(this, 60 * 1000)
 		}
-	}
+	}*/
 
 	private val shortcutLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -130,369 +138,170 @@ class MainActivity :
 			// TODO: Look at it.data for potential actions (e.g. show a specific timetable)
 		}
 
+	private val loginLauncher =
+		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+			// TODO: Look at it.data for potential actions (e.g. show a specific timetable)
+		}
+
 	@OptIn(ExperimentalMaterial3Api::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
-		if (!checkProfile())
-			return
-
 		//setupNotifications()
-
-		timetableLoader = TimetableLoader(
-			context = WeakReference(this),
-			user = profileUser,
-			timetableDatabaseInterface = timetableDatabaseInterface
-		)
 
 		setContent {
 			AppTheme {
-				/*weekView.setOnCornerClickListener(this)*/
+				withUser (
+					invalidContent = { login() }
+				) { user ->
+					/*weekView.setOnCornerClickListener(this)*/
+					val appState = rememberMainAppState(user, timetableDatabaseInterface)
 
-				val coroutineScope = rememberCoroutineScope()
-
-				val personalTimetable = remember { getPersonalTimetableElement() }
-				var isPersonalTimetable by remember { mutableStateOf(true) }
-				val defaultDisplayedName = stringResource(id = R.string.app_name)
-
-				var displayedElement by remember { mutableStateOf(personalTimetable?.first) } // TODO: Make saveable
-				var displayedName by rememberSaveable {
-					mutableStateOf(
-						personalTimetable?.second ?: defaultDisplayedName
-					)
-				}
-
-				var loading by rememberSaveable { mutableStateOf(0) }
-				var currentWeekIndex by rememberSaveable { mutableStateOf(0) }
-				var lastRefreshTimestamp by remember { mutableStateOf(0L) }
-				val weeklyTimetableItems =
-					remember { mutableStateMapOf<Int, WeeklyTimetableItems?>() }
-
-				val drawerState = rememberDrawerState(DrawerValue.Closed)
-				var drawerGestures by remember { mutableStateOf(true) }
-
-				// TODO: Implement saveable
-				var timetableItemDetailsDialog by rememberSaveable {
-					mutableStateOf<TimegridItem?>(
-						null
-					)
-				}
-
-				val anonymous = displayedElement == null
-
-				fun displayElement(element: PeriodElement?, name: String? = null) {
-					isPersonalTimetable = false
-					displayedElement = element
-					displayedName =
-						name ?: element?.let { timetableDatabaseInterface.getLongName(it) }
-								?: defaultDisplayedName
-				}
-
-				LaunchedEffect(displayedElement) {
-					weeklyTimetableItems.clear()
-					weekView.notifyDataSetChanged()
-				}
-
-				Drawer(
-					drawerState = drawerState,
-					drawerGestures = drawerGestures,
-					displayedElement = displayedElement,
-					isPersonalTimetable = isPersonalTimetable,
-					onShowTimetable = { it, isPersonal ->
-						it.let { element ->
-							displayElement(element?.first, element?.second)
+					Drawer(
+						appState = appState,
+						onShowTimetable = {
+							it.let { element ->
+								appState.displayElement(element?.first, element?.second)
+							}
 						}
-
-						isPersonalTimetable = isPersonal
-					}
-				) {
-					Scaffold(
-						topBar = {
-							CenterAlignedTopAppBar(
-								title = { Text(displayedName) },
-								navigationIcon = {
-									IconButton(onClick = {
-										coroutineScope.launch { drawerState.open() }
-									}) {
-										Icon(
-											imageVector = Icons.Outlined.Menu,
-											contentDescription = stringResource(id = R.string.main_drawer_open)
+					) {
+						Scaffold(
+							topBar = {
+								CenterAlignedTopAppBar(
+									title = { Text(appState.displayedName.value) },
+									navigationIcon = {
+										IconButton(onClick = {
+											appState.coroutineScope.launch { appState.drawerState.open() }
+										}) {
+											Icon(
+												imageVector = Icons.Outlined.Menu,
+												contentDescription = stringResource(id = R.string.main_drawer_open)
+											)
+										}
+									},
+									actions = {
+										ProfileSelectorAction(
+											users = userDatabase.getAllUsers(),
+											currentSelectionId = user.id,
+											showProfileActions = true,
+											onSelectionChange = {
+												loadUser(it)
+											},
+											onActionEdit = {
+												appState.profileManagementDialog.value = true
+											}
 										)
 									}
-								},
-								actions = {
-									ProfileSelectorAction(
-										userDatabase = userDatabase,
-										currentSelectionId = profileId,
-										showProfileActions = true
-									) {}
-								}
-							)
-						},
-					) { innerPadding ->
-						Box(
-							modifier = Modifier
-								.padding(innerPadding)
-								.fillMaxSize()
-						) {
-							val colorScheme = MaterialTheme.colorScheme
-							val currentDensity = LocalDensity.current
-							val outlineAlpha = 0.4f
-
-							AndroidView(
-								factory = {
-									val weekViewSwipeRefresh = WeekViewSwipeRefreshLayout(it)
-
-									weekViewSwipeRefresh.setOnRefreshListener {
-										displayedElement?.let { element ->
-											weeklyTimetableItems[currentWeekIndex]?.dateRange?.let { dateRange ->
-												coroutineScope.launch {
-													loadWeeklyTimetableItems(
-														dateRange.first.toLocalDate(),
-														dateRange.second.toLocalDate(),
-														element,
-														colorScheme,
-														forceRefresh = true,
-														onItemsChanged = { items ->
-															weeklyTimetableItems[currentWeekIndex] =
-																items
-															weekView.notifyDataSetChanged()
-														}
-													)
-													weekViewSwipeRefresh.isRefreshing = false
-												}
-											}
-										}
-									}
-
-									weekView = WeekView<TimegridItem>(it).apply {
-										setupCustomization()
-										setupHours()
-
-										// Workaround to enable drawer gestures only when swiping from the left edge (won't work with RTL layout)
-										onMotionEvent = { event ->
-											when (event.action) {
-												MotionEvent.ACTION_DOWN -> {
-													drawerGestures =
-														event.x < with(currentDensity) { 48.dp.toPx() }
-												}
-												MotionEvent.ACTION_UP -> {
-													drawerGestures = true
-												}
-											}
-										}
-
-										setPeriodChangeListener(object :
-											WeekViewLoader.PeriodChangeListener<TimegridItem> {
-											override fun onPeriodChange(
-												startDate: LocalDate,
-												endDate: LocalDate
-											): List<WeekViewDisplayable<TimegridItem>> {
-												val weekIndex =
-													convertDateTimeToWeekIndex(startDate)
-												return weeklyTimetableItems[weekIndex]?.items
-													?: run {
-														weeklyTimetableItems[weekIndex] =
-															WeeklyTimetableItems()
-														displayedElement?.let { displayedElement ->
-															coroutineScope.launch {
-																loading++
-																loadWeeklyTimetableItems(
-																	startDate,
-																	endDate,
-																	displayedElement,
-																	colorScheme,
-																	onItemsChanged = { items ->
-																		weeklyTimetableItems[weekIndex] =
-																			items
-																		weekView.notifyDataSetChanged()
-																	}
-																)
-																loading--
-															}
-														}
-														emptyList()
-													}
-											}
-										})
-
-										setOnEventClickListener(object :
-											EventClickListener<TimegridItem> {
-											override fun onEventClick(
-												data: TimegridItem,
-												eventRect: RectF
-											) {
-												timetableItemDetailsDialog = data
-											}
-										})
-
-										scrollListener = object : ScrollListener {
-											override fun onFirstVisibleDayChanged(
-												newFirstVisibleDay: LocalDate,
-												oldFirstVisibleDay: LocalDate?
-											) {
-												currentWeekIndex =
-													convertDateTimeToWeekIndex(newFirstVisibleDay)
-												lastRefreshTimestamp =
-													weeklyTimetableItems[currentWeekIndex]?.lastUpdated
-														?: 0
-											}
-										}
-
-										scaleListener = object : ScaleListener {
-											override fun onScaleFinished() {
-												//saveZoomLevel()
-											}
-										}
-
-										config.apply {
-											with(currentDensity) {
-												daySeparatorColor =
-													colorScheme.outline.copy(alpha = outlineAlpha)
-														.toArgb()
-												defaultEventColor = colorScheme.primary.toArgb()
-												eventMarginVertical = 4.dp.roundToPx()
-												eventPadding = 4.dp.roundToPx()
-												headerRowBackgroundColor = Color.TRANSPARENT
-												headerRowPadding = 8.dp.roundToPx()
-												headerRowSecondaryTextColor =
-													colorScheme.onSurfaceVariant.toArgb()
-												headerRowSecondaryTextSize = 12.sp.toPx()
-												headerRowTextColor = colorScheme.onSurface.toArgb()
-												headerRowTextSize = 18.sp.toPx()
-												headerRowTextSpacing = 10.dp.roundToPx()
-												holidayTextColor = colorScheme.onSurface.toArgb()
-												holidayTextSize = 16.sp.toPx()
-												hourHeight = 72.dp.roundToPx()
-												hourSeparatorColor =
-													colorScheme.outline.copy(alpha = outlineAlpha)
-														.toArgb()
-												nowLineStrokeWidth = 2.dp.toPx()
-												scrollDuration = 100
-												showHourSeparator = true
-												showNowLine = true
-												timeColumnBackground = Color.TRANSPARENT
-												timeColumnCaptionColor =
-													colorScheme.onSurface.toArgb()
-												timeColumnCaptionSize = 16.sp.toPx()
-												timeColumnPadding = 4.dp.roundToPx()
-												timeColumnTextColor =
-													colorScheme.onSurfaceVariant.toArgb()
-												timeColumnTextSize = 12.sp.toPx()
-												todayHeaderTextColor = colorScheme.primary.toArgb()
-												topLeftCornerDrawable =
-													AppCompatResources.getDrawable(
-														this@MainActivity,
-														R.drawable.all_calendar_adjusted
-													)
-												topLeftCornerPadding = 4.dp.roundToPx()
-												topLeftCornerTint = colorScheme.onSurface.toArgb()
-											}
-										}
-									}
-
-									weekViewSwipeRefresh.apply {
-										addView(weekView)
-									}
-								}, modifier = Modifier
-									.fillMaxSize()
-									.disabled(anonymous)
-							)
-
-							Text(
-								text = stringResource(
-									id = R.string.main_last_refreshed,
-									if (lastRefreshTimestamp > 0L)
-										formatTimeDiff(Instant.now().millis - lastRefreshTimestamp)
-									else
-										stringResource(id = R.string.main_last_refreshed_never)
-								),
+								)
+							},
+						) { innerPadding ->
+							Box(
 								modifier = Modifier
-									.align(Alignment.BottomStart)
-									.padding(start = 48.dp, bottom = 8.dp)
-									.disabled(anonymous)
-							)
+									.padding(innerPadding)
+									.fillMaxSize()
+							) {
+								WeekViewCompose(appState)
 
-							if (anonymous) {
-								Column(
-									verticalArrangement = Arrangement.Center,
-									horizontalAlignment = Alignment.CenterHorizontally,
+								Text(
+									text = appState.lastRefreshText(),
 									modifier = Modifier
-										.fillMaxSize()
-										.absolutePadding(left = 16.dp)
-								) {
-									Text(
-										text = stringResource(id = R.string.main_anonymous_login_info_text),
-										textAlign = TextAlign.Center,
-										modifier = Modifier
-											.padding(horizontal = 32.dp)
-									)
-
-									Button(
-										onClick = {
-											settingsLauncher.launch(
-												Intent(
-													this@MainActivity,
-													SettingsActivity::class.java
-												).apply {
-													putExtra(EXTRA_LONG_PROFILE_ID, profileId)
-													putExtra(
-														EXTRA_STRING_PREFERENCE_ROUTE,
-														"preferences_timetable"
-													)
-													putExtra(
-														EXTRA_STRING_PREFERENCE_HIGHLIGHT,
-														"preference_timetable_personal_timetable"
-													)
-												}
-											)
-										},
-										modifier = Modifier
-											.padding(top = 16.dp)
-									) {
-										Text(text = stringResource(id = R.string.main_go_to_settings))
-									}
-								}
-							}
-
-							if (loading > 0)
-								CircularProgressIndicator(
-									modifier = Modifier
-										.align(Alignment.BottomEnd)
-										.padding(8.dp)
+										.align(Alignment.BottomStart)
+										.padding(start = 48.dp, bottom = 8.dp)
+										.disabled(appState.isAnonymous)
 								)
 
-							/*viewModelStore.clear() // TODO: Doesn't seem like the best solution. This could potentially interfere with other ViewModels scoped to this activity.
-							val fragment = TimetableItemDetailsFragment(data, timetableDatabaseInterface, profileUser)
+								if (appState.isAnonymous) {
+									Column(
+										verticalArrangement = Arrangement.Center,
+										horizontalAlignment = Alignment.CenterHorizontally,
+										modifier = Modifier
+											.fillMaxSize()
+											.absolutePadding(left = 16.dp)
+									) {
+										Text(
+											text = stringResource(id = R.string.main_anonymous_login_info_text),
+											textAlign = TextAlign.Center,
+											modifier = Modifier
+												.padding(horizontal = 32.dp)
+										)
 
-							supportFragmentManager.beginTransaction().run {
-								setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-								add(R.id.content_main, fragment, FRAGMENT_TAG_LESSON_INFO)
-								addToBackStack(fragment.tag)
-								commit()
-							}*/
+										Button(
+											onClick = {
+												settingsLauncher.launch(
+													Intent(
+														this@MainActivity,
+														SettingsActivity::class.java
+													).apply {
+														putExtra(EXTRA_LONG_PROFILE_ID, user.id)
+														putExtra(
+															EXTRA_STRING_PREFERENCE_ROUTE,
+															"preferences_timetable"
+														)
+														putExtra(
+															EXTRA_STRING_PREFERENCE_HIGHLIGHT,
+															"preference_timetable_personal_timetable"
+														)
+													}
+												)
+											},
+											modifier = Modifier
+												.padding(top = 16.dp)
+										) {
+											Text(text = stringResource(id = R.string.main_go_to_settings))
+										}
+									}
+								}
+
+								if (appState.isLoading)
+									CircularProgressIndicator(
+										modifier = Modifier
+											.align(Alignment.BottomEnd)
+											.padding(8.dp)
+									)
+
+								/*viewModelStore.clear() // TODO: Doesn't seem like the best solution. This could potentially interfere with other ViewModels scoped to this activity.
+								val fragment = TimetableItemDetailsFragment(data, timetableDatabaseInterface, profileUser)
+
+								supportFragmentManager.beginTransaction().run {
+									setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+									add(R.id.content_main, fragment, FRAGMENT_TAG_LESSON_INFO)
+									addToBackStack(fragment.tag)
+									commit()
+								}*/
+							}
 						}
 					}
-				}
 
-				val density = LocalDensity.current
-				val offsetY = { _: Int ->
-					with(density) { 40.dp.roundToPx() }
-				}
-				// TODO: Implement a smoother animation (see https://m3.material.io/components/dialogs/guidelines#007536b9-76b1-474a-a152-2f340caaff6f)
-				AnimatedVisibility(
-					visible = timetableItemDetailsDialog != null,
-					enter = slideInVertically(initialOffsetY = offsetY) + fadeIn(),
-					exit = slideOutVertically(targetOffsetY = offsetY) + fadeOut()
-				) {
-					TimetableItemDetailsDialog(
-						timegridItem = remember { timetableItemDetailsDialog!! },
-						timetableDatabaseInterface = timetableDatabaseInterface,
-						onDismiss = {
-							timetableItemDetailsDialog = null
-							it?.let { displayElement(it) }
-						}
-					)
+					val density = LocalDensity.current
+					val offsetY = { _: Int ->
+						with(density) { 40.dp.roundToPx() }
+					}
+					// TODO: Implement a smoother animation (see https://m3.material.io/components/dialogs/guidelines#007536b9-76b1-474a-a152-2f340caaff6f)
+					AnimatedVisibility(
+						visible = appState.timetableItemDetailsDialog.value != null,
+						enter = slideInVertically(initialOffsetY = offsetY) + fadeIn(),
+						exit = slideOutVertically(targetOffsetY = offsetY) + fadeOut()
+					) {
+						TimetableItemDetailsDialog(
+							timegridItem = remember { appState.timetableItemDetailsDialog.value!! },
+							timetableDatabaseInterface = timetableDatabaseInterface,
+							onDismiss = {
+								appState.timetableItemDetailsDialog.value = null
+								it?.let { appState.displayElement(it) }
+							}
+						)
+					}
+					AnimatedVisibility(
+						visible = appState.profileManagementDialog.value,
+						enter = slideInVertically(initialOffsetY = offsetY) + fadeIn(),
+						exit = slideOutVertically(targetOffsetY = offsetY) + fadeOut()
+					) {
+						ProfileManagementDialog(
+							onDismiss = {
+								appState.profileManagementDialog.value = false
+							}
+						)
+					}
 				}
 			}
 		}
@@ -515,18 +324,42 @@ class MainActivity :
 		}*/
 	}
 
+	@Composable
+	private fun WeekViewCompose(appState: MainAppState) {
+		var weekViewGlobal by remember { mutableStateOf(appState.weekView.value) }
+
+		AndroidView(
+			factory = { context ->
+				if (weekViewGlobal == null) { // Create weekView if it doesn't already exist
+					WeekView<TimegridItem>(context).also {
+						weekViewGlobal = it
+						appState.weekView.value = it
+					}
+				}
+
+				appState.weekViewSwipeRefresh.value ?:
+					WeekViewSwipeRefreshLayout(context).apply {
+						appState.weekViewSwipeRefresh.value = this
+						addView(weekViewGlobal)
+					}
+			},
+			update = {
+				appState.weekView.value = weekViewGlobal
+				appState.updateViews(it)
+			},
+			modifier = Modifier
+				.fillMaxSize()
+				.disabled(appState.isAnonymous)
+		)
+	}
+
 	@OptIn(ExperimentalMaterial3Api::class)
 	@Composable
 	private fun Drawer(
-		drawerState: DrawerState,
-		drawerGestures: Boolean,
-		isPersonalTimetable: Boolean,
-		displayedElement: PeriodElement? = null,
-		onShowTimetable: (Pair<PeriodElement?, String?>?, isPersonal: Boolean) -> Unit,
+		appState: MainAppState,
+		onShowTimetable: (Pair<PeriodElement?, String?>?) -> Unit,
 		content: @Composable () -> Unit
 	) {
-		val scope = rememberCoroutineScope()
-
 		var showElementPicker by remember {
 			mutableStateOf<TimetableDatabaseInterface.Type?>(
 				null
@@ -541,18 +374,17 @@ class MainActivity :
 				onSelect = { item ->
 					item?.let {
 						onShowTimetable(
-							item to timetableDatabaseInterface.getLongName(it),
-							false
+							item to timetableDatabaseInterface.getLongName(it)
 						)
 					} ?: run {
-						onShowTimetable(getPersonalTimetableElement(), true)
+						onShowTimetable(appState.personalTimetable)
 					}
 				},
 				initialType = type
 			)
 		} ?: ModalNavigationDrawer(
-			gesturesEnabled = drawerGestures || drawerState.isOpen,
-			drawerState = drawerState,
+			gesturesEnabled = appState.drawerGesturesEnabled,
+			drawerState = appState.drawerState,
 			drawerContent = {
 				/*Text(
 					text = profileUser.getDisplayedName(applicationContext)
@@ -576,12 +408,10 @@ class MainActivity :
 						)
 					},
 					label = { Text(stringResource(id = R.string.all_personal_timetable)) },
-					selected = isPersonalTimetable,
+					selected = appState.isPersonalTimetable,
 					onClick = {
-						scope.launch {
-							drawerState.close()
-						}
-						onShowTimetable(getPersonalTimetableElement(), true)
+						appState.closeDrawer()
+						onShowTimetable(appState.personalTimetable)
 					},
 					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 				)
@@ -596,7 +426,7 @@ class MainActivity :
 					label = { Text(stringResource(id = R.string.maindrawer_bookmarks_add)) },
 					selected = false,
 					onClick = {
-						scope.launch { drawerState.close() }
+						appState.closeDrawer()
 						//selectedItem.value = item
 					},
 					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -605,21 +435,21 @@ class MainActivity :
 				DrawerText("Timetables")
 
 				DrawerItems(
-					isPersonalTimetableSelected = isPersonalTimetable,
-					displayedElement = displayedElement,
+					isPersonalTimetableSelected = appState.isPersonalTimetable,
+					displayedElement = appState.displayedElement.value,
 					onTimetableClick = { item ->
-						scope.launch { drawerState.close() }
+						appState.closeDrawer()
 						showElementPicker = item.elementType
 					},
 					onShortcutClick = { item ->
-						scope.launch { drawerState.close() }
+						appState.closeDrawer()
 
 						shortcutLauncher.launch(
 							Intent(
 								this@MainActivity,
 								item.target
 							).apply {
-								putExtra(EXTRA_LONG_PROFILE_ID, profileId)
+								putExtra(EXTRA_LONG_PROFILE_ID, currentUserId())
 							}
 						)
 					}
@@ -628,105 +458,6 @@ class MainActivity :
 			content = content
 		)
 	}
-
-	private fun getPersonalTimetableElement(): Pair<PeriodElement?, String?>? {
-		val customTimetable = preferences["preference_timetable_personal_timetable", ""]
-
-		return if (customTimetable.isEmpty()) {
-			profileUser.userData.elemType?.let { type ->
-				PeriodElement(
-					type = type,
-					id = profileUser.userData.elemId,
-					orgId = profileUser.userData.elemId,
-				) to profileUser.getDisplayedName(applicationContext)
-			}
-		} else {
-			val displayedElement = decodeStoredTimetableValue(customTimetable)
-
-			displayedElement to displayedElement?.let {
-				timetableDatabaseInterface.getLongName(it)
-			}
-		}
-	}
-
-	private suspend fun loadWeeklyTimetableItems(
-		startDate: LocalDate,
-		endDate: LocalDate,
-		element: PeriodElement,
-		colorScheme: ColorScheme,
-		onItemsChanged: (items: WeeklyTimetableItems) -> Unit,
-		forceRefresh: Boolean = false
-	) {
-		val dateRange =
-			UntisDate.fromLocalDate(LocalDate(startDate)) to
-					UntisDate.fromLocalDate(LocalDate(endDate))
-
-		loadTimetable(
-			TimetableLoader.TimetableLoaderTarget(
-				dateRange.first,
-				dateRange.second,
-				element.id,
-				element.type
-			), forceRefresh
-		)?.collect { result ->
-			result
-				.onSuccess { timetableItems ->
-					/*for (item in timetableItems.items) {
-					if (item.periodData.element.messengerChannel != null) {
-						navigationview_main.menu.findItem(R.id.nav_messenger).isVisible = true
-						break
-					}
-				}*/
-					onItemsChanged(
-						WeeklyTimetableItems(
-							dateRange = dateRange,
-							items =
-							prepareItems(
-								timetableItems.items,
-								colorScheme
-							).map { item -> item.toWeekViewEvent() },
-							lastUpdated = timetableItems.timestamp
-						)
-					)
-				}
-				.onFailure {
-					when (it) {
-						is TimetableLoader.TimetableLoaderException -> {
-							Log.e("MainActivity", it.untisErrorMessage ?: it.message ?: "unknown error")
-
-							when (it.untisErrorCode) {
-								/*TimetableLoader.CODE_CACHE_MISSING -> timetableLoader!!.repeat(
-									it.requestId,
-									TimetableLoader.FLAG_LOAD_SERVER,
-									proxyHost
-								)*/
-								else -> {
-									/*Snackbar.make(
-										content_main,
-										if (code != null) ErrorMessageDictionary.getErrorMessage(
-											resources,
-											code
-										) else message
-											?: getString(R.string.all_error),
-										Snackbar.LENGTH_INDEFINITE
-									)
-										.setAction("Show") {
-											ErrorReportingDialog(this).showRequestErrorDialog(
-												requestId,
-												code,
-												message
-											)
-										}
-										.show()*/
-								}
-							}
-						}
-					}
-				}
-		}
-	}
-
-	private fun convertDateTimeToWeekIndex(date: LocalDate) = date.year * 100 + date.dayOfYear / 7
 
 /*private fun checkForProfileUpdateRequired(): Boolean {
 	return profileUser.schoolId.isBlank() || profileUser.apiUrl.isBlank()
@@ -796,8 +527,7 @@ private fun showProfileUpdateRequired() {
 }*/
 
 	private fun login() {
-		val loginIntent = Intent(this, LoginActivity::class.java)
-		startActivityForResult(loginIntent, REQUEST_CODE_LOGINDATAINPUT_ADD)
+		loginLauncher.launch(Intent(this, LoginActivity::class.java))
 		finish()
 	}
 
@@ -1018,45 +748,6 @@ private fun setupSwipeRefresh() {
 	}
 }*/
 
-	private suspend fun loadTimetable(
-		target: TimetableLoader.TimetableLoaderTarget,
-		forceRefresh: Boolean = false
-	) = timetableLoader?.let {
-		val alwaysLoad: Boolean =
-			preferences["preference_connectivity_refresh_in_background", false]
-		val flags =
-			(if (!forceRefresh) TimetableLoader.FLAG_LOAD_CACHE else 0) or (if (alwaysLoad || forceRefresh) TimetableLoader.FLAG_LOAD_SERVER else 0)
-		it.loadAsync(target, flags, proxyHost)
-	}
-
-	private fun loadProfile(): Boolean {
-		if (userDatabase.getUsersCount() < 1) {
-			login()
-			return false
-		}
-
-		profileId = preferences.loadProfileId()
-		if (profileId == 0L || userDatabase.getUser(profileId) == null)
-			profileId = userDatabase.getAllUsers()[0].id
-				?: 0 // Fall back to the first user if an invalid user id is saved
-
-		preferences.saveProfileId(profileId)
-		preferences.loadProfile(profileId)
-		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileUser.id ?: 0)
-
-		/*if (checkForProfileUpdateRequired()) {
-			showProfileUpdateRequired()
-			return false
-		}
-
-		if (checkForNewSchoolYear()) {
-			updateProfile(profileUser)
-			return false
-		}*/
-
-		return true
-	}
-
 /*private fun setupWeekView() {
 	weekView = findViewById(R.id.weekview_main_timetable)
 	weekView.setOnEventClickListener(this)
@@ -1158,136 +849,6 @@ override fun onPrepareOptionsMenu(menu: Menu): Boolean {
 	}
 	return super.onPrepareOptionsMenu(menu)
 }*/
-
-	private fun prepareItems(
-		items: List<TimegridItem>,
-		colorScheme: ColorScheme
-	): List<TimegridItem> {
-		val newItems = mergeItems(items.mapNotNull { item ->
-			if (preferences["preference_timetable_hide_cancelled"] && item.periodData.isCancelled())
-				return@mapNotNull null
-
-			if (preferences["preference_timetable_substitutions_irregular"]) {
-				item.periodData.apply {
-					forceIrregular =
-						classes.find { it.id != it.orgId } != null
-								|| teachers.find { it.id != it.orgId } != null
-								|| subjects.find { it.id != it.orgId } != null
-								|| rooms.find { it.id != it.orgId } != null
-								|| preferences["preference_timetable_background_irregular"]
-								&& item.periodData.element.backColor != UNTIS_DEFAULT_COLOR
-				}
-			}
-			item
-		})
-		colorItems(newItems, colorScheme)
-		return newItems
-	}
-
-	private fun mergeItems(items: List<TimegridItem>): List<TimegridItem> {
-		val days = profileUser.timeGrid.days
-		val itemGrid: Array<Array<MutableList<TimegridItem>>> =
-			Array(days.size) { Array(days.maxByOrNull { it.units.size }!!.units.size) { mutableListOf() } }
-		val leftover: MutableList<TimegridItem> = mutableListOf()
-
-		// TODO: Check if the day from the Untis API is always an english string
-		val firstDayOfWeek =
-			DateTimeConstants.MONDAY //DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(days.first().day).dayOfWeek
-
-		// Put all items into a two dimensional array depending on day and hour
-		items.forEach { item ->
-			val startDateTime = item.periodData.element.startDateTime.toLocalDateTime()
-			val endDateTime = item.periodData.element.endDateTime.toLocalDateTime()
-
-			val day = endDateTime.dayOfWeek - firstDayOfWeek
-
-			if (day < 0 || day >= days.size) return@forEach
-
-			val thisUnitStartIndex = days[day].units.indexOfFirst {
-				it.startTime.time == startDateTime.toString(DateTimeUtils.tTimeNoSeconds())
-			}
-
-			val thisUnitEndIndex = days[day].units.indexOfFirst {
-				it.endTime.time == endDateTime.toString(DateTimeUtils.tTimeNoSeconds())
-			}
-
-			if (thisUnitStartIndex != -1 && thisUnitEndIndex != -1)
-				itemGrid[day][thisUnitStartIndex].add(item)
-			else
-				leftover.add(item)
-		}
-
-		val newItems = mutableListOf<TimegridItem>()
-		newItems.addAll(leftover) // Add items that didn't fit inside the timegrid. These will always be single lessons.
-		itemGrid.forEach { unitsOfDay ->
-			unitsOfDay.forEachIndexed { unitIndex, items ->
-				items.forEach {
-					var i = 1
-					while (unitIndex + i < unitsOfDay.size && it.mergeWith(unitsOfDay[unitIndex + i])) i++
-				}
-
-				newItems.addAll(items)
-			}
-		}
-		return newItems
-	}
-
-	private fun colorItems(
-		items: List<TimegridItem>,
-		colorScheme: ColorScheme
-	) {
-		val regularColor = preferences.get<Int>("preference_background_regular")
-		val examColor = preferences.get<Int>("preference_background_exam")
-		val cancelledColor =
-			preferences.get<Int>("preference_background_cancelled")
-		val irregularColor =
-			preferences.get<Int>("preference_background_irregular")
-
-		val regularPastColor =
-			preferences.get<Int>("preference_background_regular_past")
-		val examPastColor =
-			preferences.get<Int>("preference_background_exam_past")
-		val cancelledPastColor =
-			preferences.get<Int>("preference_background_cancelled_past")
-		val irregularPastColor =
-			preferences.get<Int>("preference_background_irregular_past")
-
-		val useDefault =
-			preferences.sharedPrefs!!.getStringSet("preference_school_background", emptySet())
-				?: emptySet()
-		val useTheme = true
-		//if (!useDefault.contains("regular")) preferences["preference_use_theme_background"] else false
-
-		items.forEach { item ->
-			val defaultColor = Color.parseColor(item.periodData.element.backColor)
-
-			item.color = when {
-				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor else examColor
-				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else cancelledColor
-				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else irregularColor
-				useTheme -> colorScheme.primaryContainer.toArgb()
-				else -> if (useDefault.contains("regular")) defaultColor else regularColor
-			}
-
-			item.pastColor = when {
-				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor.darken(
-					0.25f
-				) else examPastColor
-				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor.darken(
-					0.25f
-				) else cancelledPastColor
-				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(
-					0.25f
-				) else irregularPastColor
-				useTheme -> colorScheme.primaryContainer.copy(alpha = .7f).toArgb()/*if (currentTheme == "pixel") getAttr(R.attr.colorPrimary).darken(0.25f) else getAttr(
-					R.attr.colorPrimaryDark
-				)*/
-				else -> if (useDefault.contains("regular")) defaultColor.darken(0.25f) else regularPastColor
-			}
-
-			item.textColor = colorScheme.onPrimaryContainer.toArgb()
-		}
-	}
 
 /*override fun onNavigationItemSelected(item: MenuItem): Boolean {
 	when (item.itemId) {
@@ -1601,27 +1162,6 @@ private fun setLastRefresh(timestamp: Long) {
 		getString(R.string.main_last_refreshed, getString(R.string.main_last_refreshed_never))
 }*/
 
-	private fun formatTimeDiff(diff: Long): String {
-		return when {
-			diff < MINUTE_MILLIS -> getString(R.string.main_time_diff_just_now)
-			diff < HOUR_MILLIS -> resources.getQuantityString(
-				R.plurals.main_time_diff_minutes,
-				((diff / MINUTE_MILLIS).toInt()),
-				diff / MINUTE_MILLIS
-			)
-			diff < DAY_MILLIS -> resources.getQuantityString(
-				R.plurals.main_time_diff_hours,
-				((diff / HOUR_MILLIS).toInt()),
-				diff / HOUR_MILLIS
-			)
-			else -> resources.getQuantityString(
-				R.plurals.main_time_diff_days,
-				((diff / DAY_MILLIS).toInt()),
-				diff / DAY_MILLIS
-			)
-		}
-	}
-
 /*override fun addTimetableItems(
 	items: List<TimegridItem>,
 	startDate: UntisDate,
@@ -1711,14 +1251,6 @@ private fun openDrawer(drawer: DrawerLayout = drawer_layout) =
 private fun closeDrawer(drawer: DrawerLayout = drawer_layout) =
 	drawer.closeDrawer(GravityCompat.START)*/
 
-	private fun Int.darken(ratio: Float) = ColorUtils.blendARGB(this, Color.BLACK, ratio)
-
-	internal data class WeeklyTimetableItems(
-		var items: List<WeekViewEvent<TimegridItem>> = emptyList(),
-		var lastUpdated: Long = 0,
-		var dateRange: Pair<UntisDate, UntisDate>? = null
-	)
-
 /*private fun setBookmarksLongClickListeners() {
 	(navigationview_main[0] as RecyclerView).let { rv ->
 		rv.post {
@@ -1754,57 +1286,420 @@ private fun closeDrawer(drawer: DrawerLayout = drawer_layout) =
 		}
 	}
 }*/
+}
+
+class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
+	val user: UserDatabase.User,
+	val timetableDatabaseInterface: TimetableDatabaseInterface,
+	val weekViewSwipeRefresh: MutableState<WeekViewSwipeRefreshLayout?>,
+	val weekView: MutableState<WeekView<TimegridItem>?>,
+	val context: Context,
+	val coroutineScope: CoroutineScope,
+	val colorScheme: ColorScheme,
+	val currentDensity: Density,
+	val preferences: PreferenceHelper, // TODO: Remove
+	val personalTimetable: Pair<PeriodElement?, String?>?,
+	val defaultDisplayedName: String,
+	val drawerState: DrawerState,
+	var drawerGestureState: MutableState<Boolean>,
+	val loading: MutableState<Int>,
+	val currentWeekIndex: MutableState<Int>,
+	val lastRefreshTimestamp: MutableState<Long>,
+	val weeklyTimetableItems: SnapshotStateMap<Int, WeeklyTimetableItems?>,
+	val timetableLoader: TimetableLoader,
+	val timetableItemDetailsDialog: MutableState<TimegridItem?>,
+	val profileManagementDialog: MutableState<Boolean>
+) {
+	companion object {
+		private const val MINUTE_MILLIS: Int = 60 * 1000
+		private const val HOUR_MILLIS: Int = 60 * MINUTE_MILLIS
+		private const val DAY_MILLIS: Int = 24 * HOUR_MILLIS
+
+		private const val UNTIS_DEFAULT_COLOR = "#f49f25"
+	}
+
+	var drawerGestures by drawerGestureState
+
+	var displayedElement: MutableState<PeriodElement?> = mutableStateOf(personalTimetable?.first)
+	var displayedName: MutableState<String> =
+		mutableStateOf(personalTimetable?.second ?: defaultDisplayedName)
+
+	val isPersonalTimetable: Boolean
+		get() = displayedElement.value == personalTimetable?.first
+
+	val isAnonymous: Boolean
+		get() = displayedElement.value == null
+
+	val isLoading: Boolean
+		get() = loading.value > 0
+
+	var isRefreshing: Boolean by mutableStateOf(false)
+
+	var shouldUpdateWeekView = true
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	val drawerGesturesEnabled: Boolean
+		get() = drawerGestures || drawerState.isOpen
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	fun closeDrawer() {
+		coroutineScope.launch { drawerState.close() }
+	}
+
+	fun displayElement(element: PeriodElement?, name: String? = null) {
+		displayedElement.value = element
+		displayedName.value = name ?: element?.let { timetableDatabaseInterface.getLongName(it) } ?: defaultDisplayedName
+
+		weeklyTimetableItems.clear()
+		weekView.value?.notifyDataSetChanged()
+	}
+
+	@Composable
+	fun lastRefreshText() = stringResource(
+		id = R.string.main_last_refreshed,
+		if (lastRefreshTimestamp.value > 0L)
+			formatTimeDiff(Instant.now().millis - lastRefreshTimestamp.value)
+		else
+			stringResource(id = R.string.main_last_refreshed_never)
+	)
+
+	@OptIn(ExperimentalComposeUiApi::class)
+	@Composable
+	private fun formatTimeDiff(diff: Long): String {
+		return when {
+			diff < MINUTE_MILLIS -> stringResource(R.string.main_time_diff_just_now)
+			diff < HOUR_MILLIS -> pluralStringResource(
+				R.plurals.main_time_diff_minutes,
+				((diff / MINUTE_MILLIS).toInt()),
+				diff / MINUTE_MILLIS
+			)
+			diff < DAY_MILLIS -> pluralStringResource(
+				R.plurals.main_time_diff_hours,
+				((diff / HOUR_MILLIS).toInt()),
+				diff / HOUR_MILLIS
+			)
+			else -> pluralStringResource(
+				R.plurals.main_time_diff_days,
+				((diff / DAY_MILLIS).toInt()),
+				diff / DAY_MILLIS
+			)
+		}
+	}
+
+	private fun Int.darken(ratio: Float) = ColorUtils.blendARGB(this, Color.BLACK, ratio)
+
+	data class WeeklyTimetableItems(
+		var items: List<WeekViewEvent<TimegridItem>> = emptyList(),
+		var lastUpdated: Long = 0,
+		var dateRange: Pair<UntisDate, UntisDate>? = null
+	)
+
+	private fun prepareItems(
+		items: List<TimegridItem>,
+		colorScheme: ColorScheme
+	): List<TimegridItem> {
+		val newItems = mergeItems(items.mapNotNull { item ->
+			if (preferences["preference_timetable_hide_cancelled"] && item.periodData.isCancelled())
+				return@mapNotNull null
+
+			if (preferences["preference_timetable_substitutions_irregular"]) {
+				item.periodData.apply {
+					forceIrregular =
+						classes.find { it.id != it.orgId } != null
+								|| teachers.find { it.id != it.orgId } != null
+								|| subjects.find { it.id != it.orgId } != null
+								|| rooms.find { it.id != it.orgId } != null
+								|| preferences["preference_timetable_background_irregular"]
+								&& item.periodData.element.backColor != UNTIS_DEFAULT_COLOR
+				}
+			}
+			item
+		})
+		colorItems(newItems, colorScheme)
+		return newItems
+	}
+
+	private fun mergeItems(items: List<TimegridItem>): List<TimegridItem> {
+		val days = user.timeGrid.days
+		val itemGrid: Array<Array<MutableList<TimegridItem>>> =
+			Array(days.size) { Array(days.maxByOrNull { it.units.size }!!.units.size) { mutableListOf() } }
+		val leftover: MutableList<TimegridItem> = mutableListOf()
+
+		// TODO: Check if the day from the Untis API is always an english string
+		val firstDayOfWeek =
+			DateTimeConstants.MONDAY //DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(days.first().day).dayOfWeek
+
+		// Put all items into a two dimensional array depending on day and hour
+		items.forEach { item ->
+			val startDateTime = item.periodData.element.startDateTime.toLocalDateTime()
+			val endDateTime = item.periodData.element.endDateTime.toLocalDateTime()
+
+			val day = endDateTime.dayOfWeek - firstDayOfWeek
+
+			if (day < 0 || day >= days.size) return@forEach
+
+			val thisUnitStartIndex = days[day].units.indexOfFirst {
+				it.startTime.time == startDateTime.toString(DateTimeUtils.tTimeNoSeconds())
+			}
+
+			val thisUnitEndIndex = days[day].units.indexOfFirst {
+				it.endTime.time == endDateTime.toString(DateTimeUtils.tTimeNoSeconds())
+			}
+
+			if (thisUnitStartIndex != -1 && thisUnitEndIndex != -1)
+				itemGrid[day][thisUnitStartIndex].add(item)
+			else
+				leftover.add(item)
+		}
+
+		val newItems = mutableListOf<TimegridItem>()
+		newItems.addAll(leftover) // Add items that didn't fit inside the timegrid. These will always be single lessons.
+		itemGrid.forEach { unitsOfDay ->
+			unitsOfDay.forEachIndexed { unitIndex, items ->
+				items.forEach {
+					var i = 1
+					while (unitIndex + i < unitsOfDay.size && it.mergeWith(unitsOfDay[unitIndex + i])) i++
+				}
+
+				newItems.addAll(items)
+			}
+		}
+		return newItems
+	}
+
+	private fun colorItems(
+		items: List<TimegridItem>,
+		colorScheme: ColorScheme
+	) {
+		val regularColor = preferences.get<Int>("preference_background_regular")
+		val examColor = preferences.get<Int>("preference_background_exam")
+		val cancelledColor =
+			preferences.get<Int>("preference_background_cancelled")
+		val irregularColor =
+			preferences.get<Int>("preference_background_irregular")
+
+		val regularPastColor =
+			preferences.get<Int>("preference_background_regular_past")
+		val examPastColor =
+			preferences.get<Int>("preference_background_exam_past")
+		val cancelledPastColor =
+			preferences.get<Int>("preference_background_cancelled_past")
+		val irregularPastColor =
+			preferences.get<Int>("preference_background_irregular_past")
+
+		val useDefault =
+			preferences.sharedPrefs!!.getStringSet("preference_school_background", emptySet())
+				?: emptySet()
+		val useTheme = true
+		//if (!useDefault.contains("regular")) preferences["preference_use_theme_background"] else false
+
+		items.forEach { item ->
+			val defaultColor = Color.parseColor(item.periodData.element.backColor)
+
+			item.color = when {
+				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor else colorScheme.error.toArgb()
+				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else colorScheme.secondary.toArgb()
+				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else colorScheme.tertiary.toArgb()
+				useTheme -> colorScheme.primary.toArgb()
+				else -> if (useDefault.contains("regular")) defaultColor else regularColor
+			}
+
+			item.pastColor = when {
+				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor.darken(
+					0.25f
+				) else colorScheme.error.copy(alpha = .7f).toArgb()
+				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor.darken(
+					0.25f
+				) else colorScheme.secondary.copy(alpha = .7f).toArgb()
+				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(
+					0.25f
+				) else colorScheme.tertiary.copy(alpha = .7f).toArgb()
+				useTheme -> colorScheme.primary.copy(alpha = .7f).toArgb()/*if (currentTheme == "pixel") getAttr(R.attr.colorPrimary).darken(0.25f) else getAttr(
+					R.attr.colorPrimaryDark
+				)*/
+				else -> if (useDefault.contains("regular")) defaultColor.darken(0.25f) else regularPastColor
+			}
+
+			item.textColor = when {
+				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor else colorScheme.onError.toArgb()
+				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else colorScheme.onSecondary.toArgb()
+				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else colorScheme.onTertiary.toArgb()
+				else -> colorScheme.onPrimary.toArgb()
+			}
+		}
+	}
+
+	private suspend fun loadTimetable(
+		loader: TimetableLoader,
+		target: TimetableLoader.TimetableLoaderTarget,
+		forceRefresh: Boolean = false
+	): Flow<Result<TimetableLoader.TimetableItems>> {
+		val alwaysLoad: Boolean =
+			preferences["preference_connectivity_refresh_in_background", false]
+		val flags =
+			(if (!forceRefresh) TimetableLoader.FLAG_LOAD_CACHE else 0) or (if (alwaysLoad || forceRefresh) TimetableLoader.FLAG_LOAD_SERVER else 0)
+		return loader.loadAsync(target, flags, null/*preferences["preference_connectivity_proxy_host"]*/)
+	}
+
+	private suspend fun loadWeeklyTimetableItems(
+		loader: TimetableLoader?,
+		startDate: LocalDate,
+		endDate: LocalDate,
+		element: PeriodElement,
+		colorScheme: ColorScheme,
+		onItemsChanged: (items: WeeklyTimetableItems) -> Unit,
+		forceRefresh: Boolean = false
+	) {
+		loader?.let {
+			val dateRange =
+				UntisDate.fromLocalDate(LocalDate(startDate)) to
+						UntisDate.fromLocalDate(LocalDate(endDate))
+
+			loadTimetable(
+				loader,
+				TimetableLoader.TimetableLoaderTarget(
+					dateRange.first,
+					dateRange.second,
+					element.id,
+					element.type
+				), forceRefresh
+			).collect { result ->
+				result
+					.onSuccess { timetableItems ->
+						/*for (item in timetableItems.items) {
+						if (item.periodData.element.messengerChannel != null) {
+							navigationview_main.menu.findItem(R.id.nav_messenger).isVisible = true
+							break
+						}
+					}*/
+						onItemsChanged(
+							WeeklyTimetableItems(
+								dateRange = dateRange,
+								items =
+								prepareItems(
+									timetableItems.items,
+									colorScheme
+								).map { item -> item.toWeekViewEvent() },
+								lastUpdated = timetableItems.timestamp
+							)
+						)
+					}
+					.onFailure {
+						when (it) {
+							is TimetableLoader.TimetableLoaderException -> {
+								Log.e(
+									"MainActivity",
+									it.untisErrorMessage ?: it.message ?: "unknown error"
+								)
+
+								when (it.untisErrorCode) {
+									/*TimetableLoader.CODE_CACHE_MISSING -> timetableLoader!!.repeat(
+										it.requestId,
+										TimetableLoader.FLAG_LOAD_SERVER,
+										proxyHost
+									)*/
+									else -> {
+										/*Snackbar.make(
+											content_main,
+											if (code != null) ErrorMessageDictionary.getErrorMessage(
+												resources,
+												code
+											) else message
+												?: getString(R.string.all_error),
+											Snackbar.LENGTH_INDEFINITE
+										)
+											.setAction("Show") {
+												ErrorReportingDialog(this).showRequestErrorDialog(
+													requestId,
+													code,
+													message
+												)
+											}
+											.show()*/
+									}
+								}
+							}
+						}
+					}
+			}
+		}
+	}
+
+	private fun convertDateTimeToWeekIndex(date: LocalDate) = date.year * 100 + date.dayOfYear / 7
+
+	private fun onRefresh() {
+		displayedElement.value?.let { element ->
+			weeklyTimetableItems[currentWeekIndex.value]?.dateRange?.let { dateRange ->
+				coroutineScope.launch {
+					loadWeeklyTimetableItems(
+						timetableLoader,
+						dateRange.first.toLocalDate(),
+						dateRange.second.toLocalDate(),
+						element,
+						colorScheme,
+						forceRefresh = true,
+						onItemsChanged = { items ->
+							weeklyTimetableItems[currentWeekIndex.value] =
+								items
+							weekView.value?.notifyDataSetChanged()
+						}
+					)
+					isRefreshing = false // TODO: When loading fails, this is never reached (why??)
+				}
+			}
+		}
+	}
 
 	private fun <T> WeekView<T>.setupCustomization() {
-		weekLength = preferences.sharedPrefs!!.getStringSet(
-			"preference_week_custom_range",
-			emptySet()
-		)?.size?.zeroToNull ?: profileUser.timeGrid.days.size
-		numberOfVisibleDays =
-			preferences["preference_week_custom_display_length", 0].zeroToNull
-				?: weekLength
-		firstDayOfWeek = preferences.sharedPrefs!!.getStringSet(
-			"preference_week_custom_range",
-			emptySet()
-		)?.map { Weekday.valueOf(it) }
-			?.minOrNull()?.ordinal ?: DateTimeFormat.forPattern("E")
-			.withLocale(Locale.ENGLISH) // TODO: Correct locale?
-			.parseDateTime(profileUser.timeGrid.days[0].day).dayOfWeek
-		timeColumnVisibility =
-			!preferences.get<Boolean>("preference_timetable_hide_time_stamps")
-		columnGap = ConversionUtils.dpToPx(
-			preferences.get<Int>("preference_timetable_item_padding")
-				.toFloat(), this@MainActivity
-		).toInt()
-		overlappingEventGap = ConversionUtils.dpToPx(
-			preferences.get<Int>("preference_timetable_item_padding_overlap")
-				.toFloat(), this@MainActivity
-		).toInt()
-		eventCornerRadius = ConversionUtils.dpToPx(
-			preferences.get<Int>("preference_timetable_item_corner_radius")
-				.toFloat(), this@MainActivity
-		).toInt()
-		eventSecondaryTextCentered =
-			preferences["preference_timetable_centered_lesson_info"]
-		eventTextBold =
-			preferences["preference_timetable_bold_lesson_name"]
-		eventTextSize = ConversionUtils.spToPx(
-			preferences.get<Int>("preference_timetable_lesson_name_font_size")
-				.toFloat(), this@MainActivity
-		)
-		eventSecondaryTextSize = ConversionUtils.spToPx(
-			preferences.get<Int>("preference_timetable_lesson_info_font_size")
-				.toFloat(), this@MainActivity
-		)
-		eventTextColor =
-			if (preferences["preference_timetable_item_text_light"]) Color.WHITE else Color.BLACK
-		pastBackgroundColor = preferences["preference_background_past"]
-		futureBackgroundColor =
-			preferences["preference_background_future"]
-		nowLineColor = preferences["preference_marker"]
-		horizontalFlingEnabled = preferences["preference_fling_enable"]
-		snapToWeek =
-			!preferences.get<Boolean>("preference_week_snap_to_days") && numberOfVisibleDays != 1
+			weekLength = preferences.sharedPrefs!!.getStringSet(
+				"preference_week_custom_range",
+				emptySet()
+			)?.size?.zeroToNull ?: user.timeGrid.days.size
+			numberOfVisibleDays =
+				preferences["preference_week_custom_display_length", 0].zeroToNull
+					?: weekLength
+			firstDayOfWeek = preferences.sharedPrefs!!.getStringSet(
+				"preference_week_custom_range",
+				emptySet()
+			)?.map { Weekday.valueOf(it) }
+				?.minOrNull()?.ordinal ?: DateTimeFormat.forPattern("E")
+				.withLocale(Locale.ENGLISH) // TODO: Correct locale?
+				.parseDateTime(user.timeGrid.days[0].day).dayOfWeek
+			timeColumnVisibility =
+				!preferences.get<Boolean>("preference_timetable_hide_time_stamps")
+			columnGap = ConversionUtils.dpToPx(
+				preferences.get<Int>("preference_timetable_item_padding")
+					.toFloat(), context
+			).toInt()
+			overlappingEventGap = ConversionUtils.dpToPx(
+				preferences.get<Int>("preference_timetable_item_padding_overlap")
+					.toFloat(), context
+			).toInt()
+			eventCornerRadius = ConversionUtils.dpToPx(
+				preferences.get<Int>("preference_timetable_item_corner_radius")
+					.toFloat(), context
+			).toInt()
+			eventSecondaryTextCentered =
+				preferences["preference_timetable_centered_lesson_info"]
+			eventTextBold =
+				preferences["preference_timetable_bold_lesson_name"]
+			eventTextSize = ConversionUtils.spToPx(
+				preferences.get<Int>("preference_timetable_lesson_name_font_size")
+					.toFloat(), context
+			)
+			eventSecondaryTextSize = ConversionUtils.spToPx(
+				preferences.get<Int>("preference_timetable_lesson_info_font_size")
+					.toFloat(), context
+			)
+			eventTextColor =
+				if (preferences["preference_timetable_item_text_light"]) Color.WHITE else Color.BLACK
+			pastBackgroundColor = preferences["preference_background_past"]
+			futureBackgroundColor =
+				preferences["preference_background_future"]
+			nowLineColor = preferences["preference_marker"]
+			horizontalFlingEnabled = preferences["preference_fling_enable"]
+			snapToWeek =
+				!preferences.get<Boolean>("preference_week_snap_to_days") && numberOfVisibleDays != 1
 	}
 
 	private fun <T> WeekView<T>.setupHours() {
@@ -1817,7 +1712,7 @@ private fun closeDrawer(drawer: DrawerLayout = drawer_layout) =
 			)
 		)*/
 
-		profileUser.timeGrid.days.maxByOrNull { it.units.size }?.units?.forEachIndexed { index, hour ->
+		user.timeGrid.days.maxByOrNull { it.units.size }?.units?.forEachIndexed { index, hour ->
 			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
 
 			val startTime =
@@ -1852,6 +1747,253 @@ private fun closeDrawer(drawer: DrawerLayout = drawer_layout) =
 		startTime = lines.first()
 		endTime =
 			lines.last() + 30 // TODO: Don't hard-code this offset
+	}
+
+	fun updateViews(container: WeekViewSwipeRefreshLayout) {
+		val touchListener = View.OnTouchListener { view, motionEvent ->
+			if (isAnonymous) true else view.onTouchEvent(motionEvent)
+		}
+
+		container.apply {
+			isRefreshing = this@MainAppState.isRefreshing
+		}
+
+		if (!shouldUpdateWeekView) return
+
+		container.apply {
+			setOnRefreshListener { onRefresh() }
+			setOnTouchListener(touchListener)
+		}
+
+		weekView.value?.apply {
+			val outlineAlpha = 0.4f
+
+			// Workaround to enable drawer gestures only when swiping from the left edge (won't work with RTL layout)
+			onMotionEvent = { event -> onMotionEvent(event) }
+
+			setOnTouchListener(touchListener)
+
+			setPeriodChangeListener(object :
+				WeekViewLoader.PeriodChangeListener<TimegridItem> {
+				override fun onPeriodChange(
+					startDate: LocalDate,
+					endDate: LocalDate
+				): List<WeekViewDisplayable<TimegridItem>> {
+					return this@MainAppState.onPeriodChange(startDate, endDate)
+				}
+			})
+
+			setOnEventClickListener(object :
+				EventClickListener<TimegridItem> {
+				override fun onEventClick(
+					data: TimegridItem,
+					eventRect: RectF
+				) {
+					timetableItemDetailsDialog.value = data
+				}
+			})
+
+			scrollListener = object : ScrollListener {
+				override fun onFirstVisibleDayChanged(
+					newFirstVisibleDay: LocalDate,
+					oldFirstVisibleDay: LocalDate?
+				) {
+					onScroll(newFirstVisibleDay)
+				}
+			}
+
+			scaleListener = object : ScaleListener {
+				override fun onScaleFinished() {
+					//saveZoomLevel()
+				}
+			}
+
+			setupCustomization()
+			setupHours()
+
+			config.apply {
+				with(currentDensity) {
+					daySeparatorColor =
+						colorScheme.outline.copy(alpha = outlineAlpha)
+							.toArgb()
+					defaultEventColor = colorScheme.primary.toArgb()
+					eventMarginVertical = 4.dp.roundToPx()
+					eventPadding = 4.dp.roundToPx()
+					headerRowBackgroundColor = Color.TRANSPARENT
+					headerRowPadding = 8.dp.roundToPx()
+					headerRowSecondaryTextColor =
+						colorScheme.onSurfaceVariant.toArgb()
+					headerRowSecondaryTextSize = 12.sp.toPx()
+					headerRowTextColor =
+						colorScheme.onSurface.toArgb()
+					headerRowTextSize = 18.sp.toPx()
+					headerRowTextSpacing = 10.dp.roundToPx()
+					holidayTextColor =
+						colorScheme.onSurface.toArgb()
+					holidayTextSize = 16.sp.toPx()
+					hourHeight = 72.dp.roundToPx()
+					hourSeparatorColor =
+						colorScheme.outline.copy(alpha = outlineAlpha)
+							.toArgb()
+					nowLineStrokeWidth = 2.dp.toPx()
+					scrollDuration = 100
+					showHourSeparator = true
+					showNowLine = true
+					timeColumnBackground = Color.TRANSPARENT
+					timeColumnCaptionColor =
+						colorScheme.onSurface.toArgb()
+					timeColumnCaptionSize = 16.sp.toPx()
+					timeColumnPadding = 4.dp.roundToPx()
+					timeColumnTextColor =
+						colorScheme.onSurfaceVariant.toArgb()
+					timeColumnTextSize = 12.sp.toPx()
+					todayHeaderTextColor =
+						colorScheme.primary.toArgb()
+					topLeftCornerDrawable =
+						AppCompatResources.getDrawable(
+							context,
+							R.drawable.all_calendar_adjusted
+						)
+					topLeftCornerPadding = 4.dp.roundToPx()
+					topLeftCornerTint =
+						colorScheme.onSurface.toArgb()
+				}
+			}
+
+			weeklyTimetableItems.clear()
+			notifyDataSetChanged()
+		}
+
+		shouldUpdateWeekView = false
+	}
+
+	fun onMotionEvent(event: MotionEvent) {
+		when (event.action) {
+			MotionEvent.ACTION_DOWN -> {
+				drawerGestures =
+					event.x < with(currentDensity) { 48.dp.toPx() }
+			}
+			MotionEvent.ACTION_UP -> {
+				drawerGestures = true
+			}
+		}
+	}
+
+	fun onPeriodChange(
+		startDate: LocalDate,
+		endDate: LocalDate
+	): List<WeekViewDisplayable<TimegridItem>> {
+		val weekIndex =
+			convertDateTimeToWeekIndex(startDate)
+		return weeklyTimetableItems[weekIndex]?.items
+			?: run {
+				weeklyTimetableItems[weekIndex] =
+					WeeklyTimetableItems()
+				displayedElement.value?.let { displayedElement ->
+					coroutineScope.launch {
+						loading.value++
+						loadWeeklyTimetableItems(
+							timetableLoader,
+							startDate,
+							endDate,
+							displayedElement,
+							colorScheme,
+							onItemsChanged = { items ->
+								weeklyTimetableItems[weekIndex] =
+									items
+								weekView.value?.notifyDataSetChanged()
+							}
+						)
+						loading.value--
+					}
+				}
+				emptyList()
+			}
+	}
+
+	fun onScroll(newFirstVisibleDay: LocalDate) {
+		currentWeekIndex.value = convertDateTimeToWeekIndex(newFirstVisibleDay)
+		lastRefreshTimestamp.value = weeklyTimetableItems[currentWeekIndex.value]?.lastUpdated ?: 0
+	}
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun rememberMainAppState(
+	user: UserDatabase.User,
+	timetableDatabaseInterface: TimetableDatabaseInterface,
+	weekViewSwipeRefresh: MutableState<WeekViewSwipeRefreshLayout?> = remember { mutableStateOf(null) },
+	weekView: MutableState<WeekView<TimegridItem>?> = remember { mutableStateOf(null) },
+	context: Context = LocalContext.current,
+	coroutineScope: CoroutineScope = rememberCoroutineScope(),
+	colorScheme: ColorScheme = MaterialTheme.colorScheme,
+	currentDensity: Density = LocalDensity.current,
+	personalTimetable: Pair<PeriodElement?, String?>? = getPersonalTimetableElement(
+		user,
+		context,
+		timetableDatabaseInterface
+	),
+	defaultDisplayedName: String = stringResource(id = R.string.app_name),
+	drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
+	drawerGestures: MutableState<Boolean> = remember { mutableStateOf(true) },
+	loading: MutableState<Int> = remember { mutableStateOf(0) },
+	currentWeekIndex: MutableState<Int> = remember { mutableStateOf(0) },
+	lastRefreshTimestamp: MutableState<Long> = remember { mutableStateOf(0L) },
+	weeklyTimetableItems: SnapshotStateMap<Int, MainAppState.WeeklyTimetableItems?> = remember { mutableStateMapOf() },
+	timetableLoader: TimetableLoader = TimetableLoader(
+		context = WeakReference(context),
+		user = user,
+		timetableDatabaseInterface = timetableDatabaseInterface
+	),
+	timetableItemDetailsDialog: MutableState<TimegridItem?> = remember { mutableStateOf(null) },
+	profileManagementDialog: MutableState<Boolean> = remember { mutableStateOf(false) },
+) = remember(user) {
+	MainAppState(
+		user = user,
+		timetableDatabaseInterface = timetableDatabaseInterface,
+		weekViewSwipeRefresh = weekViewSwipeRefresh,
+		weekView = weekView,
+		context = context,
+		preferences = PreferenceHelper(context).apply { loadSavedProfile() },
+		coroutineScope = coroutineScope,
+		colorScheme = colorScheme,
+		currentDensity = currentDensity,
+		personalTimetable = personalTimetable,
+		defaultDisplayedName = defaultDisplayedName,
+		drawerState = drawerState,
+		drawerGestureState = drawerGestures,
+		loading = loading,
+		currentWeekIndex = currentWeekIndex,
+		lastRefreshTimestamp = lastRefreshTimestamp,
+		weeklyTimetableItems = weeklyTimetableItems,
+		timetableLoader = timetableLoader,
+		timetableItemDetailsDialog = timetableItemDetailsDialog,
+		profileManagementDialog = profileManagementDialog
+	)
+}
+
+@Composable
+private fun getPersonalTimetableElement(
+	user: UserDatabase.User,
+	context: Context,
+	timetableDatabaseInterface: TimetableDatabaseInterface
+): Pair<PeriodElement?, String?>? {
+	val customTimetable = ""//preferences["preference_timetable_personal_timetable", ""]
+
+	return if (customTimetable.isEmpty()) {
+		user.userData.elemType?.let { type ->
+			PeriodElement(
+				type = type,
+				id = user.userData.elemId,
+				orgId = user.userData.elemId,
+			) to user.getDisplayedName(context)
+		}
+	} else {
+		val displayedElement = decodeStoredTimetableValue(customTimetable)
+
+		displayedElement to displayedElement?.let {
+			timetableDatabaseInterface.getLongName(it)
+		}
 	}
 }
 

@@ -30,7 +30,7 @@ fun BaseComposeActivity.intDataStore(
 ): UntisPreferenceDataStore<Int> {
 	return UntisPreferenceDataStore(
 		dataStore = preferenceDataStore,
-		prefKey = intPreferencesKey("${profileId}_$key"),
+		prefKey = intPreferencesKey("${currentUserId()}_$key"),
 		defaultValue = defaultValue,
 		dependencyValue = dependencyValue,
 		subDependency = subDependency
@@ -52,7 +52,7 @@ fun BaseComposeActivity.doubleDataStore(
 ): UntisPreferenceDataStore<Double> {
 	return UntisPreferenceDataStore(
 		dataStore = preferenceDataStore,
-		prefKey = doublePreferencesKey("${profileId}_$key"),
+		prefKey = doublePreferencesKey("${currentUserId()}_$key"),
 		defaultValue = defaultValue,
 		dependencyValue = dependencyValue,
 		subDependency = subDependency
@@ -74,7 +74,7 @@ fun BaseComposeActivity.stringDataStore(
 ): UntisPreferenceDataStore<String> {
 	return UntisPreferenceDataStore(
 		dataStore = preferenceDataStore,
-		prefKey = stringPreferencesKey("${profileId}_$key"),
+		prefKey = stringPreferencesKey("${currentUserId()}_$key"),
 		defaultValue = defaultValue,
 		dependencyValue = dependencyValue,
 		subDependency = subDependency
@@ -96,7 +96,7 @@ fun BaseComposeActivity.booleanDataStore(
 ): UntisPreferenceDataStore<Boolean> {
 	return UntisPreferenceDataStore(
 		dataStore = preferenceDataStore,
-		prefKey = booleanPreferencesKey("${profileId}_$key"),
+		prefKey = booleanPreferencesKey("${currentUserId()}_$key"),
 		defaultValue = defaultValue,
 		dependencyValue = dependencyValue,
 		subDependency = subDependency
@@ -118,7 +118,7 @@ fun BaseComposeActivity.floatDataStore(
 ): UntisPreferenceDataStore<Float> {
 	return UntisPreferenceDataStore(
 		dataStore = preferenceDataStore,
-		prefKey = floatPreferencesKey("${profileId}_$key"),
+		prefKey = floatPreferencesKey("${currentUserId()}_$key"),
 		defaultValue = defaultValue,
 		dependencyValue = dependencyValue,
 		subDependency = subDependency
@@ -140,7 +140,7 @@ fun BaseComposeActivity.longDataStore(
 ): UntisPreferenceDataStore<Long> {
 	return UntisPreferenceDataStore(
 		dataStore = preferenceDataStore,
-		prefKey = longPreferencesKey("${profileId}_$key"),
+		prefKey = longPreferencesKey("${currentUserId()}_$key"),
 		defaultValue = defaultValue,
 		dependencyValue = dependencyValue,
 		subDependency = subDependency
@@ -156,7 +156,7 @@ fun BaseComposeActivity.stringSetDataStore(
 ): UntisPreferenceDataStore<Set<String>> {
 	return UntisPreferenceDataStore(
 		dataStore = preferenceDataStore,
-		prefKey = stringSetPreferencesKey("${profileId}_$key"),
+		prefKey = stringSetPreferencesKey("${currentUserId()}_$key"),
 		defaultValue = defaultValue,
 		dependencyValue = dependencyValue,
 		subDependency = subDependency

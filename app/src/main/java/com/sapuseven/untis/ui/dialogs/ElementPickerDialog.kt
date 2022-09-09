@@ -255,7 +255,7 @@ fun ElementPickerElements(
 	) {
 		selectedType?.let {
 			LazyVerticalGrid(
-				columns = GridCells.Adaptive(if (multiSelect) 104.dp else 72.dp),
+				columns = GridCells.Adaptive(if (multiSelect) 128.dp else 96.dp),
 				modifier = Modifier.fillMaxHeight()
 			) {
 				items(

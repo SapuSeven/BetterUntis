@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.*
@@ -66,7 +67,6 @@ class LoginDataInputActivity : BaseComposeActivity() {
 
 		//private const val FRAGMENT_TAG_PROFILE_UPDATE = "profileUpdate"
 
-		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileid"
 		const val EXTRA_BOOLEAN_PROFILE_UPDATE = "com.sapuseven.untis.activities.profileupdate"
 
 		val PREFS_BACKUP_SCHOOLID = stringPreferencesKey("logindatainput_backup_schoolid")
@@ -75,15 +75,13 @@ class LoginDataInputActivity : BaseComposeActivity() {
 		val PREFS_BACKUP_PASSWORD = stringPreferencesKey("logindatainput_backup_password")
 		val PREFS_BACKUP_PROXYURL = stringPreferencesKey("logindatainput_backup_proxyurl")
 		val PREFS_BACKUP_APIURL = stringPreferencesKey("logindatainput_backup_apiurl")
-		val PREFS_BACKUP_SKIPAPPSECRET =
-			booleanPreferencesKey("logindatainput_backup_skipappsecret")
+		val PREFS_BACKUP_SKIPAPPSECRET = booleanPreferencesKey("logindatainput_backup_skipappsecret")
 	}
 
 	private var existingUserId: Long? = null
 
 	private var schoolInfoFromSearch: UntisSchoolInfo? = null
 	private var existingUser: UserDatabase.User? = null
-	private lateinit var userDatabase: UserDatabase
 
 	@OptIn(ExperimentalMaterial3Api::class, ExperimentalSerializationApi::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -239,7 +237,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 								}
 									?: emptyList()
 							val user = UserDatabase.User(
-								existingUserId,
+								existingUserId ?: -1,
 								profileName.value ?: "",
 								untisApiUrl,
 								schoolInfo.schoolId.toString(),
@@ -343,17 +341,14 @@ class LoginDataInputActivity : BaseComposeActivity() {
 											stringResource(id = R.string.logindatainput_title_edit)
 									)
 								},
-								actions = {
-									existingUser?.let { user ->
-										IconButton(
-											enabled = !loading,
-											onClick = { deleteDialog = user }
-										) {
-											Icon(
-												imageVector = Icons.Outlined.Delete,
-												contentDescription = stringResource(id = R.string.logindatainput_delete)
-											)
-										}
+								navigationIcon = {
+									IconButton(onClick = {
+										finish()
+									}) {
+										Icon(
+											imageVector = Icons.Outlined.ArrowBack,
+											contentDescription = stringResource(id = R.string.all_back)
+										)
 									}
 								}
 							)
@@ -596,7 +591,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 		state: MutableState<T?>,
 		prefKey: Preferences.Key<T>? = null
 	) {
-		prefKey?.let {
+		/*prefKey?.let {
 			val coroutineScope = rememberCoroutineScope()
 
 			DisposableEffect(Unit) {
@@ -621,6 +616,6 @@ class LoginDataInputActivity : BaseComposeActivity() {
 					}
 				}
 			}
-		}
+		}*/
 	}
 }

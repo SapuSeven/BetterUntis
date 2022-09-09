@@ -34,7 +34,8 @@ import com.sapuseven.untis.ui.theme.AppTheme
 class SettingsActivity : BaseComposeActivity() {
 	companion object {
 		const val EXTRA_STRING_PREFERENCE_ROUTE = "com.sapuseven.untis.activities.settings.route"
-		const val EXTRA_STRING_PREFERENCE_HIGHLIGHT = "com.sapuseven.untis.activities.settings.highlight"
+		const val EXTRA_STRING_PREFERENCE_HIGHLIGHT =
+			"com.sapuseven.untis.activities.settings.highlight"
 
 		private const val URL_GITHUB_REPOSITORY = "https://github.com/SapuSeven/BetterUntis"
 		private const val URL_WIKI_PROXY = "$URL_GITHUB_REPOSITORY/wiki/Proxy"
@@ -44,9 +45,6 @@ class SettingsActivity : BaseComposeActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
-		if (!checkProfile())
-			return
-
 		// Navigate to and highlight a preference if requested
 		val preferencePath =
 			(intent.extras?.getString(EXTRA_STRING_PREFERENCE_ROUTE)) ?: "preferences"
@@ -54,991 +52,994 @@ class SettingsActivity : BaseComposeActivity() {
 
 		setContent {
 			AppTheme {
-				val navController = rememberNavController()
-				var title by remember { mutableStateOf<String?>(null) }
+				withUser {
+					val navController = rememberNavController()
+					var title by remember { mutableStateOf<String?>(null) }
 
-				Scaffold(
-					topBar = {
-						CenterAlignedTopAppBar(
-							title = {
-								Text(
-									title ?: stringResource(id = R.string.activity_title_settings)
-								)
-							},
-							navigationIcon = {
-								IconButton(onClick = { if (!navController.navigateUp()) finish() }) {
-									Icon(
-										imageVector = Icons.Outlined.ArrowBack,
-										contentDescription = stringResource(id = R.string.all_back)
+					Scaffold(
+						topBar = {
+							CenterAlignedTopAppBar(
+								title = {
+									Text(
+										title
+											?: stringResource(id = R.string.activity_title_settings)
 									)
-								}
-							}
-						)
-					}
-				) { innerPadding ->
-					Box(
-						modifier = Modifier
-							.padding(innerPadding)
-							.fillMaxSize()
-					) {
-						NavHost(navController, startDestination = preferencePath) {
-							composable("preferences") {
-								title = null
-
-								Column {
-									PreferenceScreen(
-										key = "preferences_general",
-										title = { Text(stringResource(id = R.string.preferences_general)) },
-										icon = {
-											Icon(
-												painter = painterResource(id = R.drawable.settings_general),
-												contentDescription = null
-											)
-										},
-										navController = navController
-									)
-
-									PreferenceScreen(
-										key = "preferences_styling",
-										title = { Text(stringResource(id = R.string.preferences_styling)) },
-										icon = {
-											Icon(
-												painter = painterResource(id = R.drawable.settings_styling),
-												contentDescription = null
-											)
-										},
-										navController = navController
-									)
-
-									PreferenceScreen(
-										key = "preferences_timetable",
-										title = { Text(stringResource(id = R.string.preferences_timetable)) },
-										icon = {
-											Icon(
-												painter = painterResource(id = R.drawable.settings_timetable),
-												contentDescription = null
-											)
-										},
-										navController = navController
-									)
-
-									PreferenceScreen(
-										key = "preferences_notifications",
-										title = { Text(stringResource(id = R.string.preferences_notifications)) },
-										icon = {
-											Icon(
-												painter = painterResource(id = R.drawable.settings_notifications),
-												contentDescription = null
-											)
-										},
-										navController = navController
-									)
-
-									PreferenceScreen(
-										key = "preferences_connectivity",
-										title = { Text(stringResource(id = R.string.preferences_connectivity)) },
-										icon = {
-											Icon(
-												painter = painterResource(id = R.drawable.settings_connectivity),
-												contentDescription = null
-											)
-										},
-										navController = navController
-									)
-
-									PreferenceScreen(
-										key = "preferences_info",
-										title = { Text(stringResource(id = R.string.preferences_info)) },
-										icon = {
-											Icon(
-												painter = painterResource(id = R.drawable.settings_info),
-												contentDescription = null
-											)
-										},
-										navController = navController
-									)
-								}
-							}
-
-							composable("preferences_general") {
-								title = stringResource(id = R.string.preferences_general)
-
-								Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-									PreferenceCategory(stringResource(id = R.string.preference_category_general_behaviour)) {
-										SwitchPreference(
-											title = { Text(stringResource(R.string.preference_double_tap_to_exit)) },
-											dataStore = booleanDataStore(
-												"preference_double_tap_to_exit",
-												defaultValue = booleanResource(id = R.bool.preference_double_tap_to_exit_default)
-											)
-										)
-
-										SwitchPreference(
-											title = { Text(stringResource(R.string.preference_flinging_enable)) },
-											dataStore = booleanDataStore(
-												"preference_fling_enable",
-												defaultValue = booleanResource(R.bool.preference_fling_enable_default)
-											)
-										)
-									}
-
-									PreferenceCategory(stringResource(R.string.preference_category_general_week_display)) {
-										SwitchPreference(
-											title = { Text(stringResource(R.string.preference_week_snap_to_days)) },
-											summary = { Text(stringResource(R.string.preference_week_snap_to_days_summary)) },
-											dataStore = booleanDataStore(
-												"preference_week_snap_to_days",
-												defaultValue = booleanResource(R.bool.preference_week_snap_to_days_default)
-											)
-										)
-
-										WeekRangePickerPreference(
-											title = { Text(stringResource(R.string.preference_week_custom_range)) },
-											dataStore = stringSetDataStore(
-												"preference_week_custom_range",
-												defaultValue = emptySet()
-											)
-										)
-
-										SliderPreference(
-											valueRange = 0f..7f,
-											steps = 6,
-											title = { Text(stringResource(R.string.preference_week_display_length)) },
-											summary = { Text(stringResource(R.string.preference_week_display_length_summary)) },
-											showSeekBarValue = true,
-											dataStore = floatDataStore(
-												"preference_week_custom_display_length",
-												defaultValue = 0f
-											)
-										)
-									}
-
-
-									PreferenceCategory(stringResource(id = R.string.preference_category_general_automute)) {
-										SwitchPreference(
-											title = { Text(stringResource(R.string.preference_automute_enable)) },
-											summary = { Text(stringResource(R.string.preference_automute_enable_summary)) },
-											dataStore = booleanDataStore(
-												"preference_automute_enable",
-												defaultValue = booleanResource(R.bool.preference_automute_enable_default)
-											)
-										)
-										SwitchPreference(
-											title = { Text(stringResource(R.string.preference_automute_cancelled_lessons)) },
-											dependency = booleanDataStore(
-												"preference_automute_enable",
-												defaultValue = booleanResource(R.bool.preference_automute_enable_default)
-											),
-											dataStore = booleanDataStore(
-												"preference_automute_cancelled_lessons",
-												defaultValue = booleanResource(R.bool.preference_automute_cancelled_lessons_default)
-											)
-										)
-										SwitchPreference(
-											title = { Text(stringResource(R.string.preference_automute_mute_priority)) },
-											dependency = booleanDataStore(
-												"preference_automute_enable",
-												defaultValue = booleanResource(R.bool.preference_automute_enable_default)
-											),
-											dataStore = booleanDataStore(
-												"preference_automute_mute_priority",
-												defaultValue = booleanResource(R.bool.preference_automute_mute_priority_default)
-											)
-										)
-
-										SliderPreference(
-											valueRange = 0f..20f,
-											steps = 19,
-											title = { Text(stringResource(R.string.preference_automute_minimum_break_length)) },
-											summary = { Text(stringResource(R.string.preference_automute_minimum_break_length_summary)) },
-											showSeekBarValue = true,
-											dependency = booleanDataStore(
-												"preference_automute_enable",
-												defaultValue = booleanResource(R.bool.preference_automute_enable_default)
-											),
-											dataStore = floatDataStore(
-												"preference_automute_minimum_break_length",
-												defaultValue = integerResource(id = R.integer.preference_automute_minimum_break_length_default).toFloat()
-											)
-										)
-									}
-
-									// TODO: Extract string resources
-									PreferenceCategory("Error Reporting") {
-										SwitchPreference(
-											title = { Text("Enable additional error messages") },
-											summary = { Text("This is used for non-critical background errors") },
-											dataStore = booleanDataStore(
-												"preference_additional_error_messages",
-												defaultValue = booleanResource(R.bool.preference_additional_error_messages_default)
-											)
-										)
-
-										Preference(
-											title = { Text("View logged errors") },
-											summary = { Text("Crash logs and non-critical background errors") },
-											onClick = { /*TODO*/ },
-											dataStore = UntisPreferenceDataStore.emptyDataStore()
+								},
+								navigationIcon = {
+									IconButton(onClick = { if (!navController.navigateUp()) finish() }) {
+										Icon(
+											imageVector = Icons.Outlined.ArrowBack,
+											contentDescription = stringResource(id = R.string.all_back)
 										)
 									}
 								}
-							}
+							)
+						}
+					) { innerPadding ->
+						Box(
+							modifier = Modifier
+								.padding(innerPadding)
+								.fillMaxSize()
+						) {
+							NavHost(navController, startDestination = preferencePath) {
+								composable("preferences") {
+									title = null
 
-							composable("preferences_styling") {
-								title = stringResource(id = R.string.preferences_styling)
-
-								Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-									PreferenceCategory(stringResource(id = R.string.preference_category_styling_colors)) {
-										SwitchPreference(
-											title = { Text(stringResource(R.string.preference_timetable_item_text_light)) },
-											dataStore = booleanDataStore(
-												"preference_timetable_item_text_light",
-												defaultValue = booleanResource(R.bool.preference_timetable_item_text_light_default)
-											)
+									Column {
+										PreferenceScreen(
+											key = "preferences_general",
+											title = { Text(stringResource(id = R.string.preferences_general)) },
+											icon = {
+												Icon(
+													painter = painterResource(id = R.drawable.settings_general),
+													contentDescription = null
+												)
+											},
+											navController = navController
 										)
 
-										ColorPreference(
-											title = { Text(stringResource(R.string.preference_background_future)) },
-											showAlphaSlider = true,
-											dataStore = intDataStore(
-												"preference_background_future",
-												defaultValue = integerResource(R.integer.preference_background_future_default)
-											)
+										PreferenceScreen(
+											key = "preferences_styling",
+											title = { Text(stringResource(id = R.string.preferences_styling)) },
+											icon = {
+												Icon(
+													painter = painterResource(id = R.drawable.settings_styling),
+													contentDescription = null
+												)
+											},
+											navController = navController
 										)
 
-										ColorPreference(
-											title = { Text(stringResource(R.string.preference_background_past)) },
-											showAlphaSlider = true,
-											dataStore = intDataStore(
-												"preference_background_past",
-												defaultValue = integerResource(R.integer.preference_background_past_default)
-											)
+										PreferenceScreen(
+											key = "preferences_timetable",
+											title = { Text(stringResource(id = R.string.preferences_timetable)) },
+											icon = {
+												Icon(
+													painter = painterResource(id = R.drawable.settings_timetable),
+													contentDescription = null
+												)
+											},
+											navController = navController
 										)
 
-										ColorPreference(
-											title = { Text(stringResource(R.string.preference_marker)) },
-											dataStore = intDataStore(
-												"preference_marker",
-												defaultValue = integerResource(R.integer.preference_marker_default)
-											)
+										PreferenceScreen(
+											key = "preferences_notifications",
+											title = { Text(stringResource(id = R.string.preferences_notifications)) },
+											icon = {
+												Icon(
+													painter = painterResource(id = R.drawable.settings_notifications),
+													contentDescription = null
+												)
+											},
+											navController = navController
+										)
+
+										PreferenceScreen(
+											key = "preferences_connectivity",
+											title = { Text(stringResource(id = R.string.preferences_connectivity)) },
+											icon = {
+												Icon(
+													painter = painterResource(id = R.drawable.settings_connectivity),
+													contentDescription = null
+												)
+											},
+											navController = navController
+										)
+
+										PreferenceScreen(
+											key = "preferences_info",
+											title = { Text(stringResource(id = R.string.preferences_info)) },
+											icon = {
+												Icon(
+													painter = painterResource(id = R.drawable.settings_info),
+													contentDescription = null
+												)
+											},
+											navController = navController
 										)
 									}
+								}
 
-									PreferenceCategory(stringResource(id = R.string.preference_category_styling_backgrounds)) {
-										MultiSelectListPreference(
-											title = { Text(stringResource(R.string.preference_school_background)) },
-											summary = { Text(stringResource(R.string.preference_school_background_desc)) },
-											entries = stringArrayResource(id = R.array.preference_schoolcolors_values),
-											entryLabels = stringArrayResource(id = R.array.preference_schoolcolors),
-											dataStore = stringSetDataStore(
-												"preference_school_background",
-												defaultValue = emptySet()
+								composable("preferences_general") {
+									title = stringResource(id = R.string.preferences_general)
+
+									Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+										PreferenceCategory(stringResource(id = R.string.preference_category_general_behaviour)) {
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_double_tap_to_exit)) },
+												dataStore = booleanDataStore(
+													"preference_double_tap_to_exit",
+													defaultValue = booleanResource(id = R.bool.preference_double_tap_to_exit_default)
+												)
 											)
-										)
 
-										SwitchPreference(
-											title = { Text(stringResource(R.string.preference_use_theme_background)) },
-											dependency = stringSetDataStore(
-												"preference_school_background",
-												defaultValue = emptySet(),
-												dependencyValue = { !it.contains("regular") }
-											),
-											dataStore = booleanDataStore(
-												"preference_use_theme_background",
-												defaultValue = booleanResource(R.bool.preference_use_theme_background_default)
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_flinging_enable)) },
+												dataStore = booleanDataStore(
+													"preference_fling_enable",
+													defaultValue = booleanResource(R.bool.preference_fling_enable_default)
+												)
 											)
-										)
+										}
 
-										ColorPreference(
-											title = { Text(stringResource(R.string.preference_background_regular)) },
-											dependency = stringSetDataStore(
-												"preference_school_background",
-												defaultValue = emptySet(),
-												dependencyValue = { !it.contains("regular") },
-												subDependency = booleanDataStore(
+										PreferenceCategory(stringResource(R.string.preference_category_general_week_display)) {
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_week_snap_to_days)) },
+												summary = { Text(stringResource(R.string.preference_week_snap_to_days_summary)) },
+												dataStore = booleanDataStore(
+													"preference_week_snap_to_days",
+													defaultValue = booleanResource(R.bool.preference_week_snap_to_days_default)
+												)
+											)
+
+											WeekRangePickerPreference(
+												title = { Text(stringResource(R.string.preference_week_custom_range)) },
+												dataStore = stringSetDataStore(
+													"preference_week_custom_range",
+													defaultValue = emptySet()
+												)
+											)
+
+											SliderPreference(
+												valueRange = 0f..7f,
+												steps = 6,
+												title = { Text(stringResource(R.string.preference_week_display_length)) },
+												summary = { Text(stringResource(R.string.preference_week_display_length_summary)) },
+												showSeekBarValue = true,
+												dataStore = floatDataStore(
+													"preference_week_custom_display_length",
+													defaultValue = 0f
+												)
+											)
+										}
+
+
+										PreferenceCategory(stringResource(id = R.string.preference_category_general_automute)) {
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_automute_enable)) },
+												summary = { Text(stringResource(R.string.preference_automute_enable_summary)) },
+												dataStore = booleanDataStore(
+													"preference_automute_enable",
+													defaultValue = booleanResource(R.bool.preference_automute_enable_default)
+												)
+											)
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_automute_cancelled_lessons)) },
+												dependency = booleanDataStore(
+													"preference_automute_enable",
+													defaultValue = booleanResource(R.bool.preference_automute_enable_default)
+												),
+												dataStore = booleanDataStore(
+													"preference_automute_cancelled_lessons",
+													defaultValue = booleanResource(R.bool.preference_automute_cancelled_lessons_default)
+												)
+											)
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_automute_mute_priority)) },
+												dependency = booleanDataStore(
+													"preference_automute_enable",
+													defaultValue = booleanResource(R.bool.preference_automute_enable_default)
+												),
+												dataStore = booleanDataStore(
+													"preference_automute_mute_priority",
+													defaultValue = booleanResource(R.bool.preference_automute_mute_priority_default)
+												)
+											)
+
+											SliderPreference(
+												valueRange = 0f..20f,
+												steps = 19,
+												title = { Text(stringResource(R.string.preference_automute_minimum_break_length)) },
+												summary = { Text(stringResource(R.string.preference_automute_minimum_break_length_summary)) },
+												showSeekBarValue = true,
+												dependency = booleanDataStore(
+													"preference_automute_enable",
+													defaultValue = booleanResource(R.bool.preference_automute_enable_default)
+												),
+												dataStore = floatDataStore(
+													"preference_automute_minimum_break_length",
+													defaultValue = integerResource(id = R.integer.preference_automute_minimum_break_length_default).toFloat()
+												)
+											)
+										}
+
+										// TODO: Extract string resources
+										PreferenceCategory("Error Reporting") {
+											SwitchPreference(
+												title = { Text("Enable additional error messages") },
+												summary = { Text("This is used for non-critical background errors") },
+												dataStore = booleanDataStore(
+													"preference_additional_error_messages",
+													defaultValue = booleanResource(R.bool.preference_additional_error_messages_default)
+												)
+											)
+
+											Preference(
+												title = { Text("View logged errors") },
+												summary = { Text("Crash logs and non-critical background errors") },
+												onClick = { /*TODO*/ },
+												dataStore = UntisPreferenceDataStore.emptyDataStore()
+											)
+										}
+									}
+								}
+
+								composable("preferences_styling") {
+									title = stringResource(id = R.string.preferences_styling)
+
+									Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+										PreferenceCategory(stringResource(id = R.string.preference_category_styling_colors)) {
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_timetable_item_text_light)) },
+												dataStore = booleanDataStore(
+													"preference_timetable_item_text_light",
+													defaultValue = booleanResource(R.bool.preference_timetable_item_text_light_default)
+												)
+											)
+
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_future)) },
+												showAlphaSlider = true,
+												dataStore = intDataStore(
+													"preference_background_future",
+													defaultValue = integerResource(R.integer.preference_background_future_default)
+												)
+											)
+
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_past)) },
+												showAlphaSlider = true,
+												dataStore = intDataStore(
+													"preference_background_past",
+													defaultValue = integerResource(R.integer.preference_background_past_default)
+												)
+											)
+
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_marker)) },
+												dataStore = intDataStore(
+													"preference_marker",
+													defaultValue = integerResource(R.integer.preference_marker_default)
+												)
+											)
+										}
+
+										PreferenceCategory(stringResource(id = R.string.preference_category_styling_backgrounds)) {
+											MultiSelectListPreference(
+												title = { Text(stringResource(R.string.preference_school_background)) },
+												summary = { Text(stringResource(R.string.preference_school_background_desc)) },
+												entries = stringArrayResource(id = R.array.preference_schoolcolors_values),
+												entryLabels = stringArrayResource(id = R.array.preference_schoolcolors),
+												dataStore = stringSetDataStore(
+													"preference_school_background",
+													defaultValue = emptySet()
+												)
+											)
+
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_use_theme_background)) },
+												dependency = stringSetDataStore(
+													"preference_school_background",
+													defaultValue = emptySet(),
+													dependencyValue = { !it.contains("regular") }
+												),
+												dataStore = booleanDataStore(
 													"preference_use_theme_background",
-													defaultValue = booleanResource(R.bool.preference_use_theme_background_default),
-													dependencyValue = { !it }
+													defaultValue = booleanResource(R.bool.preference_use_theme_background_default)
 												)
-											),
-											dataStore = intDataStore(
-												"preference_background_regular",
-												defaultValue = integerResource(R.integer.preference_background_regular_default)
 											)
-										)
 
-										ColorPreference(
-											title = { Text(stringResource(R.string.preference_background_regular_past)) },
-											dependency = stringSetDataStore(
-												"preference_school_background",
-												defaultValue = emptySet(),
-												dependencyValue = { !it.contains("regular") },
-												subDependency = booleanDataStore(
-													"preference_use_theme_background",
-													defaultValue = booleanResource(R.bool.preference_use_theme_background_default),
-													dependencyValue = { !it }
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_regular)) },
+												dependency = stringSetDataStore(
+													"preference_school_background",
+													defaultValue = emptySet(),
+													dependencyValue = { !it.contains("regular") },
+													subDependency = booleanDataStore(
+														"preference_use_theme_background",
+														defaultValue = booleanResource(R.bool.preference_use_theme_background_default),
+														dependencyValue = { !it }
+													)
+												),
+												dataStore = intDataStore(
+													"preference_background_regular",
+													defaultValue = integerResource(R.integer.preference_background_regular_default)
 												)
-											),
-											dataStore = intDataStore(
-												"preference_background_regular_past",
-												defaultValue = integerResource(R.integer.preference_background_regular_past_default)
 											)
-										)
 
-										ColorPreference(
-											title = { Text(stringResource(R.string.preference_background_exam)) },
-											dependency = stringSetDataStore(
-												"preference_school_background",
-												defaultValue = emptySet(),
-												dependencyValue = { !it.contains("exam") }
-											),
-											dataStore = intDataStore(
-												"preference_background_exam",
-												defaultValue = integerResource(R.integer.preference_background_exam_default)
-											)
-										)
-
-										ColorPreference(
-											title = { Text(stringResource(R.string.preference_background_exam_past)) },
-											dependency = stringSetDataStore(
-												"preference_school_background",
-												defaultValue = emptySet(),
-												dependencyValue = { !it.contains("exam") }
-											),
-											dataStore = intDataStore(
-												"preference_background_exam_past",
-												defaultValue = integerResource(R.integer.preference_background_exam_past_default)
-											)
-										)
-
-										ColorPreference(
-											title = { Text(stringResource(R.string.preference_background_irregular)) },
-											dependency = stringSetDataStore(
-												"preference_school_background",
-												defaultValue = emptySet(),
-												dependencyValue = { !it.contains("irregular") }
-											),
-											dataStore = intDataStore(
-												"preference_background_irregular",
-												defaultValue = integerResource(R.integer.preference_background_irregular_default)
-											)
-										)
-
-										ColorPreference(
-											title = { Text(stringResource(R.string.preference_background_irregular_past)) },
-											dependency = stringSetDataStore(
-												"preference_school_background",
-												defaultValue = emptySet(),
-												dependencyValue = { !it.contains("irregular") }
-											),
-											dataStore = intDataStore(
-												"preference_background_irregular_past",
-												defaultValue = integerResource(R.integer.preference_background_irregular_past_default)
-											)
-										)
-
-										ColorPreference(
-											title = { Text(stringResource(R.string.preference_background_cancelled)) },
-											dependency = stringSetDataStore(
-												"preference_school_background",
-												defaultValue = emptySet(),
-												dependencyValue = { !it.contains("cancelled") }
-											),
-											dataStore = intDataStore(
-												"preference_background_cancelled",
-												defaultValue = integerResource(R.integer.preference_background_cancelled_default)
-											)
-										)
-
-										ColorPreference(
-											title = { Text(stringResource(R.string.preference_background_cancelled_past)) },
-											dependency = stringSetDataStore(
-												"preference_school_background",
-												defaultValue = emptySet(),
-												dependencyValue = { !it.contains("cancelled") }
-											),
-											dataStore = intDataStore(
-												"preference_background_cancelled_past",
-												defaultValue = integerResource(R.integer.preference_background_cancelled_past_default)
-											)
-										)
-
-										Preference(
-											title = { Text(stringResource(R.string.preference_timetable_colors_reset)) },
-											onClick = { /*TODO*/ },
-											dataStore = UntisPreferenceDataStore.emptyDataStore()
-										)
-									}
-
-									PreferenceCategory(stringResource(id = R.string.preference_category_styling_themes)) {
-										ListPreference(
-											title = { Text(stringResource(R.string.preference_theme)) },
-											summary = { Text(it.second) },
-											icon = {
-												Icon(
-													painter = painterResource(R.drawable.settings_timetable_format_paint),
-													contentDescription = null
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_regular_past)) },
+												dependency = stringSetDataStore(
+													"preference_school_background",
+													defaultValue = emptySet(),
+													dependencyValue = { !it.contains("regular") },
+													subDependency = booleanDataStore(
+														"preference_use_theme_background",
+														defaultValue = booleanResource(R.bool.preference_use_theme_background_default),
+														dependencyValue = { !it }
+													)
+												),
+												dataStore = intDataStore(
+													"preference_background_regular_past",
+													defaultValue = integerResource(R.integer.preference_background_regular_past_default)
 												)
-											},
-											entries = stringArrayResource(id = R.array.preference_theme_values),
-											entryLabels = stringArrayResource(id = R.array.preference_themes),
-											dataStore = stringDataStore(
-												"preference_theme",
-												defaultValue = stringResource(R.string.preference_theme_default)
 											)
-										)
 
-										ListPreference(
-											title = { Text(stringResource(R.string.preference_dark_theme)) },
-											summary = { Text(it.second) },
-											icon = {
-												Icon(
-													painter = painterResource(R.drawable.settings_timetable_brightness_medium),
-													contentDescription = null
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_exam)) },
+												dependency = stringSetDataStore(
+													"preference_school_background",
+													defaultValue = emptySet(),
+													dependencyValue = { !it.contains("exam") }
+												),
+												dataStore = intDataStore(
+													"preference_background_exam",
+													defaultValue = integerResource(R.integer.preference_background_exam_default)
 												)
-											},
-											entries = stringArrayResource(id = R.array.preference_dark_theme_values),
-											entryLabels = stringArrayResource(id = R.array.preference_dark_theme),
-											dataStore = stringDataStore(
-												"preference_dark_theme",
-												defaultValue = stringResource(R.string.preference_dark_theme_default)
 											)
-										)
 
-										SwitchPreference(
-											title = { Text(stringResource(R.string.preference_dark_theme_oled)) },
-											summary = { Text(stringResource(R.string.preference_dark_theme_oled_desc)) },
-											icon = {
-												Icon(
-													painter = painterResource(R.drawable.settings_timetable_format_oled),
-													contentDescription = null
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_exam_past)) },
+												dependency = stringSetDataStore(
+													"preference_school_background",
+													defaultValue = emptySet(),
+													dependencyValue = { !it.contains("exam") }
+												),
+												dataStore = intDataStore(
+													"preference_background_exam_past",
+													defaultValue = integerResource(R.integer.preference_background_exam_past_default)
 												)
-											},
-											dependency = stringDataStore(
-												"preference_dark_theme",
-												defaultValue = stringResource(R.string.preference_dark_theme_default),
-												dependencyValue = { it != "off" }
-											),
-											dataStore = booleanDataStore(
-												"preference_dark_theme_oled",
-												defaultValue = booleanResource(R.bool.preference_dark_theme_oled_default)
 											)
-										)
+
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_irregular)) },
+												dependency = stringSetDataStore(
+													"preference_school_background",
+													defaultValue = emptySet(),
+													dependencyValue = { !it.contains("irregular") }
+												),
+												dataStore = intDataStore(
+													"preference_background_irregular",
+													defaultValue = integerResource(R.integer.preference_background_irregular_default)
+												)
+											)
+
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_irregular_past)) },
+												dependency = stringSetDataStore(
+													"preference_school_background",
+													defaultValue = emptySet(),
+													dependencyValue = { !it.contains("irregular") }
+												),
+												dataStore = intDataStore(
+													"preference_background_irregular_past",
+													defaultValue = integerResource(R.integer.preference_background_irregular_past_default)
+												)
+											)
+
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_cancelled)) },
+												dependency = stringSetDataStore(
+													"preference_school_background",
+													defaultValue = emptySet(),
+													dependencyValue = { !it.contains("cancelled") }
+												),
+												dataStore = intDataStore(
+													"preference_background_cancelled",
+													defaultValue = integerResource(R.integer.preference_background_cancelled_default)
+												)
+											)
+
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_cancelled_past)) },
+												dependency = stringSetDataStore(
+													"preference_school_background",
+													defaultValue = emptySet(),
+													dependencyValue = { !it.contains("cancelled") }
+												),
+												dataStore = intDataStore(
+													"preference_background_cancelled_past",
+													defaultValue = integerResource(R.integer.preference_background_cancelled_past_default)
+												)
+											)
+
+											Preference(
+												title = { Text(stringResource(R.string.preference_timetable_colors_reset)) },
+												onClick = { /*TODO*/ },
+												dataStore = UntisPreferenceDataStore.emptyDataStore()
+											)
+										}
+
+										PreferenceCategory(stringResource(id = R.string.preference_category_styling_themes)) {
+											ListPreference(
+												title = { Text(stringResource(R.string.preference_theme)) },
+												summary = { Text(it.second) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_timetable_format_paint),
+														contentDescription = null
+													)
+												},
+												entries = stringArrayResource(id = R.array.preference_theme_values),
+												entryLabels = stringArrayResource(id = R.array.preference_themes),
+												dataStore = stringDataStore(
+													"preference_theme",
+													defaultValue = stringResource(R.string.preference_theme_default)
+												)
+											)
+
+											ListPreference(
+												title = { Text(stringResource(R.string.preference_dark_theme)) },
+												summary = { Text(it.second) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_timetable_brightness_medium),
+														contentDescription = null
+													)
+												},
+												entries = stringArrayResource(id = R.array.preference_dark_theme_values),
+												entryLabels = stringArrayResource(id = R.array.preference_dark_theme),
+												dataStore = stringDataStore(
+													"preference_dark_theme",
+													defaultValue = stringResource(R.string.preference_dark_theme_default)
+												)
+											)
+
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_dark_theme_oled)) },
+												summary = { Text(stringResource(R.string.preference_dark_theme_oled_desc)) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_timetable_format_oled),
+														contentDescription = null
+													)
+												},
+												dependency = stringDataStore(
+													"preference_dark_theme",
+													defaultValue = stringResource(R.string.preference_dark_theme_default),
+													dependencyValue = { it != "off" }
+												),
+												dataStore = booleanDataStore(
+													"preference_dark_theme_oled",
+													defaultValue = booleanResource(R.bool.preference_dark_theme_oled_default)
+												)
+											)
+										}
 									}
 								}
-							}
 
-							composable("preferences_timetable") {
-								title = stringResource(id = R.string.preferences_timetable)
+								composable("preferences_timetable") {
+									title = stringResource(id = R.string.preferences_timetable)
 
-								Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-									ElementPickerPreference(
-										title = { Text(stringResource(R.string.preference_timetable_personal_timetable)) },
-										dataStore = stringDataStore(
-											"preference_timetable_personal_timetable",
-											defaultValue = ""
-										),
-										timetableDatabaseInterface = timetableDatabaseInterface,
-										highlight = preferenceHighlight == "preference_timetable_personal_timetable"
-									)
-
-									SwitchPreference(
-										title = { Text(stringResource(R.string.preference_timetable_hide_time_stamps)) },
-										summary = { Text(stringResource(R.string.preference_timetable_hide_time_stamps_desc)) },
-										dataStore = booleanDataStore(
-											"preference_timetable_hide_time_stamps",
-											defaultValue = booleanResource(R.bool.preference_timetable_hide_time_stamps_default)
-										)
-									)
-
-									SwitchPreference(
-										title = { Text(stringResource(R.string.preference_timetable_hide_cancelled)) },
-										summary = { Text(stringResource(R.string.preference_timetable_hide_cancelled_desc)) },
-										dataStore = booleanDataStore(
-											"preference_timetable_hide_cancelled",
-											defaultValue = booleanResource(R.bool.preference_timetable_hide_cancelled_default)
-										)
-									)
-
-									SwitchPreference(
-										title = { Text(stringResource(R.string.preference_timetable_substitutions_irregular)) },
-										summary = { Text(stringResource(R.string.preference_timetable_substitutions_irregular_desc)) },
-										dataStore = booleanDataStore(
-											"preference_timetable_substitutions_irregular",
-											defaultValue = booleanResource(R.bool.preference_timetable_substitutions_irregular_default)
-										)
-									)
-
-									SwitchPreference(
-										title = { Text(stringResource(R.string.preference_timetable_background_irregular)) },
-										summary = { Text(stringResource(R.string.preference_timetable_background_irregular_desc)) },
-										dependency = booleanDataStore(
-											"preference_timetable_substitutions_irregular",
-											defaultValue = booleanResource(R.bool.preference_timetable_substitutions_irregular_default)
-										),
-										dataStore = booleanDataStore(
-											"preference_timetable_background_irregular",
-											defaultValue = booleanResource(R.bool.preference_timetable_background_irregular_default)
-										)
-									)
-
-									PreferenceCategory(stringResource(id = R.string.preference_category_timetable_range)) {
-										RangeInputPreference(
-											title = { Text(stringResource(R.string.preference_timetable_range)) },
+									Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+										ElementPickerPreference(
+											title = { Text(stringResource(R.string.preference_timetable_personal_timetable)) },
 											dataStore = stringDataStore(
-												"preference_timetable_range",
-												defaultValue = ""
-											)
-										)
-
-										SwitchPreference(
-											title = { Text(stringResource(R.string.preference_timetable_range_index_reset)) },
-											dependency = stringDataStore(
-												"preference_timetable_range",
+												"preference_timetable_personal_timetable",
 												defaultValue = ""
 											),
-											dataStore = booleanDataStore(
-												"preference_timetable_range_index_reset",
-												defaultValue = booleanResource(R.bool.preference_timetable_range_index_reset_default)
-											)
+											timetableDatabaseInterface = timetableDatabaseInterface,
+											highlight = preferenceHighlight == "preference_timetable_personal_timetable"
 										)
 
-										/*SwitchPreference
-										enabled = false,
-										key = preference_timetable_range_hide_outside,
-										summary = (not implemented),
-										title = Hide lessons outside specified range" */
-									}
-
-									PreferenceCategory(stringResource(id = R.string.preference_category_timetable_item_appearance)) {
-										NumericInputPreference(
-											title = { Text(stringResource(R.string.preference_timetable_item_padding_overlap)) },
-											icon = {
-												Icon(
-													painter = painterResource(R.drawable.settings_timetable_padding),
-													contentDescription = null
-												)
-											},
-											unit = "dp",
-											dataStore = intDataStore(
-												"preference_timetable_item_padding_overlap",
-												defaultValue = integerResource(R.integer.preference_timetable_item_padding_overlap_default)
-											)
-										)
-
-										NumericInputPreference(
-											title = { Text(stringResource(R.string.preference_timetable_item_padding)) },
-											icon = {
-												Icon(
-													painter = painterResource(R.drawable.settings_timetable_padding),
-													contentDescription = null
-												)
-											},
-											unit = "dp",
-											dataStore = intDataStore(
-												"preference_timetable_item_padding",
-												defaultValue = integerResource(R.integer.preference_timetable_item_padding_default)
-											)
-										)
-
-										NumericInputPreference(
-											title = { Text(stringResource(R.string.preference_timetable_item_corner_radius)) },
-											icon = {
-												Icon(
-													painter = painterResource(R.drawable.settings_timetable_rounded_corner),
-													contentDescription = null
-												)
-											},
-											unit = "dp",
-											dataStore = intDataStore(
-												"preference_timetable_item_corner_radius",
-												defaultValue = integerResource(R.integer.preference_timetable_item_corner_radius_default)
-											)
-										)
-									}
-
-									PreferenceCategory(stringResource(id = R.string.preference_category_timetable_lesson_text)) {
 										SwitchPreference(
-											title = { Text(stringResource(R.string.preference_timetable_centered_lesson_info)) },
-											icon = {
-												Icon(
-													painter = painterResource(R.drawable.settings_timetable_align_center),
-													contentDescription = null
-												)
-											},
+											title = { Text(stringResource(R.string.preference_timetable_hide_time_stamps)) },
+											summary = { Text(stringResource(R.string.preference_timetable_hide_time_stamps_desc)) },
 											dataStore = booleanDataStore(
-												"preference_timetable_centered_lesson_info",
-												defaultValue = booleanResource(R.bool.preference_timetable_centered_lesson_info_default)
+												"preference_timetable_hide_time_stamps",
+												defaultValue = booleanResource(R.bool.preference_timetable_hide_time_stamps_default)
 											)
 										)
 
 										SwitchPreference(
-											title = { Text(stringResource(R.string.preference_timetable_bold_lesson_name)) },
-											icon = {
-												Icon(
-													painter = painterResource(R.drawable.settings_timetable_format_bold),
-													contentDescription = null
-												)
-											},
+											title = { Text(stringResource(R.string.preference_timetable_hide_cancelled)) },
+											summary = { Text(stringResource(R.string.preference_timetable_hide_cancelled_desc)) },
 											dataStore = booleanDataStore(
-												"preference_timetable_bold_lesson_name",
-												defaultValue = booleanResource(R.bool.preference_timetable_bold_lesson_name_default)
+												"preference_timetable_hide_cancelled",
+												defaultValue = booleanResource(R.bool.preference_timetable_hide_cancelled_default)
+											)
+										)
+
+										SwitchPreference(
+											title = { Text(stringResource(R.string.preference_timetable_substitutions_irregular)) },
+											summary = { Text(stringResource(R.string.preference_timetable_substitutions_irregular_desc)) },
+											dataStore = booleanDataStore(
+												"preference_timetable_substitutions_irregular",
+												defaultValue = booleanResource(R.bool.preference_timetable_substitutions_irregular_default)
+											)
+										)
+
+										SwitchPreference(
+											title = { Text(stringResource(R.string.preference_timetable_background_irregular)) },
+											summary = { Text(stringResource(R.string.preference_timetable_background_irregular_desc)) },
+											dependency = booleanDataStore(
+												"preference_timetable_substitutions_irregular",
+												defaultValue = booleanResource(R.bool.preference_timetable_substitutions_irregular_default)
+											),
+											dataStore = booleanDataStore(
+												"preference_timetable_background_irregular",
+												defaultValue = booleanResource(R.bool.preference_timetable_background_irregular_default)
+											)
+										)
+
+										PreferenceCategory(stringResource(id = R.string.preference_category_timetable_range)) {
+											RangeInputPreference(
+												title = { Text(stringResource(R.string.preference_timetable_range)) },
+												dataStore = stringDataStore(
+													"preference_timetable_range",
+													defaultValue = ""
+												)
+											)
+
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_timetable_range_index_reset)) },
+												dependency = stringDataStore(
+													"preference_timetable_range",
+													defaultValue = ""
+												),
+												dataStore = booleanDataStore(
+													"preference_timetable_range_index_reset",
+													defaultValue = booleanResource(R.bool.preference_timetable_range_index_reset_default)
+												)
+											)
+
+											/*SwitchPreference
+											enabled = false,
+											key = preference_timetable_range_hide_outside,
+											summary = (not implemented),
+											title = Hide lessons outside specified range" */
+										}
+
+										PreferenceCategory(stringResource(id = R.string.preference_category_timetable_item_appearance)) {
+											NumericInputPreference(
+												title = { Text(stringResource(R.string.preference_timetable_item_padding_overlap)) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_timetable_padding),
+														contentDescription = null
+													)
+												},
+												unit = "dp",
+												dataStore = intDataStore(
+													"preference_timetable_item_padding_overlap",
+													defaultValue = integerResource(R.integer.preference_timetable_item_padding_overlap_default)
+												)
+											)
+
+											NumericInputPreference(
+												title = { Text(stringResource(R.string.preference_timetable_item_padding)) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_timetable_padding),
+														contentDescription = null
+													)
+												},
+												unit = "dp",
+												dataStore = intDataStore(
+													"preference_timetable_item_padding",
+													defaultValue = integerResource(R.integer.preference_timetable_item_padding_default)
+												)
+											)
+
+											NumericInputPreference(
+												title = { Text(stringResource(R.string.preference_timetable_item_corner_radius)) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_timetable_rounded_corner),
+														contentDescription = null
+													)
+												},
+												unit = "dp",
+												dataStore = intDataStore(
+													"preference_timetable_item_corner_radius",
+													defaultValue = integerResource(R.integer.preference_timetable_item_corner_radius_default)
+												)
+											)
+										}
+
+										PreferenceCategory(stringResource(id = R.string.preference_category_timetable_lesson_text)) {
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_timetable_centered_lesson_info)) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_timetable_align_center),
+														contentDescription = null
+													)
+												},
+												dataStore = booleanDataStore(
+													"preference_timetable_centered_lesson_info",
+													defaultValue = booleanResource(R.bool.preference_timetable_centered_lesson_info_default)
+												)
+											)
+
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_timetable_bold_lesson_name)) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_timetable_format_bold),
+														contentDescription = null
+													)
+												},
+												dataStore = booleanDataStore(
+													"preference_timetable_bold_lesson_name",
+													defaultValue = booleanResource(R.bool.preference_timetable_bold_lesson_name_default)
+												)
+											)
+
+											NumericInputPreference(
+												title = { Text(stringResource(R.string.preference_timetable_lesson_name_font_size)) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_timetable_font_size),
+														contentDescription = null
+													)
+												},
+												unit = "sp",
+												dataStore = intDataStore(
+													"preference_timetable_lesson_name_font_size",
+													defaultValue = integerResource(R.integer.preference_timetable_lesson_name_font_size_default)
+												)
+											)
+
+											NumericInputPreference(
+												title = { Text(stringResource(R.string.preference_timetable_lesson_info_font_size)) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_timetable_font_size),
+														contentDescription = null
+													)
+												},
+												unit = "sp",
+												dataStore = intDataStore(
+													"preference_timetable_lesson_info_font_size",
+													defaultValue = integerResource(R.integer.preference_timetable_lesson_info_font_size_default)
+												)
+											)
+										}
+									}
+								}
+
+								composable("preferences_notifications") {
+									title = stringResource(id = R.string.preferences_notifications)
+
+									Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+										SwitchPreference(
+											title = { Text(stringResource(R.string.preference_notifications_enable)) },
+											summary = { Text(stringResource(R.string.preference_notifications_enable_desc)) },
+											/*icon = {
+												Icon(
+													painter = painterResource(R.drawable.settings_notifications_active),
+													contentDescription = null
+												)
+											},*/
+											dataStore = booleanDataStore(
+												"preference_notifications_enable",
+												defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
+											)
+										)
+
+										SwitchPreference(
+											title = { Text(stringResource(R.string.preference_notifications_multiple)) },
+											summary = { Text(stringResource(R.string.preference_notifications_multiple_desc)) },
+											dependency = booleanDataStore(
+												"preference_notifications_enable",
+												defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
+											),
+											dataStore = booleanDataStore(
+												"preference_notifications_in_multiple",
+												defaultValue = booleanResource(R.bool.preference_notifications_in_multiple_default)
+											)
+										)
+
+										SwitchPreference(
+											title = { Text(stringResource(R.string.preference_notifications_first_lesson)) },
+											summary = { Text(stringResource(R.string.preference_notifications_first_lesson_desc)) },
+											dependency = booleanDataStore(
+												"preference_notifications_enable",
+												defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
+											),
+											dataStore = booleanDataStore(
+												"preference_notifications_before_first",
+												defaultValue = booleanResource(R.bool.preference_notifications_before_first_default)
 											)
 										)
 
 										NumericInputPreference(
-											title = { Text(stringResource(R.string.preference_timetable_lesson_name_font_size)) },
-											icon = {
-												Icon(
-													painter = painterResource(R.drawable.settings_timetable_font_size),
-													contentDescription = null
-												)
-											},
-											unit = "sp",
+											title = { Text(stringResource(R.string.preference_notifications_first_lesson_time)) },
+											unit = stringResource(R.string.preference_notifications_first_lesson_time_unit),
+											dependency = booleanDataStore(
+												"preference_notifications_before_first",
+												defaultValue = booleanResource(R.bool.preference_notifications_before_first_default)
+											),
 											dataStore = intDataStore(
-												"preference_timetable_lesson_name_font_size",
-												defaultValue = integerResource(R.integer.preference_timetable_lesson_name_font_size_default)
-											)
-										)
-
-										NumericInputPreference(
-											title = { Text(stringResource(R.string.preference_timetable_lesson_info_font_size)) },
-											icon = {
-												Icon(
-													painter = painterResource(R.drawable.settings_timetable_font_size),
-													contentDescription = null
-												)
-											},
-											unit = "sp",
-											dataStore = intDataStore(
-												"preference_timetable_lesson_info_font_size",
-												defaultValue = integerResource(R.integer.preference_timetable_lesson_info_font_size_default)
-											)
-										)
-									}
-								}
-							}
-
-							composable("preferences_notifications") {
-								title = stringResource(id = R.string.preferences_notifications)
-
-								Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-									SwitchPreference(
-										title = { Text(stringResource(R.string.preference_notifications_enable)) },
-										summary = { Text(stringResource(R.string.preference_notifications_enable_desc)) },
-										/*icon = {
-											Icon(
-												painter = painterResource(R.drawable.settings_notifications_active),
-												contentDescription = null
-											)
-										},*/
-										dataStore = booleanDataStore(
-											"preference_notifications_enable",
-											defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
-										)
-									)
-
-									SwitchPreference(
-										title = { Text(stringResource(R.string.preference_notifications_multiple)) },
-										summary = { Text(stringResource(R.string.preference_notifications_multiple_desc)) },
-										dependency = booleanDataStore(
-											"preference_notifications_enable",
-											defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
-										),
-										dataStore = booleanDataStore(
-											"preference_notifications_in_multiple",
-											defaultValue = booleanResource(R.bool.preference_notifications_in_multiple_default)
-										)
-									)
-
-									SwitchPreference(
-										title = { Text(stringResource(R.string.preference_notifications_first_lesson)) },
-										summary = { Text(stringResource(R.string.preference_notifications_first_lesson_desc)) },
-										dependency = booleanDataStore(
-											"preference_notifications_enable",
-											defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
-										),
-										dataStore = booleanDataStore(
-											"preference_notifications_before_first",
-											defaultValue = booleanResource(R.bool.preference_notifications_before_first_default)
-										)
-									)
-
-									NumericInputPreference(
-										title = { Text(stringResource(R.string.preference_notifications_first_lesson_time)) },
-										unit = stringResource(R.string.preference_notifications_first_lesson_time_unit),
-										dependency = booleanDataStore(
-											"preference_notifications_before_first",
-											defaultValue = booleanResource(R.bool.preference_notifications_before_first_default)
-										),
-										dataStore = intDataStore(
-											"preference_notifications_before_first_time",
-											defaultValue = integerResource(R.integer.preference_notifications_before_first_time_default)
-										)
-									)
-
-									Preference(
-										title = { Text(stringResource(R.string.preference_notifications_clear)) },
-										onClick = { /*TODO*/ },
-										icon = {
-											Icon(
-												painter = painterResource(R.drawable.settings_notifications_clear_all),
-												contentDescription = null
-											)
-										},
-										dataStore = UntisPreferenceDataStore.emptyDataStore()
-									)
-
-									PreferenceCategory(stringResource(id = R.string.preference_category_notifications_visible_fields)) {
-										ListPreference(
-											title = { Text(stringResource(R.string.all_subjects)) },
-											summary = { Text(it.second) },
-											icon = {
-												Icon(
-													painter = painterResource(R.drawable.all_subject),
-													contentDescription = null
-												)
-											},
-											entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
-											entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
-											dependency = booleanDataStore(
-												"preference_notifications_enable",
-												defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
-											),
-											dataStore = stringDataStore(
-												"preference_notifications_visibility_subjects",
-												defaultValue = stringResource(R.string.preference_notifications_visibility_subjects_default)
-											)
-										)
-
-										ListPreference(
-											title = { Text(stringResource(R.string.all_rooms)) },
-											summary = { Text(it.second) },
-											icon = {
-												Icon(
-													painter = painterResource(R.drawable.all_rooms),
-													contentDescription = null
-												)
-											},
-											entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
-											entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
-											dependency = booleanDataStore(
-												"preference_notifications_enable",
-												defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
-											),
-											dataStore = stringDataStore(
-												"preference_notifications_visibility_rooms",
-												defaultValue = stringResource(R.string.preference_notifications_visibility_rooms_default)
-											)
-										)
-
-										ListPreference(
-											title = { Text(stringResource(R.string.all_teachers)) },
-											summary = { Text(it.second) },
-											icon = {
-												Icon(
-													painter = painterResource(R.drawable.all_teachers),
-													contentDescription = null
-												)
-											},
-											entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
-											entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
-											dependency = booleanDataStore(
-												"preference_notifications_enable",
-												defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
-											),
-											dataStore = stringDataStore(
-												"preference_notifications_visibility_teachers",
-												defaultValue = stringResource(R.string.preference_notifications_visibility_teachers_default)
-											)
-										)
-
-										ListPreference(
-											title = { Text(stringResource(R.string.all_classes)) },
-											summary = { Text(it.second) },
-											icon = {
-												Icon(
-													painter = painterResource(R.drawable.all_classes),
-													contentDescription = null
-												)
-											},
-											entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
-											entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
-											dependency = booleanDataStore(
-												"preference_notifications_enable",
-												defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
-											),
-											dataStore = stringDataStore(
-												"preference_notifications_visibility_classes",
-												defaultValue = stringResource(R.string.preference_notifications_visibility_classes_default)
-											)
-										)
-									}
-								}
-							}
-
-							composable("preferences_connectivity") {
-								title = stringResource(id = R.string.preferences_connectivity)
-
-								Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-									SwitchPreference(
-										title = { Text(stringResource(R.string.preference_connectivity_refresh_in_background)) },
-										summary = { Text(stringResource(R.string.preference_connectivity_refresh_in_background_desc)) },
-										dataStore = booleanDataStore(
-											"preference_connectivity_refresh_in_background",
-											defaultValue = booleanResource(R.bool.preference_connectivity_refresh_in_background_default)
-										)
-									)
-
-									PreferenceCategory(stringResource(id = R.string.preference_category_connectivity_proxy)) {
-										InputPreference(
-											title = { Text(stringResource(R.string.preference_connectivity_proxy_host)) },
-											icon = {
-												Icon(
-													painter = painterResource(R.drawable.settings_connectivity_proxy),
-													contentDescription = null
-												)
-											},
-											dataStore = stringDataStore(
-												"preference_connectivity_proxy_host",
-												defaultValue = ""
+												"preference_notifications_before_first_time",
+												defaultValue = integerResource(R.integer.preference_notifications_before_first_time_default)
 											)
 										)
 
 										Preference(
-											title = { Text(stringResource(R.string.preference_connectivity_proxy_about)) },
-											onClick = {
-												startActivity(
-													Intent(
-														Intent.ACTION_VIEW,
-														Uri.parse(URL_WIKI_PROXY)
-													)
-												)
-											},
-											icon = {
-												Icon(
-													painter = painterResource(R.drawable.settings_info),
-													contentDescription = null
-												)
-											},
-											dataStore = UntisPreferenceDataStore.emptyDataStore()
-										)
-									}
-								}
-							}
-
-							composable("preferences_info") {
-								title = stringResource(id = R.string.preferences_info)
-
-								Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-									Preference(
-										title = { Text(stringResource(R.string.app_name)) },
-										summary = { Text(stringResource(R.string.app_desc)) },
-										onClick = { /*TODO*/ },
-										icon = {
-											Icon(
-												painter = painterResource(R.drawable.settings_about_app_icon),
-												contentDescription = null
-											)
-										},
-										dataStore = UntisPreferenceDataStore.emptyDataStore()
-									)
-
-									PreferenceCategory(stringResource(id = R.string.preference_info_general)) {
-
-										Preference(
-											title = { Text(stringResource(R.string.preference_info_app_version)) },
-											summary = {
-												Text(
-													stringResource(
-														R.string.preference_info_app_version_desc,
-														BuildConfig.VERSION_NAME,
-														BuildConfig.VERSION_CODE
-													)
-												)
-											},
-											onClick = {
-												startActivity(
-													Intent(
-														Intent.ACTION_VIEW,
-														Uri.parse("$URL_GITHUB_REPOSITORY/releases")
-													)
-												)
-											},
-											icon = {
-												Icon(
-													painter = painterResource(R.drawable.settings_info),
-													contentDescription = null
-												)
-											},
-											dataStore = UntisPreferenceDataStore.emptyDataStore()
-										)
-
-										Preference(
-											title = { Text(stringResource(R.string.preference_info_github)) },
-											summary = { Text(URL_GITHUB_REPOSITORY) },
-											onClick = {
-												startActivity(
-													Intent(
-														Intent.ACTION_VIEW,
-														Uri.parse(URL_GITHUB_REPOSITORY)
-													)
-												)
-											},
-											icon = {
-												Icon(
-													painter = painterResource(R.drawable.settings_info_github),
-													contentDescription = null
-												)
-											},
-											dataStore = UntisPreferenceDataStore.emptyDataStore()
-										)
-
-										Preference(
-											title = { Text(stringResource(R.string.preference_info_license)) },
-											summary = { Text(stringResource(R.string.preference_info_license_desc)) },
-											onClick = {
-												startActivity(
-													Intent(
-														Intent.ACTION_VIEW,
-														Uri.parse("$URL_GITHUB_REPOSITORY/blob/master/LICENSE")
-													)
-												)
-											},
-											icon = {
-												Icon(
-													painter = painterResource(R.drawable.settings_info_github),
-													contentDescription = null
-												)
-											},
-											dataStore = UntisPreferenceDataStore.emptyDataStore()
-										)
-
-										Preference(
-											title = { Text(stringResource(R.string.preference_info_contributors)) },
-											summary = { Text(stringResource(R.string.preference_info_contributors_desc)) },
+											title = { Text(stringResource(R.string.preference_notifications_clear)) },
 											onClick = { /*TODO*/ },
 											icon = {
 												Icon(
-													painter = painterResource(R.drawable.settings_about_contributor),
+													painter = painterResource(R.drawable.settings_notifications_clear_all),
 													contentDescription = null
 												)
 											},
 											dataStore = UntisPreferenceDataStore.emptyDataStore()
 										)
 
+										PreferenceCategory(stringResource(id = R.string.preference_category_notifications_visible_fields)) {
+											ListPreference(
+												title = { Text(stringResource(R.string.all_subjects)) },
+												summary = { Text(it.second) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.all_subject),
+														contentDescription = null
+													)
+												},
+												entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
+												entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
+												dependency = booleanDataStore(
+													"preference_notifications_enable",
+													defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
+												),
+												dataStore = stringDataStore(
+													"preference_notifications_visibility_subjects",
+													defaultValue = stringResource(R.string.preference_notifications_visibility_subjects_default)
+												)
+											)
+
+											ListPreference(
+												title = { Text(stringResource(R.string.all_rooms)) },
+												summary = { Text(it.second) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.all_rooms),
+														contentDescription = null
+													)
+												},
+												entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
+												entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
+												dependency = booleanDataStore(
+													"preference_notifications_enable",
+													defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
+												),
+												dataStore = stringDataStore(
+													"preference_notifications_visibility_rooms",
+													defaultValue = stringResource(R.string.preference_notifications_visibility_rooms_default)
+												)
+											)
+
+											ListPreference(
+												title = { Text(stringResource(R.string.all_teachers)) },
+												summary = { Text(it.second) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.all_teachers),
+														contentDescription = null
+													)
+												},
+												entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
+												entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
+												dependency = booleanDataStore(
+													"preference_notifications_enable",
+													defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
+												),
+												dataStore = stringDataStore(
+													"preference_notifications_visibility_teachers",
+													defaultValue = stringResource(R.string.preference_notifications_visibility_teachers_default)
+												)
+											)
+
+											ListPreference(
+												title = { Text(stringResource(R.string.all_classes)) },
+												summary = { Text(it.second) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.all_classes),
+														contentDescription = null
+													)
+												},
+												entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
+												entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
+												dependency = booleanDataStore(
+													"preference_notifications_enable",
+													defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
+												),
+												dataStore = stringDataStore(
+													"preference_notifications_visibility_classes",
+													defaultValue = stringResource(R.string.preference_notifications_visibility_classes_default)
+												)
+											)
+										}
+									}
+								}
+
+								composable("preferences_connectivity") {
+									title = stringResource(id = R.string.preferences_connectivity)
+
+									Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+										SwitchPreference(
+											title = { Text(stringResource(R.string.preference_connectivity_refresh_in_background)) },
+											summary = { Text(stringResource(R.string.preference_connectivity_refresh_in_background_desc)) },
+											dataStore = booleanDataStore(
+												"preference_connectivity_refresh_in_background",
+												defaultValue = booleanResource(R.bool.preference_connectivity_refresh_in_background_default)
+											)
+										)
+
+										PreferenceCategory(stringResource(id = R.string.preference_category_connectivity_proxy)) {
+											InputPreference(
+												title = { Text(stringResource(R.string.preference_connectivity_proxy_host)) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_connectivity_proxy),
+														contentDescription = null
+													)
+												},
+												dataStore = stringDataStore(
+													"preference_connectivity_proxy_host",
+													defaultValue = ""
+												)
+											)
+
+											Preference(
+												title = { Text(stringResource(R.string.preference_connectivity_proxy_about)) },
+												onClick = {
+													startActivity(
+														Intent(
+															Intent.ACTION_VIEW,
+															Uri.parse(URL_WIKI_PROXY)
+														)
+													)
+												},
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_info),
+														contentDescription = null
+													)
+												},
+												dataStore = UntisPreferenceDataStore.emptyDataStore()
+											)
+										}
+									}
+								}
+
+								composable("preferences_info") {
+									title = stringResource(id = R.string.preferences_info)
+
+									Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
 										Preference(
-											title = { Text(stringResource(R.string.preference_info_libraries)) },
-											summary = { Text(stringResource(R.string.preference_info_libraries_desc)) },
+											title = { Text(stringResource(R.string.app_name)) },
+											summary = { Text(stringResource(R.string.app_desc)) },
 											onClick = { /*TODO*/ },
 											icon = {
 												Icon(
-													painter = painterResource(R.drawable.settings_about_library),
+													painter = painterResource(R.drawable.settings_about_app_icon),
 													contentDescription = null
 												)
 											},
 											dataStore = UntisPreferenceDataStore.emptyDataStore()
 										)
+
+										PreferenceCategory(stringResource(id = R.string.preference_info_general)) {
+
+											Preference(
+												title = { Text(stringResource(R.string.preference_info_app_version)) },
+												summary = {
+													Text(
+														stringResource(
+															R.string.preference_info_app_version_desc,
+															BuildConfig.VERSION_NAME,
+															BuildConfig.VERSION_CODE
+														)
+													)
+												},
+												onClick = {
+													startActivity(
+														Intent(
+															Intent.ACTION_VIEW,
+															Uri.parse("$URL_GITHUB_REPOSITORY/releases")
+														)
+													)
+												},
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_info),
+														contentDescription = null
+													)
+												},
+												dataStore = UntisPreferenceDataStore.emptyDataStore()
+											)
+
+											Preference(
+												title = { Text(stringResource(R.string.preference_info_github)) },
+												summary = { Text(URL_GITHUB_REPOSITORY) },
+												onClick = {
+													startActivity(
+														Intent(
+															Intent.ACTION_VIEW,
+															Uri.parse(URL_GITHUB_REPOSITORY)
+														)
+													)
+												},
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_info_github),
+														contentDescription = null
+													)
+												},
+												dataStore = UntisPreferenceDataStore.emptyDataStore()
+											)
+
+											Preference(
+												title = { Text(stringResource(R.string.preference_info_license)) },
+												summary = { Text(stringResource(R.string.preference_info_license_desc)) },
+												onClick = {
+													startActivity(
+														Intent(
+															Intent.ACTION_VIEW,
+															Uri.parse("$URL_GITHUB_REPOSITORY/blob/master/LICENSE")
+														)
+													)
+												},
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_info_github),
+														contentDescription = null
+													)
+												},
+												dataStore = UntisPreferenceDataStore.emptyDataStore()
+											)
+
+											Preference(
+												title = { Text(stringResource(R.string.preference_info_contributors)) },
+												summary = { Text(stringResource(R.string.preference_info_contributors_desc)) },
+												onClick = { /*TODO*/ },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_about_contributor),
+														contentDescription = null
+													)
+												},
+												dataStore = UntisPreferenceDataStore.emptyDataStore()
+											)
+
+											Preference(
+												title = { Text(stringResource(R.string.preference_info_libraries)) },
+												summary = { Text(stringResource(R.string.preference_info_libraries_desc)) },
+												onClick = { /*TODO*/ },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_about_library),
+														contentDescription = null
+													)
+												},
+												dataStore = UntisPreferenceDataStore.emptyDataStore()
+											)
+										}
 									}
 								}
 							}

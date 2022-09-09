@@ -42,10 +42,6 @@ import java.util.*
 class InfoCenterActivity : BaseComposeActivity() {
 	private var api: UntisRequest = UntisRequest()
 
-	private lateinit var userDatabase: UserDatabase
-	private lateinit var user: UserDatabase.User
-	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
-
 	companion object {
 		private const val ID_MESSAGES = 1
 		private const val ID_EVENTS = 2
@@ -57,147 +53,143 @@ class InfoCenterActivity : BaseComposeActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
-		userDatabase = UserDatabase.createInstance(this)
-		userDatabase.getUser(intent.getLongExtra(EXTRA_LONG_PROFILE_ID, -1))?.let { user = it }
-		// TODO: Move this part to BaseComposeActivity and check if user is set
-
-		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, user.id!!)
-
 		setContent {
 			AppTheme {
-				Scaffold(
-					topBar = {
-						CenterAlignedTopAppBar(
-							title = {
-								Text(stringResource(id = R.string.activity_title_info_center))
-							},
-							navigationIcon = {
-								IconButton(onClick = { finish() }) {
-									Icon(
-										imageVector = Icons.Outlined.ArrowBack,
-										contentDescription = stringResource(id = R.string.all_back)
-									)
+				withUser { user ->
+					Scaffold(
+						topBar = {
+							CenterAlignedTopAppBar(
+								title = {
+									Text(stringResource(id = R.string.activity_title_info_center))
+								},
+								navigationIcon = {
+									IconButton(onClick = { finish() }) {
+										Icon(
+											imageVector = Icons.Outlined.ArrowBack,
+											contentDescription = stringResource(id = R.string.all_back)
+										)
+									}
 								}
-							}
-						)
-					}
-				) { innerPadding ->
-					val coroutineScope = rememberCoroutineScope()
-
-					Column(
-						modifier = Modifier
-							.padding(innerPadding)
-							.fillMaxSize()
-					) {
-						val showOfficeHours = user.userData.rights.contains(RIGHT_OFFICEHOURS)
-						val showAbsences = user.userData.rights.contains(RIGHT_ABSENCES)
-
-						var selectedItem by rememberSaveable { mutableStateOf(ID_MESSAGES) }
-
-						var messages by remember { mutableStateOf<List<UntisMessage>?>(null) }
-						var officeHours by remember { mutableStateOf<List<UntisOfficeHour>?>(null) }
-						var events by remember { mutableStateOf<List<EventListItem>?>(null) }
-						var absences by remember { mutableStateOf<List<UntisAbsence>?>(null) }
-
-						var messagesLoading by remember { mutableStateOf(true) }
-						var eventsLoading by remember { mutableStateOf(true) }
-						var absencesLoading by remember { mutableStateOf(true) }
-						var officeHoursLoading by remember { mutableStateOf(true) }
-
-						SideEffect {
-							coroutineScope.launch {
-								messages = loadMessages(user)?.also {
-									preferences["preference_last_messages_count"] = it.size
-									preferences["preference_last_messages_date"] = SimpleDateFormat(
-										"dd-MM-yyyy",
-										Locale.US
-									).format(Calendar.getInstance().time)
-								}
-								messagesLoading = false
-							}
-
-							coroutineScope.launch {
-								events = loadEvents(user)
-								eventsLoading = false
-							}
-
-							coroutineScope.launch {
-								if (showAbsences)
-									absences = loadAbsences(user)
-								absencesLoading = false
-							}
-
-							coroutineScope.launch {
-								if (showOfficeHours)
-									officeHours = loadOfficeHours(user)
-								officeHoursLoading = false
-							}
+							)
 						}
+					) { innerPadding ->
+						val coroutineScope = rememberCoroutineScope()
 
-						Box(
-							contentAlignment = Alignment.Center,
+						Column(
 							modifier = Modifier
-								.fillMaxWidth()
-								.weight(1f)
+								.padding(innerPadding)
+								.fillMaxSize()
 						) {
-							when (selectedItem) {
-								ID_MESSAGES -> MessageList(messages, messagesLoading)
-								ID_EVENTS -> EventList(events, eventsLoading)
-								ID_ABSENCES -> AbsenceList(absences, absencesLoading)
-								ID_OFFICEHOURS -> OfficeHourList(officeHours, officeHoursLoading)
+							val showOfficeHours = user.userData.rights.contains(RIGHT_OFFICEHOURS)
+							val showAbsences = user.userData.rights.contains(RIGHT_ABSENCES)
+
+							var selectedItem by rememberSaveable { mutableStateOf(ID_MESSAGES) }
+
+							var messages by remember { mutableStateOf<List<UntisMessage>?>(null) }
+							var officeHours by remember { mutableStateOf<List<UntisOfficeHour>?>(null) }
+							var events by remember { mutableStateOf<List<EventListItem>?>(null) }
+							var absences by remember { mutableStateOf<List<UntisAbsence>?>(null) }
+
+							var messagesLoading by remember { mutableStateOf(true) }
+							var eventsLoading by remember { mutableStateOf(true) }
+							var absencesLoading by remember { mutableStateOf(true) }
+							var officeHoursLoading by remember { mutableStateOf(true) }
+
+							SideEffect {
+								coroutineScope.launch {
+									messages = loadMessages(user)?.also {
+										preferences["preference_last_messages_count"] = it.size
+										preferences["preference_last_messages_date"] = SimpleDateFormat(
+											"dd-MM-yyyy",
+											Locale.US
+										).format(Calendar.getInstance().time)
+									}
+									messagesLoading = false
+								}
+
+								coroutineScope.launch {
+									events = loadEvents(user)
+									eventsLoading = false
+								}
+
+								coroutineScope.launch {
+									if (showAbsences)
+										absences = loadAbsences(user)
+									absencesLoading = false
+								}
+
+								coroutineScope.launch {
+									if (showOfficeHours)
+										officeHours = loadOfficeHours(user)
+									officeHoursLoading = false
+								}
 							}
-						}
 
-						NavigationBar {
-							NavigationBarItem(
-								icon = {
-									Icon(
-										painterResource(id = R.drawable.infocenter_messages),
-										contentDescription = null
-									)
-								},
-								label = { Text(stringResource(id = R.string.menu_infocenter_messagesofday)) },
-								selected = selectedItem == ID_MESSAGES,
-								onClick = { selectedItem = ID_MESSAGES }
-							)
+							Box(
+								contentAlignment = Alignment.Center,
+								modifier = Modifier
+									.fillMaxWidth()
+									.weight(1f)
+							) {
+								when (selectedItem) {
+									ID_MESSAGES -> MessageList(messages, messagesLoading)
+									ID_EVENTS -> EventList(events, eventsLoading)
+									ID_ABSENCES -> AbsenceList(absences, absencesLoading)
+									ID_OFFICEHOURS -> OfficeHourList(officeHours, officeHoursLoading)
+								}
+							}
 
-							NavigationBarItem(
-								icon = {
-									Icon(
-										painterResource(id = R.drawable.infocenter_events),
-										contentDescription = null
-									)
-								},
-								label = { Text(stringResource(id = R.string.menu_infocenter_events)) },
-								selected = selectedItem == ID_EVENTS,
-								onClick = { selectedItem = ID_EVENTS }
-							)
-
-							if (showAbsences)
+							NavigationBar {
 								NavigationBarItem(
 									icon = {
 										Icon(
-											painterResource(id = R.drawable.infocenter_absences),
+											painterResource(id = R.drawable.infocenter_messages),
 											contentDescription = null
 										)
 									},
-									label = { Text(stringResource(id = R.string.menu_infocenter_absences)) },
-									selected = selectedItem == ID_ABSENCES,
-									onClick = { selectedItem = ID_ABSENCES }
+									label = { Text(stringResource(id = R.string.menu_infocenter_messagesofday)) },
+									selected = selectedItem == ID_MESSAGES,
+									onClick = { selectedItem = ID_MESSAGES }
 								)
 
-							if (showOfficeHours)
 								NavigationBarItem(
 									icon = {
 										Icon(
-											painterResource(id = R.drawable.infocenter_contact),
+											painterResource(id = R.drawable.infocenter_events),
 											contentDescription = null
 										)
 									},
-									label = { Text(stringResource(id = R.string.menu_infocenter_officehours)) },
-									selected = selectedItem == ID_OFFICEHOURS,
-									onClick = { selectedItem = ID_OFFICEHOURS }
+									label = { Text(stringResource(id = R.string.menu_infocenter_events)) },
+									selected = selectedItem == ID_EVENTS,
+									onClick = { selectedItem = ID_EVENTS }
 								)
+
+								if (showAbsences)
+									NavigationBarItem(
+										icon = {
+											Icon(
+												painterResource(id = R.drawable.infocenter_absences),
+												contentDescription = null
+											)
+										},
+										label = { Text(stringResource(id = R.string.menu_infocenter_absences)) },
+										selected = selectedItem == ID_ABSENCES,
+										onClick = { selectedItem = ID_ABSENCES }
+									)
+
+								if (showOfficeHours)
+									NavigationBarItem(
+										icon = {
+											Icon(
+												painterResource(id = R.drawable.infocenter_contact),
+												contentDescription = null
+											)
+										},
+										label = { Text(stringResource(id = R.string.menu_infocenter_officehours)) },
+										selected = selectedItem == ID_OFFICEHOURS,
+										onClick = { selectedItem = ID_OFFICEHOURS }
+									)
+							}
 						}
 					}
 				}
@@ -485,7 +477,7 @@ class InfoCenterActivity : BaseComposeActivity() {
 
 	private suspend fun loadExams(user: UserDatabase.User): List<EventListItem>? {
 		val schoolYears = userDatabase.getAdditionalUserData<SchoolYear>(
-			user.id!!,
+			user.id,
 			SchoolYear()
 		)?.values?.toList()
 			?: emptyList()
@@ -516,7 +508,7 @@ class InfoCenterActivity : BaseComposeActivity() {
 
 	private suspend fun loadHomeworks(user: UserDatabase.User): List<EventListItem>? {
 		val schoolYears = userDatabase.getAdditionalUserData<SchoolYear>(
-			user.id!!,
+			user.id,
 			SchoolYear()
 		)?.values?.toList()
 			?: emptyList()

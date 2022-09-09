@@ -15,13 +15,13 @@ import com.sapuseven.untis.data.databases.UserDatabase
 
 @Composable
 fun ProfileSelectorAction(
-	userDatabase: UserDatabase,
+	users: List<UserDatabase.User>,
 	currentSelectionId: Long, // TODO: Better to use a UserDatabase.User reference?
 	showProfileActions: Boolean = false,
 	hideIfSingleProfile: Boolean = false,
-	onSelectionChange: (UserDatabase.User) -> Unit
+	onSelectionChange: (UserDatabase.User) -> Unit,
+	onActionEdit: () -> Unit = {}
 ) {
-	val users = remember { userDatabase.getAllUsers() }
 	var expanded by remember { mutableStateOf(false) }
 
 	if (!showProfileActions && hideIfSingleProfile && users.size <= 1) return
@@ -67,6 +67,7 @@ fun ProfileSelectorAction(
 				},
 				onClick = {
 					expanded = false
+					onActionEdit()
 				}
 			)
 		}

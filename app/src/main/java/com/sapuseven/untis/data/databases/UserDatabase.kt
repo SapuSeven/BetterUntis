@@ -314,7 +314,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		if (cursor.moveToFirst()) {
 			do {
 				users.add(User(
-					cursor.getLongOrNull(cursor.getColumnIndexOrThrow(BaseColumns._ID)),
+					cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID)),
 					cursor.getString(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME)),
 					cursor.getString(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_APIURL)),
 					cursor.getString(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID)),
@@ -406,9 +406,9 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		db.close()
 	}
 
-	private fun refreshAdditionalUserData(db: SQLiteDatabase, userId: Long, tableName: String, items: List<TableModel>) {
+	private fun refreshAdditionalUserData(db: SQLiteDatabase, userId: Long, tableName: String, items: List<TableModel>?) {
 		db.delete(tableName, "$COLUMN_NAME_USER_ID=?", arrayOf(userId.toString()))
-		items.forEach { data -> db.insert(tableName, null, generateValues(userId, data)) }
+		items?.forEach { data -> db.insert(tableName, null, generateValues(userId, data)) }
 	}
 
 
@@ -439,7 +439,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 	}
 
 	class User(
-			val id: Long? = null,
+			val id: Long = -1,
 			val profileName: String = "",
 			val apiUrl: String,
 			val schoolId: String,

@@ -126,7 +126,8 @@ fun TimetableItemDetailsDialog(
 
 				Text(
 					text = time,
-					style = MaterialTheme.typography.labelLarge
+					style = MaterialTheme.typography.labelLarge,
+					modifier = Modifier.padding(top = 8.dp)
 				)
 
 				Divider(
@@ -372,7 +373,8 @@ private fun TimetableDatabaseInterface.TimetableItemDetailsDialogElement(
 		ListItem(
 			headlineText = {
 				Row(
-					modifier = Modifier.horizontalScroll(rememberScrollState())
+					modifier = Modifier.horizontalScroll(rememberScrollState()),
+					horizontalArrangement = Arrangement.spacedBy(8.dp)
 				) {
 					elements.forEach { element ->
 						Text(

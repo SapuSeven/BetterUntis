@@ -70,12 +70,13 @@ class WidgetConfigureActivity : BaseComposeActivity() {
 						},
 						additionalActions = {
 							ProfileSelectorAction(
-								userDatabase = userDatabase,
+								users = userDatabase.getAllUsers(),
 								currentSelectionId = selectedUserId,
-								hideIfSingleProfile = true
-							) {
-								selectedUserId = it.id ?: -1
-							}
+								hideIfSingleProfile = true,
+								onSelectionChange =  {
+									selectedUserId = it.id
+								}
+							)
 						}
 					)
 				}

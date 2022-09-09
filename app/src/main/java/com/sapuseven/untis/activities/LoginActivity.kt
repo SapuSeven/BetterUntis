@@ -63,7 +63,7 @@ class LoginActivity : BaseComposeActivity() {
 	private val loginLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
 			if (it.resultCode == Activity.RESULT_OK) {
-				startActivity(Intent(this, MainActivity::class.java))
+				//startActivity(Intent(this, MainActivity::class.java))
 				finish()
 			}
 		}

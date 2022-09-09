@@ -352,4 +352,5 @@
 	<string name="all_homework">Homework</string>
 	<string name="all_exam">Exam</string>
     <string name="all_exit">Exit</string>
+    <string name="all_edit">Edit</string>
 </resources>
