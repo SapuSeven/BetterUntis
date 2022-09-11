@@ -121,18 +121,12 @@ class LoginDataInputActivity : BaseComposeActivity() {
 				val apiUrl = rememberSaveable { mutableStateOf(existingUser?.apiUrl) }
 				val skipAppSecret = rememberSaveable { mutableStateOf<Boolean?>(null) }
 
-				val schoolIdError = schoolId.value.isNullOrEmpty()
-				val usernameError = anonymous.value != true && username.value.isNullOrEmpty()
-				val passwordError = anonymous.value != true && password.value.isNullOrEmpty()
 				val proxyUrlError =
 					!proxyUrl.value.isNullOrEmpty() && !Patterns.WEB_URL.matcher(proxyUrl.value!!)
 						.matches()
 				val apiUrlError =
 					!apiUrl.value.isNullOrEmpty() && !Patterns.WEB_URL.matcher(apiUrl.value!!)
 						.matches()
-
-				val anyError =
-					schoolIdError || usernameError || passwordError || proxyUrlError || apiUrlError
 
 				var advanced by rememberSaveable {
 					mutableStateOf(
@@ -158,6 +152,13 @@ class LoginDataInputActivity : BaseComposeActivity() {
 						}
 					}
 				}
+
+				val schoolIdError = schoolId.value.isNullOrEmpty()
+				val usernameError = anonymous.value != true && username.value.isNullOrEmpty()
+				val passwordError = anonymous.value != true && password.value.isNullOrEmpty()
+
+				val anyError =
+					schoolIdError || usernameError || passwordError || proxyUrlError || apiUrlError
 
 				fun loadData() {
 					coroutineScope.launch {
