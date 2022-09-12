@@ -16,7 +16,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ArrowForward
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -34,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.sapuseven.untis.R
@@ -50,10 +48,6 @@ import com.sapuseven.untis.ui.common.LabeledCheckbox
 import com.sapuseven.untis.ui.common.LabeledSwitch
 import com.sapuseven.untis.ui.theme.AppTheme
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
@@ -75,7 +69,8 @@ class LoginDataInputActivity : BaseComposeActivity() {
 		val PREFS_BACKUP_PASSWORD = stringPreferencesKey("logindatainput_backup_password")
 		val PREFS_BACKUP_PROXYURL = stringPreferencesKey("logindatainput_backup_proxyurl")
 		val PREFS_BACKUP_APIURL = stringPreferencesKey("logindatainput_backup_apiurl")
-		val PREFS_BACKUP_SKIPAPPSECRET = booleanPreferencesKey("logindatainput_backup_skipappsecret")
+		val PREFS_BACKUP_SKIPAPPSECRET =
+			booleanPreferencesKey("logindatainput_backup_skipappsecret")
 	}
 
 	private var existingUserId: Long? = null
@@ -111,6 +106,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 				var validate by rememberSaveable { mutableStateOf(false) }
 
 				var deleteDialog by rememberSaveable { mutableStateOf<UserDatabase.User?>(null) }
+				var qrCodeErrorDialog by rememberSaveable { mutableStateOf<Boolean>(false) }
 
 				val profileName = rememberSaveable { mutableStateOf(existingUser?.profileName) }
 				val schoolId = rememberSaveable { mutableStateOf(existingUser?.schoolId) }
@@ -121,12 +117,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 				val apiUrl = rememberSaveable { mutableStateOf(existingUser?.apiUrl) }
 				val skipAppSecret = rememberSaveable { mutableStateOf<Boolean?>(null) }
 
-				val proxyUrlError =
-					!proxyUrl.value.isNullOrEmpty() && !Patterns.WEB_URL.matcher(proxyUrl.value!!)
-						.matches()
-				val apiUrlError =
-					!apiUrl.value.isNullOrEmpty() && !Patterns.WEB_URL.matcher(apiUrl.value!!)
-						.matches()
+				var schoolIdLocked by rememberSaveable { mutableStateOf(false) }
 
 				var advanced by rememberSaveable {
 					mutableStateOf(
@@ -135,20 +126,39 @@ class LoginDataInputActivity : BaseComposeActivity() {
 					)
 				}
 
-				var schoolIdLocked by rememberSaveable { mutableStateOf(false) }
+				LaunchedEffect(Unit) {
+					val appLinkData = intent.data
 
-				val appLinkData = intent.data
+					if (appLinkData?.isHierarchical == true) {
+						if (appLinkData.scheme == "untis") {
+							if (appLinkData.host == "setschool") {
+								// Untis-supported values
+								schoolId.value = appLinkData.getQueryParameter("school")
+								username.value = appLinkData.getQueryParameter("user")
+								password.value = appLinkData.getQueryParameter("key")
 
-				if (appLinkData?.isHierarchical == true) {
-					if (appLinkData.scheme == "untis" && appLinkData.host == "setschool") {
-						schoolId.value = appLinkData.getQueryParameter("school")
-						username.value = appLinkData.getQueryParameter("user")
-						password.value = appLinkData.getQueryParameter("key")
-					} else {
-						appLinkData.getQueryParameter("schoolInfo")?.let {
-							schoolInfoFromSearch = getJSON().decodeFromString<UntisSchoolInfo>(it)
-							schoolId.value = schoolInfoFromSearch?.schoolId.toString()
-							schoolIdLocked = true
+								// Custom values
+								anonymous.value =
+									appLinkData.getBooleanQueryParameter("anonymous", false)
+								proxyUrl.value = appLinkData.getQueryParameter("proxyUrl")
+								apiUrl.value = appLinkData.getQueryParameter("apiUrl")
+								skipAppSecret.value =
+									appLinkData.getBooleanQueryParameter("skipAppSecret", false)
+
+								advanced =
+									proxyUrl.value?.isNotEmpty() == true || apiUrl.value?.isNotEmpty() == true
+							} else {
+								appLinkData.getQueryParameter("schoolInfo")?.let {
+									schoolInfoFromSearch =
+										getJSON().decodeFromString<UntisSchoolInfo>(it)
+									schoolId.value = schoolInfoFromSearch?.schoolId.toString()
+									schoolIdLocked = true
+								} ?: run {
+									qrCodeErrorDialog = true
+								}
+							}
+						} else {
+							qrCodeErrorDialog = true
 						}
 					}
 				}
@@ -156,6 +166,12 @@ class LoginDataInputActivity : BaseComposeActivity() {
 				val schoolIdError = schoolId.value.isNullOrEmpty()
 				val usernameError = anonymous.value != true && username.value.isNullOrEmpty()
 				val passwordError = anonymous.value != true && password.value.isNullOrEmpty()
+				val proxyUrlError =
+					!proxyUrl.value.isNullOrEmpty() && !Patterns.WEB_URL.matcher(proxyUrl.value!!)
+						.matches()
+				val apiUrlError =
+					!apiUrl.value.isNullOrEmpty() && !Patterns.WEB_URL.matcher(apiUrl.value!!)
+						.matches()
 
 				val anyError =
 					schoolIdError || usernameError || passwordError || proxyUrlError || apiUrlError
@@ -495,6 +511,28 @@ class LoginDataInputActivity : BaseComposeActivity() {
 												deleteDialog = null
 											}) {
 											Text(stringResource(id = R.string.all_cancel))
+										}
+									}
+								)
+							}
+
+							if (qrCodeErrorDialog) {
+								AlertDialog(
+									onDismissRequest = {
+										qrCodeErrorDialog = false
+									},
+									title = {
+										Text(getString(R.string.logindatainput_dialog_qrcodeinvalid_title))
+									},
+									text = {
+										Text(getString(R.string.logindatainput_dialog_qrcodeinvalid_text))
+									},
+									confirmButton = {
+										TextButton(
+											onClick = {
+												qrCodeErrorDialog = false
+											}) {
+											Text(stringResource(id = R.string.all_ok))
 										}
 									}
 								)
