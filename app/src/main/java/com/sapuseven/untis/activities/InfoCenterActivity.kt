@@ -1,8 +1,10 @@
 package com.sapuseven.untis.activities
 
 import android.os.Bundle
+import android.widget.TextView
 import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,9 +15,15 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
+import androidx.core.text.HtmlCompat
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.RIGHT_ABSENCES
@@ -26,10 +34,12 @@ import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.*
+import com.sapuseven.untis.models.untis.UntisAttachment
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.SchoolYear
 import com.sapuseven.untis.models.untis.params.*
 import com.sapuseven.untis.models.untis.response.*
+import com.sapuseven.untis.ui.dialogs.AttachmentsDialog
 import com.sapuseven.untis.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
@@ -86,7 +96,11 @@ class InfoCenterActivity : BaseComposeActivity() {
 							var selectedItem by rememberSaveable { mutableStateOf(ID_MESSAGES) }
 
 							var messages by remember { mutableStateOf<List<UntisMessage>?>(null) }
-							var officeHours by remember { mutableStateOf<List<UntisOfficeHour>?>(null) }
+							var officeHours by remember {
+								mutableStateOf<List<UntisOfficeHour>?>(
+									null
+								)
+							}
 							var events by remember { mutableStateOf<List<EventListItem>?>(null) }
 							var absences by remember { mutableStateOf<List<UntisAbsence>?>(null) }
 
@@ -99,10 +113,11 @@ class InfoCenterActivity : BaseComposeActivity() {
 								coroutineScope.launch {
 									messages = loadMessages(user)?.also {
 										preferences["preference_last_messages_count"] = it.size
-										preferences["preference_last_messages_date"] = SimpleDateFormat(
-											"dd-MM-yyyy",
-											Locale.US
-										).format(Calendar.getInstance().time)
+										preferences["preference_last_messages_date"] =
+											SimpleDateFormat(
+												"dd-MM-yyyy",
+												Locale.US
+											).format(Calendar.getInstance().time)
 									}
 									messagesLoading = false
 								}
@@ -135,7 +150,10 @@ class InfoCenterActivity : BaseComposeActivity() {
 									ID_MESSAGES -> MessageList(messages, messagesLoading)
 									ID_EVENTS -> EventList(events, eventsLoading)
 									ID_ABSENCES -> AbsenceList(absences, absencesLoading)
-									ID_OFFICEHOURS -> OfficeHourList(officeHours, officeHoursLoading)
+									ID_OFFICEHOURS -> OfficeHourList(
+										officeHours,
+										officeHoursLoading
+									)
 								}
 							}
 
@@ -225,12 +243,21 @@ class InfoCenterActivity : BaseComposeActivity() {
 
 	@Composable
 	private fun MessageList(messages: List<UntisMessage>?, loading: Boolean) {
+		var attachmentsDialog by remember { mutableStateOf<List<UntisAttachment>?>(null) }
+
 		ItemList(
 			items = messages,
-			itemRenderer = { MessageItem(it) },
+			itemRenderer = { MessageItem(it) { attachments -> attachmentsDialog = attachments } },
 			itemsEmptyMessage = R.string.infocenter_messages_empty,
 			loading = loading
 		)
+
+		attachmentsDialog?.let { attachments ->
+			AttachmentsDialog(
+				attachments = attachments,
+				onDismiss = { attachmentsDialog = null }
+			)
+		}
 	}
 
 	@Composable
@@ -265,15 +292,33 @@ class InfoCenterActivity : BaseComposeActivity() {
 
 	@OptIn(ExperimentalMaterial3Api::class)
 	@Composable
-	private fun MessageItem(item: UntisMessage) {
+	private fun MessageItem(
+		item: UntisMessage,
+		onShowAttachments: (List<UntisAttachment>) -> Unit
+	) {
+		val textColor = MaterialTheme.colorScheme.onSurfaceVariant
+
 		ListItem(
 			headlineText = { Text(item.subject) },
-			supportingText = { Text(item.body) },
+			supportingText = {
+				AndroidView(
+					factory = { context ->
+						TextView(context).apply {
+							setTextColor(textColor.toArgb())
+						}
+					},
+					update = {
+						it.text = HtmlCompat.fromHtml(item.body, HtmlCompat.FROM_HTML_MODE_COMPACT)
+					}
+				)
+			},
 			trailingContent = if (item.attachments.isNotEmpty()) {
 				{
-					IconButton(onClick = { /*TODO*/ }) {
+					IconButton(onClick = {
+						onShowAttachments(item.attachments)
+					}) {
 						Icon(
-							painter = painterResource(id = R.drawable.infocenter_attachment),
+							painter = painterResource(id = R.drawable.infocenter_attachments),
 							contentDescription = stringResource(id = R.string.infocenter_messages_attachments)
 						)
 					}

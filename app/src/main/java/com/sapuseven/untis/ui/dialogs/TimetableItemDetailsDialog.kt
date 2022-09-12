@@ -32,6 +32,7 @@ import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import com.sapuseven.untis.models.untis.UntisAttachment
 import com.sapuseven.untis.models.untis.UntisError
 import com.sapuseven.untis.models.untis.params.PeriodDataParams
 import com.sapuseven.untis.models.untis.response.PeriodDataResponse
@@ -102,6 +103,8 @@ fun TimetableItemDetailsDialog(
 				periodData.element.endDateTime.toLocalDateTime()
 					.toString(DateTimeFormat.shortTime())
 			)
+
+			var attachmentsDialog by remember { mutableStateOf<List<UntisAttachment>?>(null) }
 
 			Column(
 				horizontalAlignment = Alignment.CenterHorizontally,
@@ -222,7 +225,19 @@ fun TimetableItemDetailsDialog(
 									tint = MaterialTheme.colorScheme.onSurface,
 									modifier = Modifier.padding(horizontal = 8.dp)
 								)
-							}
+							},
+							trailingContent = if (it.attachments.isNotEmpty()) {
+								{
+									IconButton(onClick = {
+										attachmentsDialog = it.attachments
+									}) {
+										Icon(
+											painter = painterResource(id = R.drawable.infocenter_attachments),
+											contentDescription = stringResource(id = R.string.infocenter_messages_attachments)
+										)
+									}
+								}
+							} else null
 						)
 					}
 
@@ -305,6 +320,13 @@ fun TimetableItemDetailsDialog(
 							},
 							onClick = {}
 						)
+				}
+
+				attachmentsDialog?.let { attachments ->
+					AttachmentsDialog(
+						attachments = attachments,
+						onDismiss = { attachmentsDialog = null }
+					)
 				}
 			}
 		}
@@ -390,7 +412,9 @@ private fun TimetableDatabaseInterface.TimetableItemDetailsDialogElement(
 						if (element.id != element.orgId)
 							element.copy(id = element.orgId).let { orgElement ->
 								Text(
-									text = if (useLongName) getLongName(orgElement) else getShortName(orgElement),
+									text = if (useLongName) getLongName(orgElement) else getShortName(
+										orgElement
+									),
 									style = LocalTextStyle.current.copy(textDecoration = TextDecoration.LineThrough),
 									modifier = Modifier
 										.clip(RoundedCornerShape(50))
