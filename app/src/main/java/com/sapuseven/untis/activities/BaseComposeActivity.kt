@@ -25,7 +25,7 @@ open class BaseComposeActivity : ComponentActivity() {
 	protected var currentTheme: String = ""
 	private var currentDarkTheme: String = ""*/
 
-	protected lateinit var preferences: PreferenceHelper
+	lateinit var preferences: PreferenceHelper
 	internal var user by mutableStateOf<UserDatabase.User?>(null)
 	internal lateinit var userDatabase: UserDatabase
 	internal lateinit var timetableDatabaseInterface: TimetableDatabaseInterface

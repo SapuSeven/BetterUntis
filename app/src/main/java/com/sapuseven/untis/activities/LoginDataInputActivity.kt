@@ -62,6 +62,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 		//private const val FRAGMENT_TAG_PROFILE_UPDATE = "profileUpdate"
 
 		const val EXTRA_BOOLEAN_PROFILE_UPDATE = "com.sapuseven.untis.activities.profileupdate"
+		const val EXTRA_BOOLEAN_PROFILE_DELETE = "com.sapuseven.untis.activities.profiledelete"
 
 		val PREFS_BACKUP_SCHOOLID = stringPreferencesKey("logindatainput_backup_schoolid")
 		val PREFS_BACKUP_ANONYMOUS = booleanPreferencesKey("logindatainput_backup_anonymous")
@@ -105,7 +106,6 @@ class LoginDataInputActivity : BaseComposeActivity() {
 				var loading by rememberSaveable { mutableStateOf(false) }
 				var validate by rememberSaveable { mutableStateOf(false) }
 
-				var deleteDialog by rememberSaveable { mutableStateOf<UserDatabase.User?>(null) }
 				var qrCodeErrorDialog by rememberSaveable { mutableStateOf<Boolean>(false) }
 
 				val profileName = rememberSaveable { mutableStateOf(existingUser?.profileName) }
@@ -472,49 +472,6 @@ class LoginDataInputActivity : BaseComposeActivity() {
 								}
 							}
 							Spacer(modifier = Modifier.height(80.dp))
-
-							deleteDialog?.let { user ->
-								AlertDialog(
-									onDismissRequest = {
-										deleteDialog = null
-									},
-									title = {
-										Text(stringResource(id = R.string.main_dialog_delete_profile_title))
-									},
-									text = {
-										Text(
-											stringResource(
-												id = R.string.main_dialog_delete_profile_message,
-												user.getDisplayedName(applicationContext),
-												user.userData.schoolName
-											)
-										)
-									},
-									confirmButton = {
-										TextButton(
-											onClick = {
-												user.id?.let {
-													userDatabase.deleteUser(it)
-													preferences.deleteProfile(it)
-													if (user.id == preferences.loadProfileId())
-														preferences.deleteProfileId()
-													setResult(RESULT_OK)
-												} ?: setResult(RESULT_CANCELED)
-												finish()
-											}) {
-											Text(stringResource(id = R.string.all_delete))
-										}
-									},
-									dismissButton = {
-										TextButton(
-											onClick = {
-												deleteDialog = null
-											}) {
-											Text(stringResource(id = R.string.all_cancel))
-										}
-									}
-								)
-							}
 
 							if (qrCodeErrorDialog) {
 								AlertDialog(

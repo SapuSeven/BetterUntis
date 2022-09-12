@@ -1,6 +1,7 @@
 package com.sapuseven.untis.activities
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -12,6 +13,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
@@ -140,7 +142,10 @@ class MainActivity :
 
 	private val loginLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-			// TODO: Look at it.data for potential actions (e.g. show a specific timetable)
+			if (it.resultCode == Activity.RESULT_OK)
+				recreate() // TODO: Look at it.data for potential actions (e.g. show a specific timetable)
+			else
+				finish()
 		}
 
 	@OptIn(ExperimentalMaterial3Api::class)
@@ -528,7 +533,6 @@ private fun showProfileUpdateRequired() {
 
 	private fun login() {
 		loginLauncher.launch(Intent(this, LoginActivity::class.java))
-		finish()
 	}
 
 /*

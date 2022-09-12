@@ -13,14 +13,20 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.datastore.dataStore
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.activities.BaseComposeActivity.Companion.EXTRA_LONG_PROFILE_ID
 import com.sapuseven.untis.activities.LoginActivity
 import com.sapuseven.untis.activities.LoginDataInputActivity
+import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_PROFILE_DELETE
+import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.helpers.config.deleteProfile
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,11 +36,14 @@ fun BaseComposeActivity.ProfileManagementDialog(
 	var dismissed by remember { mutableStateOf(false) }
 	var profiles by remember { mutableStateOf(this.userDatabase.getAllUsers()) }
 	val context = LocalContext.current
+	val scope = rememberCoroutineScope()
 
 	val loginDataInputLauncher =
 		rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
 			profiles = this.userDatabase.getAllUsers()
 		}
+
+	var deleteDialog by rememberSaveable { mutableStateOf<UserDatabase.User?>(null) }
 
 	fun dismiss() {
 		onDismiss()
@@ -95,7 +104,7 @@ fun BaseComposeActivity.ProfileManagementDialog(
 					},
 					trailingContent = {
 						IconButton(onClick = {
-							//dismiss()
+							deleteDialog = profile
 						}) {
 							Icon(
 								imageVector = Icons.Outlined.Delete,
@@ -134,6 +143,51 @@ fun BaseComposeActivity.ProfileManagementDialog(
 					}
 				)
 			}
+		}
+
+		deleteDialog?.let { user ->
+			AlertDialog(
+				onDismissRequest = {
+					deleteDialog = null
+				},
+				title = {
+					Text(stringResource(id = R.string.main_dialog_delete_profile_title))
+				},
+				text = {
+					Text(
+						stringResource(
+							id = R.string.main_dialog_delete_profile_message,
+							user.getDisplayedName(applicationContext),
+							user.userData.schoolName
+						)
+					)
+				},
+				confirmButton = {
+					TextButton(
+						onClick = {
+							scope.launch {
+								userDatabase.deleteUser(user.id)
+								deleteProfile(user.id)
+								if (user.id == preferences.loadProfileId())
+									preferences.deleteProfileId()
+								profiles = this@ProfileManagementDialog.userDatabase.getAllUsers()
+								if (profiles.isEmpty())
+									recreate()
+								deleteDialog = null
+							}
+						}) {
+						Text(stringResource(id = R.string.all_delete))
+					}
+				},
+				dismissButton = {
+					TextButton(
+						onClick = {
+							deleteDialog = null
+						}) {
+						Text(stringResource(id = R.string.all_cancel))
+					}
+				}
+			)
 		}
 	}
 }

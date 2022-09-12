@@ -162,3 +162,11 @@ fun BaseComposeActivity.stringSetDataStore(
 		subDependency = subDependency
 	)
 }
+
+suspend fun BaseComposeActivity.deleteProfile(id: Long) {
+	preferenceDataStore.edit { prefs ->
+		prefs.asMap().keys.filter { it.name.startsWith("${id}_") }.forEach {
+			prefs.remove(it)
+		}
+	}
+}
