@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.datastore.core.DataStore
@@ -25,8 +26,13 @@ class UntisPreferenceDataStore<T>(
 		fun emptyDataStore() = UntisPreferenceDataStore(null, booleanPreferencesKey(""), false)
 	}
 
+	suspend fun getValue() = getValueFlow().first()
+
 	fun getValueFlow() =
 		dataStore?.data?.map { prefs -> prefs[prefKey] ?: defaultValue } ?: emptyFlow()
+
+	@Composable
+	fun getState() = getValueFlow().collectAsState(initial = defaultValue)
 
 	/**
 	 * Returns a flow of boolean values that determine whether the depending preference should be

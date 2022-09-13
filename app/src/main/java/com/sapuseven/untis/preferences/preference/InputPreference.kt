@@ -31,7 +31,9 @@ fun InputPreference(
 
 	Preference(
 		title = title,
-		summary = { Text(value.value) },
+		summary = if (value.value.isNotBlank()) {
+			{ Text(value.value) }
+		} else null,
 		icon = icon,
 		dependency = dependency,
 		dataStore = dataStore,

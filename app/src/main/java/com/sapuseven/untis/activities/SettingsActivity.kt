@@ -18,16 +18,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.*
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
-import com.sapuseven.untis.helpers.config.*
 import com.sapuseven.untis.preferences.PreferenceCategory
 import com.sapuseven.untis.preferences.PreferenceScreen
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
+import com.sapuseven.untis.preferences.dataStore
 import com.sapuseven.untis.preferences.preference.*
 import com.sapuseven.untis.ui.theme.AppTheme
 
@@ -167,18 +169,12 @@ class SettingsActivity : BaseComposeActivity() {
 										PreferenceCategory(stringResource(id = R.string.preference_category_general_behaviour)) {
 											SwitchPreference(
 												title = { Text(stringResource(R.string.preference_double_tap_to_exit)) },
-												dataStore = booleanDataStore(
-													"preference_double_tap_to_exit",
-													defaultValue = booleanResource(id = R.bool.preference_double_tap_to_exit_default)
-												)
+												dataStore = dataStore.doubleTapToExit()
 											)
 
 											SwitchPreference(
 												title = { Text(stringResource(R.string.preference_flinging_enable)) },
-												dataStore = booleanDataStore(
-													"preference_fling_enable",
-													defaultValue = booleanResource(R.bool.preference_fling_enable_default)
-												)
+												dataStore = dataStore.flingEnable()
 											)
 										}
 
@@ -186,18 +182,12 @@ class SettingsActivity : BaseComposeActivity() {
 											SwitchPreference(
 												title = { Text(stringResource(R.string.preference_week_snap_to_days)) },
 												summary = { Text(stringResource(R.string.preference_week_snap_to_days_summary)) },
-												dataStore = booleanDataStore(
-													"preference_week_snap_to_days",
-													defaultValue = booleanResource(R.bool.preference_week_snap_to_days_default)
-												)
+												dataStore = dataStore.weekSnapToDays()
 											)
 
 											WeekRangePickerPreference(
 												title = { Text(stringResource(R.string.preference_week_custom_range)) },
-												dataStore = stringSetDataStore(
-													"preference_week_custom_range",
-													defaultValue = emptySet()
-												)
+												dataStore = dataStore.weekCustomRange()
 											)
 
 											SliderPreference(
@@ -206,10 +196,7 @@ class SettingsActivity : BaseComposeActivity() {
 												title = { Text(stringResource(R.string.preference_week_display_length)) },
 												summary = { Text(stringResource(R.string.preference_week_display_length_summary)) },
 												showSeekBarValue = true,
-												dataStore = floatDataStore(
-													"preference_week_custom_display_length",
-													defaultValue = 0f
-												)
+												dataStore = dataStore.weekCustomLength()
 											)
 										}
 
@@ -218,32 +205,17 @@ class SettingsActivity : BaseComposeActivity() {
 											SwitchPreference(
 												title = { Text(stringResource(R.string.preference_automute_enable)) },
 												summary = { Text(stringResource(R.string.preference_automute_enable_summary)) },
-												dataStore = booleanDataStore(
-													"preference_automute_enable",
-													defaultValue = booleanResource(R.bool.preference_automute_enable_default)
-												)
+												dataStore = dataStore.automuteEnable()
 											)
 											SwitchPreference(
 												title = { Text(stringResource(R.string.preference_automute_cancelled_lessons)) },
-												dependency = booleanDataStore(
-													"preference_automute_enable",
-													defaultValue = booleanResource(R.bool.preference_automute_enable_default)
-												),
-												dataStore = booleanDataStore(
-													"preference_automute_cancelled_lessons",
-													defaultValue = booleanResource(R.bool.preference_automute_cancelled_lessons_default)
-												)
+												dependency = dataStore.automuteEnable(),
+												dataStore = dataStore.automuteCancelledLessons()
 											)
 											SwitchPreference(
 												title = { Text(stringResource(R.string.preference_automute_mute_priority)) },
-												dependency = booleanDataStore(
-													"preference_automute_enable",
-													defaultValue = booleanResource(R.bool.preference_automute_enable_default)
-												),
-												dataStore = booleanDataStore(
-													"preference_automute_mute_priority",
-													defaultValue = booleanResource(R.bool.preference_automute_mute_priority_default)
-												)
+												dependency = dataStore.automuteEnable(),
+												dataStore = dataStore.automuteMutePriority()
 											)
 
 											SliderPreference(
@@ -252,14 +224,8 @@ class SettingsActivity : BaseComposeActivity() {
 												title = { Text(stringResource(R.string.preference_automute_minimum_break_length)) },
 												summary = { Text(stringResource(R.string.preference_automute_minimum_break_length_summary)) },
 												showSeekBarValue = true,
-												dependency = booleanDataStore(
-													"preference_automute_enable",
-													defaultValue = booleanResource(R.bool.preference_automute_enable_default)
-												),
-												dataStore = floatDataStore(
-													"preference_automute_minimum_break_length",
-													defaultValue = integerResource(id = R.integer.preference_automute_minimum_break_length_default).toFloat()
-												)
+												dependency = dataStore.automuteEnable(),
+												dataStore = dataStore.automuteMinimumBreakLength()
 											)
 										}
 
@@ -268,10 +234,7 @@ class SettingsActivity : BaseComposeActivity() {
 											SwitchPreference(
 												title = { Text("Enable additional error messages") },
 												summary = { Text("This is used for non-critical background errors") },
-												dataStore = booleanDataStore(
-													"preference_additional_error_messages",
-													defaultValue = booleanResource(R.bool.preference_additional_error_messages_default)
-												)
+												dataStore = dataStore.additionalErrorMessages()
 											)
 
 											Preference(
@@ -291,36 +254,24 @@ class SettingsActivity : BaseComposeActivity() {
 										PreferenceCategory(stringResource(id = R.string.preference_category_styling_colors)) {
 											SwitchPreference(
 												title = { Text(stringResource(R.string.preference_timetable_item_text_light)) },
-												dataStore = booleanDataStore(
-													"preference_timetable_item_text_light",
-													defaultValue = booleanResource(R.bool.preference_timetable_item_text_light_default)
-												)
+												dataStore = dataStore.timetableItemTextLight()
 											)
 
 											ColorPreference(
 												title = { Text(stringResource(R.string.preference_background_future)) },
 												showAlphaSlider = true,
-												dataStore = intDataStore(
-													"preference_background_future",
-													defaultValue = integerResource(R.integer.preference_background_future_default)
-												)
+												dataStore = dataStore.backgroundFuture()
 											)
 
 											ColorPreference(
 												title = { Text(stringResource(R.string.preference_background_past)) },
 												showAlphaSlider = true,
-												dataStore = intDataStore(
-													"preference_background_past",
-													defaultValue = integerResource(R.integer.preference_background_past_default)
-												)
+												dataStore = dataStore.backgroundPast()
 											)
 
 											ColorPreference(
 												title = { Text(stringResource(R.string.preference_marker)) },
-												dataStore = intDataStore(
-													"preference_marker",
-													defaultValue = integerResource(R.integer.preference_marker_default)
-												)
+												dataStore = dataStore.marker()
 											)
 										}
 
@@ -330,137 +281,85 @@ class SettingsActivity : BaseComposeActivity() {
 												summary = { Text(stringResource(R.string.preference_school_background_desc)) },
 												entries = stringArrayResource(id = R.array.preference_schoolcolors_values),
 												entryLabels = stringArrayResource(id = R.array.preference_schoolcolors),
-												dataStore = stringSetDataStore(
-													"preference_school_background",
-													defaultValue = emptySet()
-												)
+												dataStore = dataStore.schoolBackground()
 											)
 
 											SwitchPreference(
 												title = { Text(stringResource(R.string.preference_use_theme_background)) },
-												dependency = stringSetDataStore(
-													"preference_school_background",
-													defaultValue = emptySet(),
+												dependency = dataStore.schoolBackground(
 													dependencyValue = { !it.contains("regular") }
 												),
-												dataStore = booleanDataStore(
-													"preference_use_theme_background",
-													defaultValue = booleanResource(R.bool.preference_use_theme_background_default)
-												)
+												dataStore = dataStore.useThemeBackground()
 											)
 
 											ColorPreference(
 												title = { Text(stringResource(R.string.preference_background_regular)) },
-												dependency = stringSetDataStore(
-													"preference_school_background",
-													defaultValue = emptySet(),
+												dependency = dataStore.schoolBackground(
 													dependencyValue = { !it.contains("regular") },
-													subDependency = booleanDataStore(
-														"preference_use_theme_background",
-														defaultValue = booleanResource(R.bool.preference_use_theme_background_default),
+													subDependency = dataStore.useThemeBackground(
 														dependencyValue = { !it }
 													)
 												),
-												dataStore = intDataStore(
-													"preference_background_regular",
-													defaultValue = integerResource(R.integer.preference_background_regular_default)
-												)
+												dataStore = dataStore.backgroundRegular()
 											)
 
 											ColorPreference(
 												title = { Text(stringResource(R.string.preference_background_regular_past)) },
-												dependency = stringSetDataStore(
-													"preference_school_background",
-													defaultValue = emptySet(),
+												dependency = dataStore.schoolBackground(
 													dependencyValue = { !it.contains("regular") },
-													subDependency = booleanDataStore(
-														"preference_use_theme_background",
-														defaultValue = booleanResource(R.bool.preference_use_theme_background_default),
+													subDependency = dataStore.useThemeBackground(
 														dependencyValue = { !it }
 													)
 												),
-												dataStore = intDataStore(
-													"preference_background_regular_past",
-													defaultValue = integerResource(R.integer.preference_background_regular_past_default)
-												)
+												dataStore = dataStore.backgroundRegularPast()
 											)
 
 											ColorPreference(
 												title = { Text(stringResource(R.string.preference_background_exam)) },
-												dependency = stringSetDataStore(
-													"preference_school_background",
-													defaultValue = emptySet(),
+												dependency = dataStore.schoolBackground(
 													dependencyValue = { !it.contains("exam") }
 												),
-												dataStore = intDataStore(
-													"preference_background_exam",
-													defaultValue = integerResource(R.integer.preference_background_exam_default)
-												)
+												dataStore = dataStore.backgroundExam()
 											)
 
 											ColorPreference(
 												title = { Text(stringResource(R.string.preference_background_exam_past)) },
-												dependency = stringSetDataStore(
-													"preference_school_background",
-													defaultValue = emptySet(),
+												dependency = dataStore.schoolBackground(
 													dependencyValue = { !it.contains("exam") }
 												),
-												dataStore = intDataStore(
-													"preference_background_exam_past",
-													defaultValue = integerResource(R.integer.preference_background_exam_past_default)
-												)
+												dataStore = dataStore.backgroundExamPast()
 											)
 
 											ColorPreference(
 												title = { Text(stringResource(R.string.preference_background_irregular)) },
-												dependency = stringSetDataStore(
-													"preference_school_background",
-													defaultValue = emptySet(),
+												dependency = dataStore.schoolBackground(
 													dependencyValue = { !it.contains("irregular") }
 												),
-												dataStore = intDataStore(
-													"preference_background_irregular",
-													defaultValue = integerResource(R.integer.preference_background_irregular_default)
-												)
+												dataStore = dataStore.backgroundIrregular()
 											)
 
 											ColorPreference(
 												title = { Text(stringResource(R.string.preference_background_irregular_past)) },
-												dependency = stringSetDataStore(
-													"preference_school_background",
-													defaultValue = emptySet(),
+												dependency = dataStore.schoolBackground(
 													dependencyValue = { !it.contains("irregular") }
 												),
-												dataStore = intDataStore(
-													"preference_background_irregular_past",
-													defaultValue = integerResource(R.integer.preference_background_irregular_past_default)
-												)
+												dataStore = dataStore.backgroundIrregularPast()
 											)
 
 											ColorPreference(
 												title = { Text(stringResource(R.string.preference_background_cancelled)) },
-												dependency = stringSetDataStore(
-													"preference_school_background",
-													defaultValue = emptySet(),
+												dependency = dataStore.schoolBackground(
 													dependencyValue = { !it.contains("cancelled") }
 												),
-												dataStore = intDataStore(
-													"preference_background_cancelled",
-													defaultValue = integerResource(R.integer.preference_background_cancelled_default)
-												)
+												dataStore = dataStore.backgroundCancelled()
 											)
 
 											ColorPreference(
 												title = { Text(stringResource(R.string.preference_background_cancelled_past)) },
-												dependency = stringSetDataStore(
-													"preference_school_background",
-													defaultValue = emptySet(),
+												dependency = dataStore.schoolBackground(
 													dependencyValue = { !it.contains("cancelled") }
 												),
-												dataStore = intDataStore(
-													"preference_background_cancelled_past",
-													defaultValue = integerResource(R.integer.preference_background_cancelled_past_default)
-												)
+												dataStore = dataStore.backgroundCancelledPast()
 											)
 
 											Preference(
@@ -482,10 +381,7 @@ class SettingsActivity : BaseComposeActivity() {
 												},
 												entries = stringArrayResource(id = R.array.preference_theme_values),
 												entryLabels = stringArrayResource(id = R.array.preference_themes),
-												dataStore = stringDataStore(
-													"preference_theme",
-													defaultValue = stringResource(R.string.preference_theme_default)
-												)
+												dataStore = dataStore.theme()
 											)
 
 											ListPreference(
@@ -499,10 +395,7 @@ class SettingsActivity : BaseComposeActivity() {
 												},
 												entries = stringArrayResource(id = R.array.preference_dark_theme_values),
 												entryLabels = stringArrayResource(id = R.array.preference_dark_theme),
-												dataStore = stringDataStore(
-													"preference_dark_theme",
-													defaultValue = stringResource(R.string.preference_dark_theme_default)
-												)
+												dataStore = dataStore.darkTheme()
 											)
 
 											SwitchPreference(
@@ -514,15 +407,8 @@ class SettingsActivity : BaseComposeActivity() {
 														contentDescription = null
 													)
 												},
-												dependency = stringDataStore(
-													"preference_dark_theme",
-													defaultValue = stringResource(R.string.preference_dark_theme_default),
-													dependencyValue = { it != "off" }
-												),
-												dataStore = booleanDataStore(
-													"preference_dark_theme_oled",
-													defaultValue = booleanResource(R.bool.preference_dark_theme_oled_default)
-												)
+												dependency = dataStore.darkTheme(),
+												dataStore = dataStore.darkThemeOled()
 											)
 										}
 									}
@@ -534,10 +420,7 @@ class SettingsActivity : BaseComposeActivity() {
 									Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
 										ElementPickerPreference(
 											title = { Text(stringResource(R.string.preference_timetable_personal_timetable)) },
-											dataStore = stringDataStore(
-												"preference_timetable_personal_timetable",
-												defaultValue = ""
-											),
+											dataStore = dataStore.timetablePersonalTimetable(),
 											timetableDatabaseInterface = timetableDatabaseInterface,
 											highlight = preferenceHighlight == "preference_timetable_personal_timetable"
 										)
@@ -545,62 +428,38 @@ class SettingsActivity : BaseComposeActivity() {
 										SwitchPreference(
 											title = { Text(stringResource(R.string.preference_timetable_hide_time_stamps)) },
 											summary = { Text(stringResource(R.string.preference_timetable_hide_time_stamps_desc)) },
-											dataStore = booleanDataStore(
-												"preference_timetable_hide_time_stamps",
-												defaultValue = booleanResource(R.bool.preference_timetable_hide_time_stamps_default)
-											)
+											dataStore = dataStore.timetableHideTimeStamps()
 										)
 
 										SwitchPreference(
 											title = { Text(stringResource(R.string.preference_timetable_hide_cancelled)) },
 											summary = { Text(stringResource(R.string.preference_timetable_hide_cancelled_desc)) },
-											dataStore = booleanDataStore(
-												"preference_timetable_hide_cancelled",
-												defaultValue = booleanResource(R.bool.preference_timetable_hide_cancelled_default)
-											)
+											dataStore = dataStore.timetableHideCancelled()
 										)
 
 										SwitchPreference(
 											title = { Text(stringResource(R.string.preference_timetable_substitutions_irregular)) },
 											summary = { Text(stringResource(R.string.preference_timetable_substitutions_irregular_desc)) },
-											dataStore = booleanDataStore(
-												"preference_timetable_substitutions_irregular",
-												defaultValue = booleanResource(R.bool.preference_timetable_substitutions_irregular_default)
-											)
+											dataStore = dataStore.timetableSubstitutionsIrregular()
 										)
 
 										SwitchPreference(
 											title = { Text(stringResource(R.string.preference_timetable_background_irregular)) },
 											summary = { Text(stringResource(R.string.preference_timetable_background_irregular_desc)) },
-											dependency = booleanDataStore(
-												"preference_timetable_substitutions_irregular",
-												defaultValue = booleanResource(R.bool.preference_timetable_substitutions_irregular_default)
-											),
-											dataStore = booleanDataStore(
-												"preference_timetable_background_irregular",
-												defaultValue = booleanResource(R.bool.preference_timetable_background_irregular_default)
-											)
+											dependency = dataStore.timetableSubstitutionsIrregular(),
+											dataStore = dataStore.timetableBackgroundIrregular()
 										)
 
 										PreferenceCategory(stringResource(id = R.string.preference_category_timetable_range)) {
 											RangeInputPreference(
 												title = { Text(stringResource(R.string.preference_timetable_range)) },
-												dataStore = stringDataStore(
-													"preference_timetable_range",
-													defaultValue = ""
-												)
+												dataStore = dataStore.timetableRange()
 											)
 
 											SwitchPreference(
 												title = { Text(stringResource(R.string.preference_timetable_range_index_reset)) },
-												dependency = stringDataStore(
-													"preference_timetable_range",
-													defaultValue = ""
-												),
-												dataStore = booleanDataStore(
-													"preference_timetable_range_index_reset",
-													defaultValue = booleanResource(R.bool.preference_timetable_range_index_reset_default)
-												)
+												dependency = dataStore.timetableRange(),
+												dataStore = dataStore.timetableRangeIndexReset()
 											)
 
 											/*SwitchPreference
@@ -620,10 +479,7 @@ class SettingsActivity : BaseComposeActivity() {
 													)
 												},
 												unit = "dp",
-												dataStore = intDataStore(
-													"preference_timetable_item_padding_overlap",
-													defaultValue = integerResource(R.integer.preference_timetable_item_padding_overlap_default)
-												)
+												dataStore = dataStore.timetableItemPaddingOverlap()
 											)
 
 											NumericInputPreference(
@@ -635,10 +491,7 @@ class SettingsActivity : BaseComposeActivity() {
 													)
 												},
 												unit = "dp",
-												dataStore = intDataStore(
-													"preference_timetable_item_padding",
-													defaultValue = integerResource(R.integer.preference_timetable_item_padding_default)
-												)
+												dataStore = dataStore.timetableItemPadding()
 											)
 
 											NumericInputPreference(
@@ -650,10 +503,7 @@ class SettingsActivity : BaseComposeActivity() {
 													)
 												},
 												unit = "dp",
-												dataStore = intDataStore(
-													"preference_timetable_item_corner_radius",
-													defaultValue = integerResource(R.integer.preference_timetable_item_corner_radius_default)
-												)
+												dataStore = dataStore.timetableItemCornerRadius()
 											)
 										}
 
@@ -666,10 +516,7 @@ class SettingsActivity : BaseComposeActivity() {
 														contentDescription = null
 													)
 												},
-												dataStore = booleanDataStore(
-													"preference_timetable_centered_lesson_info",
-													defaultValue = booleanResource(R.bool.preference_timetable_centered_lesson_info_default)
-												)
+												dataStore = dataStore.timetableCenteredLessonInfo()
 											)
 
 											SwitchPreference(
@@ -680,10 +527,7 @@ class SettingsActivity : BaseComposeActivity() {
 														contentDescription = null
 													)
 												},
-												dataStore = booleanDataStore(
-													"preference_timetable_bold_lesson_name",
-													defaultValue = booleanResource(R.bool.preference_timetable_bold_lesson_name_default)
-												)
+												dataStore = dataStore.timetableBoldLessonName()
 											)
 
 											NumericInputPreference(
@@ -695,10 +539,7 @@ class SettingsActivity : BaseComposeActivity() {
 													)
 												},
 												unit = "sp",
-												dataStore = intDataStore(
-													"preference_timetable_lesson_name_font_size",
-													defaultValue = integerResource(R.integer.preference_timetable_lesson_name_font_size_default)
-												)
+												dataStore = dataStore.timetableLessonNameFontSize()
 											)
 
 											NumericInputPreference(
@@ -710,10 +551,7 @@ class SettingsActivity : BaseComposeActivity() {
 													)
 												},
 												unit = "sp",
-												dataStore = intDataStore(
-													"preference_timetable_lesson_info_font_size",
-													defaultValue = integerResource(R.integer.preference_timetable_lesson_info_font_size_default)
-												)
+												dataStore = dataStore.timetableLessonInfoFontSize()
 											)
 										}
 									}
@@ -732,49 +570,28 @@ class SettingsActivity : BaseComposeActivity() {
 													contentDescription = null
 												)
 											},*/
-											dataStore = booleanDataStore(
-												"preference_notifications_enable",
-												defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
-											)
+											dataStore = dataStore.notificationsEnable()
 										)
 
 										SwitchPreference(
 											title = { Text(stringResource(R.string.preference_notifications_multiple)) },
 											summary = { Text(stringResource(R.string.preference_notifications_multiple_desc)) },
-											dependency = booleanDataStore(
-												"preference_notifications_enable",
-												defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
-											),
-											dataStore = booleanDataStore(
-												"preference_notifications_in_multiple",
-												defaultValue = booleanResource(R.bool.preference_notifications_in_multiple_default)
-											)
+											dependency = dataStore.notificationsEnable(),
+											dataStore = dataStore.notificationsInMultiple()
 										)
 
 										SwitchPreference(
 											title = { Text(stringResource(R.string.preference_notifications_first_lesson)) },
 											summary = { Text(stringResource(R.string.preference_notifications_first_lesson_desc)) },
-											dependency = booleanDataStore(
-												"preference_notifications_enable",
-												defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
-											),
-											dataStore = booleanDataStore(
-												"preference_notifications_before_first",
-												defaultValue = booleanResource(R.bool.preference_notifications_before_first_default)
-											)
+											dependency = dataStore.notificationsEnable(),
+											dataStore = dataStore.notificationsBeforeFirst()
 										)
 
 										NumericInputPreference(
 											title = { Text(stringResource(R.string.preference_notifications_first_lesson_time)) },
 											unit = stringResource(R.string.preference_notifications_first_lesson_time_unit),
-											dependency = booleanDataStore(
-												"preference_notifications_before_first",
-												defaultValue = booleanResource(R.bool.preference_notifications_before_first_default)
-											),
-											dataStore = intDataStore(
-												"preference_notifications_before_first_time",
-												defaultValue = integerResource(R.integer.preference_notifications_before_first_time_default)
-											)
+											dependency = dataStore.notificationsBeforeFirst(),
+											dataStore = dataStore.notificationsBeforeFirstTime()
 										)
 
 										Preference(
@@ -801,14 +618,8 @@ class SettingsActivity : BaseComposeActivity() {
 												},
 												entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
 												entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
-												dependency = booleanDataStore(
-													"preference_notifications_enable",
-													defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
-												),
-												dataStore = stringDataStore(
-													"preference_notifications_visibility_subjects",
-													defaultValue = stringResource(R.string.preference_notifications_visibility_subjects_default)
-												)
+												dependency = dataStore.notificationsEnable(),
+												dataStore = dataStore.notificationsVisibilitySubjects()
 											)
 
 											ListPreference(
@@ -822,14 +633,8 @@ class SettingsActivity : BaseComposeActivity() {
 												},
 												entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
 												entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
-												dependency = booleanDataStore(
-													"preference_notifications_enable",
-													defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
-												),
-												dataStore = stringDataStore(
-													"preference_notifications_visibility_rooms",
-													defaultValue = stringResource(R.string.preference_notifications_visibility_rooms_default)
-												)
+												dependency = dataStore.notificationsEnable(),
+												dataStore = dataStore.notificationsVisibilityRooms()
 											)
 
 											ListPreference(
@@ -843,14 +648,8 @@ class SettingsActivity : BaseComposeActivity() {
 												},
 												entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
 												entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
-												dependency = booleanDataStore(
-													"preference_notifications_enable",
-													defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
-												),
-												dataStore = stringDataStore(
-													"preference_notifications_visibility_teachers",
-													defaultValue = stringResource(R.string.preference_notifications_visibility_teachers_default)
-												)
+												dependency = dataStore.notificationsEnable(),
+												dataStore = dataStore.notificationsVisibilityTeachers()
 											)
 
 											ListPreference(
@@ -864,14 +663,8 @@ class SettingsActivity : BaseComposeActivity() {
 												},
 												entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
 												entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
-												dependency = booleanDataStore(
-													"preference_notifications_enable",
-													defaultValue = booleanResource(R.bool.preference_notifications_enable_default)
-												),
-												dataStore = stringDataStore(
-													"preference_notifications_visibility_classes",
-													defaultValue = stringResource(R.string.preference_notifications_visibility_classes_default)
-												)
+												dependency = dataStore.notificationsEnable(),
+												dataStore = dataStore.notificationsVisibilityClasses()
 											)
 										}
 									}
@@ -884,10 +677,7 @@ class SettingsActivity : BaseComposeActivity() {
 										SwitchPreference(
 											title = { Text(stringResource(R.string.preference_connectivity_refresh_in_background)) },
 											summary = { Text(stringResource(R.string.preference_connectivity_refresh_in_background_desc)) },
-											dataStore = booleanDataStore(
-												"preference_connectivity_refresh_in_background",
-												defaultValue = booleanResource(R.bool.preference_connectivity_refresh_in_background_default)
-											)
+											dataStore = dataStore.connectivityRefreshInBackground()
 										)
 
 										PreferenceCategory(stringResource(id = R.string.preference_category_connectivity_proxy)) {
@@ -899,10 +689,7 @@ class SettingsActivity : BaseComposeActivity() {
 														contentDescription = null
 													)
 												},
-												dataStore = stringDataStore(
-													"preference_connectivity_proxy_host",
-													defaultValue = ""
-												)
+												dataStore = dataStore.proxyHost()
 											)
 
 											Preference(
@@ -1049,384 +836,4 @@ class SettingsActivity : BaseComposeActivity() {
 			}
 		}
 	}
-
-	/*class PreferencesFragment : PreferenceFragmentCompat() {
-		companion object {
-			const val FRAGMENT_TAG = "preference_fragment"
-			const val DIALOG_FRAGMENT_TAG = "preference_dialog_fragment"
-		}
-
-		private var profileId: Long = 0
-
-		override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-			profileId = arguments?.getLong(EXTRA_LONG_PROFILE_ID) ?: 0
-			if (profileId == 0L) {
-				MaterialAlertDialogBuilder(requireContext())
-					.setMessage("Invalid profile ID")
-					.setPositiveButton("Exit") { _, _ ->
-						activity?.finish()
-					}
-					.show()
-			} else {
-				preferenceManager.sharedPreferencesName = "preferences_$profileId"
-
-				setPreferencesFromResource(R.xml.preferences, rootKey)
-
-				when (rootKey) {
-					"preferences_general" -> {
-						findPreference<SeekBarPreference>("preference_week_custom_display_length")?.apply {
-							max =
-								findPreference<WeekRangePickerPreference>("preference_week_custom_range")?.getPersistedStringSet(
-									emptySet()
-								)?.size?.zeroToNull
-									?: this.max
-						}
-
-						findPreference<com.sapuseven.untis.preferences.SwitchPreference>("preference_automute_enable")?.setOnPreferenceChangeListener { _, newValue ->
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && newValue == true) {
-								(activity?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
-									if (!isNotificationPolicyAccessGranted) {
-										startActivity(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
-										return@setOnPreferenceChangeListener false
-									}
-								}
-							}
-							true
-						}
-
-						findPreference<Preference>("preference_errors")?.setOnPreferenceClickListener {
-							startActivity(Intent(context, ErrorsActivity::class.java))
-							true
-						}
-					}
-					"preferences_styling" -> {
-						findPreference<MultiSelectListPreference>("preference_school_background")?.apply {
-							setOnPreferenceChangeListener { _, newValue ->
-								if (newValue !is Set<*>) return@setOnPreferenceChangeListener false
-
-								refreshColorPreferences(newValue)
-
-								true
-							}
-
-							refreshColorPreferences(values)
-						}
-
-						listOf(
-							"preference_theme",
-							"preference_dark_theme",
-							"preference_dark_theme_oled"
-						).forEach { key ->
-							findPreference<Preference>(key)?.setOnPreferenceChangeListener { _, _ ->
-								activity?.recreate()
-								true
-							}
-						}
-
-						findPreference<Preference>("preference_timetable_colors_reset")?.setOnPreferenceClickListener {
-							MaterialAlertDialogBuilder(requireContext())
-								.setTitle(R.string.preference_dialog_colors_reset_title)
-								.setMessage(R.string.preference_dialog_colors_reset_text)
-								.setPositiveButton(R.string.preference_timetable_colors_reset_button_positive) { _, _ ->
-									preferenceManager.sharedPreferences?.edit()?.apply {
-										listOf(
-											"preference_background_regular",
-											"preference_background_regular_past",
-											"preference_background_exam",
-											"preference_background_exam_past",
-											"preference_background_irregular",
-											"preference_background_irregular_past",
-											"preference_background_cancelled",
-											"preference_background_cancelled_past"
-										).forEach {
-											remove(it)
-										}
-										apply()
-									}
-									activity?.recreate()
-								}
-								.setNegativeButton(R.string.all_cancel) { _, _ -> }
-								.show()
-							true
-						}
-					}
-					"preferences_connectivity" ->
-						findPreference<Preference>("preference_connectivity_proxy_about")?.setOnPreferenceClickListener {
-							startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(WIKI_URL_PROXY)))
-							true
-						}
-
-					"preferences_notifications" -> {
-						findPreference<Preference>("preference_notifications_enable")?.setOnPreferenceChangeListener { _, newValue ->
-							if (newValue == false) clearNotifications()
-							true
-						}
-						findPreference<Preference>("preference_notifications_clear")?.setOnPreferenceClickListener {
-							clearNotifications()
-							true
-						}
-					}
-					"preferences_info" -> {
-						findPreference<Preference>("preference_info_app_version")?.apply {
-							val pInfo =
-								requireContext().packageManager.getPackageInfo(
-									requireContext().packageName,
-									0
-								)
-							summary = requireContext().getString(
-								R.string.preference_info_app_version_desc,
-								pInfo.versionName,
-								PackageInfoCompat.getLongVersionCode(pInfo)
-							)
-							setOnPreferenceClickListener {
-								startActivity(
-									Intent(
-										Intent.ACTION_VIEW,
-										Uri.parse("$REPOSITORY_URL_GITHUB/releases")
-									)
-								)
-								true
-							}
-						}
-						findPreference<Preference>("preference_info_github")?.apply {
-							summary = REPOSITORY_URL_GITHUB
-							setOnPreferenceClickListener {
-								startActivity(
-									Intent(
-										Intent.ACTION_VIEW,
-										Uri.parse(REPOSITORY_URL_GITHUB)
-									)
-								)
-								true
-							}
-						}
-						findPreference<Preference>("preference_info_license")?.setOnPreferenceClickListener {
-							startActivity(
-								Intent(
-									Intent.ACTION_VIEW,
-									Uri.parse("$REPOSITORY_URL_GITHUB/blob/master/LICENSE")
-								)
-							)
-							true
-						}
-					}
-					"preferences_contributors" -> {
-						MaterialAlertDialogBuilder(requireContext())
-							.setTitle(R.string.preference_info_privacy)
-							.setMessage(R.string.preference_info_privacy_desc)
-							.setPositiveButton(android.R.string.ok) { _, _ ->
-								GlobalScope.launch(Dispatchers.Main) {
-									"https://api.github.com/repos/sapuseven/betteruntis/contributors"
-										.httpGet()
-										.awaitStringResult()
-										.fold({ data ->
-											showContributorList(true, data)
-										}, {
-											showContributorList(false)
-										})
-								}
-							}
-							.setNegativeButton(android.R.string.cancel) { _, _ ->
-								parentFragmentManager.popBackStackImmediate()
-							}
-							.setNeutralButton(R.string.preference_info_privacy_policy) { _, _ ->
-								parentFragmentManager.popBackStackImmediate()
-								startActivity(
-									Intent(
-										Intent.ACTION_VIEW, Uri.parse(
-											"https://docs.github.com/en/github/site-policy/github-privacy-statement"
-										)
-									)
-								)
-							}
-							.show()
-					}
-				}
-			}
-		}
-
-		private suspend fun showContributorList(success: Boolean, data: String = "") {
-			val preferenceScreen = this.preferenceScreen
-			val indicator = findPreference<Preference>("preferences_contributors_indicator")
-			if (success) {
-				val contributors = getJSON().decodeFromString<List<GithubUser>>(data)
-
-				indicator?.let { preferenceScreen.removePreference(it) }
-
-				contributors.forEach { user ->
-					context?.let {
-						preferenceScreen.addPreference(
-							Preference(it).apply {
-								GlobalScope.launch(Dispatchers.Main) {
-									icon = loadProfileImage(user.avatar_url, resources)
-								}
-								title = user.login
-								summary = resources.getQuantityString(
-									R.plurals.preferences_contributors_contributions,
-									user.contributions,
-									user.contributions
-								)
-								setOnPreferenceClickListener {
-									startActivity(
-										Intent(
-											Intent.ACTION_VIEW,
-											Uri.parse(user.html_url)
-										)
-									)
-									true
-								}
-							}
-						)
-					}
-				}
-			} else {
-				indicator?.title = resources.getString(R.string.loading_failed)
-			}
-		}
-
-		private suspend fun loadProfileImage(avatarUrl: String, resources: Resources): Drawable? {
-			return avatarUrl
-				.httpGet()
-				.awaitByteArrayResult()
-				.fold({
-					BitmapDrawable(resources, BitmapFactory.decodeByteArray(it, 0, it.size))
-				}, { null })
-		}
-
-		private fun clearNotifications() =
-			(context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancelAll()
-
-		private fun refreshColorPreferences(newValue: Set<*>) {
-			val regularColors = listOf(
-				"preference_background_regular",
-				"preference_background_regular_past",
-				"preference_use_theme_background"
-			)
-			val irregularColors =
-				listOf("preference_background_irregular", "preference_background_irregular_past")
-			val cancelledColors =
-				listOf("preference_background_cancelled", "preference_background_cancelled_past")
-			val examColors = listOf("preference_background_exam", "preference_background_exam_past")
-
-			regularColors.forEach {
-				findPreference<Preference>(it)?.isEnabled = !newValue.contains("regular")
-			}
-			irregularColors.forEach {
-				findPreference<Preference>(it)?.isEnabled = !newValue.contains("irregular")
-			}
-			cancelledColors.forEach {
-				findPreference<Preference>(it)?.isEnabled = !newValue.contains("cancelled")
-			}
-			examColors.forEach {
-				findPreference<Preference>(it)?.isEnabled = !newValue.contains("exam")
-			}
-		}
-
-		override fun onPreferenceTreeClick(preference: Preference): Boolean {
-			if (preference is ElementPickerPreference) {
-				val userDatabase = UserDatabase.createInstance(requireContext())
-				val timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileId)
-
-				ElementPickerDialog.newInstance(
-					timetableDatabaseInterface,
-					ElementPickerDialog.Companion.ElementPickerDialogConfig(
-						TimetableDatabaseInterface.Type.valueOf(preference.getSavedType())
-					),
-					object : ElementPickerDialog.ElementPickerDialogListener {
-						override fun onDialogDismissed(dialog: DialogInterface?) {
-							// ignore
-						}
-
-						override fun onPeriodElementClick(
-							fragment: Fragment,
-							element: PeriodElement?,
-							useOrgId: Boolean
-						) {
-							preference.setElement(
-								element,
-								element?.let {
-									timetableDatabaseInterface.getShortName(
-										it.id,
-										TimetableDatabaseInterface.Type.valueOf(it.type)
-									)
-								} ?: "")
-							(fragment as DialogFragment).dismiss()
-						}
-
-						override fun onPositiveButtonClicked(dialog: ElementPickerDialog) {
-							// positive button not used
-						}
-					}
-				).show(requireFragmentManager(), "elementPicker")
-			}
-
-			return true
-		}
-
-		override fun onDisplayPreferenceDialog(preference: Preference) {
-			fragmentManager?.let { manager ->
-				if (manager.findFragmentByTag(DIALOG_FRAGMENT_TAG) != null) return
-
-				when (preference) {
-					is AlertPreference -> {
-						val f: DialogFragment = AlertPreferenceDialog.newInstance(preference.key)
-						f.setTargetFragment(this, 0)
-						f.show(manager, DIALOG_FRAGMENT_TAG)
-					}
-					is WeekRangePickerPreference -> {
-						val f: DialogFragment =
-							WeekRangePickerPreferenceDialog.newInstance(preference.key) { positiveResult, selectedDays ->
-								val visibleDaysPreference =
-									findPreference<SeekBarPreference>("preference_week_custom_display_length")
-								if (positiveResult) {
-									visibleDaysPreference?.max = selectedDays.zeroToNull ?: 7
-									visibleDaysPreference?.value = min(
-										visibleDaysPreference?.value
-											?: 0, selectedDays.zeroToNull ?: 7
-									)
-								}
-							}
-						f.setTargetFragment(this, 0)
-						f.show(manager, DIALOG_FRAGMENT_TAG)
-					}
-					else -> super.onDisplayPreferenceDialog(preference)
-				}
-			}
-		}
-	}
-
-	@Composable
-	fun FragmentContainer(
-		modifier: Modifier = Modifier,
-		fragmentManager: FragmentManager,
-		commit: FragmentTransaction.(containerId: Int) -> Unit
-	) {
-		val containerId by rememberSaveable { mutableStateOf(View.generateViewId()) }
-		var initialized by rememberSaveable { mutableStateOf(false) }
-		AndroidView(
-			modifier = modifier,
-			factory = { context ->
-				FragmentContainerView(context)
-					.apply { id = containerId }
-			},
-			update = { view ->
-				if (!initialized) {
-					fragmentManager.commit { commit(view.id) }
-					initialized = true
-				} else {
-					fragmentManager.onContainerAvailable(view)
-				}
-			}
-		)
-	}
-
-	// Access to package-private method in FragmentManager through reflection
-	private fun FragmentManager.onContainerAvailable(view: FragmentContainerView) {
-		val method = FragmentManager::class.java.getDeclaredMethod(
-			"onContainerAvailable",
-			FragmentContainerView::class.java
-		)
-		method.isAccessible = true
-		method.invoke(this, view)
-	}*/
 }
