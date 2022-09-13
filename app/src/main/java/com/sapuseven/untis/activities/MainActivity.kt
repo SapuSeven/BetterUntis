@@ -289,6 +289,7 @@ class MainActivity :
 					) {
 						TimetableItemDetailsDialog(
 							timegridItem = remember { appState.timetableItemDetailsDialog.value!! },
+							user = user,
 							timetableDatabaseInterface = timetableDatabaseInterface,
 							onDismiss = {
 								appState.timetableItemDetailsDialog.value = null

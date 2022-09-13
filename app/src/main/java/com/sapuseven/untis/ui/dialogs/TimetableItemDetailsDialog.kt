@@ -1,6 +1,8 @@
 package com.sapuseven.untis.ui.dialogs
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -12,8 +14,10 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -35,23 +39,28 @@ import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.UntisAttachment
 import com.sapuseven.untis.models.untis.UntisError
 import com.sapuseven.untis.models.untis.params.PeriodDataParams
+import com.sapuseven.untis.models.untis.params.SubmitLessonTopicParams
+import com.sapuseven.untis.models.untis.response.BaseResponse
 import com.sapuseven.untis.models.untis.response.PeriodDataResponse
 import com.sapuseven.untis.models.untis.response.PeriodDataResult
 import com.sapuseven.untis.models.untis.response.UntisPeriodData
 import com.sapuseven.untis.models.untis.timetable.Period
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.ui.common.conditional
+import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import org.joda.time.format.DateTimeFormat
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun TimetableItemDetailsDialog(
 	timegridItem: TimegridItem,
+	user: UserDatabase.User,
 	timetableDatabaseInterface: TimetableDatabaseInterface,
 	onDismiss: (requestedElement: PeriodElement?) -> Unit
 ) {
 	var dismissed by remember { mutableStateOf(false) }
+	val scope = rememberCoroutineScope()
 
 	fun dismiss(requestedElement: PeriodElement? = null) {
 		onDismiss(requestedElement)
@@ -105,6 +114,9 @@ fun TimetableItemDetailsDialog(
 			)
 
 			var attachmentsDialog by remember { mutableStateOf<List<UntisAttachment>?>(null) }
+			var lessonTopicEditDialog by remember { mutableStateOf<Int?>(null) }
+
+			var lessonTopicNew by remember { mutableStateOf<String?>(null) }
 
 			Column(
 				horizontalAlignment = Alignment.CenterHorizontally,
@@ -300,14 +312,16 @@ fun TimetableItemDetailsDialog(
 								Text(stringResource(id = R.string.all_lessontopic))
 							},
 							supportingText = {
+								val topic = lessonTopicNew ?: it.topic?.text
+
 								Text(
-									if (it.topic?.text.isNullOrBlank())
+									if (topic.isNullOrBlank())
 										if (periodData.element.can.contains(CAN_WRITE_LESSON_TOPIC))
 											stringResource(R.string.all_hint_tap_to_edit)
 										else
 											stringResource(R.string.all_lessontopic_none)
 									else
-										it.topic?.text!!
+										topic
 								)
 							},
 							leadingContent = {
@@ -318,7 +332,9 @@ fun TimetableItemDetailsDialog(
 									modifier = Modifier.padding(horizontal = 8.dp)
 								)
 							},
-							onClick = {}
+							onClick = {
+								lessonTopicEditDialog = periodData.element.id
+							}
 						)
 				}
 
@@ -326,6 +342,90 @@ fun TimetableItemDetailsDialog(
 					AttachmentsDialog(
 						attachments = attachments,
 						onDismiss = { attachmentsDialog = null }
+					)
+				}
+
+				lessonTopicEditDialog?.let { id ->
+					var text by remember { mutableStateOf("") }
+					var loading by remember { mutableStateOf(false) }
+					var error by remember { mutableStateOf<String?>(null) }
+
+					DynamicHeightAlertDialog(
+						title = { Text(stringResource(id = R.string.all_lessontopic_edit)) },
+						text = {
+							Column(
+								modifier = Modifier.fillMaxWidth()
+							) {
+								OutlinedTextField(
+									value = text,
+									onValueChange = { text = it },
+									isError = error != null,
+									enabled = !loading,
+									label = { Text(stringResource(id = R.string.all_lessontopic)) },
+									modifier = Modifier.fillMaxWidth()
+								)
+
+								AnimatedVisibility(visible = error != null) {
+									Text(
+										modifier = Modifier.padding(
+											horizontal = 16.dp,
+											vertical = 4.dp
+										),
+										color = MaterialTheme.colorScheme.error,
+										style = MaterialTheme.typography.bodyMedium,
+										text = error ?: ""
+									)
+								}
+							}
+						},
+						onDismissRequest = { lessonTopicEditDialog = null },
+						confirmButton = {
+							TextButton(
+								enabled = !loading,
+								onClick = {
+									loading = true
+
+									scope.launch {
+										val query = UntisRequest.UntisRequestQuery(user).apply {
+											data.method =
+												UntisApiConstants.METHOD_SUBMIT_LESSON_TOPIC
+											data.params = listOf(
+												SubmitLessonTopicParams(
+													text,
+													id,
+													UntisAuthentication.createAuthObject(user)
+												)
+											)
+										}
+
+										UntisRequest().request(query).fold({
+											// TODO: Create corresponding data model
+											val untisResponse = SerializationUtils.getJSON()
+												.decodeFromString<BaseResponse>(it)
+
+											untisResponse.error?.let { e ->
+												error = e.message
+												loading = false
+											} ?: run {
+												lessonTopicNew = text
+												lessonTopicEditDialog = null
+											}
+										}, {
+											error = it.message
+											loading = false
+										})
+									}
+								}) {
+								Text(stringResource(id = R.string.all_ok))
+							}
+						},
+						dismissButton = {
+							TextButton(
+								enabled = !loading,
+								onClick = { lessonTopicEditDialog = null }) {
+								Text(stringResource(id = R.string.all_cancel))
+							}
+						}
 					)
 				}
 			}
@@ -345,6 +445,9 @@ private fun TimetableDatabaseInterface.TimetableItemDetailsDialogWithPeriodData(
 ) {
 	var periodData by remember { mutableStateOf<UntisPeriodData?>(null) }
 	var error by remember { mutableStateOf<Throwable?>(null) }
+	val errorMessage = error?.message?.let { stringResource(id = R.string.all_error_details, it) }
+
+	val context = LocalContext.current
 
 	LaunchedEffect(Unit) {
 		this@TimetableItemDetailsDialogWithPeriodData.user?.let { user ->
@@ -372,7 +475,13 @@ private fun TimetableDatabaseInterface.TimetableItemDetailsDialogWithPeriodData(
 		modifier = Modifier
 			.conditional(error != null) {
 				clickable {
-					// TODO: Show error details
+					Toast
+						.makeText(
+							context,
+							errorMessage,
+							Toast.LENGTH_LONG
+						)
+						.show()
 				}
 			}
 			.conditional(error == null && canEdit) {
@@ -456,8 +565,8 @@ private suspend fun loadPeriodData(
 			Result.success(it)
 		} ?: Result.failure(UntisApiException(untisResponse.error))
 	}, {
-		Result.failure(UntisApiException(null))
+		Result.failure(it.exception)
 	})
 }
 
-class UntisApiException(error: UntisError?) : Throwable()
+class UntisApiException(error: UntisError?) : Throwable(error?.message)

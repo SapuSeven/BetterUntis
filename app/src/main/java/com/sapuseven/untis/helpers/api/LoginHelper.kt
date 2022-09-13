@@ -80,7 +80,7 @@ class LoginHelper(
 			} catch (e: SerializationException) {
 				onError(
 					LoginErrorInfo(
-						errorMessageStringRes = R.string.logindatainput_error_generic,
+						errorMessageStringRes = R.string.all_error_details,
 						errorMessage = e.message
 					)
 				)
@@ -88,7 +88,7 @@ class LoginHelper(
 		}, { error ->
 			onError(
 				LoginErrorInfo(
-					errorMessageStringRes = R.string.logindatainput_error_generic,
+					errorMessageStringRes = R.string.all_error_details,
 					errorMessage = error.message
 				)
 			)
@@ -128,7 +128,7 @@ class LoginHelper(
 			} catch (e: SerializationException) {
 				onError(
 					LoginErrorInfo(
-						errorMessageStringRes = R.string.logindatainput_error_generic,
+						errorMessageStringRes = R.string.all_error_details,
 						errorMessage = e.message
 					)
 				)
@@ -138,7 +138,7 @@ class LoginHelper(
 				is UnknownHostException -> onError(LoginErrorInfo(errorCode = ErrorMessageDictionary.ERROR_CODE_NO_SERVER_FOUND))
 				else -> onError(
 					LoginErrorInfo(
-						errorMessageStringRes = R.string.logindatainput_error_generic,
+						errorMessageStringRes = R.string.all_error_details,
 						errorMessage = error.message
 					)
 				)
@@ -192,7 +192,7 @@ class LoginHelper(
 			} catch (e: SerializationException) {
 				onError(
 					LoginErrorInfo(
-						errorMessageStringRes = R.string.logindatainput_error_generic,
+						errorMessageStringRes = R.string.all_error_details,
 						errorMessage = e.message
 					)
 				)
@@ -200,7 +200,7 @@ class LoginHelper(
 		}, { error ->
 			onError(
 				LoginErrorInfo(
-					errorMessageStringRes = R.string.logindatainput_error_generic,
+					errorMessageStringRes = R.string.all_error_details,
 					errorMessage = error.message
 				)
 			)

@@ -67,7 +67,7 @@
     <string name="logindatainput_login">Logg inn</string>
     <string name="logindatainput_anonymous_login">Anonym innlogging</string>
     <string name="logindatainput_error_field_empty">Dette feltet kan ikke være tomt.</string>
-    <string name="logindatainput_error_generic">Feil: %1$s</string>
+    <string name="all_error_details">Feil: %1$s</string>
     <string name="logindatainput_error_invalid_school">Ugyldig skole-ID.</string>
     <string name="logindatainput_data_loaded">Data lastet.</string>
     <string name="logindatainput_aquiring_app_secret">Henter hemmelig nøkkel…</string>

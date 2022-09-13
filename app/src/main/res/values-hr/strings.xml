@@ -190,7 +190,7 @@
     <string name="logindatainput_key">Ključ ili lozinka</string>
     <string name="logindatainput_error_invalid_url">Neispravan URL!</string>
     <string name="logindatainput_error_invalid_school">Neispravna ID oznaka škole!</string>
-    <string name="logindatainput_error_generic">Greška: %1$s</string>
+    <string name="all_error_details">Greška: %1$s</string>
     <string name="logindatainput_error_field_empty">Ovo polje ne smije biti prazno!</string>
     <string name="logindatainput_delete">Izbriši profil</string>
     <string name="logindatainput_data_loaded">Podaci su učitani.</string>
