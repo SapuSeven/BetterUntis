@@ -56,6 +56,7 @@ import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import com.sapuseven.untis.preferences.dataStore
 import com.sapuseven.untis.preferences.preference.decodeStoredTimetableValue
 import com.sapuseven.untis.ui.common.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
@@ -158,12 +159,15 @@ class MainActivity :
 
 		setContent {
 			AppTheme {
+				val snackbarHostState = remember { SnackbarHostState() }
+				if (dataStore.doubleTapToExit().getState().value)
+					BackPressConfirm(snackbarHostState)
+
 				withUser (
 					invalidContent = { login() }
 				) { user ->
 					/*weekView.setOnCornerClickListener(this)*/
 					val appState = rememberMainAppState(user, timetableDatabaseInterface)
-					val snackbarHostState = remember { SnackbarHostState() }
 
 					Drawer(
 						appState = appState,
@@ -280,9 +284,6 @@ class MainActivity :
 							}
 						}
 					}
-
-					// TODO: Only if enabled in settings
-					BackPressConfirm(snackbarHostState)
 
 					val density = LocalDensity.current
 					val offsetY = { _: Int ->
