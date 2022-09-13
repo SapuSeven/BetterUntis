@@ -1,6 +1,5 @@
 package com.sapuseven.untis.activities
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -14,7 +13,6 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
@@ -49,13 +47,13 @@ import com.sapuseven.untis.activities.main.DrawerText
 import com.sapuseven.untis.adapters.ProfileListAdapter
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
-import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.config.PreferenceHelper
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import com.sapuseven.untis.preferences.DataStore
 import com.sapuseven.untis.preferences.dataStore
 import com.sapuseven.untis.preferences.preference.decodeStoredTimetableValue
 import com.sapuseven.untis.ui.common.ElementPickerDialogFullscreen
@@ -77,6 +75,7 @@ import com.sapuseven.untis.views.weekview.listeners.ScrollListener
 import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants
@@ -85,6 +84,7 @@ import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
 import java.util.*
+import kotlin.math.roundToInt
 
 class MainActivity :
 	BaseComposeActivity()/*,
@@ -163,7 +163,7 @@ class MainActivity :
 				if (dataStore.doubleTapToExit().getState().value)
 					BackPressConfirm(snackbarHostState)
 
-				withUser (
+				withUser(
 					invalidContent = { login() }
 				) { user ->
 					/*weekView.setOnCornerClickListener(this)*/
@@ -341,6 +341,7 @@ class MainActivity :
 	@Composable
 	private fun WeekViewCompose(appState: MainAppState) {
 		var weekViewGlobal by remember { mutableStateOf(appState.weekView.value) }
+		appState.setupCustomization(weekViewGlobal, dataStore)
 
 		AndroidView(
 			factory = { context ->
@@ -351,11 +352,10 @@ class MainActivity :
 					}
 				}
 
-				appState.weekViewSwipeRefresh.value ?:
-					WeekViewSwipeRefreshLayout(context).apply {
-						appState.weekViewSwipeRefresh.value = this
-						addView(weekViewGlobal)
-					}
+				appState.weekViewSwipeRefresh.value ?: WeekViewSwipeRefreshLayout(context).apply {
+					appState.weekViewSwipeRefresh.value = this
+					addView(weekViewGlobal)
+				}
 			},
 			update = {
 				appState.weekView.value = weekViewGlobal
@@ -1369,7 +1369,8 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 	fun displayElement(element: PeriodElement?, name: String? = null) {
 		displayedElement.value = element
-		displayedName.value = name ?: element?.let { timetableDatabaseInterface.getLongName(it) } ?: defaultDisplayedName
+		displayedName.value = name ?: element?.let { timetableDatabaseInterface.getLongName(it) }
+				?: defaultDisplayedName
 
 		weeklyTimetableItems.clear()
 		weekView.value?.notifyDataSetChanged()
@@ -1559,7 +1560,11 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			preferences["preference_connectivity_refresh_in_background", false]
 		val flags =
 			(if (!forceRefresh) TimetableLoader.FLAG_LOAD_CACHE else 0) or (if (alwaysLoad || forceRefresh) TimetableLoader.FLAG_LOAD_SERVER else 0)
-		return loader.loadAsync(target, flags, null/*preferences["preference_connectivity_proxy_host"]*/)
+		return loader.loadAsync(
+			target,
+			flags,
+			null/*preferences["preference_connectivity_proxy_host"]*/
+		)
 	}
 
 	private suspend fun loadWeeklyTimetableItems(
@@ -1672,56 +1677,127 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		}
 	}
 
-	private fun <T> WeekView<T>.setupCustomization() {
-			weekLength = preferences.sharedPrefs!!.getStringSet(
-				"preference_week_custom_range",
-				emptySet()
-			)?.size?.zeroToNull ?: user.timeGrid.days.size
-			numberOfVisibleDays =
-				preferences["preference_week_custom_display_length", 0].zeroToNull
-					?: weekLength
-			firstDayOfWeek = preferences.sharedPrefs!!.getStringSet(
-				"preference_week_custom_range",
-				emptySet()
-			)?.map { Weekday.valueOf(it) }
-				?.minOrNull()?.ordinal ?: DateTimeFormat.forPattern("E")
-				.withLocale(Locale.ENGLISH) // TODO: Correct locale?
-				.parseDateTime(user.timeGrid.days[0].day).dayOfWeek
-			timeColumnVisibility =
-				!preferences.get<Boolean>("preference_timetable_hide_time_stamps")
-			columnGap = ConversionUtils.dpToPx(
-				preferences.get<Int>("preference_timetable_item_padding")
-					.toFloat(), context
-			).toInt()
-			overlappingEventGap = ConversionUtils.dpToPx(
-				preferences.get<Int>("preference_timetable_item_padding_overlap")
-					.toFloat(), context
-			).toInt()
-			eventCornerRadius = ConversionUtils.dpToPx(
-				preferences.get<Int>("preference_timetable_item_corner_radius")
-					.toFloat(), context
-			).toInt()
-			eventSecondaryTextCentered =
-				preferences["preference_timetable_centered_lesson_info"]
-			eventTextBold =
-				preferences["preference_timetable_bold_lesson_name"]
-			eventTextSize = ConversionUtils.spToPx(
-				preferences.get<Int>("preference_timetable_lesson_name_font_size")
-					.toFloat(), context
-			)
-			eventSecondaryTextSize = ConversionUtils.spToPx(
-				preferences.get<Int>("preference_timetable_lesson_info_font_size")
-					.toFloat(), context
-			)
-			eventTextColor =
-				if (preferences["preference_timetable_item_text_light"]) Color.WHITE else Color.BLACK
-			pastBackgroundColor = preferences["preference_background_past"]
-			futureBackgroundColor =
-				preferences["preference_background_future"]
-			nowLineColor = preferences["preference_marker"]
-			horizontalFlingEnabled = preferences["preference_fling_enable"]
-			snapToWeek =
-				!preferences.get<Boolean>("preference_week_snap_to_days") && numberOfVisibleDays != 1
+	@Composable
+	fun <T> setupCustomization(weekView: WeekView<T>?, dataStore: DataStore) {
+		val currentDensity = LocalDensity.current
+		val scope = rememberCoroutineScope()
+
+		val flingEnable = dataStore.flingEnable().getValueFlow()
+		val snapToDays = dataStore.weekSnapToDays().getValueFlow()
+		val weekRange = dataStore.weekCustomRange().getValueFlow()
+		val numberOfVisibleDays = dataStore.weekCustomLength().getValueFlow()
+		val eventTextColor = dataStore.timetableItemTextLight().getValueFlow()
+		val pastBackgroundColor = dataStore.backgroundPast().getValueFlow()
+		val futureBackgroundColor = dataStore.backgroundFuture().getValueFlow()
+		val nowLineColor = dataStore.marker().getValueFlow()
+		val minimalTimeColumn = dataStore.timetableHideTimeStamps().getValueFlow()
+		val eventGap = dataStore.timetableItemPadding().getValueFlow()
+		val overlappingEventGap = dataStore.timetableItemPaddingOverlap().getValueFlow()
+		val eventCornerRadius = dataStore.timetableItemCornerRadius().getValueFlow()
+		val eventSecondaryTextCentered = dataStore.timetableCenteredLessonInfo().getValueFlow()
+		val eventTextBold = dataStore.timetableBoldLessonName().getValueFlow()
+		val eventTextSize = dataStore.timetableLessonNameFontSize().getValueFlow()
+		val eventSecondaryTextSize = dataStore.timetableLessonInfoFontSize().getValueFlow()
+
+		weekView?.let {
+			Log.d("WeekView", "flow started")
+			scope.launch {
+				flingEnable.collect { weekView.horizontalFlingEnabled = it }
+			}
+
+			scope.launch {
+				snapToDays.combine(numberOfVisibleDays) { f1, f2 ->
+					!f1 && f2.roundToInt() != 1
+				}.collect { weekView.snapToWeek = it }
+			}
+
+			scope.launch {
+				weekRange.collect {
+					weekView.weekLength = it.size.zeroToNull ?: user.timeGrid.days.size
+					weekView.firstDayOfWeek =
+						it.map { day -> Weekday.valueOf(day) }.minOrNull()?.ordinal
+							?: DateTimeFormat.forPattern("E")
+								.withLocale(Locale.ENGLISH) // TODO: Correct locale?
+								.parseDateTime(user.timeGrid.days[0].day).dayOfWeek
+				}
+			}
+
+			scope.launch {
+				numberOfVisibleDays.collect {
+					weekView.numberOfVisibleDays = it.roundToInt().zeroToNull ?: weekView.weekLength
+				}
+			}
+
+			scope.launch {
+				eventTextColor.collect {
+					weekView.eventTextColor = if (it) Color.WHITE else Color.BLACK
+				}
+			}
+
+			scope.launch {
+				pastBackgroundColor.collect { weekView.pastBackgroundColor = it }
+			}
+
+			scope.launch {
+				futureBackgroundColor.collect { weekView.futureBackgroundColor = it }
+			}
+
+			scope.launch {
+				nowLineColor.collect { weekView.nowLineColor = it }
+			}
+
+			scope.launch {
+				minimalTimeColumn.collect { weekView.timeColumnVisibility = !it }
+			}
+
+			scope.launch {
+				eventGap.collect {
+					with(currentDensity) {
+						weekView.columnGap = it.dp.toPx().roundToInt()
+					}
+				}
+			}
+
+			scope.launch {
+				overlappingEventGap.collect {
+					with(currentDensity) {
+						weekView.overlappingEventGap = it.dp.toPx().roundToInt()
+					}
+				}
+			}
+
+			scope.launch {
+				eventCornerRadius.collect {
+					with(currentDensity) {
+						weekView.eventCornerRadius = it.dp.toPx().roundToInt()
+					}
+				}
+			}
+
+			scope.launch {
+				eventSecondaryTextCentered.collect { weekView.eventSecondaryTextCentered = it }
+			}
+
+			scope.launch {
+				eventTextBold.collect { weekView.eventTextBold = it }
+			}
+
+			scope.launch {
+				eventTextSize.collect {
+					with(currentDensity) {
+						weekView.eventTextSize = it.sp.toPx()
+					}
+				}
+			}
+
+			scope.launch {
+				eventSecondaryTextSize.collect {
+					with(currentDensity) {
+						weekView.eventSecondaryTextSize = it.sp.toPx()
+					}
+				}
+			}
+		}
 	}
 
 	private fun <T> WeekView<T>.setupHours() {
@@ -1830,7 +1906,6 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 				}
 			}
 
-			setupCustomization()
 			setupHours()
 
 			config.apply {
