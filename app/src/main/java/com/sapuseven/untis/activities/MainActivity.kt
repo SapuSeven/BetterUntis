@@ -12,6 +12,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -62,6 +63,7 @@ import com.sapuseven.untis.ui.common.Weekday
 import com.sapuseven.untis.ui.common.disabled
 import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
 import com.sapuseven.untis.ui.dialogs.TimetableItemDetailsDialog
+import com.sapuseven.untis.ui.functional.BackPressConfirm
 import com.sapuseven.untis.ui.theme.AppTheme
 import com.sapuseven.untis.viewmodels.PeriodDataViewModel
 import com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
@@ -161,6 +163,7 @@ class MainActivity :
 				) { user ->
 					/*weekView.setOnCornerClickListener(this)*/
 					val appState = rememberMainAppState(user, timetableDatabaseInterface)
+					val snackbarHostState = remember { SnackbarHostState() }
 
 					Drawer(
 						appState = appState,
@@ -171,6 +174,7 @@ class MainActivity :
 						}
 					) {
 						Scaffold(
+							snackbarHost = { SnackbarHost(snackbarHostState) },
 							topBar = {
 								CenterAlignedTopAppBar(
 									title = { Text(appState.displayedName.value) },
@@ -277,6 +281,9 @@ class MainActivity :
 						}
 					}
 
+					// TODO: Only if enabled in settings
+					BackPressConfirm(snackbarHostState)
+
 					val density = LocalDensity.current
 					val offsetY = { _: Int ->
 						with(density) { 40.dp.roundToPx() }
@@ -366,10 +373,18 @@ class MainActivity :
 		onShowTimetable: (Pair<PeriodElement?, String?>?) -> Unit,
 		content: @Composable () -> Unit
 	) {
+		val scope = rememberCoroutineScope()
+
 		var showElementPicker by remember {
 			mutableStateOf<TimetableDatabaseInterface.Type?>(
 				null
 			)
+		}
+
+		BackHandler(enabled = appState.drawerState.isOpen) {
+			scope.launch {
+				appState.drawerState.close()
+			}
 		}
 
 		showElementPicker?.let { type ->

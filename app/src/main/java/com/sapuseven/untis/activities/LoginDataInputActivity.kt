@@ -106,7 +106,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 				var loading by rememberSaveable { mutableStateOf(false) }
 				var validate by rememberSaveable { mutableStateOf(false) }
 
-				var qrCodeErrorDialog by rememberSaveable { mutableStateOf<Boolean>(false) }
+				var qrCodeErrorDialog by rememberSaveable { mutableStateOf(false) }
 
 				val profileName = rememberSaveable { mutableStateOf(existingUser?.profileName) }
 				val schoolId = rememberSaveable { mutableStateOf(existingUser?.schoolId) }

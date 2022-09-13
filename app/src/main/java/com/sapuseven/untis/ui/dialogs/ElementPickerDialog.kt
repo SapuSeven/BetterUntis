@@ -1,5 +1,6 @@
 package com.sapuseven.untis.ui.common
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -54,6 +55,10 @@ fun ElementPickerDialogFullscreen(
 					putAll(it)
 				}
 		}
+	}
+
+	BackHandler {
+		onDismiss(false)
 	}
 
 	Scaffold(
