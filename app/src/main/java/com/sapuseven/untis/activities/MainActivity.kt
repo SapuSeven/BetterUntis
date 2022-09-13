@@ -1650,7 +1650,9 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 	private fun onRefresh() {
 		displayedElement.value?.let { element ->
-			weeklyTimetableItems[currentWeekIndex.value]?.dateRange?.let { dateRange ->
+			val weekIndex = currentWeekIndex.value
+
+			weeklyTimetableItems[weekIndex]?.dateRange?.let { dateRange ->
 				coroutineScope.launch {
 					loadWeeklyTimetableItems(
 						timetableLoader,
@@ -1660,8 +1662,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 						colorScheme,
 						forceRefresh = true,
 						onItemsChanged = { items ->
-							weeklyTimetableItems[currentWeekIndex.value] =
-								items
+							weeklyTimetableItems[weekIndex] = items
 							weekView.value?.notifyDataSetChanged()
 						}
 					)
