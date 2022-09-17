@@ -52,11 +52,11 @@ class TimetableDatabaseInterface(@Transient val database: UserDatabase, @Transie
 	fun getLongName(id: Int, type: Type): String {
 		return when (type) {
 			Type.CLASS -> allClasses[id]?.longName
-			Type.TEACHER -> allTeachers[id]?.firstName + " " + allTeachers[id]?.lastName
+			Type.TEACHER -> allTeachers[id]?.run { "$firstName $lastName" }
 			Type.SUBJECT -> allSubjects[id]?.longName
 			Type.ROOM -> allRooms[id]?.longName
 			else -> null
-		} ?: ""
+		} ?: ELEMENT_NAME_UNKNOWN
 	}
 
 	fun getLongName(id: Int, type: String): String {
