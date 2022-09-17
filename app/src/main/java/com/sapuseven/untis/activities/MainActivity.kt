@@ -1352,7 +1352,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		get() = displayedElement.value == personalTimetable?.first
 
 	val isAnonymous: Boolean
-		get() = personalTimetable == null && displayedElement.value == null
+		get() = personalTimetable != null && displayedElement.value == null
 
 	val isLoading: Boolean
 		get() = loading.value > 0
@@ -1689,12 +1689,14 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		scope.launch {
 			personalTimetableFlow.collect { customTimetable ->
 				val element = decodeStoredTimetableValue(customTimetable)
+				val reload = personalTimetable == null
 
 				personalTimetable = element to element?.let {
 					timetableDatabaseInterface.getLongName(it)
 				}
 
-				displayElement(personalTimetable?.first, personalTimetable?.second)
+				if (reload || isAnonymous)
+					displayElement(personalTimetable?.first, personalTimetable?.second)
 			}
 		}
 	}
