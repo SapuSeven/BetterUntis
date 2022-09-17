@@ -53,8 +53,8 @@ import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import com.sapuseven.untis.preferences.DataStore
-import com.sapuseven.untis.preferences.dataStore
+import com.sapuseven.untis.preferences.DataStorePreferences
+import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.preferences.preference.decodeStoredTimetableValue
 import com.sapuseven.untis.ui.common.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
@@ -160,7 +160,7 @@ class MainActivity :
 		setContent {
 			AppTheme {
 				val snackbarHostState = remember { SnackbarHostState() }
-				if (dataStore.doubleTapToExit().getState().value)
+				if (dataStorePreferences.doubleTapToExit().getState().value)
 					BackPressConfirm(snackbarHostState)
 
 				withUser(
@@ -341,7 +341,7 @@ class MainActivity :
 	@Composable
 	private fun WeekViewCompose(appState: MainAppState) {
 		var weekViewGlobal by remember { mutableStateOf(appState.weekView.value) }
-		appState.setupCustomization(weekViewGlobal, dataStore)
+		appState.setupCustomization(weekViewGlobal, dataStorePreferences)
 
 		AndroidView(
 			factory = { context ->
@@ -1678,26 +1678,26 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	}
 
 	@Composable
-	fun <T> setupCustomization(weekView: WeekView<T>?, dataStore: DataStore) {
+	fun <T> setupCustomization(weekView: WeekView<T>?, dataStorePreferences: DataStorePreferences) {
 		val currentDensity = LocalDensity.current
 		val scope = rememberCoroutineScope()
 
-		val flingEnable = dataStore.flingEnable().getValueFlow()
-		val snapToDays = dataStore.weekSnapToDays().getValueFlow()
-		val weekRange = dataStore.weekCustomRange().getValueFlow()
-		val numberOfVisibleDays = dataStore.weekCustomLength().getValueFlow()
-		val eventTextColor = dataStore.timetableItemTextLight().getValueFlow()
-		val pastBackgroundColor = dataStore.backgroundPast().getValueFlow()
-		val futureBackgroundColor = dataStore.backgroundFuture().getValueFlow()
-		val nowLineColor = dataStore.marker().getValueFlow()
-		val minimalTimeColumn = dataStore.timetableHideTimeStamps().getValueFlow()
-		val eventGap = dataStore.timetableItemPadding().getValueFlow()
-		val overlappingEventGap = dataStore.timetableItemPaddingOverlap().getValueFlow()
-		val eventCornerRadius = dataStore.timetableItemCornerRadius().getValueFlow()
-		val eventSecondaryTextCentered = dataStore.timetableCenteredLessonInfo().getValueFlow()
-		val eventTextBold = dataStore.timetableBoldLessonName().getValueFlow()
-		val eventTextSize = dataStore.timetableLessonNameFontSize().getValueFlow()
-		val eventSecondaryTextSize = dataStore.timetableLessonInfoFontSize().getValueFlow()
+		val flingEnable = dataStorePreferences.flingEnable().getValueFlow()
+		val snapToDays = dataStorePreferences.weekSnapToDays().getValueFlow()
+		val weekRange = dataStorePreferences.weekCustomRange().getValueFlow()
+		val numberOfVisibleDays = dataStorePreferences.weekCustomLength().getValueFlow()
+		val eventTextColor = dataStorePreferences.timetableItemTextLight().getValueFlow()
+		val pastBackgroundColor = dataStorePreferences.backgroundPast().getValueFlow()
+		val futureBackgroundColor = dataStorePreferences.backgroundFuture().getValueFlow()
+		val nowLineColor = dataStorePreferences.marker().getValueFlow()
+		val minimalTimeColumn = dataStorePreferences.timetableHideTimeStamps().getValueFlow()
+		val eventGap = dataStorePreferences.timetableItemPadding().getValueFlow()
+		val overlappingEventGap = dataStorePreferences.timetableItemPaddingOverlap().getValueFlow()
+		val eventCornerRadius = dataStorePreferences.timetableItemCornerRadius().getValueFlow()
+		val eventSecondaryTextCentered = dataStorePreferences.timetableCenteredLessonInfo().getValueFlow()
+		val eventTextBold = dataStorePreferences.timetableBoldLessonName().getValueFlow()
+		val eventTextSize = dataStorePreferences.timetableLessonNameFontSize().getValueFlow()
+		val eventSecondaryTextSize = dataStorePreferences.timetableLessonInfoFontSize().getValueFlow()
 
 		weekView?.let {
 			Log.d("WeekView", "flow started")

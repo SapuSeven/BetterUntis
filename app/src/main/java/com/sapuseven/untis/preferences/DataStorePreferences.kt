@@ -4,10 +4,10 @@ import androidx.compose.runtime.Composable
 import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.helpers.config.*
 
-val BaseComposeActivity.dataStore: DataStore
-	get() = DataStore(this)
+val BaseComposeActivity.dataStorePreferences: DataStorePreferences
+	get() = DataStorePreferences(this)
 
-class DataStore(val context: BaseComposeActivity) {
+class DataStorePreferences(val context: BaseComposeActivity) {
 	@Composable
 	fun doubleTapToExit() = context.booleanDataStore(
 		"preference_double_tap_to_exit"
