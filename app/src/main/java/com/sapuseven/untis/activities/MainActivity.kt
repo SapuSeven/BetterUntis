@@ -55,6 +55,7 @@ import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
+import com.sapuseven.untis.preferences.preference.convertRangeToPair
 import com.sapuseven.untis.preferences.preference.decodeStoredTimetableValue
 import com.sapuseven.untis.ui.common.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
@@ -75,6 +76,7 @@ import com.sapuseven.untis.views.weekview.listeners.ScrollListener
 import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
@@ -168,6 +170,7 @@ class MainActivity :
 				) { user ->
 					/*weekView.setOnCornerClickListener(this)*/
 					val appState = rememberMainAppState(user, timetableDatabaseInterface)
+					appState.loadPrefs(dataStorePreferences)
 
 					Drawer(
 						appState = appState,
@@ -1319,7 +1322,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	val colorScheme: ColorScheme,
 	val currentDensity: Density,
 	val preferences: PreferenceHelper, // TODO: Remove
-	val personalTimetable: Pair<PeriodElement?, String?>?,
+	var personalTimetable: Pair<PeriodElement?, String?>?,
 	val defaultDisplayedName: String,
 	val drawerState: DrawerState,
 	var drawerGestureState: MutableState<Boolean>,
@@ -1349,7 +1352,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		get() = displayedElement.value == personalTimetable?.first
 
 	val isAnonymous: Boolean
-		get() = displayedElement.value == null
+		get() = personalTimetable == null && displayedElement.value == null
 
 	val isLoading: Boolean
 		get() = loading.value > 0
@@ -1678,6 +1681,25 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	}
 
 	@Composable
+	fun loadPrefs(dataStorePreferences: DataStorePreferences) {
+		val scope = rememberCoroutineScope()
+
+		val personalTimetableFlow = dataStorePreferences.timetablePersonalTimetable().getValueFlow()
+
+		scope.launch {
+			personalTimetableFlow.collect { customTimetable ->
+				val element = decodeStoredTimetableValue(customTimetable)
+
+				personalTimetable = element to element?.let {
+					timetableDatabaseInterface.getLongName(it)
+				}
+
+				displayElement(personalTimetable?.first, personalTimetable?.second)
+			}
+		}
+	}
+
+	@Composable
 	fun <T> setupCustomization(weekView: WeekView<T>?, dataStorePreferences: DataStorePreferences) {
 		val currentDensity = LocalDensity.current
 		val scope = rememberCoroutineScope()
@@ -1698,6 +1720,8 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		val eventTextBold = dataStorePreferences.timetableBoldLessonName().getValueFlow()
 		val eventTextSize = dataStorePreferences.timetableLessonNameFontSize().getValueFlow()
 		val eventSecondaryTextSize = dataStorePreferences.timetableLessonInfoFontSize().getValueFlow()
+		val timetableRange = dataStorePreferences.timetableRange().getValueFlow()
+		val timetableRangeIndexReset = dataStorePreferences.timetableRangeIndexReset().getValueFlow()
 
 		weekView?.let {
 			Log.d("WeekView", "flow started")
@@ -1797,18 +1821,21 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 					}
 				}
 			}
+
+			scope.launch {
+				timetableRange.combine(timetableRangeIndexReset) { range, rangeIndexReset ->
+					weekView.setupHours(range.convertRangeToPair(), rangeIndexReset)
+				}.collect()
+			}
 		}
 	}
 
-	private fun <T> WeekView<T>.setupHours() {
-		val lines = MutableList(0) { return@MutableList 0 }
-		val labels = MutableList(0) { return@MutableList "" }
-		val range: Pair<Int, Int>? = null/*RangePreference.convertToPair(
-			preferences.get<String>(
-				"preference_timetable_range",
-				null
-			)
-		)*/
+	private fun <T> WeekView<T>.setupHours(
+		range: Pair<Int, Int>?,
+		rangeIndexReset: Boolean
+	) {
+		val lines = MutableList(0) { 0 }
+		val labels = MutableList(0) { "" }
 
 		user.timeGrid.days.maxByOrNull { it.units.size }?.units?.forEachIndexed { index, hour ->
 			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
@@ -1832,7 +1859,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			labels.add(hour.label)
 		}
 
-		if (!preferences.get<Boolean>("preference_timetable_range_index_reset"))
+		if (!rangeIndexReset)
 			hourIndexOffset = (range?.first ?: 1) - 1
 		hourLines = lines.toIntArray()
 		hourLabels = labels.toTypedArray().let { hourLabelArray ->
@@ -1843,8 +1870,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			else hourLabelArray
 		}
 		startTime = lines.first()
-		endTime =
-			lines.last() + 30 // TODO: Don't hard-code this offset
+		endTime = lines.last() + 30
 	}
 
 	fun updateViews(container: WeekViewSwipeRefreshLayout) {
@@ -1905,8 +1931,6 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 					//saveZoomLevel()
 				}
 			}
-
-			setupHours()
 
 			config.apply {
 				with(currentDensity) {
@@ -2027,8 +2051,7 @@ fun rememberMainAppState(
 	currentDensity: Density = LocalDensity.current,
 	personalTimetable: Pair<PeriodElement?, String?>? = getPersonalTimetableElement(
 		user,
-		context,
-		timetableDatabaseInterface
+		context
 	),
 	defaultDisplayedName: String = stringResource(id = R.string.app_name),
 	drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
@@ -2069,28 +2092,16 @@ fun rememberMainAppState(
 	)
 }
 
-@Composable
 private fun getPersonalTimetableElement(
 	user: UserDatabase.User,
-	context: Context,
-	timetableDatabaseInterface: TimetableDatabaseInterface
+	context: Context
 ): Pair<PeriodElement?, String?>? {
-	val customTimetable = ""//preferences["preference_timetable_personal_timetable", ""]
-
-	return if (customTimetable.isEmpty()) {
-		user.userData.elemType?.let { type ->
-			PeriodElement(
-				type = type,
-				id = user.userData.elemId,
-				orgId = user.userData.elemId,
-			) to user.getDisplayedName(context)
-		}
-	} else {
-		val displayedElement = decodeStoredTimetableValue(customTimetable)
-
-		displayedElement to displayedElement?.let {
-			timetableDatabaseInterface.getLongName(it)
-		}
+	return user.userData.elemType?.let { type ->
+		PeriodElement(
+			type = type,
+			id = user.userData.elemId,
+			orgId = user.userData.elemId,
+		) to user.getDisplayedName(context)
 	}
 }
 

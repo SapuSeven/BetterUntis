@@ -164,12 +164,9 @@ fun RangeInputPreference(
 
 	val scope = rememberCoroutineScope()
 
-	fun convertToPair(text: String): Pair<Int, Int>? =
-		text.split("-").map { it.toIntOrNull() ?: return null }.toPair()
-
 	Preference(
 		title = title,
-		summary = convertToPair(value.value)?.let {
+		summary = value.value.convertRangeToPair()?.let {
 			{
 				Text(stringResource(R.string.preference_timetable_range_desc, it.first, it.second))
 			}
@@ -182,7 +179,7 @@ fun RangeInputPreference(
 	)
 
 	if (showDialog) {
-		val input = convertToPair(value.value)
+		val input = value.value.convertRangeToPair()
 		var first by remember { mutableStateOf(input?.first?.toString() ?: "") }
 		var second by remember { mutableStateOf(input?.second?.toString() ?: "") }
 
@@ -244,3 +241,6 @@ fun RangeInputPreference(
 
 private fun <E> List<E>.toPair(): Pair<E, E>? =
 	if (this.size != 2) null else this.zipWithNext().first()
+
+fun String.convertRangeToPair(): Pair<Int, Int>? =
+	this.split("-").map { it.toIntOrNull() ?: return null }.toPair()

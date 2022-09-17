@@ -455,11 +455,11 @@ class SettingsActivity : BaseComposeActivity() {
 												dataStore = dataStorePreferences.timetableRange()
 											)
 
-											SwitchPreference(
+											/*SwitchPreference(
 												title = { Text(stringResource(R.string.preference_timetable_range_index_reset)) },
 												dependency = dataStorePreferences.timetableRange(),
 												dataStore = dataStorePreferences.timetableRangeIndexReset()
-											)
+											)*/
 
 											/*SwitchPreference
 											enabled = false,
