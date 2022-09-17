@@ -14,13 +14,13 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.R
@@ -51,7 +51,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import org.joda.time.format.DateTimeFormat
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimetableItemDetailsDialog(
 	timegridItem: TimegridItem,
@@ -136,7 +136,9 @@ fun TimetableItemDetailsDialog(
 
 				Text(
 					text = title,
-					style = MaterialTheme.typography.headlineSmall
+					style = MaterialTheme.typography.headlineSmall,
+					textAlign = TextAlign.Center,
+					modifier = Modifier.padding(horizontal = 8.dp)
 				)
 
 				Text(
