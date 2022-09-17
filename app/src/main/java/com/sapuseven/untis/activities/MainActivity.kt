@@ -299,7 +299,8 @@ class MainActivity :
 						exit = slideOutVertically(targetOffsetY = offsetY) + fadeOut()
 					) {
 						TimetableItemDetailsDialog(
-							timegridItem = remember { appState.timetableItemDetailsDialog.value!! },
+							timegridItems = remember { appState.timetableItemDetailsDialog.value?.first ?: emptyList() },
+							initialPage = remember { appState.timetableItemDetailsDialog.value?.second ?: 0 },
 							user = user,
 							timetableDatabaseInterface = timetableDatabaseInterface,
 							onDismiss = {
@@ -1331,7 +1332,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	val lastRefreshTimestamp: MutableState<Long>,
 	val weeklyTimetableItems: SnapshotStateMap<Int, WeeklyTimetableItems?>,
 	val timetableLoader: TimetableLoader,
-	val timetableItemDetailsDialog: MutableState<TimegridItem?>,
+	val timetableItemDetailsDialog: MutableState<Pair<List<TimegridItem>, Int>?>,
 	val profileManagementDialog: MutableState<Boolean>
 ) {
 	companion object {
@@ -1915,7 +1916,14 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 					data: TimegridItem,
 					eventRect: RectF
 				) {
-					timetableItemDetailsDialog.value = data
+					val items = (weeklyTimetableItems[currentWeekIndex.value]?.items ?: emptyList())
+						.mapNotNull { it.data }
+						.filter {
+							it.startDateTime.millis <= data.startDateTime.millis &&
+							it.endDateTime.millis >= data.endDateTime.millis
+						}
+
+					timetableItemDetailsDialog.value = items to items.indexOf(data)
 				}
 			})
 
@@ -2067,7 +2075,7 @@ fun rememberMainAppState(
 		user = user,
 		timetableDatabaseInterface = timetableDatabaseInterface
 	),
-	timetableItemDetailsDialog: MutableState<TimegridItem?> = remember { mutableStateOf(null) },
+	timetableItemDetailsDialog: MutableState<Pair<List<TimegridItem>, Int>?> = remember { mutableStateOf(null) },
 	profileManagementDialog: MutableState<Boolean> = remember { mutableStateOf(false) },
 ) = remember(user) {
 	MainAppState(

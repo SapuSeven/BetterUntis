@@ -23,6 +23,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.HorizontalPagerIndicator
+import com.google.accompanist.pager.rememberPagerState
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_LESSON_TOPIC
@@ -51,15 +55,17 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import org.joda.time.format.DateTimeFormat
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
 @Composable
 fun TimetableItemDetailsDialog(
-	timegridItem: TimegridItem,
+	timegridItems: List<TimegridItem>,
+	initialPage: Int = 0,
 	user: UserDatabase.User,
 	timetableDatabaseInterface: TimetableDatabaseInterface,
 	onDismiss: (requestedElement: PeriodElement?) -> Unit
 ) {
 	var dismissed by remember { mutableStateOf(false) }
+	val pagerState = rememberPagerState(initialPage)
 	val scope = rememberCoroutineScope()
 
 	fun dismiss(requestedElement: PeriodElement? = null) {
@@ -73,364 +79,395 @@ fun TimetableItemDetailsDialog(
 		dismiss()
 	}
 
-	timegridItem.run {
-		Scaffold(
-			topBar = {
-				CenterAlignedTopAppBar(
-					title = { Text(stringResource(id = R.string.all_lesson_details)) },
-					navigationIcon = {
-						IconButton(onClick = {
-							dismiss()
-						}) {
-							Icon(
-								imageVector = Icons.Outlined.Close,
-								contentDescription = stringResource(id = R.string.all_close)
-							)
-						}
+	Scaffold(
+		topBar = {
+			CenterAlignedTopAppBar(
+				title = { Text(stringResource(id = R.string.all_lesson_details)) },
+				navigationIcon = {
+					IconButton(onClick = {
+						dismiss()
+					}) {
+						Icon(
+							imageVector = Icons.Outlined.Close,
+							contentDescription = stringResource(id = R.string.all_close)
+						)
 					}
-				)
-			},
-		) { innerPadding ->
-			val title = periodData.getLong(
-				periodData.subjects,
-				TimetableDatabaseInterface.Type.SUBJECT
-			).let { title ->
-				if (periodData.isCancelled())
-					stringResource(R.string.all_lesson_cancelled, title)
-				else if (periodData.isIrregular())
-					stringResource(R.string.all_lesson_irregular, title)
-				else if (periodData.isExam())
-					stringResource(R.string.all_lesson_exam, title)
-				else
-					title
-			}
-
-			val time = stringResource(
-				R.string.main_dialog_itemdetails_timeformat,
-				periodData.element.startDateTime.toLocalDateTime()
-					.toString(DateTimeFormat.shortTime()),
-				periodData.element.endDateTime.toLocalDateTime()
-					.toString(DateTimeFormat.shortTime())
+				}
 			)
-
-			var attachmentsDialog by remember { mutableStateOf<List<UntisAttachment>?>(null) }
-			var lessonTopicEditDialog by remember { mutableStateOf<Int?>(null) }
-
-			var lessonTopicNew by remember { mutableStateOf<String?>(null) }
-
-			Column(
-				horizontalAlignment = Alignment.CenterHorizontally,
+		},
+	) { innerPadding ->
+		Column(
+			horizontalAlignment = Alignment.CenterHorizontally,
+			modifier = Modifier
+				.padding(innerPadding)
+				.fillMaxSize()
+		) {
+			HorizontalPager(
+				count = timegridItems.size,
+				state = pagerState,
 				modifier = Modifier
-					.padding(innerPadding)
-					.fillMaxSize()
-					.verticalScroll(rememberScrollState())
-			) {
-				Icon(
-					painter = painterResource(R.drawable.all_subject),
-					contentDescription = null,
-					tint = MaterialTheme.colorScheme.tertiary,
-					modifier = Modifier
-						.padding(top = 24.dp, bottom = 8.dp)
-						.size(dimensionResource(id = R.dimen.size_header_icon))
-				)
+					.weight(1f)
+			) { page ->
+				timegridItems[page].run {
+					val title = periodData.getLong(
+						periodData.subjects,
+						TimetableDatabaseInterface.Type.SUBJECT
+					).let { title ->
+						if (periodData.isCancelled())
+							stringResource(R.string.all_lesson_cancelled, title)
+						else if (periodData.isIrregular())
+							stringResource(R.string.all_lesson_irregular, title)
+						else if (periodData.isExam())
+							stringResource(R.string.all_lesson_exam, title)
+						else
+							title
+					}
 
-				Text(
-					text = title,
-					style = MaterialTheme.typography.headlineSmall,
-					textAlign = TextAlign.Center,
-					modifier = Modifier.padding(horizontal = 8.dp)
-				)
-
-				Text(
-					text = time,
-					style = MaterialTheme.typography.labelLarge,
-					modifier = Modifier.padding(top = 8.dp)
-				)
-
-				Divider(
-					color = MaterialTheme.colorScheme.outline,
-					modifier = Modifier
-						.padding(top = 24.dp, bottom = 12.dp)
-						.padding(horizontal = 16.dp)
-				)
-
-				timetableDatabaseInterface.run {
-					// Lesson teachers
-					TimetableItemDetailsDialogElement(
-						elements = periodData.teachers,
-						onElementClick = { dismiss(it) },
-						useLongName = true,
-						icon = {
-							Icon(
-								painter = painterResource(id = R.drawable.all_teachers),
-								contentDescription = stringResource(id = R.string.all_teachers),
-								tint = MaterialTheme.colorScheme.onSurface,
-								modifier = Modifier.padding(start = 8.dp)
-							)
-						}
+					val time = stringResource(
+						R.string.main_dialog_itemdetails_timeformat,
+						periodData.element.startDateTime.toLocalDateTime()
+							.toString(DateTimeFormat.shortTime()),
+						periodData.element.endDateTime.toLocalDateTime()
+							.toString(DateTimeFormat.shortTime())
 					)
 
-					// Lesson classes
-					TimetableItemDetailsDialogElement(
-						elements = periodData.classes,
-						onElementClick = { dismiss(it) },
-						icon = {
-							Icon(
-								painter = painterResource(id = R.drawable.all_classes),
-								contentDescription = stringResource(id = R.string.all_classes),
-								tint = MaterialTheme.colorScheme.onSurface,
-								modifier = Modifier.padding(start = 8.dp)
-							)
-						}
-					)
+					var attachmentsDialog by remember { mutableStateOf<List<UntisAttachment>?>(null) }
+					var lessonTopicEditDialog by remember { mutableStateOf<Int?>(null) }
 
-					// Lesson rooms
-					TimetableItemDetailsDialogElement(
-						elements = periodData.rooms,
-						onElementClick = { dismiss(it) },
-						icon = {
-							Icon(
-								painter = painterResource(id = R.drawable.all_rooms),
-								contentDescription = stringResource(id = R.string.all_rooms),
-								tint = MaterialTheme.colorScheme.onSurface,
-								modifier = Modifier.padding(start = 8.dp)
-							)
-						}
-					)
+					var lessonTopicNew by remember { mutableStateOf<String?>(null) }
 
-					// Lesson info texts
-					setOf(
-						periodData.element.text.lesson,
-						periodData.element.text.substitution,
-						periodData.element.text.info
-					).forEach {
-						if (it.isNotBlank())
-							ListItem(
-								headlineText = { Text(it) },
-								leadingContent = {
+					Column(
+						horizontalAlignment = Alignment.CenterHorizontally,
+						modifier = Modifier
+							.fillMaxSize()
+							.verticalScroll(rememberScrollState())
+					) {
+						Icon(
+							painter = painterResource(R.drawable.all_subject),
+							contentDescription = null,
+							tint = MaterialTheme.colorScheme.tertiary,
+							modifier = Modifier
+								.padding(top = 24.dp, bottom = 8.dp)
+								.size(dimensionResource(id = R.dimen.size_header_icon))
+						)
+
+						Text(
+							text = title,
+							style = MaterialTheme.typography.headlineSmall,
+							textAlign = TextAlign.Center,
+							modifier = Modifier.padding(horizontal = 8.dp)
+						)
+
+						Text(
+							text = time,
+							style = MaterialTheme.typography.labelLarge,
+							modifier = Modifier.padding(top = 8.dp)
+						)
+
+						Divider(
+							color = MaterialTheme.colorScheme.outline,
+							modifier = Modifier
+								.padding(top = 24.dp, bottom = 12.dp)
+								.padding(horizontal = 16.dp)
+						)
+
+						timetableDatabaseInterface.run {
+							// Lesson teachers
+							TimetableItemDetailsDialogElement(
+								elements = periodData.teachers,
+								onElementClick = { dismiss(it) },
+								useLongName = true,
+								icon = {
 									Icon(
-										painter = painterResource(id = R.drawable.all_info),
-										contentDescription = stringResource(id = R.string.all_lesson_info),
+										painter = painterResource(id = R.drawable.all_teachers),
+										contentDescription = stringResource(id = R.string.all_teachers),
 										tint = MaterialTheme.colorScheme.onSurface,
-										modifier = Modifier.padding(horizontal = 8.dp)
+										modifier = Modifier.padding(start = 8.dp)
 									)
 								}
 							)
-					}
 
-					// Lesson homeworks
-					periodData.element.homeWorks?.forEach {
-						val endDate = it.endDate.toLocalDate()
-
-						ListItem(
-							headlineText = { Text(it.text) },
-							supportingText = {
-								Text(
-									stringResource(
-										id = R.string.homeworks_due_time,
-										endDate.toString(stringResource(R.string.homeworks_due_time_format))
-									)
-								)
-							},
-							leadingContent = {
-								Icon(
-									painter = painterResource(id = R.drawable.all_homework),
-									contentDescription = stringResource(id = R.string.all_homework),
-									tint = MaterialTheme.colorScheme.onSurface,
-									modifier = Modifier.padding(horizontal = 8.dp)
-								)
-							},
-							trailingContent = if (it.attachments.isNotEmpty()) {
-								{
-									IconButton(onClick = {
-										attachmentsDialog = it.attachments
-									}) {
-										Icon(
-											painter = painterResource(id = R.drawable.infocenter_attachments),
-											contentDescription = stringResource(id = R.string.infocenter_messages_attachments)
-										)
-									}
-								}
-							} else null
-						)
-					}
-
-					// Lesson exam
-					periodData.element.exam?.also {
-						ListItem(
-							headlineText = {
-								Text(it.name ?: stringResource(id = R.string.all_exam))
-							},
-							supportingText = it.text?.let { { Text(it) } },
-							leadingContent = {
-								Icon(
-									painter = painterResource(id = R.drawable.infocenter_exam),
-									contentDescription = stringResource(id = R.string.all_exam),
-									tint = MaterialTheme.colorScheme.onSurface,
-									modifier = Modifier.padding(horizontal = 8.dp)
-								)
-							}
-						)
-					}
-
-					// Lesson absence check
-					if (periodData.element.can.contains(CAN_READ_STUDENT_ABSENCE))
-						TimetableItemDetailsDialogWithPeriodData(
-							period = periodData,
-							canEdit = periodData.element.can.contains(CAN_WRITE_STUDENT_ABSENCE),
-							headlineText = {
-								Text(stringResource(id = R.string.all_absences))
-							},
-							supportingText = {
-								Text(
-									stringResource(
-										if (it.absenceChecked) R.string.all_dialog_absences_checked
-										else R.string.all_dialog_absences_not_checked
-									)
-								)
-							},
-							leadingContent = {
-								Icon(
-									painter = painterResource(
-										if (it?.absenceChecked == true)
-											R.drawable.all_absences_checked
-										else
-											R.drawable.all_absences
-									),
-									contentDescription = stringResource(id = R.string.all_absences),
-									tint = MaterialTheme.colorScheme.onSurface,
-									modifier = Modifier.padding(horizontal = 8.dp)
-								)
-							},
-							onClick = {}
-						)
-
-					// Lesson topic
-					if (periodData.element.can.contains(CAN_READ_LESSON_TOPIC))
-						TimetableItemDetailsDialogWithPeriodData(
-							period = periodData,
-							canEdit = periodData.element.can.contains(CAN_WRITE_LESSON_TOPIC),
-							headlineText = {
-								Text(stringResource(id = R.string.all_lessontopic))
-							},
-							supportingText = {
-								val topic = lessonTopicNew ?: it.topic?.text
-
-								Text(
-									if (topic.isNullOrBlank())
-										if (periodData.element.can.contains(CAN_WRITE_LESSON_TOPIC))
-											stringResource(R.string.all_hint_tap_to_edit)
-										else
-											stringResource(R.string.all_lessontopic_none)
-									else
-										topic
-								)
-							},
-							leadingContent = {
-								Icon(
-									painter = painterResource(id = R.drawable.all_lessontopic),
-									contentDescription = stringResource(id = R.string.all_lessontopic),
-									tint = MaterialTheme.colorScheme.onSurface,
-									modifier = Modifier.padding(horizontal = 8.dp)
-								)
-							},
-							onClick = {
-								lessonTopicEditDialog = periodData.element.id
-							}
-						)
-				}
-
-				attachmentsDialog?.let { attachments ->
-					AttachmentsDialog(
-						attachments = attachments,
-						onDismiss = { attachmentsDialog = null }
-					)
-				}
-
-				lessonTopicEditDialog?.let { id ->
-					var text by remember { mutableStateOf("") }
-					var loading by remember { mutableStateOf(false) }
-					var error by remember { mutableStateOf<String?>(null) }
-
-					DynamicHeightAlertDialog(
-						title = { Text(stringResource(id = R.string.all_lessontopic_edit)) },
-						text = {
-							Column(
-								modifier = Modifier.fillMaxWidth()
-							) {
-								OutlinedTextField(
-									value = text,
-									onValueChange = { text = it },
-									isError = error != null,
-									enabled = !loading,
-									label = { Text(stringResource(id = R.string.all_lessontopic)) },
-									modifier = Modifier.fillMaxWidth()
-								)
-
-								AnimatedVisibility(visible = error != null) {
-									Text(
-										modifier = Modifier.padding(
-											horizontal = 16.dp,
-											vertical = 4.dp
-										),
-										color = MaterialTheme.colorScheme.error,
-										style = MaterialTheme.typography.bodyMedium,
-										text = error ?: ""
+							// Lesson classes
+							TimetableItemDetailsDialogElement(
+								elements = periodData.classes,
+								onElementClick = { dismiss(it) },
+								icon = {
+									Icon(
+										painter = painterResource(id = R.drawable.all_classes),
+										contentDescription = stringResource(id = R.string.all_classes),
+										tint = MaterialTheme.colorScheme.onSurface,
+										modifier = Modifier.padding(start = 8.dp)
 									)
 								}
-							}
-						},
-						onDismissRequest = { lessonTopicEditDialog = null },
-						confirmButton = {
-							TextButton(
-								enabled = !loading,
-								onClick = {
-									loading = true
+							)
 
-									scope.launch {
-										val query = UntisRequest.UntisRequestQuery(user).apply {
-											data.method =
-												UntisApiConstants.METHOD_SUBMIT_LESSON_TOPIC
-											data.params = listOf(
-												SubmitLessonTopicParams(
-													text,
-													id,
-													UntisAuthentication.createAuthObject(user)
-												)
+							// Lesson rooms
+							TimetableItemDetailsDialogElement(
+								elements = periodData.rooms,
+								onElementClick = { dismiss(it) },
+								icon = {
+									Icon(
+										painter = painterResource(id = R.drawable.all_rooms),
+										contentDescription = stringResource(id = R.string.all_rooms),
+										tint = MaterialTheme.colorScheme.onSurface,
+										modifier = Modifier.padding(start = 8.dp)
+									)
+								}
+							)
+
+							// Lesson info texts
+							setOf(
+								periodData.element.text.lesson,
+								periodData.element.text.substitution,
+								periodData.element.text.info
+							).forEach {
+								if (it.isNotBlank())
+									ListItem(
+										headlineText = { Text(it) },
+										leadingContent = {
+											Icon(
+												painter = painterResource(id = R.drawable.all_info),
+												contentDescription = stringResource(id = R.string.all_lesson_info),
+												tint = MaterialTheme.colorScheme.onSurface,
+												modifier = Modifier.padding(horizontal = 8.dp)
 											)
 										}
+									)
+							}
 
-										UntisRequest().request(query).fold({
-											// TODO: Create corresponding data model
-											val untisResponse = SerializationUtils.getJSON()
-												.decodeFromString<BaseResponse>(it)
+							// Lesson homeworks
+							periodData.element.homeWorks?.forEach {
+								val endDate = it.endDate.toLocalDate()
 
-											untisResponse.error?.let { e ->
-												error = e.message
-												loading = false
-											} ?: run {
-												lessonTopicNew = text
-												lessonTopicEditDialog = null
+								ListItem(
+									headlineText = { Text(it.text) },
+									supportingText = {
+										Text(
+											stringResource(
+												id = R.string.homeworks_due_time,
+												endDate.toString(stringResource(R.string.homeworks_due_time_format))
+											)
+										)
+									},
+									leadingContent = {
+										Icon(
+											painter = painterResource(id = R.drawable.all_homework),
+											contentDescription = stringResource(id = R.string.all_homework),
+											tint = MaterialTheme.colorScheme.onSurface,
+											modifier = Modifier.padding(horizontal = 8.dp)
+										)
+									},
+									trailingContent = if (it.attachments.isNotEmpty()) {
+										{
+											IconButton(onClick = {
+												attachmentsDialog = it.attachments
+											}) {
+												Icon(
+													painter = painterResource(id = R.drawable.infocenter_attachments),
+													contentDescription = stringResource(id = R.string.infocenter_messages_attachments)
+												)
 											}
-										}, {
-											error = it.message
-											loading = false
-										})
+										}
+									} else null
+								)
+							}
+
+							// Lesson exam
+							periodData.element.exam?.also {
+								ListItem(
+									headlineText = {
+										Text(it.name ?: stringResource(id = R.string.all_exam))
+									},
+									supportingText = it.text?.let { { Text(it) } },
+									leadingContent = {
+										Icon(
+											painter = painterResource(id = R.drawable.infocenter_exam),
+											contentDescription = stringResource(id = R.string.all_exam),
+											tint = MaterialTheme.colorScheme.onSurface,
+											modifier = Modifier.padding(horizontal = 8.dp)
+										)
 									}
-								}) {
-								Text(stringResource(id = R.string.all_ok))
+								)
 							}
-						},
-						dismissButton = {
-							TextButton(
-								enabled = !loading,
-								onClick = { lessonTopicEditDialog = null }) {
-								Text(stringResource(id = R.string.all_cancel))
-							}
+
+							// Lesson absence check
+							if (periodData.element.can.contains(CAN_READ_STUDENT_ABSENCE))
+								TimetableItemDetailsDialogWithPeriodData(
+									period = periodData,
+									canEdit = periodData.element.can.contains(
+										CAN_WRITE_STUDENT_ABSENCE
+									),
+									headlineText = {
+										Text(stringResource(id = R.string.all_absences))
+									},
+									supportingText = {
+										Text(
+											stringResource(
+												if (it.absenceChecked) R.string.all_dialog_absences_checked
+												else R.string.all_dialog_absences_not_checked
+											)
+										)
+									},
+									leadingContent = {
+										Icon(
+											painter = painterResource(
+												if (it?.absenceChecked == true)
+													R.drawable.all_absences_checked
+												else
+													R.drawable.all_absences
+											),
+											contentDescription = stringResource(id = R.string.all_absences),
+											tint = MaterialTheme.colorScheme.onSurface,
+											modifier = Modifier.padding(horizontal = 8.dp)
+										)
+									},
+									onClick = {}
+								)
+
+							// Lesson topic
+							if (periodData.element.can.contains(CAN_READ_LESSON_TOPIC))
+								TimetableItemDetailsDialogWithPeriodData(
+									period = periodData,
+									canEdit = periodData.element.can.contains(CAN_WRITE_LESSON_TOPIC),
+									headlineText = {
+										Text(stringResource(id = R.string.all_lessontopic))
+									},
+									supportingText = {
+										val topic = lessonTopicNew ?: it.topic?.text
+
+										Text(
+											if (topic.isNullOrBlank())
+												if (periodData.element.can.contains(
+														CAN_WRITE_LESSON_TOPIC
+													)
+												)
+													stringResource(R.string.all_hint_tap_to_edit)
+												else
+													stringResource(R.string.all_lessontopic_none)
+											else
+												topic
+										)
+									},
+									leadingContent = {
+										Icon(
+											painter = painterResource(id = R.drawable.all_lessontopic),
+											contentDescription = stringResource(id = R.string.all_lessontopic),
+											tint = MaterialTheme.colorScheme.onSurface,
+											modifier = Modifier.padding(horizontal = 8.dp)
+										)
+									},
+									onClick = {
+										lessonTopicEditDialog = periodData.element.id
+									}
+								)
 						}
-					)
+
+						attachmentsDialog?.let { attachments ->
+							AttachmentsDialog(
+								attachments = attachments,
+								onDismiss = { attachmentsDialog = null }
+							)
+						}
+
+						lessonTopicEditDialog?.let { id ->
+							var text by remember { mutableStateOf("") }
+							var loading by remember { mutableStateOf(false) }
+							var error by remember { mutableStateOf<String?>(null) }
+
+							DynamicHeightAlertDialog(
+								title = { Text(stringResource(id = R.string.all_lessontopic_edit)) },
+								text = {
+									Column(
+										modifier = Modifier.fillMaxWidth()
+									) {
+										OutlinedTextField(
+											value = text,
+											onValueChange = { text = it },
+											isError = error != null,
+											enabled = !loading,
+											label = { Text(stringResource(id = R.string.all_lessontopic)) },
+											modifier = Modifier.fillMaxWidth()
+										)
+
+										AnimatedVisibility(visible = error != null) {
+											Text(
+												modifier = Modifier.padding(
+													horizontal = 16.dp,
+													vertical = 4.dp
+												),
+												color = MaterialTheme.colorScheme.error,
+												style = MaterialTheme.typography.bodyMedium,
+												text = error ?: ""
+											)
+										}
+									}
+								},
+								onDismissRequest = { lessonTopicEditDialog = null },
+								confirmButton = {
+									TextButton(
+										enabled = !loading,
+										onClick = {
+											loading = true
+
+											scope.launch {
+												val query =
+													UntisRequest.UntisRequestQuery(user).apply {
+														data.method =
+															UntisApiConstants.METHOD_SUBMIT_LESSON_TOPIC
+														data.params = listOf(
+															SubmitLessonTopicParams(
+																text,
+																id,
+																UntisAuthentication.createAuthObject(
+																	user
+																)
+															)
+														)
+													}
+
+												UntisRequest().request(query).fold({
+													// TODO: Create corresponding data model
+													val untisResponse = SerializationUtils.getJSON()
+														.decodeFromString<BaseResponse>(it)
+
+													untisResponse.error?.let { e ->
+														error = e.message
+														loading = false
+													} ?: run {
+														lessonTopicNew = text
+														lessonTopicEditDialog = null
+													}
+												}, {
+													error = it.message
+													loading = false
+												})
+											}
+										}) {
+										Text(stringResource(id = R.string.all_ok))
+									}
+								},
+								dismissButton = {
+									TextButton(
+										enabled = !loading,
+										onClick = { lessonTopicEditDialog = null }) {
+										Text(stringResource(id = R.string.all_cancel))
+									}
+								}
+							)
+						}
+					}
 				}
 			}
+
+			if (timegridItems.size > 1)
+				HorizontalPagerIndicator(
+					pagerState = pagerState,
+					activeColor = MaterialTheme.colorScheme.primary,
+					inactiveColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+					modifier = Modifier
+						.align(Alignment.CenterHorizontally)
+						.padding(16.dp),
+				)
 		}
 	}
 }
