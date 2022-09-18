@@ -14,8 +14,6 @@ import androidx.core.app.NotificationManagerCompat
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.DateTimeUtils
-import com.sapuseven.untis.helpers.config.PreferenceManager
-import com.sapuseven.untis.helpers.config.PreferenceUtils
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_BOOLEAN_CLEAR
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_BOOLEAN_FIRST
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_INT_BREAK_END_TIME
@@ -37,7 +35,6 @@ import org.joda.time.LocalDateTime
  */
 class NotificationSetup : LessonEventSetup() {
 	private var receivedManually: Boolean = false
-	private lateinit var preferenceManager: PreferenceManager
 
 	companion object {
 		// Describes whether the broadcast was sent manually by opening the app or automatically every day.
@@ -49,23 +46,23 @@ class NotificationSetup : LessonEventSetup() {
 
 	override fun onReceive(context: Context, intent: Intent) {
 		Log.d("NotificationSetup", "NotificationSetup received")
-
-		preferenceManager = PreferenceManager(context, intent.getLongExtra(EXTRA_LONG_PROFILE_ID, 0))
-		if (PreferenceUtils.getPrefBool(preferenceManager, "preference_notifications_enable"))
-			super.onReceive(context, intent)
+		super.onReceive(context, intent)
 
 		receivedManually = intent.getBooleanExtra(EXTRA_BOOLEAN_MANUAL, false)
+
+		if (preferences["preference_notifications_enable"])
+			loadTimetable(context)
 	}
 
 	override fun onLoadingSuccess(context: Context, items: List<TimegridItem>) {
 		val preparedItems = items.filter { !it.periodData.isCancelled() }.sortedBy { it.startDateTime }.merged().zipWithNext()
 
-		if (preparedItems.isNotEmpty() && PreferenceUtils.getPrefBool(preferenceManager, "preference_notifications_before_first"))
+		if (preparedItems.isNotEmpty() && preferences["preference_notifications_before_first"])
 			with(preparedItems.first().first) {
 				if (startDateTime.millisOfDay < LocalDateTime.now().millisOfDay) return@with
 
 				scheduleNotification(context,
-						startDateTime.minusMinutes(PreferenceUtils.getPrefInt(preferenceManager, "preference_notifications_before_first_time")),
+						startDateTime.minusMinutes(preferences["preference_notifications_before_first_time"]),
 						this,
 						true)
 			}
@@ -74,7 +71,7 @@ class NotificationSetup : LessonEventSetup() {
 			if (item.first.endDateTime == item.second.startDateTime) return // No break exists
 
 			if (item.first.equalsIgnoreTime(item.second)
-					&& !PreferenceUtils.getPrefBool(preferenceManager, "preference_notifications_in_multiple"))
+					&& !preferences.get<Boolean>("preference_notifications_in_multiple"))
 				return@forEach // multi-hour lesson
 
 			if (item.second.startDateTime.millisOfDay < LocalDateTime.now().millisOfDay) return@forEach // ignore lessons in the past

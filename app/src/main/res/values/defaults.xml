@@ -42,7 +42,7 @@
 	<integer name="preference_automute_minimum_break_length_default">0</integer>
 
 	<string name="preference_theme_default">default</string>
-	<string name="preference_dark_theme_default">off</string>
+	<string name="preference_dark_theme_default">auto</string>
 	<string name="preference_notifications_visibility_subjects_default">long</string>
 	<string name="preference_notifications_visibility_rooms_default">short</string>
 	<string name="preference_notifications_visibility_teachers_default">short</string>

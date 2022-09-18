@@ -48,7 +48,6 @@ import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils
-import com.sapuseven.untis.helpers.config.PreferenceUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.interfaces.TimetableDisplay
@@ -132,7 +131,6 @@ class MainActivity :
 	private var proxyHost: String? = null
 	private var profileUpdateDialog: AlertDialog? = null
 	private var currentWeekIndex = 0
-	private var currentSchoolYearId = -1
 	private val weekViewRefreshHandler = Handler(Looper.getMainLooper())
 	private var displayNameCache: CharSequence = ""
 	private var timetableLoader: TimetableLoader? = null
@@ -185,10 +183,13 @@ class MainActivity :
 	}
 
 	private fun checkForNewSchoolYear(): Boolean {
-		currentSchoolYearId = getCurrentSchoolYear()?.id ?: -1
+		val currentSchoolYearId = getCurrentSchoolYear()?.id ?: -1
 
-		return if (preferences.defaultPrefs.getInt("school_year", -1) != currentSchoolYearId) {
-			preferences.defaultPrefs.contains("school_year")
+		if (!preferences.has("school_year"))
+		preferences["school_year"] = currentSchoolYearId
+
+		return if (preferences["school_year", -1] != currentSchoolYearId) {
+			preferences.has("school_year")
 		} else false
 	}
 
@@ -216,8 +217,7 @@ class MainActivity :
 		refreshMessages(profileUser, navigationview_main)
 
 		if (::weekView.isInitialized) {
-			proxyHost =
-				preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
+			proxyHost = preferences["preference_connectivity_proxy_host", null]
 			setupWeekViewConfig()
 
 			weekViewRefreshHandler.post(weekViewUpdate)
@@ -226,7 +226,7 @@ class MainActivity :
 
 	override fun onErrorLogFound() {
 		// TODO: Extract string resources
-		if (PreferenceUtils.getPrefBool(preferences, "preference_additional_error_messages"))
+		if (preferences["preference_additional_error_messages"])
 			Snackbar.make(content_main, "Some errors have been found.", Snackbar.LENGTH_INDEFINITE)
 				.setAction("Show") {
 					startActivity(Intent(this, ErrorsActivity::class.java))
@@ -253,11 +253,8 @@ class MainActivity :
 
 	private fun showPersonalTimetable(): Boolean {
 		val customType = TimetableDatabaseInterface.Type.valueOf(
-			PreferenceUtils.getPrefString(
-				preferences,
-				"preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_TYPE}",
-				TimetableDatabaseInterface.Type.SUBJECT.toString()
-			) ?: TimetableDatabaseInterface.Type.SUBJECT.toString()
+				preferences["preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_TYPE}",
+					TimetableDatabaseInterface.Type.SUBJECT.toString()]
 		)
 		selectedElement = R.id.nav_show_personal
 		if (customType === TimetableDatabaseInterface.Type.SUBJECT) {
@@ -271,10 +268,10 @@ class MainActivity :
 				return setTarget(true, profileUser.getDisplayedName(applicationContext))
 			}
 		} else {
-			val customId = preferences.defaultPrefs.getInt(
+			val customId = preferences[
 				"preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_ID}",
 				-1
-			)
+			]
 			return setTarget(
 				customId,
 				customType.toString(),
@@ -286,7 +283,7 @@ class MainActivity :
 	private fun checkShortcut(): Boolean {
 		return intent.extras?.let { extras ->
 			val userId = extras.getLong("user")
-			if (preferences.currentProfileId() != userId)
+			if (preferences.loadProfileId() != userId)
 				switchToProfile(userDatabase.getUser(userId) ?: return false)
 
 			val element = PeriodElement(
@@ -364,10 +361,10 @@ class MainActivity :
 		val line2 = profileUser.userData.schoolName
 		(navigationView.getHeaderView(0)
 			.findViewById<View>(R.id.textview_mainactivtydrawer_line1) as TextView).text =
-			if (line1.isBlank()) getString(R.string.app_name) else line1
+				line1.ifBlank { getString(R.string.app_name) }
 		(navigationView.getHeaderView(0)
 			.findViewById<View>(R.id.textview_mainactivitydrawer_line2) as TextView).text =
-			if (line2.isBlank()) getString(R.string.all_contact_email) else line2
+				line2.ifBlank { getString(R.string.all_contact_email) }
 
 		navigationView.menu.findItem(R.id.nav_messenger).isVisible = false
 	}
@@ -411,7 +408,6 @@ class MainActivity :
 	private fun switchToProfile(user: UserDatabase.User) {
 		profileId = user.id!!
 		preferences.saveProfileId(profileId)
-		preferences.reload(profileId)
 		if (loadProfile()) {
 			updateNavDrawer(findViewById(R.id.navigationview_main))
 
@@ -430,18 +426,11 @@ class MainActivity :
 		GlobalScope.launch(Dispatchers.Main) {
 			loadMessages(user)?.let {
 				navigationView.menu.findItem(R.id.nav_infocenter).icon = if (
-					it.size > preferences.defaultPrefs.getInt(
-						"preference_last_messages_count",
-						0
-					) ||
+					it.size > preferences["preference_last_messages_count", 0] ||
 					(SimpleDateFormat(
 						"dd-MM-yyyy",
 						Locale.US
-					).format(Calendar.getInstance().time) != preferences.defaultPrefs.getString(
-						"preference_last_messages_date",
-						""
-					)
-							&& it.isNotEmpty())
+					).format(Calendar.getInstance().time) != preferences["preference_last_messages_date", ""] && it.isNotEmpty())
 				) {
 					getDrawable(R.drawable.all_infocenter_dot)
 				} else {
@@ -457,7 +446,7 @@ class MainActivity :
 
 		query.data.method = UntisApiConstants.METHOD_GET_MESSAGES
 		query.proxyHost =
-			preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
+			preferences["preference_connectivity_proxy_host", null]
 		query.data.params = listOf(
 			MessageParams(
 				UntisDate.fromLocalDate(LocalDate.now()),
@@ -516,10 +505,7 @@ class MainActivity :
 		weekView.notifyDataSetChanged()
 		if (!forceRefresh) showLoading(true)
 
-		val alwaysLoad = PreferenceUtils.getPrefBool(
-			preferences,
-			"preference_connectivity_refresh_in_background"
-		)
+		val alwaysLoad: Boolean = preferences["preference_connectivity_refresh_in_background"]
 		val flags =
 			(if (!forceRefresh) TimetableLoader.FLAG_LOAD_CACHE else 0) or (if (alwaysLoad || forceRefresh) TimetableLoader.FLAG_LOAD_SERVER else 0)
 		timetableLoader!!.load(target, flags, proxyHost)
@@ -531,14 +517,14 @@ class MainActivity :
 			return false
 		}
 
-		profileId = preferences.currentProfileId()
+		profileId = preferences.loadProfileId()
 		if (profileId == 0L || userDatabase.getUser(profileId) == null)
 			profileId = userDatabase.getAllUsers()[0].id
 				?: 0 // Fall back to the first user if an invalid user id is saved
 		profileUser = userDatabase.getUser(profileId) ?: return false
 
 		preferences.saveProfileId(profileId)
-		preferences.reload(profileId)
+		preferences.loadProfile(profileId)
 		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileUser.id ?: 0)
 
 		if (checkForProfileUpdateRequired()) {
@@ -580,86 +566,54 @@ class MainActivity :
 	}
 
 	private fun saveZoomLevel() {
-		preferences.defaultPrefs.edit().apply {
-			putInt(PERSISTENT_INT_ZOOM_LEVEL, weekView.hourHeight)
-			apply()
-		}
+		preferences[PERSISTENT_INT_ZOOM_LEVEL] = weekView.hourHeight
 	}
 
 	private fun restoreZoomLevel() {
-		weekView.hourHeight =
-			preferences.defaultPrefs.getInt(PERSISTENT_INT_ZOOM_LEVEL, weekView.hourHeight)
+		weekView.hourHeight = preferences[PERSISTENT_INT_ZOOM_LEVEL, weekView.hourHeight]
 	}
 
 	private fun setupWeekViewConfig() {
-		weekView.weekLength = preferences.defaultPrefs.getStringSet(
+		weekView.weekLength = preferences.sharedPrefs!!.getStringSet(
 			"preference_week_custom_range",
 			emptySet()
 		)?.size?.zeroToNull
 			?: profileUser.timeGrid.days.size
 		weekView.numberOfVisibleDays =
-			preferences.defaultPrefs.getInt("preference_week_custom_display_length", 0).zeroToNull
+			preferences["preference_week_custom_display_length", 0].zeroToNull
 				?: weekView.weekLength
 		weekView.firstDayOfWeek =
-			preferences.defaultPrefs.getStringSet("preference_week_custom_range", emptySet())
+			preferences.sharedPrefs!!.getStringSet("preference_week_custom_range", emptySet())
 				?.map { MaterialDayPicker.Weekday.valueOf(it) }?.minOrNull()?.ordinal
 				?: DateTimeFormat.forPattern("E").withLocale(Locale.ENGLISH)
 					.parseDateTime(profileUser.timeGrid.days[0].day).dayOfWeek
 
-		weekView.timeColumnVisibility =
-			!PreferenceUtils.getPrefBool(preferences, "preference_timetable_hide_time_stamps")
+		weekView.timeColumnVisibility = !preferences.get<Boolean>("preference_timetable_hide_time_stamps")
 
 		weekView.columnGap = ConversionUtils.dpToPx(
-			PreferenceUtils.getPrefInt(
-				preferences,
-				"preference_timetable_item_padding"
-			).toFloat(), this
+				preferences.get<Int>("preference_timetable_item_padding").toFloat(), this
 		).toInt()
 		weekView.overlappingEventGap = ConversionUtils.dpToPx(
-			PreferenceUtils.getPrefInt(
-				preferences,
-				"preference_timetable_item_padding_overlap"
-			).toFloat(), this
+				preferences.get<Int>("preference_timetable_item_padding_overlap").toFloat(), this
 		).toInt()
 		weekView.eventCornerRadius = ConversionUtils.dpToPx(
-			PreferenceUtils.getPrefInt(
-				preferences,
-				"preference_timetable_item_corner_radius"
-			).toFloat(), this
+				preferences.get<Int>("preference_timetable_item_corner_radius").toFloat(), this
 		).toInt()
-		weekView.eventSecondaryTextCentered =
-			PreferenceUtils.getPrefBool(preferences, "preference_timetable_centered_lesson_info")
-		weekView.eventTextBold =
-			PreferenceUtils.getPrefBool(preferences, "preference_timetable_bold_lesson_name")
+		weekView.eventSecondaryTextCentered = preferences["preference_timetable_centered_lesson_info"]
+		weekView.eventTextBold = preferences["preference_timetable_bold_lesson_name"]
 		weekView.eventTextSize = ConversionUtils.spToPx(
-			PreferenceUtils.getPrefInt(
-				preferences,
-				"preference_timetable_lesson_name_font_size"
-			).toFloat(), this
+				preferences.get<Int>("preference_timetable_lesson_name_font_size").toFloat(), this
 		)
 		weekView.eventSecondaryTextSize = ConversionUtils.spToPx(
-			PreferenceUtils.getPrefInt(
-				preferences,
-				"preference_timetable_lesson_info_font_size"
-			).toFloat(), this
+				preferences.get<Int>("preference_timetable_lesson_info_font_size").toFloat(), this
 		)
-		weekView.eventTextColor = if (PreferenceUtils.getPrefBool(
-				preferences,
-				"preference_timetable_item_text_light"
-			)
-		) Color.WHITE else Color.BLACK
-		weekView.pastBackgroundColor =
-			PreferenceUtils.getPrefInt(preferences, "preference_background_past")
-		weekView.futureBackgroundColor =
-			PreferenceUtils.getPrefInt(preferences, "preference_background_future")
-		weekView.nowLineColor = PreferenceUtils.getPrefInt(preferences, "preference_marker")
+		weekView.eventTextColor = if (preferences["preference_timetable_item_text_light"]) Color.WHITE else Color.BLACK
+		weekView.pastBackgroundColor = preferences["preference_background_past"]
+		weekView.futureBackgroundColor = preferences["preference_background_future"]
+		weekView.nowLineColor = preferences["preference_marker"]
 
-		weekView.horizontalFlingEnabled =
-			PreferenceUtils.getPrefBool(preferences, "preference_fling_enable")
-		weekView.snapToWeek = !PreferenceUtils.getPrefBool(
-			preferences,
-			"preference_week_snap_to_days"
-		) && weekView.numberOfVisibleDays != 1
+		weekView.horizontalFlingEnabled = preferences["preference_fling_enable"]
+		weekView.snapToWeek = !preferences.get<Boolean>("preference_week_snap_to_days") && weekView.numberOfVisibleDays != 1
 	}
 
 	override fun onPeriodChange(
@@ -694,13 +648,7 @@ class MainActivity :
 	private fun setupHours() {
 		val lines = MutableList(0) { return@MutableList 0 }
 		val labels = MutableList(0) { return@MutableList "" }
-		val range = RangePreference.convertToPair(
-			PreferenceUtils.getPrefString(
-				preferences,
-				"preference_timetable_range",
-				null
-			)
-		)
+		val range = RangePreference.convertToPair(preferences.get<String>("preference_timetable_range", null))
 
 		profileUser.timeGrid.days.maxByOrNull { it.units.size }?.units?.forEachIndexed { index, hour ->
 			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
@@ -720,7 +668,7 @@ class MainActivity :
 			labels.add(hour.label)
 		}
 
-		if (!PreferenceUtils.getPrefBool(preferences, "preference_timetable_range_index_reset"))
+		if (!preferences.get<Boolean>("preference_timetable_range_index_reset"))
 			weekView.hourIndexOffset = (range?.first ?: 1) - 1
 		weekView.hourLines = lines.toIntArray()
 		weekView.hourLabels = labels.toTypedArray().let { hourLabelArray ->
@@ -803,27 +751,18 @@ class MainActivity :
 
 	private fun prepareItems(items: List<TimegridItem>): List<TimegridItem> {
 		val newItems = mergeItems(items.mapNotNull { item ->
-			if (PreferenceUtils.getPrefBool(
-					preferences,
-					"preference_timetable_hide_cancelled"
-				) && item.periodData.isCancelled()
-			) return@mapNotNull null
+			if (preferences["preference_timetable_hide_cancelled"] && item.periodData.isCancelled())
+				return@mapNotNull null
 
-			if (PreferenceUtils.getPrefBool(
-					preferences,
-					"preference_timetable_substitutions_irregular"
-				)
-			) {
+			if (preferences["preference_timetable_substitutions_irregular"]) {
 				item.periodData.apply {
 					forceIrregular =
 						classes.find { it.id != it.orgId } != null
 								|| teachers.find { it.id != it.orgId } != null
 								|| subjects.find { it.id != it.orgId } != null
 								|| rooms.find { it.id != it.orgId } != null
-								|| (PreferenceUtils.getPrefBool(
-							preferences,
-							"preference_timetable_background_irregular"
-						) && item.periodData.element.backColor != UNTIS_DEFAULT_COLOR)
+								|| preferences["preference_timetable_background_irregular"]
+								&& item.periodData.element.backColor != UNTIS_DEFAULT_COLOR
 				}
 			}
 			item
@@ -881,29 +820,26 @@ class MainActivity :
 	}
 
 	private fun colorItems(items: List<TimegridItem>) {
-		val regularColor = PreferenceUtils.getPrefInt(preferences, "preference_background_regular")
-		val examColor = PreferenceUtils.getPrefInt(preferences, "preference_background_exam")
+		val regularColor = preferences.get<Int>("preference_background_regular")
+		val examColor = preferences.get<Int>("preference_background_exam")
 		val cancelledColor =
-			PreferenceUtils.getPrefInt(preferences, "preference_background_cancelled")
+			preferences.get<Int>("preference_background_cancelled")
 		val irregularColor =
-			PreferenceUtils.getPrefInt(preferences, "preference_background_irregular")
+			preferences.get<Int>("preference_background_irregular")
 
 		val regularPastColor =
-			PreferenceUtils.getPrefInt(preferences, "preference_background_regular_past")
+			preferences.get<Int>("preference_background_regular_past")
 		val examPastColor =
-			PreferenceUtils.getPrefInt(preferences, "preference_background_exam_past")
+			preferences.get<Int>("preference_background_exam_past")
 		val cancelledPastColor =
-			PreferenceUtils.getPrefInt(preferences, "preference_background_cancelled_past")
+			preferences.get<Int>("preference_background_cancelled_past")
 		val irregularPastColor =
-			PreferenceUtils.getPrefInt(preferences, "preference_background_irregular_past")
+			preferences.get<Int>("preference_background_irregular_past")
 
 		val useDefault =
-			preferences.defaultPrefs.getStringSet("preference_school_background", emptySet())
+			preferences.sharedPrefs!!.getStringSet("preference_school_background", emptySet())
 				?: emptySet()
-		val useTheme = if (!useDefault.contains("regular")) PreferenceUtils.getPrefBool(
-			preferences,
-			"preference_use_theme_background"
-		) else false
+		val useTheme = if (!useDefault.contains("regular")) preferences["preference_use_theme_background"] else false
 
 		items.forEach { item ->
 			val defaultColor = Color.parseColor(item.periodData.element.backColor)
@@ -1095,9 +1031,6 @@ class MainActivity :
 					recreate()
 			REQUEST_CODE_LOGINDATAINPUT_EDIT ->
 				if (resultCode == Activity.RESULT_OK) {
-					preferences.defaultPrefs.edit()
-						.putInt("school_year", currentSchoolYearId)
-						.apply()
 					recreate()
 				} else if (checkForNewSchoolYear()) {
 					finish()
@@ -1112,11 +1045,7 @@ class MainActivity :
 		} else if (supportFragmentManager.backStackEntryCount > 0) {
 			super.onBackPressed()
 		} else if (!showPersonalTimetable()) {
-			if (System.currentTimeMillis() - 2000 > lastBackPress && PreferenceUtils.getPrefBool(
-					preferences,
-					"preference_double_tap_to_exit"
-				)
-			) {
+			if (System.currentTimeMillis() - 2000 > lastBackPress && preferences["preference_double_tap_to_exit"]) {
 				Snackbar.make(
 					content_main,
 					R.string.main_press_back_double, 2000

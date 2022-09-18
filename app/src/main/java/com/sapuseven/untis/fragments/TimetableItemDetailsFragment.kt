@@ -97,23 +97,61 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 		periodData.element.homeWorks?.forEach {
 			val endDate = it.endDate.toLocalDate()
 
-			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_homework, linearLayout, false).run {
-				(findViewById<TextView>(R.id.textview_roomfinder_name)).text = it.text
-				(findViewById<TextView>(R.id.tvDate)).text = getString(R.string.homeworks_due_time, endDate.toString(getString(R.string.homeworks_due_time_format)))
+			activity.layoutInflater.inflate(
+				R.layout.fragment_timetable_item_details_page_item,
+				linearLayout,
+				false
+			).run {
+				findViewById<TextView>(R.id.textview_timetableitemdetails_line1).text = it.text
+				findViewById<TextView>(R.id.textview_timetableitemdetails_line2).text = getString(
+					R.string.homeworks_due_time,
+					endDate.toString(getString(R.string.homeworks_due_time_format))
+				)
+				findViewById<ImageView>(R.id.imageview_timetableitemdetails_image).setImageResource(
+					R.drawable.all_homework
+				)
+				linearLayout.addView(this)
+			}
+		}
+
+		periodData.element.exam?.also {
+			activity.layoutInflater.inflate(
+				R.layout.fragment_timetable_item_details_page_item,
+				linearLayout,
+				false
+			).run {
+				findViewById<TextView>(R.id.textview_timetableitemdetails_line1).text = it.name
+				findViewById<TextView>(R.id.textview_timetableitemdetails_line2).text = it.text
+				findViewById<ImageView>(R.id.imageview_timetableitemdetails_image).setImageResource(
+					R.drawable.infocenter_exam
+				)
 				linearLayout.addView(this)
 			}
 		}
 
 		if (periodData.element.can.contains(CAN_READ_STUDENT_ABSENCE))
-			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_absences, linearLayout, false).run {
+			activity.layoutInflater.inflate(
+				R.layout.fragment_timetable_item_details_page_item,
+				linearLayout,
+				false
+			).run {
+				findViewById<TextView>(R.id.textview_timetableitemdetails_line1).text =
+					getString(R.string.all_absences)
+				findViewById<TextView>(R.id.textview_timetableitemdetails_line2).text =
+					getString(R.string.loading)
+				findViewById<ImageView>(R.id.imageview_timetableitemdetails_image).setImageResource(
+					R.drawable.all_absences
+				)
+
 				viewModel.periodData().observe(viewLifecycleOwner, Observer {
-					this.findViewById<TextView>(R.id.textview_timetableitemdetails_absencestatus).text = getString(
+					findViewById<TextView>(R.id.textview_timetableitemdetails_line2).text =
+						getString(
 							if (it.absenceChecked) R.string.all_dialog_absences_checked
 							else R.string.all_dialog_absences_not_checked
-					)
-					this.findViewById<ImageView>(R.id.imageview_timetableitemdetails_absence).setImageResource(
-							if (it.absenceChecked) R.drawable.all_absences_checked
-							else R.drawable.all_absences
+						)
+					findViewById<ImageView>(R.id.imageview_timetableitemdetails_image).setImageResource(
+						if (it.absenceChecked) R.drawable.all_absences_checked
+						else R.drawable.all_absences
 					)
 				})
 
@@ -125,16 +163,28 @@ class TimetableItemDetailsFragment(item: TimegridItem?, timetableDatabaseInterfa
 			}
 
 		if (periodData.element.can.contains(CAN_READ_LESSON_TOPIC)) {
-			activity.layoutInflater.inflate(R.layout.fragment_timetable_item_details_page_lessontopic, root, false).run {
+			activity.layoutInflater.inflate(
+				R.layout.fragment_timetable_item_details_page_item,
+				root,
+				false
+			).run {
+				findViewById<TextView>(R.id.textview_timetableitemdetails_line1).text =
+					getString(R.string.all_lessontopic)
+				findViewById<TextView>(R.id.textview_timetableitemdetails_line2).text =
+					getString(R.string.loading)
+				findViewById<ImageView>(R.id.imageview_timetableitemdetails_image).setImageResource(
+					R.drawable.all_lessontopic
+				)
+
 				viewModel.periodData().observe(viewLifecycleOwner, Observer {
-					this.findViewById<TextView>(R.id.textview_timetableitemdetails_lessontopic).text =
-							if (it.topic?.text.isNullOrBlank())
-								if (periodData.element.can.contains(CAN_WRITE_LESSON_TOPIC))
-									getString(R.string.all_hint_tap_to_edit)
-								else
-									getString(R.string.all_lessontopic_none)
+					findViewById<TextView>(R.id.textview_timetableitemdetails_line2).text =
+						if (it.topic?.text.isNullOrBlank())
+							if (periodData.element.can.contains(CAN_WRITE_LESSON_TOPIC))
+								getString(R.string.all_hint_tap_to_edit)
 							else
-								it.topic?.text
+								getString(R.string.all_lessontopic_none)
+						else
+							it.topic?.text
 				})
 				if (periodData.element.can.contains(CAN_WRITE_LESSON_TOPIC))
 					setOnClickListener {

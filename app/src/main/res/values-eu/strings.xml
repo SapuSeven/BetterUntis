@@ -144,9 +144,6 @@
     <string name="notifications_text_error_title">Ezin izan da ordutegia kargatu</string>
     <string name="notifications_channel_breakinfo_desc">Uneko atsedenaldiari eta hurrengo eskolari buruzko informazioa erakusten du</string>
     <string name="notifications_channel_breakinfo">Atsedenaren informazioa</string>
-    <string name="settings_designing_info">Informazio gehiago</string>
-    <string name="settings_designing_hide">Ez erakutsi berriro</string>
-    <string name="settings_designing_message">Lagundu ezarpenen ikonoak sortuz!</string>
     <string name="preferences_timetable">Ordutegiak</string>
     <string name="preferences_styling">Pertsonalizazioa</string>
     <string name="preferences_notifications">Jakinarazpenak</string>
@@ -231,7 +228,6 @@
     <string name="preference_dark_theme_on">Beti piztuta</string>
     <string name="preference_dark_theme_oled_desc">Erabilgarria OLED pantailetarako</string>
     <string name="preference_dark_theme_off">Beti itzalita</string>
-    <string name="preference_dark_theme_auto">Gaitu bateria gutxirekin</string>
     <string name="preference_dark_theme">Gai iluna</string>
     <string name="preference_connectivity_refresh_in_background">Freskatu ordutegia beti</string>
     <string name="preference_connectivity_proxy_host">Proxy zerbitzariaren ostalaria</string>

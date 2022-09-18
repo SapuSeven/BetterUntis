@@ -40,9 +40,6 @@
     <string name="notifications_channel_backgrounderrors">Erreurs d’arrière-plan</string>
     <string name="notifications_channel_breakinfo_desc">Affiche des infos à propos de la pause actuelle et sur le cours suivant</string>
     <string name="notifications_channel_breakinfo">Infos sur la pause</string>
-    <string name="settings_designing_info">En savoir plus</string>
-    <string name="settings_designing_hide">Ne plus afficher</string>
-    <string name="settings_designing_message">Contribuez en créant les icônes de réglage manquantes !</string>
     <string name="preference_week_snap_to_days_summary">à la place des semaines</string>
     <string name="preference_week_snap_to_days">Défilement journalier</string>
     <string name="preference_week_display_length_summary">Définir à 0 pour utiliser la longueur de la semaine</string>
@@ -115,7 +112,6 @@
     <string name="preference_dark_theme_oled_desc">Utile pour les écrans OLED</string>
     <string name="preference_dark_theme_oled">Utiliser un arrière-plan totalement noir</string>
     <string name="preference_dark_theme_off">Toujours désactivé</string>
-    <string name="preference_dark_theme_auto">Activer quand la batterie est faible</string>
     <string name="preference_dark_theme">Thème sombre</string>
     <string name="preference_connectivity_refresh_in_background_desc">Désactiver pour enregistrer des données avec des mises à jour moins fréquentes</string>
     <string name="preference_connectivity_refresh_in_background">Toujours rafraîchir l’emploi du temps</string>

@@ -6,8 +6,7 @@ import android.content.Intent
 import android.util.Log
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
-import com.sapuseven.untis.helpers.config.PreferenceManager
-import com.sapuseven.untis.helpers.config.PreferenceUtils
+import com.sapuseven.untis.helpers.config.PreferenceHelper
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.interfaces.TimetableDisplay
@@ -22,17 +21,20 @@ import java.lang.ref.WeakReference
 abstract class LessonEventSetup : BroadcastReceiver() {
 	private lateinit var profileUser: UserDatabase.User
 	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
-	private lateinit var preferenceManager: PreferenceManager
+
+	protected lateinit var preferences: PreferenceHelper
+	protected lateinit var profileId: PreferenceHelper
 
 	companion object {
 		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.receivers.profileid"
 	}
 
 	override fun onReceive(context: Context, intent: Intent) {
-		preferenceManager = PreferenceManager(context)
+		val profileId = intent.getLongExtra(EXTRA_LONG_PROFILE_ID, 0)
 
-		loadDatabase(context, intent.getLongExtra(EXTRA_LONG_PROFILE_ID, 0))
-		if (::profileUser.isInitialized) loadTimetable(context)
+		preferences = PreferenceHelper(context)
+		preferences.loadProfile(profileId)
+		loadDatabase(context, profileId)
 	}
 
 
@@ -44,7 +46,7 @@ abstract class LessonEventSetup : BroadcastReceiver() {
 		}
 	}
 
-	private fun loadTimetable(context: Context) {
+	protected fun loadTimetable(context: Context) {
 		Log.d("NotificationSetup", "loadTimetable for user ${profileUser.id}")
 
 		val currentDate = UntisDate.fromLocalDate(LocalDate.now())
@@ -52,7 +54,7 @@ abstract class LessonEventSetup : BroadcastReceiver() {
 		val targetTimetable = createPersonalTimetable()
 		targetTimetable?.let {
 			val target = TimetableLoader.TimetableLoaderTarget(currentDate, currentDate, it.second, it.first)
-			val proxyHost = preferenceManager.defaultPrefs.getString("preference_connectivity_proxy_host", null)
+			val proxyHost: String = preferences["preference_connectivity_proxy_host", null]
 			lateinit var timetableLoader: TimetableLoader
 			timetableLoader = TimetableLoader(WeakReference(context), object : TimetableDisplay {
 				override fun addTimetableItems(items: List<TimegridItem>, startDate: UntisDate, endDate: UntisDate, timestamp: Long) {
@@ -74,11 +76,9 @@ abstract class LessonEventSetup : BroadcastReceiver() {
 
 	private fun createPersonalTimetable(): Pair<String, Int>? {
 		@Suppress("RemoveRedundantQualifierName")
-		val customType = TimetableDatabaseInterface.Type.valueOf(PreferenceUtils.getPrefString(
-				preferenceManager,
-				"preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_TYPE}",
-				TimetableDatabaseInterface.Type.SUBJECT.toString()
-		) ?: TimetableDatabaseInterface.Type.SUBJECT.toString())
+		val customType = TimetableDatabaseInterface.Type.valueOf(
+				preferences["preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_TYPE}", TimetableDatabaseInterface.Type.SUBJECT.toString()]
+		)
 
 		if (customType === TimetableDatabaseInterface.Type.SUBJECT) {
 			profileUser.userData.elemType?.let { type ->
@@ -87,7 +87,7 @@ abstract class LessonEventSetup : BroadcastReceiver() {
 				return null
 			}
 		} else {
-			val customId = preferenceManager.defaultPrefs.getInt("preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_ID}", -1)
+			val customId = preferences["preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_ID}", -1]
 			return customType.toString() to customId
 		}
 	}

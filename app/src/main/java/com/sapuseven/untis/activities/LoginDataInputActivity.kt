@@ -17,7 +17,6 @@ import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.api.LoginDataInfo
 import com.sapuseven.untis.helpers.api.LoginErrorInfo
 import com.sapuseven.untis.helpers.api.LoginHelper
-import com.sapuseven.untis.helpers.config.PreferenceManager
 import com.sapuseven.untis.models.UntisSchoolInfo
 import com.sapuseven.untis.models.untis.masterdata.TimeGrid
 import kotlinx.android.synthetic.main.activity_logindatainput.*
@@ -45,12 +44,13 @@ class LoginDataInputActivity : BaseActivity() {
 	private lateinit var userDatabase: UserDatabase
 
 	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+
 		if (intent.hasExtra(EXTRA_LONG_PROFILE_ID)) {
 			existingUserId = intent.getLongExtra(EXTRA_LONG_PROFILE_ID, 0)
-			preferences = PreferenceManager(this, existingUserId!!)
+			preferences.loadProfile(existingUserId!!)
 		}
 
-		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_logindatainput)
 
 		userDatabase = UserDatabase.createInstance(this)
@@ -218,7 +218,7 @@ class LoginDataInputActivity : BaseActivity() {
 		if (user.schoolId.isNotBlank()) edittext_logindatainput_school?.setText(user.schoolId)
 
 		user.id?.let { profileId ->
-			preferences.prefsForProfile(profileId)
+			preferences.loadPrefsForProfile(this, profileId)
 				.getString("preference_connectivity_proxy_host", null)?.let {
 					edittext_logindatainput_proxy_host?.setText(it)
 					if (it.isNotBlank()) {
@@ -337,10 +337,7 @@ class LoginDataInputActivity : BaseActivity() {
 				preferences.saveProfileId(userId.toLong())
 
 				if (getProxyHost()?.isNotBlank() == true)
-					with(preferences.defaultPrefs.edit()) {
-						putString("preference_connectivity_proxy_host", getProxyHost())
-						apply()
-					}
+					preferences["preference_connectivity_proxy_host"] = getProxyHost()
 
 				setResult(Activity.RESULT_OK)
 				finish()
@@ -366,6 +363,8 @@ class LoginDataInputActivity : BaseActivity() {
 			.setPositiveButton(getString(R.string.all_delete)) { _, _ ->
 				userDatabase.deleteUser(user.id!!)
 				preferences.deleteProfile(user.id)
+				if (user.id == preferences.loadProfileId())
+					preferences.deleteProfileId()
 				setResult(RESULT_OK)
 				finish()
 			}

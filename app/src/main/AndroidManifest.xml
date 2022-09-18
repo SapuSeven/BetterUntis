@@ -8,6 +8,10 @@
 	<uses-permission android:name="android.permission.CAMERA" />
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+	<queries>
+		<package android:name="com.untis.chat" />
+	</queries>
+
 	<application
 		android:allowBackup="true"
 		android:fullBackupContent="@xml/backup_descriptor"

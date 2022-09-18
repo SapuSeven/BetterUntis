@@ -202,7 +202,6 @@
     <string name="preference_dark_theme_oled_desc">OLED ekranlar için kullanışlı</string>
     <string name="preference_dark_theme_oled">Siyah arka plan kullan</string>
     <string name="preference_dark_theme_off">Her zaman kapalı</string>
-    <string name="preference_dark_theme_auto">Düşük güçte aç</string>
     <string name="preference_category_notifications_visible_fields">Görünebilir Alanlar</string>
     <string name="errormessagedictionary_no_right">Zaman çizelgesi hakkı yok</string>
 </resources>

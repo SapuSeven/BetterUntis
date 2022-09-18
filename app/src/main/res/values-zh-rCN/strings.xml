@@ -146,7 +146,6 @@
     <string name="errors_crash_title">似乎崩溃了。</string>
     <string name="notifications_channel_breakinfo_desc">显示当前休息及随后课程的信息</string>
     <string name="notifications_channel_breakinfo">信息中断</string>
-    <string name="settings_designing_message">通过创建缺少的设置图标进行贡献！</string>
     <string name="preference_week_snap_to_days">切换到每天</string>
     <string name="preference_week_snap_to_days_summary">替换每周</string>
     <string name="preference_week_custom_range_summary">%1$s 至 %2$s</string>
@@ -192,8 +191,6 @@
     <string name="notifications_text_error_title">加载课程表失败</string>
     <string name="notifications_channel_backgrounderrors_desc">显示后台任务错误信息</string>
     <string name="notifications_channel_backgrounderrors">后台错误</string>
-    <string name="settings_designing_info">了解更多</string>
-    <string name="settings_designing_hide">不再显示</string>
     <string name="preference_week_display_length_summary">一周范围设置为0</string>
     <string name="preference_week_display_length">显示天数</string>
     <string name="preference_week_custom_range">自定义一周范围</string>
@@ -251,7 +248,6 @@
     <string name="preference_dark_theme_on">总是开启</string>
     <string name="preference_dark_theme_oled">使用全黑背景</string>
     <string name="preference_dark_theme_off">总是关闭</string>
-    <string name="preference_dark_theme_auto">低电量可用</string>
     <string name="preference_dark_theme">黑暗主题</string>
     <string name="preference_connectivity_refresh_in_background_desc">更新频率较低的课程表无法保存数据</string>
     <string name="preference_connectivity_refresh_in_background">总是更新课程表</string>
