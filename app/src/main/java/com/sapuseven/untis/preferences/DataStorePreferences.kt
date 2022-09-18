@@ -1,280 +1,153 @@
 package com.sapuseven.untis.preferences
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.toArgb
 import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.helpers.config.*
 
 val BaseComposeActivity.dataStorePreferences: DataStorePreferences
-	get() = DataStorePreferences(this)
-
-class DataStorePreferences(val context: BaseComposeActivity) {
 	@Composable
-	fun doubleTapToExit() = context.booleanDataStore(
-		"preference_double_tap_to_exit"
+	get() = DataStorePreferences(
+		doubleTapToExit = this.booleanDataStore("preference_double_tap_to_exit"),
+		flingEnable = this.booleanDataStore("preference_fling_enable"),
+		weekSnapToDays = this.booleanDataStore("preference_week_snap_to_days"),
+		weekCustomRange = this.stringSetDataStore(
+			"preference_week_custom_range",
+			defaultValue = emptySet()
+		),
+		weekCustomLength = this.floatDataStore(
+			"preference_week_custom_display_length",
+			defaultValue = 0f
+		),
+		automuteEnable = this.booleanDataStore("preference_automute_enable"),
+		automuteCancelledLessons = this.booleanDataStore("preference_automute_cancelled_lessons"),
+		automuteMutePriority = this.booleanDataStore("preference_automute_mute_priority"),
+		automuteMinimumBreakLength = this.floatDataStore("preference_automute_minimum_break_length"),
+		additionalErrorMessages = this.booleanDataStore("preference_additional_error_messages"),
+		timetableItemTextLight = this.booleanDataStore("preference_timetable_item_text_light"),
+		backgroundFuture = this.intDataStore("preference_background_future"),
+		backgroundPast = this.intDataStore("preference_background_past"),
+		marker = this.intDataStore("preference_marker"),
+		backgroundRegular = this.intDataStore(
+			"preference_background_regular",
+			defaultValue = MaterialTheme.colorScheme.primary.toArgb()
+		),
+		backgroundRegularPast = this.intDataStore(
+			"preference_background_regular_past",
+			defaultValue = MaterialTheme.colorScheme.primary.copy(alpha = .7f).toArgb()
+		),
+		backgroundExam = this.intDataStore(
+			"preference_background_exam",
+			defaultValue = MaterialTheme.colorScheme.error.toArgb()
+		),
+		backgroundExamPast = this.intDataStore(
+			"preference_background_exam_past",
+			defaultValue = MaterialTheme.colorScheme.error.copy(alpha = .7f).toArgb()
+		),
+		backgroundIrregular = this.intDataStore(
+			"preference_background_irregular",
+			defaultValue = MaterialTheme.colorScheme.tertiary.toArgb()
+		),
+		backgroundIrregularPast = this.intDataStore(
+			"preference_background_irregular_past",
+			defaultValue = MaterialTheme.colorScheme.tertiary.copy(alpha = .7f).toArgb()
+		),
+		backgroundCancelled = this.intDataStore(
+			"preference_background_cancelled",
+			defaultValue = MaterialTheme.colorScheme.secondary.toArgb()
+		),
+		backgroundCancelledPast = this.intDataStore(
+			"preference_background_cancelled_past",
+			defaultValue = MaterialTheme.colorScheme.secondary.copy(alpha = .7f).toArgb()
+		),
+		theme = this.stringDataStore("preference_theme"),
+		darkTheme = this.stringDataStore(
+			"preference_dark_theme",
+			dependencyValue = { it != "off" }),
+		darkThemeOled = this.booleanDataStore("preference_dark_theme_oled"),
+		timetablePersonalTimetable = this.stringDataStore(
+			"preference_timetable_personal_timetable",
+			defaultValue = ""
+		),
+		timetableHideTimeStamps = this.booleanDataStore("preference_timetable_hide_time_stamps"),
+		timetableHideCancelled = this.booleanDataStore("preference_timetable_hide_cancelled"),
+		timetableSubstitutionsIrregular = this.booleanDataStore("preference_timetable_substitutions_irregular"),
+		timetableBackgroundIrregular = this.booleanDataStore("preference_timetable_background_irregular"),
+		timetableRange = this.stringDataStore("preference_timetable_range", defaultValue = ""),
+		timetableRangeIndexReset = this.booleanDataStore("preference_timetable_range_index_reset"),
+		timetableItemPaddingOverlap = this.intDataStore("preference_timetable_item_padding_overlap"),
+		timetableItemPadding = this.intDataStore("preference_timetable_item_padding"),
+		timetableItemCornerRadius = this.intDataStore("preference_timetable_item_corner_radius"),
+		timetableCenteredLessonInfo = this.booleanDataStore("preference_timetable_centered_lesson_info"),
+		timetableBoldLessonName = this.booleanDataStore("preference_timetable_bold_lesson_name"),
+		timetableLessonNameFontSize = this.intDataStore("preference_timetable_lesson_name_font_size"),
+		timetableLessonInfoFontSize = this.intDataStore("preference_timetable_lesson_info_font_size"),
+		notificationsEnable = this.booleanDataStore("preference_notifications_enable"),
+		notificationsInMultiple = this.booleanDataStore("preference_notifications_in_multiple"),
+		notificationsBeforeFirst = this.booleanDataStore("preference_notifications_before_first"),
+		notificationsBeforeFirstTime = this.intDataStore("preference_notifications_before_first_time"),
+		notificationsVisibilitySubjects = this.stringDataStore("preference_notifications_visibility_subjects"),
+		notificationsVisibilityRooms = this.stringDataStore("preference_notifications_visibility_rooms"),
+		notificationsVisibilityTeachers = this.stringDataStore("preference_notifications_visibility_teachers"),
+		notificationsVisibilityClasses = this.stringDataStore("preference_notifications_visibility_classes"),
+		connectivityRefreshInBackground = this.booleanDataStore("preference_connectivity_refresh_in_background"),
+		proxyHost = this.stringDataStore("preference_connectivity_proxy_host", defaultValue = ""),
+		schoolBackground = this.stringSetDataStore(
+			"preference_school_background",
+			defaultValue = emptySet()
+		),
 	)
 
-	@Composable
-	fun flingEnable() = context.booleanDataStore(
-		"preference_fling_enable"
-	)
-
-	@Composable
-	fun weekSnapToDays() = context.booleanDataStore(
-		"preference_week_snap_to_days"
-	)
-
-	@Composable
-	fun weekCustomRange() = context.stringSetDataStore(
-		"preference_week_custom_range",
-		defaultValue = emptySet()
-	)
-
-	@Composable
-	fun weekCustomLength() = context.floatDataStore(
-		"preference_week_custom_display_length",
-		defaultValue = 0f
-	)
-
-	@Composable
-	fun automuteEnable() = context.booleanDataStore(
-		"preference_automute_enable"
-	)
-
-	@Composable
-	fun automuteCancelledLessons() = context.booleanDataStore(
-		"preference_automute_cancelled_lessons"
-	)
-
-	@Composable
-	fun automuteMutePriority() = context.booleanDataStore(
-		"preference_automute_mute_priority"
-	)
-
-	@Composable
-	fun automuteMinimumBreakLength() = context.floatDataStore(
-		"preference_automute_minimum_break_length"
-	)
-
-	@Composable
-	fun additionalErrorMessages() = context.booleanDataStore(
-		"preference_additional_error_messages"
-	)
-
-	@Composable
-	fun timetableItemTextLight() = context.booleanDataStore(
-		"preference_timetable_item_text_light"
-	)
-
-	@Composable
-	fun backgroundFuture() = context.intDataStore(
-		"preference_background_future"
-	)
-
-	@Composable
-	fun backgroundPast() = context.intDataStore(
-		"preference_background_past"
-	)
-
-	@Composable
-	fun marker() = context.intDataStore(
-		"preference_marker"
-	)
-
-	@Composable
-	fun schoolBackground(
-		dependencyValue: (prefValue: Set<String>) -> Boolean = { it.isNotEmpty() },
-		subDependency: UntisPreferenceDataStore<*>? = null
-	) = context.stringSetDataStore(
-		"preference_school_background",
-		dependencyValue = dependencyValue,
-		subDependency = subDependency,
-		defaultValue = emptySet()
-	)
-
-	@Composable
-	fun useThemeBackground(
-		dependencyValue: (prefValue: Boolean) -> Boolean = { it }
-	) = context.booleanDataStore(
-		"preference_use_theme_background",
-		dependencyValue = dependencyValue
-	)
-
-	@Composable
-	fun backgroundRegular() = context.intDataStore(
-		"preference_background_regular"
-	)
-
-	@Composable
-	fun backgroundRegularPast() = context.intDataStore(
-		"preference_background_regular_past"
-	)
-
-	@Composable
-	fun backgroundExam() = context.intDataStore(
-		"preference_background_exam"
-	)
-
-	@Composable
-	fun backgroundExamPast() = context.intDataStore(
-		"preference_background_exam_past"
-	)
-
-	@Composable
-	fun backgroundIrregular() = context.intDataStore(
-		"preference_background_irregular"
-	)
-
-	@Composable
-	fun backgroundIrregularPast() = context.intDataStore(
-		"preference_background_irregular_past"
-	)
-
-	@Composable
-	fun backgroundCancelled() = context.intDataStore(
-		"preference_background_cancelled"
-	)
-
-	@Composable
-	fun backgroundCancelledPast() = context.intDataStore(
-		"preference_background_cancelled_past"
-	)
-
-	@Composable
-	fun theme() = context.stringDataStore(
-		"preference_theme"
-	)
-
-	@Composable
-	fun darkTheme() = context.stringDataStore(
-		"preference_dark_theme",
-		dependencyValue = { it != "off" }
-	)
-
-	@Composable
-	fun darkThemeOled() = context.booleanDataStore(
-		"preference_dark_theme_oled"
-	)
-
-	@Composable
-	fun timetablePersonalTimetable() = context.stringDataStore(
-		"preference_timetable_personal_timetable",
-		defaultValue = ""
-	)
-
-	@Composable
-	fun timetableHideTimeStamps() = context.booleanDataStore(
-		"preference_timetable_hide_time_stamps"
-	)
-
-	@Composable
-	fun timetableHideCancelled() = context.booleanDataStore(
-		"preference_timetable_hide_cancelled"
-	)
-
-	@Composable
-	fun timetableSubstitutionsIrregular() = context.booleanDataStore(
-		"preference_timetable_substitutions_irregular"
-	)
-
-	@Composable
-	fun timetableBackgroundIrregular() = context.booleanDataStore(
-		"preference_timetable_background_irregular"
-	)
-
-	@Composable
-	fun timetableRange() = context.stringDataStore(
-		"preference_timetable_range",
-		defaultValue = ""
-	)
-
-	@Composable
-	fun timetableRangeIndexReset() = context.booleanDataStore(
-		"preference_timetable_range_index_reset"
-	)
-
-	@Composable
-	fun timetableItemPaddingOverlap() = context.intDataStore(
-		"preference_timetable_item_padding_overlap"
-	)
-
-	@Composable
-	fun timetableItemPadding() = context.intDataStore(
-		"preference_timetable_item_padding"
-	)
-
-	@Composable
-	fun timetableItemCornerRadius() = context.intDataStore(
-		"preference_timetable_item_corner_radius"
-	)
-
-	@Composable
-	fun timetableCenteredLessonInfo() = context.booleanDataStore(
-		"preference_timetable_centered_lesson_info"
-	)
-
-	@Composable
-	fun timetableBoldLessonName() = context.booleanDataStore(
-		"preference_timetable_bold_lesson_name"
-	)
-
-	@Composable
-	fun timetableLessonNameFontSize() = context.intDataStore(
-		"preference_timetable_lesson_name_font_size"
-	)
-
-	@Composable
-	fun timetableLessonInfoFontSize() = context.intDataStore(
-		"preference_timetable_lesson_info_font_size"
-	)
-
-	@Composable
-	fun notificationsEnable() = context.booleanDataStore(
-		"preference_notifications_enable"
-	)
-
-	@Composable
-	fun notificationsInMultiple() = context.booleanDataStore(
-		"preference_notifications_in_multiple"
-	)
-
-	@Composable
-	fun notificationsBeforeFirst() = context.booleanDataStore(
-		"preference_notifications_before_first"
-	)
-
-	@Composable
-	fun notificationsBeforeFirstTime() = context.intDataStore(
-		"preference_notifications_before_first_time"
-	)
-
-	@Composable
-	fun notificationsVisibilitySubjects() = context.stringDataStore(
-		"preference_notifications_visibility_subjects"
-	)
-
-	@Composable
-	fun notificationsVisibilityRooms() = context.stringDataStore(
-		"preference_notifications_visibility_rooms"
-	)
-
-	@Composable
-	fun notificationsVisibilityTeachers() = context.stringDataStore(
-		"preference_notifications_visibility_teachers"
-	)
-
-	@Composable
-	fun notificationsVisibilityClasses() = context.stringDataStore(
-		"preference_notifications_visibility_classes"
-	)
-
-	@Composable
-	fun connectivityRefreshInBackground() = context.booleanDataStore(
-		"preference_connectivity_refresh_in_background"
-	)
-
-	@Composable
-	fun proxyHost() = context.stringDataStore(
-		"preference_connectivity_proxy_host",
-		defaultValue = ""
-	)
-}
+class DataStorePreferences(
+	val doubleTapToExit: UntisPreferenceDataStore<Boolean>,
+	val flingEnable: UntisPreferenceDataStore<Boolean>,
+	val weekSnapToDays: UntisPreferenceDataStore<Boolean>,
+	val weekCustomRange: UntisPreferenceDataStore<Set<String>>,
+	val weekCustomLength: UntisPreferenceDataStore<Float>,
+	val automuteEnable: UntisPreferenceDataStore<Boolean>,
+	val automuteCancelledLessons: UntisPreferenceDataStore<Boolean>,
+	val automuteMutePriority: UntisPreferenceDataStore<Boolean>,
+	val automuteMinimumBreakLength: UntisPreferenceDataStore<Float>,
+	val additionalErrorMessages: UntisPreferenceDataStore<Boolean>,
+	val timetableItemTextLight: UntisPreferenceDataStore<Boolean>,
+	val backgroundFuture: UntisPreferenceDataStore<Int>,
+	val backgroundPast: UntisPreferenceDataStore<Int>,
+	val marker: UntisPreferenceDataStore<Int>,
+	val backgroundRegular: UntisPreferenceDataStore<Int>,
+	val backgroundRegularPast: UntisPreferenceDataStore<Int>,
+	val backgroundExam: UntisPreferenceDataStore<Int>,
+	val backgroundExamPast: UntisPreferenceDataStore<Int>,
+	val backgroundIrregular: UntisPreferenceDataStore<Int>,
+	val backgroundIrregularPast: UntisPreferenceDataStore<Int>,
+	val backgroundCancelled: UntisPreferenceDataStore<Int>,
+	val backgroundCancelledPast: UntisPreferenceDataStore<Int>,
+	val theme: UntisPreferenceDataStore<String>,
+	val darkTheme: UntisPreferenceDataStore<String>,
+	val darkThemeOled: UntisPreferenceDataStore<Boolean>,
+	val timetablePersonalTimetable: UntisPreferenceDataStore<String>,
+	val timetableHideTimeStamps: UntisPreferenceDataStore<Boolean>,
+	val timetableHideCancelled: UntisPreferenceDataStore<Boolean>,
+	val timetableSubstitutionsIrregular: UntisPreferenceDataStore<Boolean>,
+	val timetableBackgroundIrregular: UntisPreferenceDataStore<Boolean>,
+	val timetableRange: UntisPreferenceDataStore<String>,
+	val timetableRangeIndexReset: UntisPreferenceDataStore<Boolean>,
+	val timetableItemPaddingOverlap: UntisPreferenceDataStore<Int>,
+	val timetableItemPadding: UntisPreferenceDataStore<Int>,
+	val timetableItemCornerRadius: UntisPreferenceDataStore<Int>,
+	val timetableCenteredLessonInfo: UntisPreferenceDataStore<Boolean>,
+	val timetableBoldLessonName: UntisPreferenceDataStore<Boolean>,
+	val timetableLessonNameFontSize: UntisPreferenceDataStore<Int>,
+	val timetableLessonInfoFontSize: UntisPreferenceDataStore<Int>,
+	val notificationsEnable: UntisPreferenceDataStore<Boolean>,
+	val notificationsInMultiple: UntisPreferenceDataStore<Boolean>,
+	val notificationsBeforeFirst: UntisPreferenceDataStore<Boolean>,
+	val notificationsBeforeFirstTime: UntisPreferenceDataStore<Int>,
+	val notificationsVisibilitySubjects: UntisPreferenceDataStore<String>,
+	val notificationsVisibilityRooms: UntisPreferenceDataStore<String>,
+	val notificationsVisibilityTeachers: UntisPreferenceDataStore<String>,
+	val notificationsVisibilityClasses: UntisPreferenceDataStore<String>,
+	val connectivityRefreshInBackground: UntisPreferenceDataStore<Boolean>,
+	val proxyHost: UntisPreferenceDataStore<String>,
+	val schoolBackground: UntisPreferenceDataStore<Set<String>>,
+)

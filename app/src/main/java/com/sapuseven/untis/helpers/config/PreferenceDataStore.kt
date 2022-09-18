@@ -11,7 +11,7 @@ import androidx.datastore.preferences.core.*
 import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
 
-private val Context.preferenceDataStore: DataStore<Preferences> by androidx.datastore.preferences.preferencesDataStore(
+val Context.preferenceDataStore: DataStore<Preferences> by androidx.datastore.preferences.preferencesDataStore(
 	name = "preferences"
 )
 

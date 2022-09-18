@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -44,7 +45,6 @@ val materialColors = arrayOf(
 	Color(0xFF795548), // BROWN 500
 	Color(0xFF607D8B), // BLUE GREY 500
 	Color(0xFF9E9E9E), // GREY 500
-	//Color.Black
 )
 
 @Composable
@@ -52,6 +52,7 @@ fun ColorPreference(
 	title: (@Composable () -> Unit),
 	icon: (@Composable () -> Unit)? = null,
 	showAlphaSlider: Boolean = false,
+	defaultValueLabel: String? = null,
 	dependency: UntisPreferenceDataStore<*>? = null,
 	dataStore: UntisPreferenceDataStore<Int>
 ) {
@@ -81,11 +82,18 @@ fun ColorPreference(
 	)
 
 	if (showDialog) {
-		val presetColors = remember { materialColors.plus(Color(dataStore.defaultValue)) }
+		val presetColors = remember { materialColors.plus(
+			if (defaultValueLabel == null)
+				Color(dataStore.defaultValue)
+			else
+				Color.Black
+		) }
 
 		var color by remember { mutableStateOf(Color(value.value)) }
 		var selectedPreset by remember { mutableStateOf(presetColors.indexOf(color)) }
 		var advanced by remember { mutableStateOf(false) }
+
+		val defaultColor = Color(dataStore.defaultValue)
 
 		key(advanced) {
 			AlertDialog(
@@ -103,41 +111,64 @@ fun ColorPreference(
 							}
 						)
 					} else {
-						LazyVerticalGrid(
-							columns = GridCells.Adaptive(48.dp),
-							content = {
-								items(presetColors.size) { index ->
-									Box(
-										modifier = Modifier
-											.requiredSize(56.dp)
-											.padding(4.dp)
-											.clip(CircleShape)
-											.background(MaterialTheme.colorScheme.surface)
-											.background(presetColors[index])
-											.border(
-												1.dp,
-												MaterialTheme.colorScheme.outline,
-												shape = CircleShape
-											)
-											.clickable {
+						Column(
+							verticalArrangement = Arrangement.spacedBy(16.dp)
+						) {
+							LazyVerticalGrid(
+								columns = GridCells.Adaptive(48.dp),
+								userScrollEnabled = false,
+								content = {
+									items(presetColors.size) { index ->
+										ColorBox(
+											color = presetColors[index].copy(alpha = color.alpha),
+											selected = selectedPreset == index,
+											onSelect = {
 												selectedPreset = index
-												color = presetColors[index]
-											},
-										contentAlignment = Alignment.Center
-									) {
-										if (selectedPreset == index)
-											Icon(
-												painter = painterResource(id = R.drawable.all_check),
-												contentDescription = null, // TODO: create stringResource(id = R.string.all_selected)
-												tint = if (ColorUtils.calculateLuminance(presetColors[index].toArgb()) < 0.5)
-													Color.White
-												else
-													Color.Black
-											)
+												color = it
+											}
+										)
 									}
 								}
+							)
+
+							defaultValueLabel?.let {
+								Row(
+									verticalAlignment = Alignment.CenterVertically,
+									modifier = Modifier
+										.fillMaxWidth()
+										.clip(RoundedCornerShape(50))
+										.clickable {
+											selectedPreset = -1
+											color = defaultColor
+										}
+								) {
+									ColorBox(
+										color = defaultColor.copy(alpha = color.alpha),
+										selected = color == defaultColor,
+										onSelect = {
+											selectedPreset = -1
+											color = it
+										}
+									)
+
+									Text(
+										modifier = Modifier.padding(horizontal = 4.dp),
+										style = MaterialTheme.typography.bodyLarge,
+										text = defaultValueLabel
+									)
+								}
 							}
-						)
+
+							if (showAlphaSlider) {
+								Slider(
+									value = color.alpha,
+									onValueChange = {
+										color = color.copy(alpha = it)
+									},
+									modifier = Modifier.fillMaxWidth()
+								)
+							}
+						}
 					}
 				},
 				confirmButton = {
@@ -165,7 +196,12 @@ fun ColorPreference(
 						TextButton(
 							onClick = {
 								showDialog = false
-								scope.launch { dataStore.saveValue(color.toArgb()) }
+								scope.launch {
+									if (color == defaultColor)
+										dataStore.clearValue()
+									else
+										dataStore.saveValue(color.toArgb())
+								}
 							}) {
 							Text(stringResource(id = R.string.all_ok))
 						}
@@ -173,5 +209,46 @@ fun ColorPreference(
 				}
 			)
 		}
+	}
+}
+
+@Composable
+fun ColorBox(
+	color: Color,
+	selected: Boolean,
+	onSelect: (Color) -> Unit
+) {
+	Box(
+		modifier = Modifier
+			.requiredSize(56.dp)
+			.padding(4.dp)
+			.clip(CircleShape)
+			.background(MaterialTheme.colorScheme.surface)
+			.background(color)
+			.border(
+				1.dp,
+				MaterialTheme.colorScheme.outline,
+				shape = CircleShape
+			)
+			.padding(1.dp)
+			.border(
+				1.dp,
+				color.copy(alpha = 1f),
+				shape = CircleShape
+			)
+			.clickable {
+				onSelect(color)
+			},
+		contentAlignment = Alignment.Center
+	) {
+		if (selected)
+			Icon(
+				painter = painterResource(id = R.drawable.all_check),
+				contentDescription = null, // TODO: create stringResource(id = R.string.all_selected)
+				tint = if (ColorUtils.calculateLuminance(color.toArgb()) < 0.5)
+					Color.White
+				else
+					Color.Black
+			)
 	}
 }

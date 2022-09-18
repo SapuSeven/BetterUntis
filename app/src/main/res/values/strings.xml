@@ -298,6 +298,7 @@
 	<string name="preferences_notifications">Notifications</string>
 	<string name="preferences_styling">Customization</string>
 	<string name="preferences_timetable">Timetable</string>
+	<string name="preferences_theme_color">Theme color</string>
 	<string name="roomfinder_current_hour">%1$s, %2$d. Lesson</string>
 	<string name="roomfinder_current_hour_time">%1$s - %2$s</string>
 	<string name="roomfinder_delete_item">Delete item</string>

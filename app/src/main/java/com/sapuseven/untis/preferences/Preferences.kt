@@ -42,8 +42,12 @@ class UntisPreferenceDataStore<T>(
 	 * recursively and this flow only returns `true` if all other dependencies return `true`.
 	 */
 	fun getDependencyFlow(): Flow<Boolean> {
-		val dependencyFlow = dataStore?.data?.map { prefs -> prefs[prefKey] ?: defaultValue }?.map(dependencyValue) ?: flowOf(true)
-		return dependencyFlow.combine(subDependency?.getDependencyFlow() ?: flowOf(true)) { a, b -> a && b }
+		val dependencyFlow =
+			dataStore?.data?.map { prefs -> prefs[prefKey] ?: defaultValue }?.map(dependencyValue)
+				?: flowOf(true)
+		return dependencyFlow.combine(
+			subDependency?.getDependencyFlow() ?: flowOf(true)
+		) { a, b -> a && b }
 	}
 
 	fun isDefaultEnabled() = dependencyValue(defaultValue)
@@ -52,6 +56,23 @@ class UntisPreferenceDataStore<T>(
 		dataStore?.edit { prefs ->
 			prefs[prefKey] = value
 		}
+
+	suspend fun clearValue() =
+		dataStore?.edit { prefs ->
+			prefs.remove(prefKey)
+		}
+
+	fun with(
+		defaultValue: T = this.defaultValue,
+		dependencyValue: (prefValue: T) -> Boolean = this.dependencyValue,
+		subDependency: UntisPreferenceDataStore<*>? = this.subDependency
+	) = UntisPreferenceDataStore(
+		this.dataStore,
+		this.prefKey,
+		defaultValue,
+		dependencyValue,
+		subDependency
+	)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
