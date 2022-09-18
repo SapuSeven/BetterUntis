@@ -14,7 +14,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.MenuItem
 import android.view.View
-import androidx.core.content.pm.PackageInfoCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -23,6 +22,7 @@ import com.github.kittinunf.fuel.coroutines.awaitByteArrayResult
 import com.github.kittinunf.fuel.coroutines.awaitStringResult
 import com.github.kittinunf.fuel.httpGet
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.dialogs.AlertPreferenceDialog
@@ -247,15 +247,10 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 					}
 					"preferences_info" -> {
 						findPreference<Preference>("preference_info_app_version")?.apply {
-							val pInfo =
-								requireContext().packageManager.getPackageInfo(
-									requireContext().packageName,
-									0
-								)
 							summary = requireContext().getString(
 								R.string.preference_info_app_version_desc,
-								pInfo.versionName,
-								PackageInfoCompat.getLongVersionCode(pInfo)
+								BuildConfig.VERSION_NAME,
+								BuildConfig.VERSION_CODE
 							)
 							setOnPreferenceClickListener {
 								startActivity(
