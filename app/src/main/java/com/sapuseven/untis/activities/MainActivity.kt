@@ -52,6 +52,7 @@ import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.models.untis.UntisDate
+import com.sapuseven.untis.models.untis.masterdata.Holiday
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
@@ -67,6 +68,7 @@ import com.sapuseven.untis.ui.functional.BackPressConfirm
 import com.sapuseven.untis.ui.theme.AppTheme
 import com.sapuseven.untis.viewmodels.PeriodDataViewModel
 import com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
+import com.sapuseven.untis.views.weekview.HolidayChip
 import com.sapuseven.untis.views.weekview.WeekView
 import com.sapuseven.untis.views.weekview.WeekViewDisplayable
 import com.sapuseven.untis.views.weekview.WeekViewEvent
@@ -346,6 +348,7 @@ class MainActivity :
 		var weekViewGlobal by remember { mutableStateOf(appState.weekView.value) }
 		appState.setupCustomization(weekViewGlobal, dataStorePreferences)
 
+
 		AndroidView(
 			factory = { context ->
 				if (weekViewGlobal == null) { // Create weekView if it doesn't already exist
@@ -362,6 +365,15 @@ class MainActivity :
 			},
 			update = {
 				appState.weekView.value = weekViewGlobal
+				userDatabase.getAdditionalUserData<Holiday>(user?.id!!, Holiday())?.let { item ->
+					appState.weekView.value?.addHolidays(item.map { holiday ->
+						HolidayChip(
+							text = holiday.value.longName,
+							startDate = holiday.value.startDate,
+							endDate = holiday.value.endDate
+						)
+					})
+				}
 				appState.updateViews(it)
 			},
 			modifier = Modifier
