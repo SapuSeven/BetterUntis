@@ -345,6 +345,7 @@ class MainActivity :
 		appState.loadWeekViewPreferences(weekViewGlobal, dataStorePreferences)
 
 
+
 		AndroidView(
 			factory = { context ->
 				if (weekViewGlobal == null) { // Create weekView if it doesn't already exist
