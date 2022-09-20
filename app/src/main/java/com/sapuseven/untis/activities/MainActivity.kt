@@ -346,6 +346,7 @@ class MainActivity :
 
 
 
+
 		AndroidView(
 			factory = { context ->
 				if (weekViewGlobal == null) { // Create weekView if it doesn't already exist
