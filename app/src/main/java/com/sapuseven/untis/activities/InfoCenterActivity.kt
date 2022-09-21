@@ -40,7 +40,6 @@ import com.sapuseven.untis.models.untis.masterdata.SchoolYear
 import com.sapuseven.untis.models.untis.params.*
 import com.sapuseven.untis.models.untis.response.*
 import com.sapuseven.untis.ui.dialogs.AttachmentsDialog
-import com.sapuseven.untis.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import org.joda.time.LocalDate

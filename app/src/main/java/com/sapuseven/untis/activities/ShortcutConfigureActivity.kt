@@ -19,7 +19,6 @@ import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.ui.common.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
-import com.sapuseven.untis.ui.theme.AppTheme
 
 class ShortcutConfigureActivity : BaseComposeActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {

@@ -31,7 +31,6 @@ import com.sapuseven.untis.preferences.PreferenceScreen
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.preferences.*
-import com.sapuseven.untis.ui.theme.AppTheme
 
 class SettingsActivity : BaseComposeActivity() {
 	companion object {

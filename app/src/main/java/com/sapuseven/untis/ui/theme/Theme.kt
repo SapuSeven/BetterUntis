@@ -1,15 +1,10 @@
 package com.sapuseven.untis.ui.theme
 
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.platform.LocalContext
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 
 
-private val LightColorScheme = lightColorScheme(
+val LightColorScheme = lightColorScheme(
 	primary = md_theme_light_primary,
 	onPrimary = md_theme_light_onPrimary,
 	primaryContainer = md_theme_light_primaryContainer,
@@ -40,7 +35,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 
-private val DarkColorScheme = darkColorScheme(
+val DarkColorScheme = darkColorScheme(
 	primary = md_theme_dark_primary,
 	onPrimary = md_theme_dark_onPrimary,
 	primaryContainer = md_theme_dark_primaryContainer,
@@ -69,36 +64,3 @@ private val DarkColorScheme = darkColorScheme(
 	inversePrimary = md_theme_dark_inversePrimary,
 	surfaceTint = md_theme_dark_surfaceTint,
 )
-
-@Composable
-fun AppTheme(
-	darkTheme: Boolean = isSystemInDarkTheme(),
-	dynamicColor: Boolean = true,
-	content: @Composable () -> Unit
-) {
-	val colorScheme = when {
-		dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-			val context = LocalContext.current
-			if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-		}
-		darkTheme -> DarkColorScheme
-		else -> LightColorScheme
-	}
-
-	val systemUiController = rememberSystemUiController()
-
-	SideEffect {
-		systemUiController.setSystemBarsColor(
-			color = colorScheme.background,
-			darkIcons = !darkTheme
-		)
-
-		// setStatusBarsColor() and setNavigationBarColor() also exist
-	}
-
-	MaterialTheme(
-		colorScheme = colorScheme,
-		typography = Typography,
-		content = content
-	)
-}

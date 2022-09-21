@@ -1,23 +1,28 @@
 package com.sapuseven.untis.activities
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.config.PreferenceHelper
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import com.sapuseven.untis.preferences.dataStorePreferences
+import com.sapuseven.untis.ui.theme.DarkColorScheme
+import com.sapuseven.untis.ui.theme.LightColorScheme
+import com.sapuseven.untis.ui.theme.Typography
+import kotlinx.coroutines.launch
 
 @SuppressLint("Registered") // This activity is not intended to be used directly
 open class BaseComposeActivity : ComponentActivity() {
@@ -105,6 +110,93 @@ open class BaseComposeActivity : ComponentActivity() {
 	}
 
 	fun currentUserId() = user?.id ?: -1
+
+	private fun generateColorScheme(
+		context: Context,
+		dynamicColor: Boolean,
+		darkTheme: Boolean,
+		darkThemeOled: Boolean
+	) =
+		when {
+			dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+				if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+			}
+			darkTheme -> DarkColorScheme
+			else -> LightColorScheme
+		}.run {
+			if (darkTheme && darkThemeOled)
+				copy(background = Color.Black, surface = Color.Black)
+			else
+				this
+		}
+
+	@Composable
+	fun AppTheme(
+		initialDarkTheme: Boolean = isSystemInDarkTheme(),
+		dynamicColor: Boolean = true,
+		content: @Composable () -> Unit
+	) {
+		val context = LocalContext.current
+		val scope = rememberCoroutineScope()
+
+		var theme by remember { mutableStateOf("") }
+		var darkTheme by remember { mutableStateOf(initialDarkTheme) }
+		var darkThemeOled by remember { mutableStateOf(false) }
+
+		val colorScheme = remember(theme, darkTheme, darkThemeOled) {
+			generateColorScheme(
+				context,
+				dynamicColor,
+				darkTheme,
+				darkThemeOled
+			)
+		}
+
+		val themePrefFlow = dataStorePreferences.theme.getValueFlow()
+		val darkThemePrefFlow = dataStorePreferences.darkTheme.getValueFlow()
+		val darkThemeOledPrefFlow = dataStorePreferences.darkThemeOled.getValueFlow()
+
+		LaunchedEffect(Unit) {
+			scope.launch {
+				themePrefFlow.collect {
+					theme = it
+				}
+			}
+
+			scope.launch {
+				darkThemePrefFlow.collect {
+					darkTheme = when (it) {
+						"on" -> true
+						"off" -> false
+						else -> initialDarkTheme
+					}
+				}
+			}
+
+			scope.launch {
+				darkThemeOledPrefFlow.collect {
+					darkThemeOled = it
+				}
+			}
+		}
+
+		val systemUiController = rememberSystemUiController()
+
+		SideEffect {
+			systemUiController.setSystemBarsColor(
+				color = colorScheme.background,
+				darkIcons = !darkTheme
+			)
+
+			// setStatusBarsColor() and setNavigationBarColor() also exist
+		}
+
+		MaterialTheme(
+			colorScheme = colorScheme,
+			typography = Typography,
+			content = content
+		)
+	}
 
 /*
 	/**

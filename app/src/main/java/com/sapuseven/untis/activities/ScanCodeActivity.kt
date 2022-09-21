@@ -7,7 +7,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.ui.viewinterop.AndroidView
 import com.budiyev.android.codescanner.*
 import com.google.zxing.BarcodeFormat
-import com.sapuseven.untis.ui.theme.AppTheme
 
 class ScanCodeActivity : BaseComposeActivity() {
 	private lateinit var codeScanner: CodeScanner
