@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.RectF
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -473,6 +474,7 @@ class MainActivity :
 				DrawerText("Timetables")
 
 				DrawerItems(
+					isMessengerAvailable = appState.isMessengerAvailable,
 					isPersonalTimetableSelected = appState.isPersonalTimetable,
 					displayedElement = appState.displayedElement.value,
 					onTimetableClick = { item ->
@@ -481,15 +483,38 @@ class MainActivity :
 					},
 					onShortcutClick = { item ->
 						appState.closeDrawer()
-
-						shortcutLauncher.launch(
-							Intent(
-								this@MainActivity,
-								item.target
-							).apply {
-								putExtra(EXTRA_LONG_PROFILE_ID, currentUserId())
+						if (item.id == 2){
+							try {
+								startActivity(packageManager.getLaunchIntentForPackage(MESSENGER_PACKAGE_NAME))
+							} catch (e: Exception) {
+								try {
+									startActivity(
+										Intent(
+											Intent.ACTION_VIEW,
+											Uri.parse("market://details?id=$MESSENGER_PACKAGE_NAME")
+										)
+									)
+								} catch (e: Exception) {
+									startActivity(
+										Intent(
+											Intent.ACTION_VIEW,
+											Uri.parse("https://play.google.com/store/apps/details?id=$MESSENGER_PACKAGE_NAME")
+										)
+									)
+								}
 							}
-						)
+						} else {
+							if (item.target != null){
+								shortcutLauncher.launch(
+									Intent(
+										this@MainActivity,
+										item.target
+									).apply {
+										putExtra(EXTRA_LONG_PROFILE_ID, currentUserId())
+									}
+								)
+							}
+						}
 					}
 				)
 			},
@@ -1373,6 +1398,23 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	var isRefreshing: Boolean by mutableStateOf(false)
 
 	var shouldUpdateWeekView = true
+
+	val isMessengerAvailable: Boolean
+		get() {
+			for (item in this.weeklyTimetableItems.values) {
+				if (item != null) {
+					for (it in item.items){
+						if (it.data?.periodData?.element?.messengerChannel != null){
+							return true
+						}
+						break
+					}
+				}
+
+			}
+			return false
+		}
+
 
 	@OptIn(ExperimentalMaterial3Api::class)
 	val drawerGesturesEnabled: Boolean
