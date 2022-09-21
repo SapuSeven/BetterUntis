@@ -143,7 +143,7 @@ fun ColorPreference(
 										}
 								) {
 									ColorBox(
-										color = defaultColor.copy(alpha = color.alpha),
+										color = defaultColor,
 										selected = color == defaultColor,
 										onSelect = {
 											selectedPreset = -1

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.graphics.RectF
 import android.os.Bundle
 import android.os.Handler
@@ -28,6 +27,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -1065,7 +1065,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		}
 	}
 
-	private fun Int.darken(ratio: Float) = ColorUtils.blendARGB(this, Color.BLACK, ratio)
+	private fun Int.darken(ratio: Float) = ColorUtils.blendARGB(this, Color.Black.toArgb(), ratio)
 
 	data class WeeklyTimetableItems(
 		var items: List<WeekViewEvent<TimegridItem>> = emptyList(),
@@ -1094,7 +1094,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			}
 			item
 		})
-		colorItems(newItems, colorScheme)
+		colorItems(newItems)
 		return newItems
 	}
 
@@ -1147,8 +1147,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	}
 
 	private suspend fun colorItems(
-		items: List<TimegridItem>,
-		colorScheme: ColorScheme
+		items: List<TimegridItem>
 	) {
 		val regularColor = preferences.backgroundRegular.getValue()
 		val examColor = preferences.backgroundExam.getValue()
@@ -1160,43 +1159,47 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		val irregularPastColor = preferences.backgroundIrregularPast.getValue()
 
 		val useDefault = preferences.schoolBackground.getValue()
-		val useTheme = true
-		//if (!useDefault.contains("regular")) preferences["preference_use_theme_background"] else false
 
 		items.forEach { item ->
-			val defaultColor = Color.parseColor(item.periodData.element.backColor)
+			val defaultColor = android.graphics.Color.parseColor(item.periodData.element.backColor)
+			val defaultTextColor = android.graphics.Color.parseColor(item.periodData.element.foreColor)
 
 			item.color = when {
-				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor else colorScheme.error.toArgb()
-				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else colorScheme.secondary.toArgb()
-				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else colorScheme.tertiary.toArgb()
-				useTheme -> colorScheme.primary.toArgb()
+				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor else examColor
+				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else cancelledColor
+				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else irregularColor
 				else -> if (useDefault.contains("regular")) defaultColor else regularColor
 			}
 
 			item.pastColor = when {
 				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor.darken(
 					0.25f
-				) else colorScheme.error.copy(alpha = .7f).toArgb()
+				) else examPastColor
 				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor.darken(
 					0.25f
-				) else colorScheme.secondary.copy(alpha = .7f).toArgb()
+				) else cancelledPastColor
 				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(
 					0.25f
-				) else colorScheme.tertiary.copy(alpha = .7f).toArgb()
-				useTheme -> colorScheme.primary.copy(alpha = .7f).toArgb()/*if (currentTheme == "pixel") getAttr(R.attr.colorPrimary).darken(0.25f) else getAttr(
-					R.attr.colorPrimaryDark
-				)*/
+				) else irregularPastColor
 				else -> if (useDefault.contains("regular")) defaultColor.darken(0.25f) else regularPastColor
 			}
 
 			item.textColor = when {
-				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor else colorScheme.onError.toArgb()
-				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else colorScheme.onSecondary.toArgb()
-				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else colorScheme.onTertiary.toArgb()
-				else -> colorScheme.onPrimary.toArgb()
+				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultTextColor else colorOn(Color(examColor)).toArgb()
+				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultTextColor else colorOn(Color(cancelledColor)).toArgb()
+				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultTextColor else colorOn(Color(irregularColor)).toArgb()
+				else -> if (useDefault.contains("regular")) defaultTextColor else colorOn(Color(regularColor)).toArgb()
 			}
 		}
+	}
+
+	private fun colorOn(color: Color): Color {
+		return when(color.copy(alpha = 1f)) {
+			colorScheme.primary -> colorScheme.onPrimary
+			colorScheme.secondary -> colorScheme.onSecondary
+			colorScheme.tertiary -> colorScheme.onTertiary
+			else -> if (ColorUtils.calculateLuminance(color.toArgb()) < 0.5) Color.White else Color.Black
+		}.copy(alpha = color.alpha)
 	}
 
 	private suspend fun loadTimetable(
@@ -1405,7 +1408,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 				scope.launch {
 					eventTextColor.collect {
-						weekView.eventTextColor = if (it) Color.WHITE else Color.BLACK
+						weekView.eventTextColor = (if (it) Color.White else Color.Black).toArgb()
 					}
 				}
 
@@ -1600,7 +1603,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 					defaultEventColor = colorScheme.primary.toArgb()
 					eventMarginVertical = 4.dp.roundToPx()
 					eventPadding = 4.dp.roundToPx()
-					headerRowBackgroundColor = Color.TRANSPARENT
+					headerRowBackgroundColor = Color.Transparent.toArgb()
 					headerRowPadding = 8.dp.roundToPx()
 					headerRowSecondaryTextColor =
 						colorScheme.onSurfaceVariant.toArgb()
@@ -1620,7 +1623,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 					scrollDuration = 100
 					showHourSeparator = true
 					showNowLine = true
-					timeColumnBackground = Color.TRANSPARENT
+					timeColumnBackground = Color.Transparent.toArgb()
 					timeColumnCaptionColor =
 						colorScheme.onSurface.toArgb()
 					timeColumnCaptionSize = 16.sp.toPx()
