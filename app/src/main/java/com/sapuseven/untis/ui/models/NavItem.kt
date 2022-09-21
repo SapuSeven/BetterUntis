@@ -20,5 +20,5 @@ data class NavItemShortcut(
 	override val id: Int,
 	override val icon: Painter,
 	override val label: String,
-	val target: Class<*>
+	val target: Class<*>? //TODO("Maybe not the best option to make this nullable")
 ) : NavItem(id, icon, label)
