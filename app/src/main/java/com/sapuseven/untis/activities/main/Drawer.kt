@@ -75,10 +75,9 @@ fun DrawerItems(
 				label = stringResource(id = R.string.activity_title_messenger),
 				null
 			)
-		)
-	}
-	navItemsShortcuts.sortedBy {
-		it.id
+		).sortedBy {
+			it.id
+		}
 	}
 
 	navItemsElementTypes.forEach { item ->
