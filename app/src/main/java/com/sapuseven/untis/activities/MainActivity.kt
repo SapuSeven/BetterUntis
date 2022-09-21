@@ -478,16 +478,6 @@ class MainActivity :
 					},
 					onShortcutClick = { item ->
 						appState.closeDrawer()
-
-						shortcutLauncher.launch(
-							Intent(
-								this@MainActivity,
-								item.target
-							).apply {
-								putUserIdExtra()
-								putBackgroundColorExtra()
-							}
-						)
 						if (item.id == 2){
 							try {
 								startActivity(packageManager.getLaunchIntentForPackage(MESSENGER_PACKAGE_NAME))
@@ -515,11 +505,14 @@ class MainActivity :
 										this@MainActivity,
 										item.target
 									).apply {
-										putExtra(EXTRA_LONG_PROFILE_ID, currentUserId())
+										putUserIdExtra()
+										putBackgroundColorExtra()
 									}
 								)
 							}
 						}
+
+
 					}
 				)
 			},
@@ -1052,6 +1045,23 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		}
 
 	private var shouldUpdateWeekView = true
+
+	val isMessengerAvailable: Boolean
+		get() {
+			for (item in this.weeklyTimetableItems.values) {
+				if (item != null) {
+					for (it in item.items){
+						if (it.data?.periodData?.element?.messengerChannel != null){
+							return true
+						}
+						break
+					}
+				}
+
+			}
+			return false
+		}
+
 
 	val isMessengerAvailable: Boolean
 		get() {
