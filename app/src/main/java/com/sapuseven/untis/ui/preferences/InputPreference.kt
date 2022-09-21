@@ -1,4 +1,4 @@
-package com.sapuseven.untis.preferences.preference
+package com.sapuseven.untis.ui.preferences
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth

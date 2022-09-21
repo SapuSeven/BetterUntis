@@ -30,14 +30,13 @@ import com.sapuseven.untis.preferences.PreferenceCategory
 import com.sapuseven.untis.preferences.PreferenceScreen
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
 import com.sapuseven.untis.preferences.dataStorePreferences
-import com.sapuseven.untis.preferences.preference.*
+import com.sapuseven.untis.ui.preferences.*
 import com.sapuseven.untis.ui.theme.AppTheme
 
 class SettingsActivity : BaseComposeActivity() {
 	companion object {
 		const val EXTRA_STRING_PREFERENCE_ROUTE = "com.sapuseven.untis.activities.settings.route"
-		const val EXTRA_STRING_PREFERENCE_HIGHLIGHT =
-			"com.sapuseven.untis.activities.settings.highlight"
+		const val EXTRA_STRING_PREFERENCE_HIGHLIGHT = "com.sapuseven.untis.activities.settings.highlight"
 
 		private const val URL_GITHUB_REPOSITORY = "https://github.com/SapuSeven/BetterUntis"
 		private const val URL_WIKI_PROXY = "$URL_GITHUB_REPOSITORY/wiki/Proxy"
@@ -48,8 +47,7 @@ class SettingsActivity : BaseComposeActivity() {
 		super.onCreate(savedInstanceState)
 
 		// Navigate to and highlight a preference if requested
-		val preferencePath =
-			(intent.extras?.getString(EXTRA_STRING_PREFERENCE_ROUTE)) ?: "preferences"
+		val preferencePath = (intent.extras?.getString(EXTRA_STRING_PREFERENCE_ROUTE)) ?: "preferences"
 		val preferenceHighlight = (intent.extras?.getString(EXTRA_STRING_PREFERENCE_HIGHLIGHT))
 
 		setContent {
@@ -251,11 +249,6 @@ class SettingsActivity : BaseComposeActivity() {
 
 									Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
 										PreferenceCategory(stringResource(id = R.string.preference_category_styling_colors)) {
-											SwitchPreference(
-												title = { Text(stringResource(R.string.preference_timetable_item_text_light)) },
-												dataStore = dataStorePreferences.timetableItemTextLight
-											)
-
 											ColorPreference(
 												title = { Text(stringResource(R.string.preference_background_future)) },
 												showAlphaSlider = true,
@@ -282,14 +275,6 @@ class SettingsActivity : BaseComposeActivity() {
 												entryLabels = stringArrayResource(id = R.array.preference_schoolcolors),
 												dataStore = dataStorePreferences.schoolBackground
 											)
-
-											/*SwitchPreference(
-												title = { Text(stringResource(R.string.preference_use_theme_background)) },
-												dependency = dataStorePreferences.schoolBackground.with(
-													dependencyValue = { !it.contains("regular") }
-												),
-												dataStore = dataStorePreferences.useThemeBackground
-											)*/
 
 											ColorPreference(
 												title = { Text(stringResource(R.string.preference_background_regular)) },
@@ -371,11 +356,13 @@ class SettingsActivity : BaseComposeActivity() {
 												defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 											)
 
-											Preference(
+											/*ConfirmDialogPreference(
 												title = { Text(stringResource(R.string.preference_timetable_colors_reset)) },
-												onClick = { /*TODO*/ },
-												dataStore = UntisPreferenceDataStore.emptyDataStore()
-											)
+												dialogTitle = { Text(stringResource(R.string.preference_dialog_colors_reset_title)) },
+												dialogText = { Text(stringResource(R.string.preference_dialog_colors_reset_text)) },
+												onConfirm = {
+												}
+											)*/
 										}
 
 										PreferenceCategory(stringResource(id = R.string.preference_category_styling_themes)) {

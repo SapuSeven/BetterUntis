@@ -55,8 +55,8 @@ import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
-import com.sapuseven.untis.preferences.preference.convertRangeToPair
-import com.sapuseven.untis.preferences.preference.decodeStoredTimetableValue
+import com.sapuseven.untis.ui.preferences.convertRangeToPair
+import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import com.sapuseven.untis.ui.common.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
 import com.sapuseven.untis.ui.common.Weekday

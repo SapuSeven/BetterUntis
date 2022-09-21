@@ -1,4 +1,4 @@
-package com.sapuseven.untis.preferences.preference
+package com.sapuseven.untis.ui.preferences
 
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable

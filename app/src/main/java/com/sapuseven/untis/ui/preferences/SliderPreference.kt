@@ -1,8 +1,7 @@
-package com.sapuseven.untis.preferences.preference
+package com.sapuseven.untis.ui.preferences
 
 import androidx.annotation.IntRange
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
