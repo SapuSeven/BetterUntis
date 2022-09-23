@@ -33,6 +33,7 @@ open class BaseComposeActivity : ComponentActivity() {
 
 	lateinit var preferences: PreferenceHelper
 	internal var user by mutableStateOf<UserDatabase.User?>(null)
+	internal var customThemeColor by mutableStateOf<Color?>(null) // Workaround to allow legacy views to respond to theme color changes
 	internal lateinit var userDatabase: UserDatabase
 	internal lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 
@@ -119,6 +120,8 @@ open class BaseComposeActivity : ComponentActivity() {
 		darkTheme: Boolean,
 		darkThemeOled: Boolean
 	): ColorScheme {
+		customThemeColor = if (dynamicColor) null else themeColor
+
 		return when {
 			dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
 				if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)

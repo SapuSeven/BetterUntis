@@ -55,8 +55,6 @@ import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
-import com.sapuseven.untis.ui.preferences.convertRangeToPair
-import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import com.sapuseven.untis.ui.common.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
 import com.sapuseven.untis.ui.common.Weekday
@@ -64,11 +62,12 @@ import com.sapuseven.untis.ui.common.disabled
 import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
 import com.sapuseven.untis.ui.dialogs.TimetableItemDetailsDialog
 import com.sapuseven.untis.ui.functional.BackPressConfirm
+import com.sapuseven.untis.ui.preferences.convertRangeToPair
+import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import com.sapuseven.untis.viewmodels.PeriodDataViewModel
 import com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
 import com.sapuseven.untis.views.weekview.WeekView
 import com.sapuseven.untis.views.weekview.WeekViewDisplayable
-import com.sapuseven.untis.views.weekview.WeekViewEvent
 import com.sapuseven.untis.views.weekview.listeners.EventClickListener
 import com.sapuseven.untis.views.weekview.listeners.ScaleListener
 import com.sapuseven.untis.views.weekview.listeners.ScrollListener
@@ -77,6 +76,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants
@@ -85,6 +85,7 @@ import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
 import java.util.*
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 class MainActivity :
@@ -163,7 +164,12 @@ class MainActivity :
 				) { user ->
 					/*weekView.setOnCornerClickListener(this)*/
 					val appState =
-						rememberMainAppState(user, timetableDatabaseInterface, dataStorePreferences)
+						rememberMainAppState(
+							user,
+							customThemeColor,
+							timetableDatabaseInterface,
+							dataStorePreferences
+						)
 					appState.loadPrefs(dataStorePreferences)
 
 					Drawer(
@@ -1067,7 +1073,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	private fun Int.darken(ratio: Float) = ColorUtils.blendARGB(this, Color.Black.toArgb(), ratio)
 
 	data class WeeklyTimetableItems(
-		var items: List<WeekViewEvent<TimegridItem>> = emptyList(),
+		var items: List<TimegridItem> = emptyList(),
 		var lastUpdated: Long = 0,
 		var dateRange: Pair<UntisDate, UntisDate>? = null
 	)
@@ -1149,19 +1155,20 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		items: List<TimegridItem>
 	) {
 		val regularColor = preferences.backgroundRegular.getValue()
-		val examColor = preferences.backgroundExam.getValue()
-		val cancelledColor = preferences.backgroundCancelled.getValue()
-		val irregularColor = preferences.backgroundIrregular.getValue()
 		val regularPastColor = preferences.backgroundRegularPast.getValue()
+		val examColor = preferences.backgroundExam.getValue()
 		val examPastColor = preferences.backgroundExamPast.getValue()
+		val cancelledColor = preferences.backgroundCancelled.getValue()
 		val cancelledPastColor = preferences.backgroundCancelledPast.getValue()
+		val irregularColor = preferences.backgroundIrregular.getValue()
 		val irregularPastColor = preferences.backgroundIrregularPast.getValue()
 
 		val useDefault = preferences.schoolBackground.getValue()
 
 		items.forEach { item ->
 			val defaultColor = android.graphics.Color.parseColor(item.periodData.element.backColor)
-			val defaultTextColor = android.graphics.Color.parseColor(item.periodData.element.foreColor)
+			val defaultTextColor =
+				android.graphics.Color.parseColor(item.periodData.element.foreColor)
 
 			item.color = when {
 				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor else examColor
@@ -1184,16 +1191,26 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			}
 
 			item.textColor = when {
-				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultTextColor else colorOn(Color(examColor)).toArgb()
-				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultTextColor else colorOn(Color(cancelledColor)).toArgb()
-				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultTextColor else colorOn(Color(irregularColor)).toArgb()
-				else -> if (useDefault.contains("regular")) defaultTextColor else colorOn(Color(regularColor)).toArgb()
+				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultTextColor else colorOn(
+					Color(examColor)
+				).toArgb()
+				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultTextColor else colorOn(
+					Color(cancelledColor)
+				).toArgb()
+				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultTextColor else colorOn(
+					Color(irregularColor)
+				).toArgb()
+				else -> if (useDefault.contains("regular")) defaultTextColor else colorOn(
+					Color(
+						regularColor
+					)
+				).toArgb()
 			}
 		}
 	}
 
 	private fun colorOn(color: Color): Color {
-		return when(color.copy(alpha = 1f)) {
+		return when (color.copy(alpha = 1f)) {
 			colorScheme.primary -> colorScheme.onPrimary
 			colorScheme.secondary -> colorScheme.onSecondary
 			colorScheme.tertiary -> colorScheme.onTertiary
@@ -1256,7 +1273,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 								prepareItems(
 									timetableItems.items,
 									colorScheme
-								).map { item -> item.toWeekViewEvent() },
+								),
 								lastUpdated = timetableItems.timestamp
 							)
 						)
@@ -1375,6 +1392,8 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			val timetableRange = timetableRange.getValueFlow()
 			val timetableRangeIndexReset = timetableRangeIndexReset.getValueFlow()
 
+			val themeColor = themeColor.getValueFlow()
+
 			weekView?.let {
 				Log.d("WeekView", "flow started")
 				scope.launch {
@@ -1480,6 +1499,26 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 						weekView.setupHours(range.convertRangeToPair(), rangeIndexReset)
 					}.collect()
 				}
+
+				scope.launch {
+					merge(
+						preferences.backgroundRegular.getValueFlow(),
+						preferences.backgroundRegularPast.getValueFlow(),
+						preferences.backgroundExam.getValueFlow(),
+						preferences.backgroundExamPast.getValueFlow(),
+						preferences.backgroundCancelled.getValueFlow(),
+						preferences.backgroundCancelledPast.getValueFlow(),
+						preferences.backgroundIrregular.getValueFlow(),
+						preferences.backgroundIrregularPast.getValueFlow(),
+						preferences.schoolBackground.getValueFlow(),
+						//preferences.themeColor.getValueFlow()
+					).collect {
+						weeklyTimetableItems.map {
+							it.key to it.value?.let { value -> colorItems(value.items) }
+						}
+						weekView.notifyDataSetChanged()
+					}
+				}
 			}
 		}
 	}
@@ -1569,13 +1608,12 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 					eventRect: RectF
 				) {
 					val items = (weeklyTimetableItems[currentWeekIndex.value]?.items ?: emptyList())
-						.mapNotNull { it.data }
 						.filter {
 							it.startDateTime.millis <= data.startDateTime.millis &&
 									it.endDateTime.millis >= data.endDateTime.millis
 						}
 
-					timetableItemDetailsDialog.value = items to items.indexOf(data)
+					timetableItemDetailsDialog.value = items to max(0, items.indexOf(data))
 				}
 			})
 
@@ -1668,7 +1706,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	): List<WeekViewDisplayable<TimegridItem>> {
 		val weekIndex =
 			convertDateTimeToWeekIndex(startDate)
-		return weeklyTimetableItems[weekIndex]?.items
+		return weeklyTimetableItems[weekIndex]?.items?.map { item -> item.toWeekViewEvent() }
 			?: run {
 				weeklyTimetableItems[weekIndex] =
 					WeeklyTimetableItems()
@@ -1704,6 +1742,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 @Composable
 fun rememberMainAppState(
 	user: UserDatabase.User,
+	customThemeColor: Color?,
 	timetableDatabaseInterface: TimetableDatabaseInterface,
 	preferences: DataStorePreferences,
 	weekViewSwipeRefresh: MutableState<WeekViewSwipeRefreshLayout?> = remember { mutableStateOf(null) },
@@ -1734,7 +1773,7 @@ fun rememberMainAppState(
 		)
 	},
 	profileManagementDialog: MutableState<Boolean> = remember { mutableStateOf(false) },
-) = remember(user) {
+) = remember(user, customThemeColor) {
 	MainAppState(
 		user = user,
 		timetableDatabaseInterface = timetableDatabaseInterface,
