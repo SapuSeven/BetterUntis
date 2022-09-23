@@ -203,7 +203,7 @@
 	<string name="preference_category_notifications_visible_fields">Visible Fields</string>
 	<string name="preference_category_styling_backgrounds">Item Colors</string>
 	<string name="preference_category_styling_colors">Colors</string>
-	<string name="preference_category_styling_themes">Themes</string>
+	<string name="preference_category_styling_themes">Theme</string>
 	<string name="preference_category_timetable_item_appearance">Item Appearance</string>
 	<string name="preference_category_timetable_lesson_text">Lesson Text</string>
 	<string name="preference_category_timetable_range">Timetable Range</string>
@@ -299,6 +299,7 @@
 	<string name="preferences_styling">Customization</string>
 	<string name="preferences_timetable">Timetable</string>
 	<string name="preferences_theme_color">Theme color</string>
+	<string name="preferences_theme_color_system">System theme color</string>
 	<string name="roomfinder_current_hour">%1$s, %2$d. Lesson</string>
 	<string name="roomfinder_current_hour_time">%1$s - %2$s</string>
 	<string name="roomfinder_delete_item">Delete item</string>

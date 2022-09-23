@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.toArgb
 import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.helpers.config.*
+import com.sapuseven.untis.ui.preferences.materialColors
 
 val BaseComposeActivity.dataStorePreferences: DataStorePreferences
 	@Composable
@@ -61,7 +62,10 @@ val BaseComposeActivity.dataStorePreferences: DataStorePreferences
 			"preference_background_cancelled_past",
 			defaultValue = MaterialTheme.colorScheme.secondary.copy(alpha = .7f).toArgb()
 		),
-		theme = this.stringDataStore("preference_theme"),
+		themeColor = this.intDataStore(
+			"preference_theme_color",
+			defaultValue = MaterialTheme.colorScheme.primary.toArgb()
+		),
 		darkTheme = this.stringDataStore(
 			"preference_dark_theme",
 			dependencyValue = { it != "off" }),
@@ -122,7 +126,7 @@ class DataStorePreferences(
 	val backgroundIrregularPast: UntisPreferenceDataStore<Int>,
 	val backgroundCancelled: UntisPreferenceDataStore<Int>,
 	val backgroundCancelledPast: UntisPreferenceDataStore<Int>,
-	val theme: UntisPreferenceDataStore<String>,
+	val themeColor: UntisPreferenceDataStore<Int>,
 	val darkTheme: UntisPreferenceDataStore<String>,
 	val darkThemeOled: UntisPreferenceDataStore<Boolean>,
 	val timetablePersonalTimetable: UntisPreferenceDataStore<String>,

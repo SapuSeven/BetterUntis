@@ -146,7 +146,7 @@ open class BaseComposeActivity : ComponentActivity() {
 		var darkTheme by remember { mutableStateOf(initialDarkTheme) }
 		var darkThemeOled by remember { mutableStateOf(false) }
 
-		val colorScheme = remember(theme, darkTheme, darkThemeOled) {
+		val colorScheme = remember(themeColor, darkTheme, darkThemeOled) {
 			generateColorScheme(
 				context,
 				dynamicColor,
@@ -156,15 +156,14 @@ open class BaseComposeActivity : ComponentActivity() {
 			)
 		}
 
-		val themePrefFlow = dataStorePreferences.theme.getValueFlow()
+		val themeColorPrefFlow = dataStorePreferences.themeColor.getValueFlow()
 		val darkThemePrefFlow = dataStorePreferences.darkTheme.getValueFlow()
 		val darkThemeOledPrefFlow = dataStorePreferences.darkThemeOled.getValueFlow()
 
 		LaunchedEffect(Unit) {
 			scope.launch {
-				themePrefFlow.collect {
-					// TODO: Change pref type to color
-					//themeColor = Color(it)
+				themeColorPrefFlow.collect {
+					themeColor = Color(it)
 				}
 			}
 

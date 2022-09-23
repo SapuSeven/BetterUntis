@@ -2,6 +2,7 @@ package com.sapuseven.untis.activities
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
@@ -365,18 +366,19 @@ class SettingsActivity : BaseComposeActivity() {
 										}
 
 										PreferenceCategory(stringResource(id = R.string.preference_category_styling_themes)) {
-											ListPreference(
-												title = { Text(stringResource(R.string.preference_theme)) },
-												summary = { Text(it.second) },
+											ColorPreference(
+												title = { Text(stringResource(R.string.preferences_theme_color)) },
 												icon = {
 													Icon(
 														painter = painterResource(R.drawable.settings_timetable_format_paint),
 														contentDescription = null
 													)
 												},
-												entries = stringArrayResource(id = R.array.preference_theme_values),
-												entryLabels = stringArrayResource(id = R.array.preference_themes),
-												dataStore = dataStorePreferences.theme
+												dataStore = dataStorePreferences.themeColor,
+												defaultValueLabel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+													stringResource(id = R.string.preferences_theme_color_system)
+												else
+													null
 											)
 
 											ListPreference(

@@ -40,12 +40,3 @@ fun Scheme.toColorScheme(): ColorScheme =
 		outlineVariant = Color(outlineVariant),
 		scrim = Color(scrim),
 	)
-
-
-fun lightColorSchemeFrom(color: Color): ColorScheme {
-	return Scheme.light(color.toArgb()).toColorScheme()
-}
-
-fun darkColorSchemeFrom(color: Color): ColorScheme {
-	return Scheme.dark(color.toArgb()).toColorScheme()
-}
