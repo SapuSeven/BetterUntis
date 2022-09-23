@@ -136,39 +136,38 @@ open class BaseComposeActivity : ComponentActivity() {
 	@Composable
 	fun AppTheme(
 		initialDarkTheme: Boolean = isSystemInDarkTheme(),
-		dynamicColor: Boolean = true,
 		content: @Composable () -> Unit
 	) {
 		val context = LocalContext.current
 		val scope = rememberCoroutineScope()
 
-		var themeColor by remember { mutableStateOf(materialColors[0]) }
+		val themeColorPref = dataStorePreferences.themeColor
+		val darkThemePref = dataStorePreferences.darkTheme
+		val darkThemeOledPref = dataStorePreferences.darkThemeOled
+
+		var themeColor by remember { mutableStateOf(themeColorPref.defaultValue) }
 		var darkTheme by remember { mutableStateOf(initialDarkTheme) }
 		var darkThemeOled by remember { mutableStateOf(false) }
 
 		val colorScheme = remember(themeColor, darkTheme, darkThemeOled) {
 			generateColorScheme(
 				context,
-				dynamicColor,
-				themeColor,
+				themeColor == themeColorPref.defaultValue,
+				Color(themeColor),
 				darkTheme,
 				darkThemeOled
 			)
 		}
 
-		val themeColorPrefFlow = dataStorePreferences.themeColor.getValueFlow()
-		val darkThemePrefFlow = dataStorePreferences.darkTheme.getValueFlow()
-		val darkThemeOledPrefFlow = dataStorePreferences.darkThemeOled.getValueFlow()
-
 		LaunchedEffect(Unit) {
 			scope.launch {
-				themeColorPrefFlow.collect {
-					themeColor = Color(it)
+				themeColorPref.getValueFlow().collect {
+					themeColor = it
 				}
 			}
 
 			scope.launch {
-				darkThemePrefFlow.collect {
+				darkThemePref.getValueFlow().collect {
 					darkTheme = when (it) {
 						"on" -> true
 						"off" -> false
@@ -178,7 +177,7 @@ open class BaseComposeActivity : ComponentActivity() {
 			}
 
 			scope.launch {
-				darkThemeOledPrefFlow.collect {
+				darkThemeOledPref.getValueFlow().collect {
 					darkThemeOled = it
 				}
 			}

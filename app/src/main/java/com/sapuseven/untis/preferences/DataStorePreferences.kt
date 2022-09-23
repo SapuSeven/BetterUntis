@@ -1,8 +1,10 @@
 package com.sapuseven.untis.preferences
 
+import android.os.Build
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.helpers.config.*
 import com.sapuseven.untis.ui.preferences.materialColors
@@ -64,7 +66,12 @@ val BaseComposeActivity.dataStorePreferences: DataStorePreferences
 		),
 		themeColor = this.intDataStore(
 			"preference_theme_color",
-			defaultValue = MaterialTheme.colorScheme.primary.toArgb()
+			defaultValue = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+				with(LocalContext.current) {
+					resources.getColor(android.R.color.system_accent1_500, theme)
+				}
+			else
+				materialColors[0].toArgb()
 		),
 		darkTheme = this.stringDataStore(
 			"preference_dark_theme",
