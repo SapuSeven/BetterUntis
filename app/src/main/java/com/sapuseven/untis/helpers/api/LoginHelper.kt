@@ -21,11 +21,11 @@ import java.net.UnknownHostException
 
 class LoginHelper(
 	val loginData: LoginDataInfo,
+	val proxyHost: String? = null,
 	val onStatusUpdate: (statusStringRes: Int) -> Unit,
 	val onError: (error: LoginErrorInfo) -> Unit
 ) {
 	private val api: UntisRequest = UntisRequest()
-	private val proxyHost: String? = null // TODO: Pass proxy host
 
 	init {
 		onStatusUpdate(R.string.logindatainput_connecting)

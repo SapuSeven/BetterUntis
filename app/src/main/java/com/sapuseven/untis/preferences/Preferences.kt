@@ -52,10 +52,12 @@ class UntisPreferenceDataStore<T>(
 
 	fun isDefaultEnabled() = dependencyValue(defaultValue)
 
-	suspend fun saveValue(value: T) =
-		dataStore?.edit { prefs ->
-			prefs[prefKey] = value
-		}
+	suspend fun saveValue(value: T?) =
+		value?.let {
+			dataStore?.edit { prefs ->
+				prefs[prefKey] = value
+			}
+		} ?: clearValue()
 
 	suspend fun clearValue() =
 		dataStore?.edit { prefs ->

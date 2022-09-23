@@ -39,6 +39,8 @@ import com.sapuseven.untis.models.RoomFinderItem
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.timegrid.Day
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import com.sapuseven.untis.preferences.DataStorePreferences
+import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.common.ElementPickerDialogFullscreen
 import kotlinx.coroutines.launch
 import org.joda.time.LocalDate
@@ -49,6 +51,7 @@ import java.util.*
 
 class RoomFinderActivity : BaseComposeActivity() {
 	private lateinit var roomFinderDatabase: RoomfinderDatabase
+	private lateinit var preferences: DataStorePreferences
 
 	companion object {
 		const val EXTRA_INT_ROOM_ID = "com.sapuseven.untis.activities.roomid"
@@ -68,6 +71,7 @@ class RoomFinderActivity : BaseComposeActivity() {
 			AppTheme {
 				withUser { user ->
 					roomFinderDatabase = remember { RoomfinderDatabase.createInstance(this, currentUserId()) }
+					preferences = dataStorePreferences
 
 					val maxHourIndex = remember { calculateMaxHourIndex(user) }
 
@@ -125,10 +129,7 @@ class RoomFinderActivity : BaseComposeActivity() {
 												loadStates(
 													user,
 													periodElement.id,
-													preferences.get<String>(
-														"preference_connectivity_proxy_host",
-														null
-													)
+													preferences.proxyHost.getValue()
 												) to null
 											} catch (e: TimetableLoader.TimetableLoaderException) {
 												emptyList<Boolean>() to ErrorMessageDictionary.getErrorMessage(

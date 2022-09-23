@@ -44,6 +44,7 @@ import com.sapuseven.untis.helpers.api.LoginErrorInfo
 import com.sapuseven.untis.helpers.api.LoginHelper
 import com.sapuseven.untis.models.UntisSchoolInfo
 import com.sapuseven.untis.models.untis.masterdata.TimeGrid
+import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.common.LabeledCheckbox
 import com.sapuseven.untis.ui.common.LabeledSwitch
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -84,15 +85,12 @@ class LoginDataInputActivity : BaseComposeActivity() {
 
 		if (intent.hasExtra(EXTRA_LONG_PROFILE_ID)) {
 			existingUserId = intent.getLongExtra(EXTRA_LONG_PROFILE_ID, 0)
-			existingUserId?.let { id ->
-				existingUser = userDatabase.getUser(id)
-				preferences.loadProfile(id)
-			}
-		}
 
-		val savedProxyUrl = existingUser?.id?.let { profileId ->
-			preferences.loadPrefsForProfile(this, profileId)
-				.getString("preference_connectivity_proxy_host", null)
+			existingUserId?.let { id ->
+				existingUser = userDatabase.getUser(id)?.also { user ->
+					setUser(user)
+				}
+			}
 		}
 
 		userDatabase = UserDatabase.createInstance(this)
@@ -112,7 +110,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 				val anonymous = rememberSaveable { mutableStateOf(existingUser?.anonymous) }
 				val username = rememberSaveable { mutableStateOf(existingUser?.user) }
 				val password = rememberSaveable { mutableStateOf(existingUser?.key) }
-				val proxyUrl = rememberSaveable { mutableStateOf(savedProxyUrl) }
+				val proxyUrl = rememberSaveable { mutableStateOf<String?>(null) }
 				val apiUrl = rememberSaveable { mutableStateOf(existingUser?.apiUrl) }
 				val skipAppSecret = rememberSaveable { mutableStateOf<Boolean?>(null) }
 
@@ -125,7 +123,12 @@ class LoginDataInputActivity : BaseComposeActivity() {
 					)
 				}
 
+				val proxyHostPref = dataStorePreferences.proxyHost
 				LaunchedEffect(Unit) {
+					existingUser?.let {
+						proxyUrl.value = proxyHostPref.getValue()
+					}
+
 					val appLinkData = intent.data
 
 					if (appLinkData?.isHierarchical == true) {
@@ -139,7 +142,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 								// Custom values
 								anonymous.value =
 									appLinkData.getBooleanQueryParameter("anonymous", false)
-								proxyUrl.value = appLinkData.getQueryParameter("proxyUrl")
+								proxyUrl.value = appLinkData.getQueryParameter("proxyUrl") ?: ""
 								apiUrl.value = appLinkData.getQueryParameter("apiUrl")
 								skipAppSecret.value =
 									appLinkData.getBooleanQueryParameter("skipAppSecret", false)
@@ -183,6 +186,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 								password.value ?: "",
 								anonymous.value ?: false
 							),
+							proxyHost = proxyUrl.value,
 							onStatusUpdate = { status ->
 								Log.d(
 									LoginDataInputActivity::class.java.simpleName,
@@ -280,11 +284,9 @@ class LoginDataInputActivity : BaseComposeActivity() {
 									userId,
 									userDataResponse.masterData
 								)
-								preferences.saveProfileId(userId.toLong())
 
 								if (advanced && !proxyUrl.value.isNullOrEmpty())
-									preferences["preference_connectivity_proxy_host"] =
-										proxyUrl.value ?: ""
+									proxyHostPref.saveValue(proxyUrl.value)
 
 								setResult(Activity.RESULT_OK)
 								finish()

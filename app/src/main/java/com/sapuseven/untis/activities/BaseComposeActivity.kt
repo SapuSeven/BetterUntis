@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,24 +15,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.helpers.config.PreferenceHelper
+import com.sapuseven.untis.helpers.config.globalDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.material.scheme.Scheme
-import com.sapuseven.untis.ui.preferences.materialColors
 import com.sapuseven.untis.ui.theme.toColorScheme
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 @SuppressLint("Registered") // This activity is not intended to be used directly
 open class BaseComposeActivity : ComponentActivity() {
-	/*protected var hasOwnToolbar: Boolean = false
-	protected var currentTheme: String = ""
-	private var currentDarkTheme: String = ""*/
-
-	lateinit var preferences: PreferenceHelper
 	internal var user by mutableStateOf<UserDatabase.User?>(null)
 	internal var customThemeColor by mutableStateOf<Color?>(null) // Workaround to allow legacy views to respond to theme color changes
 	internal lateinit var userDatabase: UserDatabase
@@ -39,16 +39,15 @@ open class BaseComposeActivity : ComponentActivity() {
 
 	companion object {
 		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileid"
+
+		val DATASTORE_KEY_USER_ID = longPreferencesKey("userid")
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
-		//ErrorLogger.initialize(this)
-
-		//Thread.setDefaultUncaughtExceptionHandler(CrashHandler(Thread.getDefaultUncaughtExceptionHandler()))
-
-		preferences = PreferenceHelper(this)
 		userDatabase = UserDatabase.createInstance(this)
-		loadUser()
+		runBlocking { // Not ideal, but works well enough
+			loadInitialUser()
+		}
 
 		super.onCreate(savedInstanceState)
 	}
@@ -95,20 +94,37 @@ open class BaseComposeActivity : ComponentActivity() {
 		}
 	}
 
-	fun loadUser() {
-		userDatabase.getUser(
-			intent.extras?.getLong(EXTRA_LONG_PROFILE_ID) ?: preferences.loadProfileId()
-		)?.let {
-			loadUser(it)
+	private suspend fun loadInitialUser() {
+		val user = userDatabase.getUser(
+			intent.extras?.getLong(EXTRA_LONG_PROFILE_ID)?: loadSelectedUserId()
+		) ?: userDatabase.getAllUsers().getOrNull(0)
+
+		user?.let {
+			setUser(it)
 		}
 	}
 
-	fun loadUser(user: UserDatabase.User) {
+	@OptIn(DelicateCoroutinesApi::class)
+	fun setUser(user: UserDatabase.User, save: Boolean = false) {
 		this.user = user
+		this.customThemeColor = null
 
 		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, user.id)
-		preferences.loadProfile(user.id)
-		preferences.saveProfileId(user.id)
+
+		if (save)
+			GlobalScope.launch(Dispatchers.IO) {
+				saveSelectedUserId(user.id)
+			}
+	}
+
+	private suspend fun loadSelectedUserId(): Long {
+		return globalDataStore.data.map { prefs -> prefs[DATASTORE_KEY_USER_ID] ?: -1 }.first()
+	}
+
+	private suspend fun saveSelectedUserId(id: Long) {
+		globalDataStore.edit { prefs ->
+			prefs[DATASTORE_KEY_USER_ID] = id
+		}
 	}
 
 	fun currentUserId() = user?.id ?: -1
@@ -162,26 +178,32 @@ open class BaseComposeActivity : ComponentActivity() {
 			)
 		}
 
-		LaunchedEffect(Unit) {
-			scope.launch {
-				themeColorPref.getValueFlow().collect {
-					themeColor = it
-				}
-			}
-
-			scope.launch {
-				darkThemePref.getValueFlow().collect {
-					darkTheme = when (it) {
-						"on" -> true
-						"off" -> false
-						else -> initialDarkTheme
+		DisposableEffect(user) {
+			val jobs = listOf(
+				scope.launch {
+					themeColorPref.getValueFlow().cancellable().collect {
+						themeColor = it
+					}
+				},
+				scope.launch {
+					darkThemePref.getValueFlow().cancellable().collect {
+						darkTheme = when (it) {
+							"on" -> true
+							"off" -> false
+							else -> initialDarkTheme
+						}
+					}
+				},
+				scope.launch {
+					darkThemeOledPref.getValueFlow().cancellable().collect {
+						darkThemeOled = it
 					}
 				}
-			}
+			)
 
-			scope.launch {
-				darkThemeOledPref.getValueFlow().collect {
-					darkThemeOled = it
+			onDispose {
+				jobs.forEach {
+					it.cancel()
 				}
 			}
 		}

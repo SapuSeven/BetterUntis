@@ -198,7 +198,7 @@ class MainActivity :
 											currentSelectionId = user.id,
 											showProfileActions = true,
 											onSelectionChange = {
-												loadUser(it)
+												setUser(it, true)
 											},
 											onActionEdit = {
 												appState.profileManagementDialog.value = true
@@ -1201,15 +1201,13 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		target: TimetableLoader.TimetableLoaderTarget,
 		forceRefresh: Boolean = false
 	): Flow<Result<TimetableLoader.TimetableItems>> {
-		// TODO: Wait for prefs to be loaded
 		val alwaysLoad = preferences.connectivityRefreshInBackground.getValue()
-		//preferences["preference_connectivity_refresh_in_background", false]*/
 		val flags =
 			(if (!forceRefresh) TimetableLoader.FLAG_LOAD_CACHE else 0) or (if (alwaysLoad || forceRefresh) TimetableLoader.FLAG_LOAD_SERVER else 0)
 		return loader.loadAsync(
 			target,
 			flags,
-			null/*preferences["preference_connectivity_proxy_host"]*/
+			preferences.proxyHost.getValue()
 		)
 	}
 
@@ -1365,7 +1363,6 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			val timetableRangeIndexReset = timetableRangeIndexReset.getValueFlow()
 
 			weekView?.let {
-				Log.d("WeekView", "flow started")
 				scope.launch {
 					flingEnable.collect { weekView.horizontalFlingEnabled = it }
 				}

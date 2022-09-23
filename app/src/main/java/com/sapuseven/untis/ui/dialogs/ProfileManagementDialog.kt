@@ -168,8 +168,6 @@ fun BaseComposeActivity.ProfileManagementDialog(
 							scope.launch {
 								userDatabase.deleteUser(user.id)
 								deleteProfile(user.id)
-								if (user.id == preferences.loadProfileId())
-									preferences.deleteProfileId()
 								profiles = this@ProfileManagementDialog.userDatabase.getAllUsers()
 								if (profiles.isEmpty())
 									recreate()

@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,13 +15,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.window.Dialog
 import androidx.core.text.HtmlCompat
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
@@ -39,17 +35,19 @@ import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.SchoolYear
 import com.sapuseven.untis.models.untis.params.*
 import com.sapuseven.untis.models.untis.response.*
+import com.sapuseven.untis.preferences.DataStorePreferences
+import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.dialogs.AttachmentsDialog
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
-import java.text.SimpleDateFormat
 import java.util.*
 
 class InfoCenterActivity : BaseComposeActivity() {
 	private var api: UntisRequest = UntisRequest()
+	private lateinit var preferences: DataStorePreferences
 
 	companion object {
 		private const val ID_MESSAGES = 1
@@ -65,6 +63,8 @@ class InfoCenterActivity : BaseComposeActivity() {
 		setContent {
 			AppTheme {
 				withUser { user ->
+					preferences = dataStorePreferences
+
 					Scaffold(
 						topBar = {
 							CenterAlignedTopAppBar(
@@ -110,14 +110,14 @@ class InfoCenterActivity : BaseComposeActivity() {
 
 							SideEffect {
 								coroutineScope.launch {
-									messages = loadMessages(user)?.also {
+									messages = loadMessages(user)/*?.also {
 										preferences["preference_last_messages_count"] = it.size
 										preferences["preference_last_messages_date"] =
 											SimpleDateFormat(
 												"dd-MM-yyyy",
 												Locale.US
 											).format(Calendar.getInstance().time)
-									}
+									}*/
 									messagesLoading = false
 								}
 
@@ -494,7 +494,7 @@ class InfoCenterActivity : BaseComposeActivity() {
 		val query = UntisRequest.UntisRequestQuery(user)
 
 		query.data.method = UntisApiConstants.METHOD_GET_MESSAGES
-		query.proxyHost = preferences["preference_connectivity_proxy_host", null]
+		query.proxyHost = preferences.proxyHost.getValue()
 		query.data.params = listOf(
 			MessageParams(
 				UntisDate.fromLocalDate(LocalDate.now()),
@@ -529,7 +529,7 @@ class InfoCenterActivity : BaseComposeActivity() {
 			val query = UntisRequest.UntisRequestQuery(user)
 
 			query.data.method = UntisApiConstants.METHOD_GET_EXAMS
-			query.proxyHost = preferences["preference_connectivity_proxy_host", null]
+			query.proxyHost = preferences.proxyHost.getValue()
 			query.data.params = listOf(
 				ExamParams(
 					user.userData.elemId,
@@ -560,7 +560,7 @@ class InfoCenterActivity : BaseComposeActivity() {
 			val query = UntisRequest.UntisRequestQuery(user)
 
 			query.data.method = UntisApiConstants.METHOD_GET_HOMEWORKS
-			query.proxyHost = preferences["preference_connectivity_proxy_host", null]
+			query.proxyHost = preferences.proxyHost.getValue()
 			query.data.params = listOf(
 				HomeworkParams(
 					user.userData.elemId,
@@ -590,7 +590,7 @@ class InfoCenterActivity : BaseComposeActivity() {
 		val query = UntisRequest.UntisRequestQuery(user)
 
 		query.data.method = UntisApiConstants.METHOD_GET_ABSENCES
-		query.proxyHost = preferences["preference_connectivity_proxy_host", null]
+		query.proxyHost = preferences.proxyHost.getValue()
 		query.data.params = listOf(
 			AbsenceParams(
 				UntisDate.fromLocalDate(LocalDate.now().minusYears(1)),
@@ -613,7 +613,7 @@ class InfoCenterActivity : BaseComposeActivity() {
 		val query = UntisRequest.UntisRequestQuery(user)
 
 		query.data.method = UntisApiConstants.METHOD_GET_OFFICEHOURS
-		query.proxyHost = preferences["preference_connectivity_proxy_host", null]
+		query.proxyHost = preferences.proxyHost.getValue()
 		query.data.params = listOf(
 			OfficeHoursParams(
 				-1,
