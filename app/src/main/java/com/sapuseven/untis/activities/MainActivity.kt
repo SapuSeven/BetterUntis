@@ -110,9 +110,6 @@ class MainActivity :
 		private const val FRAGMENT_TAG_ABSENCE_CHECK = "com.sapuseven.untis.fragments.absencecheck"
 	}
 
-	private var lastBackPress: Long = 0
-	//private var profileId: Long = -1
-
 	private var lastPickedDate: DateTime? = null
 	private var proxyHost: String? = null
 	private var profileUpdateDialog: AlertDialog? = null
@@ -953,24 +950,6 @@ private fun setBookmarksLongClickListeners() {
 }*/
 }
 
-class MainAppStatePreferences(
-	val automuteEnabled: Flow<Boolean>,
-	val additionalErrorMessages: Flow<Boolean>
-) {
-	/*@Composable
-	fun BaseComposeActivity.getMainAppStatePrefs() {
-		this.preferenceDataStore.data.collect {
-			it.
-		}
-
-		MainAppStatePreferences(
-			dataStorePreferences.automuteEnable().getValueFlow(),
-			dataStorePreferences.additionalErrorMessages().getValueFlow(),
-			dataStorePreferences.timeta().getValueFlow()
-		)
-	}*/
-}
-
 class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	val user: UserDatabase.User,
 	val timetableDatabaseInterface: TimetableDatabaseInterface,
@@ -1001,7 +980,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		private const val UNTIS_DEFAULT_COLOR = "#f49f25"
 	}
 
-	var drawerGestures by drawerGestureState
+	private var drawerGestures by drawerGestureState
 
 	var displayedElement: MutableState<PeriodElement?> = mutableStateOf(personalTimetable?.first)
 	var displayedName: MutableState<String> =
@@ -1016,9 +995,9 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	val isLoading: Boolean
 		get() = loading.value > 0
 
-	var isRefreshing: Boolean by mutableStateOf(false)
+	private var isRefreshing: Boolean by mutableStateOf(false)
 
-	var shouldUpdateWeekView = true
+	private var shouldUpdateWeekView = true
 
 	@OptIn(ExperimentalMaterial3Api::class)
 	val drawerGesturesEnabled: Boolean
@@ -1079,8 +1058,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	)
 
 	private suspend fun prepareItems(
-		items: List<TimegridItem>,
-		colorScheme: ColorScheme
+		items: List<TimegridItem>
 	): List<TimegridItem> {
 		val newItems = mergeItems(items.mapNotNull { item ->
 			if (item.periodData.isCancelled() && preferences.timetableHideCancelled.getValue())
@@ -1240,7 +1218,6 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		startDate: LocalDate,
 		endDate: LocalDate,
 		element: PeriodElement,
-		colorScheme: ColorScheme,
 		onItemsChanged: (items: WeeklyTimetableItems) -> Unit,
 		forceRefresh: Boolean = false
 	) {
@@ -1269,11 +1246,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 						onItemsChanged(
 							WeeklyTimetableItems(
 								dateRange = dateRange,
-								items =
-								prepareItems(
-									timetableItems.items,
-									colorScheme
-								),
+								items = prepareItems(timetableItems.items),
 								lastUpdated = timetableItems.timestamp
 							)
 						)
@@ -1333,7 +1306,6 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 						dateRange.first.toLocalDate(),
 						dateRange.second.toLocalDate(),
 						element,
-						colorScheme,
 						forceRefresh = true,
 						onItemsChanged = { items ->
 							weeklyTimetableItems[weekIndex] = items
@@ -1391,8 +1363,6 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			val eventSecondaryTextSize = timetableLessonInfoFontSize.getValueFlow()
 			val timetableRange = timetableRange.getValueFlow()
 			val timetableRangeIndexReset = timetableRangeIndexReset.getValueFlow()
-
-			val themeColor = themeColor.getValueFlow()
 
 			weekView?.let {
 				Log.d("WeekView", "flow started")
@@ -1688,7 +1658,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		shouldUpdateWeekView = false
 	}
 
-	fun onMotionEvent(event: MotionEvent) {
+	private fun onMotionEvent(event: MotionEvent) {
 		when (event.action) {
 			MotionEvent.ACTION_DOWN -> {
 				drawerGestures =
@@ -1718,7 +1688,6 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 							startDate,
 							endDate,
 							displayedElement,
-							colorScheme,
 							onItemsChanged = { items ->
 								weeklyTimetableItems[weekIndex] =
 									items
