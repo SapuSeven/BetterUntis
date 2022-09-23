@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -19,9 +20,9 @@ import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.config.PreferenceHelper
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.preferences.dataStorePreferences
-import com.sapuseven.untis.ui.theme.DarkColorScheme
-import com.sapuseven.untis.ui.theme.LightColorScheme
-import com.sapuseven.untis.ui.theme.Typography
+import com.sapuseven.untis.ui.material.scheme.Scheme
+import com.sapuseven.untis.ui.preferences.materialColors
+import com.sapuseven.untis.ui.theme.toColorScheme
 import kotlinx.coroutines.launch
 
 @SuppressLint("Registered") // This activity is not intended to be used directly
@@ -114,21 +115,23 @@ open class BaseComposeActivity : ComponentActivity() {
 	private fun generateColorScheme(
 		context: Context,
 		dynamicColor: Boolean,
+		themeColor: Color,
 		darkTheme: Boolean,
 		darkThemeOled: Boolean
-	) =
-		when {
+	): ColorScheme {
+		return when {
 			dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
 				if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
 			}
-			darkTheme -> DarkColorScheme
-			else -> LightColorScheme
+			darkTheme -> Scheme.dark(themeColor.toArgb()).toColorScheme()
+			else -> Scheme.light(themeColor.toArgb()).toColorScheme()
 		}.run {
 			if (darkTheme && darkThemeOled)
 				copy(background = Color.Black, surface = Color.Black)
 			else
 				this
 		}
+	}
 
 	@Composable
 	fun AppTheme(
@@ -139,7 +142,7 @@ open class BaseComposeActivity : ComponentActivity() {
 		val context = LocalContext.current
 		val scope = rememberCoroutineScope()
 
-		var theme by remember { mutableStateOf("") }
+		var themeColor by remember { mutableStateOf(materialColors[0]) }
 		var darkTheme by remember { mutableStateOf(initialDarkTheme) }
 		var darkThemeOled by remember { mutableStateOf(false) }
 
@@ -147,6 +150,7 @@ open class BaseComposeActivity : ComponentActivity() {
 			generateColorScheme(
 				context,
 				dynamicColor,
+				themeColor,
 				darkTheme,
 				darkThemeOled
 			)
@@ -159,7 +163,8 @@ open class BaseComposeActivity : ComponentActivity() {
 		LaunchedEffect(Unit) {
 			scope.launch {
 				themePrefFlow.collect {
-					theme = it
+					// TODO: Change pref type to color
+					//themeColor = Color(it)
 				}
 			}
 
@@ -193,7 +198,6 @@ open class BaseComposeActivity : ComponentActivity() {
 
 		MaterialTheme(
 			colorScheme = colorScheme,
-			typography = Typography,
 			content = content
 		)
 	}
