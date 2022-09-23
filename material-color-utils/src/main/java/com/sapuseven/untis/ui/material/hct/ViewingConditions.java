@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package hct;
+package com.sapuseven.untis.ui.material.hct;
 
-import utils.ColorUtils;
-import utils.MathUtils;
+import com.sapuseven.untis.ui.material.utils.ColorUtils;
+import com.sapuseven.untis.ui.material.utils.MathUtils;
 
 /**
  * In traditional color spaces, a color can be identified solely by the observer's measurement of

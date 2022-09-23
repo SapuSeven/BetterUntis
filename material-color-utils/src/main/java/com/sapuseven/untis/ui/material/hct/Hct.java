@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package hct;
+package com.sapuseven.untis.ui.material.hct;
 
-import utils.ColorUtils;
+import com.sapuseven.untis.ui.material.utils.ColorUtils;
 
 /**
  * A color system built using CAM16 hue and chroma, and L* from L*a*b*.

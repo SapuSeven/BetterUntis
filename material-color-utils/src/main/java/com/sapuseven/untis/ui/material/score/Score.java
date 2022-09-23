@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package score;
+package com.sapuseven.untis.ui.material.score;
 
-import hct.Cam16;
-import utils.ColorUtils;
-import utils.MathUtils;
+import com.sapuseven.untis.ui.material.hct.Cam16;
+import com.sapuseven.untis.ui.material.utils.ColorUtils;
+import com.sapuseven.untis.ui.material.utils.MathUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

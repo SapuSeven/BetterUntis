@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package palettes;
+package com.sapuseven.untis.ui.material.palettes;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
-import hct.Hct;
+import com.sapuseven.untis.ui.material.hct.Hct;
 
 /**
- * An intermediate concept between the key color for a UI theme, and a full color scheme. 5 sets of
+ * An intermediate concept between the key color for a UI theme, and a full color com.sapuseven.untis.ui.material.scheme. 5 sets of
  * tones are generated, all except one use the same hue as the key color, and all vary in chroma.
  */
 public final class CorePalette {

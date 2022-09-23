@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package palettes;
+package com.sapuseven.untis.ui.material.palettes;
 
-import hct.Hct;
+import com.sapuseven.untis.ui.material.hct.Hct;
 import java.util.HashMap;
 import java.util.Map;
 
