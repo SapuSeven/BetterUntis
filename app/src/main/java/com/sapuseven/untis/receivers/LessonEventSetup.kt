@@ -52,7 +52,8 @@ abstract class LessonEventSetup : BroadcastReceiver() {
 
 		val targetTimetable = createPersonalTimetable()
 		targetTimetable?.let {
-			val target = TimetableLoader.TimetableLoaderTarget(currentDate, currentDate, it.second, it.first)
+			// TODO: Implement new timetable loader
+			/*val target = TimetableLoader.TimetableLoaderTarget(currentDate, currentDate, it.second, it.first)
 			val proxyHost: String = preferences["preference_connectivity_proxy_host", null]
 			lateinit var timetableLoader: TimetableLoader
 			timetableLoader = TimetableLoader(WeakReference(context), object : TimetableDisplay {
@@ -69,7 +70,7 @@ abstract class LessonEventSetup : BroadcastReceiver() {
 					}
 				}
 			}, profileUser, timetableDatabaseInterface)
-			timetableLoader.load(target, TimetableLoader.FLAG_LOAD_CACHE, proxyHost)
+			timetableLoader.load(target, TimetableLoader.FLAG_LOAD_CACHE, proxyHost)*/
 		}
 	}
 

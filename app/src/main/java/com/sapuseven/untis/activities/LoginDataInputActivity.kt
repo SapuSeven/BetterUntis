@@ -210,7 +210,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 
 								loading = false
 								coroutineScope.launch {
-									snackbarHostState.showSnackbar(errorMessage)
+									snackbarHostState.showSnackbar(errorMessage, duration = SnackbarDuration.Long)
 								}
 							}).run {
 							val schoolInfo = (

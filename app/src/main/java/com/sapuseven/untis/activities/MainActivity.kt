@@ -55,7 +55,7 @@ import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
-import com.sapuseven.untis.ui.common.ElementPickerDialogFullscreen
+import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
 import com.sapuseven.untis.ui.common.Weekday
 import com.sapuseven.untis.ui.common.disabled
@@ -73,11 +73,11 @@ import com.sapuseven.untis.views.weekview.listeners.ScaleListener
 import com.sapuseven.untis.views.weekview.listeners.ScrollListener
 import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants
 import org.joda.time.Instant
@@ -995,7 +995,11 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	val isLoading: Boolean
 		get() = loading.value > 0
 
-	private var isRefreshing: Boolean by mutableStateOf(false)
+	private var isRefreshing: Boolean
+		get() = weekViewSwipeRefresh.value?.isRefreshing ?: false
+		set(value) {
+			weekViewSwipeRefresh.value?.isRefreshing = value
+		}
 
 	private var shouldUpdateWeekView = true
 
@@ -1199,15 +1203,18 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	private suspend fun loadTimetable(
 		loader: TimetableLoader,
 		target: TimetableLoader.TimetableLoaderTarget,
-		forceRefresh: Boolean = false
-	): Flow<Result<TimetableLoader.TimetableItems>> {
+		forceRefresh: Boolean = false,
+		onItemsReceived: (timetableItems: TimetableLoader.TimetableItems) -> Unit
+	) {
 		val alwaysLoad = preferences.connectivityRefreshInBackground.getValue()
 		val flags =
 			(if (!forceRefresh) TimetableLoader.FLAG_LOAD_CACHE else 0) or (if (alwaysLoad || forceRefresh) TimetableLoader.FLAG_LOAD_SERVER else 0)
-		return loader.loadAsync(
+
+		loader.loadAsync(
 			target,
 			flags,
-			preferences.proxyHost.getValue()
+			preferences.proxyHost.getValue(),
+			onItemsReceived
 		)
 	}
 
@@ -1224,69 +1231,64 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 				UntisDate.fromLocalDate(LocalDate(startDate)) to
 						UntisDate.fromLocalDate(LocalDate(endDate))
 
-			loadTimetable(
-				loader,
-				TimetableLoader.TimetableLoaderTarget(
-					dateRange.first,
-					dateRange.second,
-					element.id,
-					element.type
-				), forceRefresh
-			).collect { result ->
-				result
-					.onSuccess { timetableItems ->
-						/*for (item in timetableItems.items) {
-					if (item.periodData.element.messengerChannel != null) {
-						navigationview_main.menu.findItem(R.id.nav_messenger).isVisible = true
-						break
-					}
-				}*/
-						onItemsChanged(
-							WeeklyTimetableItems(
-								dateRange = dateRange,
-								items = prepareItems(timetableItems.items),
-								lastUpdated = timetableItems.timestamp
-							)
-						)
-					}
-					.onFailure {
-						when (it) {
-							is TimetableLoader.TimetableLoaderException -> {
-								Log.e(
-									"MainActivity",
-									it.untisErrorMessage ?: it.message ?: "unknown error"
-								)
-
-								// TODO
-								when (it.untisErrorCode) {
-									/*TimetableLoader.CODE_CACHE_MISSING -> timetableLoader!!.repeat(
-									it.requestId,
-									TimetableLoader.FLAG_LOAD_SERVER,
-									proxyHost
-								)*/
-									else -> {
-										/*Snackbar.make(
-										content_main,
-										if (code != null) ErrorMessageDictionary.getErrorMessage(
-											resources,
-											code
-										) else message
-											?: getString(R.string.all_error),
-										Snackbar.LENGTH_INDEFINITE
-									)
-										.setAction("Show") {
-											ErrorReportingDialog(this).showRequestErrorDialog(
-												requestId,
-												code,
-												message
-											)
-										}
-										.show()*/
-									}
-								}
-							}
+			try {
+				loadTimetable(
+					loader,
+					TimetableLoader.TimetableLoaderTarget(
+						dateRange.first,
+						dateRange.second,
+						element.id,
+						element.type
+					),
+					forceRefresh
+				) { timetableItems ->
+					/*for (item in timetableItems.items) {
+						if (item.periodData.element.messengerChannel != null) {
+							navigationview_main.menu.findItem(R.id.nav_messenger).isVisible = true
+							break
 						}
+					}*/
+					onItemsChanged(
+						WeeklyTimetableItems(
+							dateRange = dateRange,
+							items = runBlocking { prepareItems(timetableItems.items) },
+							lastUpdated = timetableItems.timestamp
+						)
+					)
+				}
+			} catch (e: TimetableLoader.TimetableLoaderException) {
+				Log.e(
+					"MainActivity",
+					e.untisErrorMessage ?: e.message ?: "unknown error"
+				)
+
+				// TODO
+				when (e.untisErrorCode) {
+					/*TimetableLoader.CODE_CACHE_MISSING -> timetableLoader!!.repeat(
+					it.requestId,
+					TimetableLoader.FLAG_LOAD_SERVER,
+					proxyHost
+				)*/
+					else -> {
+						/*Snackbar.make(
+						content_main,
+						if (code != null) ErrorMessageDictionary.getErrorMessage(
+							resources,
+							code
+						) else message
+							?: getString(R.string.all_error),
+						Snackbar.LENGTH_INDEFINITE
+					)
+						.setAction("Show") {
+							ErrorReportingDialog(this).showRequestErrorDialog(
+								requestId,
+								code,
+								message
+							)
+						}
+						.show()*/
 					}
+				}
 			}
 		}
 	}

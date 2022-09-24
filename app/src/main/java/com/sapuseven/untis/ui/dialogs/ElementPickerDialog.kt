@@ -1,4 +1,4 @@
-package com.sapuseven.untis.ui.common
+package com.sapuseven.untis.ui.dialogs
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.LocalIndication
@@ -14,7 +14,6 @@ import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.material3.TextFieldDefaults.TextFieldDecorationBox
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -29,6 +28,7 @@ import androidx.compose.ui.window.Dialog
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import com.sapuseven.untis.ui.common.disabled
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -251,7 +251,7 @@ fun ElementPickerElements(
 	modifier: Modifier,
 	onDismiss: (success: Boolean) -> Unit = {},
 	onSelect: (selectedItem: PeriodElement?) -> Unit = {},
-	items: SnapshotStateMap<PeriodElement, Boolean>,
+	items: MutableMap<PeriodElement, Boolean>,
 	filter: String = ""
 ) {
 	Box(

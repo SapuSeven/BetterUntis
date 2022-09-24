@@ -41,7 +41,7 @@ import com.sapuseven.untis.models.untis.masterdata.timegrid.Day
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
-import com.sapuseven.untis.ui.common.ElementPickerDialogFullscreen
+import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 import kotlinx.coroutines.launch
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
@@ -70,7 +70,8 @@ class RoomFinderActivity : BaseComposeActivity() {
 		setContent {
 			AppTheme {
 				withUser { user ->
-					roomFinderDatabase = remember { RoomfinderDatabase.createInstance(this, currentUserId()) }
+					roomFinderDatabase =
+						remember { RoomfinderDatabase.createInstance(this, currentUserId()) }
 					preferences = dataStorePreferences
 
 					val maxHourIndex = remember { calculateMaxHourIndex(user) }
@@ -379,7 +380,11 @@ class RoomFinderActivity : BaseComposeActivity() {
 	}
 
 	@Throws(TimetableLoader.TimetableLoaderException::class)
-	private suspend fun loadStates(user: UserDatabase.User, roomId: Int, proxyHost: String?): List<Boolean> {
+	private suspend fun loadStates(
+		user: UserDatabase.User,
+		roomId: Int,
+		proxyHost: String?
+	): List<Boolean> {
 		val states = mutableListOf<Boolean>()
 
 		val startDate = UntisDate.fromLocalDate(
@@ -400,7 +405,7 @@ class RoomFinderActivity : BaseComposeActivity() {
 		for (i in 0..10)
 			states.add(Random.nextBoolean())*/
 
-		val resultChannel = TimetableLoader(
+		TimetableLoader(
 			context = WeakReference(this@RoomFinderActivity),
 			user = user,
 			timetableDatabaseInterface = timetableDatabaseInterface
@@ -411,38 +416,36 @@ class RoomFinderActivity : BaseComposeActivity() {
 				roomId,
 				TimetableDatabaseInterface.Type.ROOM.name
 			), TimetableLoader.FLAG_LOAD_SERVER, proxyHost
-		)
+		) { timetableItems ->
+			val loadedStates = mutableListOf<Boolean>()
+			user.timeGrid.days.forEach { day ->
+				val dayDateTime =
+					DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH)
+						.parseDateTime(day.day)
 
-		val loadedStates = mutableListOf<Boolean>()
-		user.timeGrid.days.forEach { day ->
-			val dayDateTime =
-				DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH)
-					.parseDateTime(day.day)
+				day.units.forEach { unit ->
+					val unitStartDateTime = unit.startTime.toLocalTime()
+					val unitEndDateTime = unit.endTime.toLocalTime()
 
-			day.units.forEach { unit ->
-				val unitStartDateTime = unit.startTime.toLocalTime()
-				val unitEndDateTime = unit.endTime.toLocalTime()
+					var occupied = false
 
-				var occupied = false
-				resultChannel.collect { result ->
-					result.onSuccess {
-						it.items.forEach allItems@{ item ->
-							if (item.startDateTime.dayOfWeek == dayDateTime.dayOfWeek)
-								if (item.startDateTime.millisOfDay <= unitEndDateTime.millisOfDay
-									&& item.endDateTime.millisOfDay >= unitStartDateTime.millisOfDay
-								) {
-									occupied = true
-									return@allItems
-								}
-						}
+					timetableItems.items.forEach allItems@{ item ->
+						if (item.startDateTime.dayOfWeek == dayDateTime.dayOfWeek)
+							if (item.startDateTime.millisOfDay <= unitEndDateTime.millisOfDay
+								&& item.endDateTime.millisOfDay >= unitStartDateTime.millisOfDay
+							) {
+								occupied = true
+								return@allItems
+							}
 					}
-				}
 
-				loadedStates.add(occupied)
+					loadedStates.add(occupied)
+				}
 			}
+
+			states.addAll(loadedStates.toList())
 		}
 
-		states.addAll(loadedStates.toList())
 		return states.toList()
 	}
 

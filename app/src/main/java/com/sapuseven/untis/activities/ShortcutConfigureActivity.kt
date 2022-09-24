@@ -17,7 +17,7 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import com.sapuseven.untis.ui.common.ElementPickerDialogFullscreen
+import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
 
 class ShortcutConfigureActivity : BaseComposeActivity() {
