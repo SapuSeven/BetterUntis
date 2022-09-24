@@ -14,7 +14,6 @@ import android.view.View
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.*
@@ -45,7 +44,6 @@ import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PR
 import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_ROUTE
 import com.sapuseven.untis.activities.main.DrawerItems
 import com.sapuseven.untis.activities.main.DrawerText
-import com.sapuseven.untis.adapters.ProfileListAdapter
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.DateTimeUtils
@@ -64,7 +62,6 @@ import com.sapuseven.untis.ui.dialogs.TimetableItemDetailsDialog
 import com.sapuseven.untis.ui.functional.BackPressConfirm
 import com.sapuseven.untis.ui.preferences.convertRangeToPair
 import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
-import com.sapuseven.untis.viewmodels.PeriodDataViewModel
 import com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
 import com.sapuseven.untis.views.weekview.WeekView
 import com.sapuseven.untis.views.weekview.WeekViewDisplayable
@@ -98,25 +95,12 @@ class MainActivity :
 		TimetableItemDetailsFragment.TimetableItemDetailsDialogListener*/ {
 
 	companion object {
-		private const val REQUEST_CODE_LOGINDATAINPUT_ADD = 3
-		private const val REQUEST_CODE_LOGINDATAINPUT_EDIT = 4
-		private const val REQUEST_CODE_ERRORS = 5
-
-		private const val PERSISTENT_INT_ZOOM_LEVEL = "persistent_zoom_level"
-
 		private const val MESSENGER_PACKAGE_NAME = "com.untis.chat"
-
-		private const val FRAGMENT_TAG_LESSON_INFO = "com.sapuseven.untis.fragments.lessoninfo"
-		private const val FRAGMENT_TAG_ABSENCE_CHECK = "com.sapuseven.untis.fragments.absencecheck"
 	}
 
 	private var lastPickedDate: DateTime? = null
-	private var proxyHost: String? = null
 	private var profileUpdateDialog: AlertDialog? = null
 	private val weekViewRefreshHandler = Handler(Looper.getMainLooper())
-	private lateinit var profileListAdapter: ProfileListAdapter
-	private var BOOKMARKS_ADD_ID: Int = 0
-	private val timetableItemDetailsViewModel: PeriodDataViewModel by viewModels()
 
 	// TODO
 	/*private val weekViewUpdate = object : Runnable {
@@ -151,7 +135,7 @@ class MainActivity :
 		//setupNotifications()
 
 		setContent {
-			AppTheme {
+			AppTheme(navBarInset = false) {
 				val snackbarHostState = remember { SnackbarHostState() }
 				if (dataStorePreferences.doubleTapToExit.getState().value)
 					BackPressConfirm(snackbarHostState)
@@ -215,11 +199,15 @@ class MainActivity :
 							) {
 								WeekViewCompose(appState)
 
+								val timeColumnWidth = with (LocalDensity.current) {
+									appState.weekView.value?.config?.timeColumnWidth?.toDp() ?: 48.dp
+								}
 								Text(
 									text = appState.lastRefreshText(),
 									modifier = Modifier
 										.align(Alignment.BottomStart)
-										.padding(start = 48.dp, bottom = 8.dp)
+										.padding(start = timeColumnWidth + 8.dp, bottom = 8.dp)
+										.navigationBarsPadding()
 										.disabled(appState.isAnonymous)
 								)
 
@@ -245,7 +233,7 @@ class MainActivity :
 														this@MainActivity,
 														SettingsActivity::class.java
 													).apply {
-														putExtra(EXTRA_LONG_PROFILE_ID, user.id)
+														putUserIdExtra(user.id)
 														putExtra(
 															EXTRA_STRING_PREFERENCE_ROUTE,
 															"preferences_timetable"
@@ -254,6 +242,7 @@ class MainActivity :
 															EXTRA_STRING_PREFERENCE_HIGHLIGHT,
 															"preference_timetable_personal_timetable"
 														)
+														putBackgroundColorExtra()
 													}
 												)
 											},
@@ -476,7 +465,8 @@ class MainActivity :
 								this@MainActivity,
 								item.target
 							).apply {
-								putExtra(EXTRA_LONG_PROFILE_ID, currentUserId())
+								putUserIdExtra()
+								putBackgroundColorExtra()
 							}
 						)
 					}
@@ -487,7 +477,10 @@ class MainActivity :
 	}
 
 	private fun login() {
-		loginLauncher.launch(Intent(this, LoginActivity::class.java))
+		loginLauncher.launch(Intent(this, LoginActivity::class.java).apply {
+			putUserIdExtra()
+			putBackgroundColorExtra()
+		})
 	}
 
 	/*private fun checkForProfileUpdateRequired(): Boolean {
@@ -1312,7 +1305,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 							weekView.value?.notifyDataSetChanged()
 						}
 					)
-					isRefreshing = false // TODO: When loading fails, this is never reached (why??)
+					isRefreshing = false
 				}
 			}
 		}
@@ -1365,6 +1358,10 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			val timetableRangeIndexReset = timetableRangeIndexReset.getValueFlow()
 
 			weekView?.let {
+				val navBarHeight = with(LocalDensity.current) {
+					(WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 32.dp).toPx()
+				}.roundToInt()
+
 				scope.launch {
 					flingEnable.collect { weekView.horizontalFlingEnabled = it }
 				}
@@ -1465,7 +1462,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 				scope.launch {
 					timetableRange.combine(timetableRangeIndexReset) { range, rangeIndexReset ->
-						weekView.setupHours(range.convertRangeToPair(), rangeIndexReset)
+						weekView.setupHours(range.convertRangeToPair(), rangeIndexReset, navBarHeight)
 					}.collect()
 				}
 
@@ -1494,7 +1491,8 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 	private fun <T> WeekView<T>.setupHours(
 		range: Pair<Int, Int>?,
-		rangeIndexReset: Boolean
+		rangeIndexReset: Boolean,
+		additionalSpaceBelow: Int = 0
 	) {
 		val lines = MutableList(0) { 0 }
 		val labels = MutableList(0) { "" }
@@ -1532,7 +1530,8 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			else hourLabelArray
 		}
 		startTime = lines.first()
-		endTime = lines.last() + 30
+		endTime = lines.last()
+		endTimeOffset = additionalSpaceBelow
 	}
 
 	@SuppressLint("ClickableViewAccessibility")

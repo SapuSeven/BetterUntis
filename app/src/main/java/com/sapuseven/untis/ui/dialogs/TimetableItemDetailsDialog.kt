@@ -100,6 +100,7 @@ fun TimetableItemDetailsDialog(
 			horizontalAlignment = Alignment.CenterHorizontally,
 			modifier = Modifier
 				.padding(innerPadding)
+				.navigationBarsPadding()
 				.fillMaxSize()
 		) {
 			HorizontalPager(

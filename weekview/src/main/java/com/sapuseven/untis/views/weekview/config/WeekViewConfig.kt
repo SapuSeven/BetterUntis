@@ -259,6 +259,7 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 	// Custom properties
 	var startTime: Int = 0 // in minutes
 	var endTime: Int = 0 // in minutes
+	var endTimeOffset: Int = 0 // in pixels
 	var hourLines: IntArray = IntArray(0) // in minutes
 	lateinit var hourLabels: Array<String>
 	// Calculated values
@@ -271,7 +272,7 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 
 	val totalDayHeight: Float
 		get() {
-			val dayHeight = hourHeight * hoursPerDay()
+			val dayHeight = hourHeight * hoursPerDay() + endTimeOffset
 			val totalHeaderPadding = (headerRowPadding * 2).toFloat()
 			val headerBottomMargin = drawConfig.headerMarginBottom
 			return dayHeight + drawConfig.headerHeight + totalHeaderPadding + headerBottomMargin

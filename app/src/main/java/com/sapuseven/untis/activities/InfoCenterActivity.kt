@@ -37,6 +37,7 @@ import com.sapuseven.untis.models.untis.params.*
 import com.sapuseven.untis.models.untis.response.*
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
+import com.sapuseven.untis.ui.common.NavigationBarInset
 import com.sapuseven.untis.ui.dialogs.AttachmentsDialog
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
@@ -61,7 +62,7 @@ class InfoCenterActivity : BaseComposeActivity() {
 		super.onCreate(savedInstanceState)
 
 		setContent {
-			AppTheme {
+			AppTheme(navBarInset = false) {
 				withUser { user ->
 					preferences = dataStorePreferences
 
@@ -156,7 +157,7 @@ class InfoCenterActivity : BaseComposeActivity() {
 								}
 							}
 
-							NavigationBar {
+							NavigationBarInset {
 								NavigationBarItem(
 									icon = {
 										Icon(

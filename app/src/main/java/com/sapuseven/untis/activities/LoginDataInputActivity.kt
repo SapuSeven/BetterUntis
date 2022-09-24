@@ -62,7 +62,6 @@ class LoginDataInputActivity : BaseComposeActivity() {
 		//private const val FRAGMENT_TAG_PROFILE_UPDATE = "profileUpdate"
 
 		const val EXTRA_BOOLEAN_PROFILE_UPDATE = "com.sapuseven.untis.activities.profileupdate"
-		const val EXTRA_BOOLEAN_PROFILE_DELETE = "com.sapuseven.untis.activities.profiledelete"
 
 		val PREFS_BACKUP_SCHOOLID = stringPreferencesKey("logindatainput_backup_schoolid")
 		val PREFS_BACKUP_ANONYMOUS = booleanPreferencesKey("logindatainput_backup_anonymous")
@@ -83,8 +82,8 @@ class LoginDataInputActivity : BaseComposeActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
-		if (intent.hasExtra(EXTRA_LONG_PROFILE_ID)) {
-			existingUserId = intent.getLongExtra(EXTRA_LONG_PROFILE_ID, 0)
+		intent.getUserIdExtra()?.let { userId ->
+			existingUserId = userId
 
 			existingUserId?.let { id ->
 				existingUser = userDatabase.getUser(id)?.also { user ->
@@ -96,7 +95,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 		userDatabase = UserDatabase.createInstance(this)
 
 		setContent {
-			AppTheme {
+			AppTheme(navBarInset = false) {
 				val coroutineScope = rememberCoroutineScope()
 				val snackbarHostState = remember { SnackbarHostState() }
 
@@ -329,6 +328,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 						floatingActionButtonPosition = FabPosition.End,
 						floatingActionButton = {
 							ExtendedFloatingActionButton(
+								modifier = Modifier.navigationBarsPadding(),
 								icon = {
 									if (loading)
 										CircularProgressIndicator(
@@ -472,7 +472,10 @@ class LoginDataInputActivity : BaseComposeActivity() {
 									)
 								}
 							}
-							Spacer(modifier = Modifier.height(80.dp))
+							Spacer(modifier = Modifier
+								.navigationBarsPadding()
+								.height(80.dp)
+							)
 
 							if (qrCodeErrorDialog) {
 								AlertDialog(

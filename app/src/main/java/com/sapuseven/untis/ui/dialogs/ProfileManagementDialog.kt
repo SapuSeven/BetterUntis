@@ -5,8 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -17,13 +16,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.datastore.dataStore
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.BaseComposeActivity
-import com.sapuseven.untis.activities.BaseComposeActivity.Companion.EXTRA_LONG_PROFILE_ID
 import com.sapuseven.untis.activities.LoginActivity
 import com.sapuseven.untis.activities.LoginDataInputActivity
-import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_PROFILE_DELETE
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.config.deleteProfile
 import kotlinx.coroutines.launch
@@ -76,7 +72,8 @@ fun BaseComposeActivity.ProfileManagementDialog(
 		LazyColumn(
 			modifier = Modifier
 				.padding(innerPadding)
-				.fillMaxSize()
+				.fillMaxSize(),
+			contentPadding = WindowInsets.navigationBars.asPaddingValues()
 		) {
 			item {
 				ListItem(
@@ -118,7 +115,8 @@ fun BaseComposeActivity.ProfileManagementDialog(
 								context,
 								LoginDataInputActivity::class.java
 							).apply {
-								putExtra(EXTRA_LONG_PROFILE_ID, profile.id)
+								putUserIdExtra(profile.id)
+								putBackgroundColorExtra()
 							})
 					}
 				)
@@ -138,7 +136,9 @@ fun BaseComposeActivity.ProfileManagementDialog(
 							Intent(
 								context,
 								LoginActivity::class.java
-							)
+							).apply {
+								putBackgroundColorExtra()
+							}
 						)
 					}
 				)

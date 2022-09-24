@@ -2,12 +2,13 @@ package com.sapuseven.untis.activities
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -15,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.view.WindowCompat
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -23,10 +25,12 @@ import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.config.globalDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.preferences.dataStorePreferences
+import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.material.scheme.Scheme
 import com.sapuseven.untis.ui.theme.toColorScheme
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
@@ -34,11 +38,13 @@ import kotlinx.coroutines.flow.map
 open class BaseComposeActivity : ComponentActivity() {
 	internal var user by mutableStateOf<UserDatabase.User?>(null)
 	internal var customThemeColor by mutableStateOf<Color?>(null) // Workaround to allow legacy views to respond to theme color changes
+	internal var colorScheme by mutableStateOf<ColorScheme?>(null)
 	internal lateinit var userDatabase: UserDatabase
 	internal lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 
 	companion object {
-		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileid"
+		private const val EXTRA_LONG_USER_ID = "com.sapuseven.untis.activities.profileid"
+		private const val EXTRA_INT_BACKGROUND_COLOR = "com.sapuseven.untis.activities.backgroundcolor"
 
 		val DATASTORE_KEY_USER_ID = longPreferencesKey("userid")
 	}
@@ -50,6 +56,8 @@ open class BaseComposeActivity : ComponentActivity() {
 		}
 
 		super.onCreate(savedInstanceState)
+
+		WindowCompat.setDecorFitsSystemWindows(window, false)
 	}
 
 	override fun onDestroy() {
@@ -96,7 +104,7 @@ open class BaseComposeActivity : ComponentActivity() {
 
 	private suspend fun loadInitialUser() {
 		val user = userDatabase.getUser(
-			intent.extras?.getLong(EXTRA_LONG_PROFILE_ID)?: loadSelectedUserId()
+			intent.getUserIdExtra() ?: loadSelectedUserId()
 		) ?: userDatabase.getAllUsers().getOrNull(0)
 
 		user?.let {
@@ -155,6 +163,7 @@ open class BaseComposeActivity : ComponentActivity() {
 	@Composable
 	fun AppTheme(
 		initialDarkTheme: Boolean = isSystemInDarkTheme(),
+		navBarInset: Boolean = true,
 		content: @Composable () -> Unit
 	) {
 		val context = LocalContext.current
@@ -164,173 +173,111 @@ open class BaseComposeActivity : ComponentActivity() {
 		val darkThemePref = dataStorePreferences.darkTheme
 		val darkThemeOledPref = dataStorePreferences.darkThemeOled
 
-		var themeColor by remember { mutableStateOf(themeColorPref.defaultValue) }
-		var darkTheme by remember { mutableStateOf(initialDarkTheme) }
-		var darkThemeOled by remember { mutableStateOf(false) }
-
-		val colorScheme = remember(themeColor, darkTheme, darkThemeOled) {
-			generateColorScheme(
-				context,
-				themeColor == themeColorPref.defaultValue,
-				Color(themeColor),
-				darkTheme,
-				darkThemeOled
-			)
-		}
-
-		DisposableEffect(user) {
-			val jobs = listOf(
-				scope.launch {
-					themeColorPref.getValueFlow().cancellable().collect {
-						themeColor = it
-					}
-				},
-				scope.launch {
-					darkThemePref.getValueFlow().cancellable().collect {
-						darkTheme = when (it) {
-							"on" -> true
-							"off" -> false
-							else -> initialDarkTheme
-						}
-					}
-				},
-				scope.launch {
-					darkThemeOledPref.getValueFlow().cancellable().collect {
-						darkThemeOled = it
-					}
-				}
-			)
-
-			onDispose {
-				jobs.forEach {
-					it.cancel()
-				}
-			}
-		}
-
 		val systemUiController = rememberSystemUiController()
 
-		SideEffect {
-			systemUiController.setSystemBarsColor(
-				color = colorScheme.background,
-				darkIcons = !darkTheme
-			)
+		DisposableEffect(user) {
+			val job = scope.launch {
+				combine(
+					themeColorPref.getValueFlow().cancellable(),
+					darkThemePref.getValueFlow().cancellable(),
+					darkThemeOledPref.getValueFlow().cancellable()
+				) { themeColor, darkTheme, darkThemeOled ->
+					val darkThemeBool = when (darkTheme) {
+						"on" -> true
+						"off" -> false
+						else -> initialDarkTheme
+					}
 
-			// setStatusBarsColor() and setNavigationBarColor() also exist
-		}
+					systemUiController.setSystemBarsColor(
+						color = Color.Transparent,
+						darkIcons = !darkThemeBool
+					)
 
-		MaterialTheme(
-			colorScheme = colorScheme,
-			content = content
-		)
-	}
+					systemUiController.setNavigationBarColor(
+						color = Color.Transparent,
+						darkIcons = !darkThemeBool
+					)
 
-/*
-	/**
-	 * Checks for saved crashes. Calls [onErrorLogFound] if logs are found.
-	 *
-	 * @return `true` if the logs contain a critical application crash, `false` otherwise
-	 */
-	protected fun checkForCrashes(): Boolean {
-		val logFiles = File(filesDir, "logs").listFiles()
-		if (logFiles?.isNotEmpty() == true) {
-			onErrorLogFound()
+					// setStatusBarsColor() and setNavigationBarColor() also exist
 
-			return logFiles.find { f -> f.name.startsWith("_") } != null
-		}
-		return false
-	}
-
-	/**
-	 * Gets called if any error logs are found.
-	 *
-	 * Override this function in your actual activity.
-	 */
-	open fun onErrorLogFound() {
-		return
-	}
-
-	protected fun readCrashData(crashFile: File): String {
-		val reader = crashFile.bufferedReader()
-
-		val stackTrace = StringBuilder()
-		val buffer = CharArray(1024)
-		var length = reader.read(buffer)
-
-		while (length != -1) {
-			stackTrace.append(String(buffer, 0, length))
-			length = reader.read(buffer)
-		}
-
-		return stackTrace.toString()
-	}
-
-	override fun onStart() {
-		super.onStart()
-		setBlackBackground(preferences["preference_dark_theme_oled"])
-	}
-
-	override fun onResume() {
-		super.onResume()
-		val theme: String = preferences["preference_theme"]
-		val darkTheme: String = preferences["preference_dark_theme"]
-
-		if (currentTheme != theme || currentDarkTheme != darkTheme)
-			recreate()
-
-		currentTheme = theme
-		currentDarkTheme = darkTheme
-	}
-
-	private fun setAppTheme(hasOwnToolbar: Boolean) {
-		when (currentTheme) {
-			"untis" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_ThemeUntis_NoActionBar else R.style.AppTheme_ThemeUntis)
-			"blue" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_ThemeBlue_NoActionBar else R.style.AppTheme_ThemeBlue)
-			"green" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_ThemeGreen_NoActionBar else R.style.AppTheme_ThemeGreen)
-			"pink" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_ThemePink_NoActionBar else R.style.AppTheme_ThemePink)
-			"cyan" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_ThemeCyan_NoActionBar else R.style.AppTheme_ThemeCyan)
-			"pixel" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_ThemePixel_NoActionBar else R.style.AppTheme_ThemePixel)
-			else -> setTheme(if (hasOwnToolbar) R.style.AppTheme_NoActionBar else R.style.AppTheme)
-		}
-
-		AppCompatDelegate.setDefaultNightMode(
-			when (preferences["preference_dark_theme", currentDarkTheme]) {
-				"on" -> AppCompatDelegate.MODE_NIGHT_YES
-				"off" -> AppCompatDelegate.MODE_NIGHT_NO
-				else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+					generateColorScheme(
+						context,
+						themeColor == themeColorPref.defaultValue,
+						Color(themeColor),
+						darkTheme = darkThemeBool,
+						darkThemeOled
+					)
+				}.collect {
+					colorScheme = it
+				}
 			}
-		)
-	}
 
-	private fun setBlackBackground(blackBackground: Boolean) {
-		if (blackBackground
-			&& resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
-		)
-			window.decorView.setBackgroundColor(Color.BLACK)
-		else {
-			val typedValue = TypedValue()
-			theme.resolveAttribute(android.R.attr.windowBackground, typedValue, true)
-			if (typedValue.type >= TypedValue.TYPE_FIRST_COLOR_INT && typedValue.type <= TypedValue.TYPE_LAST_COLOR_INT)
-				window.decorView.setBackgroundColor(typedValue.data)
+			onDispose {
+				job.cancel()
+			}
+		}
+
+		colorScheme?.let {
+			MaterialTheme(
+				colorScheme = it,
+			) {
+				Surface(
+					modifier = Modifier
+						.background(MaterialTheme.colorScheme.background)
+						.conditional(navBarInset) {
+							navigationBarsPadding()
+						}
+						.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)),
+					content = content
+				)
+			}
+		} ?: run {
+			val backgroundColor = intent.getBackgroundColorExtra()
+				?: Color(
+					(if (initialDarkTheme) Scheme.dark(0) else Scheme.light(0)).background
+				)
+
+			Box(
+				modifier = Modifier
+					.fillMaxSize()
+					.background(backgroundColor)
+			) {}
+
+			SideEffect {
+				systemUiController.setSystemBarsColor(
+					color = backgroundColor
+				)
+
+				systemUiController.setNavigationBarColor(
+					color = backgroundColor
+				)
+			}
 		}
 	}
 
-	protected fun getAttr(@AttrRes attr: Int): Int {
-		val typedValue = TypedValue()
-		theme.resolveAttribute(attr, typedValue, true)
-		return typedValue.data
+	fun Intent.getUserIdExtra(): Long? {
+		return extras?.run {
+			if (containsKey(EXTRA_LONG_USER_ID))
+				getLong(EXTRA_LONG_USER_ID)
+			else null
+		}
 	}
 
-	private class CrashHandler(private val defaultUncaughtExceptionHandler: Thread.UncaughtExceptionHandler?) :
-		Thread.UncaughtExceptionHandler {
-		override fun uncaughtException(t: Thread, e: Throwable) {
-			Log.e("BetterUntis", "Application crashed!", e)
-			saveCrash(e)
-			defaultUncaughtExceptionHandler?.uncaughtException(t, e)
-		}
+	internal fun Intent.putUserIdExtra(profileId: Long = currentUserId()) {
+		this.putExtra(EXTRA_LONG_USER_ID, profileId)
+	}
 
-		private fun saveCrash(e: Throwable) {
-			ErrorLogger.instance?.logThrowable(e)
+	private fun Intent.getBackgroundColorExtra(): Color? {
+		return extras?.run {
+			if (containsKey(EXTRA_INT_BACKGROUND_COLOR))
+				Color(getInt(EXTRA_INT_BACKGROUND_COLOR))
+			else null
 		}
-	}*/
+	}
+
+	internal fun Intent.putBackgroundColorExtra(color: Color? = colorScheme?.background) {
+		color?.let {
+			this.putExtra(EXTRA_INT_BACKGROUND_COLOR, color.toArgb())
+		}
+	}
 }

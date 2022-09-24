@@ -112,7 +112,7 @@ class WeekViewDrawConfig(context: Context) {
 				newHourHeight = config.maxHourHeight
 			}
 
-			currentOrigin.y = currentOrigin.y / config.hourHeight * newHourHeight
+			currentOrigin.y = currentOrigin.y / (config.hourHeight * newHourHeight + config.endTimeOffset)
 			config.hourHeight = newHourHeight
 			newHourHeight = -1
 		}
@@ -122,7 +122,7 @@ class WeekViewDrawConfig(context: Context) {
 		val height = WeekView.viewHeight
 
 		// If the new currentOrigin.y is invalid, make it valid.
-		val dayHeight = config.hourHeight * config.hoursPerDay()
+		val dayHeight = config.hourHeight * config.hoursPerDay() + config.endTimeOffset
 		val potentialNewVerticalOrigin = height - (dayHeight + config.drawConfig.headerHeight)
 
 		currentOrigin.y = max(currentOrigin.y, potentialNewVerticalOrigin)

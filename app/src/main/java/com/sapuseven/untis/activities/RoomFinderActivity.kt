@@ -68,7 +68,7 @@ class RoomFinderActivity : BaseComposeActivity() {
 		super.onCreate(savedInstanceState)
 
 		setContent {
-			AppTheme {
+			AppTheme(navBarInset = false) {
 				withUser { user ->
 					roomFinderDatabase =
 						remember { RoomfinderDatabase.createInstance(this, currentUserId()) }
@@ -163,6 +163,7 @@ class RoomFinderActivity : BaseComposeActivity() {
 						)
 					else
 						Scaffold(
+							modifier = Modifier.navigationBarsPadding(),
 							topBar = {
 								CenterAlignedTopAppBar(
 									title = {

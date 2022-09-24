@@ -154,7 +154,7 @@ internal class WeekViewGestureHandler<T>(
 		val minX = Integer.MIN_VALUE
 		val maxX = Integer.MAX_VALUE
 
-		val dayHeight = (config.hourHeight * config.hoursPerDay()).toInt()
+		val dayHeight = (config.hourHeight * config.hoursPerDay() + config.endTimeOffset).toInt()
 		val viewHeight = WeekView.viewHeight
 
 		val minY = (dayHeight + drawConfig.headerHeight - viewHeight).toInt() * -1
@@ -173,7 +173,7 @@ internal class WeekViewGestureHandler<T>(
 		val minX = Integer.MIN_VALUE
 		val maxX = Integer.MAX_VALUE
 
-		val dayHeight = (config.hourHeight * config.hoursPerDay()).toInt()
+		val dayHeight = (config.hourHeight * config.hoursPerDay() + config.endTimeOffset).toInt()
 		val viewHeight = WeekView.viewHeight
 
 		val minY = (dayHeight + drawConfig.headerHeight - viewHeight).toInt() * -1

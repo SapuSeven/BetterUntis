@@ -238,6 +238,13 @@ class WeekView<T>(
 			invalidate()
 		}
 
+	var endTimeOffset: Int
+		get() = config.endTimeOffset
+		set(endTimeOffset) {
+			config.endTimeOffset = endTimeOffset
+			invalidate()
+		}
+
 	var horizontalFlingEnabled: Boolean
 		get() = config.horizontalFlingEnabled
 		set(horizontalFlingEnabled) {
@@ -461,7 +468,7 @@ class WeekView<T>(
 			return
 		}
 
-		var verticalOffset = config.hourHeight * min(hour.toFloat(), config.hoursPerDay()).toInt()
+		var verticalOffset = (config.hourHeight * min(hour.toFloat(), config.hoursPerDay()) + config.endTimeOffset).toInt()
 
 		val dayHeight = config.totalDayHeight
 		val viewHeight = height.toDouble()

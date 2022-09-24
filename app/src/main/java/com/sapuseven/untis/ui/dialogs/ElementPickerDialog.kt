@@ -2,6 +2,7 @@ package com.sapuseven.untis.ui.dialogs
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -18,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -28,6 +30,7 @@ import androidx.compose.ui.window.Dialog
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import com.sapuseven.untis.ui.common.NavigationBarInset
 import com.sapuseven.untis.ui.common.disabled
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -160,7 +163,8 @@ fun ElementPickerDialogFullscreen(
 				filter = search,
 				modifier = Modifier
 					.fillMaxWidth()
-					.weight(1f)
+					.weight(1f),
+				contentPadding = if (hideTypeSelection) WindowInsets.navigationBars.asPaddingValues() else PaddingValues(0.dp)
 			)
 
 			if (!hideTypeSelection)
@@ -252,7 +256,8 @@ fun ElementPickerElements(
 	onDismiss: (success: Boolean) -> Unit = {},
 	onSelect: (selectedItem: PeriodElement?) -> Unit = {},
 	items: MutableMap<PeriodElement, Boolean>,
-	filter: String = ""
+	filter: String = "",
+	contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
 	Box(
 		contentAlignment = Alignment.Center,
@@ -261,7 +266,8 @@ fun ElementPickerElements(
 		selectedType?.let {
 			LazyVerticalGrid(
 				columns = GridCells.Adaptive(if (multiSelect) 128.dp else 96.dp),
-				modifier = Modifier.fillMaxHeight()
+				modifier = Modifier.fillMaxHeight(),
+				contentPadding = contentPadding
 			) {
 				items(
 					items = items.keys
@@ -341,7 +347,7 @@ fun ElementPickerTypeSelection(
 	onDismiss: (success: Boolean) -> Unit = {},
 	onSelect: (selectedItem: PeriodElement?) -> Unit = {}
 ) {
-	NavigationBar {
+	NavigationBarInset {
 		NavigationBarItem(
 			icon = {
 				Icon(

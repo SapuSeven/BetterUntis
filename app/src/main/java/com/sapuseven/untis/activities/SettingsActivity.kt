@@ -5,19 +5,13 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
@@ -51,7 +45,7 @@ class SettingsActivity : BaseComposeActivity() {
 		val preferenceHighlight = (intent.extras?.getString(EXTRA_STRING_PREFERENCE_HIGHLIGHT))
 
 		setContent {
-			AppTheme {
+			AppTheme(navBarInset = false) {
 				withUser {
 					val navController = rememberNavController()
 					var title by remember { mutableStateOf<String?>(null) }
@@ -85,7 +79,7 @@ class SettingsActivity : BaseComposeActivity() {
 								composable("preferences") {
 									title = null
 
-									Column {
+									VerticalScrollColumn {
 										PreferenceScreen(
 											key = "preferences_general",
 											title = { Text(stringResource(id = R.string.preferences_general)) },
@@ -163,7 +157,7 @@ class SettingsActivity : BaseComposeActivity() {
 								composable("preferences_general") {
 									title = stringResource(id = R.string.preferences_general)
 
-									Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+									VerticalScrollColumn {
 										PreferenceCategory(stringResource(id = R.string.preference_category_general_behaviour)) {
 											SwitchPreference(
 												title = { Text(stringResource(R.string.preference_double_tap_to_exit)) },
@@ -247,7 +241,7 @@ class SettingsActivity : BaseComposeActivity() {
 								composable("preferences_styling") {
 									title = stringResource(id = R.string.preferences_styling)
 
-									Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+									VerticalScrollColumn {
 										PreferenceCategory(stringResource(id = R.string.preference_category_styling_colors)) {
 											ColorPreference(
 												title = { Text(stringResource(R.string.preference_background_future)) },
@@ -414,7 +408,7 @@ class SettingsActivity : BaseComposeActivity() {
 								composable("preferences_timetable") {
 									title = stringResource(id = R.string.preferences_timetable)
 
-									Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+									VerticalScrollColumn {
 										ElementPickerPreference(
 											title = { Text(stringResource(R.string.preference_timetable_personal_timetable)) },
 											dataStore = dataStorePreferences.timetablePersonalTimetable,
@@ -557,7 +551,7 @@ class SettingsActivity : BaseComposeActivity() {
 								composable("preferences_notifications") {
 									title = stringResource(id = R.string.preferences_notifications)
 
-									Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+									VerticalScrollColumn {
 										SwitchPreference(
 											title = { Text(stringResource(R.string.preference_notifications_enable)) },
 											summary = { Text(stringResource(R.string.preference_notifications_enable_desc)) },
@@ -670,7 +664,7 @@ class SettingsActivity : BaseComposeActivity() {
 								composable("preferences_connectivity") {
 									title = stringResource(id = R.string.preferences_connectivity)
 
-									Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+									VerticalScrollColumn {
 										SwitchPreference(
 											title = { Text(stringResource(R.string.preference_connectivity_refresh_in_background)) },
 											summary = { Text(stringResource(R.string.preference_connectivity_refresh_in_background_desc)) },
@@ -714,7 +708,7 @@ class SettingsActivity : BaseComposeActivity() {
 								composable("preferences_info") {
 									title = stringResource(id = R.string.preferences_info)
 
-									Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+									VerticalScrollColumn {
 										Preference(
 											title = { Text(stringResource(R.string.app_name)) },
 											summary = { Text(stringResource(R.string.app_desc)) },
@@ -832,5 +826,15 @@ class SettingsActivity : BaseComposeActivity() {
 				}
 			}
 		}
+	}
+
+	@Composable
+	private fun VerticalScrollColumn(content: @Composable ColumnScope.() -> Unit) {
+		Column(
+			modifier = Modifier
+				.verticalScroll(rememberScrollState())
+				.navigationBarsPadding(),
+			content = content
+		)
 	}
 }

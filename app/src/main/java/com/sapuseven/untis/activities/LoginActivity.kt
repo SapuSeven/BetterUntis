@@ -178,7 +178,9 @@ class LoginActivity : BaseComposeActivity() {
 											Intent(
 												this@LoginActivity,
 												LoginDataInputActivity::class.java
-											)
+											).apply {
+												putBackgroundColorExtra()
+											}
 										)
 									},
 									modifier = Modifier
