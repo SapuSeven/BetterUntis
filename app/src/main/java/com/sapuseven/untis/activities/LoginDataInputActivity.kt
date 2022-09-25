@@ -150,17 +150,15 @@ class LoginDataInputActivity : BaseComposeActivity() {
 								advanced =
 									proxyUrl.value?.isNotEmpty() == true || apiUrl.value?.isNotEmpty() == true
 							} else {
-								appLinkData.getQueryParameter("schoolInfo")?.let {
-									schoolInfoFromSearch =
-										getJSON().decodeFromString<UntisSchoolInfo>(it)
-									schoolId.value = schoolInfoFromSearch?.schoolId.toString()
-									schoolIdLocked = true
-								} ?: run {
-									qrCodeErrorDialog = true
-								}
+								qrCodeErrorDialog = true
 							}
 						} else {
-							qrCodeErrorDialog = true
+							appLinkData.getQueryParameter("schoolInfo")?.let {
+								schoolInfoFromSearch =
+									getJSON().decodeFromString<UntisSchoolInfo>(it)
+								schoolId.value = schoolInfoFromSearch?.schoolId.toString()
+								schoolIdLocked = true
+							}
 						}
 					}
 				}
