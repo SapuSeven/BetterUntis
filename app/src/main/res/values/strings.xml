@@ -324,6 +324,9 @@
 	<string name="widget_timetable">Timetable</string>
 	<string name="widget_timetable_empty">No timetable available for today</string>
 	<string name="widget_timetable_link">Timetable Link</string>
+    <string name="all_datepicker_select">Select date</string>
+	<string name="all_datepicker_month_next">Next month</string>
+	<string name="all_datepicker_month_previous">Previous month</string>
 
 	<plurals name="main_time_diff_minutes">
 		<item quantity="one">a minute ago</item>

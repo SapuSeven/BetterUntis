@@ -417,7 +417,7 @@ class WeekView<T>(
 		gestureHandler.forceScrollFinished()
 
 		if (viewState.areDimensionsInvalid) {
-			viewState.scrollToDay = date
+			viewState.scrollToDay = date.withTimeAtStartOfDay()
 			return
 		}
 
@@ -425,7 +425,7 @@ class WeekView<T>(
 		val offsetInWeek = DateUtils.offsetInWeek(today, config.firstDayOfWeek)
 		val firstDay = today.minusDays(offsetInWeek)
 
-		val dayDiff = DateUtils.displayedDays(Days.daysBetween(firstDay, date).days, config.weekLength).toDouble()
+		val dayDiff = DateUtils.displayedDays(Days.daysBetween(firstDay, date.withTimeAtStartOfDay()).days, config.weekLength).toDouble()
 		val weekDiff = dayDiff / config.weekLength.toDouble()
 
 		val leftOriginCount = floor(if (config.snapToWeek) weekDiff else dayDiff - offsetInWeek)

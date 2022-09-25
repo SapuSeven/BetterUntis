@@ -57,6 +57,7 @@ import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
 import com.sapuseven.untis.ui.common.Weekday
 import com.sapuseven.untis.ui.common.disabled
+import com.sapuseven.untis.ui.dialogs.DatePickerDialog
 import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
 import com.sapuseven.untis.ui.dialogs.TimetableItemDetailsDialog
 import com.sapuseven.untis.ui.functional.BackPressConfirm
@@ -68,6 +69,7 @@ import com.sapuseven.untis.views.weekview.WeekViewDisplayable
 import com.sapuseven.untis.views.weekview.listeners.EventClickListener
 import com.sapuseven.untis.views.weekview.listeners.ScaleListener
 import com.sapuseven.untis.views.weekview.listeners.ScrollListener
+import com.sapuseven.untis.views.weekview.listeners.TopLeftCornerClickListener
 import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
@@ -75,10 +77,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.joda.time.DateTime
-import org.joda.time.DateTimeConstants
-import org.joda.time.Instant
-import org.joda.time.LocalDate
+import org.joda.time.*
 import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
 import java.util.*
@@ -260,16 +259,6 @@ class MainActivity :
 											.align(Alignment.BottomEnd)
 											.padding(8.dp)
 									)
-
-								/*viewModelStore.clear() // TODO: Doesn't seem like the best solution. This could potentially interfere with other ViewModels scoped to this activity.
-								val fragment = TimetableItemDetailsFragment(data, timetableDatabaseInterface, profileUser)
-
-								supportFragmentManager.beginTransaction().run {
-									setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-									add(R.id.content_main, fragment, FRAGMENT_TAG_LESSON_INFO)
-									addToBackStack(fragment.tag)
-									commit()
-								}*/
 							}
 						}
 					}
@@ -299,6 +288,7 @@ class MainActivity :
 							}
 						)
 					}
+
 					AnimatedVisibility(
 						visible = appState.profileManagementDialog.value,
 						enter = slideInVertically(initialOffsetY = offsetY) + fadeIn(),
@@ -310,6 +300,16 @@ class MainActivity :
 							}
 						)
 					}
+
+					if (appState.showDatePicker.value)
+						DatePickerDialog(
+							initialSelection = appState.lastSelectedDate,
+							onDismiss = { appState.showDatePicker.value = false }
+						) {
+							appState.showDatePicker.value = false
+							appState.lastSelectedDate = it
+							appState.weekView.value?.goToDate(it.toDateTime(LocalTime.now()))
+						}
 				}
 			}
 		}
@@ -963,6 +963,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	val weeklyTimetableItems: SnapshotStateMap<Int, WeeklyTimetableItems?>,
 	val timetableLoader: TimetableLoader,
 	val timetableItemDetailsDialog: MutableState<Pair<List<TimegridItem>, Int>?>,
+	val showDatePicker: MutableState<Boolean>,
 	val profileManagementDialog: MutableState<Boolean>
 ) {
 	companion object {
@@ -974,6 +975,8 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	}
 
 	private var drawerGestures by drawerGestureState
+
+	var lastSelectedDate = LocalDate.now()
 
 	var displayedElement: MutableState<PeriodElement?> = mutableStateOf(personalTimetable?.first)
 	var displayedName: MutableState<String> =
@@ -1585,6 +1588,16 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 				}
 			})
 
+			setOnCornerClickListener(object : TopLeftCornerClickListener {
+				override fun onCornerClick() {
+					showDatePicker.value = true
+				}
+
+				override fun onCornerLongClick() {
+					goToToday()
+				}
+			})
+
 			scrollListener = object : ScrollListener {
 				override fun onFirstVisibleDayChanged(
 					newFirstVisibleDay: LocalDate,
@@ -1739,6 +1752,7 @@ fun rememberMainAppState(
 			null
 		)
 	},
+	showDatePicker: MutableState<Boolean> = remember { mutableStateOf(false) },
 	profileManagementDialog: MutableState<Boolean> = remember { mutableStateOf(false) },
 ) = remember(user, customThemeColor) {
 	MainAppState(
@@ -1761,6 +1775,7 @@ fun rememberMainAppState(
 		weeklyTimetableItems = weeklyTimetableItems,
 		timetableLoader = timetableLoader,
 		timetableItemDetailsDialog = timetableItemDetailsDialog,
+		showDatePicker = showDatePicker,
 		profileManagementDialog = profileManagementDialog
 	)
 }

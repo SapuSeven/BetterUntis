@@ -13,4 +13,11 @@ fun Modifier.conditional(
 	condition: Boolean,
 	modifier: @Composable Modifier.() -> Modifier
 ): Modifier =
-	if (condition) then(modifier(this)) else this
+	if (condition) then(modifier(Modifier)) else this
+
+@Composable
+fun <T> Modifier.ifNotNull(
+	value: T?,
+	modifier: @Composable Modifier.(value: T) -> Modifier
+): Modifier =
+	value?.let { then(modifier(Modifier, it)) } ?: this
