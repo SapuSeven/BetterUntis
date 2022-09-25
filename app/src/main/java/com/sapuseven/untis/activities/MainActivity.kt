@@ -444,7 +444,13 @@ class MainActivity :
 						modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 					)
 
+					var isBookmarkSelected = false
 					appState.user.bookmarks.forEach { bookmark ->
+						val isDisplayed = appState.displayedElement.value?.let {
+							it.id == bookmark.elementId && it.type == bookmark.elementType
+						} == true
+						isBookmarkSelected = isBookmarkSelected || isDisplayed
+
 						NavigationDrawerItem(
 							icon = {
 								Icon(
@@ -473,7 +479,7 @@ class MainActivity :
 								}
 							},
 							label = { Text(text = bookmark.displayName) },
-							selected = false,
+							selected = isDisplayed,
 							onClick = {
 								appState.closeDrawer()
 								val items = timetableDatabaseInterface.getElements(
@@ -511,7 +517,7 @@ class MainActivity :
 
 					DrawerItems(
 						isMessengerAvailable = appState.isMessengerAvailable,
-						isPersonalTimetableSelected = appState.isPersonalTimetable,
+						disableTypeSelection = appState.isPersonalTimetable || isBookmarkSelected,
 						displayedElement = appState.displayedElement.value,
 						onTimetableClick = { item ->
 							appState.closeDrawer()

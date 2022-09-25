@@ -21,7 +21,7 @@ import com.sapuseven.untis.ui.models.NavItemTimetable
 @Composable
 fun DrawerItems(
 	isMessengerAvailable: Boolean = false,
-	isPersonalTimetableSelected: Boolean = false,
+	disableTypeSelection: Boolean = false,
 	displayedElement: PeriodElement? = null,
 	onTimetableClick: (item: NavItemTimetable) -> Unit,
 	onShortcutClick: (item: NavItemShortcut) -> Unit,
@@ -84,7 +84,7 @@ fun DrawerItems(
 		NavigationDrawerItem(
 			icon = { Icon(item.icon, contentDescription = null) },
 			label = { Text(item.label) },
-			selected = !isPersonalTimetableSelected && item.elementType.name == displayedElement?.type,
+			selected = !disableTypeSelection && item.elementType.name == displayedElement?.type,
 			onClick = { onTimetableClick(item) },
 			modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 		)
