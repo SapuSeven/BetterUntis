@@ -347,6 +347,7 @@ class MainActivity :
 
 
 
+
 		AndroidView(
 			factory = { context ->
 				if (weekViewGlobal == null) { // Create weekView if it doesn't already exist
@@ -1046,6 +1047,23 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		}
 
 	private var shouldUpdateWeekView = true
+
+	val isMessengerAvailable: Boolean
+		get() {
+			for (item in this.weeklyTimetableItems.values) {
+				if (item != null) {
+					for (it in item.items){
+						if (it.data?.periodData?.element?.messengerChannel != null){
+							return true
+						}
+						break
+					}
+				}
+
+			}
+			return false
+		}
+
 
 	val isMessengerAvailable: Boolean
 		get() {
