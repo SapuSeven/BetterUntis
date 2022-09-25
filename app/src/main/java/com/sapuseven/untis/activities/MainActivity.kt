@@ -199,6 +199,37 @@ class MainActivity :
 								)
 							},
 						) { innerPadding ->
+							if (appState.openBookmarkDialog.value) {
+								AlertDialog(
+									onDismissRequest = {
+										appState.openBookmarkDialog.value = false
+									},
+									text = {
+										Text(text = getString(R.string.main_dialog_delete_bookmark))
+									},
+									confirmButton = {
+										TextButton(
+											onClick = {
+												appState.openBookmarkDialog.value = false
+												appState.user.bookmarks = appState.user.bookmarks.minus(appState.currentBookmark.value!!)
+												appState.currentBookmark.value = null
+												userDatabase.editUser(appState.user)
+											}
+										) {
+											Text(text = getString(R.string.all_yes))
+										}
+									},
+									dismissButton = {
+										TextButton(
+											onClick = {
+												appState.openBookmarkDialog.value = false
+											}
+										) {
+											Text(text = getString(R.string.all_no))
+										}
+									}
+								)
+							}
 							Box(
 								modifier = Modifier
 									.padding(innerPadding)
@@ -504,9 +535,9 @@ class MainActivity :
 									IconButton(
 										onClick = {
 											appState.closeDrawer()
+											appState.currentBookmark.value = bookmark
+											appState.openBookmarkDialog.value = true
 											//TODO: Add confirm dialog
-											appState.user.bookmarks = appState.user.bookmarks.minus(bookmark)
-											userDatabase.editUser(appState.user)
 										}
 									) {
 										Icon(painter = painterResource(id = R.drawable.all_bookmark_remove), contentDescription = "Remove Bookmark") //TODO: Extract String ressource
@@ -1103,6 +1134,10 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 	private var drawerGestures by drawerGestureState
 
+	var currentBookmark: MutableState<TimetableBookmark?> = mutableStateOf(null)
+
+	val openBookmarkDialog: MutableState<Boolean> = mutableStateOf(false)
+
 	var lastSelectedDate: LocalDate = LocalDate.now()
 
 	var displayedElement: MutableState<PeriodElement?> = mutableStateOf(personalTimetable?.first)
@@ -1150,6 +1185,10 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	@OptIn(ExperimentalMaterial3Api::class)
 	fun closeDrawer() {
 		scope.launch { drawerState.close() }
+	}
+
+	fun displayAlertDialoge(currentBookmark: TimetableBookmark) {
+
 	}
 
 	fun displayElement(element: PeriodElement?, name: String? = null) {
