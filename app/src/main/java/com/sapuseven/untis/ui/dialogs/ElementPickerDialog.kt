@@ -41,6 +41,7 @@ fun ElementPickerDialogFullscreen(
 	initialType: TimetableDatabaseInterface.Type? = null,
 	multiSelect: Boolean = false,
 	hideTypeSelection: Boolean = false,
+	hideTypeSelectionPersonal: Boolean = false,
 	onDismiss: (success: Boolean) -> Unit = {},
 	onSelect: (selectedItem: PeriodElement?) -> Unit = {},
 	onMultiSelect: (selectedItems: List<PeriodElement>) -> Unit = {},
@@ -170,6 +171,7 @@ fun ElementPickerDialogFullscreen(
 			if (!hideTypeSelection)
 				ElementPickerTypeSelection(
 					selectedType = selectedType,
+					hideTypeSelectionPersonal = hideTypeSelectionPersonal,
 					onTypeChange = { selectedType = it },
 					onDismiss = onDismiss,
 					onSelect = onSelect
@@ -188,6 +190,7 @@ fun ElementPickerDialog(
 	timetableDatabaseInterface: TimetableDatabaseInterface,
 	initialType: TimetableDatabaseInterface.Type? = null,
 	hideTypeSelection: Boolean = false,
+	hideTypeSelectionPersonal: Boolean = false,
 	onDismiss: (success: Boolean) -> Unit = {},
 	onSelect: (selectedItem: PeriodElement?) -> Unit = {}
 ) {
@@ -238,6 +241,7 @@ fun ElementPickerDialog(
 				if (!hideTypeSelection)
 					ElementPickerTypeSelection(
 						selectedType = selectedType,
+						hideTypeSelectionPersonal = hideTypeSelectionPersonal,
 						onTypeChange = { selectedType = it },
 						onDismiss = onDismiss,
 						onSelect = onSelect
@@ -343,25 +347,28 @@ fun ElementPickerElements(
 @Composable
 fun ElementPickerTypeSelection(
 	selectedType: TimetableDatabaseInterface.Type?,
+	hideTypeSelectionPersonal: Boolean = false,
 	onTypeChange: (TimetableDatabaseInterface.Type?) -> Unit,
 	onDismiss: (success: Boolean) -> Unit = {},
 	onSelect: (selectedItem: PeriodElement?) -> Unit = {}
 ) {
 	NavigationBarInset {
-		NavigationBarItem(
-			icon = {
-				Icon(
-					painterResource(id = R.drawable.all_prefs_personal),
-					contentDescription = null
-				)
-			},
-			label = { Text(stringResource(id = R.string.all_personal)) },
-			selected = false,
-			onClick = {
-				onSelect(null)
-				onDismiss(true)
-			}
-		)
+		if (!hideTypeSelectionPersonal)
+			NavigationBarItem(
+				icon = {
+					Icon(
+						painterResource(id = R.drawable.all_prefs_personal),
+						contentDescription = null
+					)
+				},
+				label = { Text(stringResource(id = R.string.all_personal)) },
+				selected = false,
+				onClick = {
+					onSelect(null)
+					onDismiss(true)
+				}
+			)
+
 		NavigationBarItem(
 			icon = {
 				Icon(

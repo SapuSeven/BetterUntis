@@ -106,7 +106,6 @@ class MainActivity :
 		private const val MESSENGER_PACKAGE_NAME = "com.untis.chat"
 	}
 
-	private var lastPickedDate: DateTime? = null
 	private var profileUpdateDialog: AlertDialog? = null
 	private val weekViewRefreshHandler = Handler(Looper.getMainLooper())
 
@@ -407,55 +406,7 @@ class MainActivity :
 			}
 		}
 
-		bookmarksElementPicker?.let { type ->
-			ElementPickerDialogFullscreen(
-				title = { /*TODO*/ },
-				timetableDatabaseInterface = timetableDatabaseInterface,
-				onDismiss = { bookmarksElementPicker = null },
-				onSelect = { item ->
-					item?.let {
-						appState.user.bookmarks = appState.user.bookmarks.plus(
-							TimetableBookmark(
-								classId = it.id,
-								displayName = timetableDatabaseInterface.getLongName(it),
-								drawableId = when(TimetableDatabaseInterface.Type.valueOf(item.type)){
-									TimetableDatabaseInterface.Type.CLASS -> R.drawable.all_classes
-									TimetableDatabaseInterface.Type.TEACHER -> R.drawable.all_teachers
-									TimetableDatabaseInterface.Type.SUBJECT -> R.drawable.all_subject
-									TimetableDatabaseInterface.Type.ROOM -> R.drawable.all_rooms
-									TimetableDatabaseInterface.Type.STUDENT -> R.drawable.all_prefs_personal
-								},
-								type = type.name
-							)
-						)
-						userDatabase.editUser(appState.user)
-						onShowTimetable(
-							item to timetableDatabaseInterface.getLongName(it)
-						)
-					}
-
-				},
-				initialType = type
-			)
-		} ?:
-
-		showElementPicker?.let { type ->
-			ElementPickerDialogFullscreen(
-				title = { /*TODO*/ },
-				timetableDatabaseInterface = timetableDatabaseInterface,
-				onDismiss = { showElementPicker = null },
-				onSelect = { item ->
-					item?.let {
-						onShowTimetable(
-							item to timetableDatabaseInterface.getLongName(it)
-						)
-					} ?: run {
-						onShowTimetable(appState.personalTimetable)
-					}
-				},
-				initialType = type
-			)
-		} ?: ModalNavigationDrawer(
+		ModalNavigationDrawer(
 			gesturesEnabled = appState.drawerGesturesEnabled,
 			drawerState = appState.drawerState,
 			drawerContent = {
@@ -596,6 +547,65 @@ class MainActivity :
 			},
 			content = content
 		)
+
+		AnimatedVisibility(
+			visible = showElementPicker != null,
+			enter = fullscreenDialogAnimationEnter(),
+			exit = fullscreenDialogAnimationExit()
+		) {
+			ElementPickerDialogFullscreen(
+				title = { /*TODO*/ },
+				timetableDatabaseInterface = timetableDatabaseInterface,
+				onDismiss = { showElementPicker = null },
+				onSelect = { item ->
+					item?.let {
+						onShowTimetable(
+							item to timetableDatabaseInterface.getLongName(it)
+						)
+					} ?: run {
+						onShowTimetable(appState.personalTimetable)
+					}
+				},
+				initialType = showElementPicker
+			)
+		}
+
+		AnimatedVisibility(
+			visible = bookmarksElementPicker != null,
+			enter = fullscreenDialogAnimationEnter(),
+			exit = fullscreenDialogAnimationExit()
+		) {
+			ElementPickerDialogFullscreen(
+				title = { Text(stringResource(id = R.string.maindrawer_bookmarks_add)) },
+				timetableDatabaseInterface = timetableDatabaseInterface,
+				hideTypeSelectionPersonal = true,
+				onDismiss = { bookmarksElementPicker = null },
+				onSelect = { item ->
+					item?.let {
+						appState.user.bookmarks = appState.user.bookmarks.plus(
+							TimetableBookmark(
+								classId = it.id,
+								displayName = timetableDatabaseInterface.getLongName(it),
+								drawableId = when(TimetableDatabaseInterface.Type.valueOf(item.type)){
+									TimetableDatabaseInterface.Type.CLASS -> R.drawable.all_classes
+									TimetableDatabaseInterface.Type.TEACHER -> R.drawable.all_teachers
+									TimetableDatabaseInterface.Type.SUBJECT -> R.drawable.all_subject
+									TimetableDatabaseInterface.Type.ROOM -> R.drawable.all_rooms
+									TimetableDatabaseInterface.Type.STUDENT -> R.drawable.all_prefs_personal
+								},
+								type = TimetableDatabaseInterface.Type.valueOf(it.type).name
+							)
+						)
+						userDatabase.editUser(appState.user)
+						onShowTimetable(
+							item to timetableDatabaseInterface.getLongName(it)
+						)
+					}
+
+				},
+				initialType = bookmarksElementPicker
+			)
+		}
 	}
 
 	private fun login() {
