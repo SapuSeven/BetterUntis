@@ -16,6 +16,7 @@
 	<string name="all_delete">Delete</string>
 	<string name="all_dialog_absences_checked">Absences checked.</string>
 	<string name="all_dialog_absences_not_checked">Absences not checked.</string>
+	<string name="all_dialog_absences_save">Submit absence check</string>
 	<string name="all_dialog_crash_copied">Crash log copied to clipboard.</string>
 	<string name="all_dialog_crash_title">Crash log found</string>
 	<string name="all_dialog_datepicker_button_today">Today</string>
