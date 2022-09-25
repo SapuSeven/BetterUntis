@@ -253,9 +253,9 @@ class LoginDataInputActivity : BaseComposeActivity() {
 								existingUserId?.let { user ->
 									userDatabase.getUser(
 										user
-									)?.bookmarks
+									)?.bookmarks?.toSet()
 								}
-									?: emptyList()
+									?: emptySet()
 							val user = UserDatabase.User(
 								existingUserId ?: -1,
 								profileName.value ?: "",

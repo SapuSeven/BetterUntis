@@ -182,7 +182,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		user.settings?.let { values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().encodeToString<UntisSettings>(it)) }
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USERDATA, getJSON().encodeToString<UntisUserData>(user.userData))
 		user.settings?.let { values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().encodeToString<UntisSettings>(it)) }
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_BOOKMARK_TIMETABLES, getJSON().encodeToString<List<TimetableBookmark>>(user.bookmarks))
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_BOOKMARK_TIMETABLES, getJSON().encodeToString<List<TimetableBookmark>>(user.bookmarks.toList()))
 
 		val id = db.insert(UserDatabaseContract.Users.TABLE_NAME, null, values)
 
@@ -208,7 +208,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP, user.masterDataTimestamp)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USERDATA, getJSON().encodeToString<UntisUserData>(user.userData))
 		user.settings?.let { values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().encodeToString<UntisSettings>(it)) }
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_BOOKMARK_TIMETABLES, getJSON().encodeToString<List<TimetableBookmark>>(user.bookmarks))
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_BOOKMARK_TIMETABLES, getJSON().encodeToString<List<TimetableBookmark>>(user.bookmarks.toList()))
 
 
 		db.update(UserDatabaseContract.Users.TABLE_NAME, values, BaseColumns._ID + "=?", arrayOf(user.id.toString()))
@@ -451,7 +451,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 			val userData: UntisUserData,
 			val settings: UntisSettings? = null,
 			val created: Long? = null,
-			var bookmarks: List<TimetableBookmark>
+			var bookmarks: Set<TimetableBookmark>
 	) {
 		fun getDisplayedName(context: Context): String {
 			return when {

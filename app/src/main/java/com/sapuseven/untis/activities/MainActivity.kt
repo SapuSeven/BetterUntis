@@ -12,13 +12,16 @@ import android.os.Looper
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.*
@@ -63,11 +66,11 @@ import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
-import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
 import com.sapuseven.untis.ui.common.Weekday
 import com.sapuseven.untis.ui.common.disabled
 import com.sapuseven.untis.ui.dialogs.DatePickerDialog
+import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
 import com.sapuseven.untis.ui.dialogs.TimetableItemDetailsDialog
 import com.sapuseven.untis.ui.functional.BackPressConfirm
@@ -86,7 +89,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.joda.time.*
+import org.joda.time.DateTimeConstants
+import org.joda.time.Instant
+import org.joda.time.LocalDate
+import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
 import java.util.*
@@ -207,8 +213,9 @@ class MainActivity :
 							) {
 								WeekViewCompose(appState)
 
-								val timeColumnWidth = with (LocalDensity.current) {
-									appState.weekView.value?.config?.timeColumnWidth?.toDp() ?: 48.dp
+								val timeColumnWidth = with(LocalDensity.current) {
+									appState.weekView.value?.config?.timeColumnWidth?.toDp()
+										?: 48.dp
 								}
 								Text(
 									text = appState.lastRefreshText(),
@@ -387,6 +394,8 @@ class MainActivity :
 		content: @Composable () -> Unit
 	) {
 		val scope = rememberCoroutineScope()
+		val drawerScrollState = rememberScrollState()
+		var bookmarkDeleteDialog by remember { mutableStateOf<TimetableBookmark?>(null) }
 
 		var showElementPicker by remember {
 			mutableStateOf<TimetableDatabaseInterface.Type?>(
@@ -410,64 +419,68 @@ class MainActivity :
 			gesturesEnabled = appState.drawerGesturesEnabled,
 			drawerState = appState.drawerState,
 			drawerContent = {
-				/*Text(
-					text = profileUser.getDisplayedName(applicationContext)
-						.ifBlank { stringResource(R.string.app_name) },
-					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-				)
-				Text(
-					text = profileUser.userData.schoolName.ifBlank { stringResource(R.string.all_contact_email) },
-					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-				)*/
+				Column(
+					modifier = Modifier
+						.fillMaxSize()
+						.verticalScroll(drawerScrollState)
+				) {
+					Spacer(modifier = Modifier.height(24.dp))
 
-				Spacer(modifier = Modifier.height(24.dp))
+					DrawerText("Favourites")
 
-				DrawerText("Favourites")
+					NavigationDrawerItem(
+						icon = {
+							Icon(
+								painterResource(id = R.drawable.all_prefs_personal),
+								contentDescription = null
+							)
+						},
+						label = { Text(stringResource(id = R.string.all_personal_timetable)) },
+						selected = appState.isPersonalTimetable,
+						onClick = {
+							appState.closeDrawer()
+							onShowTimetable(appState.personalTimetable)
+						},
+						modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+					)
 
-				NavigationDrawerItem(
-					icon = {
-						Icon(
-							painterResource(id = R.drawable.all_prefs_personal),
-							contentDescription = null
-						)
-					},
-					label = { Text(stringResource(id = R.string.all_personal_timetable)) },
-					selected = appState.isPersonalTimetable,
-					onClick = {
-						appState.closeDrawer()
-						onShowTimetable(appState.personalTimetable)
-					},
-					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-				)
-
-				if (appState.user.bookmarks.isNotEmpty()){
-					appState.user.bookmarks.forEach {bookmark ->
+					appState.user.bookmarks.forEach { bookmark ->
 						NavigationDrawerItem(
 							icon = {
 								Icon(
-									painter = painterResource(id = bookmark.drawableId),
+									painter = painterResource(
+										id = when (TimetableDatabaseInterface.Type.valueOf(
+											bookmark.elementType
+										)) {
+											TimetableDatabaseInterface.Type.CLASS -> R.drawable.all_classes
+											TimetableDatabaseInterface.Type.TEACHER -> R.drawable.all_teachers
+											TimetableDatabaseInterface.Type.SUBJECT -> R.drawable.all_subject
+											TimetableDatabaseInterface.Type.ROOM -> R.drawable.all_rooms
+											TimetableDatabaseInterface.Type.STUDENT -> R.drawable.all_prefs_personal
+										}
+									),
 									contentDescription = null
 								)
 							},
 							badge = {
-									IconButton(
-										onClick = {
-											appState.closeDrawer()
-											//TODO: Add confirm dialog
-											appState.user.bookmarks = appState.user.bookmarks.minus(bookmark)
-											userDatabase.editUser(appState.user)
-										}
-									) {
-										Icon(painter = painterResource(id = R.drawable.all_bookmark_remove), contentDescription = "Remove Bookmark") //TODO: Extract String ressource
-									}
+								IconButton(
+									onClick = { bookmarkDeleteDialog = bookmark }
+								) {
+									Icon(
+										painter = painterResource(id = R.drawable.all_bookmark_remove),
+										contentDescription = "Remove Bookmark"
+									) //TODO: Extract String resource
+								}
 							},
 							label = { Text(text = bookmark.displayName) },
 							selected = false,
 							onClick = {
 								appState.closeDrawer()
-								val items = timetableDatabaseInterface.getElements(TimetableDatabaseInterface.Type.valueOf(bookmark.type))
+								val items = timetableDatabaseInterface.getElements(
+									TimetableDatabaseInterface.Type.valueOf(bookmark.elementType)
+								)
 								val item = items.find {
-									it.id == bookmark.classId && it.type == bookmark.type
+									it.id == bookmark.elementId && it.type == bookmark.elementType
 								}
 								onShowTimetable(
 									item to timetableDatabaseInterface.getLongName(item!!)
@@ -476,74 +489,78 @@ class MainActivity :
 							modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 						)
 					}
-				}
 
-				NavigationDrawerItem(
-					icon = {
-						Icon(
-							painterResource(id = R.drawable.all_add),
-							contentDescription = null
-						)
-					},
-					label = { Text(stringResource(id = R.string.maindrawer_bookmarks_add)) },
-					selected = false,
-					onClick = {
-						appState.closeDrawer()
-						bookmarksElementPicker = TimetableDatabaseInterface.Type.CLASS
-						//selectedItem.value = item
-					},
-					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-				)
+					NavigationDrawerItem(
+						icon = {
+							Icon(
+								painterResource(id = R.drawable.all_add),
+								contentDescription = null
+							)
+						},
+						label = { Text(stringResource(id = R.string.maindrawer_bookmarks_add)) },
+						selected = false,
+						onClick = {
+							appState.closeDrawer()
+							bookmarksElementPicker = TimetableDatabaseInterface.Type.CLASS
+							//selectedItem.value = item
+						},
+						modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+					)
 
-				DrawerText("Timetables")
+					DrawerText("Timetables")
 
-				DrawerItems(
-					isMessengerAvailable = appState.isMessengerAvailable,
-					isPersonalTimetableSelected = appState.isPersonalTimetable,
-					displayedElement = appState.displayedElement.value,
-					onTimetableClick = { item ->
-						appState.closeDrawer()
-						showElementPicker = item.elementType
-					},
-					onShortcutClick = { item ->
-						appState.closeDrawer()
-						if (item.id == 2){
-							try {
-								startActivity(packageManager.getLaunchIntentForPackage(MESSENGER_PACKAGE_NAME))
-							} catch (e: Exception) {
+					DrawerItems(
+						isMessengerAvailable = appState.isMessengerAvailable,
+						isPersonalTimetableSelected = appState.isPersonalTimetable,
+						displayedElement = appState.displayedElement.value,
+						onTimetableClick = { item ->
+							appState.closeDrawer()
+							showElementPicker = item.elementType
+						},
+						onShortcutClick = { item ->
+							appState.closeDrawer()
+							if (item.id == 2) {
 								try {
 									startActivity(
-										Intent(
-											Intent.ACTION_VIEW,
-											Uri.parse("market://details?id=$MESSENGER_PACKAGE_NAME")
+										packageManager.getLaunchIntentForPackage(
+											MESSENGER_PACKAGE_NAME
 										)
 									)
 								} catch (e: Exception) {
-									startActivity(
-										Intent(
-											Intent.ACTION_VIEW,
-											Uri.parse("https://play.google.com/store/apps/details?id=$MESSENGER_PACKAGE_NAME")
+									try {
+										startActivity(
+											Intent(
+												Intent.ACTION_VIEW,
+												Uri.parse("market://details?id=$MESSENGER_PACKAGE_NAME")
+											)
 										)
+									} catch (e: Exception) {
+										startActivity(
+											Intent(
+												Intent.ACTION_VIEW,
+												Uri.parse("https://play.google.com/store/apps/details?id=$MESSENGER_PACKAGE_NAME")
+											)
+										)
+									}
+								}
+							} else {
+								if (item.target != null) {
+									shortcutLauncher.launch(
+										Intent(
+											this@MainActivity,
+											item.target
+										).apply {
+											putUserIdExtra()
+											putBackgroundColorExtra()
+										}
 									)
 								}
 							}
-						} else {
-							if (item.target != null){
-								shortcutLauncher.launch(
-									Intent(
-										this@MainActivity,
-										item.target
-									).apply {
-										putUserIdExtra()
-										putBackgroundColorExtra()
-									}
-								)
-							}
+
+
 						}
-
-
-					}
-				)
+					)
+				}
 			},
 			content = content
 		)
@@ -575,6 +592,8 @@ class MainActivity :
 			enter = fullscreenDialogAnimationEnter(),
 			exit = fullscreenDialogAnimationExit()
 		) {
+			val context = LocalContext.current
+
 			ElementPickerDialogFullscreen(
 				title = { Text(stringResource(id = R.string.maindrawer_bookmarks_add)) },
 				timetableDatabaseInterface = timetableDatabaseInterface,
@@ -582,28 +601,54 @@ class MainActivity :
 				onDismiss = { bookmarksElementPicker = null },
 				onSelect = { item ->
 					item?.let {
-						appState.user.bookmarks = appState.user.bookmarks.plus(
-							TimetableBookmark(
-								classId = it.id,
-								displayName = timetableDatabaseInterface.getLongName(it),
-								drawableId = when(TimetableDatabaseInterface.Type.valueOf(item.type)){
-									TimetableDatabaseInterface.Type.CLASS -> R.drawable.all_classes
-									TimetableDatabaseInterface.Type.TEACHER -> R.drawable.all_teachers
-									TimetableDatabaseInterface.Type.SUBJECT -> R.drawable.all_subject
-									TimetableDatabaseInterface.Type.ROOM -> R.drawable.all_rooms
-									TimetableDatabaseInterface.Type.STUDENT -> R.drawable.all_prefs_personal
-								},
-								type = TimetableDatabaseInterface.Type.valueOf(it.type).name
+						val newBookmark = TimetableBookmark(
+							elementId = it.id,
+							elementType = TimetableDatabaseInterface.Type.valueOf(it.type).name,
+							displayName = timetableDatabaseInterface.getLongName(it)
+						)
+
+						if (appState.user.bookmarks.contains(newBookmark))
+							Toast
+								.makeText(
+									context,
+									"Bookmark already exists",
+									Toast.LENGTH_LONG
+								) // TODO: Extract string resource
+								.show()
+						else {
+							appState.user.bookmarks = appState.user.bookmarks.plus(newBookmark)
+							userDatabase.editUser(appState.user)
+							onShowTimetable(
+								item to timetableDatabaseInterface.getLongName(it)
 							)
-						)
-						userDatabase.editUser(appState.user)
-						onShowTimetable(
-							item to timetableDatabaseInterface.getLongName(it)
-						)
+						}
 					}
 
 				},
 				initialType = bookmarksElementPicker
+			)
+		}
+
+		bookmarkDeleteDialog?.let { bookmark ->
+			AlertDialog(
+				text = { Text(stringResource(id = R.string.main_dialog_delete_bookmark)) },
+				onDismissRequest = { bookmarkDeleteDialog = null },
+				confirmButton = {
+					TextButton(
+						onClick = {
+							appState.user.bookmarks = appState.user.bookmarks.minus(bookmark)
+							userDatabase.editUser(appState.user)
+							bookmarkDeleteDialog = null
+						}) {
+						Text(stringResource(id = R.string.all_delete))
+					}
+				},
+				dismissButton = {
+					TextButton(
+						onClick = { bookmarkDeleteDialog = null }) {
+						Text(stringResource(id = R.string.all_cancel))
+					}
+				}
 			)
 		}
 	}
@@ -1138,8 +1183,8 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		get() {
 			for (item in this.weeklyTimetableItems.values) {
 				if (item != null) {
-					for (it in item.items){
-						if (it.data?.periodData?.element?.messengerChannel != null){
+					for (it in item.items) {
+						if (it.data?.periodData?.element?.messengerChannel != null) {
 							return true
 						}
 						break
@@ -1486,7 +1531,10 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	}
 
 	@Composable
-	fun <T> loadWeekViewPreferences(weekView: WeekView<T>?, dataStorePreferences: DataStorePreferences) {
+	fun <T> loadWeekViewPreferences(
+		weekView: WeekView<T>?,
+		dataStorePreferences: DataStorePreferences
+	) {
 		val currentDensity = LocalDensity.current
 		val scope = rememberCoroutineScope()
 
@@ -1512,7 +1560,8 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 			weekView?.let {
 				val navBarHeight = with(LocalDensity.current) {
-					(WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 32.dp).toPx()
+					(WindowInsets.navigationBars.asPaddingValues()
+						.calculateBottomPadding() + 32.dp).toPx()
 				}.roundToInt()
 
 				scope.launch {
@@ -1615,7 +1664,11 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 				scope.launch {
 					timetableRange.combine(timetableRangeIndexReset) { range, rangeIndexReset ->
-						weekView.setupHours(range.convertRangeToPair(), rangeIndexReset, navBarHeight)
+						weekView.setupHours(
+							range.convertRangeToPair(),
+							rangeIndexReset,
+							navBarHeight
+						)
 					}.collect()
 				}
 
@@ -1767,7 +1820,9 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 				override fun onScaleFinished() {
 					scope.launch {
 						globalPreferences.edit { prefs ->
-							weekView.value?.let { prefs[DATASTORE_KEY_WEEKVIEW_SCALE] = it.hourHeight }
+							weekView.value?.let {
+								prefs[DATASTORE_KEY_WEEKVIEW_SCALE] = it.hourHeight
+							}
 						}
 					}
 				}
