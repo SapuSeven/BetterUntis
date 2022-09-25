@@ -22,6 +22,7 @@ import com.sapuseven.untis.activities.LoginActivity
 import com.sapuseven.untis.activities.LoginDataInputActivity
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.config.deleteProfile
+import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,7 +74,7 @@ fun BaseComposeActivity.ProfileManagementDialog(
 			modifier = Modifier
 				.padding(innerPadding)
 				.fillMaxSize(),
-			contentPadding = WindowInsets.navigationBars.asPaddingValues()
+			contentPadding = insetsPaddingValues()
 		) {
 			item {
 				ListItem(

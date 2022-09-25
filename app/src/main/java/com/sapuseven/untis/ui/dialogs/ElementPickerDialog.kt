@@ -32,6 +32,7 @@ import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.ui.common.NavigationBarInset
 import com.sapuseven.untis.ui.common.disabled
+import com.sapuseven.untis.ui.functional.insetsPaddingValues
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -165,7 +166,7 @@ fun ElementPickerDialogFullscreen(
 				modifier = Modifier
 					.fillMaxWidth()
 					.weight(1f),
-				contentPadding = if (hideTypeSelection) WindowInsets.navigationBars.asPaddingValues() else PaddingValues(0.dp)
+				contentPadding = if (hideTypeSelection) insetsPaddingValues() else PaddingValues(0.dp)
 			)
 
 			if (!hideTypeSelection)

@@ -55,6 +55,8 @@ import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.SmallCircularProgressIndicator
 import com.sapuseven.untis.ui.common.conditional
+import com.sapuseven.untis.ui.functional.bottomInsets
+import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import org.joda.time.LocalDateTime
@@ -125,7 +127,7 @@ fun TimetableItemDetailsDialog(
 			) {
 				absenceCheck?.let { absenceCheckPeriod ->
 					FloatingActionButton(
-						modifier = Modifier.navigationBarsPadding(),
+						modifier = Modifier.bottomInsets(),
 						onClick = {
 							loading = true
 
@@ -168,7 +170,7 @@ fun TimetableItemDetailsDialog(
 			horizontalAlignment = Alignment.CenterHorizontally,
 			modifier = Modifier
 				.padding(innerPadding)
-				.navigationBarsPadding()
+				.bottomInsets()
 				.fillMaxSize()
 		) {
 			HorizontalPager(
@@ -556,7 +558,7 @@ fun TimetableItemDetailsDialog(
 						.padding(innerPadding)
 						.fillMaxSize()
 						.background(MaterialTheme.colorScheme.surface),
-					contentPadding = WindowInsets.navigationBars.asPaddingValues()
+					contentPadding = insetsPaddingValues()
 				) {
 					val students = untisPeriodData?.studentIds?.let { studentIds ->
 						studentIds.mapNotNull { studentId -> untisStudents?.find { it.id == studentId } }

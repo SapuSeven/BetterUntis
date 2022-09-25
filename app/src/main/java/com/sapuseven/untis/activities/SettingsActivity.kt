@@ -25,6 +25,7 @@ import com.sapuseven.untis.preferences.PreferenceCategory
 import com.sapuseven.untis.preferences.PreferenceScreen
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
 import com.sapuseven.untis.preferences.dataStorePreferences
+import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.preferences.*
 
 class SettingsActivity : BaseComposeActivity() {
@@ -833,7 +834,7 @@ class SettingsActivity : BaseComposeActivity() {
 		Column(
 			modifier = Modifier
 				.verticalScroll(rememberScrollState())
-				.navigationBarsPadding(),
+				.bottomInsets(),
 			content = content
 		)
 	}

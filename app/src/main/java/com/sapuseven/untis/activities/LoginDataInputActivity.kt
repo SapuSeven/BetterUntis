@@ -48,6 +48,7 @@ import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.common.LabeledCheckbox
 import com.sapuseven.untis.ui.common.LabeledSwitch
 import com.sapuseven.untis.ui.common.SmallCircularProgressIndicator
+import com.sapuseven.untis.ui.functional.bottomInsets
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -327,7 +328,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 						floatingActionButtonPosition = FabPosition.End,
 						floatingActionButton = {
 							ExtendedFloatingActionButton(
-								modifier = Modifier.navigationBarsPadding(),
+								modifier = Modifier.bottomInsets(),
 								icon = {
 									if (loading)
 										SmallCircularProgressIndicator()
@@ -469,7 +470,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 								}
 							}
 							Spacer(modifier = Modifier
-								.navigationBarsPadding()
+								.bottomInsets()
 								.height(80.dp)
 							)
 

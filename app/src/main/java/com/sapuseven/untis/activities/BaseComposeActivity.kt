@@ -26,6 +26,7 @@ import com.sapuseven.untis.helpers.config.globalDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.common.conditional
+import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.material.scheme.Scheme
 import com.sapuseven.untis.ui.theme.toColorScheme
 import kotlinx.coroutines.*
@@ -225,7 +226,7 @@ open class BaseComposeActivity : ComponentActivity() {
 					modifier = Modifier
 						.background(MaterialTheme.colorScheme.background)
 						.conditional(navBarInset) {
-							navigationBarsPadding()
+							bottomInsets()
 						}
 						.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)),
 					content = content

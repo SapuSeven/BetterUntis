@@ -74,6 +74,8 @@ import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
 import com.sapuseven.untis.ui.dialogs.TimetableItemDetailsDialog
 import com.sapuseven.untis.ui.functional.BackPressConfirm
+import com.sapuseven.untis.ui.functional.bottomInsets
+import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.preferences.convertRangeToPair
 import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
@@ -222,7 +224,7 @@ class MainActivity :
 									modifier = Modifier
 										.align(Alignment.BottomStart)
 										.padding(start = timeColumnWidth + 8.dp, bottom = 8.dp)
-										.navigationBarsPadding()
+										.bottomInsets()
 										.disabled(appState.isAnonymous)
 								)
 
@@ -1527,7 +1529,8 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			personalTimetableFlow.collect { customTimetable ->
 				val element = decodeStoredTimetableValue(customTimetable)
 				val previousElement = personalTimetable?.first
-				personalTimetable = element to element?.let { timetableDatabaseInterface.getLongName(it) }
+				personalTimetable =
+					element to element?.let { timetableDatabaseInterface.getLongName(it) }
 
 				if (element != previousElement)
 					displayElement(personalTimetable?.first, personalTimetable?.second)
@@ -1565,8 +1568,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 			weekView?.let {
 				val navBarHeight = with(LocalDensity.current) {
-					(WindowInsets.navigationBars.asPaddingValues()
-						.calculateBottomPadding() + 32.dp).toPx()
+					(insetsPaddingValues().calculateBottomPadding() + 32.dp).toPx()
 				}.roundToInt()
 
 				scope.launch {

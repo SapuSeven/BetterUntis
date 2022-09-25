@@ -42,6 +42,7 @@ import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
+import com.sapuseven.untis.ui.functional.bottomInsets
 import kotlinx.coroutines.launch
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
@@ -163,7 +164,7 @@ class RoomFinderActivity : BaseComposeActivity() {
 						)
 					else
 						Scaffold(
-							modifier = Modifier.navigationBarsPadding(),
+							modifier = Modifier.bottomInsets(),
 							topBar = {
 								CenterAlignedTopAppBar(
 									title = {
