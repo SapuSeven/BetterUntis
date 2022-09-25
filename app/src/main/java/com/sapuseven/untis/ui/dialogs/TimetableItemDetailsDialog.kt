@@ -3,12 +3,14 @@ package com.sapuseven.untis.ui.dialogs
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.*
@@ -38,24 +40,30 @@ import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
+import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import com.sapuseven.untis.models.UntisAbsence
 import com.sapuseven.untis.models.untis.UntisAttachment
 import com.sapuseven.untis.models.untis.UntisError
-import com.sapuseven.untis.models.untis.params.PeriodDataParams
-import com.sapuseven.untis.models.untis.params.SubmitLessonTopicParams
-import com.sapuseven.untis.models.untis.response.BaseResponse
-import com.sapuseven.untis.models.untis.response.PeriodDataResponse
-import com.sapuseven.untis.models.untis.response.PeriodDataResult
-import com.sapuseven.untis.models.untis.response.UntisPeriodData
+import com.sapuseven.untis.models.untis.UntisTime
+import com.sapuseven.untis.models.untis.params.*
+import com.sapuseven.untis.models.untis.response.*
 import com.sapuseven.untis.models.untis.timetable.Period
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
+import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
+import com.sapuseven.untis.ui.common.SmallCircularProgressIndicator
 import com.sapuseven.untis.ui.common.conditional
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
+import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
+@OptIn(
+	ExperimentalMaterial3Api::class, ExperimentalPagerApi::class,
+	ExperimentalAnimationApi::class
+)
 @Composable
 fun TimetableItemDetailsDialog(
 	timegridItems: List<TimegridItem>,
@@ -67,6 +75,15 @@ fun TimetableItemDetailsDialog(
 	var dismissed by remember { mutableStateOf(false) }
 	val pagerState = rememberPagerState(initialPage)
 	val scope = rememberCoroutineScope()
+	val context = LocalContext.current
+
+	var absenceCheck by remember { mutableStateOf<Period?>(null) }
+
+	var untisPeriodData by remember { mutableStateOf<UntisPeriodData?>(null) }
+	var untisStudents by remember { mutableStateOf<List<UntisStudent>?>(null) }
+	var error by remember { mutableStateOf<Throwable?>(null) }
+	val errorMessage = error?.message?.let { stringResource(id = R.string.all_error_details, it) }
+	val errorMessageGeneric = stringResource(id = R.string.errormessagedictionary_generic)
 
 	fun dismiss(requestedElement: PeriodElement? = null) {
 		onDismiss(requestedElement)
@@ -85,7 +102,10 @@ fun TimetableItemDetailsDialog(
 				title = { Text(stringResource(id = R.string.all_lesson_details)) },
 				navigationIcon = {
 					IconButton(onClick = {
-						dismiss()
+						if (absenceCheck != null)
+							absenceCheck = null
+						else
+							dismiss()
 					}) {
 						Icon(
 							imageVector = Icons.Outlined.Close,
@@ -95,6 +115,54 @@ fun TimetableItemDetailsDialog(
 				}
 			)
 		},
+		floatingActionButton = {
+			var loading by remember { mutableStateOf(false) }
+
+			AnimatedVisibility(
+				visible = absenceCheck != null,
+				enter = scaleIn(),
+				exit = scaleOut()
+			) {
+				absenceCheck?.let { absenceCheckPeriod ->
+					FloatingActionButton(
+						modifier = Modifier.navigationBarsPadding(),
+						onClick = {
+							loading = true
+
+							scope.launch {
+								submitAbsencesChecked(
+									user,
+									absenceCheckPeriod.id
+								).fold({
+									if (it) {
+										untisPeriodData = untisPeriodData?.copy(
+											absenceChecked = true
+										)
+										absenceCheck = null
+									} else
+										Toast
+											.makeText(context, errorMessageGeneric, Toast.LENGTH_LONG)
+											.show()
+								}, {
+									Toast
+										.makeText(context, it.message, Toast.LENGTH_LONG)
+										.show()
+								})
+								loading = false
+							}
+						}
+					) {
+						if (loading)
+							SmallCircularProgressIndicator()
+						else
+							Icon(
+								painter = painterResource(id = R.drawable.all_check),
+								contentDescription = stringResource(R.string.all_dialog_absences_save)
+							)
+					}
+				}
+			}
+		}
 	) { innerPadding ->
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
@@ -132,7 +200,12 @@ fun TimetableItemDetailsDialog(
 							.toString(DateTimeFormat.shortTime())
 					)
 
-					var attachmentsDialog by remember { mutableStateOf<List<UntisAttachment>?>(null) }
+					var attachmentsDialog by remember {
+						mutableStateOf<List<UntisAttachment>?>(
+							null
+						)
+					}
+
 					var lessonTopicEditDialog by remember { mutableStateOf<Int?>(null) }
 
 					var lessonTopicNew by remember { mutableStateOf<String?>(null) }
@@ -173,6 +246,19 @@ fun TimetableItemDetailsDialog(
 						)
 
 						timetableDatabaseInterface.run {
+							LaunchedEffect(Unit) {
+								loadPeriodData(
+									user = user,
+									period = periodData.element
+								).fold({
+									untisPeriodData =
+										it.dataByTTId[periodData.element.id.toString()]
+									untisStudents = it.referencedStudents
+								}, {
+									error = it
+								})
+							}
+
 							// Lesson teachers
 							TimetableItemDetailsDialogElement(
 								elements = periodData.teachers,
@@ -294,10 +380,11 @@ fun TimetableItemDetailsDialog(
 							// Lesson absence check
 							if (periodData.element.can.contains(CAN_READ_STUDENT_ABSENCE))
 								TimetableItemDetailsDialogWithPeriodData(
-									period = periodData,
-									canEdit = periodData.element.can.contains(
-										CAN_WRITE_STUDENT_ABSENCE
-									),
+									periodData = periodData,
+									untisPeriodData = untisPeriodData,
+									error = error,
+									errorMessage = errorMessage,
+									editPermission = CAN_WRITE_STUDENT_ABSENCE,
 									headlineText = {
 										Text(stringResource(id = R.string.all_absences))
 									},
@@ -322,14 +409,19 @@ fun TimetableItemDetailsDialog(
 											modifier = Modifier.padding(horizontal = 8.dp)
 										)
 									},
-									onClick = {}
+									onClick = {
+										absenceCheck = periodData.element
+									}
 								)
 
 							// Lesson topic
 							if (periodData.element.can.contains(CAN_READ_LESSON_TOPIC))
 								TimetableItemDetailsDialogWithPeriodData(
-									period = periodData,
-									canEdit = periodData.element.can.contains(CAN_WRITE_LESSON_TOPIC),
+									periodData = periodData,
+									untisPeriodData = untisPeriodData,
+									error = error,
+									errorMessage = errorMessage,
+									editPermission = CAN_WRITE_LESSON_TOPIC,
 									headlineText = {
 										Text(stringResource(id = R.string.all_lessontopic))
 									},
@@ -373,7 +465,7 @@ fun TimetableItemDetailsDialog(
 						lessonTopicEditDialog?.let { id ->
 							var text by remember { mutableStateOf("") }
 							var loading by remember { mutableStateOf(false) }
-							var error by remember { mutableStateOf<String?>(null) }
+							var dialogError by remember { mutableStateOf<String?>(null) }
 
 							DynamicHeightAlertDialog(
 								title = { Text(stringResource(id = R.string.all_lessontopic_edit)) },
@@ -384,13 +476,13 @@ fun TimetableItemDetailsDialog(
 										OutlinedTextField(
 											value = text,
 											onValueChange = { text = it },
-											isError = error != null,
+											isError = dialogError != null,
 											enabled = !loading,
 											label = { Text(stringResource(id = R.string.all_lessontopic)) },
 											modifier = Modifier.fillMaxWidth()
 										)
 
-										AnimatedVisibility(visible = error != null) {
+										AnimatedVisibility(visible = dialogError != null) {
 											Text(
 												modifier = Modifier.padding(
 													horizontal = 16.dp,
@@ -398,7 +490,7 @@ fun TimetableItemDetailsDialog(
 												),
 												color = MaterialTheme.colorScheme.error,
 												style = MaterialTheme.typography.bodyMedium,
-												text = error ?: ""
+												text = dialogError ?: ""
 											)
 										}
 									}
@@ -411,35 +503,11 @@ fun TimetableItemDetailsDialog(
 											loading = true
 
 											scope.launch {
-												val query =
-													UntisRequest.UntisRequestQuery(user).apply {
-														data.method =
-															UntisApiConstants.METHOD_SUBMIT_LESSON_TOPIC
-														data.params = listOf(
-															SubmitLessonTopicParams(
-																text,
-																id,
-																UntisAuthentication.createAuthObject(
-																	user
-																)
-															)
-														)
-													}
-
-												UntisRequest().request(query).fold({
-													// TODO: Create corresponding data model
-													val untisResponse = SerializationUtils.getJSON()
-														.decodeFromString<BaseResponse>(it)
-
-													untisResponse.error?.let { e ->
-														error = e.message
-														loading = false
-													} ?: run {
-														lessonTopicNew = text
-														lessonTopicEditDialog = null
-													}
+												submitLessonTopic(user, id, text).fold({
+													lessonTopicNew = it
+													lessonTopicEditDialog = null
 												}, {
-													error = it.message
+													dialogError = it.message
 													loading = false
 												})
 											}
@@ -470,48 +538,144 @@ fun TimetableItemDetailsDialog(
 						.padding(16.dp),
 				)
 		}
+
+		AnimatedVisibility(
+			visible = absenceCheck != null,
+			enter = fullscreenDialogAnimationEnter(),
+			exit = fullscreenDialogAnimationExit()
+		) {
+			BackHandler(
+				enabled = absenceCheck != null,
+			) {
+				absenceCheck = null
+			}
+
+			absenceCheck?.let { absenceCheckPeriod ->
+				LazyColumn(
+					modifier = Modifier
+						.padding(innerPadding)
+						.fillMaxSize()
+						.background(MaterialTheme.colorScheme.surface),
+					contentPadding = WindowInsets.navigationBars.asPaddingValues()
+				) {
+					val students = untisPeriodData?.studentIds?.let { studentIds ->
+						studentIds.mapNotNull { studentId -> untisStudents?.find { it.id == studentId } }
+					} ?: emptyList()
+
+					items(students) { student ->
+						var loading by remember { mutableStateOf(false) }
+						val absence =
+							untisPeriodData?.absences?.findLast { it.studentId == student.id }
+
+						ListItem(
+							headlineText = {
+								Text(text = student.fullName())
+							},
+							supportingText = absence?.let {
+								{
+									it.text
+								}
+							},
+							leadingContent = {
+								if (loading)
+									SmallCircularProgressIndicator()
+								else if (absence != null)
+									Icon(
+										painterResource(id = R.drawable.all_cross),
+										contentDescription = "Absent"
+									)
+								else
+									Icon(
+										painterResource(id = R.drawable.all_check),
+										contentDescription = "Present"
+									)
+							},
+							modifier = Modifier.clickable {
+								absence?.let {
+									loading = true
+
+									scope.launch {
+										deleteAbsence(
+											user,
+											absence
+										).fold({
+											if (it)
+												untisPeriodData = untisPeriodData?.copy(
+													absences = untisPeriodData?.absences?.minus(
+														absence
+													)
+												)
+											else
+												Toast
+													.makeText(context, errorMessageGeneric, Toast.LENGTH_LONG)
+													.show()
+										}, {
+											Toast
+												.makeText(context, it.message, Toast.LENGTH_LONG)
+												.show()
+										})
+										loading = false
+									}
+								} ?: run {
+									loading = true
+
+									scope.launch {
+										createAbsence(
+											user,
+											absenceCheckPeriod.id,
+											student,
+											absenceCheckPeriod.startDateTime.toLocalDateTime(),
+											absenceCheckPeriod.endDateTime.toLocalDateTime()
+										).fold({
+											untisPeriodData = untisPeriodData?.copy(
+												absences = untisPeriodData?.absences?.plus(it)
+											)
+										}, {
+											Toast
+												.makeText(context, it.message, Toast.LENGTH_LONG)
+												.show()
+										})
+										loading = false
+									}
+								}
+							}
+						)
+					}
+				}
+			}
+		}
 	}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TimetableDatabaseInterface.TimetableItemDetailsDialogWithPeriodData(
-	period: PeriodData,
-	canEdit: Boolean = false,
+private fun TimetableItemDetailsDialogWithPeriodData(
+	periodData: PeriodData,
+	untisPeriodData: UntisPeriodData?,
+	error: Throwable?,
+	errorMessage: String?,
+	editPermission: String? = null,
 	headlineText: @Composable () -> Unit,
 	supportingText: @Composable (UntisPeriodData) -> Unit,
 	leadingContent: @Composable (UntisPeriodData?) -> Unit,
 	onClick: () -> Unit
 ) {
-	var periodData by remember { mutableStateOf<UntisPeriodData?>(null) }
-	var error by remember { mutableStateOf<Throwable?>(null) }
-	val errorMessage = error?.message?.let { stringResource(id = R.string.all_error_details, it) }
-
 	val context = LocalContext.current
-
-	LaunchedEffect(Unit) {
-		this@TimetableItemDetailsDialogWithPeriodData.user?.let { user ->
-			loadPeriodData(
-				user = user,
-				period = period.element
-			).fold({
-				periodData = it.dataByTTId[period.element.id.toString()]
-			}, {
-				error = it
-			})
-		}
-	}
+	val canEdit =
+		periodData.element.can.contains(editPermission) || untisPeriodData?.can?.contains(
+			editPermission
+		) == true
 
 	ListItem(
 		headlineText = headlineText,
 		supportingText = {
-			periodData?.let {
+			untisPeriodData?.let {
 				supportingText(it)
 			} ?: error?.let {
 				Text(stringResource(R.string.all_error))
 			} ?: Text(stringResource(R.string.loading))
 		},
-		leadingContent = { leadingContent(periodData) },
+		leadingContent = { leadingContent(untisPeriodData) },
 		modifier = Modifier
 			.conditional(error != null) {
 				clickable {
@@ -580,9 +744,6 @@ private fun TimetableDatabaseInterface.TimetableItemDetailsDialogElement(
 		)
 }
 
-private val TimetableDatabaseInterface.user: UserDatabase.User?
-	get() = database.getUser(id)
-
 private suspend fun loadPeriodData(
 	user: UserDatabase.User,
 	period: Period
@@ -604,6 +765,122 @@ private suspend fun loadPeriodData(
 		untisResponse.result?.let {
 			Result.success(it)
 		} ?: Result.failure(UntisApiException(untisResponse.error))
+	}, {
+		Result.failure(it.exception)
+	})
+}
+
+private suspend fun createAbsence(
+	user: UserDatabase.User,
+	ttId: Int,
+	student: UntisStudent,
+	startDateTime: LocalDateTime,
+	endDateTime: LocalDateTime
+): Result<UntisAbsence> {
+	val query =
+		UntisRequest.UntisRequestQuery(user).apply {
+			data.method = UntisApiConstants.METHOD_CREATE_IMMEDIATE_ABSENCE
+			data.params = listOf(
+				CreateImmediateAbsenceParams(
+					ttId,
+					student.id,
+					UntisTime(startDateTime.toString(DateTimeUtils.tTimeNoSeconds())),
+					UntisTime(endDateTime.toString(DateTimeUtils.tTimeNoSeconds())),
+					UntisAuthentication.createAuthObject(user)
+				)
+			)
+		}
+
+	return UntisRequest().request(query).fold({ data ->
+		val untisResponse =
+			SerializationUtils.getJSON().decodeFromString<CreateImmediateAbsenceResponse>(data)
+
+		untisResponse.result?.let {
+			Result.success(it.absences[0])
+		} ?: Result.failure(UntisApiException(untisResponse.error))
+	}, {
+		Result.failure(it)
+	})
+}
+
+private suspend fun deleteAbsence(
+	user: UserDatabase.User,
+	absence: UntisAbsence
+): Result<Boolean> {
+	val query =
+		UntisRequest.UntisRequestQuery(user).apply {
+			data.method = UntisApiConstants.METHOD_DELETE_ABSENCE
+			data.params = listOf(
+				DeleteAbsenceParams(
+					absence.id,
+					UntisAuthentication.createAuthObject(user)
+				)
+			)
+		}
+
+	return UntisRequest().request(query).fold({ data ->
+		val untisResponse =
+			SerializationUtils.getJSON().decodeFromString<DeleteAbsenceResponse>(data)
+
+		untisResponse.result?.let {
+			Result.success(it.success)
+		} ?: Result.failure(UntisApiException(untisResponse.error))
+	}, {
+		Result.failure(it)
+	})
+}
+
+private suspend fun submitAbsencesChecked(
+	user: UserDatabase.User,
+	ttId: Int
+): Result<Boolean> {
+	val query =
+		UntisRequest.UntisRequestQuery(user).apply {
+			data.method = UntisApiConstants.METHOD_SUBMIT_ABSENCES_CHECKED
+			data.params = listOf(
+				AbsencesCheckedParams(
+					listOf(ttId),
+					UntisAuthentication.createAuthObject(user)
+				)
+			)
+		}
+
+	return UntisRequest().request(query).fold({ data ->
+		// TODO: Create corresponding data model
+		val untisResponse = SerializationUtils.getJSON().decodeFromString<BaseResponse>(data)
+
+		untisResponse.error?.let {
+			Result.failure(UntisApiException(it))
+		} ?: Result.success(true)
+	}, {
+		Result.failure(it)
+	})
+}
+
+private suspend fun submitLessonTopic(
+	user: UserDatabase.User,
+	ttId: Int,
+	lessonTopic: String
+): Result<String> {
+	val query =
+		UntisRequest.UntisRequestQuery(user).apply {
+			data.method = UntisApiConstants.METHOD_SUBMIT_LESSON_TOPIC
+			data.params = listOf(
+				SubmitLessonTopicParams(
+					lessonTopic,
+					ttId,
+					UntisAuthentication.createAuthObject(user)
+				)
+			)
+		}
+
+	return UntisRequest().request(query).fold({ data ->
+		// TODO: Create corresponding data model
+		val untisResponse = SerializationUtils.getJSON().decodeFromString<BaseResponse>(data)
+
+		untisResponse.error?.let {
+			Result.failure(UntisApiException(it))
+		} ?: Result.success(lessonTopic)
 	}, {
 		Result.failure(it.exception)
 	})

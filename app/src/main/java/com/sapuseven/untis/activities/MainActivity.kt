@@ -61,6 +61,8 @@ import com.sapuseven.untis.models.untis.masterdata.Holiday
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
+import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
+import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
 import com.sapuseven.untis.ui.common.Weekday
@@ -302,15 +304,11 @@ class MainActivity :
 						}
 					}
 
-					val density = LocalDensity.current
-					val offsetY = { _: Int ->
-						with(density) { 40.dp.roundToPx() }
-					}
 					// TODO: Implement a smoother animation (see https://m3.material.io/components/dialogs/guidelines#007536b9-76b1-474a-a152-2f340caaff6f)
 					AnimatedVisibility(
 						visible = appState.timetableItemDetailsDialog.value != null,
-						enter = slideInVertically(initialOffsetY = offsetY) + fadeIn(),
-						exit = slideOutVertically(targetOffsetY = offsetY) + fadeOut()
+						enter = fullscreenDialogAnimationEnter(),
+						exit = fullscreenDialogAnimationExit()
 					) {
 						TimetableItemDetailsDialog(
 							timegridItems = remember {
@@ -330,8 +328,8 @@ class MainActivity :
 
 					AnimatedVisibility(
 						visible = appState.profileManagementDialog.value,
-						enter = slideInVertically(initialOffsetY = offsetY) + fadeIn(),
-						exit = slideOutVertically(targetOffsetY = offsetY) + fadeOut()
+						enter = fullscreenDialogAnimationEnter(),
+						exit = fullscreenDialogAnimationExit()
 					) {
 						ProfileManagementDialog(
 							onDismiss = {

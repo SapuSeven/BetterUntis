@@ -47,6 +47,7 @@ import com.sapuseven.untis.models.untis.masterdata.TimeGrid
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.common.LabeledCheckbox
 import com.sapuseven.untis.ui.common.LabeledSwitch
+import com.sapuseven.untis.ui.common.SmallCircularProgressIndicator
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -331,10 +332,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 								modifier = Modifier.navigationBarsPadding(),
 								icon = {
 									if (loading)
-										CircularProgressIndicator(
-											strokeWidth = 3.dp,
-											modifier = Modifier.size(24.dp)
-										)
+										SmallCircularProgressIndicator()
 									else
 										Icon(Icons.Outlined.ArrowForward, contentDescription = null)
 								},
