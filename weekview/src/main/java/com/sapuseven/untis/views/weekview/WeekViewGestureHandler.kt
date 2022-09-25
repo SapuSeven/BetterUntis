@@ -54,7 +54,6 @@ internal class WeekViewGestureHandler<T>(
 
 			override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
 				isZooming = true
-				goToNearestOrigin()
 				return true
 			}
 

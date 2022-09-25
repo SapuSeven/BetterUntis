@@ -112,7 +112,7 @@ class WeekViewDrawConfig(context: Context) {
 				newHourHeight = config.maxHourHeight
 			}
 
-			currentOrigin.y = currentOrigin.y / (config.hourHeight * newHourHeight + config.endTimeOffset)
+			currentOrigin.y = currentOrigin.y / config.hourHeight * newHourHeight
 			config.hourHeight = newHourHeight
 			newHourHeight = -1
 		}

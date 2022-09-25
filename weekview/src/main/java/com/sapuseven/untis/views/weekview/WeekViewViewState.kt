@@ -22,7 +22,7 @@ class WeekViewViewState {
 
 		config.effectiveMinHourHeight = max(
 				config.minHourHeight,
-				((height - config.drawConfig.headerHeight) / config.hoursPerDay()).toInt()
+				((height - config.drawConfig.headerHeight - config.endTimeOffset) / config.hoursPerDay()).toInt()
 		)
 
 		areDimensionsInvalid = false

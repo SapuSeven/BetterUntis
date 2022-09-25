@@ -39,6 +39,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.ColorUtils
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_HIGHLIGHT
 import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_ROUTE
@@ -47,6 +51,7 @@ import com.sapuseven.untis.activities.main.DrawerText
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.DateTimeUtils
+import com.sapuseven.untis.helpers.config.globalDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.models.untis.UntisDate
@@ -72,9 +77,7 @@ import com.sapuseven.untis.views.weekview.listeners.ScrollListener
 import com.sapuseven.untis.views.weekview.listeners.TopLeftCornerClickListener
 import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.joda.time.*
@@ -148,7 +151,8 @@ class MainActivity :
 							user,
 							customThemeColor,
 							timetableDatabaseInterface,
-							dataStorePreferences
+							dataStorePreferences,
+							globalDataStore
 						)
 					appState.loadPrefs(dataStorePreferences)
 
@@ -167,7 +171,7 @@ class MainActivity :
 									title = { Text(appState.displayedName.value) },
 									navigationIcon = {
 										IconButton(onClick = {
-											appState.coroutineScope.launch { appState.drawerState.open() }
+											appState.scope.launch { appState.drawerState.open() }
 										}) {
 											Icon(
 												imageVector = Icons.Outlined.Menu,
@@ -335,7 +339,7 @@ class MainActivity :
 	@Composable
 	private fun WeekViewCompose(appState: MainAppState) {
 		var weekViewGlobal by remember { mutableStateOf(appState.weekView.value) }
-		appState.setupCustomization(weekViewGlobal, dataStorePreferences)
+		appState.loadWeekViewPreferences(weekViewGlobal, dataStorePreferences)
 
 		AndroidView(
 			factory = { context ->
@@ -949,10 +953,11 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	val weekViewSwipeRefresh: MutableState<WeekViewSwipeRefreshLayout?>,
 	val weekView: MutableState<WeekView<TimegridItem>?>,
 	val context: Context,
-	val coroutineScope: CoroutineScope,
+	val scope: CoroutineScope,
 	val colorScheme: ColorScheme,
 	val currentDensity: Density,
 	val preferences: DataStorePreferences,
+	val globalPreferences: DataStore<Preferences>,
 	var personalTimetable: Pair<PeriodElement?, String?>?,
 	val defaultDisplayedName: String,
 	val drawerState: DrawerState,
@@ -972,11 +977,13 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		private const val DAY_MILLIS: Int = 24 * HOUR_MILLIS
 
 		private const val UNTIS_DEFAULT_COLOR = "#f49f25"
+
+		private val DATASTORE_KEY_WEEKVIEW_SCALE = intPreferencesKey("weekView.hourHeight")
 	}
 
 	private var drawerGestures by drawerGestureState
 
-	var lastSelectedDate = LocalDate.now()
+	var lastSelectedDate: LocalDate = LocalDate.now()
 
 	var displayedElement: MutableState<PeriodElement?> = mutableStateOf(personalTimetable?.first)
 	var displayedName: MutableState<String> =
@@ -1005,7 +1012,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 	@OptIn(ExperimentalMaterial3Api::class)
 	fun closeDrawer() {
-		coroutineScope.launch { drawerState.close() }
+		scope.launch { drawerState.close() }
 	}
 
 	fun displayElement(element: PeriodElement?, name: String? = null) {
@@ -1296,7 +1303,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			val weekIndex = currentWeekIndex.value
 
 			weeklyTimetableItems[weekIndex]?.dateRange?.let { dateRange ->
-				coroutineScope.launch {
+				scope.launch {
 					loadWeeklyTimetableItems(
 						timetableLoader,
 						dateRange.first.toLocalDate(),
@@ -1336,7 +1343,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	}
 
 	@Composable
-	fun <T> setupCustomization(weekView: WeekView<T>?, dataStorePreferences: DataStorePreferences) {
+	fun <T> loadWeekViewPreferences(weekView: WeekView<T>?, dataStorePreferences: DataStorePreferences) {
 		val currentDensity = LocalDensity.current
 		val scope = rememberCoroutineScope()
 
@@ -1488,6 +1495,12 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 						weekView.notifyDataSetChanged()
 					}
 				}
+
+				scope.launch {
+					weekView.hourHeight = globalPreferences.data
+						.map { prefs -> prefs[DATASTORE_KEY_WEEKVIEW_SCALE] ?: -1 }
+						.first()
+				}
 			}
 		}
 	}
@@ -1609,7 +1622,11 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 			scaleListener = object : ScaleListener {
 				override fun onScaleFinished() {
-					//saveZoomLevel()
+					scope.launch {
+						globalPreferences.edit { prefs ->
+							weekView.value?.let { prefs[DATASTORE_KEY_WEEKVIEW_SCALE] = it.hourHeight }
+						}
+					}
 				}
 			}
 
@@ -1692,7 +1709,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 				weeklyTimetableItems[weekIndex] =
 					WeeklyTimetableItems()
 				displayedElement.value?.let { displayedElement ->
-					coroutineScope.launch {
+					scope.launch {
 						loading.value++
 						loadWeeklyTimetableItems(
 							timetableLoader,
@@ -1725,6 +1742,7 @@ fun rememberMainAppState(
 	customThemeColor: Color?,
 	timetableDatabaseInterface: TimetableDatabaseInterface,
 	preferences: DataStorePreferences,
+	globalPreferences: DataStore<Preferences>,
 	weekViewSwipeRefresh: MutableState<WeekViewSwipeRefreshLayout?> = remember { mutableStateOf(null) },
 	weekView: MutableState<WeekView<TimegridItem>?> = remember { mutableStateOf(null) },
 	context: Context = LocalContext.current,
@@ -1762,7 +1780,8 @@ fun rememberMainAppState(
 		weekView = weekView,
 		context = context,
 		preferences = preferences,
-		coroutineScope = coroutineScope,
+		globalPreferences = globalPreferences,
+		scope = coroutineScope,
 		colorScheme = colorScheme,
 		currentDensity = currentDensity,
 		personalTimetable = personalTimetable,
