@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.RectF
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -54,7 +55,9 @@ import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.config.globalDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
+import com.sapuseven.untis.models.TimetableBookmark
 import com.sapuseven.untis.models.untis.UntisDate
+import com.sapuseven.untis.models.untis.masterdata.Holiday
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
@@ -71,6 +74,7 @@ import com.sapuseven.untis.ui.functional.BackPressConfirm
 import com.sapuseven.untis.ui.preferences.convertRangeToPair
 import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
+import com.sapuseven.untis.views.weekview.HolidayChip
 import com.sapuseven.untis.views.weekview.WeekView
 import com.sapuseven.untis.views.weekview.WeekViewDisplayable
 import com.sapuseven.untis.views.weekview.listeners.EventClickListener
@@ -339,6 +343,10 @@ class MainActivity :
 		var weekViewGlobal by remember { mutableStateOf(appState.weekView.value) }
 		appState.loadWeekViewPreferences(weekViewGlobal, dataStorePreferences)
 
+
+
+
+
 		AndroidView(
 			factory = { context ->
 				if (weekViewGlobal == null) { // Create weekView if it doesn't already exist
@@ -355,6 +363,15 @@ class MainActivity :
 			},
 			update = {
 				appState.weekView.value = weekViewGlobal
+				userDatabase.getAdditionalUserData<Holiday>(user?.id!!, Holiday())?.let { item ->
+					appState.weekView.value?.addHolidays(item.map { holiday ->
+						HolidayChip(
+							text = holiday.value.longName,
+							startDate = holiday.value.startDate,
+							endDate = holiday.value.endDate
+						)
+					})
+				}
 				appState.updateViews(it)
 			},
 			modifier = Modifier
@@ -378,11 +395,49 @@ class MainActivity :
 			)
 		}
 
+		var bookmarksElementPicker by remember {
+			mutableStateOf<TimetableDatabaseInterface.Type?>(
+				null
+			)
+		}
+
 		BackHandler(enabled = appState.drawerState.isOpen) {
 			scope.launch {
 				appState.drawerState.close()
 			}
 		}
+
+		bookmarksElementPicker?.let { type ->
+			ElementPickerDialogFullscreen(
+				title = { /*TODO*/ },
+				timetableDatabaseInterface = timetableDatabaseInterface,
+				onDismiss = { bookmarksElementPicker = null },
+				onSelect = { item ->
+					item?.let {
+						appState.user.bookmarks = appState.user.bookmarks.plus(
+							TimetableBookmark(
+								classId = it.id,
+								displayName = timetableDatabaseInterface.getLongName(it),
+								drawableId = when(TimetableDatabaseInterface.Type.valueOf(item.type)){
+									TimetableDatabaseInterface.Type.CLASS -> R.drawable.all_classes
+									TimetableDatabaseInterface.Type.TEACHER -> R.drawable.all_teachers
+									TimetableDatabaseInterface.Type.SUBJECT -> R.drawable.all_subject
+									TimetableDatabaseInterface.Type.ROOM -> R.drawable.all_rooms
+									TimetableDatabaseInterface.Type.STUDENT -> R.drawable.all_prefs_personal
+								},
+								type = type.name
+							)
+						)
+						userDatabase.editUser(appState.user)
+						onShowTimetable(
+							item to timetableDatabaseInterface.getLongName(it)
+						)
+					}
+
+				},
+				initialType = type
+			)
+		} ?:
 
 		showElementPicker?.let { type ->
 			ElementPickerDialogFullscreen(
@@ -434,6 +489,44 @@ class MainActivity :
 					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 				)
 
+				if (appState.user.bookmarks.isNotEmpty()){
+					appState.user.bookmarks.forEach {bookmark ->
+						NavigationDrawerItem(
+							icon = {
+								Icon(
+									painter = painterResource(id = bookmark.drawableId),
+									contentDescription = null
+								)
+							},
+							badge = {
+									IconButton(
+										onClick = {
+											appState.closeDrawer()
+											//TODO: Add confirm dialog
+											appState.user.bookmarks = appState.user.bookmarks.minus(bookmark)
+											userDatabase.editUser(appState.user)
+										}
+									) {
+										Icon(painter = painterResource(id = R.drawable.all_bookmark_remove), contentDescription = "Remove Bookmark") //TODO: Extract String ressource
+									}
+							},
+							label = { Text(text = bookmark.displayName) },
+							selected = false,
+							onClick = {
+								appState.closeDrawer()
+								val items = timetableDatabaseInterface.getElements(TimetableDatabaseInterface.Type.valueOf(bookmark.type))
+								val item = items.find {
+									it.id == bookmark.classId && it.type == bookmark.type
+								}
+								onShowTimetable(
+									item to timetableDatabaseInterface.getLongName(item!!)
+								)
+							},
+							modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+						)
+					}
+				}
+
 				NavigationDrawerItem(
 					icon = {
 						Icon(
@@ -445,6 +538,7 @@ class MainActivity :
 					selected = false,
 					onClick = {
 						appState.closeDrawer()
+						bookmarksElementPicker = TimetableDatabaseInterface.Type.CLASS
 						//selectedItem.value = item
 					},
 					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -453,6 +547,7 @@ class MainActivity :
 				DrawerText("Timetables")
 
 				DrawerItems(
+					isMessengerAvailable = appState.isMessengerAvailable,
 					isPersonalTimetableSelected = appState.isPersonalTimetable,
 					displayedElement = appState.displayedElement.value,
 					onTimetableClick = { item ->
@@ -461,16 +556,41 @@ class MainActivity :
 					},
 					onShortcutClick = { item ->
 						appState.closeDrawer()
-
-						shortcutLauncher.launch(
-							Intent(
-								this@MainActivity,
-								item.target
-							).apply {
-								putUserIdExtra()
-								putBackgroundColorExtra()
+						if (item.id == 2){
+							try {
+								startActivity(packageManager.getLaunchIntentForPackage(MESSENGER_PACKAGE_NAME))
+							} catch (e: Exception) {
+								try {
+									startActivity(
+										Intent(
+											Intent.ACTION_VIEW,
+											Uri.parse("market://details?id=$MESSENGER_PACKAGE_NAME")
+										)
+									)
+								} catch (e: Exception) {
+									startActivity(
+										Intent(
+											Intent.ACTION_VIEW,
+											Uri.parse("https://play.google.com/store/apps/details?id=$MESSENGER_PACKAGE_NAME")
+										)
+									)
+								}
 							}
-						)
+						} else {
+							if (item.target != null){
+								shortcutLauncher.launch(
+									Intent(
+										this@MainActivity,
+										item.target
+									).apply {
+										putUserIdExtra()
+										putBackgroundColorExtra()
+									}
+								)
+							}
+						}
+
+
 					}
 				)
 			},
@@ -1003,6 +1123,23 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		}
 
 	private var shouldUpdateWeekView = true
+
+	val isMessengerAvailable: Boolean
+		get() {
+			for (item in this.weeklyTimetableItems.values) {
+				if (item != null) {
+					for (it in item.items){
+						if (it.data?.periodData?.element?.messengerChannel != null){
+							return true
+						}
+						break
+					}
+				}
+
+			}
+			return false
+		}
+
 
 	@OptIn(ExperimentalMaterial3Api::class)
 	val drawerGesturesEnabled: Boolean

@@ -20,10 +20,11 @@ import com.sapuseven.untis.ui.models.NavItemTimetable
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DrawerItems(
+	isMessengerAvailable: Boolean = false,
 	isPersonalTimetableSelected: Boolean = false,
 	displayedElement: PeriodElement? = null,
 	onTimetableClick: (item: NavItemTimetable) -> Unit,
-	onShortcutClick: (item: NavItemShortcut) -> Unit
+	onShortcutClick: (item: NavItemShortcut) -> Unit,
 ) {
 	val navItemsElementTypes = listOf(
 		NavItemTimetable(
@@ -46,18 +47,13 @@ fun DrawerItems(
 		),
 	)
 
-	val navItemsShortcuts = listOf(
+	var navItemsShortcuts = listOf(
 		NavItemShortcut(
 			id = 1,
 			icon = painterResource(id = R.drawable.all_infocenter),
 			label = stringResource(id = R.string.activity_title_info_center),
 			InfoCenterActivity::class.java
 		),
-		/*NavItemShortcut(
-			id = 2,
-			icon = painterResource(id = R.drawable.all_messenger),
-			label = stringResource(id = R.string.activity_title_messenger)
-		),*/
 		NavItemShortcut(
 			id = 3,
 			icon = painterResource(id = R.drawable.all_search_rooms),
@@ -71,6 +67,18 @@ fun DrawerItems(
 			SettingsActivity::class.java
 		)
 	)
+	if (isMessengerAvailable) {
+		navItemsShortcuts = navItemsShortcuts.plus(
+			NavItemShortcut(
+				id = 2,
+				icon = painterResource(id = R.drawable.all_messenger),
+				label = stringResource(id = R.string.activity_title_messenger),
+				null
+			)
+		).sortedBy {
+			it.id
+		}
+	}
 
 	navItemsElementTypes.forEach { item ->
 		NavigationDrawerItem(
