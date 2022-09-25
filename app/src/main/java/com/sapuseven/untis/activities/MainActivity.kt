@@ -55,6 +55,7 @@ import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.config.globalDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
+import com.sapuseven.untis.models.TimetableBookmark
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.masterdata.Holiday
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
@@ -396,11 +397,49 @@ class MainActivity :
 			)
 		}
 
+		var bookmarksElementPicker by remember {
+			mutableStateOf<TimetableDatabaseInterface.Type?>(
+				null
+			)
+		}
+
 		BackHandler(enabled = appState.drawerState.isOpen) {
 			scope.launch {
 				appState.drawerState.close()
 			}
 		}
+
+		bookmarksElementPicker?.let { type ->
+			ElementPickerDialogFullscreen(
+				title = { /*TODO*/ },
+				timetableDatabaseInterface = timetableDatabaseInterface,
+				onDismiss = { bookmarksElementPicker = null },
+				onSelect = { item ->
+					item?.let {
+						appState.user.bookmarks = appState.user.bookmarks.plus(
+							TimetableBookmark(
+								classId = it.id,
+								displayName = timetableDatabaseInterface.getLongName(it),
+								drawableId = when(TimetableDatabaseInterface.Type.valueOf(item.type)){
+									TimetableDatabaseInterface.Type.CLASS -> R.drawable.all_classes
+									TimetableDatabaseInterface.Type.TEACHER -> R.drawable.all_teachers
+									TimetableDatabaseInterface.Type.SUBJECT -> R.drawable.all_subject
+									TimetableDatabaseInterface.Type.ROOM -> R.drawable.all_rooms
+									TimetableDatabaseInterface.Type.STUDENT -> R.drawable.all_prefs_personal
+								},
+								type = type.name
+							)
+						)
+						userDatabase.editUser(appState.user)
+						onShowTimetable(
+							item to timetableDatabaseInterface.getLongName(it)
+						)
+					}
+
+				},
+				initialType = type
+			)
+		} ?:
 
 		showElementPicker?.let { type ->
 			ElementPickerDialogFullscreen(
@@ -452,6 +491,44 @@ class MainActivity :
 					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 				)
 
+				if (appState.user.bookmarks.isNotEmpty()){
+					appState.user.bookmarks.forEach {bookmark ->
+						NavigationDrawerItem(
+							icon = {
+								Icon(
+									painter = painterResource(id = bookmark.drawableId),
+									contentDescription = null
+								)
+							},
+							badge = {
+									IconButton(
+										onClick = {
+											appState.closeDrawer()
+											//TODO: Add confirm dialog
+											appState.user.bookmarks = appState.user.bookmarks.minus(bookmark)
+											userDatabase.editUser(appState.user)
+										}
+									) {
+										Icon(painter = painterResource(id = R.drawable.all_bookmark_remove), contentDescription = "Remove Bookmark") //TODO: Extract String ressource
+									}
+							},
+							label = { Text(text = bookmark.displayName) },
+							selected = false,
+							onClick = {
+								appState.closeDrawer()
+								val items = timetableDatabaseInterface.getElements(TimetableDatabaseInterface.Type.valueOf(bookmark.type))
+								val item = items.find {
+									it.id == bookmark.classId && it.type == bookmark.type
+								}
+								onShowTimetable(
+									item to timetableDatabaseInterface.getLongName(item!!)
+								)
+							},
+							modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+						)
+					}
+				}
+
 				NavigationDrawerItem(
 					icon = {
 						Icon(
@@ -463,6 +540,7 @@ class MainActivity :
 					selected = false,
 					onClick = {
 						appState.closeDrawer()
+						bookmarksElementPicker = TimetableDatabaseInterface.Type.CLASS
 						//selectedItem.value = item
 					},
 					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -1047,40 +1125,6 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		}
 
 	private var shouldUpdateWeekView = true
-
-	val isMessengerAvailable: Boolean
-		get() {
-			for (item in this.weeklyTimetableItems.values) {
-				if (item != null) {
-					for (it in item.items){
-						if (it.data?.periodData?.element?.messengerChannel != null){
-							return true
-						}
-						break
-					}
-				}
-
-			}
-			return false
-		}
-
-
-	val isMessengerAvailable: Boolean
-		get() {
-			for (item in this.weeklyTimetableItems.values) {
-				if (item != null) {
-					for (it in item.items){
-						if (it.data?.periodData?.element?.messengerChannel != null){
-							return true
-						}
-						break
-					}
-				}
-
-			}
-			return false
-		}
-
 
 	val isMessengerAvailable: Boolean
 		get() {
