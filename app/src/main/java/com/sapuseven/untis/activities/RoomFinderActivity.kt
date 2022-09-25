@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -41,6 +42,8 @@ import com.sapuseven.untis.models.untis.masterdata.timegrid.Day
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
+import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
+import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.functional.bottomInsets
 import kotlinx.coroutines.launch
@@ -107,7 +110,177 @@ class RoomFinderActivity : BaseComposeActivity() {
 						)
 					}
 
-					if (showElementPicker)
+					Scaffold(
+						modifier = Modifier.bottomInsets(),
+						topBar = {
+							CenterAlignedTopAppBar(
+								title = {
+									Text(stringResource(id = R.string.activity_title_free_rooms))
+								},
+								navigationIcon = {
+									IconButton(onClick = { finish() }) {
+										Icon(
+											imageVector = Icons.Outlined.ArrowBack,
+											contentDescription = stringResource(id = R.string.all_back)
+										)
+									}
+								},
+								actions = {
+									IconButton(onClick = { showElementPicker = true }) {
+										Icon(
+											imageVector = Icons.Outlined.Add,
+											contentDescription = stringResource(id = R.string.all_add)
+										)
+									}
+								}
+							)
+						}
+					) { innerPadding ->
+						Column(
+							modifier = Modifier
+								.padding(innerPadding)
+								.fillMaxSize()
+						) {
+							Column(
+								horizontalAlignment = Alignment.CenterHorizontally,
+								verticalArrangement = Arrangement.Center,
+								modifier = Modifier
+									.fillMaxWidth()
+									.weight(1f)
+							) {
+								LazyColumn(
+									Modifier
+										.fillMaxWidth()
+										.weight(1f)
+								) {
+									items(
+										roomList.sortedWith(
+											compareByDescending<RoomStatusData> {
+												it.getState(
+													hourIndex
+												)
+											}
+												.thenBy { it.name }
+										),
+										key = { it.periodElement.id }
+									) {
+										RoomListItem(
+											item = it,
+											hourIndex = hourIndex,
+											onDelete = { deleteItem = it.periodElement.id },
+											modifier = Modifier
+												.animateItemPlacement()
+												.clickable {
+													setResult(
+														Activity.RESULT_OK, Intent().putExtra(
+															EXTRA_INT_ROOM_ID,
+															it.periodElement.id
+														)
+													)
+													finish()
+												}
+										)
+									}
+								}
+
+								if (roomList.isEmpty()) {
+									val annotatedString = buildAnnotatedString {
+										val text = stringResource(R.string.roomfinder_no_rooms)
+										append(text.substring(0, text.indexOf("+")))
+										appendInlineContent(id = "add")
+										append(text.substring(text.indexOf("+") + 1))
+									}
+
+									val inlineContentMap = mapOf(
+										"add" to InlineTextContent(
+											Placeholder(
+												MaterialTheme.typography.bodyLarge.fontSize,
+												MaterialTheme.typography.bodyLarge.fontSize,
+												PlaceholderVerticalAlign.TextCenter
+											)
+										) {
+											Icon(
+												imageVector = Icons.Outlined.Add,
+												modifier = Modifier.fillMaxSize(),
+												contentDescription = "+"
+											)
+										}
+									)
+
+									Text(
+										text = annotatedString,
+										textAlign = TextAlign.Center,
+										inlineContent = inlineContentMap,
+										modifier = Modifier
+											.align(Alignment.CenterHorizontally)
+											.weight(1f)
+									)
+								} else {
+									unit?.let { unit ->
+										ListItem(
+											headlineText = {
+												Text(
+													text = stringResource(
+														id = R.string.roomfinder_current_hour,
+														translateDay(unit.first.day),
+														unit.second
+													),
+													textAlign = TextAlign.Center,
+													modifier = Modifier.fillMaxWidth()
+												)
+											},
+											supportingText = {
+												Text(
+													text = stringResource(
+														id = R.string.roomfinder_current_hour_time,
+														unit.third.startTime.toLocalTime()
+															.toString(DateTimeFormat.shortTime()),
+														unit.third.endTime.toLocalTime()
+															.toString(DateTimeFormat.shortTime())
+													),
+													textAlign = TextAlign.Center,
+													modifier = Modifier.fillMaxWidth()
+												)
+											},
+											leadingContent = {
+												IconButton(
+													enabled = hourIndexCanDecrease,
+													onClick = { hourIndex-- }
+												) {
+													Icon(
+														painter = painterResource(id = R.drawable.roomfinder_previous),
+														contentDescription = stringResource(id = R.string.roomfinder_image_previous_hour)
+													)
+												}
+											},
+											trailingContent = {
+												IconButton(
+													enabled = hourIndexCanIncrease,
+													onClick = { hourIndex++ }
+												) {
+													Icon(
+														painter = painterResource(id = R.drawable.roomfinder_next),
+														contentDescription = stringResource(id = R.string.roomfinder_image_next_hour)
+													)
+												}
+											},
+											modifier = Modifier
+												.clickable {
+													hourIndex =
+														calculateCurrentHourIndex(user)
+												}
+										)
+									}
+								}
+							}
+						}
+					}
+
+					AnimatedVisibility(
+						visible = showElementPicker,
+						enter = fullscreenDialogAnimationEnter(),
+						exit = fullscreenDialogAnimationExit()
+					) {
 						ElementPickerDialogFullscreen(
 							title = { Text(stringResource(id = R.string.all_add)) }, // TODO: Proper string resource
 							multiSelect = true,
@@ -162,172 +335,7 @@ class RoomFinderActivity : BaseComposeActivity() {
 									}
 							}
 						)
-					else
-						Scaffold(
-							modifier = Modifier.bottomInsets(),
-							topBar = {
-								CenterAlignedTopAppBar(
-									title = {
-										Text(stringResource(id = R.string.activity_title_free_rooms))
-									},
-									navigationIcon = {
-										IconButton(onClick = { finish() }) {
-											Icon(
-												imageVector = Icons.Outlined.ArrowBack,
-												contentDescription = stringResource(id = R.string.all_back)
-											)
-										}
-									},
-									actions = {
-										IconButton(onClick = { showElementPicker = true }) {
-											Icon(
-												imageVector = Icons.Outlined.Add,
-												contentDescription = stringResource(id = R.string.all_add)
-											)
-										}
-									}
-								)
-							}
-						) { innerPadding ->
-							Column(
-								modifier = Modifier
-									.padding(innerPadding)
-									.fillMaxSize()
-							) {
-								Column(
-									horizontalAlignment = Alignment.CenterHorizontally,
-									verticalArrangement = Arrangement.Center,
-									modifier = Modifier
-										.fillMaxWidth()
-										.weight(1f)
-								) {
-									LazyColumn(
-										Modifier
-											.fillMaxWidth()
-											.weight(1f)
-									) {
-										items(
-											roomList.sortedWith(
-												compareByDescending<RoomStatusData> {
-													it.getState(
-														hourIndex
-													)
-												}
-													.thenBy { it.name }
-											),
-											key = { it.periodElement.id }
-										) {
-											RoomListItem(
-												item = it,
-												hourIndex = hourIndex,
-												onDelete = { deleteItem = it.periodElement.id },
-												modifier = Modifier
-													.animateItemPlacement()
-													.clickable {
-														setResult(
-															Activity.RESULT_OK, Intent().putExtra(
-																EXTRA_INT_ROOM_ID,
-																it.periodElement.id
-															)
-														)
-														finish()
-													}
-											)
-										}
-									}
-
-									if (roomList.isEmpty()) {
-										val annotatedString = buildAnnotatedString {
-											val text = stringResource(R.string.roomfinder_no_rooms)
-											append(text.substring(0, text.indexOf("+")))
-											appendInlineContent(id = "add")
-											append(text.substring(text.indexOf("+") + 1))
-										}
-
-										val inlineContentMap = mapOf(
-											"add" to InlineTextContent(
-												Placeholder(
-													MaterialTheme.typography.bodyLarge.fontSize,
-													MaterialTheme.typography.bodyLarge.fontSize,
-													PlaceholderVerticalAlign.TextCenter
-												)
-											) {
-												Icon(
-													imageVector = Icons.Outlined.Add,
-													modifier = Modifier.fillMaxSize(),
-													contentDescription = "+"
-												)
-											}
-										)
-
-										Text(
-											text = annotatedString,
-											textAlign = TextAlign.Center,
-											inlineContent = inlineContentMap,
-											modifier = Modifier
-												.align(Alignment.CenterHorizontally)
-												.weight(1f)
-										)
-									} else {
-										unit?.let { unit ->
-											ListItem(
-												headlineText = {
-													Text(
-														text = stringResource(
-															id = R.string.roomfinder_current_hour,
-															translateDay(unit.first.day),
-															unit.second
-														),
-														textAlign = TextAlign.Center,
-														modifier = Modifier.fillMaxWidth()
-													)
-												},
-												supportingText = {
-													Text(
-														text = stringResource(
-															id = R.string.roomfinder_current_hour_time,
-															unit.third.startTime.toLocalTime()
-																.toString(DateTimeFormat.shortTime()),
-															unit.third.endTime.toLocalTime()
-																.toString(DateTimeFormat.shortTime())
-														),
-														textAlign = TextAlign.Center,
-														modifier = Modifier.fillMaxWidth()
-													)
-												},
-												leadingContent = {
-													IconButton(
-														enabled = hourIndexCanDecrease,
-														onClick = { hourIndex-- }
-													) {
-														Icon(
-															painter = painterResource(id = R.drawable.roomfinder_previous),
-															contentDescription = stringResource(id = R.string.roomfinder_image_previous_hour)
-														)
-													}
-												},
-												trailingContent = {
-													IconButton(
-														enabled = hourIndexCanIncrease,
-														onClick = { hourIndex++ }
-													) {
-														Icon(
-															painter = painterResource(id = R.drawable.roomfinder_next),
-															contentDescription = stringResource(id = R.string.roomfinder_image_next_hour)
-														)
-													}
-												},
-												modifier = Modifier
-													.clickable {
-														hourIndex =
-															calculateCurrentHourIndex(user)
-													}
-											)
-										}
-									}
-								}
-							}
-						}
+					}
 
 					if (deleteItem != DELETE_ITEM_NONE) {
 						roomList.find { it.periodElement.id == deleteItem }?.let { item ->
