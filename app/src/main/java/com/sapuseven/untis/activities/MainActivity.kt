@@ -1464,12 +1464,10 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 		scope.launch {
 			personalTimetableFlow.collect { customTimetable ->
-				val element = decodeStoredTimetableValue(customTimetable)
+				val element = decodeStoredTimetableValue(customTimetable) ?: return@collect
 				val reload = personalTimetable == null
 
-				personalTimetable = element to element?.let {
-					timetableDatabaseInterface.getLongName(it)
-				}
+				personalTimetable = element to timetableDatabaseInterface.getLongName(element)
 
 				if (reload || isAnonymous)
 					displayElement(personalTimetable?.first, personalTimetable?.second)
