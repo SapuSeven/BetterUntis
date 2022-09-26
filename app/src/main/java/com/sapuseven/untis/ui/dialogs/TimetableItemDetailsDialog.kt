@@ -125,43 +125,41 @@ fun TimetableItemDetailsDialog(
 				enter = scaleIn(),
 				exit = scaleOut()
 			) {
-				absenceCheck?.let { absenceCheckPeriod ->
-					FloatingActionButton(
-						modifier = Modifier.bottomInsets(),
-						onClick = {
-							loading = true
+				FloatingActionButton(
+					modifier = Modifier.bottomInsets(),
+					onClick = {
+						loading = true
 
-							scope.launch {
-								submitAbsencesChecked(
-									user,
-									absenceCheckPeriod.id
-								).fold({
-									if (it) {
-										untisPeriodData = untisPeriodData?.copy(
-											absenceChecked = true
-										)
-										absenceCheck = null
-									} else
-										Toast
-											.makeText(context, errorMessageGeneric, Toast.LENGTH_LONG)
-											.show()
-								}, {
+						scope.launch {
+							submitAbsencesChecked(
+								user,
+								absenceCheck?.id ?: -1
+							).fold({
+								if (it) {
+									untisPeriodData = untisPeriodData?.copy(
+										absenceChecked = true
+									)
+									absenceCheck = null
+								} else
 									Toast
-										.makeText(context, it.message, Toast.LENGTH_LONG)
+										.makeText(context, errorMessageGeneric, Toast.LENGTH_LONG)
 										.show()
-								})
-								loading = false
-							}
+							}, {
+								Toast
+									.makeText(context, it.message, Toast.LENGTH_LONG)
+									.show()
+							})
+							loading = false
 						}
-					) {
-						if (loading)
-							SmallCircularProgressIndicator()
-						else
-							Icon(
-								painter = painterResource(id = R.drawable.all_check),
-								contentDescription = stringResource(R.string.all_dialog_absences_save)
-							)
 					}
+				) {
+					if (loading)
+						SmallCircularProgressIndicator()
+					else
+						Icon(
+							painter = painterResource(id = R.drawable.all_check),
+							contentDescription = stringResource(R.string.all_dialog_absences_save)
+						)
 				}
 			}
 		}
@@ -552,97 +550,95 @@ fun TimetableItemDetailsDialog(
 				absenceCheck = null
 			}
 
-			absenceCheck?.let { absenceCheckPeriod ->
-				LazyColumn(
-					modifier = Modifier
-						.padding(innerPadding)
-						.fillMaxSize()
-						.background(MaterialTheme.colorScheme.surface),
-					contentPadding = insetsPaddingValues()
-				) {
-					val students = untisPeriodData?.studentIds?.let { studentIds ->
-						studentIds.mapNotNull { studentId -> untisStudents?.find { it.id == studentId } }
-					} ?: emptyList()
+			LazyColumn(
+				modifier = Modifier
+					.padding(innerPadding)
+					.fillMaxSize()
+					.background(MaterialTheme.colorScheme.surface),
+				contentPadding = insetsPaddingValues()
+			) {
+				val students = untisPeriodData?.studentIds?.let { studentIds ->
+					studentIds.mapNotNull { studentId -> untisStudents?.find { it.id == studentId } }
+				} ?: emptyList()
 
-					items(students) { student ->
-						var loading by remember { mutableStateOf(false) }
-						val absence =
-							untisPeriodData?.absences?.findLast { it.studentId == student.id }
+				items(students) { student ->
+					var loading by remember { mutableStateOf(false) }
+					val absence =
+						untisPeriodData?.absences?.findLast { it.studentId == student.id }
 
-						ListItem(
-							headlineText = {
-								Text(text = student.fullName())
-							},
-							supportingText = absence?.let {
-								{
-									it.text
-								}
-							},
-							leadingContent = {
-								if (loading)
-									SmallCircularProgressIndicator()
-								else if (absence != null)
-									Icon(
-										painterResource(id = R.drawable.all_cross),
-										contentDescription = "Absent"
-									)
-								else
-									Icon(
-										painterResource(id = R.drawable.all_check),
-										contentDescription = "Present"
-									)
-							},
-							modifier = Modifier.clickable {
-								absence?.let {
-									loading = true
+					ListItem(
+						headlineText = {
+							Text(text = student.fullName())
+						},
+						supportingText = absence?.let {
+							{
+								it.text
+							}
+						},
+						leadingContent = {
+							if (loading)
+								SmallCircularProgressIndicator()
+							else if (absence != null)
+								Icon(
+									painterResource(id = R.drawable.all_cross),
+									contentDescription = "Absent"
+								)
+							else
+								Icon(
+									painterResource(id = R.drawable.all_check),
+									contentDescription = "Present"
+								)
+						},
+						modifier = Modifier.clickable {
+							absence?.let {
+								loading = true
 
-									scope.launch {
-										deleteAbsence(
-											user,
-											absence
-										).fold({
-											if (it)
-												untisPeriodData = untisPeriodData?.copy(
-													absences = untisPeriodData?.absences?.minus(
-														absence
-													)
-												)
-											else
-												Toast
-													.makeText(context, errorMessageGeneric, Toast.LENGTH_LONG)
-													.show()
-										}, {
-											Toast
-												.makeText(context, it.message, Toast.LENGTH_LONG)
-												.show()
-										})
-										loading = false
-									}
-								} ?: run {
-									loading = true
-
-									scope.launch {
-										createAbsence(
-											user,
-											absenceCheckPeriod.id,
-											student,
-											absenceCheckPeriod.startDateTime.toLocalDateTime(),
-											absenceCheckPeriod.endDateTime.toLocalDateTime()
-										).fold({
+								scope.launch {
+									deleteAbsence(
+										user,
+										absence
+									).fold({
+										if (it)
 											untisPeriodData = untisPeriodData?.copy(
-												absences = untisPeriodData?.absences?.plus(it)
+												absences = untisPeriodData?.absences?.minus(
+													absence
+												)
 											)
-										}, {
+										else
 											Toast
-												.makeText(context, it.message, Toast.LENGTH_LONG)
+												.makeText(context, errorMessageGeneric, Toast.LENGTH_LONG)
 												.show()
-										})
-										loading = false
-									}
+									}, {
+										Toast
+											.makeText(context, it.message, Toast.LENGTH_LONG)
+											.show()
+									})
+									loading = false
+								}
+							} ?: absenceCheck?.let { absenceCheckPeriod ->
+								loading = true
+
+								scope.launch {
+									createAbsence(
+										user,
+										absenceCheckPeriod.id,
+										student,
+										absenceCheckPeriod.startDateTime.toLocalDateTime(),
+										absenceCheckPeriod.endDateTime.toLocalDateTime()
+									).fold({
+										untisPeriodData = untisPeriodData?.copy(
+											absences = untisPeriodData?.absences?.plus(it)
+										)
+									}, {
+										Toast
+											.makeText(context, it.message, Toast.LENGTH_LONG)
+											.show()
+									})
+									loading = false
 								}
 							}
-						)
-					}
+						}
+					)
 				}
 			}
 		}
