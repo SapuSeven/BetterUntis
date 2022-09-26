@@ -1,4 +1,7 @@
-version: 2
+version: 2.1
+orbs:
+  gh: circleci/github-cli@2.1.0
+  
 jobs:
   build:
     working_directory: ~/betteruntis
@@ -53,7 +56,7 @@ jobs:
             - outputs
   deploy_debug:
     docker:
-      - image: cimg/base:2022.03
+      - image: cimg/base:stable
     working_directory: ~/betteruntis
     steps:
       - run:
@@ -72,7 +75,7 @@ jobs:
             scp -r -P $SSH_DEPLOY_PORT -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null workspace/outputs/apk/debug "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/debug/$CIRCLE_BUILD_NUM"
   deploy_release:
     docker:
-      - image: cimg/base:2022.03
+      - image: cimg/base:stable
     working_directory: ~/betteruntis
     steps:
       - run:
@@ -116,18 +119,19 @@ jobs:
 
   deploy_github:
     docker:
-      - image: cimg/go:1.19
+      - image: cimg/base:stable
+    working_directory: ~/betteruntis
     steps:
+      - gh/setup
       - attach_workspace:
           at: workspace
-      - run:
-          name: Publish Release on GitHub
-          command: |
-            go get github.com/tcnksm/ghr
-            VERSION=TEST
-            mkdir github
-            mv "workspace/outputs/apk/debug/*.apk" "github/BetterUntis ${VERSION}.apk"
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -replace -draft -prerelease ${VERSION} ./github
+      - gh/release:
+          title: BetterUntis
+          tag: $CIRCLE_TAG
+          draft: true
+          prerelease: true
+          files: "workspace/outputs/apk/debug/app-debug.apk#BetterUntis ${CIRCLE_TAG}.apk"
+          #notes-file: 
 
 workflows:
   version: 2
@@ -168,4 +172,4 @@ workflows:
             branches:
               only: circleci
             tags:
-              only: /.*/
+              only: /v.*/
