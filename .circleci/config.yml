@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   gh: circleci/github-cli@2.1.0
-  
+
 jobs:
   build:
     working_directory: ~/betteruntis
@@ -132,8 +132,6 @@ workflows:
           filters:
             branches:
               only: develop
-            tags:
-              only: /.*/
       - deploy_release:
           requires:
             - build
@@ -161,10 +159,10 @@ workflows:
               only: /test-.*/
           pre-steps:
             - attach_workspace:
-                at: workspace
+                at: /tmp/workspace
           title: BetterUntis
           tag: $CIRCLE_TAG
           draft: true
           prerelease: true
-          files: "workspace/outputs/apk/debug/app-debug.apk#BetterUntis ${CIRCLE_TAG}.apk"
+          files: "/tmp/workspace/outputs/apk/debug/app-debug.apk#BetterUntis ${CIRCLE_TAG}.apk"
           #notes-file: 
