@@ -156,9 +156,9 @@ workflows:
             - build
           filters:
             branches:
-              only: circleci
+              ignore: /.*/
             tags:
-              only: /v.*/
+              only: /test-.*/
           pre-steps:
             - attach_workspace:
                 at: workspace
