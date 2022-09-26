@@ -114,6 +114,20 @@ jobs:
             echo $GOOGLE_PLAY_KEY_ENCODED | base64 --decode > fastlane/key.json
             bundle exec fastlane deploy aab:'workspace/outputs/bundle/release/app-release.aab'
 
+  deploy_github:
+    docker:
+      - image: cibuilds/github:0.10
+    steps:
+      - attach_workspace:
+          at: workspace
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            VERSION=TEST
+            mkdir github
+            mv "workspace/outputs/apk/debug/*.apk" "github/BetterUntis ${VERSION}.apk"
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -replace -draft -prerelease ${VERSION} ./github
+
 workflows:
   version: 2
   build-and-deploy:
@@ -146,3 +160,11 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
+      - deploy_github:
+          requires:
+            - build
+          filters:
+            branches:
+              only: circleci
+            tags:
+              only: /.*/
