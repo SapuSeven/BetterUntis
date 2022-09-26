@@ -34,7 +34,15 @@ jobs:
             echo 'export KEY_RELEASE_PASSWORD=$(echo "$KEY_RELEASE_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
       - run:
           name: Initial build
-          command: ./gradlew clean assemble bundle
+          command: ./gradlew assemble bundle
+          environment:
+            GRADLE_OPTS: '
+              -Dorg.gradle.jvmargs="-Xmx3g -XX:+HeapDumpOnOutOfMemoryError -XX:MaxPermSize=512m"
+              -Dorg.gradle.daemon=false
+              -Dorg.gradle.parallel=true
+              -Dorg.gradle.workers.max=3
+              -Dkotlin.incremental=false
+            '
       - store_artifacts:
           name: Upload build artifacts
           path: app/build/outputs
