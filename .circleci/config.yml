@@ -130,7 +130,7 @@ jobs:
       - run:
           name: Deploy Release to GitHub
           command: |
-            VERSION=$(cut -d " " -f2- <<< $(grep versionCode app/build.gradle))
+            VERSION=$(grep versionCode app/build.gradle | cut -d " " -f2-)
             gh release create $CIRCLE_TAG --draft --prerelease --title "BetterUntis ${CIRCLE_TAG}" --notes-file "./fastlane/metadata/android/en-US/changelogs/${VERSION}.txt" "~/workspace/outputs/apk/debug/app-debug.apk#BetterUntis ${CIRCLE_TAG}.apk"
 
 workflows:
