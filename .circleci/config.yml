@@ -10,9 +10,8 @@ jobs:
   build:
     working_directory: ~/betteruntis
     docker:
-      - image: cimg/android:2022.03
-    environment:
-      JVM_OPTS: -Xmx3200m
+      - image: cimg/android:2022.09
+    resource_class: large
     steps:
       - checkout
       - restore_cache:
