@@ -116,13 +116,14 @@ jobs:
 
   deploy_github:
     docker:
-      - image: cibuilds/github:0.10
+      - image: cimg/go:1.19
     steps:
       - attach_workspace:
           at: workspace
       - run:
-          name: "Publish Release on GitHub"
+          name: Publish Release on GitHub
           command: |
+            go get github.com/tcnksm/ghr
             VERSION=TEST
             mkdir github
             mv "workspace/outputs/apk/debug/*.apk" "github/BetterUntis ${VERSION}.apk"
