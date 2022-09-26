@@ -118,6 +118,21 @@ jobs:
             echo $GOOGLE_PLAY_KEY_ENCODED | base64 --decode > fastlane/key.json
             bundle exec fastlane deploy aab:'workspace/outputs/bundle/release/app-release.aab'
 
+  deploy_github:
+    docker:
+      - image: cimg/base:stable
+    working_directory: ~/betteruntis
+    steps:
+      - gh/setup
+      - gh/clone
+      - attach_workspace:
+          at: ~/workspace
+      - run:
+          name: Deploy Release to GitHub
+          command: |
+            VERSION=$(cut -d " " -f2- <<< $(grep versionCode app/build.gradle))
+            gh release create $CIRCLE_TAG --draft --prerelease --title "BetterUntis ${CIRCLE_TAG}" --notes-file "./fastlane/metadata/android/en-US/changelogs/${VERSION}.txt" "~/workspace/outputs/apk/debug/app-debug.apk#BetterUntis ${CIRCLE_TAG}.apk"
+
 workflows:
   version: 2
   build-and-deploy:
@@ -148,8 +163,7 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
-      - gh/release:
-          name: deploy_github
+      - deploy_github:
           requires:
             - build
           filters:
@@ -157,12 +171,3 @@ workflows:
               ignore: /.*/
             tags:
               only: /test-.*/
-          pre-steps:
-            - attach_workspace:
-                at: /tmp/workspace
-          title: BetterUntis
-          tag: $CIRCLE_TAG
-          draft: true
-          prerelease: true
-          files: "/tmp/workspace/outputs/apk/debug/app-debug.apk#BetterUntis ${CIRCLE_TAG}.apk"
-          #notes-file: 
