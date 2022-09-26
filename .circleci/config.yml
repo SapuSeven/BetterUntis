@@ -1,8 +1,11 @@
 version: 2.1
-
 orbs:
   gh: circleci/github-cli@2.1.0
-
+filters: &release
+  branches:
+    ignore: /.*/
+  tags:
+    only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
 jobs:
   build:
     working_directory: ~/betteruntis
@@ -150,24 +153,12 @@ workflows:
       - deploy_release:
           requires:
             - build
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
+          filters: *release
       - deploy_fastlane:
           requires:
             - build
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
+          filters: *release
       - deploy_github:
           requires:
             - build
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /test-.*/
+          filters: *release
