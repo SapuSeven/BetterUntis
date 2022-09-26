@@ -1,4 +1,11 @@
-version: 2
+version: 2.1
+orbs:
+  gh: circleci/github-cli@2.1.0
+filters: &release
+  branches:
+    ignore: /.*/
+  tags:
+    only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
 jobs:
   build:
     working_directory: ~/betteruntis
@@ -53,7 +60,7 @@ jobs:
             - outputs
   deploy_debug:
     docker:
-      - image: cimg/base:2022.03
+      - image: cimg/base:stable
     working_directory: ~/betteruntis
     steps:
       - run:
@@ -72,7 +79,7 @@ jobs:
             scp -r -P $SSH_DEPLOY_PORT -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null workspace/outputs/apk/debug "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/debug/$CIRCLE_BUILD_NUM"
   deploy_release:
     docker:
-      - image: cimg/base:2022.03
+      - image: cimg/base:stable
     working_directory: ~/betteruntis
     steps:
       - run:
@@ -114,6 +121,21 @@ jobs:
             echo $GOOGLE_PLAY_KEY_ENCODED | base64 --decode > fastlane/key.json
             bundle exec fastlane deploy aab:'workspace/outputs/bundle/release/app-release.aab'
 
+  deploy_github:
+    docker:
+      - image: cimg/base:stable
+    working_directory: ~/betteruntis
+    steps:
+      - gh/setup
+      - gh/clone
+      - attach_workspace:
+          at: workspace
+      - run:
+          name: Deploy Release to GitHub
+          command: |
+            VERSION=$(grep versionCode app/build.gradle | cut -d " " -f2-)
+            gh release create $CIRCLE_TAG --prerelease --title "BetterUntis ${CIRCLE_TAG}" --notes-file "./fastlane/metadata/android/en-US/changelogs/${VERSION}.txt" "./workspace/outputs/apk/debug/app-debug.apk#BetterUntis ${CIRCLE_TAG}.apk"
+
 workflows:
   version: 2
   build-and-deploy:
@@ -128,21 +150,15 @@ workflows:
           filters:
             branches:
               only: develop
-            tags:
-              only: /.*/
       - deploy_release:
           requires:
             - build
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
+          filters: *release
       - deploy_fastlane:
           requires:
             - build
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
+          filters: *release
+      - deploy_github:
+          requires:
+            - build
+          filters: *release
