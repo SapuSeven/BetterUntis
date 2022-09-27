@@ -13,12 +13,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowCompat
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
+import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
@@ -165,6 +167,7 @@ open class BaseComposeActivity : ComponentActivity() {
 	fun AppTheme(
 		initialDarkTheme: Boolean = isSystemInDarkTheme(),
 		navBarInset: Boolean = true,
+		systemUiController: SystemUiController? = rememberSystemUiController(),
 		content: @Composable () -> Unit
 	) {
 		val context = LocalContext.current
@@ -173,8 +176,6 @@ open class BaseComposeActivity : ComponentActivity() {
 		val themeColorPref = dataStorePreferences.themeColor
 		val darkThemePref = dataStorePreferences.darkTheme
 		val darkThemeOledPref = dataStorePreferences.darkThemeOled
-
-		val systemUiController = rememberSystemUiController()
 
 		DisposableEffect(user) {
 			val job = scope.launch {
@@ -189,15 +190,9 @@ open class BaseComposeActivity : ComponentActivity() {
 						else -> initialDarkTheme
 					}
 
-					systemUiController.setSystemBarsColor(
-						color = Color.Transparent,
-						darkIcons = !darkThemeBool
-					)
-
-					systemUiController.setNavigationBarColor(
-						color = Color.Transparent,
-						darkIcons = !darkThemeBool
-					)
+					systemUiController?.let {
+						setSystemUiColor(it, Color.Transparent, !darkThemeBool)
+					}
 
 					// setStatusBarsColor() and setNavigationBarColor() also exist
 
@@ -245,14 +240,28 @@ open class BaseComposeActivity : ComponentActivity() {
 			) {}
 
 			SideEffect {
-				systemUiController.setSystemBarsColor(
-					color = backgroundColor
-				)
-
-				systemUiController.setNavigationBarColor(
-					color = backgroundColor
-				)
+				systemUiController?.let {
+					setSystemUiColor(it, backgroundColor)
+				}
 			}
+		}
+	}
+
+	fun setSystemUiColor(
+		systemUiController: SystemUiController,
+		color: Color = Color.Transparent,
+		darkIcons: Boolean = color.luminance() > 0.5f
+	) {
+		systemUiController.run {
+			setSystemBarsColor(
+				color = color,
+				darkIcons = darkIcons
+			)
+
+			setNavigationBarColor(
+				color = color,
+				darkIcons = darkIcons
+			)
 		}
 	}
 
