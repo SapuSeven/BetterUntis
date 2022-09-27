@@ -3,9 +3,10 @@ package com.sapuseven.untis.data.databases
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.provider.BaseColumns
 import com.sapuseven.untis.models.RoomFinderItem
 
-private const val DATABASE_VERSION = 1
+private const val DATABASE_VERSION = 2
 private const val DATABASE_NAME = "roomfinder-%d.db"
 
 interface RoomFinderDatabase {
@@ -30,14 +31,24 @@ class RoomFinderDatabaseImpl internal constructor(context: Context, profileId: L
 	RoomFinderDatabase,
 	SQLiteOpenHelper(context, DATABASE_NAME.format(profileId), null, DATABASE_VERSION) {
 	override fun onCreate(db: SQLiteDatabase) {
-		db.execSQL(RoomfinderDatabaseContract.SQL_CREATE_ENTRIES)
+		db.execSQL(RoomfinderDatabaseContract.SQL_CREATE_ENTRIES_V2)
 	}
 
 	override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-		// If you change the DATABASE_VERSION, insert logic to migrate the data
-		db.execSQL(RoomfinderDatabaseContract.SQL_DELETE_ENTRIES)
+		var currentVersion = oldVersion
 
-		onCreate(db)
+		while (currentVersion < newVersion) {
+			when (currentVersion) {
+				1 -> {
+					db.execSQL("ALTER TABLE ${RoomfinderDatabaseContract.TABLE_NAME} RENAME TO ${RoomfinderDatabaseContract.TABLE_NAME}_v1")
+					db.execSQL(RoomfinderDatabaseContract.SQL_CREATE_ENTRIES_V2)
+					db.execSQL("INSERT INTO ${RoomfinderDatabaseContract.TABLE_NAME} SELECT id, states FROM ${RoomfinderDatabaseContract.TABLE_NAME}_v1;")
+					db.execSQL("DROP TABLE ${RoomfinderDatabaseContract.TABLE_NAME}_v1")
+				}
+			}
+
+			currentVersion++
+		}
 	}
 
 	override fun addRoom(room: RoomFinderItem) {
@@ -45,7 +56,7 @@ class RoomFinderDatabaseImpl internal constructor(context: Context, profileId: L
 
 		db.delete(
 			RoomfinderDatabaseContract.TABLE_NAME,
-			RoomfinderDatabaseContract.COLUMN_NAME_ROOM_ID + "=?",
+			BaseColumns._ID + "=?",
 			arrayOf(room.id.toString())
 		)
 		db.insert(RoomfinderDatabaseContract.TABLE_NAME, null, room.generateValues())
@@ -58,7 +69,7 @@ class RoomFinderDatabaseImpl internal constructor(context: Context, profileId: L
 
 		val affectedRows = db.delete(
 			RoomfinderDatabaseContract.TABLE_NAME,
-			RoomfinderDatabaseContract.COLUMN_NAME_ROOM_ID + "=?",
+			BaseColumns._ID + "=?",
 			arrayOf(id.toString())
 		)
 
@@ -73,11 +84,10 @@ class RoomFinderDatabaseImpl internal constructor(context: Context, profileId: L
 		val cursor = db.query(
 			RoomfinderDatabaseContract.TABLE_NAME,
 			arrayOf(
-				RoomfinderDatabaseContract.COLUMN_NAME_ROOM_NAME,
-				RoomfinderDatabaseContract.COLUMN_NAME_ROOM_ID,
+				BaseColumns._ID,
 				RoomfinderDatabaseContract.COLUMN_NAME_STATES
 			),
-			RoomfinderDatabaseContract.COLUMN_NAME_ROOM_ID + "=?",
+			BaseColumns._ID + "=?",
 			arrayOf(id.toString()), null, null, null
 		)
 
@@ -85,8 +95,8 @@ class RoomFinderDatabaseImpl internal constructor(context: Context, profileId: L
 			return null
 
 		val room = RoomFinderItem(
-			cursor.getInt(cursor.getColumnIndex("id")),
-			RoomFinderItem.parseStateListFromString(cursor.getString(cursor.getColumnIndex("states")))
+			cursor.getInt(cursor.getColumnIndex(BaseColumns._ID)),
+			RoomFinderItem.parseStateListFromString(cursor.getString(cursor.getColumnIndex(RoomfinderDatabaseContract.COLUMN_NAME_STATES)))
 		)
 
 		cursor.close()
@@ -102,8 +112,7 @@ class RoomFinderDatabaseImpl internal constructor(context: Context, profileId: L
 		val cursor = db.query(
 			RoomfinderDatabaseContract.TABLE_NAME,
 			arrayOf(
-				RoomfinderDatabaseContract.COLUMN_NAME_ROOM_NAME,
-				RoomfinderDatabaseContract.COLUMN_NAME_ROOM_ID,
+				BaseColumns._ID,
 				RoomfinderDatabaseContract.COLUMN_NAME_STATES
 			), null, null, null, null, null
 		)
@@ -112,12 +121,10 @@ class RoomFinderDatabaseImpl internal constructor(context: Context, profileId: L
 			do {
 				rooms.add(
 					RoomFinderItem(
-						cursor.getInt(cursor.getColumnIndex("id")),
+						cursor.getInt(cursor.getColumnIndex(BaseColumns._ID)),
 						RoomFinderItem.parseStateListFromString(
 							cursor.getString(
-								cursor.getColumnIndex(
-									"states"
-								)
+								cursor.getColumnIndex(RoomfinderDatabaseContract.COLUMN_NAME_STATES)
 							)
 						)
 					)

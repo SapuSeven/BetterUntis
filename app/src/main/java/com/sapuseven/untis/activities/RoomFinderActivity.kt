@@ -18,6 +18,7 @@ import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -367,6 +368,7 @@ class RoomFinderState constructor(
 	private val preferences: DataStorePreferences,
 	private val contextActivity: Activity,
 	private val scope: CoroutineScope,
+	private var hourIndex: MutableState<Int>,
 	private val roomFinderDatabase: RoomFinderDatabase = RoomFinderDatabase.createInstance(contextActivity, user.id)
 ) {
 	companion object {
@@ -390,29 +392,27 @@ class RoomFinderState constructor(
 		get() = roomList.find { it.periodElement.id == deleteItem }
 
 	val currentUnit: Triple<Day, Int, com.sapuseven.untis.models.untis.masterdata.timegrid.Unit>?
-		get() = getUnitFromIndex(user, hourIndex)
+		get() = getUnitFromIndex(user, currentHourIndex)
 
 	val currentHourIndex: Int
-		get() = hourIndex
+		get() = hourIndex.value
 
 	val hourIndexCanDecrease: Boolean
-		get() = hourIndex > 0
+		get() = currentHourIndex > 0
 
 	val hourIndexCanIncrease: Boolean
-		get() = hourIndex < maxHourIndex
+		get() = currentHourIndex < maxHourIndex
 
 	val sortedRoomList: List<RoomStatusData>
 		get() = roomList.sortedWith(
 			compareByDescending<RoomStatusData> {
-				it.getState(hourIndex)
+				it.getState(currentHourIndex)
 			}.thenBy { it.name }
 		)
 
 	private var showElementPicker by mutableStateOf(false)
 
 	private var deleteItem by mutableStateOf(DELETE_ITEM_NONE)
-
-	private var hourIndex by mutableStateOf(calculateCurrentHourIndex(user))
 
 	private val maxHourIndex = calculateMaxHourIndex(user)
 
@@ -530,28 +530,6 @@ class RoomFinderState constructor(
 		}
 	}
 
-	private fun calculateCurrentHourIndex(user: UserDatabase.User): Int {
-		val now = LocalDateTime.now()
-		var index = 0
-
-		user.timeGrid.days.forEach { day ->
-			val dayDate =
-				DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseLocalDate(day.day)
-			if (dayDate.dayOfWeek == now.dayOfWeek) {
-				day.units.forEach { unit ->
-					if (unit.endTime.toLocalTime().millisOfDay > now.millisOfDay)
-						return index
-					index++
-				}
-				return index
-			} else {
-				index += day.units.size
-			}
-		}
-
-		return 0
-	}
-
 	/**
 	 * @return A triple of the day, the unit index of day (1-indexed) and the unit corresponding to the provided hour index.
 	 */
@@ -603,16 +581,16 @@ class RoomFinderState constructor(
 
 	fun onIncreaseHourIndex() {
 		if (hourIndexCanIncrease)
-			hourIndex++
+			hourIndex.value++
 	}
 
 	fun onDecreaseHourIndex() {
 		if (hourIndexCanDecrease)
-			hourIndex--
+			hourIndex.value--
 	}
 
 	fun onResetHourIndex() {
-		hourIndex = calculateCurrentHourIndex(user)
+		hourIndex.value = calculateCurrentHourIndex(user)
 	}
 
 	fun onDeleteItemDialogDismiss() {
@@ -670,19 +648,43 @@ class RoomFinderState constructor(
 	}
 }
 
+private fun calculateCurrentHourIndex(user: UserDatabase.User): Int {
+	val now = LocalDateTime.now()
+	var index = 0
+
+	user.timeGrid.days.forEach { day ->
+		val dayDate =
+			DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseLocalDate(day.day)
+		if (dayDate.dayOfWeek == now.dayOfWeek) {
+			day.units.forEach { unit ->
+				if (unit.endTime.toLocalTime().millisOfDay > now.millisOfDay)
+					return index
+				index++
+			}
+			return index
+		} else {
+			index += day.units.size
+		}
+	}
+
+	return 0
+}
+
 @Composable
 private fun rememberRoomFinderState(
 	user: UserDatabase.User,
 	timetableDatabaseInterface: TimetableDatabaseInterface,
 	preferences: DataStorePreferences,
 	contextActivity: RoomFinderActivity,
-	scope: CoroutineScope = rememberCoroutineScope()
+	scope: CoroutineScope = rememberCoroutineScope(),
+	hourIndex: MutableState<Int> = rememberSaveable { mutableStateOf(calculateCurrentHourIndex(user)) }
 ) = remember(user) {
 	RoomFinderState(
 		user = user,
 		timetableDatabaseInterface = timetableDatabaseInterface,
 		preferences = preferences,
 		contextActivity = contextActivity,
-		scope = scope
+		scope = scope,
+		hourIndex = hourIndex
 	)
 }
