@@ -33,7 +33,7 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.RoomFinderActivity.Companion.EXTRA_INT_ROOM_ID
 import com.sapuseven.untis.activities.RoomFinderState.Companion.ROOM_STATE_FREE
 import com.sapuseven.untis.activities.RoomFinderState.Companion.ROOM_STATE_OCCUPIED
-import com.sapuseven.untis.data.databases.RoomfinderDatabase
+import com.sapuseven.untis.data.databases.RoomFinderDatabase
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
@@ -365,8 +365,9 @@ class RoomFinderState constructor(
 	private val user: UserDatabase.User,
 	val timetableDatabaseInterface: TimetableDatabaseInterface,
 	private val preferences: DataStorePreferences,
-	private val contextActivity: RoomFinderActivity,
-	private val scope: CoroutineScope
+	private val contextActivity: Activity,
+	private val scope: CoroutineScope,
+	private val roomFinderDatabase: RoomFinderDatabase = RoomFinderDatabase.createInstance(contextActivity, user.id)
 ) {
 	companion object {
 		const val ROOM_STATE_OCCUPIED = 0
@@ -412,8 +413,6 @@ class RoomFinderState constructor(
 	private var deleteItem by mutableStateOf(DELETE_ITEM_NONE)
 
 	private var hourIndex by mutableStateOf(calculateCurrentHourIndex(user))
-
-	private val roomFinderDatabase = RoomfinderDatabase.createInstance(contextActivity, user.id)
 
 	private val maxHourIndex = calculateMaxHourIndex(user)
 
@@ -653,7 +652,6 @@ class RoomFinderState constructor(
 					roomFinderDatabase.addRoom(
 						RoomFinderItem(
 							periodElement.id,
-							item.name,
 							states
 						)
 					)

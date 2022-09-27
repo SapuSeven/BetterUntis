@@ -5,7 +5,6 @@ import android.database.Cursor
 
 data class RoomFinderItem(
 		val id: Int,
-		val name: String,
 		val states: List<Boolean>
 ) {
 	companion object {
@@ -16,7 +15,6 @@ data class RoomFinderItem(
 		fun parseCursor(cursor: Cursor): RoomFinderItem {
 			return RoomFinderItem(
 					cursor.getInt(cursor.getColumnIndex("id")),
-					cursor.getString(cursor.getColumnIndex("name")),
 					parseStateListFromString(cursor.getString(cursor.getColumnIndex("states")))
 			)
 		}
@@ -26,7 +24,6 @@ data class RoomFinderItem(
 		val values = ContentValues()
 
 		values.put("id", id)
-		values.put("name", name)
 		values.put("states", states.joinToString("") { if (it) "1" else "0" })
 
 		return values
