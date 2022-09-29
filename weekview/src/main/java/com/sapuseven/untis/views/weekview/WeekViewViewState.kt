@@ -35,7 +35,7 @@ class WeekViewViewState {
 			listener.goToHour(scrollToHour)
 		}
 
-		scrollToDay = null
+		//scrollToDay = null
 		scrollToHour = -1
 		areDimensionsInvalid = false
 	}

@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +46,7 @@ import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.UntisAbsence
 import com.sapuseven.untis.models.untis.UntisAttachment
+import com.sapuseven.untis.models.untis.UntisDateTime
 import com.sapuseven.untis.models.untis.UntisError
 import com.sapuseven.untis.models.untis.UntisTime
 import com.sapuseven.untis.models.untis.params.*
@@ -74,15 +76,15 @@ fun TimetableItemDetailsDialog(
 	timetableDatabaseInterface: TimetableDatabaseInterface,
 	onDismiss: (requestedElement: PeriodElement?) -> Unit
 ) {
-	var dismissed by remember { mutableStateOf(false) }
+	var dismissed by rememberSaveable { mutableStateOf(false) }
 	val pagerState = rememberPagerState(initialPage)
 	val scope = rememberCoroutineScope()
 	val context = LocalContext.current
 
-	var absenceCheck by remember { mutableStateOf<Period?>(null) }
+	var absenceCheck by rememberSaveable { mutableStateOf<Triple<Int, UntisDateTime, UntisDateTime>?>(null) }
 
 	var untisPeriodData by remember { mutableStateOf<UntisPeriodData?>(null) }
-	var untisStudents by remember { mutableStateOf<List<UntisStudent>?>(null) }
+	var untisStudents by rememberSaveable { mutableStateOf<List<UntisStudent>?>(null) }
 	var error by remember { mutableStateOf<Throwable?>(null) }
 	val errorMessage = error?.message?.let { stringResource(id = R.string.all_error_details, it) }
 	val errorMessageGeneric = stringResource(id = R.string.errormessagedictionary_generic)
@@ -118,7 +120,7 @@ fun TimetableItemDetailsDialog(
 			)
 		},
 		floatingActionButton = {
-			var loading by remember { mutableStateOf(false) }
+			var loading by rememberSaveable { mutableStateOf(false) }
 
 			AnimatedVisibility(
 				visible = absenceCheck != null,
@@ -133,7 +135,7 @@ fun TimetableItemDetailsDialog(
 						scope.launch {
 							submitAbsencesChecked(
 								user,
-								absenceCheck?.id ?: -1
+								absenceCheck?.first ?: -1
 							).fold({
 								if (it) {
 									untisPeriodData = untisPeriodData?.copy(
@@ -200,15 +202,15 @@ fun TimetableItemDetailsDialog(
 							.toString(DateTimeFormat.shortTime())
 					)
 
-					var attachmentsDialog by remember {
+					var attachmentsDialog by rememberSaveable {
 						mutableStateOf<List<UntisAttachment>?>(
 							null
 						)
 					}
 
-					var lessonTopicEditDialog by remember { mutableStateOf<Int?>(null) }
+					var lessonTopicEditDialog by rememberSaveable { mutableStateOf<Int?>(null) }
 
-					var lessonTopicNew by remember { mutableStateOf<String?>(null) }
+					var lessonTopicNew by rememberSaveable { mutableStateOf<String?>(null) }
 
 					Column(
 						horizontalAlignment = Alignment.CenterHorizontally,
@@ -410,7 +412,7 @@ fun TimetableItemDetailsDialog(
 										)
 									},
 									onClick = {
-										absenceCheck = periodData.element
+										absenceCheck = periodData.element.let { Triple(it.id, it.startDateTime, it.endDateTime) }
 									}
 								)
 
@@ -463,9 +465,9 @@ fun TimetableItemDetailsDialog(
 						}
 
 						lessonTopicEditDialog?.let { id ->
-							var text by remember { mutableStateOf("") }
-							var loading by remember { mutableStateOf(false) }
-							var dialogError by remember { mutableStateOf<String?>(null) }
+							var text by rememberSaveable { mutableStateOf("") }
+							var loading by rememberSaveable { mutableStateOf(false) }
+							var dialogError by rememberSaveable { mutableStateOf<String?>(null) }
 
 							DynamicHeightAlertDialog(
 								title = { Text(stringResource(id = R.string.all_lessontopic_edit)) },
@@ -621,10 +623,10 @@ fun TimetableItemDetailsDialog(
 								scope.launch {
 									createAbsence(
 										user,
-										absenceCheckPeriod.id,
+										absenceCheckPeriod.first,
 										student,
-										absenceCheckPeriod.startDateTime.toLocalDateTime(),
-										absenceCheckPeriod.endDateTime.toLocalDateTime()
+										absenceCheckPeriod.second.toLocalDateTime(),
+										absenceCheckPeriod.third.toLocalDateTime()
 									).fold({
 										untisPeriodData = untisPeriodData?.copy(
 											absences = untisPeriodData?.absences?.plus(it)

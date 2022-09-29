@@ -369,6 +369,7 @@ class RoomFinderState constructor(
 	private val contextActivity: Activity,
 	private val scope: CoroutineScope,
 	private var hourIndex: MutableState<Int>,
+	private var showElementPicker: MutableState<Boolean>,
 	private val roomFinderDatabase: RoomFinderDatabase = RoomFinderDatabase.createInstance(contextActivity, user.id)
 ) {
 	companion object {
@@ -383,7 +384,7 @@ class RoomFinderState constructor(
 		get() = roomList.isEmpty()
 
 	val shouldShowElementPicker: Boolean
-		get() = showElementPicker
+		get() = showElementPicker.value
 
 	val shouldShowDeleteItem: Boolean
 		get() = deleteItem != DELETE_ITEM_NONE
@@ -409,8 +410,6 @@ class RoomFinderState constructor(
 				it.getState(currentHourIndex)
 			}.thenBy { it.name }
 		)
-
-	private var showElementPicker by mutableStateOf(false)
 
 	private var deleteItem by mutableStateOf(DELETE_ITEM_NONE)
 
@@ -572,7 +571,7 @@ class RoomFinderState constructor(
 	}
 
 	fun onAddButtonClick() {
-		showElementPicker = true
+		showElementPicker.value = true
 	}
 
 	fun onBackClick() {
@@ -598,11 +597,11 @@ class RoomFinderState constructor(
 	}
 
 	fun onElementPickerDismiss() {
-		showElementPicker = false
+		showElementPicker.value = false
 	}
 
 	fun onElementPickerSelect(selectedItems: List<PeriodElement>) {
-		showElementPicker = false
+		showElementPicker.value = false
 
 		selectedItems
 			.filter { roomList.find { existing -> existing.periodElement.id == it.id } == null }
@@ -677,7 +676,8 @@ private fun rememberRoomFinderState(
 	preferences: DataStorePreferences,
 	contextActivity: RoomFinderActivity,
 	scope: CoroutineScope = rememberCoroutineScope(),
-	hourIndex: MutableState<Int> = rememberSaveable { mutableStateOf(calculateCurrentHourIndex(user)) }
+	hourIndex: MutableState<Int> = rememberSaveable { mutableStateOf(calculateCurrentHourIndex(user)) },
+	showElementPicker: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
 ) = remember(user) {
 	RoomFinderState(
 		user = user,
@@ -685,6 +685,7 @@ private fun rememberRoomFinderState(
 		preferences = preferences,
 		contextActivity = contextActivity,
 		scope = scope,
-		hourIndex = hourIndex
+		hourIndex = hourIndex,
+		showElementPicker = showElementPicker
 	)
 }

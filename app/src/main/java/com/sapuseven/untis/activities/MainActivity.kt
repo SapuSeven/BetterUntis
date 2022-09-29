@@ -26,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -91,10 +92,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.joda.time.DateTimeConstants
-import org.joda.time.Instant
-import org.joda.time.LocalDate
-import org.joda.time.LocalTime
+import org.joda.time.*
 import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
 import java.util.*
@@ -114,7 +112,6 @@ class MainActivity :
 		private const val MESSENGER_PACKAGE_NAME = "com.untis.chat"
 	}
 
-	private var profileUpdateDialog: AlertDialog? = null
 	private val weekViewRefreshHandler = Handler(Looper.getMainLooper())
 
 	// TODO
@@ -288,6 +285,7 @@ class MainActivity :
 						enter = fullscreenDialogAnimationEnter(),
 						exit = fullscreenDialogAnimationExit()
 					) {
+						// TODO: Incorrect insets
 						TimetableItemDetailsDialog(
 							timegridItems = remember {
 								appState.timetableItemDetailsDialog.value?.first ?: emptyList()
@@ -1495,7 +1493,9 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		}
 	}
 
-	private fun convertDateTimeToWeekIndex(date: LocalDate) = date.year * 100 + date.dayOfYear / 7
+	private fun convertDateTimeToWeekIndex(date: LocalDate) = date.year * 100 + date.dayOfYear.floorDiv(7) + 1
+
+	private fun convertWeekIndexToDateTime(weekIndex: Int) = DateTime.now().withYear(weekIndex.floorDiv(100)).withDayOfYear(weekIndex % 100 * 7)
 
 	private fun onRefresh() {
 		displayedElement.value?.let { element ->
@@ -1895,6 +1895,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 			weeklyTimetableItems.clear()
 			notifyDataSetChanged()
+			restoreWeekViewScrollPosition()
 		}
 
 		shouldUpdateWeekView = false
@@ -1947,6 +1948,12 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		currentWeekIndex.value = convertDateTimeToWeekIndex(newFirstVisibleDay)
 		lastRefreshTimestamp.value = weeklyTimetableItems[currentWeekIndex.value]?.lastUpdated ?: 0
 	}
+
+	fun restoreWeekViewScrollPosition() {
+		Log.d("MainActivity", "WeekView Week Index: ${currentWeekIndex.value}")
+		if (currentWeekIndex.value % 100 > 0)
+			weekView.value?.goToDate(convertWeekIndexToDateTime(currentWeekIndex.value))
+	}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1969,23 +1976,23 @@ fun rememberMainAppState(
 	),
 	defaultDisplayedName: String = stringResource(id = R.string.app_name),
 	drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
-	drawerGestures: MutableState<Boolean> = remember { mutableStateOf(true) },
-	loading: MutableState<Int> = remember { mutableStateOf(0) },
-	currentWeekIndex: MutableState<Int> = remember { mutableStateOf(0) },
-	lastRefreshTimestamp: MutableState<Long> = remember { mutableStateOf(0L) },
+	drawerGestures: MutableState<Boolean> = rememberSaveable { mutableStateOf(true) },
+	loading: MutableState<Int> = rememberSaveable { mutableStateOf(0) },
+	currentWeekIndex: MutableState<Int> = rememberSaveable { mutableStateOf(0) },
+	lastRefreshTimestamp: MutableState<Long> = rememberSaveable { mutableStateOf(0L) },
 	weeklyTimetableItems: SnapshotStateMap<Int, MainAppState.WeeklyTimetableItems?> = remember { mutableStateMapOf() },
 	timetableLoader: TimetableLoader = TimetableLoader(
 		context = WeakReference(context),
 		user = user,
 		timetableDatabaseInterface = timetableDatabaseInterface
 	),
-	timetableItemDetailsDialog: MutableState<Pair<List<TimegridItem>, Int>?> = remember {
+	timetableItemDetailsDialog: MutableState<Pair<List<TimegridItem>, Int>?> = rememberSaveable {
 		mutableStateOf(
 			null
 		)
 	},
-	showDatePicker: MutableState<Boolean> = remember { mutableStateOf(false) },
-	profileManagementDialog: MutableState<Boolean> = remember { mutableStateOf(false) },
+	showDatePicker: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
+	profileManagementDialog: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 ) = remember(user, customThemeColor, colorScheme) {
 	MainAppState(
 		user = user,

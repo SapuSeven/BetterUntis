@@ -443,6 +443,7 @@ class WeekView<T>(
 
 			gestureHandler.scroller.startScroll(startX, config.drawConfig.currentOrigin.y.toInt(), distanceX, 0, duration)
 			gestureHandler.listener.onScrolled()
+			viewState.scrollToDay = null
 		}
 
 		invalidate()
