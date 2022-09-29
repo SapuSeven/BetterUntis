@@ -161,11 +161,12 @@ class MainActivity :
 					/*weekView.setOnCornerClickListener(this)*/
 					val appState =
 						rememberMainAppState(
-							user,
-							customThemeColor,
-							timetableDatabaseInterface,
-							dataStorePreferences,
-							globalDataStore
+							user = user,
+							customThemeColor = customThemeColor,
+							timetableDatabaseInterface = timetableDatabaseInterface,
+							preferences = dataStorePreferences,
+							globalPreferences = globalDataStore,
+							colorScheme = MaterialTheme.colorScheme//!! // Can't be null, AppTheme content isn't rendered if colorScheme is null
 						)
 					appState.loadPrefs(dataStorePreferences)
 
@@ -1689,8 +1690,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 						preferences.backgroundCancelledPast.getValueFlow(),
 						preferences.backgroundIrregular.getValueFlow(),
 						preferences.backgroundIrregularPast.getValueFlow(),
-						preferences.schoolBackground.getValueFlow(),
-						//preferences.themeColor.getValueFlow()
+						preferences.schoolBackground.getValueFlow()
 					).collect {
 						weeklyTimetableItems.map {
 							it.key to it.value?.let { value -> colorItems(value.items) }
@@ -1698,6 +1698,15 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 						weekView.notifyDataSetChanged()
 					}
 				}
+
+				/*scope.launch {
+					merge(
+						preferences.themeColor.getValueFlow(),
+						preferences.darkTheme.getValueFlow()
+					) {
+						weekView
+					}
+				}*/
 
 				scope.launch {
 					weekView.hourHeight = globalPreferences.data
@@ -1977,7 +1986,7 @@ fun rememberMainAppState(
 	},
 	showDatePicker: MutableState<Boolean> = remember { mutableStateOf(false) },
 	profileManagementDialog: MutableState<Boolean> = remember { mutableStateOf(false) },
-) = remember(user, customThemeColor) {
+) = remember(user, customThemeColor, colorScheme) {
 	MainAppState(
 		user = user,
 		timetableDatabaseInterface = timetableDatabaseInterface,
