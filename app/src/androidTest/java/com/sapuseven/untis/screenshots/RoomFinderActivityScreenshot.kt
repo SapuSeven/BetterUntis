@@ -1,5 +1,7 @@
 package com.sapuseven.untis.screenshots
 
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -63,7 +65,7 @@ class RoomFinderActivityScreenshot {
 			rule.activity.setSystemUiColor(rememberSystemUiController())
 			rule.activity.setUser(userMock(), false)
 			rule.activity.AppTheme(systemUiController = null, initialDarkTheme = false) {
-				val state = RoomFinderState(
+				RoomFinder(RoomFinderState(
 					user = rule.activity.user!!,
 					timetableDatabaseInterface = TimetableDatabaseInterface(
 						database = UserDatabase.createInstance(rule.activity),
@@ -72,10 +74,10 @@ class RoomFinderActivityScreenshot {
 					preferences = rule.activity.dataStorePreferences,
 					contextActivity = rule.activity,
 					scope = rememberCoroutineScope(),
-					roomFinderDatabase = mockRoomFinderDatabase()
-				)
-				state.setHourIndex(2)
-				RoomFinder(state)
+					roomFinderDatabase = mockRoomFinderDatabase(),
+					hourIndex = remember { mutableStateOf(2) },
+					showElementPicker = remember { mutableStateOf(false) }
+				))
 			}
 		}
 		rule.takeScreenshot("activity-roomfinder.png")
@@ -85,12 +87,6 @@ class RoomFinderActivityScreenshot {
 	fun cleanupUserDatabase() {
 		UserDatabase.createInstance(rule.activity).deleteUser(MOCK_USER_ID)
 	}
-}
-
-private fun RoomFinderState.setHourIndex(i: Int) {
-	val hourIndex = RoomFinderState::class.java.getDeclaredMethod("setHourIndex", Int::class.java)
-	hourIndex.isAccessible = true
-	hourIndex.invoke(this, i)
 }
 
 fun mockRoomFinderDatabase(): RoomFinderDatabase = object : RoomFinderDatabase {
