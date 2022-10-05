@@ -49,7 +49,7 @@ class TimetableLoader(
 		val requestId: Int,
 		val untisErrorCode: Int?,
 		val untisErrorMessage: String?
-	) : Throwable()
+	) : Exception(untisErrorMessage)
 
 	suspend fun loadAsync(
 		target: TimetableLoaderTarget,

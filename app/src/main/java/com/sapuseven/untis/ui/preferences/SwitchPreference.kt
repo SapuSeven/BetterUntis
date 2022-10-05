@@ -25,7 +25,7 @@ fun SwitchPreference(
 		dataStore = dataStore,
 		onClick = { value ->
 			scope.launch { dataStore.saveValue(!value) }
-			onCheckedChange?.invoke(value)
+			onCheckedChange?.invoke(!value)
 		},
 		trailingContent = { value, enabled ->
 			Switch(
