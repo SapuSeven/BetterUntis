@@ -47,17 +47,17 @@ class PeriodData(
 
 	fun setup() = parseElements()
 
-	fun getShort(list: HashSet<PeriodElement>, type: TimetableDatabaseInterface.Type) =
+	fun getShort(type: TimetableDatabaseInterface.Type, list: HashSet<PeriodElement> = getListFor(type)) =
 			list.joinToString(ELEMENT_NAME_SEPARATOR) {
 				timetableDatabaseInterface?.getShortName(it.id, type) ?: ELEMENT_NAME_UNKNOWN
 			}
 
-	fun getLong(list: HashSet<PeriodElement>, type: TimetableDatabaseInterface.Type) =
+	fun getLong(type: TimetableDatabaseInterface.Type, list: HashSet<PeriodElement> = getListFor(type)) =
 			list.joinToString(ELEMENT_NAME_SEPARATOR) {
 				timetableDatabaseInterface?.getLongName(it.id, type) ?: ELEMENT_NAME_UNKNOWN
 			}
 
-	fun getShortSpanned(list: HashSet<PeriodElement>, type: TimetableDatabaseInterface.Type, includeOrgIds: Boolean = true): SpannableString {
+	fun getShortSpanned(type: TimetableDatabaseInterface.Type, list: HashSet<PeriodElement> = getListFor(type), includeOrgIds: Boolean = true): SpannableString {
 		val builder = SpannableStringBuilder()
 
 		list.forEach {
@@ -75,6 +75,15 @@ class PeriodData(
 
 		return SpannableString.valueOf(builder)
 	}
+
+	private fun getListFor(type: TimetableDatabaseInterface.Type): java.util.HashSet<PeriodElement> =
+		when (type) {
+			TimetableDatabaseInterface.Type.CLASS -> classes
+			TimetableDatabaseInterface.Type.TEACHER -> teachers
+			TimetableDatabaseInterface.Type.SUBJECT -> subjects
+			TimetableDatabaseInterface.Type.ROOM -> rooms
+			TimetableDatabaseInterface.Type.STUDENT -> hashSetOf()
+		}
 
 	@Deprecated("Use getShort instead.")
 	fun getShortTitle() = subjects.joinToString(ELEMENT_NAME_SEPARATOR) {

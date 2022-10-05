@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-	xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.sapuseven.untis">
 
 	<uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+	<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.CAMERA" />
-	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+	<uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
 	<queries>
 		<package android:name="com.untis.chat" />
 	</queries>
 
 	<application
+		android:name=".activities.App"
 		android:allowBackup="true"
 		android:fullBackupContent="@xml/backup_descriptor"
 		android:icon="@mipmap/ic_launcher"
@@ -119,15 +120,6 @@
 				android:name="android.support.PARENT_ACTIVITY"
 				android:value=".activities.MainActivity" />
 		</activity>
-
-		<receiver android:name=".receivers.StartupReceiver"
-			android:exported="true">
-			<intent-filter>
-				<action android:name="android.intent.action.BOOT_COMPLETED" />
-			</intent-filter>
-		</receiver>
-
-		<receiver android:name=".receivers.NotificationSetup" />
 
 		<receiver android:name=".receivers.NotificationReceiver" />
 

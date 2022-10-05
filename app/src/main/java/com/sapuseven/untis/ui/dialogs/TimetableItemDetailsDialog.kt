@@ -181,7 +181,6 @@ fun TimetableItemDetailsDialog(
 			) { page ->
 				timegridItems[page].run {
 					val title = periodData.getLong(
-						periodData.subjects,
 						TimetableDatabaseInterface.Type.SUBJECT
 					).let { title ->
 						if (periodData.isCancelled())

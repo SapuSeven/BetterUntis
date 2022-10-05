@@ -1,0 +1,78 @@
+package com.sapuseven.untis.workers
+
+import android.content.Context
+import androidx.work.CoroutineWorker
+import androidx.work.WorkerParameters
+import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.helpers.config.stringDataStore
+import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import com.sapuseven.untis.helpers.timetable.TimetableLoader
+import com.sapuseven.untis.models.untis.UntisDate
+import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.completeWith
+import org.joda.time.LocalDate
+import java.lang.ref.WeakReference
+
+abstract class TimetableDependantWorker(
+	context: Context,
+	params: WorkerParameters,
+	private val loadFromServer: Boolean = false
+) : CoroutineWorker(context, params) {
+
+	protected suspend fun loadPersonalTimetableElement(
+		user: UserDatabase.User
+	): Pair<Int, String>? {
+		val customPersonalTimetable = decodeStoredTimetableValue(
+			applicationContext.stringDataStore(
+				user.id,
+				"preference_timetable_personal_timetable",
+				defaultValue = ""
+			).getValue()
+		)
+
+		val elemId = customPersonalTimetable?.id ?: user.userData.elemId
+		val elemType = customPersonalTimetable?.type ?: user.userData.elemType ?: ""
+
+		return if (TimetableDatabaseInterface.Type.values().find { it.name == elemType } == null)
+			null // Anonymous / no custom personal timetable
+		else
+			elemId to elemType
+	}
+
+	protected suspend fun loadTimetable(
+		user: UserDatabase.User,
+		timetableDatabaseInterface: TimetableDatabaseInterface,
+		timetableElement: Pair<Int, String>
+	): TimetableLoader.TimetableItems {
+		val proxyHost = applicationContext.stringDataStore(
+			user.id,
+			"preference_connectivity_proxy_host",
+			defaultValue = ""
+		).getValue()
+
+		val currentDate = UntisDate.fromLocalDate(LocalDate.now())
+
+		val target = TimetableLoader.TimetableLoaderTarget(
+			currentDate,
+			currentDate,
+			timetableElement.first,
+			timetableElement.second
+		)
+		val loaderFlags = if (loadFromServer)
+			TimetableLoader.FLAG_LOAD_SERVER
+		else
+			TimetableLoader.FLAG_LOAD_CACHE or TimetableLoader.FLAG_LOAD_CACHE_ONLY
+
+		return CompletableDeferred<TimetableLoader.TimetableItems>().apply {
+			TimetableLoader(
+				context = WeakReference(applicationContext),
+				user = user,
+				timetableDatabaseInterface = timetableDatabaseInterface
+			).loadAsync(target, loaderFlags, proxyHost) {
+				completeWith(kotlin.Result.success(it))
+			}
+			completeWith(kotlin.Result.failure(Exception("Timetable loading failed")))
+		}.await()
+	}
+}

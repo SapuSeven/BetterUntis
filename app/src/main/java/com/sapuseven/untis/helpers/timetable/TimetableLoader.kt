@@ -9,16 +9,10 @@ import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
-import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.params.TimetableParams
 import com.sapuseven.untis.models.untis.response.TimetableResponse
 import com.sapuseven.untis.models.untis.timetable.Period
-import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.ProducerScope
-import kotlinx.coroutines.channels.trySendBlocking
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.serialization.decodeFromString
 import org.joda.time.Instant
 import java.lang.ref.WeakReference
@@ -31,6 +25,7 @@ class TimetableLoader(
 	companion object {
 		const val FLAG_LOAD_CACHE = 0b00000001
 		const val FLAG_LOAD_SERVER = 0b00000010
+		const val FLAG_LOAD_CACHE_ONLY = 0b00000100
 
 		const val CODE_CACHE_MISSING = 1
 		const val CODE_REQUEST_FAILED = 2
@@ -76,8 +71,11 @@ class TimetableLoader(
 
 		var shouldLoadFromServer = flags and FLAG_LOAD_SERVER > 0
 
-		if (flags and FLAG_LOAD_CACHE > 0)
-			shouldLoadFromServer = shouldLoadFromServer or !loadFromCache(target, requestList.size - 1, onItemsReceived)
+		if (flags and FLAG_LOAD_CACHE > 0) // if FLAG_LOAD_CACHE is set
+			shouldLoadFromServer = shouldLoadFromServer or (
+					!loadFromCache(target, requestList.size - 1, onItemsReceived)
+							&& (flags and FLAG_LOAD_CACHE_ONLY == 0)
+					) // set shouldLoadFromServer to true on cache miss only if FLAG_LOAD_CACHE_ONLY is not set
 
 		if (shouldLoadFromServer)
 			loadFromServer(target, requestList.size - 1, proxyHost, onItemsReceived)
@@ -97,17 +95,19 @@ class TimetableLoader(
 				"target $target (requestId $requestId): cached file found"
 			)
 			cache.load()?.let { cacheObject ->
-				onItemsReceived(TimetableItems(
-					items = cacheObject.items.map {
-						periodToTimegridItem(
-							it,
-							target.type
-						)
-					},
-					startDate = target.startDate,
-					endDate = target.endDate,
-					timestamp = cacheObject.timestamp
-				))
+				onItemsReceived(
+					TimetableItems(
+						items = cacheObject.items.map {
+							periodToTimegridItem(
+								it,
+								target.type
+							)
+						},
+						startDate = target.startDate,
+						endDate = target.endDate,
+						timestamp = cacheObject.timestamp
+					)
+				)
 				true
 			} ?: run {
 				cache.delete()
@@ -167,17 +167,19 @@ class TimetableLoader(
 
 				val items = untisResponse.result.timetable.periods
 				val timestamp = Instant.now().millis
-				onItemsReceived(TimetableItems(
-					items = items.map {
-						periodToTimegridItem(
-							it,
-							target.type
-						)
-					},
-					startDate = target.startDate,
-					endDate = target.endDate,
-					timestamp = timestamp
-				))
+				onItemsReceived(
+					TimetableItems(
+						items = items.map {
+							periodToTimegridItem(
+								it,
+								target.type
+							)
+						},
+						startDate = target.startDate,
+						endDate = target.endDate,
+						timestamp = timestamp
+					)
+				)
 				Log.d(
 					"TimetableLoaderDebug",
 					"target $target (requestId $requestId): saving to cache: $cache"
