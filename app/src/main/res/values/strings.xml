@@ -237,14 +237,14 @@
 	<string name="preference_info_privacy_policy">Privacy Policy</string>
 	<string name="preference_marker">Time indicator</string>
 	<string name="preference_notifications_clear">Clear all notifications</string>
-	<string name="preference_notifications_enable">Enable notification</string>
-	<string name="preference_notifications_enable_desc">Displays a notification with information about the next lesson while you have break.</string>
+	<string name="preference_notifications_enable">Enable notifications</string>
+	<string name="preference_notifications_enable_desc">Displays a notification with information about the next lesson during breaks</string>
 	<string name="preference_notifications_first_lesson">Notification before first lesson</string>
 	<string name="preference_notifications_first_lesson_desc">Show a notification right before school starts</string>
 	<string name="preference_notifications_first_lesson_time">Notification time</string>
 	<string name="preference_notifications_first_lesson_time_unit">min before first lesson</string>
 	<string name="preference_notifications_multiple">Enable in multiple-hour lesson</string>
-	<string name="preference_notifications_multiple_desc">Notifications will be shown in breaks within multiple-hour lessons.</string>
+	<string name="preference_notifications_multiple_desc">Notifications will be shown in breaks within multiple-hour lessons</string>
 	<string name="preference_notifications_visibility_hidden">Hidden</string>
 	<string name="preference_notifications_visibility_long">Long name</string>
 	<string name="preference_notifications_visibility_short">Short name</string>

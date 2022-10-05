@@ -1406,15 +1406,12 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		forceRefresh: Boolean = false,
 		onItemsReceived: (timetableItems: TimetableLoader.TimetableItems) -> Unit
 	) {
-		val alwaysLoad = preferences.connectivityRefreshInBackground.getValue()
-		val flags =
-			(if (!forceRefresh) TimetableLoader.FLAG_LOAD_CACHE else 0) or (if (alwaysLoad || forceRefresh) TimetableLoader.FLAG_LOAD_SERVER else 0)
-
 		loader.loadAsync(
 			target,
-			flags,
 			preferences.proxyHost.getValue(),
-			onItemsReceived
+			loadFromCache = !forceRefresh,
+			loadFromServer = forceRefresh || preferences.connectivityRefreshInBackground.getValue(),
+			onItemsReceived = onItemsReceived
 		)
 	}
 

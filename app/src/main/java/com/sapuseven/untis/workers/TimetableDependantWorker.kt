@@ -18,8 +18,7 @@ import java.lang.ref.WeakReference
 
 abstract class TimetableDependantWorker(
 	context: Context,
-	params: WorkerParameters,
-	private val loadFromServer: Boolean = false
+	params: WorkerParameters
 ) : CoroutineWorker(context, params) {
 
 	protected suspend fun loadPersonalTimetableElement(
@@ -61,17 +60,13 @@ abstract class TimetableDependantWorker(
 			timetableElement.first,
 			timetableElement.second
 		)
-		val loaderFlags = if (loadFromServer)
-			TimetableLoader.FLAG_LOAD_SERVER
-		else
-			TimetableLoader.FLAG_LOAD_CACHE or TimetableLoader.FLAG_LOAD_CACHE_ONLY
 
 		return CompletableDeferred<TimetableLoader.TimetableItems>().apply {
 			TimetableLoader(
 				context = WeakReference(applicationContext),
 				user = user,
 				timetableDatabaseInterface = timetableDatabaseInterface
-			).loadAsync(target, loaderFlags, proxyHost) {
+			).loadAsync(target, proxyHost, loadFromCache = true) {
 				completeWith(kotlin.Result.success(it))
 			}
 			completeWith(kotlin.Result.failure(Exception("Timetable loading failed")))

@@ -471,7 +471,9 @@ class RoomFinderState constructor(
 				endDate,
 				roomId,
 				TimetableDatabaseInterface.Type.ROOM.name
-			), TimetableLoader.FLAG_LOAD_SERVER, proxyHost
+			),
+			proxyHost,
+			loadFromServer = true
 		) { timetableItems ->
 			val loadedStates = mutableListOf<Boolean>()
 			user.timeGrid.days.forEach { day ->

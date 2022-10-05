@@ -1,5 +1,6 @@
 package com.sapuseven.untis.activities
 
+import android.app.NotificationManager
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -19,6 +20,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.preferences.PreferenceCategory
@@ -27,6 +30,8 @@ import com.sapuseven.untis.preferences.UntisPreferenceDataStore
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.preferences.*
+import com.sapuseven.untis.workers.AutoMuteSetupWorker
+import com.sapuseven.untis.workers.NotificationSetupWorker
 
 class SettingsActivity : BaseComposeActivity() {
 	companion object {
@@ -47,7 +52,7 @@ class SettingsActivity : BaseComposeActivity() {
 
 		setContent {
 			AppTheme(navBarInset = false) {
-				withUser {
+				withUser { user ->
 					val navController = rememberNavController()
 					var title by remember { mutableStateOf<String?>(null) }
 
@@ -197,6 +202,13 @@ class SettingsActivity : BaseComposeActivity() {
 											SwitchPreference(
 												title = { Text(stringResource(R.string.preference_automute_enable)) },
 												summary = { Text(stringResource(R.string.preference_automute_enable_summary)) },
+												onCheckedChange = {
+													if (it)
+														AutoMuteSetupWorker.enqueue(
+															WorkManager.getInstance(this@SettingsActivity),
+															user
+														)
+												},
 												dataStore = dataStorePreferences.automuteEnable
 											)
 											SwitchPreference(
@@ -562,6 +574,15 @@ class SettingsActivity : BaseComposeActivity() {
 													contentDescription = null
 												)
 											},*/
+											onCheckedChange = {
+												if (it)
+													NotificationSetupWorker.enqueue(
+														WorkManager.getInstance(this@SettingsActivity),
+														user
+													)
+												else
+													clearNotifications()
+											},
 											dataStore = dataStorePreferences.notificationsEnable
 										)
 
@@ -588,7 +609,7 @@ class SettingsActivity : BaseComposeActivity() {
 
 										Preference(
 											title = { Text(stringResource(R.string.preference_notifications_clear)) },
-											onClick = { /*TODO*/ },
+											onClick = { clearNotifications() },
 											icon = {
 												Icon(
 													painter = painterResource(R.drawable.settings_notifications_clear_all),
@@ -828,6 +849,8 @@ class SettingsActivity : BaseComposeActivity() {
 			}
 		}
 	}
+
+	private fun clearNotifications() = (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).cancelAll()
 
 	@Composable
 	private fun VerticalScrollColumn(content: @Composable ColumnScope.() -> Unit) {

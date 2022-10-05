@@ -16,8 +16,8 @@ class AutoMuteReceiver : BroadcastReceiver() {
 		const val EXTRA_INT_ID = "com.sapuseven.untis.automute.id"
 		const val EXTRA_LONG_USER_ID = "com.sapuseven.untis.automute.userId"
 
-		const val PREFERENCE_KEY_INTERRUPTION_FILTER = "interruption_filter"
-		const val PREFERENCE_KEY_RINGER_MODE = "ringer_mode"
+		const val PREFERENCE_KEY_INTERRUPTION_FILTER = "automuteInterruptionFilterBackup"
+		const val PREFERENCE_KEY_RINGER_MODE = "automuteRingerModeBackup"
 	}
 
 	override fun onReceive(context: Context, intent: Intent) = runBlocking {
@@ -43,6 +43,7 @@ class AutoMuteReceiver : BroadcastReceiver() {
 			val editor = prefs.edit()
 
 			if (intent.getBooleanExtra(EXTRA_BOOLEAN_MUTE, false)) {
+				// Mute
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 					val notificationManager =
 						context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -70,6 +71,7 @@ class AutoMuteReceiver : BroadcastReceiver() {
 					audioManager.ringerMode = AudioManager.RINGER_MODE_SILENT
 				}
 			} else {
+				// Unmute
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 					val notificationManager =
 						context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

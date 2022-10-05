@@ -11,6 +11,7 @@ fun SwitchPreference(
 	title: (@Composable () -> Unit),
 	summary: (@Composable () -> Unit)? = null,
 	icon: (@Composable () -> Unit)? = null,
+	onCheckedChange: ((checked: Boolean) -> Unit)? = null,
 	dependency: UntisPreferenceDataStore<*>? = null,
 	dataStore: UntisPreferenceDataStore<Boolean>
 ) {
@@ -22,14 +23,19 @@ fun SwitchPreference(
 		icon = icon,
 		dependency = dependency,
 		dataStore = dataStore,
-		onClick = { value -> scope.launch { dataStore.saveValue(!value) } },
+		onClick = { value ->
+			scope.launch { dataStore.saveValue(!value) }
+			onCheckedChange?.invoke(value)
+		},
 		trailingContent = { value, enabled ->
 			Switch(
 				checked = value,
-				onCheckedChange = { scope.launch { dataStore.saveValue(it) } },
+				onCheckedChange = { value ->
+					scope.launch { dataStore.saveValue(value) }
+					onCheckedChange?.invoke(value)
+				},
 				enabled = enabled
 			)
 		}
 	)
 }
-

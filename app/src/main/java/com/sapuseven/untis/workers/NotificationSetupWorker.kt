@@ -12,6 +12,9 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
@@ -47,10 +50,25 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 	TimetableDependantWorker(context, params) {
 	companion object {
 		private const val LOG_TAG = "NotificationSetup"
+		private const val TAG_NOTIFICATION_SETUP_WORK = "NotificationSetupWork"
 
 		const val CHANNEL_ID_DEBUG = "notifications.debug"
 		const val CHANNEL_ID_BACKGROUNDERRORS = "notifications.backgrounderrors"
 		const val CHANNEL_ID_BREAKINFO = "notifications.breakinfo"
+
+		fun enqueue(workManager: WorkManager, user: UserDatabase.User) {
+			val data: Data = Data.Builder().run {
+				put(WORKER_DATA_USER_ID, user.id)
+				build()
+			}
+
+			workManager.enqueue(
+				OneTimeWorkRequestBuilder<NotificationSetupWorker>()
+					.addTag(TAG_NOTIFICATION_SETUP_WORK)
+					.setInputData(data)
+					.build()
+			)
+		}
 	}
 
 	override suspend fun doWork(): Result {
@@ -226,7 +244,7 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 			.putExtra(EXTRA_BOOLEAN_CLEAR, true)
 		val deletingPendingIntent = PendingIntent.getBroadcast(
 			context,
-			notificationTime.millisOfDay + 1,
+			notificationTime.millisOfDay + 1, // Different id to previous intent
 			deletingIntent,
 			FLAG_IMMUTABLE
 		)

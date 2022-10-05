@@ -15,11 +15,9 @@ import java.util.concurrent.TimeUnit
  * which can then use the cached timetable.
  */
 class DailyWorker(context: Context, params: WorkerParameters) :
-	TimetableDependantWorker(context, params, true) {
+	TimetableDependantWorker(context, params) {
 	companion object {
 		private const val TAG_DAILY_WORK = "DailyWork"
-		private const val TAG_NOTIFICATION_SETUP_WORK = "NotificationSetupWork"
-		private const val TAG_AUTO_MUTE_SETUP_WORK = "AutoMuteSetupWork"
 
 		const val WORKER_DATA_USER_ID = "UserId"
 
@@ -52,16 +50,12 @@ class DailyWorker(context: Context, params: WorkerParameters) :
 				?: return@forEach // Anonymous / no custom personal timetable
 
 			try {
+				// Load timetable to cache
 				loadTimetable(
 					user,
 					TimetableDatabaseInterface(userDatabase, user.id),
 					personalTimetable
 				)
-
-				val data: Data = Data.Builder().run {
-					put(WORKER_DATA_USER_ID, user.id)
-					build()
-				}
 
 				val notificationsEnable = applicationContext.booleanDataStore(
 					user.id,
@@ -72,22 +66,12 @@ class DailyWorker(context: Context, params: WorkerParameters) :
 					"preference_automute_enable"
 				).getValue()
 
-				WorkManager.getInstance(applicationContext).run {
+				WorkManager.getInstance(applicationContext).let {
 					if (notificationsEnable)
-						enqueue(
-							OneTimeWorkRequestBuilder<NotificationSetupWorker>()
-								.addTag(TAG_NOTIFICATION_SETUP_WORK)
-								.setInputData(data)
-								.build()
-						)
+						NotificationSetupWorker.enqueue(it, user)
 
 					if (automuteEnable)
-						enqueue(
-							OneTimeWorkRequestBuilder<AutoMuteSetupWorker>()
-								.addTag(TAG_AUTO_MUTE_SETUP_WORK)
-								.setInputData(data)
-								.build()
-						)
+						AutoMuteSetupWorker.enqueue(it, user)
 				}
 			} catch (e: Exception) {
 				Log.e("DailyWorker", "Timetable loading error", e)
