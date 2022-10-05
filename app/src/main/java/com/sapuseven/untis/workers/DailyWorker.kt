@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.work.*
 import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.helpers.config.booleanDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import org.joda.time.LocalDateTime
 import org.joda.time.Seconds
@@ -62,20 +63,31 @@ class DailyWorker(context: Context, params: WorkerParameters) :
 					build()
 				}
 
-				WorkManager.getInstance(applicationContext).run {
-					enqueue(
-						OneTimeWorkRequestBuilder<NotificationSetupWorker>()
-							.addTag(TAG_NOTIFICATION_SETUP_WORK)
-							.setInputData(data)
-							.build()
-					)
+				val notificationsEnable = applicationContext.booleanDataStore(
+					user.id,
+					"preference_notifications_enable"
+				).getValue()
+				val automuteEnable = applicationContext.booleanDataStore(
+					user.id,
+					"preference_automute_enable"
+				).getValue()
 
-					enqueue(
-						OneTimeWorkRequestBuilder<AutoMuteSetupWorker>()
-							.addTag(TAG_AUTO_MUTE_SETUP_WORK)
-							.setInputData(data)
-							.build()
-					)
+				WorkManager.getInstance(applicationContext).run {
+					if (notificationsEnable)
+						enqueue(
+							OneTimeWorkRequestBuilder<NotificationSetupWorker>()
+								.addTag(TAG_NOTIFICATION_SETUP_WORK)
+								.setInputData(data)
+								.build()
+						)
+
+					if (automuteEnable)
+						enqueue(
+							OneTimeWorkRequestBuilder<AutoMuteSetupWorker>()
+								.addTag(TAG_AUTO_MUTE_SETUP_WORK)
+								.setInputData(data)
+								.build()
+						)
 				}
 			} catch (e: Exception) {
 				Log.e("DailyWorker", "Timetable loading error", e)

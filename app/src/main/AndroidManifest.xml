@@ -123,8 +123,6 @@
 
 		<receiver android:name=".receivers.NotificationReceiver" />
 
-		<receiver android:name=".receivers.AutoMuteSetup" />
-
 		<receiver android:name=".receivers.AutoMuteReceiver" />
 
 		<receiver

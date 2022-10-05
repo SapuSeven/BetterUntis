@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.config.stringDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
@@ -11,6 +12,7 @@ import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.completeWith
+import org.joda.time.Instant
 import org.joda.time.LocalDate
 import java.lang.ref.WeakReference
 
@@ -75,4 +77,23 @@ abstract class TimetableDependantWorker(
 			completeWith(kotlin.Result.failure(Exception("Timetable loading failed")))
 		}.await()
 	}
+
+	protected fun isOutdated(
+		timestamp: Long,
+		threshold: Long = 1 * 60 * 1000
+	): Boolean = (Instant.now().millis - timestamp) > threshold
 }
+
+/**
+ * Merges all values from contemporaneous lessons.
+ * After this operation, every time period only has a single lesson containing all subjects, teachers, rooms and classes.
+ */
+internal fun List<TimegridItem>.merged(): List<TimegridItem> = this.groupBy { it.startDateTime }
+	.map { it.value.reduce { item1, item2 -> item1.mergeValuesWith(item2); item1 } }
+
+/**
+ * Creates a copy of a zipped list with the very last element duplicated into a new Pair whose second element is null.
+ */
+internal fun <E> List<Pair<E?, E?>>.withLast(): List<Pair<E?, E?>> =
+	if (this.isEmpty()) this
+	else this.toMutableList().apply { add(Pair(this.last().second, null)) }.toList()

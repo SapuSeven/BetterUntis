@@ -36,10 +36,8 @@ import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_NEXT_SUBJECT_LONG
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_NEXT_TEACHER
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_NEXT_TEACHER_LONG
-import com.sapuseven.untis.receivers.merged
 import com.sapuseven.untis.workers.DailyWorker.Companion.WORKER_DATA_USER_ID
 import org.joda.time.DateTime
-import org.joda.time.Instant
 import org.joda.time.LocalDateTime
 
 /**
@@ -88,8 +86,8 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 					personalTimetable
 				)
 
-				if ((Instant.now().millis - timetable.timestamp) > 1 * 60 * 1000)
-					return@let // Cache older than 1 minute
+				if (isOutdated(timetable.timestamp))
+					return@let // Cache too old
 
 				val notificationsBeforeFirst = applicationContext.booleanDataStore(
 					user.id,
@@ -131,13 +129,18 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 						return@forEach // multi-hour lesson
 
 					if (item.second.startDateTime.millisOfDay < LocalDateTime.now().millisOfDay)
-						return@forEach // lessons in the past
+						return@forEach // lesson is in the past
 
 					Log.d(
 						LOG_TAG,
 						"found ${item.first.periodData.getShort(TimetableDatabaseInterface.Type.SUBJECT)}"
 					)
-					scheduleNotification(applicationContext, user.id, item.first.endDateTime, item.second)
+					scheduleNotification(
+						applicationContext,
+						user.id,
+						item.first.endDateTime,
+						item.second
+					)
 					scheduledNotifications++
 				}
 
