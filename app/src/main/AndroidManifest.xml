@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
 	package="com.sapuseven.untis">
 
 	<uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
@@ -156,5 +157,11 @@
 		<service
 			android:name=".widgets.WidgetRemoteViewsService"
 			android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+		<provider
+			android:name="androidx.startup.InitializationProvider"
+			android:authorities="${applicationId}.androidx-startup"
+			tools:node="remove">
+		</provider>
 	</application>
 </manifest>
