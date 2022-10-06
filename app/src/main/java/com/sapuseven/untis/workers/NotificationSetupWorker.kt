@@ -10,8 +10,6 @@ import android.content.Context.ALARM_SERVICE
 import android.content.Intent
 import android.os.Build
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -76,18 +74,6 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 		return scheduleNotifications()
 	}
 
-	private fun sendDebugNotification(text: String) {
-		val builder = NotificationCompat.Builder(applicationContext, "debug")
-			.setSmallIcon(R.drawable.notification_error)
-			.setContentTitle("BetterUntis Debug")
-			.setContentText(text)
-			.setPriority(NotificationCompat.PRIORITY_DEFAULT)
-
-		with(NotificationManagerCompat.from(applicationContext)) {
-			notify(1, builder.build())
-		}
-	}
-
 	private suspend fun scheduleNotifications(): Result {
 		val userDatabase = UserDatabase.createInstance(applicationContext)
 
@@ -103,9 +89,6 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 					TimetableDatabaseInterface(userDatabase, user.id),
 					personalTimetable
 				)
-
-				if (isOutdated(timetable.timestamp))
-					return@let // Cache too old
 
 				val notificationsBeforeFirst = applicationContext.booleanDataStore(
 					user.id,
@@ -125,10 +108,10 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 				val preparedItems = timetable.items.filter { !it.periodData.isCancelled() }
 					.sortedBy { it.startDateTime }.merged().zipWithNext()
 
-				if (preparedItems.isNotEmpty() && notificationsBeforeFirst)
-					with(preparedItems.first().first) {
-						if (startDateTime.millisOfDay < LocalDateTime.now().millisOfDay) return@with
+				with(preparedItems.first().first) {
+					if (startDateTime.millisOfDay < LocalDateTime.now().millisOfDay) return@with
 
+					if (notificationsBeforeFirst && preparedItems.isNotEmpty()) {
 						scheduleNotification(
 							applicationContext,
 							user.id,
@@ -137,22 +120,29 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 							true
 						)
 						scheduledNotifications++
+					} else {
+						clearNotification(
+							applicationContext,
+							startDateTime.minusMinutes(notificationsBeforeFirstTime)
+						)
 					}
+				}
 
 				preparedItems.forEach { item ->
 					if (item.first.endDateTime == item.second.startDateTime)
 						return@forEach // No break exists
 
-					if (item.first.equalsIgnoreTime(item.second) && !notificationsInMultiple)
+					if (item.first.equalsIgnoreTime(item.second) && !notificationsInMultiple) {
+						clearNotification(
+							applicationContext,
+							item.first.endDateTime
+						)
 						return@forEach // multi-hour lesson
+					}
 
 					if (item.second.startDateTime.millisOfDay < LocalDateTime.now().millisOfDay)
 						return@forEach // lesson is in the past
 
-					Log.d(
-						LOG_TAG,
-						"found ${item.first.periodData.getShort(TimetableDatabaseInterface.Type.SUBJECT)}"
-					)
 					scheduleNotification(
 						applicationContext,
 						user.id,
@@ -161,12 +151,8 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 					)
 					scheduledNotifications++
 				}
-
-				sendDebugNotification("$scheduledNotifications notifications scheduled.")
-
 			} catch (e: Exception) {
 				Log.e(LOG_TAG, "Notifications couldn't be scheduled", e)
-				sendDebugNotification("Notifications couldn't be scheduled: ${e.message}")
 				return Result.failure()
 			}
 		}
@@ -257,6 +243,22 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 			LOG_TAG,
 			"${notificationEndLesson.periodData.getShort(TimetableDatabaseInterface.Type.SUBJECT)} delete scheduled for ${notificationEndLesson.startDateTime}"
 		)
+	}
+
+	private fun clearNotification(
+		context: Context,
+		notificationTime: DateTime,
+	) {
+		(context.getSystemService(ALARM_SERVICE) as AlarmManager).run {
+			cancel(
+				PendingIntent.getBroadcast(
+					context,
+					notificationTime.millisOfDay,
+					Intent(context, NotificationReceiver::class.java),
+					FLAG_IMMUTABLE
+				)
+			)
+		}
 	}
 
 	private fun setupNotificationChannels() {

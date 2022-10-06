@@ -75,7 +75,6 @@ class DailyWorker(context: Context, params: WorkerParameters) :
 				}
 			} catch (e: Exception) {
 				Log.e("DailyWorker", "Timetable loading error", e)
-				return Result.failure()
 			}
 		}
 

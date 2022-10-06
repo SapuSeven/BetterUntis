@@ -12,7 +12,6 @@ import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.completeWith
-import org.joda.time.Instant
 import org.joda.time.LocalDate
 import java.lang.ref.WeakReference
 
@@ -44,7 +43,8 @@ abstract class TimetableDependantWorker(
 	protected suspend fun loadTimetable(
 		user: UserDatabase.User,
 		timetableDatabaseInterface: TimetableDatabaseInterface,
-		timetableElement: Pair<Int, String>
+		timetableElement: Pair<Int, String>,
+		skipCache: Boolean = false
 	): TimetableLoader.TimetableItems {
 		val proxyHost = applicationContext.stringDataStore(
 			user.id,
@@ -66,17 +66,12 @@ abstract class TimetableDependantWorker(
 				context = WeakReference(applicationContext),
 				user = user,
 				timetableDatabaseInterface = timetableDatabaseInterface
-			).loadAsync(target, proxyHost, loadFromCache = true) {
+			).loadAsync(target, proxyHost, loadFromCache = !skipCache, loadFromServer = skipCache) {
 				completeWith(kotlin.Result.success(it))
 			}
 			completeWith(kotlin.Result.failure(Exception("Timetable loading failed")))
 		}.await()
 	}
-
-	protected fun isOutdated(
-		timestamp: Long,
-		threshold: Long = 1 * 60 * 1000
-	): Boolean = (Instant.now().millis - timestamp) > threshold
 }
 
 /**

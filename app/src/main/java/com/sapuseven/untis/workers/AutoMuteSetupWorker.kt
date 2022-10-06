@@ -2,6 +2,7 @@ package com.sapuseven.untis.workers
 
 import android.app.AlarmManager
 import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
 import android.content.Context.ALARM_SERVICE
 import android.content.Intent
@@ -17,6 +18,7 @@ import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.receivers.AutoMuteReceiver
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_BOOLEAN_MUTE
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_INT_ID
+import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_LONG_USER_ID
 import com.sapuseven.untis.workers.DailyWorker.Companion.WORKER_DATA_USER_ID
 import org.joda.time.LocalDateTime
 
@@ -59,9 +61,6 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 					personalTimetable
 				)
 
-				if (isOutdated(timetable.timestamp))
-					return@let // Cache too old
-
 				val automuteCancelledLessons = applicationContext.booleanDataStore(
 					user.id,
 					"preference_automute_cancelled_lessons"
@@ -88,12 +87,13 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 							val muteIntent =
 								Intent(applicationContext, AutoMuteReceiver::class.java)
 									.putExtra(EXTRA_INT_ID, id)
+									.putExtra(EXTRA_LONG_USER_ID, user.id)
 									.putExtra(EXTRA_BOOLEAN_MUTE, true)
 							val pendingMuteIntent = PendingIntent.getBroadcast(
 								applicationContext,
 								item.startDateTime.millisOfDay,
 								muteIntent,
-								0
+								FLAG_IMMUTABLE
 							)
 							alarmManager.setExact(
 								AlarmManager.RTC_WAKEUP,
@@ -113,12 +113,13 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 							val unmuteIntent =
 								Intent(applicationContext, AutoMuteReceiver::class.java)
 									.putExtra(EXTRA_INT_ID, id)
+									.putExtra(EXTRA_LONG_USER_ID, user.id)
 									.putExtra(EXTRA_BOOLEAN_MUTE, false)
 							val pendingUnmuteIntent = PendingIntent.getBroadcast(
 								applicationContext,
 								item.endDateTime.millisOfDay,
 								unmuteIntent,
-								0
+								FLAG_IMMUTABLE
 							)
 							alarmManager.setExact(
 								AlarmManager.RTC_WAKEUP,

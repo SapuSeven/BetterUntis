@@ -1,11 +1,16 @@
 package com.sapuseven.untis.activities
 
 import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -20,23 +25,28 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
+import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.preferences.PreferenceCategory
 import com.sapuseven.untis.preferences.PreferenceScreen
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
 import com.sapuseven.untis.preferences.dataStorePreferences
+import com.sapuseven.untis.receivers.AutoMuteReceiver
+import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_BOOLEAN_MUTE
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.preferences.*
 import com.sapuseven.untis.workers.AutoMuteSetupWorker
 import com.sapuseven.untis.workers.NotificationSetupWorker
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class SettingsActivity : BaseComposeActivity() {
 	companion object {
 		const val EXTRA_STRING_PREFERENCE_ROUTE = "com.sapuseven.untis.activities.settings.route"
-		const val EXTRA_STRING_PREFERENCE_HIGHLIGHT = "com.sapuseven.untis.activities.settings.highlight"
+		const val EXTRA_STRING_PREFERENCE_HIGHLIGHT =
+			"com.sapuseven.untis.activities.settings.highlight"
 
 		private const val URL_GITHUB_REPOSITORY = "https://github.com/SapuSeven/BetterUntis"
 		private const val URL_WIKI_PROXY = "$URL_GITHUB_REPOSITORY/wiki/Proxy"
@@ -47,7 +57,8 @@ class SettingsActivity : BaseComposeActivity() {
 		super.onCreate(savedInstanceState)
 
 		// Navigate to and highlight a preference if requested
-		val preferencePath = (intent.extras?.getString(EXTRA_STRING_PREFERENCE_ROUTE)) ?: "preferences"
+		val preferencePath =
+			(intent.extras?.getString(EXTRA_STRING_PREFERENCE_ROUTE)) ?: "preferences"
 		val preferenceHighlight = (intent.extras?.getString(EXTRA_STRING_PREFERENCE_HIGHLIGHT))
 
 		setContent {
@@ -55,6 +66,14 @@ class SettingsActivity : BaseComposeActivity() {
 				withUser { user ->
 					val navController = rememberNavController()
 					var title by remember { mutableStateOf<String?>(null) }
+
+					val autoMutePref = dataStorePreferences.automuteEnable
+					val scope = rememberCoroutineScope()
+					val systemSettingsLauncher =
+						rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+							updateAutoMutePref(user, scope, autoMutePref, true)
+						}
+					updateAutoMutePref(user, scope, autoMutePref)
 
 					Scaffold(
 						topBar = {
@@ -203,11 +222,21 @@ class SettingsActivity : BaseComposeActivity() {
 												title = { Text(stringResource(R.string.preference_automute_enable)) },
 												summary = { Text(stringResource(R.string.preference_automute_enable_summary)) },
 												onCheckedChange = {
-													if (it)
-														AutoMuteSetupWorker.enqueue(
-															WorkManager.getInstance(this@SettingsActivity),
-															user
-														)
+													if (it) {
+														if (requestAutoMutePermission(
+																systemSettingsLauncher
+															)
+														) {
+															AutoMuteSetupWorker.enqueue(
+																WorkManager.getInstance(this@SettingsActivity),
+																user
+															)
+															true
+														} else false
+													} else {
+														disableAutoMute()
+														it
+													}
 												},
 												dataStore = dataStorePreferences.automuteEnable
 											)
@@ -582,6 +611,7 @@ class SettingsActivity : BaseComposeActivity() {
 													)
 												else
 													clearNotifications()
+												it
 											},
 											dataStore = dataStorePreferences.notificationsEnable
 										)
@@ -590,6 +620,13 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_notifications_multiple)) },
 											summary = { Text(stringResource(R.string.preference_notifications_multiple_desc)) },
 											dependency = dataStorePreferences.notificationsEnable,
+											onCheckedChange = {
+												NotificationSetupWorker.enqueue(
+													WorkManager.getInstance(this@SettingsActivity),
+													user
+												)
+												it
+											},
 											dataStore = dataStorePreferences.notificationsInMultiple
 										)
 
@@ -597,6 +634,13 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_notifications_first_lesson)) },
 											summary = { Text(stringResource(R.string.preference_notifications_first_lesson_desc)) },
 											dependency = dataStorePreferences.notificationsEnable,
+											onCheckedChange = {
+												NotificationSetupWorker.enqueue(
+													WorkManager.getInstance(this@SettingsActivity),
+													user
+												)
+												it
+											},
 											dataStore = dataStorePreferences.notificationsBeforeFirst
 										)
 
@@ -604,6 +648,12 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_notifications_first_lesson_time)) },
 											unit = stringResource(R.string.preference_notifications_first_lesson_time_unit),
 											dependency = dataStorePreferences.notificationsBeforeFirst,
+											onChange = {
+												NotificationSetupWorker.enqueue(
+													WorkManager.getInstance(this@SettingsActivity),
+													user
+												)
+											},
 											dataStore = dataStorePreferences.notificationsBeforeFirstTime
 										)
 
@@ -850,7 +900,42 @@ class SettingsActivity : BaseComposeActivity() {
 		}
 	}
 
-	private fun clearNotifications() = (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).cancelAll()
+	private fun updateAutoMutePref(
+		user: UserDatabase.User,
+		scope: CoroutineScope,
+		autoMutePref: UntisPreferenceDataStore<Boolean>,
+		enable: Boolean = false
+	) {
+		scope.launch {
+			val permissionGranted =
+				(getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).isNotificationPolicyAccessGranted
+
+			if (autoMutePref.getValue() && !permissionGranted)
+				autoMutePref.saveValue(false)
+
+			if (enable && permissionGranted) {
+				autoMutePref.saveValue(true)
+				AutoMuteSetupWorker.enqueue(
+					WorkManager.getInstance(this@SettingsActivity),
+					user
+				)
+			}
+		}
+	}
+
+	private fun requestAutoMutePermission(activityLauncher: ActivityResultLauncher<Intent>): Boolean {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			(getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
+				return if (!isNotificationPolicyAccessGranted) {
+					activityLauncher.launch(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
+					false
+				} else true
+			}
+		} else return true
+	}
+
+	private fun clearNotifications() =
+		(getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancelAll()
 
 	@Composable
 	private fun VerticalScrollColumn(content: @Composable ColumnScope.() -> Unit) {
@@ -859,6 +944,13 @@ class SettingsActivity : BaseComposeActivity() {
 				.verticalScroll(rememberScrollState())
 				.bottomInsets(),
 			content = content
+		)
+	}
+
+	private fun disableAutoMute() {
+		sendBroadcast(
+			Intent(applicationContext, AutoMuteReceiver::class.java)
+				.putExtra(EXTRA_BOOLEAN_MUTE, false)
 		)
 	}
 }

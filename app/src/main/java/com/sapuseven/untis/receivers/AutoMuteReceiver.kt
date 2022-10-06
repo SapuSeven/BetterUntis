@@ -31,8 +31,6 @@ class AutoMuteReceiver : BroadcastReceiver() {
 			"preference_automute_enable"
 		).getValue()
 
-		if (!automuteEnable) return@runBlocking
-
 		val automutePriority = context.booleanDataStore(
 			intent.getLongExtra(EXTRA_LONG_USER_ID, -1),
 			"preference_automute_mute_priority"
@@ -44,6 +42,8 @@ class AutoMuteReceiver : BroadcastReceiver() {
 
 			if (intent.getBooleanExtra(EXTRA_BOOLEAN_MUTE, false)) {
 				// Mute
+				if (!automuteEnable) return@runBlocking
+
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 					val notificationManager =
 						context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
