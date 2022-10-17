@@ -15,29 +15,34 @@ import kotlinx.coroutines.completeWith
 import org.joda.time.LocalDate
 import java.lang.ref.WeakReference
 
+/*
+ * This class provides base functions to load timetables for the current day.
+ */
 abstract class TimetableDependantWorker(
 	context: Context,
 	params: WorkerParameters
 ) : CoroutineWorker(context, params) {
+	companion object {
+		suspend fun loadPersonalTimetableElement(
+			user: UserDatabase.User,
+			context: Context
+		): Pair<Int, String>? {
+			val customPersonalTimetable = decodeStoredTimetableValue(
+				context.stringDataStore(
+					user.id,
+					"preference_timetable_personal_timetable",
+					defaultValue = ""
+				).getValue()
+			)
 
-	protected suspend fun loadPersonalTimetableElement(
-		user: UserDatabase.User
-	): Pair<Int, String>? {
-		val customPersonalTimetable = decodeStoredTimetableValue(
-			applicationContext.stringDataStore(
-				user.id,
-				"preference_timetable_personal_timetable",
-				defaultValue = ""
-			).getValue()
-		)
+			val elemId = customPersonalTimetable?.id ?: user.userData.elemId
+			val elemType = customPersonalTimetable?.type ?: user.userData.elemType ?: ""
 
-		val elemId = customPersonalTimetable?.id ?: user.userData.elemId
-		val elemType = customPersonalTimetable?.type ?: user.userData.elemType ?: ""
-
-		return if (TimetableDatabaseInterface.Type.values().find { it.name == elemType } == null)
-			null // Anonymous / no custom personal timetable
-		else
-			elemId to elemType
+			return if (TimetableDatabaseInterface.Type.values().find { it.name == elemType } == null)
+				null // Anonymous / no custom personal timetable
+			else
+				elemId to elemType
+		}
 	}
 
 	protected suspend fun loadTimetable(

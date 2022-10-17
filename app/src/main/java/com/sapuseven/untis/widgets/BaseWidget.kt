@@ -12,10 +12,9 @@ import android.widget.RemoteViews
 import androidx.core.content.ContextCompat
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.widgets.WidgetRemoteViewsFactory.Companion.WIDGET_TYPE_UNKNOWN
 
 
-open class BaseWidget : AppWidgetProvider() {
+/*open class BaseWidget : AppWidgetProvider() {
 	private var user: UserDatabase.User? = null
 	private lateinit var userDatabase: UserDatabase
 	private lateinit var context: Context
@@ -109,4 +108,4 @@ internal fun loadIdPref(context: Context, appWidgetId: Int): Long {
 
 internal fun deleteIdPref(context: Context, appWidgetId: Int) {
 	context.getSharedPreferences(PREFS_NAME, 0).edit().remove(PREF_PREFIX_KEY + appWidgetId).apply()
-}
+}*/

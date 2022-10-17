@@ -44,9 +44,10 @@ class DailyWorker(context: Context, params: WorkerParameters) :
 
 	override suspend fun doWork(): Result {
 		val userDatabase = UserDatabase.createInstance(applicationContext)
+		val workManager = WorkManager.getInstance(applicationContext)
 
 		userDatabase.getAllUsers().forEach { user ->
-			val personalTimetable = loadPersonalTimetableElement(user)
+			val personalTimetable = loadPersonalTimetableElement(user, applicationContext)
 				?: return@forEach // Anonymous / no custom personal timetable
 
 			try {
@@ -66,7 +67,7 @@ class DailyWorker(context: Context, params: WorkerParameters) :
 					"preference_automute_enable"
 				).getValue()
 
-				WorkManager.getInstance(applicationContext).let {
+				workManager.let {
 					if (notificationsEnable)
 						NotificationSetupWorker.enqueue(it, user)
 
@@ -77,6 +78,8 @@ class DailyWorker(context: Context, params: WorkerParameters) :
 				Log.e("DailyWorker", "Timetable loading error", e)
 			}
 		}
+
+		WidgetUpdateWorker.enqueue(workManager)
 
 		enqueueNext(applicationContext)
 		return Result.success()

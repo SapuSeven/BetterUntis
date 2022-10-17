@@ -328,8 +328,9 @@
     <string name="all_datepicker_select">Select date</string>
 	<string name="all_datepicker_month_next">Next month</string>
 	<string name="all_datepicker_month_previous">Previous month</string>
+    <string name="all_reload">Reload</string>
 
-	<plurals name="main_time_diff_minutes">
+    <plurals name="main_time_diff_minutes">
 		<item quantity="one">a minute ago</item>
 		<item quantity="other">%d minutes ago</item>
 	</plurals>

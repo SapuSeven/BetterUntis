@@ -36,7 +36,7 @@
 		</activity>
 
 		<activity
-			android:name=".activities.WidgetConfigureActivity"
+			android:name=".activities.ElementPickerWidgetConfigureActivity"
 			android:label="@string/widget_configuration"
 			android:exported="true">
 
@@ -127,7 +127,7 @@
 		<receiver android:name=".receivers.AutoMuteReceiver" />
 
 		<receiver
-			android:name=".widgets.TimetableWidget"
+			android:name=".widgets.TimetableWidgetReceiver"
 			android:label="@string/widget_timetable"
 			android:exported="true">
 
@@ -141,7 +141,7 @@
 		</receiver>
 
 		<receiver
-			android:name=".widgets.MessagesWidget"
+			android:name=".widgets.MessagesWidgetReceiver"
 			android:label="@string/widget_daily_messages"
 			android:exported="true">
 
@@ -153,10 +153,6 @@
 				android:name="android.appwidget.provider"
 				android:resource="@xml/widget_info" />
 		</receiver>
-
-		<service
-			android:name=".widgets.WidgetRemoteViewsService"
-			android:permission="android.permission.BIND_REMOTEVIEWS" />
 
 		<provider
 			android:name="androidx.startup.InitializationProvider"

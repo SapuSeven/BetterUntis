@@ -30,6 +30,7 @@ import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.material.scheme.Scheme
+import com.sapuseven.untis.ui.theme.generateColorScheme
 import com.sapuseven.untis.ui.theme.toColorScheme
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.cancellable
@@ -140,29 +141,6 @@ open class BaseComposeActivity : ComponentActivity() {
 
 	fun currentUserId() = user?.id ?: -1
 
-	private fun generateColorScheme(
-		context: Context,
-		dynamicColor: Boolean,
-		themeColor: Color,
-		darkTheme: Boolean,
-		darkThemeOled: Boolean
-	): ColorScheme {
-		customThemeColor = if (dynamicColor) null else themeColor
-
-		return when {
-			dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-				if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-			}
-			darkTheme -> Scheme.dark(themeColor.toArgb()).toColorScheme()
-			else -> Scheme.light(themeColor.toArgb()).toColorScheme()
-		}.run {
-			if (darkTheme && darkThemeOled)
-				copy(background = Color.Black, surface = Color.Black)
-			else
-				this
-		}
-	}
-
 	@Composable
 	fun AppTheme(
 		initialDarkTheme: Boolean = isSystemInDarkTheme(),
@@ -196,9 +174,12 @@ open class BaseComposeActivity : ComponentActivity() {
 
 					// setStatusBarsColor() and setNavigationBarColor() also exist
 
+					val dynamicColor = themeColor == themeColorPref.defaultValue
+					customThemeColor = if (dynamicColor) null else Color(themeColor)
+
 					generateColorScheme(
 						context,
-						themeColor == themeColorPref.defaultValue,
+						dynamicColor,
 						Color(themeColor),
 						darkTheme = darkThemeBool,
 						darkThemeOled

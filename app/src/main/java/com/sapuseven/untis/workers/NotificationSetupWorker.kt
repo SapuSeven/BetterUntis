@@ -81,7 +81,7 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 			var scheduledNotifications = 0
 
 			try {
-				val personalTimetable = loadPersonalTimetableElement(user)
+				val personalTimetable = loadPersonalTimetableElement(user, applicationContext)
 					?: return@let // Anonymous / no custom personal timetable
 
 				val timetable = loadTimetable(

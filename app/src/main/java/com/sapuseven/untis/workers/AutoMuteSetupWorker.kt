@@ -52,7 +52,7 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 
 		userDatabase.getUser(inputData.getLong(WORKER_DATA_USER_ID, -1))?.let { user ->
 			try {
-				val personalTimetable = loadPersonalTimetableElement(user)
+				val personalTimetable = loadPersonalTimetableElement(user, applicationContext)
 					?: return@let // Anonymous / no custom personal timetable
 
 				val timetable = loadTimetable(

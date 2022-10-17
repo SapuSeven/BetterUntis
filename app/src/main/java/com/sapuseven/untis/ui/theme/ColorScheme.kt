@@ -1,12 +1,32 @@
 package com.sapuseven.untis.ui.theme
 
+import android.content.Context
+import android.os.Build
 import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.sapuseven.untis.ui.material.palettes.CorePalette
 import com.sapuseven.untis.ui.material.scheme.Scheme
+
+fun generateColorScheme(
+	context: Context,
+	dynamicColor: Boolean,
+	themeColor: Color,
+	darkTheme: Boolean,
+	darkThemeOled: Boolean
+): ColorScheme = when {
+	dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+		if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+	}
+	darkTheme -> Scheme.dark(themeColor.toArgb()).toColorScheme()
+	else -> Scheme.light(themeColor.toArgb()).toColorScheme()
+}.run {
+	if (darkTheme && darkThemeOled)
+		copy(background = Color.Black, surface = Color.Black)
+	else
+		this
+}
 
 fun Scheme.toColorScheme(): ColorScheme =
 	ColorScheme(
