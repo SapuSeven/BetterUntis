@@ -7,6 +7,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.system.Os
+import kotlin.collections.Collection
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
@@ -907,8 +909,10 @@ class SettingsActivity : BaseComposeActivity() {
 		enable: Boolean = false
 	) {
 		scope.launch {
-			val permissionGranted =
+			val permissionGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
 				(getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).isNotificationPolicyAccessGranted
+			} else true
+
 
 			if (autoMutePref.getValue() && !permissionGranted)
 				autoMutePref.saveValue(false)

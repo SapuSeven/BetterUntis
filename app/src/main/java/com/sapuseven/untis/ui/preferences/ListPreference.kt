@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import com.sapuseven.untis.R
+import com.sapuseven.untis.helpers.ownGetOrDefault
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
 import kotlinx.coroutines.launch
 
@@ -36,7 +37,8 @@ fun ListPreference(
 		title = title,
 		summary = if (summary != null) {
 			{
-				summary(value.value to entryLabelMap.getOrDefault(value.value, value.value))
+				val selected = value.value to entryLabelMap.ownGetOrDefault(value.value, value.value)
+				summary(selected)
 			}
 		} else null,
 		icon = icon,
@@ -75,7 +77,7 @@ fun ListPreference(
 
 							Text(
 								modifier = Modifier.weight(1f),
-								text = entryLabelMap.getOrDefault(it, it)
+								text = entryLabelMap.ownGetOrDefault(it, it)
 							)
 						}
 					}
@@ -139,12 +141,12 @@ fun MultiSelectListPreference(
 								.clickable(
 									role = Role.Checkbox
 								) {
-									dialogItems[it] = !dialogItems.getOrDefault(it, false)
+									dialogItems[it] = !dialogItems.ownGetOrDefault(it, false)
 								},
 							verticalAlignment = Alignment.CenterVertically
 						) {
 							Checkbox(
-								checked = dialogItems.getOrDefault(it, false),
+								checked = dialogItems.ownGetOrDefault(it, false),
 								onCheckedChange = { newValue ->
 									dialogItems[it] = newValue
 								}
@@ -152,7 +154,7 @@ fun MultiSelectListPreference(
 
 							Text(
 								modifier = Modifier.weight(1f),
-								text = entryLabelMap.getOrDefault(it, it)
+								text = entryLabelMap.ownGetOrDefault(it, it)
 							)
 						}
 					}
