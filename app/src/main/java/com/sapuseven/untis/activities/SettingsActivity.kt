@@ -24,10 +24,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.work.WorkManager
+import com.mikepenz.aboutlibraries.Libs
+import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
+import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults.libraryColors
+import com.mikepenz.aboutlibraries.util.withJson
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
@@ -882,7 +887,7 @@ class SettingsActivity : BaseComposeActivity() {
 											Preference(
 												title = { Text(stringResource(R.string.preference_info_libraries)) },
 												summary = { Text(stringResource(R.string.preference_info_libraries_desc)) },
-												onClick = { /*TODO*/ },
+												onClick = { navController.navigate("about_libs") },
 												icon = {
 													Icon(
 														painter = painterResource(R.drawable.settings_about_library),
@@ -893,6 +898,31 @@ class SettingsActivity : BaseComposeActivity() {
 											)
 										}
 									}
+								}
+								composable("about_libs"){
+									title = stringResource(id = R.string.preference_info_libraries)
+
+									val colors = libraryColors(
+										backgroundColor = colorScheme!!.background,
+										contentColor = colorScheme!!.onBackground,
+										badgeBackgroundColor = colorScheme!!.primary,
+										badgeContentColor = colorScheme!!.onPrimary
+									)
+									/*
+									* The about libraries (android library from mikepenz)
+									* use a custom library file stored in R.raw.about_libs
+									* to modify the shown libraries edit the JSON file
+									* about_libs.json
+									*/
+									LibrariesContainer(
+										Modifier
+											.fillMaxSize()
+											.padding(bottom = 48.dp),
+										librariesBlock = { ctx ->
+											Libs.Builder().withJson(ctx, R.raw.about_libs).build()
+										},
+										colors = colors
+									)
 								}
 							}
 						}

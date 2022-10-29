@@ -1525,13 +1525,15 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 		scope.launch {
 			personalTimetableFlow.collect { customTimetable ->
-				val element = decodeStoredTimetableValue(customTimetable)
-				val previousElement = personalTimetable?.first
-				personalTimetable =
-					element to element?.let { timetableDatabaseInterface.getLongName(it) }
+				if (user.anonymous || customTimetable != ""){
+					val element = decodeStoredTimetableValue(customTimetable)
+					val previousElement = personalTimetable?.first
+					personalTimetable =
+						element to element?.let { timetableDatabaseInterface.getLongName(it) }
 
-				if (element != previousElement)
-					displayElement(personalTimetable?.first, personalTimetable?.second)
+					if (element != previousElement)
+						displayElement(personalTimetable?.first, personalTimetable?.second)
+				}
 			}
 		}
 	}

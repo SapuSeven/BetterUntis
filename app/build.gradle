@@ -3,6 +3,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlinx-serialization'
+apply plugin:  'com.mikepenz.aboutlibraries.plugin'
 
 android {
 	compileSdkVersion 33
@@ -128,6 +129,9 @@ dependencies {
 	implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
 	implementation "com.google.accompanist:accompanist-pager-indicators:$accompanist_version"
     implementation 'androidx.work:work-runtime-ktx:2.7.1'
+
+	implementation "com.mikepenz:aboutlibraries-compose:$latestAboutLibsRelease"
+	implementation "com.mikepenz:aboutlibraries-core:$latestAboutLibsRelease"
 
 	coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
