@@ -13,22 +13,33 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.work.WorkManager
+import coil.compose.AsyncImage
+import com.github.kittinunf.fuel.coroutines.awaitStringResult
+import com.github.kittinunf.fuel.httpGet
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults.libraryColors
@@ -36,6 +47,8 @@ import com.mikepenz.aboutlibraries.util.withJson
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.helpers.SerializationUtils.getJSON
+import com.sapuseven.untis.models.github.GithubUser
 import com.sapuseven.untis.preferences.PreferenceCategory
 import com.sapuseven.untis.preferences.PreferenceScreen
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
@@ -48,6 +61,9 @@ import com.sapuseven.untis.workers.AutoMuteSetupWorker
 import com.sapuseven.untis.workers.NotificationSetupWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.JsonConfiguration
 
 class SettingsActivity : BaseComposeActivity() {
 	companion object {
@@ -803,6 +819,8 @@ class SettingsActivity : BaseComposeActivity() {
 
 										PreferenceCategory(stringResource(id = R.string.preference_info_general)) {
 
+											val openDialog = remember { mutableStateOf(false) }
+
 											Preference(
 												title = { Text(stringResource(R.string.preference_info_app_version)) },
 												summary = {
@@ -874,7 +892,9 @@ class SettingsActivity : BaseComposeActivity() {
 											Preference(
 												title = { Text(stringResource(R.string.preference_info_contributors)) },
 												summary = { Text(stringResource(R.string.preference_info_contributors_desc)) },
-												onClick = { /*TODO*/ },
+												onClick = {
+														  openDialog.value = true
+												},
 												icon = {
 													Icon(
 														painter = painterResource(R.drawable.settings_about_contributor),
@@ -883,6 +903,56 @@ class SettingsActivity : BaseComposeActivity() {
 												},
 												dataStore = UntisPreferenceDataStore.emptyDataStore()
 											)
+
+											if(openDialog.value){
+												AlertDialog(
+													onDismissRequest = {
+																	   openDialog.value = false
+																	   },
+													confirmButton = {
+														Row(
+															modifier = Modifier.padding(all = 8.dp),
+															horizontalArrangement = Arrangement.SpaceAround
+														) {
+															TextButton(
+																onClick = {
+																	openDialog.value = false
+																	startActivity(
+																		Intent(
+																			Intent.ACTION_VIEW, Uri.parse(
+																				"https://docs.github.com/en/github/site-policy/github-privacy-statement"
+																			)
+																		)
+																	)
+																}
+															) {
+																Text(text = stringResource(id = R.string.preference_info_privacy_policy))
+															}
+															TextButton(
+																onClick = {
+																	openDialog.value = false
+																}
+															) {
+																Text(text = stringResource(id = R.string.all_cancel))
+															}
+															TextButton(
+																onClick = {
+																	openDialog.value = false
+																	navController.navigate("contributors")
+																}
+															) {
+																Text(text = stringResource(id = R.string.all_ok))
+															}
+														}
+													},
+													title = {
+														Text(text = stringResource(id = R.string.preference_info_privacy))
+													},
+													text = {
+														Text(stringResource(id = R.string.preference_info_privacy_desc))
+													}
+												)
+											}
 
 											Preference(
 												title = { Text(stringResource(R.string.preference_info_libraries)) },
@@ -924,9 +994,60 @@ class SettingsActivity : BaseComposeActivity() {
 										colors = colors
 									)
 								}
+								composable("contributors"){
+									title = stringResource(id = R.string.preference_info_contributors)
+
+									var userList = remember { listOf<GithubUser>() }
+
+									runBlocking {
+										"https://api.github.com/repos/sapuseven/betteruntis/contributors"
+											.httpGet()
+											.awaitStringResult()
+											.fold({ data ->
+												userList = getJSON().decodeFromString<List<GithubUser>>(data)
+											}, {
+
+											})
+									}
+									
+									LazyColumn(modifier = Modifier
+										.fillMaxHeight()
+										.padding(bottom = 48.dp)){
+										this.items(userList){
+											Contributor(contributor = it)
+										}
+									}
+								}
 							}
 						}
 					}
+				}
+			}
+		}
+	}
+
+	@OptIn(ExperimentalComposeUiApi::class)
+	@Composable
+	fun Contributor(
+		contributor: GithubUser
+	) {
+		Box(modifier = Modifier
+			.fillMaxWidth()
+			.clickable {
+				startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(contributor.html_url)))
+			}
+			.height(68.dp)
+			.padding(start = 16.dp), Alignment.CenterStart)
+		{
+			Row() {
+				AsyncImage(model = contributor.avatar_url, contentDescription = "UserImage", //TODO: Extract string resource
+					Modifier
+						.height(48.dp)
+						.width(48.dp))
+				Spacer(modifier = Modifier.width(8.dp))
+				Column() {
+					Text(text = contributor.login, fontWeight = FontWeight.Bold)
+					Text(text = pluralStringResource(id = R.plurals.preferences_contributors_contributions, count = contributor.contributions, contributor.contributions))
 				}
 			}
 		}
