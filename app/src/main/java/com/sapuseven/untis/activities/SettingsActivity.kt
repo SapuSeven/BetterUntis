@@ -13,6 +13,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,6 +27,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringArrayResource
@@ -997,24 +999,43 @@ class SettingsActivity : BaseComposeActivity() {
 								composable("contributors"){
 									title = stringResource(id = R.string.preference_info_contributors)
 
-									var userList = remember { listOf<GithubUser>() }
+									var userList by remember { mutableStateOf(listOf<GithubUser>()) }
+									val error = remember { mutableStateOf(true) }
+									var string by remember { mutableStateOf(getString(R.string.loading)) }
 
-									runBlocking {
+									scope.launch {
 										"https://api.github.com/repos/sapuseven/betteruntis/contributors"
 											.httpGet()
 											.awaitStringResult()
 											.fold({ data ->
 												userList = getJSON().decodeFromString<List<GithubUser>>(data)
+												error.value = false
 											}, {
-
+												string = getString(R.string.loading_failed)
+												error.value = true
 											})
 									}
-									
-									LazyColumn(modifier = Modifier
-										.fillMaxHeight()
-										.padding(bottom = 48.dp)){
-										this.items(userList){
-											Contributor(contributor = it)
+
+									if (!error.value){
+										LazyColumn(modifier = Modifier
+											.fillMaxHeight()
+											.padding(bottom = 48.dp)){
+											this.items(userList){
+												Contributor(githubUser = it)
+											}
+										}
+									} else {
+										Box(modifier = Modifier
+											.fillMaxWidth()
+											.height(68.dp)
+											.padding(start = 16.dp), Alignment.CenterStart)
+										{
+											Row() {
+												Icon(painter = painterResource(id = R.drawable.settings_about_contributor), contentDescription = "")
+												Spacer(modifier = Modifier.width(8.dp))
+												Text(text = string)
+												
+											}
 										}
 									}
 								}
@@ -1029,25 +1050,25 @@ class SettingsActivity : BaseComposeActivity() {
 	@OptIn(ExperimentalComposeUiApi::class)
 	@Composable
 	fun Contributor(
-		contributor: GithubUser
+		githubUser: GithubUser
 	) {
 		Box(modifier = Modifier
 			.fillMaxWidth()
 			.clickable {
-				startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(contributor.html_url)))
+				startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(githubUser.html_url)))
 			}
 			.height(68.dp)
 			.padding(start = 16.dp), Alignment.CenterStart)
 		{
 			Row() {
-				AsyncImage(model = contributor.avatar_url, contentDescription = "UserImage", //TODO: Extract string resource
+				AsyncImage(model = githubUser.avatar_url, contentDescription = "UserImage", //TODO: Extract string resource
 					Modifier
 						.height(48.dp)
 						.width(48.dp))
 				Spacer(modifier = Modifier.width(8.dp))
 				Column() {
-					Text(text = contributor.login, fontWeight = FontWeight.Bold)
-					Text(text = pluralStringResource(id = R.plurals.preferences_contributors_contributions, count = contributor.contributions, contributor.contributions))
+					Text(text = githubUser.login, fontWeight = FontWeight.Bold)
+					Text(text = pluralStringResource(id = R.plurals.preferences_contributors_contributions, count = githubUser.contributions, githubUser.contributions))
 				}
 			}
 		}
