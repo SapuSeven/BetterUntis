@@ -982,8 +982,8 @@ class SettingsActivity : BaseComposeActivity() {
 									)
 									/*
 									* The about libraries (android library from mikepenz)
-									* use a custom library file stored in R.raw.about_libs
-									* to modify the shown libraries edit the JSON file
+									* use a custom library file stored in R.raw.about_libs.
+									* To modify the shown libraries edit the JSON file
 									* about_libs.json
 									*/
 									LibrariesContainer(
