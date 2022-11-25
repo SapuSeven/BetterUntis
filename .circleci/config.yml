@@ -149,7 +149,7 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
-      - deploy_fastlane_material3:
+      - deploy_fastlane:
           requires:
             - build
           filters:
