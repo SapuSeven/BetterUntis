@@ -5,6 +5,11 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlinx-serialization'
 apply plugin:  'com.mikepenz.aboutlibraries.plugin'
 
+// Auto-generates a new version code every minute
+static def generateVersionCode() {
+	return (new Date().getTime() / 1000 / 60).toInteger()
+}
+
 android {
 	compileSdkVersion 33
 	buildToolsVersion '33.0.0'
@@ -13,7 +18,7 @@ android {
 		applicationId "com.sapuseven.untis"
 		minSdkVersion 21
 		targetSdkVersion 33
-		versionCode 34
+		versionCode generateVersionCode()
 		versionName "3.5.1"
 		vectorDrawables.useSupportLibrary = true
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
