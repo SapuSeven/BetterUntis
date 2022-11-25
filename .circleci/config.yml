@@ -94,6 +94,10 @@ jobs:
     docker:
       - image: cimg/ruby:3.1.2
     working_directory: ~/betteruntis
+    parameters:
+      track:
+        type: string
+        default: 'beta'
     steps:
       - checkout
       - restore_cache:
@@ -111,7 +115,7 @@ jobs:
           name: Deploy to Play Store Beta track
           command: |
             echo $GOOGLE_PLAY_KEY_ENCODED | base64 --decode > fastlane/key.json
-            bundle exec fastlane deploy aab:'workspace/outputs/bundle/release/app-release.aab'
+            bundle exec fastlane deploy aab:'workspace/outputs/bundle/release/app-release.aab' track:<<parameters.track>>
 
 workflows:
   version: 2
@@ -145,3 +149,10 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
+      - deploy_fastlane_material3:
+          requires:
+            - build
+          filters:
+            branches:
+              only: 287-material-design-3
+          track: 'material-3'
