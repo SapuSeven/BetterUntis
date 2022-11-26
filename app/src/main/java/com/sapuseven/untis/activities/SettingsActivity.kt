@@ -53,6 +53,7 @@ import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.receivers.AutoMuteReceiver
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_BOOLEAN_MUTE
 import com.sapuseven.untis.ui.functional.bottomInsets
+import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.preferences.*
 import com.sapuseven.untis.workers.AutoMuteSetupWorker
 import com.sapuseven.untis.workers.NotificationSetupWorker
@@ -67,6 +68,7 @@ class SettingsActivity : BaseComposeActivity() {
 			"com.sapuseven.untis.activities.settings.highlight"
 
 		private const val URL_GITHUB_REPOSITORY = "https://github.com/SapuSeven/BetterUntis"
+		private const val URL_GITHUB_REPOSITORY_API = "https://api.github.com/repos/SapuSeven/BetterUntis"
 		private const val URL_WIKI_PROXY = "$URL_GITHUB_REPOSITORY/wiki/Proxy"
 	}
 
@@ -102,7 +104,7 @@ class SettingsActivity : BaseComposeActivity() {
 						)
 
 						if (intent.resolveActivity(packageManager) != null) {
-							startActivity(intent);
+							startActivity(intent)
 						} else {
 							dialogOpenUrl = url
 						}
@@ -970,31 +972,28 @@ class SettingsActivity : BaseComposeActivity() {
 									*/
 									LibrariesContainer(
 										Modifier
-											.fillMaxSize()
-											.padding(bottom = 48.dp),
+											.fillMaxSize(),
 										librariesBlock = { ctx ->
-											Libs.Builder().withJson(ctx, R.raw.about_libs).build()
+											Libs.Builder().withJson(ctx, R.raw.about_libs)
+												.build()
 										},
+										contentPadding = insetsPaddingValues(),
 										colors = colors
 									)
 								}
 								composable("contributors") {
-									title =
-										stringResource(id = R.string.preference_info_contributors)
+									title = stringResource(id = R.string.preference_info_contributors)
 
 									var userList by remember { mutableStateOf(listOf<GithubUser>()) }
 									val error = remember { mutableStateOf(true) }
 									var string by remember { mutableStateOf(getString(R.string.loading)) }
 
 									scope.launch {
-										"https://api.github.com/repos/sapuseven/betteruntis/contributors"
+										"$URL_GITHUB_REPOSITORY_API/contributors"
 											.httpGet()
 											.awaitStringResult()
 											.fold({ data ->
-												userList =
-													getJSON().decodeFromString<List<GithubUser>>(
-														data
-													)
+												userList = getJSON().decodeFromString(data)
 												error.value = false
 											}, {
 												string = getString(R.string.loading_failed)
@@ -1005,8 +1004,8 @@ class SettingsActivity : BaseComposeActivity() {
 									if (!error.value) {
 										LazyColumn(
 											modifier = Modifier
-												.fillMaxHeight()
-												.padding(bottom = 48.dp)
+												.fillMaxHeight(),
+											contentPadding = insetsPaddingValues()
 										) {
 											this.items(userList) {
 												Contributor(
@@ -1018,11 +1017,10 @@ class SettingsActivity : BaseComposeActivity() {
 										Box(
 											modifier = Modifier
 												.fillMaxWidth()
-												.height(68.dp)
 												.padding(start = 16.dp), Alignment.CenterStart
 										)
 										{
-											Row() {
+											Row {
 												Icon(
 													painter = painterResource(id = R.drawable.settings_about_contributor),
 													contentDescription = ""
@@ -1078,7 +1076,7 @@ class SettingsActivity : BaseComposeActivity() {
 				.padding(start = 16.dp), Alignment.CenterStart
 		)
 		{
-			Row() {
+			Row {
 				AsyncImage(
 					model = githubUser.avatar_url,
 					contentDescription = "UserImage", //TODO: Extract string resource
@@ -1087,7 +1085,7 @@ class SettingsActivity : BaseComposeActivity() {
 						.width(48.dp)
 				)
 				Spacer(modifier = Modifier.width(8.dp))
-				Column() {
+				Column {
 					Text(text = githubUser.login, fontWeight = FontWeight.Bold)
 					Text(
 						text = pluralStringResource(
