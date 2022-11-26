@@ -108,6 +108,11 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 				val preparedItems = timetable.items.filter { !it.periodData.isCancelled() }
 					.sortedBy { it.startDateTime }.merged().zipWithNext()
 
+				if (preparedItems.isEmpty()) {
+					Log.d(LOG_TAG, "No notifications to schedule")
+					return Result.success()
+				}
+
 				with(preparedItems.first().first) {
 					if (startDateTime.millisOfDay < LocalDateTime.now().millisOfDay) return@with
 

@@ -6,8 +6,10 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -61,6 +63,8 @@ class ElementPickerWidgetConfigureActivity : BaseComposeActivity() {
 				}
 
 				val context = this
+
+				var showConfirmationDialog by remember { mutableStateOf(true) }
 
 				Surface(
 					modifier = Modifier.fillMaxSize()
@@ -125,6 +129,27 @@ class ElementPickerWidgetConfigureActivity : BaseComposeActivity() {
 							)
 						}
 					)
+
+					if (showConfirmationDialog)
+						AlertDialog(
+							onDismissRequest = {
+								showConfirmationDialog = false
+							},
+							title = {
+								Text(getString(R.string.widget_disclaimer_title))
+							},
+							text = {
+								Text(getString(R.string.widget_disclaimer_text))
+							},
+							confirmButton = {
+								TextButton(
+									onClick = {
+										showConfirmationDialog = false
+									}) {
+									Text(stringResource(id = R.string.all_ok))
+								}
+							}
+						)
 				}
 			}
 		}

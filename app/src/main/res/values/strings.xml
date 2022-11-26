@@ -329,8 +329,10 @@
 	<string name="all_datepicker_month_next">Next month</string>
 	<string name="all_datepicker_month_previous">Previous month</string>
     <string name="all_reload">Reload</string>
+	<string name="widget_disclaimer_title">Beta feature</string>
+	<string name="widget_disclaimer_text">The widget feature is still work-in-progress and may not work correctly on all devices.</string>
 
-    <plurals name="main_time_diff_minutes">
+	<plurals name="main_time_diff_minutes">
 		<item quantity="one">a minute ago</item>
 		<item quantity="other">%d minutes ago</item>
 	</plurals>
