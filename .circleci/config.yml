@@ -112,7 +112,7 @@ jobs:
       - attach_workspace:
           at: workspace
       - run:
-          name: Deploy to Play Store Beta track
+          name: Deploy to Play Store testing track
           command: |
             echo $GOOGLE_PLAY_KEY_ENCODED | base64 --decode > fastlane/key.json
             bundle exec fastlane deploy aab:'workspace/outputs/bundle/release/app-release.aab' track:<<parameters.track>>
