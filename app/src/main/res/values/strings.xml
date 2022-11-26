@@ -320,6 +320,8 @@
 	<string name="settings_recommend_share">Share</string>
 	<string name="settings_recommend_text">Try BetterUntis - A better alternative to Untis Mobile! Download at %1$s</string>
 	<string name="settings_recommend_title">Recommend BetterUntis</string>
+	<string name="settings_dialog_url_open_title">No compatible app found</string>
+	<string name="settings_dialog_url_open_text">BetterUntis could not find an app that can handle opening links.\nPlease ensure you have a web browser installed or open the link on another device:</string>
 	<string name="widget_configuration">Widget Configuration</string>
 	<string name="widget_daily_messages">Daily Messages</string>
 	<string name="widget_select_profile">Please select a profile for the widget</string>

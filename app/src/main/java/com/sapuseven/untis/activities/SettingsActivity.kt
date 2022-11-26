@@ -7,13 +7,10 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.system.Os
-import kotlin.collections.Collection
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,13 +24,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -63,9 +58,7 @@ import com.sapuseven.untis.workers.AutoMuteSetupWorker
 import com.sapuseven.untis.workers.NotificationSetupWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.JsonConfiguration
 
 class SettingsActivity : BaseComposeActivity() {
 	companion object {
@@ -99,6 +92,21 @@ class SettingsActivity : BaseComposeActivity() {
 							updateAutoMutePref(user, scope, autoMutePref, true)
 						}
 					updateAutoMutePref(user, scope, autoMutePref)
+
+					var dialogOpenUrl by remember { mutableStateOf<String?>(null) }
+
+					fun openUrl(url: String) {
+						val intent = Intent(
+							Intent.ACTION_VIEW,
+							Uri.parse(url)
+						)
+
+						if (intent.resolveActivity(packageManager) != null) {
+							startActivity(intent);
+						} else {
+							dialogOpenUrl = url
+						}
+					}
 
 					Scaffold(
 						topBar = {
@@ -783,12 +791,7 @@ class SettingsActivity : BaseComposeActivity() {
 											Preference(
 												title = { Text(stringResource(R.string.preference_connectivity_proxy_about)) },
 												onClick = {
-													startActivity(
-														Intent(
-															Intent.ACTION_VIEW,
-															Uri.parse(URL_WIKI_PROXY)
-														)
-													)
+													openUrl(URL_WIKI_PROXY)
 												},
 												icon = {
 													Icon(
@@ -835,12 +838,7 @@ class SettingsActivity : BaseComposeActivity() {
 													)
 												},
 												onClick = {
-													startActivity(
-														Intent(
-															Intent.ACTION_VIEW,
-															Uri.parse("$URL_GITHUB_REPOSITORY/releases")
-														)
-													)
+													openUrl("$URL_GITHUB_REPOSITORY/releases")
 												},
 												icon = {
 													Icon(
@@ -855,12 +853,7 @@ class SettingsActivity : BaseComposeActivity() {
 												title = { Text(stringResource(R.string.preference_info_github)) },
 												summary = { Text(URL_GITHUB_REPOSITORY) },
 												onClick = {
-													startActivity(
-														Intent(
-															Intent.ACTION_VIEW,
-															Uri.parse(URL_GITHUB_REPOSITORY)
-														)
-													)
+													openUrl(URL_GITHUB_REPOSITORY)
 												},
 												icon = {
 													Icon(
@@ -875,12 +868,7 @@ class SettingsActivity : BaseComposeActivity() {
 												title = { Text(stringResource(R.string.preference_info_license)) },
 												summary = { Text(stringResource(R.string.preference_info_license_desc)) },
 												onClick = {
-													startActivity(
-														Intent(
-															Intent.ACTION_VIEW,
-															Uri.parse("$URL_GITHUB_REPOSITORY/blob/master/LICENSE")
-														)
-													)
+													openUrl("$URL_GITHUB_REPOSITORY/blob/master/LICENSE")
 												},
 												icon = {
 													Icon(
@@ -895,7 +883,7 @@ class SettingsActivity : BaseComposeActivity() {
 												title = { Text(stringResource(R.string.preference_info_contributors)) },
 												summary = { Text(stringResource(R.string.preference_info_contributors_desc)) },
 												onClick = {
-														  openDialog.value = true
+													openDialog.value = true
 												},
 												icon = {
 													Icon(
@@ -906,11 +894,11 @@ class SettingsActivity : BaseComposeActivity() {
 												dataStore = UntisPreferenceDataStore.emptyDataStore()
 											)
 
-											if(openDialog.value){
+											if (openDialog.value) {
 												AlertDialog(
 													onDismissRequest = {
-																	   openDialog.value = false
-																	   },
+														openDialog.value = false
+													},
 													confirmButton = {
 														Row(
 															modifier = Modifier.padding(all = 8.dp),
@@ -919,13 +907,7 @@ class SettingsActivity : BaseComposeActivity() {
 															TextButton(
 																onClick = {
 																	openDialog.value = false
-																	startActivity(
-																		Intent(
-																			Intent.ACTION_VIEW, Uri.parse(
-																				"https://docs.github.com/en/github/site-policy/github-privacy-statement"
-																			)
-																		)
-																	)
+																	openUrl("https://docs.github.com/en/github/site-policy/github-privacy-statement")
 																}
 															) {
 																Text(text = stringResource(id = R.string.preference_info_privacy_policy))
@@ -971,7 +953,7 @@ class SettingsActivity : BaseComposeActivity() {
 										}
 									}
 								}
-								composable("about_libs"){
+								composable("about_libs") {
 									title = stringResource(id = R.string.preference_info_libraries)
 
 									val colors = libraryColors(
@@ -996,8 +978,9 @@ class SettingsActivity : BaseComposeActivity() {
 										colors = colors
 									)
 								}
-								composable("contributors"){
-									title = stringResource(id = R.string.preference_info_contributors)
+								composable("contributors") {
+									title =
+										stringResource(id = R.string.preference_info_contributors)
 
 									var userList by remember { mutableStateOf(listOf<GithubUser>()) }
 									val error = remember { mutableStateOf(true) }
@@ -1008,7 +991,10 @@ class SettingsActivity : BaseComposeActivity() {
 											.httpGet()
 											.awaitStringResult()
 											.fold({ data ->
-												userList = getJSON().decodeFromString<List<GithubUser>>(data)
+												userList =
+													getJSON().decodeFromString<List<GithubUser>>(
+														data
+													)
 												error.value = false
 											}, {
 												string = getString(R.string.loading_failed)
@@ -1016,31 +1002,62 @@ class SettingsActivity : BaseComposeActivity() {
 											})
 									}
 
-									if (!error.value){
-										LazyColumn(modifier = Modifier
-											.fillMaxHeight()
-											.padding(bottom = 48.dp)){
-											this.items(userList){
-												Contributor(githubUser = it)
+									if (!error.value) {
+										LazyColumn(
+											modifier = Modifier
+												.fillMaxHeight()
+												.padding(bottom = 48.dp)
+										) {
+											this.items(userList) {
+												Contributor(
+													githubUser = it,
+													onClick = { openUrl(it.html_url) })
 											}
 										}
 									} else {
-										Box(modifier = Modifier
-											.fillMaxWidth()
-											.height(68.dp)
-											.padding(start = 16.dp), Alignment.CenterStart)
+										Box(
+											modifier = Modifier
+												.fillMaxWidth()
+												.height(68.dp)
+												.padding(start = 16.dp), Alignment.CenterStart
+										)
 										{
 											Row() {
-												Icon(painter = painterResource(id = R.drawable.settings_about_contributor), contentDescription = "")
+												Icon(
+													painter = painterResource(id = R.drawable.settings_about_contributor),
+													contentDescription = ""
+												)
 												Spacer(modifier = Modifier.width(8.dp))
 												Text(text = string)
-												
+
 											}
 										}
 									}
 								}
 							}
 						}
+					}
+
+					dialogOpenUrl?.let { url ->
+						AlertDialog(
+							onDismissRequest = {
+								dialogOpenUrl = null
+							},
+							title = {
+								Text(text = stringResource(id = R.string.settings_dialog_url_open_title))
+							},
+							text = {
+								Column {
+									Text(text = stringResource(id = R.string.settings_dialog_url_open_text))
+									Text(text = url, modifier = Modifier.padding(top = 16.dp))
+								}
+							},
+							confirmButton = {
+								TextButton(onClick = { dialogOpenUrl = null }) {
+									Text(text = stringResource(id = R.string.all_close))
+								}
+							}
+						)
 					}
 				}
 			}
@@ -1050,25 +1067,35 @@ class SettingsActivity : BaseComposeActivity() {
 	@OptIn(ExperimentalComposeUiApi::class)
 	@Composable
 	fun Contributor(
-		githubUser: GithubUser
+		githubUser: GithubUser,
+		onClick: () -> Unit
 	) {
-		Box(modifier = Modifier
-			.fillMaxWidth()
-			.clickable {
-				startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(githubUser.html_url)))
-			}
-			.height(68.dp)
-			.padding(start = 16.dp), Alignment.CenterStart)
+		Box(
+			modifier = Modifier
+				.fillMaxWidth()
+				.clickable(onClick = onClick)
+				.height(68.dp)
+				.padding(start = 16.dp), Alignment.CenterStart
+		)
 		{
 			Row() {
-				AsyncImage(model = githubUser.avatar_url, contentDescription = "UserImage", //TODO: Extract string resource
+				AsyncImage(
+					model = githubUser.avatar_url,
+					contentDescription = "UserImage", //TODO: Extract string resource
 					Modifier
 						.height(48.dp)
-						.width(48.dp))
+						.width(48.dp)
+				)
 				Spacer(modifier = Modifier.width(8.dp))
 				Column() {
 					Text(text = githubUser.login, fontWeight = FontWeight.Bold)
-					Text(text = pluralStringResource(id = R.plurals.preferences_contributors_contributions, count = githubUser.contributions, githubUser.contributions))
+					Text(
+						text = pluralStringResource(
+							id = R.plurals.preferences_contributors_contributions,
+							count = githubUser.contributions,
+							githubUser.contributions
+						)
+					)
 				}
 			}
 		}
@@ -1081,7 +1108,7 @@ class SettingsActivity : BaseComposeActivity() {
 		enable: Boolean = false
 	) {
 		scope.launch {
-			val permissionGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+			val permissionGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 				(getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).isNotificationPolicyAccessGranted
 			} else true
 
