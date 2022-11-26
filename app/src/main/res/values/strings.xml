@@ -128,6 +128,7 @@
 	<string name="logindatainput_error_invalid_school">Invalid school ID!</string>
 	<string name="logindatainput_error_invalid_url">Invalid URL!</string>
 	<string name="logindatainput_key">Key or Password</string>
+	<string name="logindatainput_key_saved">Key or Password (saved)</string>
 	<string name="logindatainput_loading_user_data">Loading user data…</string>
 	<string name="logindatainput_login">Login</string>
 	<string name="logindatainput_profilename">Profile name (optional)</string>

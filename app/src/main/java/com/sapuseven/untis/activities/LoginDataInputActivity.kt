@@ -110,7 +110,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 				val schoolId = rememberSaveable { mutableStateOf(existingUser?.schoolId) }
 				val anonymous = rememberSaveable { mutableStateOf(existingUser?.anonymous) }
 				val username = rememberSaveable { mutableStateOf(existingUser?.user) }
-				val password = rememberSaveable { mutableStateOf(existingUser?.key) }
+				val password = rememberSaveable { mutableStateOf<String?>(null) }
 				val proxyUrl = rememberSaveable { mutableStateOf<String?>(null) }
 				val apiUrl = rememberSaveable { mutableStateOf(existingUser?.apiUrl) }
 				val skipAppSecret = rememberSaveable { mutableStateOf<Boolean?>(null) }
@@ -166,7 +166,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 
 				val schoolIdError = schoolId.value.isNullOrEmpty()
 				val usernameError = anonymous.value != true && username.value.isNullOrEmpty()
-				val passwordError = anonymous.value != true && password.value.isNullOrEmpty()
+				val passwordError = anonymous.value != true && existingUser?.key == null && password.value.isNullOrEmpty()
 				val proxyUrlError =
 					!proxyUrl.value.isNullOrEmpty() && !Patterns.WEB_URL.matcher(proxyUrl.value!!)
 						.matches()
@@ -182,7 +182,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 						LoginHelper(
 							loginData = LoginDataInfo(
 								username.value ?: "",
-								password.value ?: "",
+								password.value ?: existingUser?.key ?: "",
 								anonymous.value ?: false
 							),
 							proxyHost = proxyUrl.value,
@@ -421,7 +421,12 @@ class LoginDataInputActivity : BaseComposeActivity() {
 									InputField(
 										state = password,
 										type = KeyboardType.Password,
-										label = { Text(stringResource(id = R.string.logindatainput_key)) },
+										label = { Text(
+											if (existingUser?.key == null || password.value != null)
+												stringResource(id = R.string.logindatainput_key)
+											else
+												stringResource(id = R.string.logindatainput_key_saved)
+										) },
 										prefKey = PREFS_BACKUP_PASSWORD,
 										enabled = !loading,
 										error = validate && passwordError,
