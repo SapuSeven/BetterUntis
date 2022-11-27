@@ -11,11 +11,15 @@ import kotlinx.serialization.json.JsonDecoder
 
 @Serializable
 class UnknownObject(val jsonString: String?) {
+	@OptIn(ExperimentalSerializationApi::class)
 	@Serializer(forClass = UnknownObject::class)
 	companion object : KSerializer<UnknownObject> {
 		override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("UnknownObject", PrimitiveKind.STRING)
 
-		override fun serialize(encoder: Encoder, obj: UnknownObject) {}
+		@OptIn(ExperimentalSerializationApi::class)
+		override fun serialize(encoder: Encoder, value: UnknownObject) {
+			encoder.encodeNull()
+		}
 
 		override fun deserialize(decoder: Decoder): UnknownObject {
 			return UnknownObject((decoder as? JsonDecoder)?.decodeJsonElement().toString())
