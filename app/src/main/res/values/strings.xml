@@ -298,7 +298,7 @@
 	<string name="preferences_general">General</string>
 	<string name="preferences_info">About</string>
 	<string name="preferences_notifications">Notifications</string>
-	<string name="preferences_styling">Customization</string>
+	<string name="preferences_styling">Theme</string>
 	<string name="preferences_timetable">Timetable</string>
 	<string name="preferences_theme_color">Theme color</string>
 	<string name="preferences_theme_color_system">System theme color</string>
