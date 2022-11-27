@@ -16,7 +16,6 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
@@ -463,7 +462,7 @@ class MainActivity :
 											TimetableDatabaseInterface.Type.TEACHER -> R.drawable.all_teachers
 											TimetableDatabaseInterface.Type.SUBJECT -> R.drawable.all_subject
 											TimetableDatabaseInterface.Type.ROOM -> R.drawable.all_rooms
-											TimetableDatabaseInterface.Type.STUDENT -> R.drawable.all_prefs_personal
+											else -> R.drawable.all_prefs_personal
 										}
 									),
 									contentDescription = null
