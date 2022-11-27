@@ -82,7 +82,7 @@ class PeriodData(
 			TimetableDatabaseInterface.Type.TEACHER -> teachers
 			TimetableDatabaseInterface.Type.SUBJECT -> subjects
 			TimetableDatabaseInterface.Type.ROOM -> rooms
-			TimetableDatabaseInterface.Type.STUDENT -> hashSetOf()
+			else -> hashSetOf()
 		}
 
 	@Deprecated("Use getShort instead.")
