@@ -231,15 +231,15 @@ class SettingsActivity : BaseComposeActivity() {
 										}
 
 										PreferenceCategory(stringResource(R.string.preference_category_general_week_display)) {
+											WeekRangePickerPreference(
+												title = { Text(stringResource(R.string.preference_week_custom_range)) },
+												dataStore = dataStorePreferences.weekCustomRange
+											)
+
 											SwitchPreference(
 												title = { Text(stringResource(R.string.preference_week_snap_to_days)) },
 												summary = { Text(stringResource(R.string.preference_week_snap_to_days_summary)) },
 												dataStore = dataStorePreferences.weekSnapToDays
-											)
-
-											WeekRangePickerPreference(
-												title = { Text(stringResource(R.string.preference_week_custom_range)) },
-												dataStore = dataStorePreferences.weekCustomRange
 											)
 
 											SliderPreference(
@@ -247,6 +247,7 @@ class SettingsActivity : BaseComposeActivity() {
 												steps = 6,
 												title = { Text(stringResource(R.string.preference_week_display_length)) },
 												summary = { Text(stringResource(R.string.preference_week_display_length_summary)) },
+												dependency = dataStorePreferences.weekSnapToDays,
 												showSeekBarValue = true,
 												dataStore = dataStorePreferences.weekCustomLength
 											)

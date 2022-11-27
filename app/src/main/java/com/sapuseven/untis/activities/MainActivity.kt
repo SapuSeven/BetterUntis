@@ -1135,7 +1135,10 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 				}
 
 				scope.launch {
-					numberOfVisibleDays.collect {
+					numberOfVisibleDays.combine(snapToDays) { numberOfVisibleDaysValue, snapToDaysValue ->
+						// Ignore numberOfVisibleDays when snapping to weeks
+						if (snapToDaysValue) numberOfVisibleDaysValue else 0f
+					}.collect {
 						weekView.numberOfVisibleDays =
 							it.roundToInt().zeroToNull ?: weekView.weekLength
 					}
