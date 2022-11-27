@@ -334,6 +334,7 @@
     <string name="all_reload">Reload</string>
 	<string name="widget_disclaimer_title">Beta feature</string>
 	<string name="widget_disclaimer_text">The widget feature is still work-in-progress and may not work correctly on all devices.</string>
+	<string name="login_demo">Try it out!</string>
 
 	<plurals name="main_time_diff_minutes">
 		<item quantity="one">a minute ago</item>

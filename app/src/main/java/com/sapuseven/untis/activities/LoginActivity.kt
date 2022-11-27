@@ -27,6 +27,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import com.sapuseven.untis.R
+import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_DEMO_LOGIN
 import com.sapuseven.untis.activities.ScanCodeActivity.Companion.EXTRA_STRING_SCAN_RESULT
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.SCHOOL_SEARCH_URL
@@ -172,22 +173,45 @@ class LoginActivity : BaseComposeActivity() {
 								}
 							)
 							if (!searchMode)
-								TextButton(
-									onClick = {
-										loginLauncher.launch(
-											Intent(
-												this@LoginActivity,
-												LoginDataInputActivity::class.java
-											).apply {
-												putBackgroundColorExtra()
-											}
-										)
-									},
+								Row(
 									modifier = Modifier
-										.align(Alignment.CenterHorizontally)
-										.padding(vertical = dimensionResource(id = R.dimen.margin_login_input_vertical))
+										.fillMaxWidth()
+										.padding(
+											horizontal = dimensionResource(id = R.dimen.margin_login_input_horizontal),
+											vertical = dimensionResource(id = R.dimen.margin_login_input_vertical)
+										),
+									horizontalArrangement = Arrangement.SpaceBetween
 								) {
-									Text(text = stringResource(id = R.string.login_manual_data_input))
+									TextButton(
+										onClick = {
+											loginLauncher.launch(
+												Intent(
+													this@LoginActivity,
+													LoginDataInputActivity::class.java
+												).apply {
+													putBackgroundColorExtra()
+													putExtra(EXTRA_BOOLEAN_DEMO_LOGIN, true)
+												}
+											)
+										}
+									) {
+										Text(text = stringResource(id = R.string.login_demo))
+									}
+
+									TextButton(
+										onClick = {
+											loginLauncher.launch(
+												Intent(
+													this@LoginActivity,
+													LoginDataInputActivity::class.java
+												).apply {
+													putBackgroundColorExtra()
+												}
+											)
+										}
+									) {
+										Text(text = stringResource(id = R.string.login_manual_data_input))
+									}
 								}
 						}
 					}

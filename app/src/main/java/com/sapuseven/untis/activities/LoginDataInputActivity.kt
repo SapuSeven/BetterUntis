@@ -64,6 +64,9 @@ class LoginDataInputActivity : BaseComposeActivity() {
 		//private const val FRAGMENT_TAG_PROFILE_UPDATE = "profileUpdate"
 
 		const val EXTRA_BOOLEAN_PROFILE_UPDATE = "com.sapuseven.untis.activities.profileupdate"
+		const val EXTRA_BOOLEAN_DEMO_LOGIN = "com.sapuseven.untis.activities.demoLogin"
+
+		const val DEMO_API_URL = "https://api.sapuseven.com/untis/testing"
 
 		val PREFS_BACKUP_SCHOOLID = stringPreferencesKey("logindatainput_backup_schoolid")
 		val PREFS_BACKUP_ANONYMOUS = booleanPreferencesKey("logindatainput_backup_anonymous")
@@ -178,6 +181,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 					schoolIdError || usernameError || passwordError || proxyUrlError || apiUrlError
 
 				fun loadData() {
+					loading = true
 					coroutineScope.launch {
 						LoginHelper(
 							loginData = LoginDataInfo(
@@ -339,7 +343,6 @@ class LoginDataInputActivity : BaseComposeActivity() {
 								onClick = {
 									validate = true
 									if (!anyError) {
-										loading = true
 										snackbarHostState.currentSnackbarData?.dismiss()
 										loadData()
 									}
@@ -502,6 +505,15 @@ class LoginDataInputActivity : BaseComposeActivity() {
 							}
 						}
 					}
+
+				if (intent.getBooleanExtra(EXTRA_BOOLEAN_DEMO_LOGIN, false)) {
+					anonymous.value = true
+					schoolId.value = "demo"
+					advanced = true
+					apiUrl.value = DEMO_API_URL
+
+					loadData()
+				}
 			}
 		}
 	}

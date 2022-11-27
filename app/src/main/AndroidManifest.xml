@@ -59,6 +59,7 @@
 
 		<activity
 			android:name=".activities.LoginActivity"
+			android:windowSoftInputMode="adjustResize"
 			android:launchMode="singleTop" />
 
 		<activity
@@ -94,6 +95,7 @@
 		<activity
 			android:name=".activities.LoginDataInputActivity"
 			android:parentActivityName=".activities.LoginActivity"
+			android:windowSoftInputMode="adjustResize"
 			android:exported="true">
 
 			<meta-data
