@@ -1,12 +1,16 @@
 package com.sapuseven.untis.models
 
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 
 @Serializable
-data class TimetableBookmark(
-	val elementId: Int,
-	val elementType: String,
-	val displayName: String
+data class TimetableBookmark @OptIn(ExperimentalSerializationApi::class) constructor(
+	@JsonNames("classId") val elementId: Int,
+	@JsonNames("type") val elementType: String,
+	val displayName: String,
+	@EncodeDefault(EncodeDefault.Mode.NEVER) private val drawableId: Int = -1 // Unused, included for backwards compatibility
 ) {
 	override fun equals(other: Any?): Boolean {
 		if (this === other) return true
