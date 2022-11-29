@@ -28,7 +28,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -68,7 +67,8 @@ class SettingsActivity : BaseComposeActivity() {
 			"com.sapuseven.untis.activities.settings.highlight"
 
 		private const val URL_GITHUB_REPOSITORY = "https://github.com/SapuSeven/BetterUntis"
-		private const val URL_GITHUB_REPOSITORY_API = "https://api.github.com/repos/SapuSeven/BetterUntis"
+		private const val URL_GITHUB_REPOSITORY_API =
+			"https://api.github.com/repos/SapuSeven/BetterUntis"
 		private const val URL_WIKI_PROXY = "$URL_GITHUB_REPOSITORY/wiki/Proxy"
 	}
 
@@ -983,11 +983,12 @@ class SettingsActivity : BaseComposeActivity() {
 									)
 								}
 								composable("contributors") {
-									title = stringResource(id = R.string.preference_info_contributors)
+									title =
+										stringResource(id = R.string.preference_info_contributors)
 
 									var userList by remember { mutableStateOf(listOf<GithubUser>()) }
 									val error = remember { mutableStateOf(true) }
-									var string by remember { mutableStateOf(getString(R.string.loading)) }
+									var loadingText by remember { mutableStateOf(getString(R.string.loading)) }
 
 									scope.launch {
 										"$URL_GITHUB_REPOSITORY_API/contributors"
@@ -997,7 +998,7 @@ class SettingsActivity : BaseComposeActivity() {
 												userList = getJSON().decodeFromString(data)
 												error.value = false
 											}, {
-												string = getString(R.string.loading_failed)
+												loadingText = getString(R.string.loading_failed)
 												error.value = true
 											})
 									}
@@ -1015,22 +1016,17 @@ class SettingsActivity : BaseComposeActivity() {
 											}
 										}
 									} else {
-										Box(
-											modifier = Modifier
-												.fillMaxWidth()
-												.padding(start = 16.dp), Alignment.CenterStart
-										)
-										{
-											Row {
+										ListItem(
+											headlineText = {
+												Text(loadingText)
+											},
+											leadingContent = {
 												Icon(
 													painter = painterResource(id = R.drawable.settings_about_contributor),
 													contentDescription = ""
 												)
-												Spacer(modifier = Modifier.width(8.dp))
-												Text(text = string)
-
 											}
-										}
+										)
 									}
 								}
 							}
@@ -1063,41 +1059,34 @@ class SettingsActivity : BaseComposeActivity() {
 		}
 	}
 
-	@OptIn(ExperimentalComposeUiApi::class)
+	@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 	@Composable
 	fun Contributor(
 		githubUser: GithubUser,
 		onClick: () -> Unit
 	) {
-		Box(
-			modifier = Modifier
-				.fillMaxWidth()
-				.clickable(onClick = onClick)
-				.height(68.dp)
-				.padding(start = 16.dp), Alignment.CenterStart
-		)
-		{
-			Row {
+		ListItem(
+			modifier = Modifier.clickable(onClick = onClick),
+			headlineText = {
+				Text(githubUser.login)
+			},
+			supportingText = {
+				Text(
+					pluralStringResource(
+						id = R.plurals.preferences_contributors_contributions,
+						count = githubUser.contributions,
+						githubUser.contributions
+					)
+				)
+			},
+			leadingContent = {
 				AsyncImage(
 					model = githubUser.avatar_url,
 					contentDescription = "UserImage", //TODO: Extract string resource
-					Modifier
-						.height(48.dp)
-						.width(48.dp)
+					modifier = Modifier.size(48.dp)
 				)
-				Spacer(modifier = Modifier.width(8.dp))
-				Column {
-					Text(text = githubUser.login, fontWeight = FontWeight.Bold)
-					Text(
-						text = pluralStringResource(
-							id = R.plurals.preferences_contributors_contributions,
-							count = githubUser.contributions,
-							githubUser.contributions
-						)
-					)
-				}
 			}
-		}
+		)
 	}
 
 	private fun updateAutoMutePref(
