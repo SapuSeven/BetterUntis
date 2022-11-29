@@ -22,7 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -300,18 +299,11 @@ class SettingsActivity : BaseComposeActivity() {
 										}
 
 										// TODO: Extract string resources
-										PreferenceCategory("Error Reporting") {
+										PreferenceCategory("Analytics") {
 											SwitchPreference(
-												title = { Text("Enable additional error messages") },
-												summary = { Text("This is used for non-critical background errors") },
-												dataStore = dataStorePreferences.additionalErrorMessages
-											)
-
-											Preference(
-												title = { Text("View logged errors") },
-												summary = { Text("Crash logs and non-critical background errors") },
-												onClick = { /*TODO*/ },
-												dataStore = UntisPreferenceDataStore.emptyDataStore()
+												title = { Text("Send anonymous usage stats") },
+												summary = { Text("This helps to improve the application. Crash logs are always sent.") },
+												dataStore = dataStorePreferences.analyticsUsageStats
 											)
 										}
 									}

@@ -23,6 +23,7 @@ import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.helpers.analytics.initSentry
 import com.sapuseven.untis.helpers.config.globalDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.preferences.dataStorePreferences
@@ -31,10 +32,7 @@ import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.material.scheme.Scheme
 import com.sapuseven.untis.ui.theme.generateColorScheme
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.cancellable
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 
 @SuppressLint("Registered") // This activity is not intended to be used directly
 open class BaseComposeActivity : ComponentActivity() {
@@ -73,6 +71,13 @@ open class BaseComposeActivity : ComponentActivity() {
 		invalidContent: @Composable () -> Unit = { InvalidProfileDialog() },
 		content: @Composable (UserDatabase.User) -> Unit
 	) {
+		val prefs = dataStorePreferences
+		rememberCoroutineScope().launch {
+			prefs.analyticsUsageStats.getValueFlow().collect { enableUsageStats ->
+				initSentry(enableUsageStats)
+			}
+		}
+
 		user?.let {
 			content(it)
 		} ?: run {

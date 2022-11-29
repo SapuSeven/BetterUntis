@@ -22,6 +22,8 @@ android {
 		versionName "3.5.1"
 		vectorDrawables.useSupportLibrary = true
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+		buildConfigField "String", "SENTRY_DSN", "https://d3b77222abce4fcfa74fda2185e0f8dc@o1136770.ingest.sentry.io/6188900"
 	}
 
 	signingConfigs {
@@ -79,7 +81,6 @@ android {
 	}
 
 	compileOptions {
-
 		coreLibraryDesugaringEnabled true
 
 		sourceCompatibility JavaVersion.VERSION_1_8
@@ -135,7 +136,7 @@ dependencies {
 	implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
 	implementation "com.google.accompanist:accompanist-pager-indicators:$accompanist_version"
     implementation 'androidx.work:work-runtime-ktx:2.7.1'
-	implementation 'io.sentry:sentry-android:5.7.3'
+	implementation 'io.sentry:sentry-android:6.8.0'
 	implementation 'io.coil-kt:coil-compose:2.2.2'
 	implementation "com.mikepenz:aboutlibraries-compose:$latestAboutLibsRelease"
 	implementation "com.mikepenz:aboutlibraries-core:$latestAboutLibsRelease"
