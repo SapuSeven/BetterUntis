@@ -3,6 +3,7 @@ package com.sapuseven.untis.activities
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.*
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -98,10 +99,10 @@ class SettingsActivity : BaseComposeActivity() {
 					var dialogOpenUrl by remember { mutableStateOf<String?>(null) }
 
 					fun openUrl(url: String) {
-						val intent = Intent(
-							Intent.ACTION_VIEW,
-							Uri.parse(url)
-						)
+						val intent = Intent(ACTION_VIEW, Uri.parse(url)).apply {
+							addCategory(CATEGORY_BROWSABLE)
+							flags = FLAG_ACTIVITY_NEW_TASK
+						}
 
 						if (intent.resolveActivity(packageManager) != null) {
 							startActivity(intent)
