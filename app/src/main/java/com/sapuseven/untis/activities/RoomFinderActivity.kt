@@ -31,7 +31,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.RoomFinderActivity.Companion.EXTRA_INT_ROOM_ID
+import com.sapuseven.untis.activities.MainActivity.Companion.EXTRA_SERIALIZABLE_PERIOD_ELEMENT
 import com.sapuseven.untis.activities.RoomFinderState.Companion.ROOM_STATE_FREE
 import com.sapuseven.untis.activities.RoomFinderState.Companion.ROOM_STATE_OCCUPIED
 import com.sapuseven.untis.data.databases.RoomFinderDatabase
@@ -58,10 +58,6 @@ import java.lang.ref.WeakReference
 import java.util.*
 
 class RoomFinderActivity : BaseComposeActivity() {
-	companion object {
-		const val EXTRA_INT_ROOM_ID = "com.sapuseven.untis.activities.roomid"
-	}
-
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
@@ -561,8 +557,8 @@ class RoomFinderState constructor(
 	fun onRoomListItemClick(item: RoomStatusData) {
 		contextActivity.setResult(
 			Activity.RESULT_OK, Intent().putExtra(
-				EXTRA_INT_ROOM_ID,
-				item.periodElement.id
+				EXTRA_SERIALIZABLE_PERIOD_ELEMENT,
+				item.periodElement
 			)
 		)
 		contextActivity.finish()

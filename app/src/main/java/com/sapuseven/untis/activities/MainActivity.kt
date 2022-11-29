@@ -14,6 +14,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
@@ -109,6 +110,8 @@ class MainActivity :
 
 	companion object {
 		private const val MESSENGER_PACKAGE_NAME = "com.untis.chat"
+
+		const val EXTRA_SERIALIZABLE_PERIOD_ELEMENT = "com.sapuseven.untis.activities.main.element"
 	}
 
 	private val weekViewRefreshHandler = Handler(Looper.getMainLooper())
@@ -120,16 +123,6 @@ class MainActivity :
 			weekViewRefreshHandler.postDelayed(this, 60 * 1000)
 		}
 	}*/
-
-	private val shortcutLauncher =
-		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-			// TODO: Look at it.data for potential actions (e.g. show a specific timetable)
-		}
-
-	private val settingsLauncher =
-		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-			// TODO: Look at it.data for potential actions (e.g. show a specific timetable)
-		}
 
 	private val loginLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -242,7 +235,7 @@ class MainActivity :
 
 										Button(
 											onClick = {
-												settingsLauncher.launch(
+												startActivity(
 													Intent(
 														this@MainActivity,
 														SettingsActivity::class.java
@@ -409,6 +402,16 @@ class MainActivity :
 			)
 		}
 
+		val shortcutLauncher =
+			rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
+				val periodElement: PeriodElement? =
+					activityResult.data?.getSerializable(EXTRA_SERIALIZABLE_PERIOD_ELEMENT)
+
+				periodElement?.let {
+					onShowTimetable(it to timetableDatabaseInterface.getLongName(it))
+				}
+			}
+
 		BackHandler(enabled = appState.drawerState.isOpen) {
 			scope.launch {
 				appState.drawerState.close()
@@ -525,7 +528,7 @@ class MainActivity :
 						},
 						onShortcutClick = { item ->
 							appState.closeDrawer()
-							if (item.id == 2) {
+							if (item.target == null) {
 								try {
 									startActivity(
 										packageManager.getLaunchIntentForPackage(
@@ -550,20 +553,16 @@ class MainActivity :
 									}
 								}
 							} else {
-								if (item.target != null) {
-									shortcutLauncher.launch(
-										Intent(
-											this@MainActivity,
-											item.target
-										).apply {
-											putUserIdExtra()
-											putBackgroundColorExtra()
-										}
-									)
-								}
+								shortcutLauncher.launch(
+									Intent(
+										this@MainActivity,
+										item.target
+									).apply {
+										putUserIdExtra()
+										putBackgroundColorExtra()
+									}
+								)
 							}
-
-
 						}
 					)
 				}
@@ -1031,9 +1030,11 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		}
 	}
 
-	private fun convertDateTimeToWeekIndex(date: LocalDate) = date.year * 100 + date.dayOfYear.floorDiv(7) + 1
+	private fun convertDateTimeToWeekIndex(date: LocalDate) =
+		date.year * 100 + date.dayOfYear.floorDiv(7) + 1
 
-	private fun convertWeekIndexToDateTime(weekIndex: Int) = DateTime.now().withYear(weekIndex.floorDiv(100)).withDayOfYear(weekIndex % 100 * 7)
+	private fun convertWeekIndexToDateTime(weekIndex: Int) =
+		DateTime.now().withYear(weekIndex.floorDiv(100)).withDayOfYear(weekIndex % 100 * 7)
 
 	private fun onRefresh() {
 		displayedElement.value?.let { element ->
@@ -1066,7 +1067,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 		scope.launch {
 			personalTimetableFlow.collect { customTimetable ->
-				if (user.anonymous || customTimetable != ""){
+				if (user.anonymous || customTimetable != "") {
 					val element = decodeStoredTimetableValue(customTimetable)
 					val previousElement = personalTimetable?.first
 					personalTimetable =

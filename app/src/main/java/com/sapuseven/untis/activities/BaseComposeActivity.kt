@@ -1,7 +1,6 @@
 package com.sapuseven.untis.activities
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -31,7 +30,6 @@ import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.material.scheme.Scheme
 import com.sapuseven.untis.ui.theme.generateColorScheme
-import com.sapuseven.untis.ui.theme.toColorScheme
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.combine
@@ -228,7 +226,7 @@ open class BaseComposeActivity : ComponentActivity() {
 		}
 	}
 
-	fun setSystemUiColor(
+	private fun setSystemUiColor(
 		systemUiController: SystemUiController,
 		color: Color = Color.Transparent,
 		darkIcons: Boolean = color.luminance() > 0.5f
@@ -270,5 +268,13 @@ open class BaseComposeActivity : ComponentActivity() {
 		color?.let {
 			this.putExtra(EXTRA_INT_BACKGROUND_COLOR, color.toArgb())
 		}
+	}
+
+	inline fun <reified T : java.io.Serializable> Intent.getSerializable(key: String): T? = when {
+		Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> getSerializableExtra(
+			key,
+			T::class.java
+		)
+		else -> @Suppress("DEPRECATION") getSerializableExtra(key) as? T
 	}
 }

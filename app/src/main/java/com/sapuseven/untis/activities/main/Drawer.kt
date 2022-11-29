@@ -55,7 +55,7 @@ fun DrawerItems(
 			InfoCenterActivity::class.java
 		),
 		NavItemShortcut(
-			id = 3,
+			id = 2,
 			icon = painterResource(id = R.drawable.all_search_rooms),
 			label = stringResource(id = R.string.activity_title_free_rooms),
 			RoomFinderActivity::class.java
@@ -70,7 +70,7 @@ fun DrawerItems(
 	if (isMessengerAvailable) {
 		navItemsShortcuts = navItemsShortcuts.plus(
 			NavItemShortcut(
-				id = 2,
+				id = 3,
 				icon = painterResource(id = R.drawable.all_messenger),
 				label = stringResource(id = R.string.activity_title_messenger),
 				null
