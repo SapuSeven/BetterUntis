@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.core.content.ContextCompat
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_DEMO_LOGIN
@@ -140,7 +141,8 @@ class LoginActivity : BaseComposeActivity() {
 								Text(
 									text = stringResource(id = R.string.login_welcome),
 									style = MaterialTheme.typography.headlineLarge,
-									modifier = Modifier.align(Alignment.CenterHorizontally)
+									textAlign = TextAlign.Center,
+									modifier = Modifier.fillMaxWidth()
 								)
 							}
 						else
