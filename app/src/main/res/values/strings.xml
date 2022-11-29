@@ -199,6 +199,7 @@
 	<string name="preference_background_regular">Regular lessons</string>
 	<string name="preference_background_regular_past">Past regular lessons</string>
 	<string name="preference_category_connectivity_proxy">WebUntis Proxy</string>
+	<string name="preference_category_display_options">Display Options</string>
 	<string name="preference_category_general_automute">Auto-Mute</string>
 	<string name="preference_category_general_behaviour">Behaviour</string>
 	<string name="preference_category_general_week_display">Week Display Settings</string>
@@ -280,7 +281,7 @@
 	<string name="preference_timetable_lesson_info_font_size">Font size for lesson infos</string>
 	<string name="preference_timetable_lesson_name_font_size">Font size for lesson name</string>
 	<string name="preference_timetable_personal_timetable">Custom Personal Timetable</string>
-	<string name="preference_timetable_range">Hours to display</string>
+	<string name="preference_timetable_range">Hour range to display</string>
 	<string name="preference_timetable_range_desc">Hours %1$d to %2$d</string>
 	<string name="preference_timetable_range_index_reset">Reset lesson numbering</string>
 	<string name="preference_timetable_substitutions_irregular">Detect irregular lessons</string>

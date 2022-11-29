@@ -520,7 +520,7 @@ class SettingsActivity : BaseComposeActivity() {
 											dataStore = dataStorePreferences.timetableBackgroundIrregular
 										)
 
-										PreferenceCategory(stringResource(id = R.string.preference_category_timetable_range)) {
+										PreferenceCategory(stringResource(id = R.string.preference_category_display_options)) {
 											RangeInputPreference(
 												title = { Text(stringResource(R.string.preference_timetable_range)) },
 												dataStore = dataStorePreferences.timetableRange
