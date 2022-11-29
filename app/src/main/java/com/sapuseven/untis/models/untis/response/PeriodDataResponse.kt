@@ -23,7 +23,7 @@ data class UntisStudent(
 		val firstName: String,
 		val lastName: String
 ) {
-	fun fullName(): String = "$lastName $firstName"
+	fun fullName(): String = "$firstName $lastName"
 }
 
 @Serializable

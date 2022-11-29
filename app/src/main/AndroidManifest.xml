@@ -1,14 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
 	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
 	package="com.sapuseven.untis">
 
 	<uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+	<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.CAMERA" />
-	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+	<uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+
+	<queries>
+		<package android:name="com.untis.chat" />
+
+		<intent>
+			<action android:name="android.intent.action.VIEW" />
+			<category android:name="android.intent.category.BROWSABLE" />
+			<data android:scheme="https" />
+		</intent>
+	</queries>
 
 	<application
+		android:name=".activities.App"
 		android:allowBackup="true"
 		android:fullBackupContent="@xml/backup_descriptor"
 		android:icon="@mipmap/ic_launcher"
@@ -23,9 +36,9 @@
 
 		<activity
 			android:name=".activities.ShortcutConfigureActivity"
-			android:exported="false"
 			android:icon="@mipmap/ic_shortcut"
-			android:label="@string/widget_timetable_link">
+			android:label="@string/widget_timetable_link"
+			android:exported="true">
 
 			<intent-filter>
 				<category android:name="android.intent.category.DEFAULT" />
@@ -34,9 +47,9 @@
 		</activity>
 
 		<activity
-			android:name=".activities.BaseWidgetConfigureActivity"
-			android:exported="true"
-			android:label="@string/widget_configuration">
+			android:name=".activities.ElementPickerWidgetConfigureActivity"
+			android:label="@string/widget_configuration"
+			android:exported="true">
 
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
@@ -45,9 +58,8 @@
 
 		<activity
 			android:name=".activities.MainActivity"
-			android:exported="true"
 			android:launchMode="singleTop"
-			android:theme="@style/AppTheme.Launcher.NoActionBar">
+			android:exported="true">
 
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
@@ -58,6 +70,7 @@
 
 		<activity
 			android:name=".activities.LoginActivity"
+			android:windowSoftInputMode="adjustResize"
 			android:launchMode="singleTop" />
 
 		<activity
@@ -92,9 +105,9 @@
 
 		<activity
 			android:name=".activities.LoginDataInputActivity"
-			android:exported="true"
 			android:parentActivityName=".activities.LoginActivity"
-			android:windowSoftInputMode="adjustResize">
+			android:windowSoftInputMode="adjustResize"
+			android:exported="true">
 
 			<meta-data
 				android:name="android.support.PARENT_ACTIVITY"
@@ -122,30 +135,14 @@
 				android:value=".activities.MainActivity" />
 		</activity>
 
-		<activity
-			android:name=".activities.ErrorsActivity"
-			android:label="@string/activity_title_errors" />
-
-		<receiver
-			android:name=".receivers.StartupReceiver"
-			android:exported="true">
-			<intent-filter>
-				<action android:name="android.intent.action.BOOT_COMPLETED" />
-			</intent-filter>
-		</receiver>
-
-		<receiver android:name=".receivers.NotificationSetup" />
-
 		<receiver android:name=".receivers.NotificationReceiver" />
-
-		<receiver android:name=".receivers.AutoMuteSetup" />
 
 		<receiver android:name=".receivers.AutoMuteReceiver" />
 
 		<receiver
-			android:name=".widgets.TimetableWidget"
-			android:exported="true"
-			android:label="@string/widget_timetable">
+			android:name=".widgets.TimetableWidgetReceiver"
+			android:label="@string/widget_timetable"
+			android:exported="true">
 
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -157,9 +154,9 @@
 		</receiver>
 
 		<receiver
-			android:name=".widgets.MessagesWidget"
-			android:exported="true"
-			android:label="@string/widget_daily_messages">
+			android:name=".widgets.MessagesWidgetReceiver"
+			android:label="@string/widget_daily_messages"
+			android:exported="true">
 
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -170,8 +167,10 @@
 				android:resource="@xml/widget_info" />
 		</receiver>
 
-		<service
-			android:name=".widgets.WidgetRemoteViewsService"
-			android:permission="android.permission.BIND_REMOTEVIEWS" />
+		<provider
+			android:name="androidx.startup.InitializationProvider"
+			android:authorities="${applicationId}.androidx-startup"
+			tools:node="remove">
+		</provider>
 	</application>
 </manifest>

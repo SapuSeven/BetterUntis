@@ -2,6 +2,7 @@ package com.sapuseven.untis.data.connectivity
 
 import android.net.Uri
 import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.coroutines.awaitStringResult
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
@@ -15,12 +16,16 @@ import java.io.UnsupportedEncodingException
 import java.net.URISyntaxException
 
 class UntisRequest {
-	suspend fun request(query: UntisRequestQuery): Result<String, FuelError> {
+	fun requestSynchronously(query: UntisRequestQuery): Request {
 		return query.getUri().toString().httpPost()
-				.header(mapOf("Content-Type" to "application/json; charset=UTF-8"))
-				.body(getJSON().encodeToString(query.data))
-				.awaitStringResult()
+			.header(mapOf("Content-Type" to "application/json; charset=UTF-8"))
+			.body(getJSON().encodeToString(query.data))
 	}
+
+	suspend fun request(query: UntisRequestQuery): Result<String, FuelError> {
+		return requestSynchronously(query).awaitStringResult()
+	}
+
 
 	class UntisRequestQuery(val user: UserDatabase.User? = null, apiUrl: String? = null) {
 		var url = apiUrl ?: user?.apiUrl ?: user?.schoolId?.let {

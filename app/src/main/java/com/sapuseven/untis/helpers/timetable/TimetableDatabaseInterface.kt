@@ -10,17 +10,21 @@ import com.sapuseven.untis.models.untis.masterdata.Teacher
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import java.io.Serializable
 
-class TimetableDatabaseInterface(@Transient val database: UserDatabase, id: Long) : Serializable {
+class TimetableDatabaseInterface(@Transient val database: UserDatabase, @Transient val id: Long) : Serializable {
 	private var allClasses: Map<Int, Klasse> = mapOf()
 	private var allTeachers: Map<Int, Teacher> = mapOf()
 	private var allSubjects: Map<Int, Subject> = mapOf()
 	private var allRooms: Map<Int, Room> = mapOf()
 
-	enum class Type {
-		CLASS,
-		TEACHER,
-		SUBJECT,
-		ROOM
+	enum class Type(val id: Int) {
+		CLASS(1),
+		TEACHER(2),
+		SUBJECT(3),
+		ROOM(4),
+		STUDENT(5),
+		LEGAL_GUARDIAN(12),
+		PARENT(15),
+		APPRENTICE_REPRESENTATIVE(21)
 	}
 
 	init {
@@ -40,13 +44,30 @@ class TimetableDatabaseInterface(@Transient val database: UserDatabase, id: Long
 		} ?: ELEMENT_NAME_UNKNOWN
 	}
 
+	fun getShortName(id: Int, type: String?): String {
+		return getShortName(id, type?.let { Type.valueOf(it) })
+	}
+
+	fun getShortName(periodElement: PeriodElement): String {
+		return getShortName(periodElement.id, periodElement.type)
+	}
+
 	fun getLongName(id: Int, type: Type): String {
 		return when (type) {
 			Type.CLASS -> allClasses[id]?.longName
-			Type.TEACHER -> allTeachers[id]?.firstName + " " + allTeachers[id]?.lastName
+			Type.TEACHER -> allTeachers[id]?.run { "$firstName $lastName" }
 			Type.SUBJECT -> allSubjects[id]?.longName
 			Type.ROOM -> allRooms[id]?.longName
-		} ?: ""
+			else -> null
+		} ?: ELEMENT_NAME_UNKNOWN
+	}
+
+	fun getLongName(id: Int, type: String): String {
+		return getLongName(id, Type.valueOf(type))
+	}
+
+	fun getLongName(periodElement: PeriodElement): String {
+		return getLongName(periodElement.id, periodElement.type)
 	}
 
 	fun isAllowed(id: Int, type: Type?): Boolean {
@@ -57,6 +78,14 @@ class TimetableDatabaseInterface(@Transient val database: UserDatabase, id: Long
 			Type.ROOM -> allRooms[id]?.displayAllowed
 			else -> null
 		} ?: false
+	}
+
+	fun isAllowed(id: Int, type: String): Boolean {
+		return isAllowed(id, Type.valueOf(type))
+	}
+
+	fun isAllowed(periodElement: PeriodElement): Boolean {
+		return isAllowed(periodElement.id, periodElement.type)
 	}
 
 	private fun tableModelToPeriodElement(values: Collection<TableModel>): List<PeriodElement> {
@@ -77,6 +106,7 @@ class TimetableDatabaseInterface(@Transient val database: UserDatabase, id: Long
 			Type.TEACHER -> allTeachers[element.id]?.compareTo(other)
 			Type.SUBJECT -> allSubjects[element.id]?.compareTo(other)
 			Type.ROOM -> allRooms[element.id]?.compareTo(other)
+			else -> null
 		} == 0
 	}
 

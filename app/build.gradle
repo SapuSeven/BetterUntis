@@ -3,17 +3,23 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlinx-serialization'
+apply plugin:  'com.mikepenz.aboutlibraries.plugin'
+
+// Auto-generates a new version code every minute
+static def generateVersionCode() {
+	return (new Date().getTime() / 1000 / 60).toInteger()
+}
 
 android {
-	compileSdkVersion 31
-	buildToolsVersion '31.0.0'
+	compileSdkVersion 33
+	buildToolsVersion '33.0.0'
 
 	defaultConfig {
 		applicationId "com.sapuseven.untis"
 		minSdkVersion 21
-		targetSdkVersion 31
-		versionCode 33
-		versionName "3.5.0"
+		targetSdkVersion 33
+		versionCode generateVersionCode()
+		versionName "3.5.1"
 		vectorDrawables.useSupportLibrary = true
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 	}
@@ -68,17 +74,28 @@ android {
 		}
 	}
 
+	buildFeatures {
+		compose true
+	}
+
 	compileOptions {
+
+		coreLibraryDesugaringEnabled true
+
 		sourceCompatibility JavaVersion.VERSION_1_8
 		targetCompatibility JavaVersion.VERSION_1_8
+	}
+
+	composeOptions {
+		kotlinCompilerExtensionVersion '1.3.0-beta01'
 	}
 
 	kotlinOptions {
 		jvmTarget = JavaVersion.VERSION_1_8.toString()
 	}
 
-	lintOptions {
-		disable "MissingTranslation"
+	lint {
+		disable 'MissingTranslation'
 	}
 }
 
@@ -88,33 +105,55 @@ dependencies {
 	implementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
 	implementation "org.jetbrains.kotlinx:kotlinx-serialization-cbor:$serialization_version"
 	implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization_version"
-	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.8-1.4.0-rc"
-	implementation 'androidx.appcompat:appcompat:1.1.0'
-	implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta8'
-	implementation 'androidx.fragment:fragment-ktx:1.2.4'
-	implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
+	implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+	implementation 'androidx.appcompat:appcompat:1.4.2'
+	implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+	implementation 'androidx.fragment:fragment-ktx:1.5.0'
+	implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.0'
 	implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01'
-	implementation 'androidx.recyclerview:recyclerview:1.1.0'
-	implementation "androidx.preference:preference-ktx:1.1.1"
-	implementation "com.github.kittinunf.fuel:fuel:2.2.3"
-	implementation "com.github.kittinunf.fuel:fuel-coroutines:2.2.3"
-	implementation "joda-time:joda-time:2.10.6"
-	implementation 'com.google.android.material:material:1.2.0-alpha04' //Newer versions will break DatePickerDialog
-	implementation 'com.jaredrummler:colorpicker-compat:1.0.5'
-	implementation 'com.github.cesarferreira:MaterialComponent.Banner:0.13.0'
+	implementation 'androidx.recyclerview:recyclerview:1.2.1'
+	implementation 'androidx.preference:preference-ktx:1.2.0'
+	implementation 'com.github.kittinunf.fuel:fuel:2.3.1'
+	implementation 'com.github.kittinunf.fuel:fuel-coroutines:2.3.1'
+	implementation 'joda-time:joda-time:2.10.14'
+	implementation 'com.google.android.material:material:1.7.0-alpha03'
 	implementation 'com.budiyev.android:code-scanner:2.1.0'
-	implementation 'ca.antonious:materialdaypicker:0.6.0'
+	implementation 'com.github.ajalt.colormath:colormath:3.2.0'
+	implementation 'androidx.activity:activity-compose:1.5.0'
+	implementation "androidx.compose.animation:animation:$compose_version"
+	implementation "androidx.compose.ui:ui:$compose_version"
+	implementation "androidx.compose.ui:ui-tooling:$compose_version"
+	implementation 'androidx.compose.material3:material3:1.0.0-alpha15'
+	implementation 'androidx.glance:glance-appwidget:1.0.0-alpha05'
+	implementation 'androidx.navigation:navigation-compose:2.5.0'
+	implementation 'androidx.datastore:datastore-preferences:1.0.0'
+	implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0'
+	implementation 'com.google.android.material:material:1.6.1'
+	implementation 'com.google.android.material:compose-theme-adapter:1.1.14'
+	implementation "com.google.accompanist:accompanist-swiperefresh:$accompanist_version"
+	implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
+	implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
+	implementation "com.google.accompanist:accompanist-pager-indicators:$accompanist_version"
+    implementation 'androidx.work:work-runtime-ktx:2.7.1'
 	implementation 'io.sentry:sentry-android:5.7.3'
-	testImplementation 'junit:junit:4.13'
-	testImplementation 'org.mockito:mockito-core:4.1.0'
-	androidTestImplementation 'androidx.test:runner:1.3.0'
-	androidTestImplementation 'androidx.test:rules:1.3.0'
-	androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-	androidTestImplementation 'org.hamcrest:hamcrest-library:1.3'
-	androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-	androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.3.0'
+	implementation 'io.coil-kt:coil-compose:2.2.2'
+	implementation "com.mikepenz:aboutlibraries-compose:$latestAboutLibsRelease"
+	implementation "com.mikepenz:aboutlibraries-core:$latestAboutLibsRelease"
+
+	coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
+
+	testImplementation 'junit:junit:4.13.2'
+	testImplementation 'org.mockito:mockito-core:4.6.1'
+	testImplementation 'org.hamcrest:hamcrest:2.2'
+	testImplementation 'org.hamcrest:hamcrest-library:2.2'
+	androidTestImplementation 'androidx.test:runner:1.4.0'
+	androidTestImplementation 'androidx.test:rules:1.4.0'
+	androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+	androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+	androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.4.0'
 	androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
-	androidTestImplementation 'tools.fastlane:screengrab:2.0.0'
+	androidTestImplementation 'tools.fastlane:screengrab:2.1.1'
 
 	implementation project(':weekview')
+	implementation project(':material-color-utils')
 }

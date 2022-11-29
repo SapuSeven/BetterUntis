@@ -2,10 +2,11 @@ package com.sapuseven.untis.models
 
 import android.content.ContentValues
 import android.database.Cursor
+import android.provider.BaseColumns
+import com.sapuseven.untis.data.databases.RoomfinderDatabaseContract
 
 data class RoomFinderItem(
 		val id: Int,
-		val name: String,
 		val states: List<Boolean>
 ) {
 	companion object {
@@ -15,9 +16,8 @@ data class RoomFinderItem(
 
 		fun parseCursor(cursor: Cursor): RoomFinderItem {
 			return RoomFinderItem(
-					cursor.getInt(cursor.getColumnIndex("id")),
-					cursor.getString(cursor.getColumnIndex("name")),
-					parseStateListFromString(cursor.getString(cursor.getColumnIndex("states")))
+					cursor.getInt(cursor.getColumnIndex(BaseColumns._ID)),
+					parseStateListFromString(cursor.getString(cursor.getColumnIndex(RoomfinderDatabaseContract.COLUMN_NAME_STATES)))
 			)
 		}
 	}
@@ -25,9 +25,8 @@ data class RoomFinderItem(
 	fun generateValues(): ContentValues {
 		val values = ContentValues()
 
-		values.put("id", id)
-		values.put("name", name)
-		values.put("states", states.joinToString("") { if (it) "1" else "0" })
+		values.put(BaseColumns._ID, id)
+		values.put(RoomfinderDatabaseContract.COLUMN_NAME_STATES, states.joinToString("") { if (it) "1" else "0" })
 
 		return values
 	}

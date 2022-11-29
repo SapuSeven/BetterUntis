@@ -27,7 +27,7 @@ class WeekView<T>(
 		View(context, attrs),
 		WeekViewGestureHandler.Listener,
 		WeekViewViewState.UpdateListener {
-	private val config: WeekViewConfig = WeekViewConfig(context, attrs)
+	val config: WeekViewConfig = WeekViewConfig(context, attrs)
 	private val data: WeekViewData<T> = WeekViewData()
 
 	private val viewState: WeekViewViewState = WeekViewViewState()
@@ -238,6 +238,13 @@ class WeekView<T>(
 			invalidate()
 		}
 
+	var endTimeOffset: Int
+		get() = config.endTimeOffset
+		set(endTimeOffset) {
+			config.endTimeOffset = endTimeOffset
+			invalidate()
+		}
+
 	var horizontalFlingEnabled: Boolean
 		get() = config.horizontalFlingEnabled
 		set(horizontalFlingEnabled) {
@@ -251,6 +258,8 @@ class WeekView<T>(
 			config.snapToWeek = snapToWeek
 			invalidate()
 		}
+
+	var onMotionEvent: ((MotionEvent) -> Unit)? = null
 
 	init {
 		gestureHandler = WeekViewGestureHandler(context, this, config, data)
@@ -357,8 +366,7 @@ class WeekView<T>(
 
 	private fun calculateWidthPerDay() {
 		// Calculate the available width for each day
-		config.drawConfig.widthPerDay = width - config.drawConfig.timeColumnWidth
-		config.drawConfig.widthPerDay = config.drawConfig.widthPerDay / config.visibleDays
+		config.drawConfig.widthPerDay = (width - config.drawConfig.timeColumnWidth + config.drawConfig.daySeparatorPaint.strokeWidth) / config.visibleDays
 	}
 
 	private fun clipEventsRect(canvas: Canvas) {
@@ -385,6 +393,7 @@ class WeekView<T>(
 
 	@SuppressLint("ClickableViewAccessibility")
 	override fun onTouchEvent(event: MotionEvent): Boolean {
+		onMotionEvent?.invoke(event)
 		return gestureHandler.onTouchEvent(event)
 	}
 
@@ -408,7 +417,7 @@ class WeekView<T>(
 		gestureHandler.forceScrollFinished()
 
 		if (viewState.areDimensionsInvalid) {
-			viewState.scrollToDay = date
+			viewState.scrollToDay = date.withTimeAtStartOfDay()
 			return
 		}
 
@@ -416,7 +425,7 @@ class WeekView<T>(
 		val offsetInWeek = DateUtils.offsetInWeek(today, config.firstDayOfWeek)
 		val firstDay = today.minusDays(offsetInWeek)
 
-		val dayDiff = DateUtils.displayedDays(Days.daysBetween(firstDay, date).days, config.weekLength).toDouble()
+		val dayDiff = DateUtils.displayedDays(Days.daysBetween(firstDay, date.withTimeAtStartOfDay()).days, config.weekLength).toDouble()
 		val weekDiff = dayDiff / config.weekLength.toDouble()
 
 		val leftOriginCount = floor(if (config.snapToWeek) weekDiff else dayDiff - offsetInWeek)
@@ -434,6 +443,7 @@ class WeekView<T>(
 
 			gestureHandler.scroller.startScroll(startX, config.drawConfig.currentOrigin.y.toInt(), distanceX, 0, duration)
 			gestureHandler.listener.onScrolled()
+			viewState.scrollToDay = null
 		}
 
 		invalidate()
@@ -459,7 +469,7 @@ class WeekView<T>(
 			return
 		}
 
-		var verticalOffset = config.hourHeight * min(hour.toFloat(), config.hoursPerDay()).toInt()
+		var verticalOffset = (config.hourHeight * min(hour.toFloat(), config.hoursPerDay()) + config.endTimeOffset).toInt()
 
 		val dayHeight = config.totalDayHeight
 		val viewHeight = height.toDouble()

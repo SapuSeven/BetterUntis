@@ -31,7 +31,7 @@
     <string name="logindatainput_school">Ikastetxearen izena edo IDa</string>
     <string name="logindatainput_error_invalid_school">Ikastetxearen ID baliogabea!</string>
     <string name="login_search_by_school_name_or_address">Bilatu ikastetxearen izenaren edo helbidearen arabera</string>
-    <string name="logindatainput_error_generic">Errorea: %1$s</string>
+    <string name="all_error_details">Errorea: %1$s</string>
     <string name="logindatainput_error_field_empty">Eremu hau ezin da hutsik egon!</string>
     <string name="logindatainput_delete">Ezabatu profila</string>
     <string name="logindatainput_data_loaded">Datuak kargatu dira.</string>
@@ -142,13 +142,10 @@
     <string name="notifications_text_error_title">Ezin izan da ordutegia kargatu</string>
     <string name="notifications_channel_breakinfo_desc">Uneko atsedenaldiari eta hurrengo eskolari buruzko informazioa erakusten du</string>
     <string name="notifications_channel_breakinfo">Atsedenaren informazioa</string>
-    <string name="settings_designing_info">Informazio gehiago</string>
-    <string name="settings_designing_hide">Ez erakutsi berriro</string>
-    <string name="settings_designing_message">Lagundu ezarpenen ikonoak sortuz!</string>
     <string name="preferences_timetable">Ordutegiak</string>
     <string name="preferences_styling">Pertsonalizazioa</string>
     <string name="preferences_notifications">Jakinarazpenak</string>
-    <string name="preferences_infos">Honi buruz</string>
+    <string name="preferences_info">Honi buruz</string>
     <string name="preferences_general">Orokorra</string>
     <string name="preferences_connectivity">Konektagarritasuna</string>
     <string name="preference_week_snap_to_days_summary">asteak beharrean</string>
@@ -229,7 +226,6 @@
     <string name="preference_dark_theme_on">Beti piztuta</string>
     <string name="preference_dark_theme_oled_desc">Erabilgarria OLED pantailetarako</string>
     <string name="preference_dark_theme_off">Beti itzalita</string>
-    <string name="preference_dark_theme_auto">Gaitu bateria gutxirekin</string>
     <string name="preference_dark_theme">Gai iluna</string>
     <string name="preference_connectivity_refresh_in_background">Freskatu ordutegia beti</string>
     <string name="preference_connectivity_proxy_host">Proxy zerbitzariaren ostalaria</string>

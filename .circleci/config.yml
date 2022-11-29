@@ -1,11 +1,10 @@
-version: 2
+version: 2.1
 jobs:
   build:
     working_directory: ~/betteruntis
     docker:
-      - image: cimg/android:2022.03
-    environment:
-      JVM_OPTS: -Xmx3200m
+      - image: cimg/android:2022.06.1
+    resource_class: large
     steps:
       - checkout
       - restore_cache:
@@ -27,7 +26,7 @@ jobs:
             echo 'export KEY_RELEASE_PASSWORD=$(echo "$KEY_RELEASE_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
       - run:
           name: Initial build
-          command: ./gradlew clean assemble bundle
+          command: ./gradlew --no-daemon clean assemble bundle
       - store_artifacts:
           name: Upload build artifacts
           path: app/build/outputs
@@ -95,6 +94,10 @@ jobs:
     docker:
       - image: cimg/ruby:3.1.2
     working_directory: ~/betteruntis
+    parameters:
+      track:
+        type: string
+        default: 'beta'
     steps:
       - checkout
       - restore_cache:
@@ -109,10 +112,10 @@ jobs:
       - attach_workspace:
           at: workspace
       - run:
-          name: Deploy to Play Store Beta track
+          name: Deploy to Play Store testing track
           command: |
             echo $GOOGLE_PLAY_KEY_ENCODED | base64 --decode > fastlane/key.json
-            bundle exec fastlane deploy aab:'workspace/outputs/bundle/release/app-release.aab'
+            bundle exec fastlane deploy aab:'workspace/outputs/bundle/release/app-release.aab' track:<<parameters.track>>
 
 workflows:
   version: 2
@@ -146,3 +149,11 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
+      - deploy_fastlane:
+          name: deploy_fastlane_material3
+          requires:
+            - build
+          filters:
+            branches:
+              only: 287-material-design-3
+          track: 'material-3'

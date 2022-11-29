@@ -38,9 +38,6 @@
     <string name="notifications_channel_backgrounderrors">Erreurs d’arrière-plan</string>
     <string name="notifications_channel_breakinfo_desc">Affiche des infos à propos de la pause actuelle et sur le cours suivant</string>
     <string name="notifications_channel_breakinfo">Infos sur la pause</string>
-    <string name="settings_designing_info">En savoir plus</string>
-    <string name="settings_designing_hide">Ne plus afficher</string>
-    <string name="settings_designing_message">Contribuez en créant les icônes de réglage manquantes !</string>
     <string name="preference_week_snap_to_days_summary">à la place des semaines</string>
     <string name="preference_week_snap_to_days">Défilement journalier</string>
     <string name="preference_week_display_length_summary">Définir à 0 pour utiliser la longueur de la semaine</string>
@@ -113,7 +110,6 @@
     <string name="preference_dark_theme_oled_desc">Utile pour les écrans OLED</string>
     <string name="preference_dark_theme_oled">Utiliser un arrière-plan totalement noir</string>
     <string name="preference_dark_theme_off">Toujours désactivé</string>
-    <string name="preference_dark_theme_auto">Activer quand la batterie est faible</string>
     <string name="preference_dark_theme">Thème sombre</string>
     <string name="preference_connectivity_refresh_in_background_desc">Désactiver pour enregistrer des données avec des mises à jour moins fréquentes</string>
     <string name="preference_connectivity_refresh_in_background">Toujours rafraîchir l’emploi du temps</string>
@@ -147,7 +143,7 @@
     <string name="preferences_timetable">Emploi du temps</string>
     <string name="preferences_styling">Personnalisation</string>
     <string name="preferences_notifications">Notifications</string>
-    <string name="preferences_infos">À propos</string>
+    <string name="preferences_info">À propos</string>
     <string name="preferences_connectivity">Connectivité</string>
     <string name="elementpicker_hint_search_rooms">Rechercher des salles…</string>
     <string name="elementpicker_hint_search_teachers">Rechercher des enseignants…</string>
@@ -192,7 +188,7 @@
     <string name="logindatainput_aquiring_app_secret">Acquisition du secret de l’appli…</string>
     <string name="logindatainput_data_loaded">Données chargées.</string>
     <string name="logindatainput_error_invalid_school">Identifiant de l’école invalide !</string>
-    <string name="logindatainput_error_generic">Erreur : %1$s</string>
+    <string name="all_error_details">Erreur : %1$s</string>
     <string name="logindatainput_error_field_empty">Ce champ ne peut pas être vide !</string>
     <string name="logindatainput_anonymous_login">Connexion anonyme</string>
     <string name="logindatainput_login">Se connecter</string>

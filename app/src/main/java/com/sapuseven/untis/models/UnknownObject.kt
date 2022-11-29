@@ -2,9 +2,7 @@ package com.sapuseven.untis.models
 
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Serializer
+import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -14,12 +12,15 @@ import kotlinx.serialization.json.JsonDecoder
 
 @Serializable
 class UnknownObject(val jsonString: String?) {
+	@OptIn(ExperimentalSerializationApi::class)
 	@Serializer(forClass = UnknownObject::class)
 	companion object : KSerializer<UnknownObject> {
-		override val descriptor: SerialDescriptor =
-			PrimitiveSerialDescriptor("UnknownObject", PrimitiveKind.STRING)
+		override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("UnknownObject", PrimitiveKind.STRING)
 
-		override fun serialize(encoder: Encoder, value: UnknownObject) {}
+		@OptIn(ExperimentalSerializationApi::class)
+		override fun serialize(encoder: Encoder, value: UnknownObject) {
+			encoder.encodeNull()
+		}
 
 		override fun deserialize(decoder: Decoder): UnknownObject {
 			return UnknownObject((decoder as? JsonDecoder)?.decodeJsonElement().toString())

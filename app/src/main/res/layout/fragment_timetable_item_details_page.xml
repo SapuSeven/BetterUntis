@@ -17,7 +17,7 @@
 			android:layout_marginTop="24dp"
 			android:layout_marginBottom="8dp"
 			android:contentDescription="@null"
-			android:tint="?attr/colorAccent"
+			app:tint="?attr/colorAccent"
 			app:srcCompat="@drawable/all_subject" />
 
 		<TextView
@@ -58,8 +58,8 @@
 				android:layout_marginEnd="24dp"
 				android:layout_marginBottom="12dp"
 				android:contentDescription="@string/all_teachers"
-				android:tint="?android:attr/textColorPrimary"
-				app:srcCompat="@drawable/all_teacher" />
+				app:srcCompat="@drawable/all_teachers"
+				app:tint="?android:attr/textColorPrimary" />
 
 			<HorizontalScrollView
 				android:layout_width="match_parent"
@@ -89,7 +89,7 @@
 				android:layout_marginEnd="24dp"
 				android:layout_marginBottom="12dp"
 				android:contentDescription="@string/all_classes"
-				android:tint="?android:attr/textColorPrimary"
+				app:tint="?android:attr/textColorPrimary"
 				app:srcCompat="@drawable/all_classes" />
 
 			<HorizontalScrollView
@@ -120,7 +120,7 @@
 				android:layout_marginEnd="24dp"
 				android:layout_marginBottom="12dp"
 				android:contentDescription="@string/all_rooms"
-				android:tint="?android:attr/textColorPrimary"
+				app:tint="?android:attr/textColorPrimary"
 				app:srcCompat="@drawable/all_rooms" />
 
 			<HorizontalScrollView

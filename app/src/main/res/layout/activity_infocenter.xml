@@ -29,7 +29,6 @@
 
 	<com.google.android.material.bottomnavigation.BottomNavigationView
 		android:id="@+id/bottomnavigationview_infocenter"
-		style="@style/Widget.MaterialComponents.BottomNavigationView.Colored"
 		android:layout_width="0dp"
 		android:layout_height="wrap_content"
 		app:layout_constraintBottom_toBottomOf="parent"

@@ -4,51 +4,94 @@ import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import androidx.annotation.AttrRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import com.google.android.material.color.DynamicColors
 import com.sapuseven.untis.R
-import com.sapuseven.untis.helpers.config.PreferenceManager
-import com.sapuseven.untis.helpers.config.PreferenceUtils
+import com.sapuseven.untis.helpers.ErrorLogger
+import com.sapuseven.untis.helpers.config.PreferenceHelper
+import java.io.File
 
 @SuppressLint("Registered") // This activity is not intended to be used directly
 open class BaseActivity : AppCompatActivity() {
+	protected var hasOwnToolbar: Boolean = false
 	protected var currentTheme: String = ""
 	private var currentDarkTheme: String = ""
-	protected lateinit var preferences: PreferenceManager
-	protected var hasOwnToolbar: Boolean = false
 
-	private var themeId = -1
+	protected lateinit var preferences: PreferenceHelper
 
 	override fun onCreate(savedInstanceState: Bundle?) {
-		if (!::preferences.isInitialized) preferences = PreferenceManager(this)
-		currentTheme = PreferenceUtils.getPrefString(preferences, "preference_theme")
-		currentDarkTheme = PreferenceUtils.getPrefString(preferences, "preference_dark_theme")
+		ErrorLogger.initialize(this)
+
+		Thread.setDefaultUncaughtExceptionHandler(CrashHandler(Thread.getDefaultUncaughtExceptionHandler()))
+
+		preferences = PreferenceHelper(this)
+		preferences.loadSavedProfile()
+
+		currentTheme = preferences["preference_theme"]
+		currentDarkTheme = preferences["preference_dark_theme"]
 		setAppTheme(hasOwnToolbar)
 		super.onCreate(savedInstanceState)
+		DynamicColors.applyToActivitiesIfAvailable(application);
+	}
+
+	/**
+	 * Checks for saved crashes. Calls [onErrorLogFound] if logs are found.
+	 *
+	 * @return `true` if the logs contain a critical application crash, `false` otherwise
+	 */
+	protected fun checkForCrashes(): Boolean {
+		val logFiles = File(filesDir, "logs").listFiles()
+		if (logFiles?.isNotEmpty() == true) {
+			onErrorLogFound()
+
+			return logFiles.find { f -> f.name.startsWith("_") } != null
+		}
+		return false
+	}
+
+	/**
+	 * Gets called if any error logs are found.
+	 *
+	 * Override this function in your actual activity.
+	 */
+	open fun onErrorLogFound() {
+		return
+	}
+
+	protected fun readCrashData(crashFile: File): String {
+		val reader = crashFile.bufferedReader()
+
+		val stackTrace = StringBuilder()
+		val buffer = CharArray(1024)
+		var length = reader.read(buffer)
+
+		while (length != -1) {
+			stackTrace.append(String(buffer, 0, length))
+			length = reader.read(buffer)
+		}
+
+		return stackTrace.toString()
 	}
 
 	override fun onStart() {
 		super.onStart()
-		setBlackBackground(PreferenceUtils.getPrefBool(preferences, "preference_dark_theme_oled"))
+		setBlackBackground(preferences["preference_dark_theme_oled"])
 	}
 
 	override fun onResume() {
 		super.onResume()
-		val theme = PreferenceUtils.getPrefString(preferences, "preference_theme")
-		val darkTheme = PreferenceUtils.getPrefString(preferences, "preference_dark_theme")
+		val theme: String = preferences["preference_theme"]
+		val darkTheme: String = preferences["preference_dark_theme"]
 
 		if (currentTheme != theme || currentDarkTheme != darkTheme)
 			recreate()
 
 		currentTheme = theme
 		currentDarkTheme = darkTheme
-	}
-
-	override fun setTheme(resid: Int) {
-		super.setTheme(resid)
-		themeId = resid
 	}
 
 	private fun setAppTheme(hasOwnToolbar: Boolean) {
@@ -61,15 +104,14 @@ open class BaseActivity : AppCompatActivity() {
 			"pixel" -> setTheme(if (hasOwnToolbar) R.style.AppTheme_ThemePixel_NoActionBar else R.style.AppTheme_ThemePixel)
 			else -> setTheme(if (hasOwnToolbar) R.style.AppTheme_NoActionBar else R.style.AppTheme)
 		}
-		delegate.localNightMode = when (PreferenceUtils.getPrefString(
-			preferences,
-			"preference_dark_theme",
-			currentDarkTheme
-		)) {
-			"on" -> AppCompatDelegate.MODE_NIGHT_YES
-			"auto" -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
-			else -> AppCompatDelegate.MODE_NIGHT_NO
-		}
+
+		AppCompatDelegate.setDefaultNightMode(
+			when (preferences["preference_dark_theme", currentDarkTheme]) {
+				"on" -> AppCompatDelegate.MODE_NIGHT_YES
+				"off" -> AppCompatDelegate.MODE_NIGHT_NO
+				else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+			}
+		)
 	}
 
 	private fun setBlackBackground(blackBackground: Boolean) {
@@ -89,5 +131,18 @@ open class BaseActivity : AppCompatActivity() {
 		val typedValue = TypedValue()
 		theme.resolveAttribute(attr, typedValue, true)
 		return typedValue.data
+	}
+
+	private class CrashHandler(private val defaultUncaughtExceptionHandler: Thread.UncaughtExceptionHandler?) :
+		Thread.UncaughtExceptionHandler {
+		override fun uncaughtException(t: Thread, e: Throwable) {
+			Log.e("BetterUntis", "Application crashed!", e)
+			saveCrash(e)
+			defaultUncaughtExceptionHandler?.uncaughtException(t, e)
+		}
+
+		private fun saveCrash(e: Throwable) {
+			ErrorLogger.instance?.logThrowable(e)
+		}
 	}
 }

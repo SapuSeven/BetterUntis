@@ -54,13 +54,10 @@
     <string name="notifications_channel_backgrounderrors">Greške u pozadini</string>
     <string name="notifications_channel_breakinfo_desc">Prikazuje podatke o trenutačnoj pauzi i sljedećem satu nastave</string>
     <string name="notifications_channel_breakinfo">Podaci pauze</string>
-    <string name="settings_designing_info">Saznaj više</string>
-    <string name="settings_designing_hide">Nemoj više prikazivati</string>
-    <string name="settings_designing_message">Doprinesi stvaranjem ikona postavki koje nedostaju!</string>
     <string name="preferences_timetable">Raspored sati</string>
     <string name="preferences_styling">Prilagođavanje</string>
     <string name="preferences_notifications">Obavještavanja</string>
-    <string name="preferences_infos">Informacije</string>
+    <string name="preferences_info">Informacije</string>
     <string name="preferences_general">Opće</string>
     <string name="preferences_connectivity">Povezanost</string>
     <string name="preference_week_snap_to_days_summary">umjesto po tjednima</string>
@@ -137,7 +134,6 @@
     <string name="preference_dark_theme_oled_desc">Korisno za OLED-ekrane</string>
     <string name="preference_dark_theme_oled">Koristi potpuno crnu pozadinu</string>
     <string name="preference_dark_theme_off">Uvijek isključeno</string>
-    <string name="preference_dark_theme_auto">Aktiviraj kad je baterija slaba</string>
     <string name="preference_dark_theme">Tamna tema</string>
     <string name="preference_connectivity_refresh_in_background_desc">Deaktiviraj spremanje podataka s rjeđim aktualiziranjima rasporeda sati</string>
     <string name="preference_connectivity_refresh_in_background">Uvijek aktualiziraj raspored sati</string>
@@ -192,7 +188,7 @@
     <string name="logindatainput_key">Ključ ili lozinka</string>
     <string name="logindatainput_error_invalid_url">Neispravan URL!</string>
     <string name="logindatainput_error_invalid_school">Neispravna ID oznaka škole!</string>
-    <string name="logindatainput_error_generic">Greška: %1$s</string>
+    <string name="all_error_details">Greška: %1$s</string>
     <string name="logindatainput_error_field_empty">Ovo polje ne smije biti prazno!</string>
     <string name="logindatainput_delete">Izbriši profil</string>
     <string name="logindatainput_data_loaded">Podaci su učitani.</string>
