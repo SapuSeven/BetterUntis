@@ -99,15 +99,7 @@ import java.util.*
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-class MainActivity :
-	BaseComposeActivity()/*,
-		NavigationView.OnNavigationItemSelectedListener,
-		WeekViewLoader.PeriodChangeListener<TimegridItem>,
-		EventClickListener<TimegridItem>,
-		TopLeftCornerClickListener,
-		TimetableDisplay,
-		TimetableItemDetailsFragment.TimetableItemDetailsDialogListener*/ {
-
+class MainActivity : BaseComposeActivity() {
 	companion object {
 		private const val MESSENGER_PACKAGE_NAME = "com.untis.chat"
 
@@ -136,8 +128,6 @@ class MainActivity :
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
-		//setupNotifications()
-
 		setContent {
 			AppTheme(navBarInset = false) {
 				val snackbarHostState = remember { SnackbarHostState() }
@@ -147,7 +137,6 @@ class MainActivity :
 				withUser(
 					invalidContent = { login() }
 				) { user ->
-					/*weekView.setOnCornerClickListener(this)*/
 					val appState =
 						rememberMainAppState(
 							user = user,
@@ -318,33 +307,12 @@ class MainActivity :
 				}
 			}
 		}
-
-		/*if (checkForCrashes()) {
-			startActivityForResult(Intent(this, ErrorsActivity::class.java).apply {
-				putExtra(ErrorsActivity.EXTRA_BOOLEAN_SHOW_CRASH_MESSAGE, true)
-			}, REQUEST_CODE_ERRORS)
-		} else {
-			setupActionBar()
-			setupNavDrawer()
-
-			setupViews()
-			setupHours()
-			setupHolidays()
-
-			setupTimetableLoader()
-			if (!checkShortcut()) showPersonalTimetable()
-			refreshNavigationViewSelection()
-		}*/
 	}
 
 	@Composable
 	private fun WeekViewCompose(appState: MainAppState) {
 		var weekViewGlobal by remember { mutableStateOf(appState.weekView.value) }
 		appState.loadWeekViewPreferences(weekViewGlobal, dataStorePreferences)
-
-
-
-
 
 		AndroidView(
 			factory = { context ->
@@ -1390,50 +1358,36 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 			config.apply {
 				with(currentDensity) {
-					daySeparatorColor =
-						colorScheme.outline.copy(alpha = outlineAlpha)
-							.toArgb()
+					daySeparatorColor = colorScheme.outline.copy(alpha = outlineAlpha).toArgb()
 					defaultEventColor = colorScheme.primary.toArgb()
 					eventMarginVertical = 4.dp.roundToPx()
 					eventPadding = 4.dp.roundToPx()
 					headerRowBackgroundColor = Color.Transparent.toArgb()
 					headerRowPadding = 8.dp.roundToPx()
-					headerRowSecondaryTextColor =
-						colorScheme.onSurfaceVariant.toArgb()
+					headerRowSecondaryTextColor = colorScheme.onSurfaceVariant.toArgb()
 					headerRowSecondaryTextSize = 12.sp.toPx()
-					headerRowTextColor =
-						colorScheme.onSurface.toArgb()
+					headerRowTextColor = colorScheme.onSurface.toArgb()
 					headerRowTextSize = 18.sp.toPx()
 					headerRowTextSpacing = 10.dp.roundToPx()
-					holidayTextColor =
-						colorScheme.onSurface.toArgb()
+					holidayTextColor = colorScheme.onSurface.toArgb()
 					holidayTextSize = 16.sp.toPx()
 					hourHeight = 72.dp.roundToPx()
-					hourSeparatorColor =
-						colorScheme.outline.copy(alpha = outlineAlpha)
-							.toArgb()
+					hourSeparatorColor = colorScheme.outline.copy(alpha = outlineAlpha).toArgb()
 					nowLineStrokeWidth = 2.dp.toPx()
 					scrollDuration = 100
 					showHourSeparator = true
 					showNowLine = true
 					timeColumnBackground = Color.Transparent.toArgb()
-					timeColumnCaptionColor =
-						colorScheme.onSurface.toArgb()
+					timeColumnCaptionColor = colorScheme.onSurface.toArgb()
 					timeColumnCaptionSize = 16.sp.toPx()
 					timeColumnPadding = 4.dp.roundToPx()
-					timeColumnTextColor =
-						colorScheme.onSurfaceVariant.toArgb()
+					timeColumnTextColor = colorScheme.onSurfaceVariant.toArgb()
 					timeColumnTextSize = 12.sp.toPx()
-					todayHeaderTextColor =
-						colorScheme.primary.toArgb()
+					todayHeaderTextColor = colorScheme.primary.toArgb()
 					topLeftCornerDrawable =
-						AppCompatResources.getDrawable(
-							context,
-							R.drawable.all_calendar_adjusted
-						)
+						AppCompatResources.getDrawable(context, R.drawable.all_calendar_adjusted)
 					topLeftCornerPadding = 4.dp.roundToPx()
-					topLeftCornerTint =
-						colorScheme.onSurface.toArgb()
+					topLeftCornerTint = colorScheme.onSurface.toArgb()
 				}
 			}
 
@@ -1493,8 +1447,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		lastRefreshTimestamp.value = weeklyTimetableItems[currentWeekIndex.value]?.lastUpdated ?: 0
 	}
 
-	fun restoreWeekViewScrollPosition() {
-		Log.d("MainActivity", "WeekView Week Index: ${currentWeekIndex.value}")
+	private fun restoreWeekViewScrollPosition() {
 		if (currentWeekIndex.value % 100 > 0)
 			weekView.value?.goToDate(convertWeekIndexToDateTime(currentWeekIndex.value))
 	}
