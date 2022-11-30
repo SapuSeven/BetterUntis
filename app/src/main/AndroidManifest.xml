@@ -10,6 +10,10 @@
 	<uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
 	<queries>
+		<!--Add those packages for opening GitHub links in the two most popular GitHub viewers for android-->
+		<package android:name="com.github.android" />
+		<package android:name="com.gh4a" />
+		<!--Untis Messenger package-->
 		<package android:name="com.untis.chat" />
 
 		<intent>
