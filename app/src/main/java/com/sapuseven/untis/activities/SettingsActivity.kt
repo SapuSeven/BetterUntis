@@ -101,7 +101,7 @@ class SettingsActivity : BaseComposeActivity() {
 					fun openUrl(url: String) {
 						val intent = Intent(ACTION_VIEW, Uri.parse(url)).apply {
 							addCategory(CATEGORY_BROWSABLE)
-							flags = FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_REQUIRE_NON_BROWSER
+							flags = FLAG_ACTIVITY_NEW_TASK
 						}
 
 						if (intent.resolveActivity(packageManager) != null) {
