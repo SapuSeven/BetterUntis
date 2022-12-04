@@ -397,7 +397,7 @@ class MainActivity : BaseComposeActivity() {
 				) {
 					Spacer(modifier = Modifier.height(24.dp))
 
-					DrawerText("Favourites")
+					DrawerText(stringResource(id = R.string.all_favourites))
 
 					NavigationDrawerItem(
 						icon = {
@@ -484,7 +484,7 @@ class MainActivity : BaseComposeActivity() {
 						modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 					)
 
-					DrawerText("Timetables")
+					DrawerText(stringResource(id = R.string.nav_all_timetables))
 
 					DrawerItems(
 						isMessengerAvailable = appState.isMessengerAvailable,
