@@ -2,7 +2,9 @@
 <resources>
     <string name="app_desc">Eine alternative App für das Untis-Stundenplansystem.</string>
     <string name="all_success">erfolgreich</string>
-    <string name="all_failed">fehlgeschlagen</string>
+	<string name="all_exam">Klausur</string>
+	<string name="all_exit">Verlassen</string>
+	<string name="all_failed">fehlgeschlagen</string>
     <string name="all_personal">Persönlich</string>
     <string name="all_subjects">Fächer</string>
     <string name="all_teachers">Lehrer</string>
@@ -16,14 +18,16 @@
     <string name="all_no">Nein</string>
     <string name="all_close">Schließen</string>
     <string name="all_cancel">Abbrechen</string>
-    <string name="all_error">Fehler</string>
+	<string name="all_edit">Bearbeiten</string>
+	<string name="all_error">Fehler</string>
     <string name="all_report">Melden</string>
     <string name="all_add">Hinzufügen</string>
     <string name="all_delete">Löschen</string>
     <string name="all_reset">Zurücksetzen</string>
     <string name="all_back">Zurück</string>
     <string name="all_lesson_details">Stundendetails</string>
-    <string name="all_lesson_cancelled">%1$s (entfällt)</string>
+	<string name="all_homework">Hausaufgaben</string>
+	<string name="all_lesson_cancelled">%1$s (entfällt)</string>
     <string name="all_lesson_irregular">%1$s (irregulär)</string>
     <string name="all_lesson_exam">%1$s (Klausur!)</string>
     <string name="all_dialog_datepicker_button_today">Heute</string>
@@ -72,14 +76,19 @@
     <string name="logindatainput_connecting">Verbindung wird hergestellt…</string>
     <string name="logindatainput_login">Anmelden</string>
     <string name="logindatainput_anonymous_login">Anonyme Anmeldung</string>
-    <string name="logindatainput_error_field_empty">Dieses Feld darf nicht leer sein!</string>
+	<string name="logindatainput_dialog_qrcodeinvalid_text">Der gescannte QR-Code hat ein ungültiges Format, oder wird
+		nicht von BetterUntis unterstützt.
+	</string>
+	<string name="logindatainput_dialog_qrcodeinvalid_title">Ungültiger QR-Code</string>
+	<string name="logindatainput_error_field_empty">Dieses Feld darf nicht leer sein!</string>
     <string name="all_error_details">Fehler: %1$s</string>
     <string name="logindatainput_error_invalid_school">Ungültige Schul-ID!</string>
     <string name="logindatainput_error_invalid_format">Ungültiges Format!</string>
     <string name="logindatainput_data_loaded">Daten erfolgreich geladen.</string>
     <string name="logindatainput_aquiring_app_secret">Lade App-Secret…</string>
     <string name="logindatainput_aquiring_schoolid">Lade Schule…</string>
-    <string name="logindatainput_loading_user_data">Lade Benutzerdaten…</string>
+	<string name="logindatainput_key_saved">Zugriffsschlüssel oder Passwort (gespeichert)</string>
+	<string name="logindatainput_loading_user_data">Lade Benutzerdaten…</string>
     <string name="logindatainput_adding_user_unknown_error">Beim Hinzufügen des Benutzers trat ein unbekannter Fehler auf.</string>
     <string name="logindatainput_title_add">Profil hinzufügen</string>
     <string name="logindatainput_title_edit">Profil bearbeiten</string>
@@ -115,7 +124,9 @@
     <string name="infocenter_events_empty">Keine Termine</string>
     <string name="infocenter_absences_empty">Keine Abwesenheiten</string>
     <string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
-    <string name="infocenter_absence_unknown_reason">Unbekannter Grund</string>
+	<string name="infocenter_absence_excused">Entschuldigt</string>
+	<string name="infocenter_absence_unexcused">Unentschuldigt</string>
+	<string name="infocenter_absence_unknown_reason">Unbekannter Grund</string>
     <string name="elementpicker_hint_search">Suchen…</string>
     <string name="elementpicker_hint_search_classes">Klassen durchsuchen…</string>
     <string name="elementpicker_hint_search_teachers">Lehrer durchsuchen…</string>
@@ -263,7 +274,12 @@
     <string name="errors_button_report">Alle melden</string>
     <string name="loading">Wird geladen</string>
     <string name="loading_failed">Ladevorgang fehlgeschlagen</string>
-    <string name="widget_configuration">Widget-Konfiguration</string>
+	<string name="settings_dialog_url_open_title">Keine kompatible App gefunden</string>
+	<string name="settings_dialog_url_open_text">BetterUntis konnte keine App finden, die mit dem Öffnen von Links
+		umgehen kann. Bitte stellen Sie sicher, dass Sie einen Webbrowser installiert haben oder öffnen Sie den Link auf
+		einem anderen Gerät:
+	</string>
+	<string name="widget_configuration">Widget-Konfiguration</string>
     <string name="widget_timetable">Stundenplan</string>
     <string name="widget_timetable_empty">Kein Stundenplan für heute verfügbar</string>
     <string name="widget_daily_messages">Tagesnachrichten</string>
@@ -302,8 +318,11 @@
     <string name="all_hint_tap_to_edit">(Durch Tippen hinzufügen)</string>
     <string name="all_dialog_crash_copied">Absturzprotokoll wurde in die Zwischenablage kopiert.</string>
     <string name="all_dialog_crash_title">Absturzprotokoll gefunden</string>
-    <string name="all_lessontopic_none">(Kein Lehrstoff)</string>
+	<string name="all_lessontopic_edit">Lehrstof bearbeiten</string>
+	<string name="all_lessontopic_none">(Kein Lehrstoff)</string>
     <string name="main_dialog_itemdetails_timeformat">%1$s - %2$s</string>
     <string name="main_dialog_delete_bookmark">Dieses Lesezeichen löschen?</string>
-    <string name="maindrawer_bookmarks_add">Stundenplan hinzufügen</string>
+	<string name="mainactivitydrawer_profile_edit">Profile bearbeiten</string>
+	<string name="maindrawer_bookmarks_add">Stundenplan hinzufügen</string>
+	<string name="all_favourites">Favoriten</string>
 </resources>
