@@ -78,7 +78,7 @@ fun BaseComposeActivity.ProfileManagementDialog(
 		) {
 			item {
 				ListItem(
-					headlineText = { Text("Tap on a profile to edit") },
+					headlineText = { Text(stringResource(R.string.mainactivitydrawer_profile_edit_hint)) },
 					leadingContent = {
 						Icon(
 							imageVector = Icons.Outlined.Info,
