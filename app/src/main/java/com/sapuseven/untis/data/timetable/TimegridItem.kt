@@ -16,17 +16,17 @@ class TimegridItem(
 	init {
 		periodData.setup()
 
-		title = periodData.getShort(periodData.subjects, TimetableDatabaseInterface.Type.SUBJECT)
+		title = periodData.getShort(TimetableDatabaseInterface.Type.SUBJECT)
 		top =
 				if (contextType == TimetableDatabaseInterface.Type.TEACHER.name)
-					periodData.getShortSpanned(periodData.classes, TimetableDatabaseInterface.Type.CLASS, includeOrgIds)
+					periodData.getShortSpanned(TimetableDatabaseInterface.Type.CLASS, includeOrgIds = includeOrgIds)
 				else
-					periodData.getShortSpanned(periodData.teachers, TimetableDatabaseInterface.Type.TEACHER, includeOrgIds)
+					periodData.getShortSpanned(TimetableDatabaseInterface.Type.TEACHER, includeOrgIds = includeOrgIds)
 		bottom =
 				if (contextType == TimetableDatabaseInterface.Type.ROOM.name)
-					periodData.getShortSpanned(periodData.classes, TimetableDatabaseInterface.Type.CLASS, includeOrgIds)
+					periodData.getShortSpanned(TimetableDatabaseInterface.Type.CLASS, includeOrgIds = includeOrgIds)
 				else
-					periodData.getShortSpanned(periodData.rooms, TimetableDatabaseInterface.Type.ROOM, includeOrgIds)
+					periodData.getShortSpanned(TimetableDatabaseInterface.Type.ROOM, includeOrgIds = includeOrgIds)
 
 		hasIndicator = !periodData.element.homeWorks.isNullOrEmpty()
 				|| periodData.element.text.lesson.isNotEmpty()

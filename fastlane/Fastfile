@@ -12,7 +12,7 @@ platform :android do
   lane :deploy do |options|
     if options[:aab]
       upload_to_play_store(
-        track: 'beta',
+        track: options.fetch(:track, 'beta'),
         aab: options[:aab],
         skip_upload_metadata: 'true',
         skip_upload_images: 'true',

@@ -1,39 +1,78 @@
 package com.sapuseven.untis.activities
 
+import android.Manifest
+import android.app.AlarmManager
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
+import android.content.Intent.*
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.work.WorkManager
+import coil.compose.AsyncImage
+import com.github.kittinunf.fuel.coroutines.awaitStringResult
+import com.github.kittinunf.fuel.httpGet
+import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.flowlayout.MainAxisAlignment
+import com.mikepenz.aboutlibraries.Libs
+import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
+import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults.libraryColors
+import com.mikepenz.aboutlibraries.util.withJson
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
+import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.helpers.SerializationUtils.getJSON
+import com.sapuseven.untis.models.github.GithubUser
 import com.sapuseven.untis.preferences.PreferenceCategory
 import com.sapuseven.untis.preferences.PreferenceScreen
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
 import com.sapuseven.untis.preferences.dataStorePreferences
+import com.sapuseven.untis.receivers.AutoMuteReceiver
+import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_BOOLEAN_MUTE
 import com.sapuseven.untis.ui.functional.bottomInsets
+import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.preferences.*
+import com.sapuseven.untis.workers.AutoMuteSetupWorker
+import com.sapuseven.untis.workers.NotificationSetupWorker
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
 
 class SettingsActivity : BaseComposeActivity() {
 	companion object {
 		const val EXTRA_STRING_PREFERENCE_ROUTE = "com.sapuseven.untis.activities.settings.route"
-		const val EXTRA_STRING_PREFERENCE_HIGHLIGHT = "com.sapuseven.untis.activities.settings.highlight"
+		const val EXTRA_STRING_PREFERENCE_HIGHLIGHT =
+			"com.sapuseven.untis.activities.settings.highlight"
 
 		private const val URL_GITHUB_REPOSITORY = "https://github.com/SapuSeven/BetterUntis"
+		private const val URL_GITHUB_REPOSITORY_API =
+			"https://api.github.com/repos/SapuSeven/BetterUntis"
 		private const val URL_WIKI_PROXY = "$URL_GITHUB_REPOSITORY/wiki/Proxy"
 	}
 
@@ -42,14 +81,67 @@ class SettingsActivity : BaseComposeActivity() {
 		super.onCreate(savedInstanceState)
 
 		// Navigate to and highlight a preference if requested
-		val preferencePath = (intent.extras?.getString(EXTRA_STRING_PREFERENCE_ROUTE)) ?: "preferences"
+		val preferencePath =
+			(intent.extras?.getString(EXTRA_STRING_PREFERENCE_ROUTE)) ?: "preferences"
 		val preferenceHighlight = (intent.extras?.getString(EXTRA_STRING_PREFERENCE_HIGHLIGHT))
 
 		setContent {
 			AppTheme(navBarInset = false) {
-				withUser {
+				withUser { user ->
 					val navController = rememberNavController()
 					var title by remember { mutableStateOf<String?>(null) }
+
+					val autoMutePref = dataStorePreferences.automuteEnable
+					val scope = rememberCoroutineScope()
+					val autoMuteSettingsLauncher =
+						rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+							updateAutoMutePref(user, scope, autoMutePref, true)
+						}
+					updateAutoMutePref(user, scope, autoMutePref)
+
+					var dialogOpenUrl by remember { mutableStateOf<String?>(null) }
+					var dialogScheduleExactAlarms by remember { mutableStateOf(false) }
+
+					val notificationPref = dataStorePreferences.notificationsEnable
+					val notificationSettingsLauncher =
+						rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+							if (canPostNotifications())
+								scope.launch {
+									notificationPref.saveValue(true)
+									enqueueNotificationSetup(user)
+								}
+						}
+					val requestNotificationPermissionLauncher =
+						rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+							if (isGranted)
+								scope.launch {
+									notificationPref.saveValue(true)
+									enqueueNotificationSetup(user)
+								}
+							else
+								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+									notificationSettingsLauncher.launch(
+										Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+											.putExtra(
+												Settings.EXTRA_APP_PACKAGE,
+												BuildConfig.APPLICATION_ID
+											)
+									)
+								}
+						}
+
+					fun openUrl(url: String) {
+						val intent = Intent(ACTION_VIEW, Uri.parse(url)).apply {
+							addCategory(CATEGORY_BROWSABLE)
+							flags = FLAG_ACTIVITY_NEW_TASK
+						}
+
+						if (intent.resolveActivity(packageManager) != null) {
+							startActivity(intent)
+						} else {
+							dialogOpenUrl = url
+						}
+					}
 
 					Scaffold(
 						topBar = {
@@ -73,8 +165,8 @@ class SettingsActivity : BaseComposeActivity() {
 					) { innerPadding ->
 						Box(
 							modifier = Modifier
-								.padding(innerPadding)
-								.fillMaxSize()
+                                .padding(innerPadding)
+                                .fillMaxSize()
 						) {
 							NavHost(navController, startDestination = preferencePath) {
 								composable("preferences") {
@@ -172,15 +264,15 @@ class SettingsActivity : BaseComposeActivity() {
 										}
 
 										PreferenceCategory(stringResource(R.string.preference_category_general_week_display)) {
+											WeekRangePickerPreference(
+												title = { Text(stringResource(R.string.preference_week_custom_range)) },
+												dataStore = dataStorePreferences.weekCustomRange
+											)
+
 											SwitchPreference(
 												title = { Text(stringResource(R.string.preference_week_snap_to_days)) },
 												summary = { Text(stringResource(R.string.preference_week_snap_to_days_summary)) },
 												dataStore = dataStorePreferences.weekSnapToDays
-											)
-
-											WeekRangePickerPreference(
-												title = { Text(stringResource(R.string.preference_week_custom_range)) },
-												dataStore = dataStorePreferences.weekCustomRange
 											)
 
 											SliderPreference(
@@ -188,6 +280,7 @@ class SettingsActivity : BaseComposeActivity() {
 												steps = 6,
 												title = { Text(stringResource(R.string.preference_week_display_length)) },
 												summary = { Text(stringResource(R.string.preference_week_display_length_summary)) },
+												dependency = dataStorePreferences.weekSnapToDays,
 												showSeekBarValue = true,
 												dataStore = dataStorePreferences.weekCustomLength
 											)
@@ -197,6 +290,23 @@ class SettingsActivity : BaseComposeActivity() {
 											SwitchPreference(
 												title = { Text(stringResource(R.string.preference_automute_enable)) },
 												summary = { Text(stringResource(R.string.preference_automute_enable_summary)) },
+												onCheckedChange = {
+													if (it) {
+														if (requestAutoMutePermission(
+																autoMuteSettingsLauncher
+															)
+														) {
+															AutoMuteSetupWorker.enqueue(
+																WorkManager.getInstance(this@SettingsActivity),
+																user
+															)
+															true
+														} else false
+													} else {
+														disableAutoMute()
+														false
+													}
+												},
 												dataStore = dataStorePreferences.automuteEnable
 											)
 											SwitchPreference(
@@ -442,7 +552,7 @@ class SettingsActivity : BaseComposeActivity() {
 											dataStore = dataStorePreferences.timetableBackgroundIrregular
 										)
 
-										PreferenceCategory(stringResource(id = R.string.preference_category_timetable_range)) {
+										PreferenceCategory(stringResource(id = R.string.preference_category_display_options)) {
 											RangeInputPreference(
 												title = { Text(stringResource(R.string.preference_timetable_range)) },
 												dataStore = dataStorePreferences.timetableRange
@@ -562,6 +672,26 @@ class SettingsActivity : BaseComposeActivity() {
 													contentDescription = null
 												)
 											},*/
+											onCheckedChange = { enable ->
+												if (enable) {
+													if (!canScheduleExactAlarms()) {
+														dialogScheduleExactAlarms = true
+														false
+													} else if (!canPostNotifications()) {
+														// TODO: This may not be backwards compatible
+														requestNotificationPermissionLauncher.launch(
+															Manifest.permission.POST_NOTIFICATIONS
+														)
+														false
+													} else {
+														enqueueNotificationSetup(user)
+														true
+													}
+												} else {
+													clearNotifications()
+													false
+												}
+											},
 											dataStore = dataStorePreferences.notificationsEnable
 										)
 
@@ -569,6 +699,10 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_notifications_multiple)) },
 											summary = { Text(stringResource(R.string.preference_notifications_multiple_desc)) },
 											dependency = dataStorePreferences.notificationsEnable,
+											onCheckedChange = {
+												enqueueNotificationSetup(user)
+												it
+											},
 											dataStore = dataStorePreferences.notificationsInMultiple
 										)
 
@@ -576,6 +710,10 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_notifications_first_lesson)) },
 											summary = { Text(stringResource(R.string.preference_notifications_first_lesson_desc)) },
 											dependency = dataStorePreferences.notificationsEnable,
+											onCheckedChange = {
+												enqueueNotificationSetup(user)
+												it
+											},
 											dataStore = dataStorePreferences.notificationsBeforeFirst
 										)
 
@@ -583,12 +721,15 @@ class SettingsActivity : BaseComposeActivity() {
 											title = { Text(stringResource(R.string.preference_notifications_first_lesson_time)) },
 											unit = stringResource(R.string.preference_notifications_first_lesson_time_unit),
 											dependency = dataStorePreferences.notificationsBeforeFirst,
+											onChange = {
+												enqueueNotificationSetup(user)
+											},
 											dataStore = dataStorePreferences.notificationsBeforeFirstTime
 										)
 
 										Preference(
 											title = { Text(stringResource(R.string.preference_notifications_clear)) },
-											onClick = { /*TODO*/ },
+											onClick = { clearNotifications() },
 											icon = {
 												Icon(
 													painter = painterResource(R.drawable.settings_notifications_clear_all),
@@ -687,12 +828,7 @@ class SettingsActivity : BaseComposeActivity() {
 											Preference(
 												title = { Text(stringResource(R.string.preference_connectivity_proxy_about)) },
 												onClick = {
-													startActivity(
-														Intent(
-															Intent.ACTION_VIEW,
-															Uri.parse(URL_WIKI_PROXY)
-														)
-													)
+													openUrl(URL_WIKI_PROXY)
 												},
 												icon = {
 													Icon(
@@ -725,6 +861,8 @@ class SettingsActivity : BaseComposeActivity() {
 
 										PreferenceCategory(stringResource(id = R.string.preference_info_general)) {
 
+											val openDialog = remember { mutableStateOf(false) }
+
 											Preference(
 												title = { Text(stringResource(R.string.preference_info_app_version)) },
 												summary = {
@@ -737,12 +875,7 @@ class SettingsActivity : BaseComposeActivity() {
 													)
 												},
 												onClick = {
-													startActivity(
-														Intent(
-															Intent.ACTION_VIEW,
-															Uri.parse("$URL_GITHUB_REPOSITORY/releases")
-														)
-													)
+													openUrl("$URL_GITHUB_REPOSITORY/releases")
 												},
 												icon = {
 													Icon(
@@ -757,12 +890,7 @@ class SettingsActivity : BaseComposeActivity() {
 												title = { Text(stringResource(R.string.preference_info_github)) },
 												summary = { Text(URL_GITHUB_REPOSITORY) },
 												onClick = {
-													startActivity(
-														Intent(
-															Intent.ACTION_VIEW,
-															Uri.parse(URL_GITHUB_REPOSITORY)
-														)
-													)
+													openUrl(URL_GITHUB_REPOSITORY)
 												},
 												icon = {
 													Icon(
@@ -777,12 +905,7 @@ class SettingsActivity : BaseComposeActivity() {
 												title = { Text(stringResource(R.string.preference_info_license)) },
 												summary = { Text(stringResource(R.string.preference_info_license_desc)) },
 												onClick = {
-													startActivity(
-														Intent(
-															Intent.ACTION_VIEW,
-															Uri.parse("$URL_GITHUB_REPOSITORY/blob/master/LICENSE")
-														)
-													)
+													openUrl("$URL_GITHUB_REPOSITORY/blob/master/LICENSE")
 												},
 												icon = {
 													Icon(
@@ -796,7 +919,9 @@ class SettingsActivity : BaseComposeActivity() {
 											Preference(
 												title = { Text(stringResource(R.string.preference_info_contributors)) },
 												summary = { Text(stringResource(R.string.preference_info_contributors_desc)) },
-												onClick = { /*TODO*/ },
+												onClick = {
+													openDialog.value = true
+												},
 												icon = {
 													Icon(
 														painter = painterResource(R.drawable.settings_about_contributor),
@@ -806,10 +931,55 @@ class SettingsActivity : BaseComposeActivity() {
 												dataStore = UntisPreferenceDataStore.emptyDataStore()
 											)
 
+											if (openDialog.value) {
+												AlertDialog(
+													onDismissRequest = {
+														openDialog.value = false
+													},
+													confirmButton = {
+														FlowRow(
+															modifier = Modifier.padding(all = 8.dp),
+															mainAxisAlignment = MainAxisAlignment.End,
+															mainAxisSpacing = 8.dp
+														) {
+															TextButton(
+																onClick = {
+																	openDialog.value = false
+																	openUrl("https://docs.github.com/en/github/site-policy/github-privacy-statement")
+																}
+															) {
+																Text(text = stringResource(id = R.string.preference_info_privacy_policy))
+															}
+															TextButton(
+																onClick = {
+																	openDialog.value = false
+																}
+															) {
+																Text(text = stringResource(id = R.string.all_cancel))
+															}
+															TextButton(
+																onClick = {
+																	openDialog.value = false
+																	navController.navigate("contributors")
+																}
+															) {
+																Text(text = stringResource(id = R.string.all_ok))
+															}
+														}
+													},
+													title = {
+														Text(text = stringResource(id = R.string.preference_info_privacy))
+													},
+													text = {
+														Text(stringResource(id = R.string.preference_info_privacy_desc))
+													}
+												)
+											}
+
 											Preference(
 												title = { Text(stringResource(R.string.preference_info_libraries)) },
 												summary = { Text(stringResource(R.string.preference_info_libraries_desc)) },
-												onClick = { /*TODO*/ },
+												onClick = { navController.navigate("about_libs") },
 												icon = {
 													Icon(
 														painter = painterResource(R.drawable.settings_about_library),
@@ -821,21 +991,232 @@ class SettingsActivity : BaseComposeActivity() {
 										}
 									}
 								}
+								composable("about_libs") {
+									title = stringResource(id = R.string.preference_info_libraries)
+
+									val colors = libraryColors(
+										backgroundColor = colorScheme!!.background,
+										contentColor = colorScheme!!.onBackground,
+										badgeBackgroundColor = colorScheme!!.primary,
+										badgeContentColor = colorScheme!!.onPrimary
+									)
+									/*
+									* The about libraries (android library from mikepenz)
+									* use a custom library file stored in R.raw.about_libs.
+									* To modify the shown libraries edit the JSON file
+									* about_libs.json
+									*/
+									LibrariesContainer(
+										Modifier
+											.fillMaxSize(),
+										librariesBlock = { ctx ->
+											Libs.Builder().withJson(ctx, R.raw.about_libs)
+												.build()
+										},
+										contentPadding = insetsPaddingValues(),
+										colors = colors
+									)
+								}
+								composable("contributors") {
+									title =
+										stringResource(id = R.string.preference_info_contributors)
+
+									var userList by remember { mutableStateOf(listOf<GithubUser>()) }
+									val error = remember { mutableStateOf(true) }
+									var loadingText by remember { mutableStateOf(getString(R.string.loading)) }
+
+									LaunchedEffect(Unit) {
+										scope.launch {
+											"$URL_GITHUB_REPOSITORY_API/contributors"
+												.httpGet()
+												.awaitStringResult()
+												.fold({ data ->
+													userList = getJSON().decodeFromString(data)
+													error.value = false
+												}, {
+													loadingText = getString(R.string.loading_failed)
+													error.value = true
+												})
+										}
+									}
+
+									if (!error.value) {
+										LazyColumn(
+											modifier = Modifier
+												.fillMaxHeight(),
+											contentPadding = insetsPaddingValues()
+										) {
+											this.items(userList) {
+												Contributor(
+													githubUser = it,
+													onClick = { openUrl(it.html_url) })
+											}
+										}
+									} else {
+										ListItem(
+											headlineText = {
+												Text(loadingText)
+											},
+											leadingContent = {
+												Icon(
+													painter = painterResource(id = R.drawable.settings_about_contributor),
+													contentDescription = ""
+												)
+											}
+										)
+									}
+								}
 							}
 						}
 					}
+
+					dialogOpenUrl?.let { url ->
+						AlertDialog(
+							onDismissRequest = {
+								dialogOpenUrl = null
+							},
+							title = {
+								Text(text = stringResource(id = R.string.settings_dialog_url_open_title))
+							},
+							text = {
+								Column {
+									Text(text = stringResource(id = R.string.settings_dialog_url_open_text))
+									Text(text = url, modifier = Modifier.padding(top = 16.dp))
+								}
+							},
+							confirmButton = {
+								TextButton(onClick = { dialogOpenUrl = null }) {
+									Text(text = stringResource(id = R.string.all_close))
+								}
+							}
+						)
+					}
+
+					if (dialogScheduleExactAlarms)
+						AlertDialog(
+							onDismissRequest = {
+								dialogScheduleExactAlarms = false
+							},
+							title = {
+								Text(text = "Permission needed")
+							},
+							text = {
+								Text(text = "This feature requires additional permissions. Please allow BetterUntis access to schedule exact alarms.")
+							},
+							confirmButton = {
+								TextButton(onClick = {
+									dialogScheduleExactAlarms = false
+								}) {
+									Text(text = stringResource(id = R.string.all_ok))
+								}
+							}
+						)
 				}
 			}
 		}
 	}
 
+	private fun enqueueNotificationSetup(user: UserDatabase.User) {
+		NotificationSetupWorker.enqueue(
+			WorkManager.getInstance(this@SettingsActivity),
+			user
+		)
+	}
+
+	private fun canPostNotifications(): Boolean {
+		val notificationManager =
+			applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+		return (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || notificationManager.areNotificationsEnabled())
+	}
+
+	private fun canScheduleExactAlarms(): Boolean {
+		val alarmManager = applicationContext.getSystemService(ALARM_SERVICE) as AlarmManager
+		return (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms())
+	}
+
+	@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+	@Composable
+	fun Contributor(
+		githubUser: GithubUser,
+		onClick: () -> Unit
+	) {
+		ListItem(
+			modifier = Modifier.clickable(onClick = onClick),
+			headlineText = {
+				Text(githubUser.login)
+			},
+			supportingText = {
+				Text(
+					pluralStringResource(
+						id = R.plurals.preferences_contributors_contributions,
+						count = githubUser.contributions,
+						githubUser.contributions
+					)
+				)
+			},
+			leadingContent = {
+				AsyncImage(
+					model = githubUser.avatar_url,
+					contentDescription = "UserImage", //TODO: Extract string resource
+					modifier = Modifier.size(48.dp)
+				)
+			}
+		)
+	}
+
+	private fun updateAutoMutePref(
+		user: UserDatabase.User,
+		scope: CoroutineScope,
+		autoMutePref: UntisPreferenceDataStore<Boolean>,
+		enable: Boolean = false
+	) {
+		scope.launch {
+			val permissionGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				(getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).isNotificationPolicyAccessGranted
+			} else true
+
+
+			if (autoMutePref.getValue() && !permissionGranted)
+				autoMutePref.saveValue(false)
+
+			if (enable && permissionGranted) {
+				autoMutePref.saveValue(true)
+				AutoMuteSetupWorker.enqueue(
+					WorkManager.getInstance(this@SettingsActivity),
+					user
+				)
+			}
+		}
+	}
+
+	private fun requestAutoMutePermission(activityLauncher: ActivityResultLauncher<Intent>): Boolean {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			(getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
+				return if (!isNotificationPolicyAccessGranted) {
+					activityLauncher.launch(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
+					false
+				} else true
+			}
+		} else return true
+	}
+
+	private fun clearNotifications() =
+		(getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancelAll()
+
 	@Composable
 	private fun VerticalScrollColumn(content: @Composable ColumnScope.() -> Unit) {
 		Column(
 			modifier = Modifier
-				.verticalScroll(rememberScrollState())
-				.bottomInsets(),
+                .verticalScroll(rememberScrollState())
+                .bottomInsets(),
 			content = content
+		)
+	}
+
+	private fun disableAutoMute() {
+		sendBroadcast(
+			Intent(applicationContext, AutoMuteReceiver::class.java)
+				.putExtra(EXTRA_BOOLEAN_MUTE, false)
 		)
 	}
 }

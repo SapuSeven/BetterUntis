@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 fun InputPreference(
 	title: (@Composable () -> Unit),
 	icon: (@Composable () -> Unit)? = null,
+	onChange: ((value: String) -> Unit)? = null,
 	dependency: UntisPreferenceDataStore<*>? = null,
 	dataStore: UntisPreferenceDataStore<String>
 ) {
@@ -64,7 +65,10 @@ fun InputPreference(
 				TextButton(
 					onClick = {
 						showDialog = false
-						scope.launch { dataStore.saveValue(input) }
+						scope.launch {
+							dataStore.saveValue(input)
+							onChange?.invoke(input)
+						}
 					}) {
 					Text(stringResource(id = R.string.all_ok))
 				}
@@ -84,6 +88,7 @@ fun NumericInputPreference(
 	title: (@Composable () -> Unit),
 	icon: (@Composable () -> Unit)? = null,
 	unit: String? = null,
+	onChange: ((value: Int) -> Unit)? = null,
 	dependency: UntisPreferenceDataStore<*>? = null,
 	dataStore: UntisPreferenceDataStore<Int>
 ) {
@@ -137,7 +142,11 @@ fun NumericInputPreference(
 				TextButton(
 					onClick = {
 						showDialog = false
-						scope.launch { dataStore.saveValue(input.toIntOrNull() ?: 0) }
+						scope.launch {
+							val inputInt = input.toIntOrNull() ?: 0
+							dataStore.saveValue(inputInt)
+							onChange?.invoke(inputInt)
+						}
 					}) {
 					Text(stringResource(id = R.string.all_ok))
 				}

@@ -1,18 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-	xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
 	package="com.sapuseven.untis">
 
 	<uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+	<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.CAMERA" />
-	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+	<uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
 	<queries>
 		<package android:name="com.untis.chat" />
+
+		<intent>
+			<action android:name="android.intent.action.VIEW" />
+			<category android:name="android.intent.category.BROWSABLE" />
+			<data android:scheme="https" android:host="*" />
+		</intent>
 	</queries>
 
 	<application
+		android:name=".activities.App"
 		android:allowBackup="true"
 		android:fullBackupContent="@xml/backup_descriptor"
 		android:icon="@mipmap/ic_launcher"
@@ -34,7 +42,7 @@
 		</activity>
 
 		<activity
-			android:name=".activities.WidgetConfigureActivity"
+			android:name=".activities.ElementPickerWidgetConfigureActivity"
 			android:label="@string/widget_configuration"
 			android:exported="true">
 
@@ -57,6 +65,7 @@
 
 		<activity
 			android:name=".activities.LoginActivity"
+			android:windowSoftInputMode="adjustResize"
 			android:launchMode="singleTop" />
 
 		<activity
@@ -92,6 +101,7 @@
 		<activity
 			android:name=".activities.LoginDataInputActivity"
 			android:parentActivityName=".activities.LoginActivity"
+			android:windowSoftInputMode="adjustResize"
 			android:exported="true">
 
 			<meta-data
@@ -120,23 +130,12 @@
 				android:value=".activities.MainActivity" />
 		</activity>
 
-		<receiver android:name=".receivers.StartupReceiver"
-			android:exported="true">
-			<intent-filter>
-				<action android:name="android.intent.action.BOOT_COMPLETED" />
-			</intent-filter>
-		</receiver>
-
-		<receiver android:name=".receivers.NotificationSetup" />
-
 		<receiver android:name=".receivers.NotificationReceiver" />
-
-		<receiver android:name=".receivers.AutoMuteSetup" />
 
 		<receiver android:name=".receivers.AutoMuteReceiver" />
 
 		<receiver
-			android:name=".widgets.TimetableWidget"
+			android:name=".widgets.TimetableWidgetReceiver"
 			android:label="@string/widget_timetable"
 			android:exported="true">
 
@@ -150,7 +149,7 @@
 		</receiver>
 
 		<receiver
-			android:name=".widgets.MessagesWidget"
+			android:name=".widgets.MessagesWidgetReceiver"
 			android:label="@string/widget_daily_messages"
 			android:exported="true">
 
@@ -163,8 +162,10 @@
 				android:resource="@xml/widget_info" />
 		</receiver>
 
-		<service
-			android:name=".widgets.WidgetRemoteViewsService"
-			android:permission="android.permission.BIND_REMOTEVIEWS" />
+		<provider
+			android:name="androidx.startup.InitializationProvider"
+			android:authorities="${applicationId}.androidx-startup"
+			tools:node="remove">
+		</provider>
 	</application>
 </manifest>

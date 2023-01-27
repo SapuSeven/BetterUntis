@@ -16,12 +16,15 @@ class TimetableDatabaseInterface(@Transient val database: UserDatabase, @Transie
 	private var allSubjects: Map<Int, Subject> = mapOf()
 	private var allRooms: Map<Int, Room> = mapOf()
 
-	enum class Type {
-		CLASS,
-		TEACHER,
-		SUBJECT,
-		ROOM,
-		STUDENT
+	enum class Type(val id: Int) {
+		CLASS(1),
+		TEACHER(2),
+		SUBJECT(3),
+		ROOM(4),
+		STUDENT(5),
+		LEGAL_GUARDIAN(12),
+		PARENT(15),
+		APPRENTICE_REPRESENTATIVE(21)
 	}
 
 	init {

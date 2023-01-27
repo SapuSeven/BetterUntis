@@ -12,7 +12,7 @@
 	<bool name="preference_timetable_range_index_reset_default">false</bool>
 	<bool name="preference_timetable_substitutions_irregular_default">true</bool>
 	<bool name="preference_notifications_before_first_default">false</bool>
-	<bool name="preference_notifications_enable_default">true</bool>
+	<bool name="preference_notifications_enable_default">false</bool>
 	<bool name="preference_notifications_in_multiple_default">true</bool>
 	<bool name="preference_double_tap_to_exit_default">false</bool>
 	<bool name="preference_fling_enable_default">false</bool>

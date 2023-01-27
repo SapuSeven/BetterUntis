@@ -2,12 +2,14 @@ package com.sapuseven.untis.data.connectivity
 
 import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.models.untis.params.SchoolSearchParams
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
 class UntisRequestTest {
+	@OptIn(ExperimentalSerializationApi::class)
 	@Test
 	fun untisRequestData_serialization() {
 		val data = UntisRequest.UntisRequestData()
@@ -16,6 +18,6 @@ class UntisRequestTest {
 		data.method = "data-method"
 		data.params = listOf(SchoolSearchParams("school"))
 		assertThat(SerializationUtils.getJSON().encodeToString<UntisRequest.UntisRequestData>(data),
-				`is`("""{"id":"data-id","jsonrpc":"data-jsonrpc","method":"data-method","params":[{"search":"school","schoolid":0,"schoolname":""}]}"""))
+				`is`("""{"id":"data-id","jsonrpc":"data-jsonrpc","method":"data-method","params":[{"search":"school"}]}""")) //,"schoolid":0,"schoolname":"" are not encoded as `@EncodeDefault(EncodeDefault.Mode.NEVER)` is set
 	}
 }

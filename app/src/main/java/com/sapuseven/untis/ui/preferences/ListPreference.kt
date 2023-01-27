@@ -36,7 +36,8 @@ fun ListPreference(
 		title = title,
 		summary = if (summary != null) {
 			{
-				summary(value.value to entryLabelMap.getOrDefault(value.value, value.value))
+				val selected = value.value to entryLabelMap.getOrDefault(value.value, value.value)
+				summary(selected)
 			}
 		} else null,
 		icon = icon,

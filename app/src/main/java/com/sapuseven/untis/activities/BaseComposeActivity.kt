@@ -1,7 +1,6 @@
 package com.sapuseven.untis.activities
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -30,7 +29,7 @@ import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.material.scheme.Scheme
-import com.sapuseven.untis.ui.theme.toColorScheme
+import com.sapuseven.untis.ui.theme.generateColorScheme
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.combine
@@ -140,29 +139,6 @@ open class BaseComposeActivity : ComponentActivity() {
 
 	fun currentUserId() = user?.id ?: -1
 
-	private fun generateColorScheme(
-		context: Context,
-		dynamicColor: Boolean,
-		themeColor: Color,
-		darkTheme: Boolean,
-		darkThemeOled: Boolean
-	): ColorScheme {
-		customThemeColor = if (dynamicColor) null else themeColor
-
-		return when {
-			dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-				if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-			}
-			darkTheme -> Scheme.dark(themeColor.toArgb()).toColorScheme()
-			else -> Scheme.light(themeColor.toArgb()).toColorScheme()
-		}.run {
-			if (darkTheme && darkThemeOled)
-				copy(background = Color.Black, surface = Color.Black)
-			else
-				this
-		}
-	}
-
 	@Composable
 	fun AppTheme(
 		initialDarkTheme: Boolean = isSystemInDarkTheme(),
@@ -196,9 +172,12 @@ open class BaseComposeActivity : ComponentActivity() {
 
 					// setStatusBarsColor() and setNavigationBarColor() also exist
 
+					val dynamicColor = themeColor == themeColorPref.defaultValue
+					customThemeColor = if (dynamicColor) null else Color(themeColor)
+
 					generateColorScheme(
 						context,
-						themeColor == themeColorPref.defaultValue,
+						dynamicColor,
 						Color(themeColor),
 						darkTheme = darkThemeBool,
 						darkThemeOled
@@ -247,7 +226,7 @@ open class BaseComposeActivity : ComponentActivity() {
 		}
 	}
 
-	fun setSystemUiColor(
+	private fun setSystemUiColor(
 		systemUiController: SystemUiController,
 		color: Color = Color.Transparent,
 		darkIcons: Boolean = color.luminance() > 0.5f
@@ -289,5 +268,13 @@ open class BaseComposeActivity : ComponentActivity() {
 		color?.let {
 			this.putExtra(EXTRA_INT_BACKGROUND_COLOR, color.toArgb())
 		}
+	}
+
+	inline fun <reified T : java.io.Serializable> Intent.getSerializable(key: String): T? = when {
+		Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> getSerializableExtra(
+			key,
+			T::class.java
+		)
+		else -> @Suppress("DEPRECATION") getSerializableExtra(key) as? T
 	}
 }

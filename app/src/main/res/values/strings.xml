@@ -128,6 +128,7 @@
 	<string name="logindatainput_error_invalid_school">Invalid school ID!</string>
 	<string name="logindatainput_error_invalid_url">Invalid URL!</string>
 	<string name="logindatainput_key">Key or Password</string>
+	<string name="logindatainput_key_saved">Key or Password (saved)</string>
 	<string name="logindatainput_loading_user_data">Loading user data…</string>
 	<string name="logindatainput_login">Login</string>
 	<string name="logindatainput_profilename">Profile name (optional)</string>
@@ -198,6 +199,7 @@
 	<string name="preference_background_regular">Regular lessons</string>
 	<string name="preference_background_regular_past">Past regular lessons</string>
 	<string name="preference_category_connectivity_proxy">WebUntis Proxy</string>
+	<string name="preference_category_display_options">Display Options</string>
 	<string name="preference_category_general_automute">Auto-Mute</string>
 	<string name="preference_category_general_behaviour">Behaviour</string>
 	<string name="preference_category_general_week_display">Week Display Settings</string>
@@ -237,14 +239,14 @@
 	<string name="preference_info_privacy_policy">Privacy Policy</string>
 	<string name="preference_marker">Time indicator</string>
 	<string name="preference_notifications_clear">Clear all notifications</string>
-	<string name="preference_notifications_enable">Enable notification</string>
-	<string name="preference_notifications_enable_desc">Displays a notification with information about the next lesson while you have break.</string>
+	<string name="preference_notifications_enable">Enable notifications</string>
+	<string name="preference_notifications_enable_desc">Displays a notification with information about the next lesson during breaks</string>
 	<string name="preference_notifications_first_lesson">Notification before first lesson</string>
 	<string name="preference_notifications_first_lesson_desc">Show a notification right before school starts</string>
 	<string name="preference_notifications_first_lesson_time">Notification time</string>
 	<string name="preference_notifications_first_lesson_time_unit">min before first lesson</string>
 	<string name="preference_notifications_multiple">Enable in multiple-hour lesson</string>
-	<string name="preference_notifications_multiple_desc">Notifications will be shown in breaks within multiple-hour lessons.</string>
+	<string name="preference_notifications_multiple_desc">Notifications will be shown in breaks within multiple-hour lessons</string>
 	<string name="preference_notifications_visibility_hidden">Hidden</string>
 	<string name="preference_notifications_visibility_long">Long name</string>
 	<string name="preference_notifications_visibility_short">Short name</string>
@@ -279,7 +281,7 @@
 	<string name="preference_timetable_lesson_info_font_size">Font size for lesson infos</string>
 	<string name="preference_timetable_lesson_name_font_size">Font size for lesson name</string>
 	<string name="preference_timetable_personal_timetable">Custom Personal Timetable</string>
-	<string name="preference_timetable_range">Hours to display</string>
+	<string name="preference_timetable_range">Hour range to display</string>
 	<string name="preference_timetable_range_desc">Hours %1$d to %2$d</string>
 	<string name="preference_timetable_range_index_reset">Reset lesson numbering</string>
 	<string name="preference_timetable_substitutions_irregular">Detect irregular lessons</string>
@@ -297,7 +299,7 @@
 	<string name="preferences_general">General</string>
 	<string name="preferences_info">About</string>
 	<string name="preferences_notifications">Notifications</string>
-	<string name="preferences_styling">Customization</string>
+	<string name="preferences_styling">Theme</string>
 	<string name="preferences_timetable">Timetable</string>
 	<string name="preferences_theme_color">Theme color</string>
 	<string name="preferences_theme_color_system">System theme color</string>
@@ -319,6 +321,8 @@
 	<string name="settings_recommend_share">Share</string>
 	<string name="settings_recommend_text">Try BetterUntis - A better alternative to Untis Mobile! Download at %1$s</string>
 	<string name="settings_recommend_title">Recommend BetterUntis</string>
+	<string name="settings_dialog_url_open_title">No compatible app found</string>
+	<string name="settings_dialog_url_open_text">BetterUntis could not find an app that can handle opening links.\nPlease ensure you have a web browser installed or open the link on another device:</string>
 	<string name="widget_configuration">Widget Configuration</string>
 	<string name="widget_daily_messages">Daily Messages</string>
 	<string name="widget_select_profile">Please select a profile for the widget</string>
@@ -328,6 +332,10 @@
     <string name="all_datepicker_select">Select date</string>
 	<string name="all_datepicker_month_next">Next month</string>
 	<string name="all_datepicker_month_previous">Previous month</string>
+    <string name="all_reload">Reload</string>
+	<string name="widget_disclaimer_title">Beta feature</string>
+	<string name="widget_disclaimer_text">The widget feature is still work-in-progress and may not work correctly on all devices.</string>
+	<string name="login_demo">Try it out!</string>
 
 	<plurals name="main_time_diff_minutes">
 		<item quantity="one">a minute ago</item>
@@ -349,4 +357,6 @@
 		<item quantity="one">%1$d contribution</item>
 		<item quantity="other">%1$d contributions</item>
 	</plurals>
+	<string name="all_favourites">Favourites</string>
+	<string name="mainactivitydrawer_profile_edit_hint">Tap on a profile to edit</string>
 </resources>

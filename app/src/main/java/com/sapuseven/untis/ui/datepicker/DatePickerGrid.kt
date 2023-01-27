@@ -37,7 +37,7 @@ fun DatePickerGrid(
 			(1..WEEK_LENGTH).forEach {
 				DatePickerGridItem(
 					text = DayOfWeek.of(it)
-						.getDisplayName(TextStyle.NARROW_STANDALONE, Locale.getDefault()),
+						.getDisplayName(TextStyle.NARROW_STANDALONE, Locale.getDefault()), // TODO: Bug: This sometimes shows numbers instead of week day letters
 					modifier = Modifier
 						.weight(1f)
 						.aspectRatio(1f),
