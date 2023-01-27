@@ -38,6 +38,8 @@ import androidx.work.WorkManager
 import coil.compose.AsyncImage
 import com.github.kittinunf.fuel.coroutines.awaitStringResult
 import com.github.kittinunf.fuel.httpGet
+import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.flowlayout.MainAxisAlignment
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults.libraryColors
@@ -935,9 +937,10 @@ class SettingsActivity : BaseComposeActivity() {
 														openDialog.value = false
 													},
 													confirmButton = {
-														Row(
+														FlowRow(
 															modifier = Modifier.padding(all = 8.dp),
-															horizontalArrangement = Arrangement.SpaceAround
+															mainAxisAlignment = MainAxisAlignment.End,
+															mainAxisSpacing = 8.dp
 														) {
 															TextButton(
 																onClick = {
