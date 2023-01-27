@@ -1,5 +1,7 @@
 package com.sapuseven.untis.activities
 
+import android.Manifest
+import android.app.AlarmManager
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
@@ -22,7 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -90,13 +91,42 @@ class SettingsActivity : BaseComposeActivity() {
 
 					val autoMutePref = dataStorePreferences.automuteEnable
 					val scope = rememberCoroutineScope()
-					val systemSettingsLauncher =
+					val autoMuteSettingsLauncher =
 						rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
 							updateAutoMutePref(user, scope, autoMutePref, true)
 						}
 					updateAutoMutePref(user, scope, autoMutePref)
 
 					var dialogOpenUrl by remember { mutableStateOf<String?>(null) }
+					var dialogScheduleExactAlarms by remember { mutableStateOf(false) }
+
+					val notificationPref = dataStorePreferences.notificationsEnable
+					val notificationSettingsLauncher =
+						rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+							if (canPostNotifications())
+								scope.launch {
+									notificationPref.saveValue(true)
+									enqueueNotificationSetup(user)
+								}
+						}
+					val requestNotificationPermissionLauncher =
+						rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+							if (isGranted)
+								scope.launch {
+									notificationPref.saveValue(true)
+									enqueueNotificationSetup(user)
+								}
+							else
+								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+									notificationSettingsLauncher.launch(
+										Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+											.putExtra(
+												Settings.EXTRA_APP_PACKAGE,
+												BuildConfig.APPLICATION_ID
+											)
+									)
+								}
+						}
 
 					fun openUrl(url: String) {
 						val intent = Intent(ACTION_VIEW, Uri.parse(url)).apply {
@@ -133,8 +163,8 @@ class SettingsActivity : BaseComposeActivity() {
 					) { innerPadding ->
 						Box(
 							modifier = Modifier
-								.padding(innerPadding)
-								.fillMaxSize()
+                                .padding(innerPadding)
+                                .fillMaxSize()
 						) {
 							NavHost(navController, startDestination = preferencePath) {
 								composable("preferences") {
@@ -261,7 +291,7 @@ class SettingsActivity : BaseComposeActivity() {
 												onCheckedChange = {
 													if (it) {
 														if (requestAutoMutePermission(
-																systemSettingsLauncher
+																autoMuteSettingsLauncher
 															)
 														) {
 															AutoMuteSetupWorker.enqueue(
@@ -272,7 +302,7 @@ class SettingsActivity : BaseComposeActivity() {
 														} else false
 													} else {
 														disableAutoMute()
-														it
+														false
 													}
 												},
 												dataStore = dataStorePreferences.automuteEnable
@@ -640,15 +670,25 @@ class SettingsActivity : BaseComposeActivity() {
 													contentDescription = null
 												)
 											},*/
-											onCheckedChange = {
-												if (it)
-													NotificationSetupWorker.enqueue(
-														WorkManager.getInstance(this@SettingsActivity),
-														user
-													)
-												else
+											onCheckedChange = { enable ->
+												if (enable) {
+													if (!canScheduleExactAlarms()) {
+														dialogScheduleExactAlarms = true
+														false
+													} else if (!canPostNotifications()) {
+														// TODO: This may not be backwards compatible
+														requestNotificationPermissionLauncher.launch(
+															Manifest.permission.POST_NOTIFICATIONS
+														)
+														false
+													} else {
+														enqueueNotificationSetup(user)
+														true
+													}
+												} else {
 													clearNotifications()
-												it
+													false
+												}
 											},
 											dataStore = dataStorePreferences.notificationsEnable
 										)
@@ -658,10 +698,7 @@ class SettingsActivity : BaseComposeActivity() {
 											summary = { Text(stringResource(R.string.preference_notifications_multiple_desc)) },
 											dependency = dataStorePreferences.notificationsEnable,
 											onCheckedChange = {
-												NotificationSetupWorker.enqueue(
-													WorkManager.getInstance(this@SettingsActivity),
-													user
-												)
+												enqueueNotificationSetup(user)
 												it
 											},
 											dataStore = dataStorePreferences.notificationsInMultiple
@@ -672,10 +709,7 @@ class SettingsActivity : BaseComposeActivity() {
 											summary = { Text(stringResource(R.string.preference_notifications_first_lesson_desc)) },
 											dependency = dataStorePreferences.notificationsEnable,
 											onCheckedChange = {
-												NotificationSetupWorker.enqueue(
-													WorkManager.getInstance(this@SettingsActivity),
-													user
-												)
+												enqueueNotificationSetup(user)
 												it
 											},
 											dataStore = dataStorePreferences.notificationsBeforeFirst
@@ -686,10 +720,7 @@ class SettingsActivity : BaseComposeActivity() {
 											unit = stringResource(R.string.preference_notifications_first_lesson_time_unit),
 											dependency = dataStorePreferences.notificationsBeforeFirst,
 											onChange = {
-												NotificationSetupWorker.enqueue(
-													WorkManager.getInstance(this@SettingsActivity),
-													user
-												)
+												enqueueNotificationSetup(user)
 											},
 											dataStore = dataStorePreferences.notificationsBeforeFirstTime
 										)
@@ -991,17 +1022,19 @@ class SettingsActivity : BaseComposeActivity() {
 									val error = remember { mutableStateOf(true) }
 									var loadingText by remember { mutableStateOf(getString(R.string.loading)) }
 
-									scope.launch {
-										"$URL_GITHUB_REPOSITORY_API/contributors"
-											.httpGet()
-											.awaitStringResult()
-											.fold({ data ->
-												userList = getJSON().decodeFromString(data)
-												error.value = false
-											}, {
-												loadingText = getString(R.string.loading_failed)
-												error.value = true
-											})
+									LaunchedEffect(Unit) {
+										scope.launch {
+											"$URL_GITHUB_REPOSITORY_API/contributors"
+												.httpGet()
+												.awaitStringResult()
+												.fold({ data ->
+													userList = getJSON().decodeFromString(data)
+													error.value = false
+												}, {
+													loadingText = getString(R.string.loading_failed)
+													error.value = true
+												})
+										}
 									}
 
 									if (!error.value) {
@@ -1055,9 +1088,47 @@ class SettingsActivity : BaseComposeActivity() {
 							}
 						)
 					}
+
+					if (dialogScheduleExactAlarms)
+						AlertDialog(
+							onDismissRequest = {
+								dialogScheduleExactAlarms = false
+							},
+							title = {
+								Text(text = "Permission needed")
+							},
+							text = {
+								Text(text = "This feature requires additional permissions. Please allow BetterUntis access to schedule exact alarms.")
+							},
+							confirmButton = {
+								TextButton(onClick = {
+									dialogScheduleExactAlarms = false
+								}) {
+									Text(text = stringResource(id = R.string.all_ok))
+								}
+							}
+						)
 				}
 			}
 		}
+	}
+
+	private fun enqueueNotificationSetup(user: UserDatabase.User) {
+		NotificationSetupWorker.enqueue(
+			WorkManager.getInstance(this@SettingsActivity),
+			user
+		)
+	}
+
+	private fun canPostNotifications(): Boolean {
+		val notificationManager =
+			applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+		return (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || notificationManager.areNotificationsEnabled())
+	}
+
+	private fun canScheduleExactAlarms(): Boolean {
+		val alarmManager = applicationContext.getSystemService(ALARM_SERVICE) as AlarmManager
+		return (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms())
 	}
 
 	@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
@@ -1133,8 +1204,8 @@ class SettingsActivity : BaseComposeActivity() {
 	private fun VerticalScrollColumn(content: @Composable ColumnScope.() -> Unit) {
 		Column(
 			modifier = Modifier
-				.verticalScroll(rememberScrollState())
-				.bottomInsets(),
+                .verticalScroll(rememberScrollState())
+                .bottomInsets(),
 			content = content
 		)
 	}
