@@ -87,7 +87,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
-		intent.getUserIdExtra()?.let { userId ->
+		getUserIdExtra(intent)?.let { userId ->
 			existingUserId = userId
 
 			existingUserId?.let { id ->

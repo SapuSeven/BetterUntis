@@ -105,8 +105,7 @@ open class BaseComposeActivity : ComponentActivity() {
 	}
 
 	private suspend fun loadInitialUser() {
-		val user = userDatabase.getUser(
-			intent.getUserIdExtra() ?: loadSelectedUserId()
+		val user = userDatabase.getUser(getUserIdExtra(intent) ?: loadSelectedUserId()
 		) ?: userDatabase.getAllUsers().getOrNull(0)
 
 		user?.let {
@@ -207,7 +206,7 @@ open class BaseComposeActivity : ComponentActivity() {
 				)
 			}
 		} ?: run {
-			val backgroundColor = intent.getBackgroundColorExtra()
+			val backgroundColor = getBackgroundColorExtra(intent)
 				?: Color(
 					(if (initialDarkTheme) Scheme.dark(0) else Scheme.light(0)).background
 				)
@@ -244,37 +243,37 @@ open class BaseComposeActivity : ComponentActivity() {
 		}
 	}
 
-	fun Intent.getUserIdExtra(): Long? {
-		return extras?.run {
+	fun getUserIdExtra(intent: Intent): Long? {
+		return intent.extras?.run {
 			if (containsKey(EXTRA_LONG_USER_ID))
 				getLong(EXTRA_LONG_USER_ID)
 			else null
 		}
 	}
 
-	internal fun Intent.putUserIdExtra(profileId: Long = currentUserId()) {
-		this.putExtra(EXTRA_LONG_USER_ID, profileId)
+	internal fun putUserIdExtra(intent: Intent, profileId: Long = currentUserId()) {
+		intent.putExtra(EXTRA_LONG_USER_ID, profileId)
 	}
 
-	private fun Intent.getBackgroundColorExtra(): Color? {
-		return extras?.run {
+	private fun getBackgroundColorExtra(intent: Intent): Color? {
+		return intent.extras?.run {
 			if (containsKey(EXTRA_INT_BACKGROUND_COLOR))
 				Color(getInt(EXTRA_INT_BACKGROUND_COLOR))
 			else null
 		}
 	}
 
-	internal fun Intent.putBackgroundColorExtra(color: Color? = colorScheme?.background) {
+	internal fun putBackgroundColorExtra(intent: Intent, color: Color? = colorScheme?.background) {
 		color?.let {
-			this.putExtra(EXTRA_INT_BACKGROUND_COLOR, color.toArgb())
+			intent.putExtra(EXTRA_INT_BACKGROUND_COLOR, color.toArgb())
 		}
 	}
 
-	inline fun <reified T : java.io.Serializable> Intent.getSerializable(key: String): T? = when {
-		Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> getSerializableExtra(
+	inline fun <reified T : java.io.Serializable> getSerializable(intent: Intent, key: String): T? = when {
+		Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> intent.getSerializableExtra(
 			key,
 			T::class.java
 		)
-		else -> @Suppress("DEPRECATION") getSerializableExtra(key) as? T
+		else -> @Suppress("DEPRECATION") intent.getSerializableExtra(key) as? T
 	}
 }
