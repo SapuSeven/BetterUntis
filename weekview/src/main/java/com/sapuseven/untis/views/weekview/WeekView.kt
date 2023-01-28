@@ -346,9 +346,8 @@ class WeekView<T>(
 		val oldFirstVisibleDay = viewState.firstVisibleDay
 		val today = DateTime.now()
 
-		val offset = DateUtils.offsetInWeek(today, config.firstDayOfWeek)
 		val daysScrolled = (ceil((config.drawConfig.currentOrigin.x / config.totalDayWidth).toDouble()) * -1).toInt()
-		val newFirstVisibleDay = today.plusDays(DateUtils.actualDays(daysScrolled, config.weekLength) - offset)
+		val newFirstVisibleDay = today.plusDays(DateUtils.actualDays(daysScrolled, config.weekLength))
 
 		if (viewState.shouldRefreshEvents || oldFirstVisibleDay != newFirstVisibleDay) {
 			viewState.firstVisibleDay = newFirstVisibleDay
