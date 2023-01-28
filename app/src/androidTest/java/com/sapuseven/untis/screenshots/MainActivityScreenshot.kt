@@ -15,6 +15,6 @@ class MainActivityScreenshot {
 
 	@Test
 	fun mainActivityScreenshot() {
-		rule.takeScreenshot("activity-main.png")
+		rule.takeScreenshot("activity-main.png", true)
 	}
 }

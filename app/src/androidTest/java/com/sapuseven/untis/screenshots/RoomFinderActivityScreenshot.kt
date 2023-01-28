@@ -19,6 +19,9 @@ import com.sapuseven.untis.models.RoomFinderItem
 import com.sapuseven.untis.models.untis.UntisMasterData
 import com.sapuseven.untis.models.untis.masterdata.Room
 import com.sapuseven.untis.preferences.dataStorePreferences
+import com.sapuseven.untis.ui.activities.InfoCenter
+import com.sapuseven.untis.utils.WithScreenshot
+import com.sapuseven.untis.utils.preferenceWithThemeColor
 import com.sapuseven.untis.utils.takeScreenshot
 import org.junit.After
 import org.junit.Before
@@ -65,19 +68,21 @@ class RoomFinderActivityScreenshot {
 			rule.activity.setSystemUiColor(rememberSystemUiController())
 			rule.activity.setUser(userMock(), false)
 			rule.activity.AppTheme(systemUiController = null, initialDarkTheme = false) {
-				RoomFinder(RoomFinderState(
-					user = rule.activity.user!!,
-					timetableDatabaseInterface = TimetableDatabaseInterface(
-						database = UserDatabase.createInstance(rule.activity),
-						id = MOCK_USER_ID
-					),
-					preferences = rule.activity.dataStorePreferences,
-					contextActivity = rule.activity,
-					scope = rememberCoroutineScope(),
-					roomFinderDatabase = mockRoomFinderDatabase(),
-					hourIndex = remember { mutableStateOf(2) },
-					showElementPicker = remember { mutableStateOf(false) }
-				))
+				WithScreenshot {
+					RoomFinder(RoomFinderState(
+						user = rule.activity.user!!,
+						timetableDatabaseInterface = TimetableDatabaseInterface(
+							database = UserDatabase.createInstance(rule.activity),
+							id = MOCK_USER_ID
+						),
+						preferences = preferenceWithThemeColor(rule.activity.dataStorePreferences),
+						contextActivity = rule.activity,
+						scope = rememberCoroutineScope(),
+						roomFinderDatabase = mockRoomFinderDatabase(),
+						hourIndex = remember { mutableStateOf(2) },
+						showElementPicker = remember { mutableStateOf(false) }
+					))
+				}
 			}
 		}
 		rule.takeScreenshot("activity-roomfinder.png")
