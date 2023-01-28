@@ -226,7 +226,7 @@ open class BaseComposeActivity : ComponentActivity() {
 		}
 	}
 
-	private fun setSystemUiColor(
+	fun setSystemUiColor(
 		systemUiController: SystemUiController,
 		color: Color = Color.Transparent,
 		darkIcons: Boolean = color.luminance() > 0.5f
