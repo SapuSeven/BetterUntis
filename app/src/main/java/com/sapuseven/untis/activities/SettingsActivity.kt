@@ -21,7 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -43,6 +43,7 @@ import com.google.accompanist.flowlayout.MainAxisAlignment
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults.libraryColors
+import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults.libraryPadding
 import com.mikepenz.aboutlibraries.util.withJson
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
@@ -165,8 +166,8 @@ class SettingsActivity : BaseComposeActivity() {
 					) { innerPadding ->
 						Box(
 							modifier = Modifier
-                                .padding(innerPadding)
-                                .fillMaxSize()
+								.padding(innerPadding)
+								.fillMaxSize()
 						) {
 							NavHost(navController, startDestination = preferencePath) {
 								composable("preferences") {
@@ -522,6 +523,7 @@ class SettingsActivity : BaseComposeActivity() {
 									VerticalScrollColumn {
 										ElementPickerPreference(
 											title = { Text(stringResource(R.string.preference_timetable_personal_timetable)) },
+											icon = { Icon(imageVector = Icons.Outlined.ManageAccounts, contentDescription = null)},
 											dataStore = dataStorePreferences.timetablePersonalTimetable,
 											timetableDatabaseInterface = timetableDatabaseInterface,
 											highlight = preferenceHighlight == "preference_timetable_personal_timetable"
@@ -529,24 +531,28 @@ class SettingsActivity : BaseComposeActivity() {
 
 										SwitchPreference(
 											title = { Text(stringResource(R.string.preference_timetable_hide_time_stamps)) },
+											icon = { Icon(imageVector = Icons.Outlined.Schedule, contentDescription = null)},
 											summary = { Text(stringResource(R.string.preference_timetable_hide_time_stamps_desc)) },
 											dataStore = dataStorePreferences.timetableHideTimeStamps
 										)
 
 										SwitchPreference(
 											title = { Text(stringResource(R.string.preference_timetable_hide_cancelled)) },
+											icon = { Icon(imageVector = Icons.Outlined.SearchOff, contentDescription = null)},
 											summary = { Text(stringResource(R.string.preference_timetable_hide_cancelled_desc)) },
 											dataStore = dataStorePreferences.timetableHideCancelled
 										)
 
 										SwitchPreference(
 											title = { Text(stringResource(R.string.preference_timetable_substitutions_irregular)) },
+											icon = { Icon(imageVector = Icons.Outlined.Cancel, contentDescription = null)},
 											summary = { Text(stringResource(R.string.preference_timetable_substitutions_irregular_desc)) },
 											dataStore = dataStorePreferences.timetableSubstitutionsIrregular
 										)
 
 										SwitchPreference(
 											title = { Text(stringResource(R.string.preference_timetable_background_irregular)) },
+											icon = { Icon(imageVector = Icons.Outlined.FormatPaint, contentDescription = null)},
 											summary = { Text(stringResource(R.string.preference_timetable_background_irregular_desc)) },
 											dependency = dataStorePreferences.timetableSubstitutionsIrregular,
 											dataStore = dataStorePreferences.timetableBackgroundIrregular
@@ -554,6 +560,7 @@ class SettingsActivity : BaseComposeActivity() {
 
 										PreferenceCategory(stringResource(id = R.string.preference_category_display_options)) {
 											RangeInputPreference(
+												icon = { Icon(imageVector = Icons.Outlined.Preview, contentDescription = null)},
 												title = { Text(stringResource(R.string.preference_timetable_range)) },
 												dataStore = dataStorePreferences.timetableRange
 											)
@@ -568,7 +575,7 @@ class SettingsActivity : BaseComposeActivity() {
 											enabled = false,
 											key = preference_timetable_range_hide_outside,
 											summary = (not implemented),
-											title = Hide lessons outside specified range" */
+											title = "Hide lessons outside specified range" */
 										}
 
 										PreferenceCategory(stringResource(id = R.string.preference_category_timetable_item_appearance)) {
@@ -856,6 +863,7 @@ class SettingsActivity : BaseComposeActivity() {
 													contentDescription = null
 												)
 											},
+											clickable = false,
 											dataStore = UntisPreferenceDataStore.emptyDataStore()
 										)
 
@@ -1000,6 +1008,9 @@ class SettingsActivity : BaseComposeActivity() {
 										badgeBackgroundColor = colorScheme!!.primary,
 										badgeContentColor = colorScheme!!.onPrimary
 									)
+									val libraryPadding = libraryPadding(
+										badgePadding = PaddingValues(start = 148.dp)
+									)
 									/*
 									* The about libraries (android library from mikepenz)
 									* use a custom library file stored in R.raw.about_libs.
@@ -1013,6 +1024,7 @@ class SettingsActivity : BaseComposeActivity() {
 											Libs.Builder().withJson(ctx, R.raw.about_libs)
 												.build()
 										},
+										padding = libraryPadding,
 										contentPadding = insetsPaddingValues(),
 										colors = colors
 									)
@@ -1207,8 +1219,8 @@ class SettingsActivity : BaseComposeActivity() {
 	private fun VerticalScrollColumn(content: @Composable ColumnScope.() -> Unit) {
 		Column(
 			modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .bottomInsets(),
+				.verticalScroll(rememberScrollState())
+				.bottomInsets(),
 			content = content
 		)
 	}

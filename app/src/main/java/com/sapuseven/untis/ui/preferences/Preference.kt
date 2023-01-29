@@ -29,6 +29,7 @@ fun <T> Preference(
 	trailingContent: @Composable ((value: T, enabled: Boolean) -> Unit)? = null,
 	scope: CoroutineScope = rememberCoroutineScope(),
 	onClick: (value: T) -> Unit = {},
+	clickable: Boolean = true,//Defines if the preference is clickable. this is currently only used on the about screen
 	highlight: Boolean = false
 ) {
 	var enabled by remember {
@@ -84,10 +85,12 @@ fun <T> Preference(
 		trailingContent = { trailingContent?.invoke(value.value, enabled) },
 		modifier = Modifier
 			.conditional(enabled) {
-				Modifier.clickable(
-					interactionSource = interactionSource,
-					indication = LocalIndication.current
-				) { onClick(value.value) }
+				Modifier.conditional(clickable){
+					Modifier.clickable(
+						interactionSource = interactionSource,
+						indication = LocalIndication.current
+					) { onClick(value.value) }
+				}
 			}
 	)
 }

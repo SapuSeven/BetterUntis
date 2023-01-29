@@ -15,7 +15,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.Login
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -337,7 +337,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 									if (loading)
 										SmallCircularProgressIndicator()
 									else
-										Icon(Icons.Outlined.ArrowForward, contentDescription = null)
+										Icon(Icons.Outlined.Login, contentDescription = null)
 								},
 								text = { Text(stringResource(id = R.string.logindatainput_login)) },
 								onClick = {
