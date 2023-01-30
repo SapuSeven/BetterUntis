@@ -5,13 +5,15 @@ import com.sapuseven.untis.models.untis.UntisTime
 import com.sapuseven.untis.models.untis.UntisUserData
 import com.sapuseven.untis.models.untis.masterdata.TimeGrid
 import com.sapuseven.untis.models.untis.masterdata.timegrid.Day
+import com.sapuseven.untis.utils.SCREENSHOT_API_URL
+import com.sapuseven.untis.utils.SCREENSHOT_PROFILE_NAME
 
 const val MOCK_USER_ID: Long = Long.MAX_VALUE
 
-fun userMock(): UserDatabase.User = UserDatabase.User(
+fun userMock(profileName: String = SCREENSHOT_PROFILE_NAME, apiUrl: String = SCREENSHOT_API_URL): UserDatabase.User = UserDatabase.User(
 	id = MOCK_USER_ID,
-	profileName = "Android Test",
-	"https://api.sapuseven.com/untis/testing",
+	profileName = profileName,
+	apiUrl = apiUrl,
 	schoolId = "test",
 	user = "test.user",
 	key = "test.key",

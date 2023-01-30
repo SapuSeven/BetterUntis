@@ -16,6 +16,8 @@ import java.io.File
 import java.io.FileOutputStream
 
 private const val TAG_SCREENSHOT = "screenshot"
+const val SCREENSHOT_PROFILE_NAME = "Example School"
+const val SCREENSHOT_API_URL = "https://api.sapuseven.com/untis/testing"
 
 fun ComposeContentTestRule.takeScreenshot(file: String, useRoot: Boolean = false) {
 	(if (useRoot) onRoot() else onNodeWithTag(TAG_SCREENSHOT))
