@@ -19,9 +19,8 @@ import com.sapuseven.untis.models.RoomFinderItem
 import com.sapuseven.untis.models.untis.UntisMasterData
 import com.sapuseven.untis.models.untis.masterdata.Room
 import com.sapuseven.untis.preferences.dataStorePreferences
-import com.sapuseven.untis.ui.activities.InfoCenter
 import com.sapuseven.untis.utils.WithScreenshot
-import com.sapuseven.untis.utils.preferenceWithThemeColor
+import com.sapuseven.untis.utils.preferenceWithTheme
 import com.sapuseven.untis.utils.takeScreenshot
 import org.junit.After
 import org.junit.Before
@@ -75,7 +74,7 @@ class RoomFinderActivityScreenshot {
 							database = UserDatabase.createInstance(rule.activity),
 							id = MOCK_USER_ID
 						),
-						preferences = preferenceWithThemeColor(rule.activity.dataStorePreferences),
+						preferences = preferenceWithTheme(rule.activity.dataStorePreferences),
 						contextActivity = rule.activity,
 						scope = rememberCoroutineScope(),
 						roomFinderDatabase = mockRoomFinderDatabase(),

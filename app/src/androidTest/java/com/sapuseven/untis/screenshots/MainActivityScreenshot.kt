@@ -1,56 +1,34 @@
 package com.sapuseven.untis.screenshots
 
+import android.graphics.*
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.*
-import com.sapuseven.untis.data.connectivity.UntisApiConstants
-import com.sapuseven.untis.data.connectivity.UntisAuthentication
-import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.data.timetable.PeriodData
-import com.sapuseven.untis.data.timetable.TimegridItem
-import com.sapuseven.untis.helpers.SerializationUtils
-import com.sapuseven.untis.helpers.api.LoginErrorInfo
-import com.sapuseven.untis.helpers.api.LoginHelper
 import com.sapuseven.untis.helpers.config.globalDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.mocks.MOCK_USER_ID
-import com.sapuseven.untis.mocks.timeGrid
 import com.sapuseven.untis.mocks.userMock
-import com.sapuseven.untis.models.UntisAbsence
-import com.sapuseven.untis.models.UntisMessage
-import com.sapuseven.untis.models.UntisOfficeHour
-import com.sapuseven.untis.models.untis.UntisMasterData
-import com.sapuseven.untis.models.untis.masterdata.Room
-import com.sapuseven.untis.models.untis.params.UserDataParams
-import com.sapuseven.untis.models.untis.response.UserDataResponse
-import com.sapuseven.untis.models.untis.response.UserDataResult
-import com.sapuseven.untis.models.untis.timetable.Period
 import com.sapuseven.untis.preferences.dataStorePreferences
-import com.sapuseven.untis.ui.activities.EventListItem
-import com.sapuseven.untis.ui.activities.InfoCenter
-import com.sapuseven.untis.ui.activities.InfoCenterState
-import com.sapuseven.untis.ui.activities.rememberInfoCenterState
+import com.sapuseven.untis.ui.preferences.materialColors
 import com.sapuseven.untis.utils.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.decodeFromString
-import org.joda.time.DateTime
-import org.joda.time.LocalDate
 import org.junit.After
-import org.junit.Assert
+import org.junit.AfterClass
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.File
+import kotlin.test.AfterTest
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 @RunWith(AndroidJUnit4::class)
 class MainActivityScreenshot {
@@ -70,7 +48,90 @@ class MainActivityScreenshot {
 
 	@OptIn(ExperimentalMaterial3Api::class)
 	@Test
-	fun mainActivityScreenshot() {
+	fun mainActivityScreenshotRed() {
+		mainActivityScreenshotWithTheme(materialColors[0], false, "1-red")
+	}
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	@Test
+	fun mainActivityScreenshotOrange() {
+		mainActivityScreenshotWithTheme(materialColors[15], false, "2-orange")
+	}
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	@Test
+	fun mainActivityScreenshotYellow() {
+		mainActivityScreenshotWithTheme(materialColors[13], false, "3-yellow")
+	}
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	@Test
+	fun mainActivityScreenshotGreen() {
+		mainActivityScreenshotWithTheme(materialColors[11], false, "4-green")
+	}
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	@Test
+	fun mainActivityScreenshotBlue() {
+		mainActivityScreenshotWithTheme(materialColors[6], false, "5-blue")
+	}
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	@Test
+	fun mainActivityScreenshotIndigo() {
+		mainActivityScreenshotWithTheme(materialColors[5], false, "6-indigo")
+	}
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	@Test
+	fun mainActivityScreenshotPurple() {
+		mainActivityScreenshotWithTheme(materialColors[3], false, "7-purple")
+	}
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	@Test
+	fun mainActivityScreenshotRedDark() {
+		mainActivityScreenshotWithTheme(materialColors[0], true, "dark-1-red")
+	}
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	@Test
+	fun mainActivityScreenshotOrangeDark() {
+		mainActivityScreenshotWithTheme(materialColors[15], true, "dark-2-orange")
+	}
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	@Test
+	fun mainActivityScreenshotYellowDark() {
+		mainActivityScreenshotWithTheme(materialColors[13], true, "dark-3-yellow")
+	}
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	@Test
+	fun mainActivityScreenshotGreenDark() {
+		mainActivityScreenshotWithTheme(materialColors[11], true, "dark-4-green")
+	}
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	@Test
+	fun mainActivityScreenshotBlueDark() {
+		mainActivityScreenshotWithTheme(materialColors[6], true, "dark-5-blue")
+	}
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	@Test
+	fun mainActivityScreenshotIndigoDark() {
+		mainActivityScreenshotWithTheme(materialColors[5], true, "dark-6-indigo")
+	}
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	@Test
+	fun mainActivityScreenshotPurpleDark() {
+		mainActivityScreenshotWithTheme(materialColors[3], true, "dark-7-purple")
+	}
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	private fun mainActivityScreenshotWithTheme(themeColor: Color, darkTheme: Boolean = false, themeColorName: String) {
 		rule.setContent {
 			rule.activity.setSystemUiColor(rememberSystemUiController())
 			rule.activity.setUser(userMock(), false)
@@ -82,7 +143,7 @@ class MainActivityScreenshot {
 						database = UserDatabase.createInstance(rule.activity),
 						id = MOCK_USER_ID
 					),
-					preferences = preferenceWithThemeColor(rule.activity.dataStorePreferences),
+					preferences = preferenceWithTheme(rule.activity.dataStorePreferences, themeColor, darkTheme),
 					customThemeColor = rule.activity.customThemeColor,
 					globalPreferences = rule.activity.globalDataStore
 				)
@@ -92,10 +153,12 @@ class MainActivityScreenshot {
 				WithScreenshot {
 					MainApp(state)
 				}
+
+				//rule.mainClock.advanceTimeUntil(30000) { !state.isLoading } // Doesn't seem to work at all
 			}
 		}
-		rule.waitForIdle()
-		rule.takeScreenshot("activity-main.png")
+
+		rule.takeScreenshot("activity-main-${themeColorName}.png")
 	}
 
 	@After

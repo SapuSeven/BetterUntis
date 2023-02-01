@@ -1,6 +1,7 @@
 package com.sapuseven.untis.utils
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.runtime.Composable
@@ -13,6 +14,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.test.platform.app.InstrumentationRegistry
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 
 private const val TAG_SCREENSHOT = "screenshot"
@@ -32,6 +34,11 @@ fun Bitmap.save(file: String) {
 	FileOutputStream(File(basePath, file)).use { out ->
 		compress(Bitmap.CompressFormat.PNG, 100, out)
 	}
+}
+
+fun loadScreenshot(file: String): Bitmap {
+	val basePath = InstrumentationRegistry.getInstrumentation().targetContext.filesDir.canonicalPath + "/screenshots"
+	return BitmapFactory.decodeStream(FileInputStream(File(basePath, file)))
 }
 
 @Composable

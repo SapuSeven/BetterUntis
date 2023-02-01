@@ -1,30 +1,17 @@
 package com.sapuseven.untis.screenshots
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.datastore.preferences.core.edit
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.activities.BaseComposeActivity
-import com.sapuseven.untis.activities.RoomFinder
-import com.sapuseven.untis.activities.RoomFinderState
-import com.sapuseven.untis.data.databases.RoomFinderDatabase
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.mocks.MOCK_USER_ID
 import com.sapuseven.untis.mocks.timeGrid
 import com.sapuseven.untis.mocks.userMock
-import com.sapuseven.untis.models.RoomFinderItem
 import com.sapuseven.untis.models.UntisAbsence
 import com.sapuseven.untis.models.UntisMessage
 import com.sapuseven.untis.models.UntisOfficeHour
@@ -35,11 +22,9 @@ import com.sapuseven.untis.ui.activities.EventListItem
 import com.sapuseven.untis.ui.activities.InfoCenter
 import com.sapuseven.untis.ui.activities.InfoCenterState
 import com.sapuseven.untis.ui.activities.rememberInfoCenterState
-import com.sapuseven.untis.ui.preferences.materialColors
 import com.sapuseven.untis.utils.WithScreenshot
-import com.sapuseven.untis.utils.preferenceWithThemeColor
+import com.sapuseven.untis.utils.preferenceWithTheme
 import com.sapuseven.untis.utils.takeScreenshot
-import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -107,7 +92,7 @@ class InfoCenterActivityScreenshot {
 						database = UserDatabase.createInstance(rule.activity),
 						id = MOCK_USER_ID
 					),
-					preferences = preferenceWithThemeColor(rule.activity.dataStorePreferences),
+					preferences = preferenceWithTheme(rule.activity.dataStorePreferences),
 					contextActivity = rule.activity,
 					selectedItem = rememberSaveable { mutableStateOf(InfoCenterState.ID_MESSAGES) },
 					messages = remember { mutableStateOf<List<UntisMessage>?>(messages) },
