@@ -70,7 +70,7 @@ class MainActivityScreenshot {
 	@Test
 	fun mainActivityScreenshotYellow() {
 		mainActivityScreenshotWithTheme(materialColors[13], false, "3-yellow")
-	}
+	}*/
 
 	@OptIn(ExperimentalMaterial3Api::class)
 	@Test
@@ -78,7 +78,7 @@ class MainActivityScreenshot {
 		mainActivityScreenshotWithTheme(materialColors[11], false, "4-green")
 	}
 
-	@OptIn(ExperimentalMaterial3Api::class)
+	/*@OptIn(ExperimentalMaterial3Api::class)
 	@Test
 	fun mainActivityScreenshotBlue() {
 		mainActivityScreenshotWithTheme(materialColors[6], false, "5-blue")
@@ -118,21 +118,21 @@ class MainActivityScreenshot {
 	@Test
 	fun mainActivityScreenshotGreenDark() {
 		mainActivityScreenshotWithTheme(materialColors[11], true, "dark-4-green")
-	}*/
+	}
 
 	@OptIn(ExperimentalMaterial3Api::class)
 	@Test
 	fun mainActivityScreenshotBlueDark() {
 		mainActivityScreenshotWithTheme(materialColors[6], true, "dark-5-blue")
-	}
+	}*/
 
-	/*@OptIn(ExperimentalMaterial3Api::class)
+	@OptIn(ExperimentalMaterial3Api::class)
 	@Test
 	fun mainActivityScreenshotIndigoDark() {
 		mainActivityScreenshotWithTheme(materialColors[5], true, "dark-6-indigo")
 	}
 
-	@OptIn(ExperimentalMaterial3Api::class)
+	/*@OptIn(ExperimentalMaterial3Api::class)
 	@Test
 	fun mainActivityScreenshotPurpleDark() {
 		mainActivityScreenshotWithTheme(materialColors[3], true, "dark-7-purple")

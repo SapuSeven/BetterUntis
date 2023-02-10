@@ -69,14 +69,19 @@ class InfoCenterActivityScreenshot {
 		val messages = listOf(
 			UntisMessage(
 				1,
-				"Test message 1",
-				"Message body - even with <b>HTML</b> support!",
+				"School messages...",
+				"You can view messages from your school here in the <b>Info Center</b>.",
 				emptyList()
 			),
 			UntisMessage(
 				2,
-				"Test message 2",
-				"Here's a second one.",
+				"...and more!",
+				"There are even more tabs with other useful information at the bottom:<br>" +
+						"<br><ul>" +
+						"  <li>&nbsp;<b>Events</b> shows all upcoming exams and homework assignments.</li>" +
+						"  <li>&nbsp;<b>Absences</b> lets you manage your absences.</li>" +
+						"  <li>&nbsp;<b>Office Hours</b> lists the available office hours for teachers.</li>" +
+						"</ul>",
 				emptyList()
 			)
 		)

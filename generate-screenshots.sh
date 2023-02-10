@@ -20,8 +20,8 @@ done
 # Do some image magick to make the screenshots look pretty
 cd screenshots
 
-SPLIT_IMAGE_1=activity-main-1-red.png
-SPLIT_IMAGE_2=activity-main-dark-5-blue.png
+SPLIT_IMAGE_1=activity-main-4-green.png
+SPLIT_IMAGE_2=activity-main-dark-6-indigo.png
 SPLIT_IMAGE_DST=main-activity-theme.png
 SPLIT_RATIO=0.35
 

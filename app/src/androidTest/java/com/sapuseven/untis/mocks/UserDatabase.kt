@@ -1,5 +1,8 @@
 package com.sapuseven.untis.mocks
 
+import com.sapuseven.untis.data.connectivity.UntisApiConstants.RIGHT_ABSENCES
+import com.sapuseven.untis.data.connectivity.UntisApiConstants.RIGHT_CLASSREGISTER
+import com.sapuseven.untis.data.connectivity.UntisApiConstants.RIGHT_OFFICEHOURS
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.models.untis.UntisTime
 import com.sapuseven.untis.models.untis.UntisUserData
@@ -28,7 +31,7 @@ fun userMock(profileName: String = SCREENSHOT_PROFILE_NAME, apiUrl: String = SCR
 		1,
 		children = emptyList(),
 		klassenIds = emptyList(),
-		rights = emptyList()
+		rights = listOf(RIGHT_OFFICEHOURS, RIGHT_ABSENCES, RIGHT_CLASSREGISTER)
 	),
 	settings = null,
 	created = null,
