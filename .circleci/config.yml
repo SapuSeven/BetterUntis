@@ -1,9 +1,18 @@
 version: 2.1
+orbs:
+  gh: circleci/github-cli@2.1.0
+filters: &release
+  branches:
+    ignore: /.*/
+  tags:
+    only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
 jobs:
   build:
     working_directory: ~/betteruntis
     docker:
       - image: cimg/android:2022.06.1
+    resource_class: large
+      - image: cimg/android:2022.09
     resource_class: large
     steps:
       - checkout
@@ -26,7 +35,15 @@ jobs:
             echo 'export KEY_RELEASE_PASSWORD=$(echo "$KEY_RELEASE_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
       - run:
           name: Initial build
-          command: ./gradlew --no-daemon clean assemble bundle
+          command: ./gradlew --no-daemon assemble bundle
+          environment:
+            GRADLE_OPTS: '
+              -Dorg.gradle.jvmargs="-Xmx3g -XX:+HeapDumpOnOutOfMemoryError -XX:MaxPermSize=512m"
+              -Dorg.gradle.daemon=false
+              -Dorg.gradle.parallel=true
+              -Dorg.gradle.workers.max=3
+              -Dkotlin.incremental=false
+            '
       - store_artifacts:
           name: Upload build artifacts
           path: app/build/outputs
@@ -52,7 +69,7 @@ jobs:
             - outputs
   deploy_debug:
     docker:
-      - image: cimg/base:2022.03
+      - image: cimg/base:stable
     working_directory: ~/betteruntis
     steps:
       - run:
@@ -71,7 +88,7 @@ jobs:
             scp -r -P $SSH_DEPLOY_PORT -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null workspace/outputs/apk/debug "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/debug/$CIRCLE_BUILD_NUM"
   deploy_release:
     docker:
-      - image: cimg/base:2022.03
+      - image: cimg/base:stable
     working_directory: ~/betteruntis
     steps:
       - run:
@@ -94,10 +111,6 @@ jobs:
     docker:
       - image: cimg/ruby:3.1.2
     working_directory: ~/betteruntis
-    parameters:
-      track:
-        type: string
-        default: 'beta'
     steps:
       - checkout
       - restore_cache:
@@ -117,6 +130,21 @@ jobs:
             echo $GOOGLE_PLAY_KEY_ENCODED | base64 --decode > fastlane/key.json
             bundle exec fastlane deploy aab:'workspace/outputs/bundle/release/app-release.aab' track:<<parameters.track>>
 
+  deploy_github:
+    docker:
+      - image: cimg/base:stable
+    working_directory: ~/betteruntis
+    steps:
+      - gh/setup
+      - gh/clone
+      - attach_workspace:
+          at: workspace
+      - run:
+          name: Deploy Release to GitHub
+          command: |
+            VERSION=$(grep versionCode app/build.gradle | cut -d " " -f2-)
+            gh release create $CIRCLE_TAG --prerelease --title "BetterUntis ${CIRCLE_TAG}" --notes-file "./fastlane/metadata/android/en-US/changelogs/${VERSION}.txt" "./workspace/outputs/apk/debug/app-debug.apk#BetterUntis ${CIRCLE_TAG}.apk"
+
 workflows:
   version: 2
   build-and-deploy:
@@ -131,24 +159,15 @@ workflows:
           filters:
             branches:
               only: develop
-            tags:
-              only: /.*/
       - deploy_release:
           requires:
             - build
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
+          filters: *release
       - deploy_fastlane:
           requires:
             - build
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
+          filters: *release
+          track: 'beta'
       - deploy_fastlane:
           name: deploy_fastlane_material3
           requires:
@@ -157,3 +176,7 @@ workflows:
             branches:
               only: 287-material-design-3
           track: 'material-3'
+      - deploy_github:
+          requires:
+            - build
+          filters: *release
