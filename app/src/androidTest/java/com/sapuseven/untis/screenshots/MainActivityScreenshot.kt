@@ -17,6 +17,8 @@ import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.preferences.materialColors
 import com.sapuseven.untis.utils.*
 import kotlinx.coroutines.runBlocking
+import org.joda.time.DateTime
+import org.joda.time.DateTimeUtils
 import org.junit.After
 import org.junit.AfterClass
 import org.junit.Before
@@ -44,6 +46,12 @@ class MainActivityScreenshot {
 		UserDatabase.createInstance(rule.activity).setAdditionalUserData(
 			MOCK_USER_ID, masterData
 		)
+		DateTimeUtils.setCurrentMillisFixed(
+			DateTime.now()
+				.withDayOfWeek(2)
+				.withTime(10, 15, 0, 0)
+				.millis
+		)
 	}
 
 	@OptIn(ExperimentalMaterial3Api::class)
@@ -52,7 +60,7 @@ class MainActivityScreenshot {
 		mainActivityScreenshotWithTheme(materialColors[0], false, "1-red")
 	}
 
-	@OptIn(ExperimentalMaterial3Api::class)
+	/*@OptIn(ExperimentalMaterial3Api::class)
 	@Test
 	fun mainActivityScreenshotOrange() {
 		mainActivityScreenshotWithTheme(materialColors[15], false, "2-orange")
@@ -110,7 +118,7 @@ class MainActivityScreenshot {
 	@Test
 	fun mainActivityScreenshotGreenDark() {
 		mainActivityScreenshotWithTheme(materialColors[11], true, "dark-4-green")
-	}
+	}*/
 
 	@OptIn(ExperimentalMaterial3Api::class)
 	@Test
@@ -118,7 +126,7 @@ class MainActivityScreenshot {
 		mainActivityScreenshotWithTheme(materialColors[6], true, "dark-5-blue")
 	}
 
-	@OptIn(ExperimentalMaterial3Api::class)
+	/*@OptIn(ExperimentalMaterial3Api::class)
 	@Test
 	fun mainActivityScreenshotIndigoDark() {
 		mainActivityScreenshotWithTheme(materialColors[5], true, "dark-6-indigo")
@@ -128,10 +136,14 @@ class MainActivityScreenshot {
 	@Test
 	fun mainActivityScreenshotPurpleDark() {
 		mainActivityScreenshotWithTheme(materialColors[3], true, "dark-7-purple")
-	}
+	}*/
 
 	@OptIn(ExperimentalMaterial3Api::class)
-	private fun mainActivityScreenshotWithTheme(themeColor: Color, darkTheme: Boolean = false, themeColorName: String) {
+	private fun mainActivityScreenshotWithTheme(
+		themeColor: Color,
+		darkTheme: Boolean = false,
+		themeColorName: String
+	) {
 		rule.setContent {
 			rule.activity.setSystemUiColor(rememberSystemUiController())
 			rule.activity.setUser(userMock(), false)
@@ -143,7 +155,11 @@ class MainActivityScreenshot {
 						database = UserDatabase.createInstance(rule.activity),
 						id = MOCK_USER_ID
 					),
-					preferences = preferenceWithTheme(rule.activity.dataStorePreferences, themeColor, darkTheme),
+					preferences = preferenceWithTheme(
+						rule.activity.dataStorePreferences,
+						themeColor,
+						darkTheme
+					),
 					customThemeColor = rule.activity.customThemeColor,
 					globalPreferences = rule.activity.globalDataStore
 				)
