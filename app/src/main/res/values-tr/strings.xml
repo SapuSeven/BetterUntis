@@ -226,13 +226,9 @@
     <string name="preference_flinging_enable">Hızlı kaydırmayı etkinleştir</string>
     <string name="preferences_connectivity">Bağlantı</string>
     <string name="preferences_general">Genel</string>
-    <string name="preferences_infos">Hakkında</string>
     <string name="preferences_notifications">Bildirimler</string>
     <string name="preferences_styling">Kişiselleştirme</string>
     <string name="preferences_timetable">Ders Programı</string>
-    <string name="settings_designing_message">Henüz olmayan ayar ikonlarını yaparak uygulamayı geliştirmeye yardımcı ol!</string>
-    <string name="settings_designing_hide">Bir daha gösterme</string>
-    <string name="settings_designing_info">Daha fazla</string>
     <string name="notifications_channel_breakinfo">Teneffüs bilgisi</string>
     <string name="notifications_text_error_title">Ders programı yüklenemedi</string>
     <string name="notifications_text_error_message">Bugün bildirim almayacaksın.</string>
