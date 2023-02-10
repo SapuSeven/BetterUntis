@@ -191,7 +191,7 @@ class LoginActivity : BaseComposeActivity() {
 													this@LoginActivity,
 													LoginDataInputActivity::class.java
 												).apply {
-													putBackgroundColorExtra()
+													putBackgroundColorExtra(this)
 													putExtra(EXTRA_BOOLEAN_DEMO_LOGIN, true)
 												}
 											)
@@ -207,7 +207,7 @@ class LoginActivity : BaseComposeActivity() {
 													this@LoginActivity,
 													LoginDataInputActivity::class.java
 												).apply {
-													putBackgroundColorExtra()
+													putBackgroundColorExtra(this)
 												}
 											)
 										}
