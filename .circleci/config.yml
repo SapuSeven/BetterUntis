@@ -109,6 +109,10 @@ jobs:
     docker:
       - image: cimg/ruby:3.1.2
     working_directory: ~/betteruntis
+    parameters:
+      track:
+        type: string
+        default: 'beta'
     steps:
       - checkout
       - restore_cache:
@@ -165,7 +169,6 @@ workflows:
           requires:
             - build
           filters: *release
-          track: 'beta'
       - deploy_fastlane:
           name: deploy_fastlane_material3
           requires:
