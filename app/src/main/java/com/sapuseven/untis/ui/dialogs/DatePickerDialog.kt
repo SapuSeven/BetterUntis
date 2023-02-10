@@ -8,6 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.flowlayout.MainAxisAlignment
 import com.sapuseven.untis.R
 import com.sapuseven.untis.ui.datepicker.DatePicker
 import org.joda.time.LocalDate
@@ -54,8 +56,9 @@ fun DatePickerDialog(
 
 				DatePicker(selectedDayState = selectedDay)
 
-				Row(
-					horizontalArrangement = Arrangement.SpaceBetween,
+				FlowRow(
+					mainAxisAlignment = MainAxisAlignment.End,
+					mainAxisSpacing = 8.dp,
 					modifier = Modifier
 						.fillMaxWidth()
 						.padding(top = 16.dp, bottom = 24.dp)

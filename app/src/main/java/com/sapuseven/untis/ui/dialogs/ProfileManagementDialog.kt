@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BaseComposeActivity.ProfileManagementDialog(
+fun BaseComposeActivity.ProfileManagementDialog( // TODO: Remove inheritance of BaseComposeActivity
 	onDismiss: () -> Unit
 ) {
 	var dismissed by remember { mutableStateOf(false) }
@@ -78,7 +78,7 @@ fun BaseComposeActivity.ProfileManagementDialog(
 		) {
 			item {
 				ListItem(
-					headlineText = { Text("Tap on a profile to edit") },
+					headlineText = { Text(stringResource(R.string.mainactivitydrawer_profile_edit_hint)) },
 					leadingContent = {
 						Icon(
 							imageVector = Icons.Outlined.Info,
@@ -116,8 +116,8 @@ fun BaseComposeActivity.ProfileManagementDialog(
 								context,
 								LoginDataInputActivity::class.java
 							).apply {
-								putUserIdExtra(profile.id)
-								putBackgroundColorExtra()
+								putUserIdExtra(this, profile.id)
+								putBackgroundColorExtra(this)
 							})
 					}
 				)
@@ -138,7 +138,7 @@ fun BaseComposeActivity.ProfileManagementDialog(
 								context,
 								LoginActivity::class.java
 							).apply {
-								putBackgroundColorExtra()
+								putBackgroundColorExtra(this)
 							}
 						)
 					}

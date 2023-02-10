@@ -101,7 +101,7 @@ import kotlin.math.roundToInt
 
 class MainActivity : BaseComposeActivity() {
 	companion object {
-		private const val MESSENGER_PACKAGE_NAME = "com.untis.chat"
+		const val MESSENGER_PACKAGE_NAME = "com.untis.chat"
 
 		const val EXTRA_SERIALIZABLE_PERIOD_ELEMENT = "com.sapuseven.untis.activities.main.element"
 	}
@@ -130,513 +130,525 @@ class MainActivity : BaseComposeActivity() {
 
 		setContent {
 			AppTheme(navBarInset = false) {
-				val snackbarHostState = remember { SnackbarHostState() }
-				if (dataStorePreferences.doubleTapToExit.getState().value)
-					BackPressConfirm(snackbarHostState)
-
 				withUser(
 					invalidContent = { login() }
 				) { user ->
-					val appState =
+					val state =
 						rememberMainAppState(
 							user = user,
+							contextActivity = this,
 							customThemeColor = customThemeColor,
 							timetableDatabaseInterface = timetableDatabaseInterface,
 							preferences = dataStorePreferences,
 							globalPreferences = globalDataStore,
 							colorScheme = MaterialTheme.colorScheme//!! // Can't be null, AppTheme content isn't rendered if colorScheme is null
 						)
-					appState.loadPrefs(dataStorePreferences)
+					state.loadPrefs(dataStorePreferences)
 
-					Drawer(
-						appState = appState,
-						onShowTimetable = {
-							it.let { element ->
-								appState.displayElement(element?.first, element?.second)
-							}
-						}
-					) {
-						Scaffold(
-							snackbarHost = { SnackbarHost(snackbarHostState) },
-							topBar = {
-								CenterAlignedTopAppBar(
-									title = { Text(appState.displayedName.value) },
-									navigationIcon = {
-										IconButton(onClick = {
-											appState.scope.launch { appState.drawerState.open() }
-										}) {
-											Icon(
-												imageVector = Icons.Outlined.Menu,
-												contentDescription = stringResource(id = R.string.main_drawer_open)
-											)
-										}
-									},
-									actions = {
-										ProfileSelectorAction(
-											users = userDatabase.getAllUsers(),
-											currentSelectionId = user.id,
-											showProfileActions = true,
-											onSelectionChange = {
-												setUser(it, true)
-											},
-											onActionEdit = {
-												appState.profileManagementDialog.value = true
-											}
-										)
-									}
-								)
-							},
-						) { innerPadding ->
-							Box(
-								modifier = Modifier
-									.padding(innerPadding)
-									.fillMaxSize()
-							) {
-								WeekViewCompose(appState)
-
-								val timeColumnWidth = with(LocalDensity.current) {
-									appState.weekView.value?.config?.timeColumnWidth?.toDp()
-										?: 48.dp
-								}
-								Text(
-									text = appState.lastRefreshText(),
-									modifier = Modifier
-										.align(Alignment.BottomStart)
-										.padding(start = timeColumnWidth + 8.dp, bottom = 8.dp)
-										.bottomInsets()
-										.disabled(appState.isAnonymous)
-								)
-
-								if (appState.isAnonymous) {
-									Column(
-										verticalArrangement = Arrangement.Center,
-										horizontalAlignment = Alignment.CenterHorizontally,
-										modifier = Modifier
-											.fillMaxSize()
-											.absolutePadding(left = 16.dp)
-									) {
-										Text(
-											text = stringResource(id = R.string.main_anonymous_login_info_text),
-											textAlign = TextAlign.Center,
-											modifier = Modifier
-												.padding(horizontal = 32.dp)
-										)
-
-										Button(
-											onClick = {
-												startActivity(
-													Intent(
-														this@MainActivity,
-														SettingsActivity::class.java
-													).apply {
-														putUserIdExtra(user.id)
-														putExtra(
-															EXTRA_STRING_PREFERENCE_ROUTE,
-															"preferences_timetable"
-														)
-														putExtra(
-															EXTRA_STRING_PREFERENCE_HIGHLIGHT,
-															"preference_timetable_personal_timetable"
-														)
-														putBackgroundColorExtra()
-													}
-												)
-											},
-											modifier = Modifier
-												.padding(top = 16.dp)
-										) {
-											Text(text = stringResource(id = R.string.main_go_to_settings))
-										}
-									}
-								}
-
-								if (appState.isLoading)
-									CircularProgressIndicator(
-										modifier = Modifier
-											.align(Alignment.BottomEnd)
-											.padding(8.dp)
-									)
-							}
-						}
-					}
-
-					// TODO: Implement a smoother animation (see https://m3.material.io/components/dialogs/guidelines#007536b9-76b1-474a-a152-2f340caaff6f)
-					AnimatedVisibility(
-						visible = appState.timetableItemDetailsDialog.value != null,
-						enter = fullscreenDialogAnimationEnter(),
-						exit = fullscreenDialogAnimationExit()
-					) {
-						// TODO: Incorrect insets
-						TimetableItemDetailsDialog(
-							timegridItems = remember {
-								appState.timetableItemDetailsDialog.value?.first ?: emptyList()
-							},
-							initialPage = remember {
-								appState.timetableItemDetailsDialog.value?.second ?: 0
-							},
-							user = user,
-							timetableDatabaseInterface = timetableDatabaseInterface,
-							onDismiss = {
-								appState.timetableItemDetailsDialog.value = null
-								it?.let { appState.displayElement(it) }
-							}
-						)
-					}
-
-					AnimatedVisibility(
-						visible = appState.profileManagementDialog.value,
-						enter = fullscreenDialogAnimationEnter(),
-						exit = fullscreenDialogAnimationExit()
-					) {
-						ProfileManagementDialog(
-							onDismiss = {
-								appState.profileManagementDialog.value = false
-							}
-						)
-					}
-
-					if (appState.showDatePicker.value)
-						DatePickerDialog(
-							initialSelection = appState.lastSelectedDate,
-							onDismiss = { appState.showDatePicker.value = false }
-						) {
-							appState.showDatePicker.value = false
-							appState.lastSelectedDate = it
-							appState.weekView.value?.goToDate(it.toDateTime(LocalTime.now()))
-						}
+					MainApp(state)
 				}
 			}
-		}
-	}
-
-	@Composable
-	private fun WeekViewCompose(appState: MainAppState) {
-		var weekViewGlobal by remember { mutableStateOf(appState.weekView.value) }
-		appState.loadWeekViewPreferences(weekViewGlobal, dataStorePreferences)
-
-		AndroidView(
-			factory = { context ->
-				if (weekViewGlobal == null) { // Create weekView if it doesn't already exist
-					WeekView<TimegridItem>(context).also {
-						weekViewGlobal = it
-						appState.weekView.value = it
-					}
-				}
-
-				appState.weekViewSwipeRefresh.value ?: WeekViewSwipeRefreshLayout(context).apply {
-					appState.weekViewSwipeRefresh.value = this
-					addView(weekViewGlobal)
-				}
-			},
-			update = {
-				appState.weekView.value = weekViewGlobal
-				userDatabase.getAdditionalUserData<Holiday>(user?.id!!, Holiday())?.let { item ->
-					appState.weekView.value?.addHolidays(item.map { holiday ->
-						HolidayChip(
-							text = holiday.value.longName,
-							startDate = holiday.value.startDate,
-							endDate = holiday.value.endDate
-						)
-					})
-				}
-				appState.updateViews(it)
-			},
-			modifier = Modifier
-				.fillMaxSize()
-				.disabled(appState.isAnonymous)
-		)
-	}
-
-	@OptIn(ExperimentalMaterial3Api::class)
-	@Composable
-	private fun Drawer(
-		appState: MainAppState,
-		onShowTimetable: (Pair<PeriodElement?, String?>?) -> Unit,
-		content: @Composable () -> Unit
-	) {
-		val scope = rememberCoroutineScope()
-		val drawerScrollState = rememberScrollState()
-		var bookmarkDeleteDialog by remember { mutableStateOf<TimetableBookmark?>(null) }
-
-		var showElementPicker by remember {
-			mutableStateOf<TimetableDatabaseInterface.Type?>(
-				null
-			)
-		}
-
-		var bookmarksElementPicker by remember {
-			mutableStateOf<TimetableDatabaseInterface.Type?>(
-				null
-			)
-		}
-
-		val shortcutLauncher =
-			rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
-				val periodElement: PeriodElement? =
-					activityResult.data?.getSerializable(EXTRA_SERIALIZABLE_PERIOD_ELEMENT)
-
-				periodElement?.let {
-					onShowTimetable(it to timetableDatabaseInterface.getLongName(it))
-				}
-			}
-
-		BackHandler(enabled = appState.drawerState.isOpen) {
-			scope.launch {
-				appState.drawerState.close()
-			}
-		}
-
-		ModalNavigationDrawer(
-			gesturesEnabled = appState.drawerGesturesEnabled,
-			drawerState = appState.drawerState,
-			drawerContent = {
-				Column(
-					modifier = Modifier
-						.fillMaxSize()
-						.verticalScroll(drawerScrollState)
-				) {
-					Spacer(modifier = Modifier.height(24.dp))
-
-					DrawerText(stringResource(id = R.string.all_favourites))
-
-					NavigationDrawerItem(
-						icon = {
-							Icon(
-								painterResource(id = R.drawable.all_prefs_personal),
-								contentDescription = null
-							)
-						},
-						label = { Text(stringResource(id = R.string.all_personal_timetable)) },
-						selected = appState.isPersonalTimetable,
-						onClick = {
-							appState.closeDrawer()
-							onShowTimetable(appState.personalTimetable)
-						},
-						modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-					)
-
-					var isBookmarkSelected = false
-					appState.user.bookmarks.forEach { bookmark ->
-						val isDisplayed = appState.displayedElement.value?.let {
-							it.id == bookmark.elementId && it.type == bookmark.elementType
-						} == true
-						isBookmarkSelected = isBookmarkSelected || isDisplayed
-
-						NavigationDrawerItem(
-							icon = {
-								Icon(
-									painter = painterResource(
-										id = when (TimetableDatabaseInterface.Type.valueOf(
-											bookmark.elementType
-										)) {
-											TimetableDatabaseInterface.Type.CLASS -> R.drawable.all_classes
-											TimetableDatabaseInterface.Type.TEACHER -> R.drawable.all_teachers
-											TimetableDatabaseInterface.Type.SUBJECT -> R.drawable.all_subject
-											TimetableDatabaseInterface.Type.ROOM -> R.drawable.all_rooms
-											else -> R.drawable.all_prefs_personal
-										}
-									),
-									contentDescription = null
-								)
-							},
-							badge = {
-								IconButton(
-									onClick = { bookmarkDeleteDialog = bookmark }
-								) {
-									Icon(
-										painter = painterResource(id = R.drawable.all_bookmark_remove),
-										contentDescription = "Remove Bookmark"
-									) //TODO: Extract String resource
-								}
-							},
-							label = { Text(text = bookmark.displayName) },
-							selected = isDisplayed,
-							onClick = {
-								appState.closeDrawer()
-								val items = timetableDatabaseInterface.getElements(
-									TimetableDatabaseInterface.Type.valueOf(bookmark.elementType)
-								)
-								val item = items.find {
-									it.id == bookmark.elementId && it.type == bookmark.elementType
-								}
-								onShowTimetable(
-									item to timetableDatabaseInterface.getLongName(item!!)
-								)
-							},
-							modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-						)
-					}
-
-					NavigationDrawerItem(
-						icon = {
-							Icon(
-								painterResource(id = R.drawable.all_add),
-								contentDescription = null
-							)
-						},
-						label = { Text(stringResource(id = R.string.maindrawer_bookmarks_add)) },
-						selected = false,
-						onClick = {
-							appState.closeDrawer()
-							bookmarksElementPicker = TimetableDatabaseInterface.Type.CLASS
-							//selectedItem.value = item
-						},
-						modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-					)
-
-					DrawerText(stringResource(id = R.string.nav_all_timetables))
-
-					DrawerItems(
-						isMessengerAvailable = appState.isMessengerAvailable,
-						disableTypeSelection = appState.isPersonalTimetable || isBookmarkSelected,
-						displayedElement = appState.displayedElement.value,
-						onTimetableClick = { item ->
-							appState.closeDrawer()
-							showElementPicker = item.elementType
-						},
-						onShortcutClick = { item ->
-							appState.closeDrawer()
-							if (item.target == null) {
-								try {
-									startActivity(
-										packageManager.getLaunchIntentForPackage(
-											MESSENGER_PACKAGE_NAME
-										)
-									)
-								} catch (e: Exception) {
-									try {
-										startActivity(
-											Intent(
-												Intent.ACTION_VIEW,
-												Uri.parse("market://details?id=$MESSENGER_PACKAGE_NAME")
-											)
-										)
-									} catch (e: Exception) {
-										startActivity(
-											Intent(
-												Intent.ACTION_VIEW,
-												Uri.parse("https://play.google.com/store/apps/details?id=$MESSENGER_PACKAGE_NAME")
-											)
-										)
-									}
-								}
-							} else {
-								shortcutLauncher.launch(
-									Intent(
-										this@MainActivity,
-										item.target
-									).apply {
-										putUserIdExtra()
-										putBackgroundColorExtra()
-									}
-								)
-							}
-						}
-					)
-				}
-			},
-			content = content
-		)
-
-		AnimatedVisibility(
-			visible = showElementPicker != null,
-			enter = fullscreenDialogAnimationEnter(),
-			exit = fullscreenDialogAnimationExit()
-		) {
-			ElementPickerDialogFullscreen(
-				title = { /*TODO*/ },
-				timetableDatabaseInterface = timetableDatabaseInterface,
-				onDismiss = { showElementPicker = null },
-				onSelect = { item ->
-					item?.let {
-						onShowTimetable(
-							item to timetableDatabaseInterface.getLongName(it)
-						)
-					} ?: run {
-						onShowTimetable(appState.personalTimetable)
-					}
-				},
-				initialType = showElementPicker
-			)
-		}
-
-		AnimatedVisibility(
-			visible = bookmarksElementPicker != null,
-			enter = fullscreenDialogAnimationEnter(),
-			exit = fullscreenDialogAnimationExit()
-		) {
-			val context = LocalContext.current
-
-			ElementPickerDialogFullscreen(
-				title = { Text(stringResource(id = R.string.maindrawer_bookmarks_add)) },
-				timetableDatabaseInterface = timetableDatabaseInterface,
-				hideTypeSelectionPersonal = true,
-				onDismiss = { bookmarksElementPicker = null },
-				onSelect = { item ->
-					item?.let {
-						val newBookmark = TimetableBookmark(
-							elementId = it.id,
-							elementType = TimetableDatabaseInterface.Type.valueOf(it.type).name,
-							displayName = timetableDatabaseInterface.getLongName(it)
-						)
-
-						if (appState.user.bookmarks.contains(newBookmark))
-							Toast
-								.makeText(
-									context,
-									"Bookmark already exists",
-									Toast.LENGTH_LONG
-								) // TODO: Extract string resource
-								.show()
-						else {
-							appState.user.bookmarks = appState.user.bookmarks.plus(newBookmark)
-							userDatabase.editUser(appState.user)
-							onShowTimetable(
-								item to timetableDatabaseInterface.getLongName(it)
-							)
-						}
-					}
-
-				},
-				initialType = bookmarksElementPicker
-			)
-		}
-
-		bookmarkDeleteDialog?.let { bookmark ->
-			AlertDialog(
-				text = { Text(stringResource(id = R.string.main_dialog_delete_bookmark)) },
-				onDismissRequest = { bookmarkDeleteDialog = null },
-				confirmButton = {
-					TextButton(
-						onClick = {
-							appState.user.bookmarks = appState.user.bookmarks.minus(bookmark)
-							userDatabase.editUser(appState.user)
-							bookmarkDeleteDialog = null
-						}) {
-						Text(stringResource(id = R.string.all_delete))
-					}
-				},
-				dismissButton = {
-					TextButton(
-						onClick = { bookmarkDeleteDialog = null }) {
-						Text(stringResource(id = R.string.all_cancel))
-					}
-				}
-			)
 		}
 	}
 
 	private fun login() {
 		loginLauncher.launch(Intent(this, LoginActivity::class.java).apply {
-			putUserIdExtra()
-			putBackgroundColorExtra()
+			putUserIdExtra(this)
+			putBackgroundColorExtra(this)
 		})
 	}
 
 }
 
+@Composable
+private fun WeekViewCompose(state: MainAppState) {
+	var weekViewGlobal by remember { mutableStateOf(state.weekView.value) }
+	state.loadWeekViewPreferences(weekViewGlobal, state.preferences)
+
+	AndroidView(
+		factory = { context ->
+			if (weekViewGlobal == null) { // Create weekView if it doesn't already exist
+				WeekView<TimegridItem>(context).also {
+					weekViewGlobal = it
+					state.weekView.value = it
+				}
+			}
+
+			state.weekViewSwipeRefresh.value ?: WeekViewSwipeRefreshLayout(context).apply {
+				state.weekViewSwipeRefresh.value = this
+				addView(weekViewGlobal)
+			}
+		},
+		update = {
+			state.weekView.value = weekViewGlobal
+			state.userDatabase.getAdditionalUserData<Holiday>(state.user.id, Holiday())?.let { item ->
+				state.weekView.value?.addHolidays(item.map { holiday ->
+					HolidayChip(
+						text = holiday.value.longName,
+						startDate = holiday.value.startDate,
+						endDate = holiday.value.endDate
+					)
+				})
+			}
+			state.updateViews(it)
+		},
+		modifier = Modifier
+			.fillMaxSize()
+			.disabled(state.isAnonymous)
+	)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun Drawer(
+	state: MainAppState,
+	onShowTimetable: (Pair<PeriodElement?, String?>?) -> Unit,
+	content: @Composable () -> Unit
+) {
+	val scope = rememberCoroutineScope()
+	val drawerScrollState = rememberScrollState()
+	var bookmarkDeleteDialog by remember { mutableStateOf<TimetableBookmark?>(null) }
+
+	var showElementPicker by remember {
+		mutableStateOf<TimetableDatabaseInterface.Type?>(
+			null
+		)
+	}
+
+	var bookmarksElementPicker by remember {
+		mutableStateOf<TimetableDatabaseInterface.Type?>(
+			null
+		)
+	}
+
+	val shortcutLauncher =
+		rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
+			val periodElement: PeriodElement? = activityResult.data?.let { intent ->
+				state.contextActivity.getSerializable(
+					intent,
+					MainActivity.EXTRA_SERIALIZABLE_PERIOD_ELEMENT
+				)
+			}
+
+			periodElement?.let {
+				onShowTimetable(it to state.timetableDatabaseInterface.getLongName(it))
+			}
+		}
+
+	BackHandler(enabled = state.drawerState.isOpen) {
+		scope.launch {
+			state.drawerState.close()
+		}
+	}
+
+	ModalNavigationDrawer(
+		gesturesEnabled = state.drawerGesturesEnabled,
+		drawerState = state.drawerState,
+		drawerContent = {
+			Column(
+				modifier = Modifier
+					.fillMaxSize()
+					.verticalScroll(drawerScrollState)
+			) {
+				Spacer(modifier = Modifier.height(24.dp))
+
+				DrawerText(stringResource(id = R.string.all_favourites))
+
+				NavigationDrawerItem(
+					icon = {
+						Icon(
+							painterResource(id = R.drawable.all_prefs_personal),
+							contentDescription = null
+						)
+					},
+					label = { Text(stringResource(id = R.string.all_personal_timetable)) },
+					selected = state.isPersonalTimetable,
+					onClick = {
+						state.closeDrawer()
+						onShowTimetable(state.personalTimetable)
+					},
+					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+				)
+
+				var isBookmarkSelected = false
+				state.user.bookmarks.forEach { bookmark ->
+					val isDisplayed = state.displayedElement.value?.let {
+						it.id == bookmark.elementId && it.type == bookmark.elementType
+					} == true
+					isBookmarkSelected = isBookmarkSelected || isDisplayed
+
+					NavigationDrawerItem(
+						icon = {
+							Icon(
+								painter = painterResource(
+									id = when (TimetableDatabaseInterface.Type.valueOf(
+										bookmark.elementType
+									)) {
+										TimetableDatabaseInterface.Type.CLASS -> R.drawable.all_classes
+										TimetableDatabaseInterface.Type.TEACHER -> R.drawable.all_teachers
+										TimetableDatabaseInterface.Type.SUBJECT -> R.drawable.all_subject
+										TimetableDatabaseInterface.Type.ROOM -> R.drawable.all_rooms
+										else -> R.drawable.all_prefs_personal
+									}
+								),
+								contentDescription = null
+							)
+						},
+						badge = {
+							IconButton(
+								onClick = { bookmarkDeleteDialog = bookmark }
+							) {
+								Icon(
+									painter = painterResource(id = R.drawable.all_bookmark_remove),
+									contentDescription = "Remove Bookmark"
+								) //TODO: Extract String resource
+							}
+						},
+						label = { Text(text = bookmark.displayName) },
+						selected = isDisplayed,
+						onClick = {
+							state.closeDrawer()
+							val items = state.timetableDatabaseInterface.getElements(
+								TimetableDatabaseInterface.Type.valueOf(bookmark.elementType)
+							)
+							val item = items.find {
+								it.id == bookmark.elementId && it.type == bookmark.elementType
+							}
+							onShowTimetable(
+								item to state.timetableDatabaseInterface.getLongName(item!!)
+							)
+						},
+						modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+					)
+				}
+
+				NavigationDrawerItem(
+					icon = {
+						Icon(
+							painterResource(id = R.drawable.all_add),
+							contentDescription = null
+						)
+					},
+					label = { Text(stringResource(id = R.string.maindrawer_bookmarks_add)) },
+					selected = false,
+					onClick = {
+						state.closeDrawer()
+						bookmarksElementPicker = TimetableDatabaseInterface.Type.CLASS
+						//selectedItem.value = item
+					},
+					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+				)
+
+				DrawerText(stringResource(id = R.string.nav_all_timetables))
+
+				DrawerItems(
+					isMessengerAvailable = state.isMessengerAvailable,
+					disableTypeSelection = state.isPersonalTimetable || isBookmarkSelected,
+					displayedElement = state.displayedElement.value,
+					onTimetableClick = { item ->
+						state.closeDrawer()
+						showElementPicker = item.elementType
+					},
+					onShortcutClick = { item ->
+						state.closeDrawer()
+						if (item.target == null) {
+							try {
+								state.context.startActivity(
+									state.context.packageManager.getLaunchIntentForPackage(
+										MainActivity.MESSENGER_PACKAGE_NAME
+									)
+								)
+							} catch (e: Exception) {
+								try {
+									state.context.startActivity(
+										Intent(
+											Intent.ACTION_VIEW,
+											Uri.parse("market://details?id=${MainActivity.MESSENGER_PACKAGE_NAME}")
+										)
+									)
+								} catch (e: Exception) {
+									state.context.startActivity(
+										Intent(
+											Intent.ACTION_VIEW,
+											Uri.parse("https://play.google.com/store/apps/details?id=${MainActivity.MESSENGER_PACKAGE_NAME}")
+										)
+									)
+								}
+							}
+						} else {
+							shortcutLauncher.launch(
+								Intent(
+									state.context,
+									item.target
+								).apply {
+									state.contextActivity.putUserIdExtra(this, state.user.id)
+									state.contextActivity.putBackgroundColorExtra(this)
+								}
+							)
+						}
+					}
+				)
+			}
+		},
+		content = content
+	)
+
+	AnimatedVisibility(
+		visible = showElementPicker != null,
+		enter = fullscreenDialogAnimationEnter(),
+		exit = fullscreenDialogAnimationExit()
+	) {
+		ElementPickerDialogFullscreen(
+			title = { /*TODO*/ },
+			timetableDatabaseInterface = state.timetableDatabaseInterface,
+			onDismiss = { showElementPicker = null },
+			onSelect = { item ->
+				item?.let {
+					onShowTimetable(
+						item to state.timetableDatabaseInterface.getLongName(it)
+					)
+				} ?: run {
+					onShowTimetable(state.personalTimetable)
+				}
+			},
+			initialType = showElementPicker
+		)
+	}
+
+	AnimatedVisibility(
+		visible = bookmarksElementPicker != null,
+		enter = fullscreenDialogAnimationEnter(),
+		exit = fullscreenDialogAnimationExit()
+	) {
+		val context = LocalContext.current
+
+		ElementPickerDialogFullscreen(
+			title = { Text(stringResource(id = R.string.maindrawer_bookmarks_add)) },
+			timetableDatabaseInterface = state.timetableDatabaseInterface,
+			hideTypeSelectionPersonal = true,
+			onDismiss = { bookmarksElementPicker = null },
+			onSelect = { item ->
+				item?.let {
+					val newBookmark = TimetableBookmark(
+						elementId = it.id,
+						elementType = TimetableDatabaseInterface.Type.valueOf(it.type).name,
+						displayName = state.timetableDatabaseInterface.getLongName(it)
+					)
+
+					if (state.user.bookmarks.contains(newBookmark))
+						Toast
+							.makeText(
+								context,
+								"Bookmark already exists",
+								Toast.LENGTH_LONG
+							) // TODO: Extract string resource
+							.show()
+					else {
+						state.user.bookmarks = state.user.bookmarks.plus(newBookmark)
+						state.userDatabase.editUser(state.user)
+						onShowTimetable(
+							item to state.timetableDatabaseInterface.getLongName(it)
+						)
+					}
+				}
+
+			},
+			initialType = bookmarksElementPicker
+		)
+	}
+
+	bookmarkDeleteDialog?.let { bookmark ->
+		AlertDialog(
+			text = { Text(stringResource(id = R.string.main_dialog_delete_bookmark)) },
+			onDismissRequest = { bookmarkDeleteDialog = null },
+			confirmButton = {
+				TextButton(
+					onClick = {
+						state.user.bookmarks = state.user.bookmarks.minus(bookmark)
+						state.userDatabase.editUser(state.user)
+						bookmarkDeleteDialog = null
+					}) {
+					Text(stringResource(id = R.string.all_delete))
+				}
+			},
+			dismissButton = {
+				TextButton(
+					onClick = { bookmarkDeleteDialog = null }) {
+					Text(stringResource(id = R.string.all_cancel))
+				}
+			}
+		)
+	}
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainApp(state: MainAppState) {
+	val snackbarHostState = remember { SnackbarHostState() }
+	if (state.preferences.doubleTapToExit.getState().value)
+		BackPressConfirm(snackbarHostState)
+
+	Drawer(
+		state = state,
+		onShowTimetable = {
+			it.let { element ->
+				state.displayElement(element?.first, element?.second)
+			}
+		}
+	) {
+		Scaffold(
+			snackbarHost = { SnackbarHost(snackbarHostState) },
+			topBar = {
+				CenterAlignedTopAppBar(
+					title = { Text(state.displayedName.value) },
+					navigationIcon = {
+						IconButton(onClick = {
+							state.scope.launch { state.drawerState.open() }
+						}) {
+							Icon(
+								imageVector = Icons.Outlined.Menu,
+								contentDescription = stringResource(id = R.string.main_drawer_open)
+							)
+						}
+					},
+					actions = {
+						ProfileSelectorAction(
+							users = state.userDatabase.getAllUsers(),
+							currentSelectionId = state.user.id,
+							showProfileActions = true,
+							onSelectionChange = {
+								state.contextActivity.setUser(it, true)
+							},
+							onActionEdit = {
+								state.profileManagementDialog.value = true
+							}
+						)
+					}
+				)
+			},
+		) { innerPadding ->
+			Box(
+				modifier = Modifier
+					.padding(innerPadding)
+					.fillMaxSize()
+			) {
+				WeekViewCompose(state)
+
+				val timeColumnWidth = with(LocalDensity.current) {
+					state.weekView.value?.config?.timeColumnWidth?.toDp()
+						?: 48.dp
+				}
+				Text(
+					text = state.lastRefreshText(),
+					modifier = Modifier
+						.align(Alignment.BottomStart)
+						.padding(start = timeColumnWidth + 8.dp, bottom = 8.dp)
+						.bottomInsets()
+						.disabled(state.isAnonymous)
+				)
+
+				if (state.isAnonymous) {
+					Column(
+						verticalArrangement = Arrangement.Center,
+						horizontalAlignment = Alignment.CenterHorizontally,
+						modifier = Modifier
+							.fillMaxSize()
+							.absolutePadding(left = 16.dp)
+					) {
+						Text(
+							text = stringResource(id = R.string.main_anonymous_login_info_text),
+							textAlign = TextAlign.Center,
+							modifier = Modifier
+								.padding(horizontal = 32.dp)
+						)
+
+						Button(
+							onClick = {
+								state.contextActivity.startActivity(
+									Intent(
+										state.contextActivity,
+										SettingsActivity::class.java
+									).apply {
+										state.contextActivity.putUserIdExtra(this, state.user.id)
+										putExtra(
+											EXTRA_STRING_PREFERENCE_ROUTE,
+											"preferences_timetable"
+										)
+										putExtra(
+											EXTRA_STRING_PREFERENCE_HIGHLIGHT,
+											"preference_timetable_personal_timetable"
+										)
+										state.contextActivity.putBackgroundColorExtra(this)
+									}
+								)
+							},
+							modifier = Modifier
+								.padding(top = 16.dp)
+						) {
+							Text(text = stringResource(id = R.string.main_go_to_settings))
+						}
+					}
+				}
+
+				if (state.isLoading)
+					CircularProgressIndicator(
+						modifier = Modifier
+							.align(Alignment.BottomEnd)
+							.padding(8.dp)
+					)
+			}
+		}
+	}
+
+	// TODO: Implement a smoother animation (see https://m3.material.io/components/dialogs/guidelines#007536b9-76b1-474a-a152-2f340caaff6f)
+	AnimatedVisibility(
+		visible = state.timetableItemDetailsDialog.value != null,
+		enter = fullscreenDialogAnimationEnter(),
+		exit = fullscreenDialogAnimationExit()
+	) {
+		// TODO: Incorrect insets
+		TimetableItemDetailsDialog(
+			timegridItems = remember {
+				state.timetableItemDetailsDialog.value?.first ?: emptyList()
+			},
+			initialPage = remember {
+				state.timetableItemDetailsDialog.value?.second ?: 0
+			},
+			user = state.user,
+			timetableDatabaseInterface = state.timetableDatabaseInterface,
+			onDismiss = {
+				state.timetableItemDetailsDialog.value = null
+				it?.let { state.displayElement(it) }
+			}
+		)
+	}
+
+	AnimatedVisibility(
+		visible = state.profileManagementDialog.value,
+		enter = fullscreenDialogAnimationEnter(),
+		exit = fullscreenDialogAnimationExit()
+	) {
+		state.contextActivity.ProfileManagementDialog(
+			onDismiss = {
+				state.profileManagementDialog.value = false
+			}
+		)
+	}
+
+	if (state.showDatePicker.value)
+		DatePickerDialog(
+			initialSelection = state.lastSelectedDate,
+			onDismiss = { state.showDatePicker.value = false }
+		) {
+			state.showDatePicker.value = false
+			state.lastSelectedDate = it
+			state.weekView.value?.goToDate(it.toDateTime(LocalTime.now()))
+		}
+}
+
 class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	val user: UserDatabase.User,
+	val contextActivity: BaseComposeActivity,
 	val timetableDatabaseInterface: TimetableDatabaseInterface,
 	val weekViewSwipeRefresh: MutableState<WeekViewSwipeRefreshLayout?>,
 	val weekView: MutableState<WeekView<TimegridItem>?>,
@@ -668,6 +680,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 		private val DATASTORE_KEY_WEEKVIEW_SCALE = intPreferencesKey("weekView.hourHeight")
 	}
+	val userDatabase = contextActivity.userDatabase
 
 	private var drawerGestures by drawerGestureState
 
@@ -1027,10 +1040,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		}
 	}
 
-	@Composable
 	fun loadPrefs(dataStorePreferences: DataStorePreferences) {
-		val scope = rememberCoroutineScope()
-
 		val personalTimetableFlow = dataStorePreferences.timetablePersonalTimetable.getValueFlow()
 
 		scope.launch {
@@ -1457,6 +1467,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 @Composable
 fun rememberMainAppState(
 	user: UserDatabase.User,
+	contextActivity: BaseComposeActivity,
 	customThemeColor: Color?,
 	timetableDatabaseInterface: TimetableDatabaseInterface,
 	preferences: DataStorePreferences,
@@ -1493,6 +1504,7 @@ fun rememberMainAppState(
 ) = remember(user, customThemeColor, colorScheme) {
 	MainAppState(
 		user = user,
+		contextActivity = contextActivity,
 		timetableDatabaseInterface = timetableDatabaseInterface,
 		weekViewSwipeRefresh = weekViewSwipeRefresh,
 		weekView = weekView,

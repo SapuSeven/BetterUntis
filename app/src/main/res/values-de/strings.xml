@@ -141,7 +141,7 @@
     <string name="preference_category_notifications_visible_fields">Sichtbare Felder</string>
     <string name="preference_category_styling_backgrounds">Elementfarben</string>
     <string name="preference_category_styling_colors">Farben</string>
-    <string name="preference_category_styling_themes">Designs</string>
+    <string name="preference_category_styling_themes">Anwendungsdesign</string>
     <string name="preference_category_timetable_item_appearance">Stundendesign</string>
     <string name="preference_category_timetable_lesson_text">Stundentext</string>
     <string name="preference_category_timetable_range">Stundenbereich</string>
@@ -325,4 +325,19 @@
 	<string name="mainactivitydrawer_profile_edit">Profile bearbeiten</string>
 	<string name="maindrawer_bookmarks_add">Stundenplan hinzufügen</string>
 	<string name="all_favourites">Favoriten</string>
+	<string name="preferences_theme_color">Designfarbe</string>
+	<string name="preferences_theme_color_system">Designfarbe des Systems</string>
+	<string name="all_dialog_absences_save">Abwesenheitskontrolle absenden</string>
+	<string name="all_lesson_info">Stundeninfo</string>
+	<string name="preference_category_display_options">Anzeigeoptionen</string>
+	<string name="roomfinder_error">Fehler beim Laden der Daten.</string>
+	<string name="roomfinder_error_details">Fehler: %1$s.</string>
+	<string name="all_datepicker_select">Datum auswählen</string>
+	<string name="all_datepicker_month_next">Nächster Monat</string>
+	<string name="all_datepicker_month_previous">Vorheriger Monat</string>
+	<string name="all_reload">Neu laden</string>
+	<string name="widget_disclaimer_title">Beta-Funktion</string>
+	<string name="widget_disclaimer_text">Die Widget-Funktion befindet sich noch in der Entwicklungsphase und funktioniert unter Umständen nicht auf jedem Gerät.</string>
+	<string name="login_demo">Zuerst ausprobieren</string>
+	<string name="mainactivitydrawer_profile_edit_hint">Tippe auf ein Profil, um es zu bearbeiten</string>
 </resources>
