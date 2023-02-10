@@ -1,436 +1,1222 @@
 package com.sapuseven.untis.activities
 
+import android.Manifest
+import android.app.AlarmManager
 import android.app.NotificationManager
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
-import android.content.res.Resources
-import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
+import android.content.Intent.*
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.view.MenuItem
-import android.view.View
-import androidx.core.content.pm.PackageInfoCompat
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
-import androidx.preference.*
-import com.github.kittinunf.fuel.coroutines.awaitByteArrayResult
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.work.WorkManager
+import coil.compose.AsyncImage
 import com.github.kittinunf.fuel.coroutines.awaitStringResult
 import com.github.kittinunf.fuel.httpGet
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.flowlayout.MainAxisAlignment
+import com.mikepenz.aboutlibraries.Libs
+import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
+import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults.libraryColors
+import com.mikepenz.aboutlibraries.util.withJson
+import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.dialogs.AlertPreferenceDialog
-import com.sapuseven.untis.dialogs.ElementPickerDialog
-import com.sapuseven.untis.dialogs.WeekRangePickerPreferenceDialog
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.github.GithubUser
-import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import com.sapuseven.untis.preferences.AlertPreference
-import com.sapuseven.untis.preferences.ElementPickerPreference
-import com.sapuseven.untis.preferences.WeekRangePickerPreference
-import kotlinx.android.synthetic.main.activity_settings.*
-import kotlinx.android.synthetic.main.settings_banner.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import com.sapuseven.untis.preferences.PreferenceCategory
+import com.sapuseven.untis.preferences.PreferenceScreen
+import com.sapuseven.untis.preferences.UntisPreferenceDataStore
+import com.sapuseven.untis.preferences.dataStorePreferences
+import com.sapuseven.untis.receivers.AutoMuteReceiver
+import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_BOOLEAN_MUTE
+import com.sapuseven.untis.ui.functional.bottomInsets
+import com.sapuseven.untis.ui.functional.insetsPaddingValues
+import com.sapuseven.untis.ui.preferences.*
+import com.sapuseven.untis.workers.AutoMuteSetupWorker
+import com.sapuseven.untis.workers.NotificationSetupWorker
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
-import kotlin.math.min
 
-class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback {
-	private var profileId: Long? = null
-
+class SettingsActivity : BaseComposeActivity() {
 	companion object {
-		const val EXTRA_LONG_PROFILE_ID = "com.sapuseven.untis.activities.profileId"
+		const val EXTRA_STRING_PREFERENCE_ROUTE = "com.sapuseven.untis.activities.settings.route"
+		const val EXTRA_STRING_PREFERENCE_HIGHLIGHT =
+			"com.sapuseven.untis.activities.settings.highlight"
 
-		private const val DIALOG_RECOMMEND_HIDE = "preference_dialog_recommend_hide"
-
-		private const val REPOSITORY_URL_GITHUB = "https://github.com/SapuSeven/BetterUntis"
-		private const val WIKI_URL_PROXY = "$REPOSITORY_URL_GITHUB/wiki/Proxy"
-		private const val URL_RECOMMEND = "https://sapuseven.com/app/BetterUntis"
+		private const val URL_GITHUB_REPOSITORY = "https://github.com/SapuSeven/BetterUntis"
+		private const val URL_GITHUB_REPOSITORY_API =
+			"https://api.github.com/repos/SapuSeven/BetterUntis"
+		private const val URL_WIKI_PROXY = "$URL_GITHUB_REPOSITORY/wiki/Proxy"
 	}
 
+	@OptIn(ExperimentalMaterial3Api::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
-		profileId = intent.extras?.getLong(EXTRA_LONG_PROFILE_ID)
+		// Navigate to and highlight a preference if requested
+		val preferencePath =
+			(intent.extras?.getString(EXTRA_STRING_PREFERENCE_ROUTE)) ?: "preferences"
+		val preferenceHighlight = (intent.extras?.getString(EXTRA_STRING_PREFERENCE_HIGHLIGHT))
 
-		setupActionBar()
-		setContentView(R.layout.activity_settings)
-		setupRecommendDialog()
+		setContent {
+			AppTheme(navBarInset = false) {
+				withUser { user ->
+					val navController = rememberNavController()
+					var title by remember { mutableStateOf<String?>(null) }
 
-		if (savedInstanceState == null) {
-			// Create the fragment only when the activity is created for the first time.
-			// ie. not after orientation changes
-			val fragment = supportFragmentManager.findFragmentByTag(PreferencesFragment.FRAGMENT_TAG)
-					?: PreferencesFragment()
-			val args = Bundle()
-			profileId?.let { args.putLong(EXTRA_LONG_PROFILE_ID, it) }
-			fragment.arguments = args
-
-			supportFragmentManager
-					.beginTransaction()
-					.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-					.replace(R.id.framelayout_settings_content, fragment, PreferencesFragment.FRAGMENT_TAG)
-					.commit()
-		}
-	}
-
-	override fun onOptionsItemSelected(item: MenuItem): Boolean {
-		if (item.itemId == android.R.id.home)
-			onBackPressed()
-		return true
-	}
-  
-	private fun setupRecommendDialog() {
-		if (preferences[DIALOG_RECOMMEND_HIDE, false]) return
-
-		banner_settings_recommend.visibility = View.VISIBLE
-
-		leftButton.setOnClickListener {
-			banner_settings_recommend.visibility = View.GONE
-
-			preferences[DIALOG_RECOMMEND_HIDE] = true
-		}
-		rightButton.setOnClickListener {
-			startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
-				type = "text/plain"
-				putExtra(
-					Intent.EXTRA_TEXT,
-					getString(R.string.settings_recommend_text, URL_RECOMMEND)
-				)
-			}, getString(R.string.settings_recommend_title)))
-		}
-	}
-
-	private fun setupActionBar() {
-		supportActionBar?.setDisplayHomeAsUpEnabled(true)
-	}
-
-	override fun onPreferenceStartScreen(preferenceFragmentCompat: PreferenceFragmentCompat,
-	                                     preferenceScreen: PreferenceScreen): Boolean {
-		val fragment = PreferencesFragment()
-		val args = Bundle()
-		args.putString(PreferenceFragmentCompat.ARG_PREFERENCE_ROOT, preferenceScreen.key)
-		profileId?.let { args.putLong(EXTRA_LONG_PROFILE_ID, it) }
-		fragment.arguments = args
-
-		supportFragmentManager
-				.beginTransaction()
-				.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-				.replace(R.id.framelayout_settings_content, fragment, preferenceScreen.key)
-				.addToBackStack(preferenceScreen.title.toString())
-				.commit()
-
-		supportActionBar?.title = preferenceScreen.title
-		return true
-	}
-
-	override fun onBackPressed() {
-		super.onBackPressed()
-
-		supportFragmentManager.run {
-			supportActionBar?.title = if (backStackEntryCount > 0) getBackStackEntryAt(backStackEntryCount - 1).name else getString(R.string.activity_title_settings)
-		}
-	}
-
-	class PreferencesFragment : PreferenceFragmentCompat() {
-		companion object {
-			const val FRAGMENT_TAG = "preference_fragment"
-			const val DIALOG_FRAGMENT_TAG = "preference_dialog_fragment"
-		}
-
-		private var profileId: Long = 0
-
-		override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-			profileId = arguments?.getLong(EXTRA_LONG_PROFILE_ID) ?: 0
-			if (profileId == 0L) {
-				MaterialAlertDialogBuilder(requireContext())
-						.setMessage("Invalid profile ID")
-						.setPositiveButton("Exit") { _, _ ->
-							activity?.finish()
+					val autoMutePref = dataStorePreferences.automuteEnable
+					val scope = rememberCoroutineScope()
+					val autoMuteSettingsLauncher =
+						rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+							updateAutoMutePref(user, scope, autoMutePref, true)
 						}
-						.show()
-			} else {
-				preferenceManager.sharedPreferencesName = "preferences_$profileId"
+					updateAutoMutePref(user, scope, autoMutePref)
 
-				setPreferencesFromResource(R.xml.preferences, rootKey)
+					var dialogOpenUrl by remember { mutableStateOf<String?>(null) }
+					var dialogScheduleExactAlarms by remember { mutableStateOf(false) }
 
-				when (rootKey) {
-					"preferences_general" -> {
-						findPreference<SeekBarPreference>("preference_week_custom_display_length")?.apply {
-							max = findPreference<WeekRangePickerPreference>("preference_week_custom_range")?.getPersistedStringSet(emptySet())?.size?.zeroToNull
-									?: this.max
-						}
-
-						findPreference<SwitchPreference>("preference_automute_enable")?.setOnPreferenceChangeListener { _, newValue ->
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && newValue == true) {
-								(activity?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
-									if (!isNotificationPolicyAccessGranted) {
-										startActivity(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
-										return@setOnPreferenceChangeListener false
-									}
+					val notificationPref = dataStorePreferences.notificationsEnable
+					val notificationSettingsLauncher =
+						rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+							if (canPostNotifications())
+								scope.launch {
+									notificationPref.saveValue(true)
+									enqueueNotificationSetup(user)
 								}
-							}
-							true
 						}
-
-						findPreference<Preference>("preference_errors")?.setOnPreferenceClickListener {
-							startActivity(Intent(context, ErrorsActivity::class.java))
-							true
-						}
-					}
-					"preferences_styling" -> {
-						findPreference<MultiSelectListPreference>("preference_school_background")?.apply {
-							setOnPreferenceChangeListener { _, newValue ->
-								if (newValue !is Set<*>) return@setOnPreferenceChangeListener false
-
-								refreshColorPreferences(newValue)
-
-								true
-							}
-
-							refreshColorPreferences(values)
-						}
-
-						listOf("preference_theme", "preference_dark_theme", "preference_dark_theme_oled").forEach { key ->
-							findPreference<Preference>(key)?.setOnPreferenceChangeListener { _, _ ->
-								activity?.recreate()
-								true
-							}
-						}
-
-						findPreference<Preference>("preference_timetable_colors_reset")?.setOnPreferenceClickListener {
-							MaterialAlertDialogBuilder(requireContext())
-									.setTitle(R.string.preference_dialog_colors_reset_title)
-									.setMessage(R.string.preference_dialog_colors_reset_text)
-									.setPositiveButton(R.string.preference_timetable_colors_reset_button_positive) { _, _ ->
-										preferenceManager.sharedPreferences.edit().apply {
-											listOf(
-													"preference_background_regular", "preference_background_regular_past",
-													"preference_background_exam", "preference_background_exam_past",
-													"preference_background_irregular", "preference_background_irregular_past",
-													"preference_background_cancelled", "preference_background_cancelled_past"
-											).forEach {
-												remove(it)
-											}
-											apply()
-										}
-										activity?.recreate()
-									}
-									.setNegativeButton(R.string.all_cancel) { _, _ -> }
-									.show()
-							true
-						}
-					}
-					"preferences_connectivity" ->
-						findPreference<Preference>("preference_connectivity_proxy_about")?.setOnPreferenceClickListener {
-							startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(WIKI_URL_PROXY)))
-							true
-						}
-
-					"preferences_notifications" -> {
-						findPreference<Preference>("preference_notifications_enable")?.setOnPreferenceChangeListener { _, newValue ->
-							if (newValue == false) clearNotifications()
-							true
-						}
-						findPreference<Preference>("preference_notifications_clear")?.setOnPreferenceClickListener {
-							clearNotifications()
-							true
-						}
-					}
-					"preferences_info" -> {
-						findPreference<Preference>("preference_info_app_version")?.apply {
-							val pInfo =
-								requireContext().packageManager.getPackageInfo(
-									requireContext().packageName,
-									0
-								)
-							summary = requireContext().getString(
-								R.string.preference_info_app_version_desc,
-								pInfo.versionName,
-								PackageInfoCompat.getLongVersionCode(pInfo)
-							)
-							setOnPreferenceClickListener {
-								startActivity(
-									Intent(
-										Intent.ACTION_VIEW,
-										Uri.parse("$REPOSITORY_URL_GITHUB/releases")
-									)
-								)
-								true
-							}
-						}
-						findPreference<Preference>("preference_info_github")?.apply {
-							summary = REPOSITORY_URL_GITHUB
-							setOnPreferenceClickListener {
-								startActivity(
-									Intent(
-										Intent.ACTION_VIEW,
-										Uri.parse(REPOSITORY_URL_GITHUB)
-									)
-								)
-								true
-							}
-						}
-						findPreference<Preference>("preference_info_license")?.setOnPreferenceClickListener {
-							startActivity(
-								Intent(
-									Intent.ACTION_VIEW,
-									Uri.parse("$REPOSITORY_URL_GITHUB/blob/master/LICENSE")
-								)
-							)
-							true
-						}
-					}
-					"preferences_contributors" -> {
-						MaterialAlertDialogBuilder(requireContext())
-							.setTitle(R.string.preference_info_privacy)
-							.setMessage(R.string.preference_info_privacy_desc)
-							.setPositiveButton(android.R.string.ok) { _, _ ->
-								GlobalScope.launch(Dispatchers.Main) {
-									"https://api.github.com/repos/sapuseven/betteruntis/contributors"
-										.httpGet()
-										.awaitStringResult()
-										.fold({ data ->
-											showContributorList(true, data)
-										}, {
-											showContributorList(false)
-										})
+					val requestNotificationPermissionLauncher =
+						rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+							if (isGranted)
+								scope.launch {
+									notificationPref.saveValue(true)
+									enqueueNotificationSetup(user)
 								}
-							}
-							.setNegativeButton(android.R.string.cancel) { _, _ ->
-								parentFragmentManager.popBackStackImmediate()
-							}
-							.setNeutralButton(R.string.preference_info_privacy_policy) { _, _ ->
-								parentFragmentManager.popBackStackImmediate()
-								startActivity(
-									Intent(
-										Intent.ACTION_VIEW, Uri.parse(
-											"https://docs.github.com/en/github/site-policy/github-privacy-statement"
+							else
+								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+									notificationSettingsLauncher.launch(
+										Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+											.putExtra(
+												Settings.EXTRA_APP_PACKAGE,
+												BuildConfig.APPLICATION_ID
+											)
+									)
+								}
+						}
+
+					fun openUrl(url: String) {
+						val intent = Intent(ACTION_VIEW, Uri.parse(url)).apply {
+							addCategory(CATEGORY_BROWSABLE)
+							flags = FLAG_ACTIVITY_NEW_TASK
+						}
+
+						if (intent.resolveActivity(packageManager) != null) {
+							startActivity(intent)
+						} else {
+							dialogOpenUrl = url
+						}
+					}
+
+					Scaffold(
+						topBar = {
+							CenterAlignedTopAppBar(
+								title = {
+									Text(
+										title
+											?: stringResource(id = R.string.activity_title_settings)
+									)
+								},
+								navigationIcon = {
+									IconButton(onClick = { if (!navController.navigateUp()) finish() }) {
+										Icon(
+											imageVector = Icons.Outlined.ArrowBack,
+											contentDescription = stringResource(id = R.string.all_back)
 										)
+									}
+								}
+							)
+						}
+					) { innerPadding ->
+						Box(
+							modifier = Modifier
+                                .padding(innerPadding)
+                                .fillMaxSize()
+						) {
+							NavHost(navController, startDestination = preferencePath) {
+								composable("preferences") {
+									title = null
+
+									VerticalScrollColumn {
+										PreferenceScreen(
+											key = "preferences_general",
+											title = { Text(stringResource(id = R.string.preferences_general)) },
+											icon = {
+												Icon(
+													painter = painterResource(id = R.drawable.settings_general),
+													contentDescription = null
+												)
+											},
+											navController = navController
+										)
+
+										PreferenceScreen(
+											key = "preferences_styling",
+											title = { Text(stringResource(id = R.string.preferences_styling)) },
+											icon = {
+												Icon(
+													painter = painterResource(id = R.drawable.settings_styling),
+													contentDescription = null
+												)
+											},
+											navController = navController
+										)
+
+										PreferenceScreen(
+											key = "preferences_timetable",
+											title = { Text(stringResource(id = R.string.preferences_timetable)) },
+											icon = {
+												Icon(
+													painter = painterResource(id = R.drawable.settings_timetable),
+													contentDescription = null
+												)
+											},
+											navController = navController
+										)
+
+										PreferenceScreen(
+											key = "preferences_notifications",
+											title = { Text(stringResource(id = R.string.preferences_notifications)) },
+											icon = {
+												Icon(
+													painter = painterResource(id = R.drawable.settings_notifications),
+													contentDescription = null
+												)
+											},
+											navController = navController
+										)
+
+										PreferenceScreen(
+											key = "preferences_connectivity",
+											title = { Text(stringResource(id = R.string.preferences_connectivity)) },
+											icon = {
+												Icon(
+													painter = painterResource(id = R.drawable.settings_connectivity),
+													contentDescription = null
+												)
+											},
+											navController = navController
+										)
+
+										PreferenceScreen(
+											key = "preferences_info",
+											title = { Text(stringResource(id = R.string.preferences_info)) },
+											icon = {
+												Icon(
+													painter = painterResource(id = R.drawable.settings_info),
+													contentDescription = null
+												)
+											},
+											navController = navController
+										)
+									}
+								}
+
+								composable("preferences_general") {
+									title = stringResource(id = R.string.preferences_general)
+
+									VerticalScrollColumn {
+										PreferenceCategory(stringResource(id = R.string.preference_category_general_behaviour)) {
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_double_tap_to_exit)) },
+												dataStore = dataStorePreferences.doubleTapToExit
+											)
+
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_flinging_enable)) },
+												dataStore = dataStorePreferences.flingEnable
+											)
+										}
+
+										PreferenceCategory(stringResource(R.string.preference_category_general_week_display)) {
+											WeekRangePickerPreference(
+												title = { Text(stringResource(R.string.preference_week_custom_range)) },
+												dataStore = dataStorePreferences.weekCustomRange
+											)
+
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_week_snap_to_days)) },
+												summary = { Text(stringResource(R.string.preference_week_snap_to_days_summary)) },
+												dataStore = dataStorePreferences.weekSnapToDays
+											)
+
+											SliderPreference(
+												valueRange = 0f..7f,
+												steps = 6,
+												title = { Text(stringResource(R.string.preference_week_display_length)) },
+												summary = { Text(stringResource(R.string.preference_week_display_length_summary)) },
+												dependency = dataStorePreferences.weekSnapToDays,
+												showSeekBarValue = true,
+												dataStore = dataStorePreferences.weekCustomLength
+											)
+										}
+
+										PreferenceCategory(stringResource(id = R.string.preference_category_general_automute)) {
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_automute_enable)) },
+												summary = { Text(stringResource(R.string.preference_automute_enable_summary)) },
+												onCheckedChange = {
+													if (it) {
+														if (requestAutoMutePermission(
+																autoMuteSettingsLauncher
+															)
+														) {
+															AutoMuteSetupWorker.enqueue(
+																WorkManager.getInstance(this@SettingsActivity),
+																user
+															)
+															true
+														} else false
+													} else {
+														disableAutoMute()
+														false
+													}
+												},
+												dataStore = dataStorePreferences.automuteEnable
+											)
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_automute_cancelled_lessons)) },
+												dependency = dataStorePreferences.automuteEnable,
+												dataStore = dataStorePreferences.automuteCancelledLessons
+											)
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_automute_mute_priority)) },
+												dependency = dataStorePreferences.automuteEnable,
+												dataStore = dataStorePreferences.automuteMutePriority
+											)
+
+											SliderPreference(
+												valueRange = 0f..20f,
+												steps = 19,
+												title = { Text(stringResource(R.string.preference_automute_minimum_break_length)) },
+												summary = { Text(stringResource(R.string.preference_automute_minimum_break_length_summary)) },
+												showSeekBarValue = true,
+												dependency = dataStorePreferences.automuteEnable,
+												dataStore = dataStorePreferences.automuteMinimumBreakLength
+											)
+										}
+
+										// TODO: Extract string resources
+										PreferenceCategory("Error Reporting") {
+											SwitchPreference(
+												title = { Text("Enable additional error messages") },
+												summary = { Text("This is used for non-critical background errors") },
+												dataStore = dataStorePreferences.additionalErrorMessages
+											)
+
+											Preference(
+												title = { Text("View logged errors") },
+												summary = { Text("Crash logs and non-critical background errors") },
+												onClick = { /*TODO*/ },
+												dataStore = UntisPreferenceDataStore.emptyDataStore()
+											)
+										}
+									}
+								}
+
+								composable("preferences_styling") {
+									title = stringResource(id = R.string.preferences_styling)
+
+									VerticalScrollColumn {
+										PreferenceCategory(stringResource(id = R.string.preference_category_styling_colors)) {
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_future)) },
+												showAlphaSlider = true,
+												dataStore = dataStorePreferences.backgroundFuture
+											)
+
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_past)) },
+												showAlphaSlider = true,
+												dataStore = dataStorePreferences.backgroundPast
+											)
+
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_marker)) },
+												dataStore = dataStorePreferences.marker
+											)
+										}
+
+										PreferenceCategory(stringResource(id = R.string.preference_category_styling_backgrounds)) {
+											MultiSelectListPreference(
+												title = { Text(stringResource(R.string.preference_school_background)) },
+												summary = { Text(stringResource(R.string.preference_school_background_desc)) },
+												entries = stringArrayResource(id = R.array.preference_schoolcolors_values),
+												entryLabels = stringArrayResource(id = R.array.preference_schoolcolors),
+												dataStore = dataStorePreferences.schoolBackground
+											)
+
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_regular)) },
+												dependency = dataStorePreferences.schoolBackground.with(
+													dependencyValue = { !it.contains("regular") }
+												),
+												dataStore = dataStorePreferences.backgroundRegular,
+												showAlphaSlider = true,
+												defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+											)
+
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_regular_past)) },
+												dependency = dataStorePreferences.schoolBackground.with(
+													dependencyValue = { !it.contains("regular") }
+												),
+												dataStore = dataStorePreferences.backgroundRegularPast,
+												showAlphaSlider = true,
+												defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+											)
+
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_exam)) },
+												dependency = dataStorePreferences.schoolBackground.with(
+													dependencyValue = { !it.contains("exam") }
+												),
+												dataStore = dataStorePreferences.backgroundExam,
+												showAlphaSlider = true,
+												defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+											)
+
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_exam_past)) },
+												dependency = dataStorePreferences.schoolBackground.with(
+													dependencyValue = { !it.contains("exam") }
+												),
+												dataStore = dataStorePreferences.backgroundExamPast,
+												showAlphaSlider = true,
+												defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+											)
+
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_irregular)) },
+												dependency = dataStorePreferences.schoolBackground.with(
+													dependencyValue = { !it.contains("irregular") }
+												),
+												dataStore = dataStorePreferences.backgroundIrregular,
+												showAlphaSlider = true,
+												defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+											)
+
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_irregular_past)) },
+												dependency = dataStorePreferences.schoolBackground.with(
+													dependencyValue = { !it.contains("irregular") }
+												),
+												dataStore = dataStorePreferences.backgroundIrregularPast,
+												showAlphaSlider = true,
+												defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+											)
+
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_cancelled)) },
+												dependency = dataStorePreferences.schoolBackground.with(
+													dependencyValue = { !it.contains("cancelled") }
+												),
+												dataStore = dataStorePreferences.backgroundCancelled,
+												showAlphaSlider = true,
+												defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+											)
+
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_cancelled_past)) },
+												dependency = dataStorePreferences.schoolBackground.with(
+													dependencyValue = { !it.contains("cancelled") }
+												),
+												dataStore = dataStorePreferences.backgroundCancelledPast,
+												showAlphaSlider = true,
+												defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+											)
+
+											/*ConfirmDialogPreference(
+												title = { Text(stringResource(R.string.preference_timetable_colors_reset)) },
+												dialogTitle = { Text(stringResource(R.string.preference_dialog_colors_reset_title)) },
+												dialogText = { Text(stringResource(R.string.preference_dialog_colors_reset_text)) },
+												onConfirm = {
+												}
+											)*/
+										}
+
+										PreferenceCategory(stringResource(id = R.string.preference_category_styling_themes)) {
+											ColorPreference(
+												title = { Text(stringResource(R.string.preferences_theme_color)) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_timetable_format_paint),
+														contentDescription = null
+													)
+												},
+												dataStore = dataStorePreferences.themeColor,
+												defaultValueLabel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+													stringResource(id = R.string.preferences_theme_color_system)
+												else
+													null
+											)
+
+											ListPreference(
+												title = { Text(stringResource(R.string.preference_dark_theme)) },
+												summary = { Text(it.second) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_timetable_brightness_medium),
+														contentDescription = null
+													)
+												},
+												entries = stringArrayResource(id = R.array.preference_dark_theme_values),
+												entryLabels = stringArrayResource(id = R.array.preference_dark_theme),
+												dataStore = dataStorePreferences.darkTheme
+											)
+
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_dark_theme_oled)) },
+												summary = { Text(stringResource(R.string.preference_dark_theme_oled_desc)) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_timetable_format_oled),
+														contentDescription = null
+													)
+												},
+												dependency = dataStorePreferences.darkTheme,
+												dataStore = dataStorePreferences.darkThemeOled
+											)
+										}
+									}
+								}
+
+								composable("preferences_timetable") {
+									title = stringResource(id = R.string.preferences_timetable)
+
+									VerticalScrollColumn {
+										ElementPickerPreference(
+											title = { Text(stringResource(R.string.preference_timetable_personal_timetable)) },
+											dataStore = dataStorePreferences.timetablePersonalTimetable,
+											timetableDatabaseInterface = timetableDatabaseInterface,
+											highlight = preferenceHighlight == "preference_timetable_personal_timetable"
+										)
+
+										SwitchPreference(
+											title = { Text(stringResource(R.string.preference_timetable_hide_time_stamps)) },
+											summary = { Text(stringResource(R.string.preference_timetable_hide_time_stamps_desc)) },
+											dataStore = dataStorePreferences.timetableHideTimeStamps
+										)
+
+										SwitchPreference(
+											title = { Text(stringResource(R.string.preference_timetable_hide_cancelled)) },
+											summary = { Text(stringResource(R.string.preference_timetable_hide_cancelled_desc)) },
+											dataStore = dataStorePreferences.timetableHideCancelled
+										)
+
+										SwitchPreference(
+											title = { Text(stringResource(R.string.preference_timetable_substitutions_irregular)) },
+											summary = { Text(stringResource(R.string.preference_timetable_substitutions_irregular_desc)) },
+											dataStore = dataStorePreferences.timetableSubstitutionsIrregular
+										)
+
+										SwitchPreference(
+											title = { Text(stringResource(R.string.preference_timetable_background_irregular)) },
+											summary = { Text(stringResource(R.string.preference_timetable_background_irregular_desc)) },
+											dependency = dataStorePreferences.timetableSubstitutionsIrregular,
+											dataStore = dataStorePreferences.timetableBackgroundIrregular
+										)
+
+										PreferenceCategory(stringResource(id = R.string.preference_category_display_options)) {
+											RangeInputPreference(
+												title = { Text(stringResource(R.string.preference_timetable_range)) },
+												dataStore = dataStorePreferences.timetableRange
+											)
+
+											/*SwitchPreference(
+												title = { Text(stringResource(R.string.preference_timetable_range_index_reset)) },
+												dependency = dataStorePreferences.timetableRange,
+												dataStore = dataStorePreferences.timetableRangeIndexReset
+											)*/
+
+											/*SwitchPreference
+											enabled = false,
+											key = preference_timetable_range_hide_outside,
+											summary = (not implemented),
+											title = Hide lessons outside specified range" */
+										}
+
+										PreferenceCategory(stringResource(id = R.string.preference_category_timetable_item_appearance)) {
+											NumericInputPreference(
+												title = { Text(stringResource(R.string.preference_timetable_item_padding_overlap)) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_timetable_padding),
+														contentDescription = null
+													)
+												},
+												unit = "dp",
+												dataStore = dataStorePreferences.timetableItemPaddingOverlap
+											)
+
+											NumericInputPreference(
+												title = { Text(stringResource(R.string.preference_timetable_item_padding)) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_timetable_padding),
+														contentDescription = null
+													)
+												},
+												unit = "dp",
+												dataStore = dataStorePreferences.timetableItemPadding
+											)
+
+											NumericInputPreference(
+												title = { Text(stringResource(R.string.preference_timetable_item_corner_radius)) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_timetable_rounded_corner),
+														contentDescription = null
+													)
+												},
+												unit = "dp",
+												dataStore = dataStorePreferences.timetableItemCornerRadius
+											)
+										}
+
+										PreferenceCategory(stringResource(id = R.string.preference_category_timetable_lesson_text)) {
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_timetable_centered_lesson_info)) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_timetable_align_center),
+														contentDescription = null
+													)
+												},
+												dataStore = dataStorePreferences.timetableCenteredLessonInfo
+											)
+
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_timetable_bold_lesson_name)) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_timetable_format_bold),
+														contentDescription = null
+													)
+												},
+												dataStore = dataStorePreferences.timetableBoldLessonName
+											)
+
+											NumericInputPreference(
+												title = { Text(stringResource(R.string.preference_timetable_lesson_name_font_size)) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_timetable_font_size),
+														contentDescription = null
+													)
+												},
+												unit = "sp",
+												dataStore = dataStorePreferences.timetableLessonNameFontSize
+											)
+
+											NumericInputPreference(
+												title = { Text(stringResource(R.string.preference_timetable_lesson_info_font_size)) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_timetable_font_size),
+														contentDescription = null
+													)
+												},
+												unit = "sp",
+												dataStore = dataStorePreferences.timetableLessonInfoFontSize
+											)
+										}
+									}
+								}
+
+								composable("preferences_notifications") {
+									title = stringResource(id = R.string.preferences_notifications)
+
+									VerticalScrollColumn {
+										SwitchPreference(
+											title = { Text(stringResource(R.string.preference_notifications_enable)) },
+											summary = { Text(stringResource(R.string.preference_notifications_enable_desc)) },
+											/*icon = {
+												Icon(
+													painter = painterResource(R.drawable.settings_notifications_active),
+													contentDescription = null
+												)
+											},*/
+											onCheckedChange = { enable ->
+												if (enable) {
+													if (!canScheduleExactAlarms()) {
+														dialogScheduleExactAlarms = true
+														false
+													} else if (!canPostNotifications()) {
+														// TODO: This may not be backwards compatible
+														requestNotificationPermissionLauncher.launch(
+															Manifest.permission.POST_NOTIFICATIONS
+														)
+														false
+													} else {
+														enqueueNotificationSetup(user)
+														true
+													}
+												} else {
+													clearNotifications()
+													false
+												}
+											},
+											dataStore = dataStorePreferences.notificationsEnable
+										)
+
+										SwitchPreference(
+											title = { Text(stringResource(R.string.preference_notifications_multiple)) },
+											summary = { Text(stringResource(R.string.preference_notifications_multiple_desc)) },
+											dependency = dataStorePreferences.notificationsEnable,
+											onCheckedChange = {
+												enqueueNotificationSetup(user)
+												it
+											},
+											dataStore = dataStorePreferences.notificationsInMultiple
+										)
+
+										SwitchPreference(
+											title = { Text(stringResource(R.string.preference_notifications_first_lesson)) },
+											summary = { Text(stringResource(R.string.preference_notifications_first_lesson_desc)) },
+											dependency = dataStorePreferences.notificationsEnable,
+											onCheckedChange = {
+												enqueueNotificationSetup(user)
+												it
+											},
+											dataStore = dataStorePreferences.notificationsBeforeFirst
+										)
+
+										NumericInputPreference(
+											title = { Text(stringResource(R.string.preference_notifications_first_lesson_time)) },
+											unit = stringResource(R.string.preference_notifications_first_lesson_time_unit),
+											dependency = dataStorePreferences.notificationsBeforeFirst,
+											onChange = {
+												enqueueNotificationSetup(user)
+											},
+											dataStore = dataStorePreferences.notificationsBeforeFirstTime
+										)
+
+										Preference(
+											title = { Text(stringResource(R.string.preference_notifications_clear)) },
+											onClick = { clearNotifications() },
+											icon = {
+												Icon(
+													painter = painterResource(R.drawable.settings_notifications_clear_all),
+													contentDescription = null
+												)
+											},
+											dataStore = UntisPreferenceDataStore.emptyDataStore()
+										)
+
+										PreferenceCategory(stringResource(id = R.string.preference_category_notifications_visible_fields)) {
+											ListPreference(
+												title = { Text(stringResource(R.string.all_subjects)) },
+												summary = { Text(it.second) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.all_subject),
+														contentDescription = null
+													)
+												},
+												entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
+												entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
+												dependency = dataStorePreferences.notificationsEnable,
+												dataStore = dataStorePreferences.notificationsVisibilitySubjects
+											)
+
+											ListPreference(
+												title = { Text(stringResource(R.string.all_rooms)) },
+												summary = { Text(it.second) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.all_rooms),
+														contentDescription = null
+													)
+												},
+												entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
+												entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
+												dependency = dataStorePreferences.notificationsEnable,
+												dataStore = dataStorePreferences.notificationsVisibilityRooms
+											)
+
+											ListPreference(
+												title = { Text(stringResource(R.string.all_teachers)) },
+												summary = { Text(it.second) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.all_teachers),
+														contentDescription = null
+													)
+												},
+												entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
+												entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
+												dependency = dataStorePreferences.notificationsEnable,
+												dataStore = dataStorePreferences.notificationsVisibilityTeachers
+											)
+
+											ListPreference(
+												title = { Text(stringResource(R.string.all_classes)) },
+												summary = { Text(it.second) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.all_classes),
+														contentDescription = null
+													)
+												},
+												entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
+												entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
+												dependency = dataStorePreferences.notificationsEnable,
+												dataStore = dataStorePreferences.notificationsVisibilityClasses
+											)
+										}
+									}
+								}
+
+								composable("preferences_connectivity") {
+									title = stringResource(id = R.string.preferences_connectivity)
+
+									VerticalScrollColumn {
+										SwitchPreference(
+											title = { Text(stringResource(R.string.preference_connectivity_refresh_in_background)) },
+											summary = { Text(stringResource(R.string.preference_connectivity_refresh_in_background_desc)) },
+											dataStore = dataStorePreferences.connectivityRefreshInBackground
+										)
+
+										PreferenceCategory(stringResource(id = R.string.preference_category_connectivity_proxy)) {
+											InputPreference(
+												title = { Text(stringResource(R.string.preference_connectivity_proxy_host)) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_connectivity_proxy),
+														contentDescription = null
+													)
+												},
+												dataStore = dataStorePreferences.proxyHost
+											)
+
+											Preference(
+												title = { Text(stringResource(R.string.preference_connectivity_proxy_about)) },
+												onClick = {
+													openUrl(URL_WIKI_PROXY)
+												},
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_info),
+														contentDescription = null
+													)
+												},
+												dataStore = UntisPreferenceDataStore.emptyDataStore()
+											)
+										}
+									}
+								}
+
+								composable("preferences_info") {
+									title = stringResource(id = R.string.preferences_info)
+
+									VerticalScrollColumn {
+										Preference(
+											title = { Text(stringResource(R.string.app_name)) },
+											summary = { Text(stringResource(R.string.app_desc)) },
+											onClick = { /*TODO*/ },
+											icon = {
+												Icon(
+													painter = painterResource(R.drawable.settings_about_app_icon),
+													contentDescription = null
+												)
+											},
+											dataStore = UntisPreferenceDataStore.emptyDataStore()
+										)
+
+										PreferenceCategory(stringResource(id = R.string.preference_info_general)) {
+
+											val openDialog = remember { mutableStateOf(false) }
+
+											Preference(
+												title = { Text(stringResource(R.string.preference_info_app_version)) },
+												summary = {
+													Text(
+														stringResource(
+															R.string.preference_info_app_version_desc,
+															BuildConfig.VERSION_NAME,
+															BuildConfig.VERSION_CODE
+														)
+													)
+												},
+												onClick = {
+													openUrl("$URL_GITHUB_REPOSITORY/releases")
+												},
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_info),
+														contentDescription = null
+													)
+												},
+												dataStore = UntisPreferenceDataStore.emptyDataStore()
+											)
+
+											Preference(
+												title = { Text(stringResource(R.string.preference_info_github)) },
+												summary = { Text(URL_GITHUB_REPOSITORY) },
+												onClick = {
+													openUrl(URL_GITHUB_REPOSITORY)
+												},
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_info_github),
+														contentDescription = null
+													)
+												},
+												dataStore = UntisPreferenceDataStore.emptyDataStore()
+											)
+
+											Preference(
+												title = { Text(stringResource(R.string.preference_info_license)) },
+												summary = { Text(stringResource(R.string.preference_info_license_desc)) },
+												onClick = {
+													openUrl("$URL_GITHUB_REPOSITORY/blob/master/LICENSE")
+												},
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_info_github),
+														contentDescription = null
+													)
+												},
+												dataStore = UntisPreferenceDataStore.emptyDataStore()
+											)
+
+											Preference(
+												title = { Text(stringResource(R.string.preference_info_contributors)) },
+												summary = { Text(stringResource(R.string.preference_info_contributors_desc)) },
+												onClick = {
+													openDialog.value = true
+												},
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_about_contributor),
+														contentDescription = null
+													)
+												},
+												dataStore = UntisPreferenceDataStore.emptyDataStore()
+											)
+
+											if (openDialog.value) {
+												AlertDialog(
+													onDismissRequest = {
+														openDialog.value = false
+													},
+													confirmButton = {
+														FlowRow(
+															modifier = Modifier.padding(all = 8.dp),
+															mainAxisAlignment = MainAxisAlignment.End,
+															mainAxisSpacing = 8.dp
+														) {
+															TextButton(
+																onClick = {
+																	openDialog.value = false
+																	openUrl("https://docs.github.com/en/github/site-policy/github-privacy-statement")
+																}
+															) {
+																Text(text = stringResource(id = R.string.preference_info_privacy_policy))
+															}
+															TextButton(
+																onClick = {
+																	openDialog.value = false
+																}
+															) {
+																Text(text = stringResource(id = R.string.all_cancel))
+															}
+															TextButton(
+																onClick = {
+																	openDialog.value = false
+																	navController.navigate("contributors")
+																}
+															) {
+																Text(text = stringResource(id = R.string.all_ok))
+															}
+														}
+													},
+													title = {
+														Text(text = stringResource(id = R.string.preference_info_privacy))
+													},
+													text = {
+														Text(stringResource(id = R.string.preference_info_privacy_desc))
+													}
+												)
+											}
+
+											Preference(
+												title = { Text(stringResource(R.string.preference_info_libraries)) },
+												summary = { Text(stringResource(R.string.preference_info_libraries_desc)) },
+												onClick = { navController.navigate("about_libs") },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_about_library),
+														contentDescription = null
+													)
+												},
+												dataStore = UntisPreferenceDataStore.emptyDataStore()
+											)
+										}
+									}
+								}
+								composable("about_libs") {
+									title = stringResource(id = R.string.preference_info_libraries)
+
+									val colors = libraryColors(
+										backgroundColor = colorScheme!!.background,
+										contentColor = colorScheme!!.onBackground,
+										badgeBackgroundColor = colorScheme!!.primary,
+										badgeContentColor = colorScheme!!.onPrimary
 									)
-								)
+									/*
+									* The about libraries (android library from mikepenz)
+									* use a custom library file stored in R.raw.about_libs.
+									* To modify the shown libraries edit the JSON file
+									* about_libs.json
+									*/
+									LibrariesContainer(
+										Modifier
+											.fillMaxSize(),
+										librariesBlock = { ctx ->
+											Libs.Builder().withJson(ctx, R.raw.about_libs)
+												.build()
+										},
+										contentPadding = insetsPaddingValues(),
+										colors = colors
+									)
+								}
+								composable("contributors") {
+									title =
+										stringResource(id = R.string.preference_info_contributors)
+
+									var userList by remember { mutableStateOf(listOf<GithubUser>()) }
+									val error = remember { mutableStateOf(true) }
+									var loadingText by remember { mutableStateOf(getString(R.string.loading)) }
+
+									LaunchedEffect(Unit) {
+										scope.launch {
+											"$URL_GITHUB_REPOSITORY_API/contributors"
+												.httpGet()
+												.awaitStringResult()
+												.fold({ data ->
+													userList = getJSON().decodeFromString(data)
+													error.value = false
+												}, {
+													loadingText = getString(R.string.loading_failed)
+													error.value = true
+												})
+										}
+									}
+
+									if (!error.value) {
+										LazyColumn(
+											modifier = Modifier
+												.fillMaxHeight(),
+											contentPadding = insetsPaddingValues()
+										) {
+											this.items(userList) {
+												Contributor(
+													githubUser = it,
+													onClick = { openUrl(it.html_url) })
+											}
+										}
+									} else {
+										ListItem(
+											headlineText = {
+												Text(loadingText)
+											},
+											leadingContent = {
+												Icon(
+													painter = painterResource(id = R.drawable.settings_about_contributor),
+													contentDescription = ""
+												)
+											}
+										)
+									}
+								}
 							}
-							.show()
+						}
 					}
+
+					dialogOpenUrl?.let { url ->
+						AlertDialog(
+							onDismissRequest = {
+								dialogOpenUrl = null
+							},
+							title = {
+								Text(text = stringResource(id = R.string.settings_dialog_url_open_title))
+							},
+							text = {
+								Column {
+									Text(text = stringResource(id = R.string.settings_dialog_url_open_text))
+									Text(text = url, modifier = Modifier.padding(top = 16.dp))
+								}
+							},
+							confirmButton = {
+								TextButton(onClick = { dialogOpenUrl = null }) {
+									Text(text = stringResource(id = R.string.all_close))
+								}
+							}
+						)
+					}
+
+					if (dialogScheduleExactAlarms)
+						AlertDialog(
+							onDismissRequest = {
+								dialogScheduleExactAlarms = false
+							},
+							title = {
+								Text(text = "Permission needed")
+							},
+							text = {
+								Text(text = "This feature requires additional permissions. Please allow BetterUntis access to schedule exact alarms.")
+							},
+							confirmButton = {
+								TextButton(onClick = {
+									dialogScheduleExactAlarms = false
+								}) {
+									Text(text = stringResource(id = R.string.all_ok))
+								}
+							}
+						)
 				}
 			}
 		}
+	}
 
-		private suspend fun showContributorList(success: Boolean, data: String = "") {
-			val preferenceScreen = this.preferenceScreen
-			val indicator = findPreference<Preference>("preferences_contributors_indicator")
-			if (success) {
-				val contributors = getJSON().decodeFromString<List<GithubUser>>(data)
+	private fun enqueueNotificationSetup(user: UserDatabase.User) {
+		NotificationSetupWorker.enqueue(
+			WorkManager.getInstance(this@SettingsActivity),
+			user
+		)
+	}
 
-				preferenceScreen.removePreference(indicator)
+	private fun canPostNotifications(): Boolean {
+		val notificationManager =
+			applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+		return (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || notificationManager.areNotificationsEnabled())
+	}
 
-				contributors.forEach { user ->
-					preferenceScreen.addPreference(Preference(context).apply {
-						GlobalScope.launch(Dispatchers.Main) { icon = loadProfileImage(user.avatar_url, resources) }
-						title = user.login
-						summary = resources.getQuantityString(R.plurals.preferences_contributors_contributions, user.contributions, user.contributions)
-						setOnPreferenceClickListener {
-							startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(user.html_url)))
-							true
-						}
-					})
-				}
-			} else {
-				indicator?.title = resources.getString(R.string.loading_failed)
+	private fun canScheduleExactAlarms(): Boolean {
+		val alarmManager = applicationContext.getSystemService(ALARM_SERVICE) as AlarmManager
+		return (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms())
+	}
+
+	@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+	@Composable
+	fun Contributor(
+		githubUser: GithubUser,
+		onClick: () -> Unit
+	) {
+		ListItem(
+			modifier = Modifier.clickable(onClick = onClick),
+			headlineText = {
+				Text(githubUser.login)
+			},
+			supportingText = {
+				Text(
+					pluralStringResource(
+						id = R.plurals.preferences_contributors_contributions,
+						count = githubUser.contributions,
+						githubUser.contributions
+					)
+				)
+			},
+			leadingContent = {
+				AsyncImage(
+					model = githubUser.avatar_url,
+					contentDescription = "UserImage", //TODO: Extract string resource
+					modifier = Modifier.size(48.dp)
+				)
+			}
+		)
+	}
+
+	private fun updateAutoMutePref(
+		user: UserDatabase.User,
+		scope: CoroutineScope,
+		autoMutePref: UntisPreferenceDataStore<Boolean>,
+		enable: Boolean = false
+	) {
+		scope.launch {
+			val permissionGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				(getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).isNotificationPolicyAccessGranted
+			} else true
+
+
+			if (autoMutePref.getValue() && !permissionGranted)
+				autoMutePref.saveValue(false)
+
+			if (enable && permissionGranted) {
+				autoMutePref.saveValue(true)
+				AutoMuteSetupWorker.enqueue(
+					WorkManager.getInstance(this@SettingsActivity),
+					user
+				)
 			}
 		}
+	}
 
-		private suspend fun loadProfileImage(avatarUrl: String, resources: Resources): Drawable? {
-			return avatarUrl
-					.httpGet()
-					.awaitByteArrayResult()
-					.fold({
-						BitmapDrawable(resources, BitmapFactory.decodeByteArray(it, 0, it.size))
-					}, { null })
-		}
-
-		private fun clearNotifications() = (context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancelAll()
-
-		private fun refreshColorPreferences(newValue: Set<*>) {
-			val regularColors = listOf("preference_background_regular", "preference_background_regular_past", "preference_use_theme_background")
-			val irregularColors = listOf("preference_background_irregular", "preference_background_irregular_past")
-			val cancelledColors = listOf("preference_background_cancelled", "preference_background_cancelled_past")
-			val examColors = listOf("preference_background_exam", "preference_background_exam_past")
-
-			regularColors.forEach { findPreference<Preference>(it)?.isEnabled = !newValue.contains("regular") }
-			irregularColors.forEach { findPreference<Preference>(it)?.isEnabled = !newValue.contains("irregular") }
-			cancelledColors.forEach { findPreference<Preference>(it)?.isEnabled = !newValue.contains("cancelled") }
-			examColors.forEach { findPreference<Preference>(it)?.isEnabled = !newValue.contains("exam") }
-		}
-
-		override fun onPreferenceTreeClick(preference: Preference): Boolean {
-			if (preference is ElementPickerPreference) {
-				val userDatabase = UserDatabase.createInstance(requireContext())
-				val timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileId)
-
-				ElementPickerDialog.newInstance(
-						timetableDatabaseInterface,
-						ElementPickerDialog.Companion.ElementPickerDialogConfig(TimetableDatabaseInterface.Type.valueOf(preference.getSavedType())),
-						object : ElementPickerDialog.ElementPickerDialogListener {
-							override fun onDialogDismissed(dialog: DialogInterface?) {
-								// ignore
-							}
-
-							override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
-								preference.setElement(
-										element,
-										element?.let {
-											timetableDatabaseInterface.getShortName(it.id, TimetableDatabaseInterface.Type.valueOf(it.type))
-										} ?: "")
-								(fragment as DialogFragment).dismiss()
-							}
-
-							override fun onPositiveButtonClicked(dialog: ElementPickerDialog) {
-								// positive button not used
-							}
-						}
-				).show(requireFragmentManager(), "elementPicker")
+	private fun requestAutoMutePermission(activityLauncher: ActivityResultLauncher<Intent>): Boolean {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			(getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).apply {
+				return if (!isNotificationPolicyAccessGranted) {
+					activityLauncher.launch(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
+					false
+				} else true
 			}
+		} else return true
+	}
 
-			return true
-		}
+	private fun clearNotifications() =
+		(getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancelAll()
 
-		override fun onDisplayPreferenceDialog(preference: Preference) {
-			fragmentManager?.let { manager ->
-				if (manager.findFragmentByTag(DIALOG_FRAGMENT_TAG) != null) return
+	@Composable
+	private fun VerticalScrollColumn(content: @Composable ColumnScope.() -> Unit) {
+		Column(
+			modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .bottomInsets(),
+			content = content
+		)
+	}
 
-				when (preference) {
-					is AlertPreference -> {
-						val f: DialogFragment = AlertPreferenceDialog.newInstance(preference.key)
-						f.setTargetFragment(this, 0)
-						f.show(manager, DIALOG_FRAGMENT_TAG)
-					}
-					is WeekRangePickerPreference -> {
-						val f: DialogFragment = WeekRangePickerPreferenceDialog.newInstance(preference.key) { positiveResult, selectedDays ->
-							val visibleDaysPreference = findPreference<SeekBarPreference>("preference_week_custom_display_length")
-							if (positiveResult) {
-								visibleDaysPreference?.max = selectedDays.zeroToNull ?: 7
-								visibleDaysPreference?.value = min(visibleDaysPreference?.value
-										?: 0, selectedDays.zeroToNull ?: 7)
-							}
-						}
-						f.setTargetFragment(this, 0)
-						f.show(manager, DIALOG_FRAGMENT_TAG)
-					}
-					else -> super.onDisplayPreferenceDialog(preference)
-				}
-			}
-		}
+	private fun disableAutoMute() {
+		sendBroadcast(
+			Intent(applicationContext, AutoMuteReceiver::class.java)
+				.putExtra(EXTRA_BOOLEAN_MUTE, false)
+		)
 	}
 }
-
-private val Int.zeroToNull: Int?
-	get() = if (this != 0) this else null

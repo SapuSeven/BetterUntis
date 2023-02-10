@@ -145,7 +145,7 @@
     <string name="preferences_timetable">Emploi du temps</string>
     <string name="preferences_styling">Personnalisation</string>
     <string name="preferences_notifications">Notifications</string>
-    <string name="preferences_infos">À propos</string>
+    <string name="preferences_info">À propos</string>
     <string name="preferences_connectivity">Connectivité</string>
     <string name="elementpicker_hint_search_rooms">Rechercher des salles…</string>
     <string name="elementpicker_hint_search_teachers">Rechercher des enseignants…</string>
@@ -190,7 +190,7 @@
     <string name="logindatainput_aquiring_app_secret">Acquisition du secret de l’appli…</string>
     <string name="logindatainput_data_loaded">Données chargées.</string>
     <string name="logindatainput_error_invalid_school">Identifiant de l’école invalide !</string>
-    <string name="logindatainput_error_generic">Erreur : %1$s</string>
+    <string name="all_error_details">Erreur : %1$s</string>
     <string name="logindatainput_error_field_empty">Ce champ ne peut pas être vide !</string>
     <string name="logindatainput_anonymous_login">Connexion anonyme</string>
     <string name="logindatainput_login">Se connecter</string>

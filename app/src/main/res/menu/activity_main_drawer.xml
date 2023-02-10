@@ -17,7 +17,7 @@
 			android:title="@string/all_classes"/>
 		<item
 			android:id="@+id/nav_show_teachers"
-			android:icon="@drawable/all_teacher"
+			android:icon="@drawable/all_teachers"
 			android:title="@string/all_teachers"/>
 		<item
 			android:id="@+id/nav_show_rooms"

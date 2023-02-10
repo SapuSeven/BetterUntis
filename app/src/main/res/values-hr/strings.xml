@@ -59,7 +59,7 @@
     <string name="preferences_timetable">Raspored sati</string>
     <string name="preferences_styling">Prilagođavanje</string>
     <string name="preferences_notifications">Obavještavanja</string>
-    <string name="preferences_infos">Informacije</string>
+    <string name="preferences_info">Informacije</string>
     <string name="preferences_general">Opće</string>
     <string name="preferences_connectivity">Povezanost</string>
     <string name="preference_week_snap_to_days_summary">umjesto po tjednima</string>
@@ -190,7 +190,7 @@
     <string name="logindatainput_key">Ključ ili lozinka</string>
     <string name="logindatainput_error_invalid_url">Neispravan URL!</string>
     <string name="logindatainput_error_invalid_school">Neispravna ID oznaka škole!</string>
-    <string name="logindatainput_error_generic">Greška: %1$s</string>
+    <string name="all_error_details">Greška: %1$s</string>
     <string name="logindatainput_error_field_empty">Ovo polje ne smije biti prazno!</string>
     <string name="logindatainput_delete">Izbriši profil</string>
     <string name="logindatainput_data_loaded">Podaci su učitani.</string>

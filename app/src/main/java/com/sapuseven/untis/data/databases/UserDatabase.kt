@@ -8,6 +8,8 @@ import android.database.Cursor.FIELD_TYPE_STRING
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.UserDatabaseQueryHelper.generateCreateTable
@@ -180,7 +182,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		user.settings?.let { values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().encodeToString<UntisSettings>(it)) }
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USERDATA, getJSON().encodeToString<UntisUserData>(user.userData))
 		user.settings?.let { values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().encodeToString<UntisSettings>(it)) }
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_BOOKMARK_TIMETABLES, getJSON().encodeToString<List<TimetableBookmark>>(user.bookmarks))
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_BOOKMARK_TIMETABLES, getJSON().encodeToString<List<TimetableBookmark>>(user.bookmarks.toList()))
 
 		val id = db.insert(UserDatabaseContract.Users.TABLE_NAME, null, values)
 
@@ -206,7 +208,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP, user.masterDataTimestamp)
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_USERDATA, getJSON().encodeToString<UntisUserData>(user.userData))
 		user.settings?.let { values.put(UserDatabaseContract.Users.COLUMN_NAME_SETTINGS, getJSON().encodeToString<UntisSettings>(it)) }
-		values.put(UserDatabaseContract.Users.COLUMN_NAME_BOOKMARK_TIMETABLES, getJSON().encodeToString<List<TimetableBookmark>>(user.bookmarks))
+		values.put(UserDatabaseContract.Users.COLUMN_NAME_BOOKMARK_TIMETABLES, getJSON().encodeToString<List<TimetableBookmark>>(user.bookmarks.toList()))
 
 
 		db.update(UserDatabaseContract.Users.TABLE_NAME, values, BaseColumns._ID + "=?", arrayOf(user.id.toString()))
@@ -312,7 +314,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 		if (cursor.moveToFirst()) {
 			do {
 				users.add(User(
-					cursor.getLongOrNull(cursor.getColumnIndexOrThrow(BaseColumns._ID)),
+					cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID)),
 					cursor.getString(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_PROFILENAME)),
 					cursor.getString(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_APIURL)),
 					cursor.getString(cursor.getColumnIndexOrThrow(UserDatabaseContract.Users.COLUMN_NAME_SCHOOL_ID)),
@@ -437,7 +439,7 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 	}
 
 	class User(
-			val id: Long? = null,
+			val id: Long = -1,
 			val profileName: String = "",
 			val apiUrl: String,
 			val schoolId: String,
@@ -449,12 +451,21 @@ class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(cont
 			val userData: UntisUserData,
 			val settings: UntisSettings? = null,
 			val created: Long? = null,
-			var bookmarks: List<TimetableBookmark>
+			var bookmarks: Set<TimetableBookmark>
 	) {
 		fun getDisplayedName(context: Context): String {
 			return when {
 				profileName.isNotBlank() -> profileName
 				anonymous -> context.getString(R.string.all_anonymous)
+				else -> userData.displayName
+			}
+		}
+
+		@Composable
+		fun getDisplayedName(): String {
+			return when {
+				profileName.isNotBlank() -> profileName
+				anonymous -> stringResource(R.string.all_anonymous)
 				else -> userData.displayName
 			}
 		}

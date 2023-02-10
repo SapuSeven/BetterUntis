@@ -67,7 +67,7 @@
     <string name="logindatainput_login">Logg inn</string>
     <string name="logindatainput_anonymous_login">Anonym innlogging</string>
     <string name="logindatainput_error_field_empty">Dette feltet kan ikke være tomt.</string>
-    <string name="logindatainput_error_generic">Feil: %1$s</string>
+    <string name="all_error_details">Feil: %1$s</string>
     <string name="logindatainput_error_invalid_school">Ugyldig skole-ID.</string>
     <string name="logindatainput_data_loaded">Data lastet.</string>
     <string name="logindatainput_aquiring_app_secret">Henter hemmelig nøkkel…</string>
@@ -111,7 +111,7 @@
     <string name="elementpicker_hint_search_teachers">Søk etter lærere…</string>
     <string name="elementpicker_hint_search_rooms">Søk etter rom…</string>
     <string name="preferences_connectivity">Tilkobling</string>
-    <string name="preferences_infos">Om</string>
+    <string name="preferences_info">Om</string>
     <string name="preferences_notifications">Varsler</string>
     <string name="preferences_styling">Tilpasning</string>
     <string name="preferences_timetable">Timeplan</string>

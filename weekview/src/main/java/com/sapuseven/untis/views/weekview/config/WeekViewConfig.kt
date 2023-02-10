@@ -41,7 +41,7 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 		set(value) {
 			drawConfig.timeCaptionPaint.color = value
 		}
-	var timeColumnBackgroundColor: Int
+	var timeColumnBackground: Int
 		get() = drawConfig.timeColumnBackgroundPaint.color
 		set(value) {
 			drawConfig.timeColumnBackgroundPaint.color = value
@@ -87,7 +87,7 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 		set(value) {
 			drawConfig.headerTextPaint.textSize = value
 			drawConfig.todayHeaderTextPaint.textSize = value
-			drawConfig.calculateHeaderTextHeight()
+			drawConfig.calculateHeaderTextHeight(this)
 		}
 	var headerRowSecondaryTextColor: Int
 		get() = drawConfig.headerSecondaryTextPaint.color
@@ -100,7 +100,7 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 		set(value) {
 			drawConfig.headerSecondaryTextPaint.textSize = value
 			drawConfig.todayHeaderSecondaryTextPaint.textSize = value
-			drawConfig.calculateHeaderSecondaryTextHeight()
+			drawConfig.calculateHeaderSecondaryTextHeight(this)
 		}
 	var headerRowBackgroundColor: Int
 		get() = drawConfig.headerBackgroundPaint.color
@@ -112,7 +112,12 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 			field = value
 			drawConfig.calculateHeaderHeight(this)
 		}
-	var headerRowTextSpacing: Int
+	var headerRowTextSpacing: Int = 0
+		set(value) {
+			field = value
+			drawConfig.calculateHeaderHeight(this)
+		}
+
 	var todayHeaderTextColor: Int
 		get() = drawConfig.todayHeaderTextPaint.color
 		set(value) {
@@ -249,10 +254,12 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 	// Top left corner
 	var topLeftCornerDrawable: Drawable? = null
 	var topLeftCornerPadding: Int
+	var topLeftCornerTint: Int
 
 	// Custom properties
 	var startTime: Int = 0 // in minutes
 	var endTime: Int = 0 // in minutes
+	var endTimeOffset: Int = 0 // in pixels
 	var hourLines: IntArray = IntArray(0) // in minutes
 	lateinit var hourLabels: Array<String>
 	// Calculated values
@@ -265,7 +272,7 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 
 	val totalDayHeight: Float
 		get() {
-			val dayHeight = hourHeight * hoursPerDay()
+			val dayHeight = hourHeight * hoursPerDay() + endTimeOffset
 			val totalHeaderPadding = (headerRowPadding * 2).toFloat()
 			val headerBottomMargin = drawConfig.headerMarginBottom
 			return dayHeight + drawConfig.headerHeight + totalHeaderPadding + headerBottomMargin
@@ -290,8 +297,10 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 
 			// Time column
 			timeColumnTextColor = a.getColor(R.styleable.WeekView_timeColumnTextColor, Color.BLACK)
-			timeColumnCaptionColor = a.getColor(R.styleable.WeekView_timeColumnCaptionColor, Color.BLACK)
-			timeColumnBackgroundColor = a.getColor(R.styleable.WeekView_timeColumnBackground, Color.WHITE)
+			timeColumnCaptionColor =
+				a.getColor(R.styleable.WeekView_timeColumnCaptionColor, Color.BLACK)
+			timeColumnBackground =
+				a.getColor(R.styleable.WeekView_timeColumnBackground, Color.WHITE)
 			timeColumnPadding = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnPadding, 10)
 			timeColumnTextSize = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnTextSize, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12.0f, context.resources.displayMetrics).toInt()).toFloat()
 			timeColumnCaptionSize = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnCaptionSize, TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14.0f, context.resources.displayMetrics).toInt()).toFloat()
@@ -366,7 +375,9 @@ class WeekViewConfig(context: Context, attrs: AttributeSet?) {
 
 			// Top left corner
 			topLeftCornerDrawable = a.getDrawable(R.styleable.WeekView_topLeftCornerDrawable)
-			topLeftCornerPadding = a.getDimensionPixelSize(R.styleable.WeekView_topLeftCornerPadding, 0)
+			topLeftCornerPadding =
+				a.getDimensionPixelSize(R.styleable.WeekView_topLeftCornerPadding, 0)
+			topLeftCornerTint = a.getColor(R.styleable.WeekView_topLeftCornerTint, 0)
 		} finally {
 			a.recycle()
 		}

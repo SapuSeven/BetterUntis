@@ -53,6 +53,8 @@ internal constructor(var event: WeekViewEvent<T>, var originalEvent: WeekViewEve
 			return paint
 		}
 
+	private val textColor: Int = event.textColorOrDefault
+
 	fun draw(config: WeekViewConfig, canvas: Canvas) {
 		val cornerRadius = config.eventCornerRadius.toFloat()
 
@@ -67,9 +69,9 @@ internal constructor(var event: WeekViewEvent<T>, var originalEvent: WeekViewEve
 
 		if (availableHeight < 0 || availableWidth < 0) return
 
-		val topPaint = config.drawConfig.eventTopPaint
-		val titlePaint = config.drawConfig.eventTextPaint
-		val bottomPaint = config.drawConfig.eventBottomPaint
+		val topPaint = config.drawConfig.eventTopPaint.apply { color = textColor }
+		val titlePaint = config.drawConfig.eventTextPaint.apply { color = textColor }
+		val bottomPaint = config.drawConfig.eventBottomPaint.apply { color = textColor }
 		val indicatorRadius = topPaint.textSize / 4f
 
 		val eventTop = restoreSpanned(event.top, TextUtils.ellipsize(event.top, topPaint, availableWidth.toFloat(), TextUtils.TruncateAt.END))

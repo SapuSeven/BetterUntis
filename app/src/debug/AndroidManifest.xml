@@ -16,4 +16,9 @@
 	<uses-permission
 		android:name="android.permission.CHANGE_CONFIGURATION"
 		tools:ignore="ProtectedPermissions" />
+
+	<application tools:ignore="MissingApplicationIcon">
+		<activity
+			android:name=".activities.BaseComposeActivity" />
+	</application>
 </manifest>

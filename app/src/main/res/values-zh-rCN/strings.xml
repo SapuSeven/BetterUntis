@@ -73,7 +73,7 @@
     <string name="logindatainput_login">登录</string>
     <string name="logindatainput_anonymous_login">匿名登录</string>
     <string name="logindatainput_error_field_empty">此处不能为空！</string>
-    <string name="logindatainput_error_generic">错误： %1$s</string>
+    <string name="all_error_details">错误： %1$s</string>
     <string name="logindatainput_error_invalid_school">学校ID无效！</string>
     <string name="logindatainput_data_loaded">数据已加载。</string>
     <string name="logindatainput_aquiring_app_secret">正在获取软件 secret…</string>
@@ -115,7 +115,7 @@
     <string name="elementpicker_hint_search_teachers">搜索教师…</string>
     <string name="elementpicker_hint_search_rooms">搜索教室…</string>
     <string name="preferences_connectivity">连接</string>
-    <string name="preferences_infos">关于</string>
+    <string name="preferences_info">关于</string>
     <string name="preferences_notifications">提示</string>
     <string name="preferences_styling">自定义</string>
     <string name="preferences_timetable">课程表</string>

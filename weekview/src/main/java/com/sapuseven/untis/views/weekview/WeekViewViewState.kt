@@ -22,7 +22,7 @@ class WeekViewViewState {
 
 		config.effectiveMinHourHeight = max(
 				config.minHourHeight,
-				((height - config.drawConfig.headerHeight) / config.hoursPerDay()).toInt()
+				((height - config.drawConfig.headerHeight - config.endTimeOffset) / config.hoursPerDay()).toInt()
 		)
 
 		areDimensionsInvalid = false
@@ -35,7 +35,7 @@ class WeekViewViewState {
 			listener.goToHour(scrollToHour)
 		}
 
-		scrollToDay = null
+		//scrollToDay = null
 		scrollToHour = -1
 		areDimensionsInvalid = false
 	}

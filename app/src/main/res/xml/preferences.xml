@@ -26,10 +26,10 @@
 				android:summary="@string/preference_week_snap_to_days_summary"
 				android:title="@string/preference_week_snap_to_days" />
 
-			<com.sapuseven.untis.preferences.WeekRangePickerPreference
+			<!--com.sapuseven.untis.preferences.WeekRangePickerPreference
 				android:dialogLayout="@layout/dialog_day_picker"
 				android:key="preference_week_custom_range"
-				android:title="@string/preference_week_custom_range" />
+				android:title="@string/preference_week_custom_range" /-->
 
 			<SeekBarPreference
 				android:key="preference_week_custom_display_length"
@@ -91,7 +91,7 @@
 				android:key="preference_timetable_item_text_light"
 				android:title="@string/preference_timetable_item_text_light" />
 
-			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
+			<!--<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
 				android:defaultValue="@integer/preference_background_future_default"
 				android:key="preference_background_future"
 				android:title="@string/preference_background_future"
@@ -108,7 +108,7 @@
 			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
 				android:defaultValue="@integer/preference_marker_default"
 				android:key="preference_marker"
-				android:title="@string/preference_marker" />
+				android:title="@string/preference_marker" />-->
 
 		</PreferenceCategory>
 
@@ -128,7 +128,7 @@
 				android:summary="@string/preference_use_theme_background_desc"
 				android:title="@string/preference_use_theme_background" />
 
-			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
+			<!--<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
 				android:defaultValue="@integer/preference_background_regular_default"
 				android:dependency="preference_use_theme_background"
 				android:key="preference_background_regular"
@@ -168,7 +168,7 @@
 			<com.jaredrummler.android.colorpicker.ColorPreferenceCompat
 				android:defaultValue="@integer/preference_background_cancelled_past_default"
 				android:key="preference_background_cancelled_past"
-				android:title="@string/preference_background_cancelled_past" />
+				android:title="@string/preference_background_cancelled_past" />-->
 
 			<Preference
 				android:key="preference_timetable_colors_reset"
@@ -213,9 +213,9 @@
 		android:key="preferences_timetable"
 		android:title="@string/preferences_timetable">
 
-		<com.sapuseven.untis.preferences.ElementPickerPreference
+		<!--<com.sapuseven.untis.preferences.ElementPickerPreference
 			android:key="preference_timetable_personal_timetable"
-			android:title="@string/preference_timetable_personal_timetable" />
+			android:title="@string/preference_timetable_personal_timetable" />-->
 
 		<SwitchPreference
 			android:defaultValue="@bool/preference_timetable_hide_time_stamps_default"
@@ -254,7 +254,7 @@
 				android:key="preference_timetable_range_index_reset"
 				android:title="@string/preference_timetable_range_index_reset" />
 
-			<!--SwitchPreference
+			<!--com.sapuseven.untis.preferences.SwitchPreference
 				android:enabled="false"
 				android:key="preference_timetable_range_hide_outside"
 				android:summary="(not implemented)"
@@ -262,7 +262,7 @@
 		</PreferenceCategory>
 
 		<PreferenceCategory android:title="@string/preference_category_timetable_item_appearance">
-			<com.sapuseven.untis.preferences.UnitPreference
+			<!--<com.sapuseven.untis.preferences.UnitPreference
 				android:defaultValue="@integer/preference_timetable_item_padding_overlap_default"
 				android:icon="@drawable/settings_timetable_padding"
 				android:key="preference_timetable_item_padding_overlap"
@@ -281,7 +281,7 @@
 				android:icon="@drawable/settings_timetable_rounded_corner"
 				android:key="preference_timetable_item_corner_radius"
 				android:title="@string/preference_timetable_item_corner_radius"
-				app:unit="dp" />
+				app:unit="dp" />-->
 		</PreferenceCategory>
 
 		<PreferenceCategory android:title="@string/preference_category_timetable_lesson_text">
@@ -298,7 +298,7 @@
 				android:key="preference_timetable_bold_lesson_name"
 				android:title="@string/preference_timetable_bold_lesson_name" />
 
-			<com.sapuseven.untis.preferences.UnitPreference
+			<!--<com.sapuseven.untis.preferences.UnitPreference
 				android:defaultValue="@integer/preference_timetable_lesson_name_font_size_default"
 				android:icon="@drawable/settings_timetable_font_size"
 				android:key="preference_timetable_lesson_name_font_size"
@@ -310,7 +310,7 @@
 				android:icon="@drawable/settings_timetable_font_size"
 				android:key="preference_timetable_lesson_info_font_size"
 				android:title="@string/preference_timetable_lesson_info_font_size"
-				app:unit="sp" />
+				app:unit="sp" />-->
 		</PreferenceCategory>
 	</PreferenceScreen>
 
@@ -340,12 +340,12 @@
 			android:summary="@string/preference_notifications_first_lesson_desc"
 			android:title="@string/preference_notifications_first_lesson" />
 
-		<com.sapuseven.untis.preferences.UnitPreference
+		<!--<com.sapuseven.untis.preferences.UnitPreference
 			android:defaultValue="@integer/preference_notifications_before_first_time_default"
 			android:dependency="preference_notifications_before_first"
 			android:key="preference_notifications_before_first_time"
 			android:title="@string/preference_notifications_first_lesson_time"
-			app:unit="@string/preference_notifications_first_lesson_time_unit" />
+			app:unit="@string/preference_notifications_first_lesson_time_unit" />-->
 
 		<Preference
 			android:icon="@drawable/settings_notifications_clear_all"
@@ -379,7 +379,7 @@
 				android:dependency="preference_notifications_enable"
 				android:entries="@array/preference_notifications_visibility"
 				android:entryValues="@array/preference_notifications_visibility_values"
-				android:icon="@drawable/all_teacher"
+				android:icon="@drawable/all_teachers"
 				android:key="preference_notifications_visibility_teachers"
 				android:summary="%s"
 				android:title="@string/all_teachers" />
@@ -427,7 +427,7 @@
 	<PreferenceScreen
 		android:icon="@drawable/settings_info"
 		android:key="preferences_info"
-		android:title="@string/preferences_infos">
+		android:title="@string/preferences_info">
 
 		<Preference
 			android:icon="@drawable/settings_about_app_icon"
