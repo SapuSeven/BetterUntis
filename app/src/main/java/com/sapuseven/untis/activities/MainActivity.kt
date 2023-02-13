@@ -1011,7 +1011,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		}
 	}
 
-	private fun convertDateTimeToWeekIndex(date: LocalDate) =
+	private fun convertLocalDateToWeekIndex(date: LocalDate) =
 		date.year * 100 + date.dayOfYear.floorDiv(7) + 1
 
 	private fun convertWeekIndexToDateTime(weekIndex: Int) =
@@ -1325,7 +1325,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 					data: TimegridItem,
 					eventRect: RectF
 				) {
-					val items = (weeklyTimetableItems[currentWeekIndex.value]?.items ?: emptyList())
+					val items = (weeklyTimetableItems[convertLocalDateToWeekIndex(data.startDateTime.toLocalDate())]?.items ?: emptyList())
 						.filter {
 							it.startDateTime.millis <= data.startDateTime.millis &&
 									it.endDateTime.millis >= data.endDateTime.millis
@@ -1426,7 +1426,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		endDate: LocalDate
 	): List<WeekViewDisplayable<TimegridItem>> {
 		val weekIndex =
-			convertDateTimeToWeekIndex(startDate)
+			convertLocalDateToWeekIndex(startDate)
 		return weeklyTimetableItems[weekIndex]?.items?.map { item -> item.toWeekViewEvent() }
 			?: run {
 				weeklyTimetableItems[weekIndex] =
@@ -1453,7 +1453,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	}
 
 	fun onScroll(newFirstVisibleDay: LocalDate) {
-		currentWeekIndex.value = convertDateTimeToWeekIndex(newFirstVisibleDay)
+		currentWeekIndex.value = convertLocalDateToWeekIndex(newFirstVisibleDay)
 		lastRefreshTimestamp.value = weeklyTimetableItems[currentWeekIndex.value]?.lastUpdated ?: 0
 	}
 
