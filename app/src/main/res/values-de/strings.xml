@@ -222,8 +222,8 @@
     <string name="preference_timetable_colors_reset_button_positive">Zurücksetzen</string>
     <string name="preference_timetable_hide_cancelled">Entfallene Stunden ausblenden</string>
     <string name="preference_timetable_hide_cancelled_desc">Wird erst bei erneutem Laden des Stundenplans aktiv</string>
-    <string name="preference_timetable_hide_time_stamps">Zeitstempel ausblenden</string>
-    <string name="preference_timetable_hide_time_stamps_desc">Start- und Endzeit von Stunden neben dem Stundenplan ausblenden</string>
+    <string name="preference_timetable_hide_timestamps">Zeitstempel ausblenden</string>
+    <string name="preference_timetable_hide_timestamps_desc">Start- und Endzeit von Stunden neben dem Stundenplan ausblenden</string>
     <string name="preference_timetable_item_corner_radius">Abgerundete Ecken</string>
     <string name="preference_timetable_item_padding">Abstand zwischen Stunden</string>
     <string name="preference_timetable_item_padding_overlap">Abstand zwischen gleichzeitigen Stunden</string>

@@ -164,8 +164,8 @@
     <string name="preference_timetable_lesson_info_font_size">Eskolen informazioaren letra-tamaina</string>
     <string name="preference_timetable_item_text_light">Erabili testu zuria ordutegiko elementuetarako</string>
     <string name="preference_timetable_item_corner_radius">Elementuaren ertzeko erradioa</string>
-    <string name="preference_timetable_hide_time_stamps_desc">Ezkutatu ordutegiaren ondoko denbora-zigiluak</string>
-    <string name="preference_timetable_hide_time_stamps">Ezkutatu denbora-zigiluak</string>
+    <string name="preference_timetable_hide_timestamps_desc">Ezkutatu ordutegiaren ondoko denbora-zigiluak</string>
+    <string name="preference_timetable_hide_timestamps">Ezkutatu denbora-zigiluak</string>
     <string name="preference_timetable_hide_cancelled_desc">Ezarpen hau aldatu ondoren ordutegia berriro kargatu behar duzu</string>
     <string name="preference_timetable_hide_cancelled">Ezkutatu bertan behera utzitako eskolak</string>
     <string name="preference_timetable_colors_reset_button_positive">Berrezarri</string>

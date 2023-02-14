@@ -218,10 +218,10 @@
 			android:title="@string/preference_timetable_personal_timetable" />-->
 
 		<SwitchPreference
-			android:defaultValue="@bool/preference_timetable_hide_time_stamps_default"
-			android:key="preference_timetable_hide_time_stamps"
-			android:summary="@string/preference_timetable_hide_time_stamps_desc"
-			android:title="@string/preference_timetable_hide_time_stamps" />
+			android:defaultValue="@bool/preference_timetable_hide_timestamps_default"
+			android:key="preference_timetable_hide_timestamps"
+			android:summary="@string/preference_timetable_hide_timestamps_desc"
+			android:title="@string/preference_timetable_hide_timestamps" />
 
 		<SwitchPreference
 			android:defaultValue="@bool/preference_timetable_hide_cancelled_default"
