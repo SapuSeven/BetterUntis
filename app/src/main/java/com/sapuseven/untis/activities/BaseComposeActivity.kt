@@ -2,6 +2,7 @@ package com.sapuseven.untis.activities
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -16,6 +17,7 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
@@ -41,6 +43,8 @@ open class BaseComposeActivity : ComponentActivity() {
 	internal var colorScheme by mutableStateOf<ColorScheme?>(null)
 	internal lateinit var userDatabase: UserDatabase
 	internal lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
+
+	private var dialogOpenUrl: MutableState<String?>? = null
 
 	companion object {
 		private const val EXTRA_LONG_USER_ID = "com.sapuseven.untis.activities.profileid"
@@ -209,6 +213,29 @@ open class BaseComposeActivity : ComponentActivity() {
 						.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)),
 					content = content
 				)
+
+				dialogOpenUrl = remember { mutableStateOf<String?>(null) }
+				dialogOpenUrl?.value?.let { url ->
+					AlertDialog(
+						onDismissRequest = {
+							dialogOpenUrl?.value = null
+						},
+						title = {
+							Text(text = stringResource(id = R.string.settings_dialog_url_open_title))
+						},
+						text = {
+							Column {
+								Text(text = stringResource(id = R.string.settings_dialog_url_open_text))
+								Text(text = url, modifier = Modifier.padding(top = 16.dp))
+							}
+						},
+						confirmButton = {
+							TextButton(onClick = { dialogOpenUrl?.value = null }) {
+								Text(text = stringResource(id = R.string.all_close))
+							}
+						}
+					)
+				}
 			}
 		} ?: run {
 			val backgroundColor = getBackgroundColorExtra(intent)
@@ -274,11 +301,16 @@ open class BaseComposeActivity : ComponentActivity() {
 		}
 	}
 
-	inline fun <reified T : java.io.Serializable> getSerializable(intent: Intent, key: String): T? = when {
-		Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> intent.getSerializableExtra(
-			key,
-			T::class.java
-		)
-		else -> @Suppress("DEPRECATION") intent.getSerializableExtra(key) as? T
+	fun openUrl(url: String) {
+		val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+			addCategory(Intent.CATEGORY_BROWSABLE)
+			flags = Intent.FLAG_ACTIVITY_NEW_TASK
+		}
+
+		if (intent.resolveActivity(packageManager) != null) {
+			startActivity(intent)
+		} else {
+			dialogOpenUrl?.value = url
+		}
 	}
 }

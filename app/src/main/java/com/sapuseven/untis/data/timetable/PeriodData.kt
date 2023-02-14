@@ -7,12 +7,14 @@ import android.text.style.StrikethroughSpan
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.Period
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import java.io.Serializable
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
+@Serializable
 class PeriodData(
-		private var timetableDatabaseInterface: TimetableDatabaseInterface? = null,
+		@Transient private var timetableDatabaseInterface: TimetableDatabaseInterface? = null,
 		var element: Period
-) : Serializable {
+) {
 	val classes = HashSet<PeriodElement>()
 	val teachers = HashSet<PeriodElement>()
 	val subjects = HashSet<PeriodElement>()

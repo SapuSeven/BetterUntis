@@ -138,7 +138,7 @@ val BaseComposeActivity.dataStorePreferences: DataStorePreferences
 			),
 			timetableHideTimeStamps = this.booleanDataStore(
 				currentUserId(),
-				"preference_timetable_hide_time_stamps"
+				"preference_timetable_hide_timestamps"
 			),
 			timetableHideCancelled = this.booleanDataStore(
 				currentUserId(),

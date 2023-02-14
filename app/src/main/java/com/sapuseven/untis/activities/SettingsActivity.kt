@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.*
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -21,7 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -99,7 +98,6 @@ class SettingsActivity : BaseComposeActivity() {
 						}
 					updateAutoMutePref(user, scope, autoMutePref)
 
-					var dialogOpenUrl by remember { mutableStateOf<String?>(null) }
 					var dialogScheduleExactAlarms by remember { mutableStateOf(false) }
 
 					val notificationPref = dataStorePreferences.notificationsEnable
@@ -130,19 +128,6 @@ class SettingsActivity : BaseComposeActivity() {
 								}
 						}
 
-					fun openUrl(url: String) {
-						val intent = Intent(ACTION_VIEW, Uri.parse(url)).apply {
-							addCategory(CATEGORY_BROWSABLE)
-							flags = FLAG_ACTIVITY_NEW_TASK
-						}
-
-						if (intent.resolveActivity(packageManager) != null) {
-							startActivity(intent)
-						} else {
-							dialogOpenUrl = url
-						}
-					}
-
 					Scaffold(
 						topBar = {
 							CenterAlignedTopAppBar(
@@ -165,8 +150,8 @@ class SettingsActivity : BaseComposeActivity() {
 					) { innerPadding ->
 						Box(
 							modifier = Modifier
-                                .padding(innerPadding)
-                                .fillMaxSize()
+								.padding(innerPadding)
+								.fillMaxSize()
 						) {
 							NavHost(navController, startDestination = preferencePath) {
 								composable("preferences") {
@@ -515,32 +500,62 @@ class SettingsActivity : BaseComposeActivity() {
 									VerticalScrollColumn {
 										ElementPickerPreference(
 											title = { Text(stringResource(R.string.preference_timetable_personal_timetable)) },
+											icon = {
+												Icon(
+													painter = painterResource(id = R.drawable.settings_account_personal),
+													contentDescription = null
+												)
+											},
 											dataStore = dataStorePreferences.timetablePersonalTimetable,
 											timetableDatabaseInterface = timetableDatabaseInterface,
 											highlight = preferenceHighlight == "preference_timetable_personal_timetable"
 										)
 
 										SwitchPreference(
-											title = { Text(stringResource(R.string.preference_timetable_hide_time_stamps)) },
-											summary = { Text(stringResource(R.string.preference_timetable_hide_time_stamps_desc)) },
+											title = { Text(stringResource(R.string.preference_timetable_hide_timestamps)) },
+											summary = { Text(stringResource(R.string.preference_timetable_hide_timestamps_desc)) },
+											icon = {
+												Icon(
+													painter = painterResource(id = R.drawable.settings_hide_timestamps),
+													contentDescription = null
+												)
+											},
 											dataStore = dataStorePreferences.timetableHideTimeStamps
 										)
 
 										SwitchPreference(
 											title = { Text(stringResource(R.string.preference_timetable_hide_cancelled)) },
 											summary = { Text(stringResource(R.string.preference_timetable_hide_cancelled_desc)) },
+											icon = {
+												Icon(
+													painter = painterResource(id = R.drawable.settings_hide_cancelled),
+													contentDescription = null
+												)
+											},
 											dataStore = dataStorePreferences.timetableHideCancelled
 										)
 
 										SwitchPreference(
 											title = { Text(stringResource(R.string.preference_timetable_substitutions_irregular)) },
 											summary = { Text(stringResource(R.string.preference_timetable_substitutions_irregular_desc)) },
+											icon = {
+												Icon(
+													painter = painterResource(id = R.drawable.settings_detect_irregular),
+													contentDescription = null
+												)
+											},
 											dataStore = dataStorePreferences.timetableSubstitutionsIrregular
 										)
 
 										SwitchPreference(
 											title = { Text(stringResource(R.string.preference_timetable_background_irregular)) },
 											summary = { Text(stringResource(R.string.preference_timetable_background_irregular_desc)) },
+											icon = {
+												Icon(
+													painter = painterResource(id = R.drawable.settings_background_irregular),
+													contentDescription = null
+												)
+											},
 											dependency = dataStorePreferences.timetableSubstitutionsIrregular,
 											dataStore = dataStorePreferences.timetableBackgroundIrregular
 										)
@@ -548,6 +563,12 @@ class SettingsActivity : BaseComposeActivity() {
 										PreferenceCategory(stringResource(id = R.string.preference_category_display_options)) {
 											RangeInputPreference(
 												title = { Text(stringResource(R.string.preference_timetable_range)) },
+												icon = {
+													Icon(
+														painter = painterResource(id = R.drawable.settings_timetable_range),
+														contentDescription = null
+													)
+												},
 												dataStore = dataStorePreferences.timetableRange
 											)
 
@@ -841,8 +862,18 @@ class SettingsActivity : BaseComposeActivity() {
 									VerticalScrollColumn {
 										Preference(
 											title = { Text(stringResource(R.string.app_name)) },
-											summary = { Text(stringResource(R.string.app_desc)) },
-											onClick = { /*TODO*/ },
+											summary = {
+												Text(
+													stringResource(
+														R.string.preference_info_app_version_desc,
+														BuildConfig.VERSION_NAME,
+														BuildConfig.VERSION_CODE
+													)
+												)
+											},
+											onClick = {
+												openUrl("$URL_GITHUB_REPOSITORY/releases")
+											},
 											icon = {
 												Icon(
 													painter = painterResource(R.drawable.settings_about_app_icon),
@@ -853,31 +884,7 @@ class SettingsActivity : BaseComposeActivity() {
 										)
 
 										PreferenceCategory(stringResource(id = R.string.preference_info_general)) {
-
 											val openDialog = remember { mutableStateOf(false) }
-
-											Preference(
-												title = { Text(stringResource(R.string.preference_info_app_version)) },
-												summary = {
-													Text(
-														stringResource(
-															R.string.preference_info_app_version_desc,
-															BuildConfig.VERSION_NAME,
-															BuildConfig.VERSION_CODE
-														)
-													)
-												},
-												onClick = {
-													openUrl("$URL_GITHUB_REPOSITORY/releases")
-												},
-												icon = {
-													Icon(
-														painter = painterResource(R.drawable.settings_info),
-														contentDescription = null
-													)
-												},
-												dataStore = UntisPreferenceDataStore.emptyDataStore()
-											)
 
 											Preference(
 												title = { Text(stringResource(R.string.preference_info_github)) },
@@ -1061,28 +1068,6 @@ class SettingsActivity : BaseComposeActivity() {
 								}
 							}
 						}
-					}
-
-					dialogOpenUrl?.let { url ->
-						AlertDialog(
-							onDismissRequest = {
-								dialogOpenUrl = null
-							},
-							title = {
-								Text(text = stringResource(id = R.string.settings_dialog_url_open_title))
-							},
-							text = {
-								Column {
-									Text(text = stringResource(id = R.string.settings_dialog_url_open_text))
-									Text(text = url, modifier = Modifier.padding(top = 16.dp))
-								}
-							},
-							confirmButton = {
-								TextButton(onClick = { dialogOpenUrl = null }) {
-									Text(text = stringResource(id = R.string.all_close))
-								}
-							}
-						)
 					}
 
 					if (dialogScheduleExactAlarms)

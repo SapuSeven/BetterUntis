@@ -205,8 +205,8 @@
     <string name="preference_timetable_item_padding_overlap">叠加格子填充</string>
     <string name="preference_timetable_item_padding">格子填充</string>
     <string name="preference_timetable_item_corner_radius">格子圆角弧度</string>
-    <string name="preference_timetable_hide_time_stamps_desc">下一次进入课程表时隐藏时间标记</string>
-    <string name="preference_timetable_hide_time_stamps">隐藏时间标记</string>
+    <string name="preference_timetable_hide_timestamps_desc">下一次进入课程表时隐藏时间标记</string>
+    <string name="preference_timetable_hide_timestamps">隐藏时间标记</string>
     <string name="preference_timetable_hide_cancelled_desc">设置改变后需要重新加载课程表</string>
     <string name="preference_timetable_hide_cancelled">隐藏已删除课程</string>
     <string name="preference_timetable_colors_reset">重置颜色</string>

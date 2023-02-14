@@ -156,8 +156,8 @@
     <string name="all_lessontopic_none">(Konu yok)</string>
     <string name="all_lesson_details">Ders detayları</string>
     <string name="all_subjects">Konular</string>
-    <string name="preference_timetable_hide_time_stamps_desc">Zaman çizelgesinin yanındaki zaman bilgilerini gizle</string>
-    <string name="preference_timetable_hide_time_stamps">Zaman bilgisini gizle</string>
+    <string name="preference_timetable_hide_timestamps_desc">Zaman çizelgesinin yanındaki zaman bilgilerini gizle</string>
+    <string name="preference_timetable_hide_timestamps">Zaman bilgisini gizle</string>
     <string name="preference_timetable_hide_cancelled_desc">Bu ayarı değiştirdikten sonra zaman çizelgesini yeniden yüklemeniz gerekir</string>
     <string name="preference_timetable_hide_cancelled">İptal edilen dersleri gizle</string>
     <string name="preference_timetable_colors_reset_button_positive">Sıfırla</string>
@@ -226,13 +226,9 @@
     <string name="preference_flinging_enable">Hızlı kaydırmayı etkinleştir</string>
     <string name="preferences_connectivity">Bağlantı</string>
     <string name="preferences_general">Genel</string>
-    <string name="preferences_infos">Hakkında</string>
     <string name="preferences_notifications">Bildirimler</string>
     <string name="preferences_styling">Kişiselleştirme</string>
     <string name="preferences_timetable">Ders Programı</string>
-    <string name="settings_designing_message">Henüz olmayan ayar ikonlarını yaparak uygulamayı geliştirmeye yardımcı ol!</string>
-    <string name="settings_designing_hide">Bir daha gösterme</string>
-    <string name="settings_designing_info">Daha fazla</string>
     <string name="notifications_channel_breakinfo">Teneffüs bilgisi</string>
     <string name="notifications_text_error_title">Ders programı yüklenemedi</string>
     <string name="notifications_text_error_message">Bugün bildirim almayacaksın.</string>

@@ -61,8 +61,8 @@
     <string name="preference_timetable_item_padding_overlap">Chevauchement de l’espacement des cours</string>
     <string name="preference_timetable_item_padding">Espacement entre les cours</string>
     <string name="preference_timetable_item_corner_radius">Rayon d’angle de l’élément</string>
-    <string name="preference_timetable_hide_time_stamps_desc">Cacher l’horodatage à côté de l’emploi du temps</string>
-    <string name="preference_timetable_hide_time_stamps">Cacher l’horodatage</string>
+    <string name="preference_timetable_hide_timestamps_desc">Cacher l’horodatage à côté de l’emploi du temps</string>
+    <string name="preference_timetable_hide_timestamps">Cacher l’horodatage</string>
     <string name="preference_timetable_hide_cancelled_desc">Vous devez recharger l’emploi du temps après avoir changer ce paramètre</string>
     <string name="preference_timetable_hide_cancelled">Cacher les cours annulés</string>
     <string name="preference_timetable_colors_reset">Réinitialiser les couleurs</string>

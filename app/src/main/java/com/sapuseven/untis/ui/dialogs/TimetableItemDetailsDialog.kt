@@ -31,6 +31,8 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
 import com.sapuseven.untis.R
+import com.sapuseven.untis.activities.BaseComposeActivity
+import com.sapuseven.untis.activities.MainActivity
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_LESSON_TOPIC
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_STUDENT_ABSENCE
@@ -69,8 +71,8 @@ import org.joda.time.format.DateTimeFormat
 	ExperimentalAnimationApi::class
 )
 @Composable
-fun TimetableItemDetailsDialog(
-	timegridItems: List<TimegridItem>,
+fun BaseComposeActivity.TimetableItemDetailsDialog(
+	timegridItems: List<PeriodData>,
 	initialPage: Int = 0,
 	user: UserDatabase.User,
 	timetableDatabaseInterface: TimetableDatabaseInterface,
@@ -179,7 +181,7 @@ fun TimetableItemDetailsDialog(
 				modifier = Modifier
 					.weight(1f)
 			) { page ->
-				timegridItems[page].run {
+				timegridItems[page].also { periodData ->
 					val title = periodData.getLong(
 						TimetableDatabaseInterface.Type.SUBJECT
 					).let { title ->
@@ -374,6 +376,33 @@ fun TimetableItemDetailsDialog(
 											tint = MaterialTheme.colorScheme.onSurface,
 											modifier = Modifier.padding(horizontal = 8.dp)
 										)
+									}
+								)
+							}
+
+							// Online lesson
+							if (periodData.element.isOnlinePeriod == true) {
+								ListItem(
+									headlineText = { Text(stringResource(R.string.all_lesson_online)) },
+									leadingContent = {
+										Icon(
+											painter = painterResource(id = R.drawable.all_lesson_online),
+											contentDescription = stringResource(id = R.string.all_lesson_info),
+											tint = MaterialTheme.colorScheme.onSurface,
+											modifier = Modifier.padding(horizontal = 8.dp)
+										)
+									},
+									trailingContent = periodData.element.onlinePeriodLink?.let {
+										{
+											IconButton(onClick = {
+												openUrl(it)
+											}) {
+												Icon(
+													painter = painterResource(id = R.drawable.all_open_in_new),
+													contentDescription = stringResource(R.string.all_open_link)
+												)
+											}
+										}
 									}
 								)
 							}

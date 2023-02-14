@@ -20,7 +20,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.AutofillNode
+import androidx.compose.ui.autofill.AutofillType
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalAutofillTree
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -45,9 +51,7 @@ import com.sapuseven.untis.helpers.api.LoginHelper
 import com.sapuseven.untis.models.UntisSchoolInfo
 import com.sapuseven.untis.models.untis.masterdata.TimeGrid
 import com.sapuseven.untis.preferences.dataStorePreferences
-import com.sapuseven.untis.ui.common.LabeledCheckbox
-import com.sapuseven.untis.ui.common.LabeledSwitch
-import com.sapuseven.untis.ui.common.SmallCircularProgressIndicator
+import com.sapuseven.untis.ui.common.*
 import com.sapuseven.untis.ui.functional.bottomInsets
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
@@ -83,7 +87,9 @@ class LoginDataInputActivity : BaseComposeActivity() {
 	private var schoolInfoFromSearch: UntisSchoolInfo? = null
 	private var existingUser: UserDatabase.User? = null
 
-	@OptIn(ExperimentalMaterial3Api::class, ExperimentalSerializationApi::class)
+	@OptIn(ExperimentalMaterial3Api::class, ExperimentalSerializationApi::class,
+		ExperimentalComposeUiApi::class
+	)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
@@ -419,7 +425,8 @@ class LoginDataInputActivity : BaseComposeActivity() {
 										prefKey = PREFS_BACKUP_USERNAME,
 										enabled = !loading,
 										error = validate && usernameError,
-										errorText = stringResource(id = R.string.logindatainput_error_field_empty)
+										errorText = stringResource(id = R.string.logindatainput_error_field_empty),
+										autofillType = AutofillType.Username
 									)
 									InputField(
 										state = password,
@@ -433,7 +440,8 @@ class LoginDataInputActivity : BaseComposeActivity() {
 										prefKey = PREFS_BACKUP_PASSWORD,
 										enabled = !loading,
 										error = validate && passwordError,
-										errorText = stringResource(id = R.string.logindatainput_error_field_empty)
+										errorText = stringResource(id = R.string.logindatainput_error_field_empty),
+										autofillType = AutofillType.Password
 									)
 									Spacer(
 										modifier = Modifier.height(32.dp)
@@ -518,7 +526,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 		}
 	}
 
-	@OptIn(ExperimentalMaterial3Api::class)
+	@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 	@Composable
 	private fun InputField(
 		state: MutableState<String?>,
@@ -527,7 +535,8 @@ class LoginDataInputActivity : BaseComposeActivity() {
 		prefKey: Preferences.Key<String>? = null,
 		enabled: Boolean = true,
 		error: Boolean = false,
-		errorText: String = ""
+		errorText: String = "",
+		autofillType: AutofillType? = null
 	) {
 		Column(
 			modifier = Modifier
@@ -541,9 +550,15 @@ class LoginDataInputActivity : BaseComposeActivity() {
 				keyboardOptions = KeyboardOptions(keyboardType = type),
 				visualTransformation = if (type == KeyboardType.Password) PasswordVisualTransformation() else VisualTransformation.None,
 				label = label,
-				modifier = Modifier.fillMaxWidth(),
 				enabled = enabled,
-				isError = error
+				isError = error,
+				modifier = Modifier
+					.fillMaxWidth()
+					.ifNotNull(autofillType) {
+						autofill(listOf(it)) {
+							state.value = it
+						}
+					}
 			)
 
 			AnimatedVisibility(visible = error) {

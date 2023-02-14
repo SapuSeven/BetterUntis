@@ -242,8 +242,8 @@
     <string name="preference_schoolcolors_exam">For leksjoner med tester</string>
     <string name="preference_schoolcolors_irregular">For uvanlige leksjoner</string>
     <string name="preference_schoolcolors_cancelled">For kansellerte leksjoner</string>
-    <string name="preference_timetable_hide_time_stamps">Skjul tidsstempel</string>
-    <string name="preference_timetable_hide_time_stamps_desc">Skjul tidsstempel ved siden av timeplanen</string>
+    <string name="preference_timetable_hide_timestamps">Skjul tidsstempel</string>
+    <string name="preference_timetable_hide_timestamps_desc">Skjul tidsstempel ved siden av timeplanen</string>
     <string name="errors_crash_title">Det ser ut til at BetterUntis krasjet.</string>
     <string name="loading_failed">Innlasting mislyktes</string>
     <string name="loading">Laster</string>

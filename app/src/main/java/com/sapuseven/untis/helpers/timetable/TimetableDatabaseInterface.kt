@@ -8,9 +8,8 @@ import com.sapuseven.untis.models.untis.masterdata.Room
 import com.sapuseven.untis.models.untis.masterdata.Subject
 import com.sapuseven.untis.models.untis.masterdata.Teacher
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import java.io.Serializable
 
-class TimetableDatabaseInterface(@Transient val database: UserDatabase, @Transient val id: Long) : Serializable {
+class TimetableDatabaseInterface(val database: UserDatabase, val id: Long) {
 	private var allClasses: Map<Int, Klasse> = mapOf()
 	private var allTeachers: Map<Int, Teacher> = mapOf()
 	private var allSubjects: Map<Int, Subject> = mapOf()

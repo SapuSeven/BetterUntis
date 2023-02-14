@@ -180,7 +180,7 @@
     <string name="preference_flinging_enable">Schnelles Scrollen aktivieren</string>
     <string name="preference_info_general">General</string>
     <string name="preference_info_app_version">App-Version</string>
-    <string name="preference_info_app_version_desc">%1$s (%2$d)</string>
+    <string name="preference_info_app_version_desc">Version %1$s (%2$d)</string>
     <string name="preference_info_github">GitHub-Repository</string>
     <string name="preference_info_contributors">Mitwirkende</string>
     <string name="preference_info_contributors_desc">Eine Liste aller Mitwirkenden am Projekt</string>
@@ -222,8 +222,8 @@
     <string name="preference_timetable_colors_reset_button_positive">Zurücksetzen</string>
     <string name="preference_timetable_hide_cancelled">Entfallene Stunden ausblenden</string>
     <string name="preference_timetable_hide_cancelled_desc">Wird erst bei erneutem Laden des Stundenplans aktiv</string>
-    <string name="preference_timetable_hide_time_stamps">Zeitstempel ausblenden</string>
-    <string name="preference_timetable_hide_time_stamps_desc">Start- und Endzeit von Stunden neben dem Stundenplan ausblenden</string>
+    <string name="preference_timetable_hide_timestamps">Zeitstempel ausblenden</string>
+    <string name="preference_timetable_hide_timestamps_desc">Start- und Endzeit von Stunden neben dem Stundenplan ausblenden</string>
     <string name="preference_timetable_item_corner_radius">Abgerundete Ecken</string>
     <string name="preference_timetable_item_padding">Abstand zwischen Stunden</string>
     <string name="preference_timetable_item_padding_overlap">Abstand zwischen gleichzeitigen Stunden</string>
@@ -340,4 +340,6 @@
 	<string name="widget_disclaimer_text">Die Widget-Funktion befindet sich noch in der Entwicklungsphase und funktioniert unter Umständen nicht auf jedem Gerät.</string>
 	<string name="login_demo">Zuerst ausprobieren</string>
 	<string name="mainactivitydrawer_profile_edit_hint">Tippe auf ein Profil, um es zu bearbeiten</string>
+    <string name="all_lesson_online">Findet online statt</string>
+	<string name="all_open_link">Link öffnen</string>
 </resources>

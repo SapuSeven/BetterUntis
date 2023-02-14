@@ -28,7 +28,8 @@
 		android:label="@string/app_name"
 		android:roundIcon="@mipmap/ic_launcher_round"
 		android:supportsRtl="true"
-		android:theme="@style/AppTheme">
+		android:theme="@style/AppTheme"
+		android:enableOnBackInvokedCallback="true">
 
 		<meta-data android:name="io.sentry.auto-init" android:value="false" />
 
