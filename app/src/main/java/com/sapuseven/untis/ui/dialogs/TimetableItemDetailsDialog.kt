@@ -381,7 +381,7 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 							}
 
 							// Online lesson
-							periodData.element.isOnlinePeriod?.also {
+							if (periodData.element.isOnlinePeriod == true) {
 								ListItem(
 									headlineText = { Text(stringResource(R.string.all_lesson_online)) },
 									leadingContent = {
