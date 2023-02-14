@@ -99,7 +99,6 @@ class SettingsActivity : BaseComposeActivity() {
 						}
 					updateAutoMutePref(user, scope, autoMutePref)
 
-					var dialogOpenUrl by remember { mutableStateOf<String?>(null) }
 					var dialogScheduleExactAlarms by remember { mutableStateOf(false) }
 
 					val notificationPref = dataStorePreferences.notificationsEnable
@@ -129,19 +128,6 @@ class SettingsActivity : BaseComposeActivity() {
 									)
 								}
 						}
-
-					fun openUrl(url: String) {
-						val intent = Intent(ACTION_VIEW, Uri.parse(url)).apply {
-							addCategory(CATEGORY_BROWSABLE)
-							flags = FLAG_ACTIVITY_NEW_TASK
-						}
-
-						if (intent.resolveActivity(packageManager) != null) {
-							startActivity(intent)
-						} else {
-							dialogOpenUrl = url
-						}
-					}
 
 					Scaffold(
 						topBar = {
@@ -1068,28 +1054,6 @@ class SettingsActivity : BaseComposeActivity() {
 								}
 							}
 						}
-					}
-
-					dialogOpenUrl?.let { url ->
-						AlertDialog(
-							onDismissRequest = {
-								dialogOpenUrl = null
-							},
-							title = {
-								Text(text = stringResource(id = R.string.settings_dialog_url_open_title))
-							},
-							text = {
-								Column {
-									Text(text = stringResource(id = R.string.settings_dialog_url_open_text))
-									Text(text = url, modifier = Modifier.padding(top = 16.dp))
-								}
-							},
-							confirmButton = {
-								TextButton(onClick = { dialogOpenUrl = null }) {
-									Text(text = stringResource(id = R.string.all_close))
-								}
-							}
-						)
 					}
 
 					if (dialogScheduleExactAlarms)

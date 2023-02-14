@@ -359,4 +359,6 @@
 	</plurals>
 	<string name="all_favourites">Favourites</string>
 	<string name="mainactivitydrawer_profile_edit_hint">Tap on a profile to edit</string>
+    <string name="all_lesson_online">Taking place online</string>
+	<string name="all_open_link">Open link</string>
 </resources>

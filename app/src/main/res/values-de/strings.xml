@@ -340,4 +340,6 @@
 	<string name="widget_disclaimer_text">Die Widget-Funktion befindet sich noch in der Entwicklungsphase und funktioniert unter Umständen nicht auf jedem Gerät.</string>
 	<string name="login_demo">Zuerst ausprobieren</string>
 	<string name="mainactivitydrawer_profile_edit_hint">Tippe auf ein Profil, um es zu bearbeiten</string>
+    <string name="all_lesson_online">Findet online statt</string>
+	<string name="all_open_link">Link öffnen</string>
 </resources>

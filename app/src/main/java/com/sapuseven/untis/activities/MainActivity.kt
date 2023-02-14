@@ -54,6 +54,7 @@ import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PR
 import com.sapuseven.untis.activities.main.DrawerItems
 import com.sapuseven.untis.activities.main.DrawerText
 import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.config.globalDataStore
@@ -92,6 +93,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.*
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.PairSerializer
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.Json
 import org.joda.time.*
 import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
@@ -181,20 +187,21 @@ private fun WeekViewCompose(state: MainAppState) {
 		},
 		update = {
 			state.weekView.value = weekViewGlobal
-			state.userDatabase.getAdditionalUserData<Holiday>(state.user.id, Holiday())?.let { item ->
-				state.weekView.value?.addHolidays(item.map { holiday ->
-					HolidayChip(
-						text = holiday.value.longName,
-						startDate = holiday.value.startDate,
-						endDate = holiday.value.endDate
-					)
-				})
-			}
+			state.userDatabase.getAdditionalUserData<Holiday>(state.user.id, Holiday())
+				?.let { item ->
+					state.weekView.value?.addHolidays(item.map { holiday ->
+						HolidayChip(
+							text = holiday.value.longName,
+							startDate = holiday.value.startDate,
+							endDate = holiday.value.endDate
+						)
+					})
+				}
 			state.updateViews(it)
 		},
 		modifier = Modifier
-			.fillMaxSize()
-			.disabled(state.isAnonymous)
+            .fillMaxSize()
+            .disabled(state.isAnonymous)
 	)
 }
 
@@ -247,8 +254,8 @@ private fun Drawer(
 		drawerContent = {
 			Column(
 				modifier = Modifier
-					.fillMaxSize()
-					.verticalScroll(drawerScrollState)
+                    .fillMaxSize()
+                    .verticalScroll(drawerScrollState)
 			) {
 				Spacer(modifier = Modifier.height(24.dp))
 
@@ -483,7 +490,7 @@ private fun Drawer(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainApp(state: MainAppState) {
+fun MainActivity.MainApp(state: MainAppState) {
 	val snackbarHostState = remember { SnackbarHostState() }
 	if (state.preferences.doubleTapToExit.getState().value)
 		BackPressConfirm(snackbarHostState)
@@ -529,8 +536,8 @@ fun MainApp(state: MainAppState) {
 		) { innerPadding ->
 			Box(
 				modifier = Modifier
-					.padding(innerPadding)
-					.fillMaxSize()
+                    .padding(innerPadding)
+                    .fillMaxSize()
 			) {
 				WeekViewCompose(state)
 
@@ -541,10 +548,10 @@ fun MainApp(state: MainAppState) {
 				Text(
 					text = state.lastRefreshText(),
 					modifier = Modifier
-						.align(Alignment.BottomStart)
-						.padding(start = timeColumnWidth + 8.dp, bottom = 8.dp)
-						.bottomInsets()
-						.disabled(state.isAnonymous)
+                        .align(Alignment.BottomStart)
+                        .padding(start = timeColumnWidth + 8.dp, bottom = 8.dp)
+                        .bottomInsets()
+                        .disabled(state.isAnonymous)
 				)
 
 				if (state.isAnonymous) {
@@ -552,8 +559,8 @@ fun MainApp(state: MainAppState) {
 						verticalArrangement = Arrangement.Center,
 						horizontalAlignment = Alignment.CenterHorizontally,
 						modifier = Modifier
-							.fillMaxSize()
-							.absolutePadding(left = 16.dp)
+                            .fillMaxSize()
+                            .absolutePadding(left = 16.dp)
 					) {
 						Text(
 							text = stringResource(id = R.string.main_anonymous_login_info_text),
@@ -593,8 +600,8 @@ fun MainApp(state: MainAppState) {
 				if (state.isLoading)
 					CircularProgressIndicator(
 						modifier = Modifier
-							.align(Alignment.BottomEnd)
-							.padding(8.dp)
+                            .align(Alignment.BottomEnd)
+                            .padding(8.dp)
 					)
 			}
 		}
@@ -667,7 +674,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	val lastRefreshTimestamp: MutableState<Long>,
 	val weeklyTimetableItems: SnapshotStateMap<Int, WeeklyTimetableItems?>,
 	val timetableLoader: TimetableLoader,
-	val timetableItemDetailsDialog: MutableState<Pair<List<TimegridItem>, Int>?>,
+	val timetableItemDetailsDialog: MutableState<Pair<List<PeriodData>, Int>?>,
 	val showDatePicker: MutableState<Boolean>,
 	val profileManagementDialog: MutableState<Boolean>
 ) {
@@ -680,6 +687,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 		private val DATASTORE_KEY_WEEKVIEW_SCALE = intPreferencesKey("weekView.hourHeight")
 	}
+
 	val userDatabase = contextActivity.userDatabase
 
 	private var drawerGestures by drawerGestureState
@@ -1325,13 +1333,16 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 					data: TimegridItem,
 					eventRect: RectF
 				) {
-					val items = (weeklyTimetableItems[convertLocalDateToWeekIndex(data.startDateTime.toLocalDate())]?.items ?: emptyList())
-						.filter {
-							it.startDateTime.millis <= data.startDateTime.millis &&
-									it.endDateTime.millis >= data.endDateTime.millis
-						}
+					val items =
+						(weeklyTimetableItems[convertLocalDateToWeekIndex(data.startDateTime.toLocalDate())]?.items
+							?: emptyList())
+							.filter {
+								it.startDateTime.millis <= data.startDateTime.millis &&
+										it.endDateTime.millis >= data.endDateTime.millis
+							}
 
-					timetableItemDetailsDialog.value = items to max(0, items.indexOf(data))
+					timetableItemDetailsDialog.value =
+						items.map { it.periodData } to max(0, items.indexOf(data))
 				}
 			})
 
@@ -1494,11 +1505,10 @@ fun rememberMainAppState(
 		user = user,
 		timetableDatabaseInterface = timetableDatabaseInterface
 	),
-	timetableItemDetailsDialog: MutableState<Pair<List<TimegridItem>, Int>?> = rememberSaveable {
-		mutableStateOf(
-			null
-		)
-	},
+	timetableItemDetailsDialog: MutableState<Pair<List<PeriodData>, Int>?> =
+		rememberSaveable {
+			mutableStateOf(null)
+		},
 	showDatePicker: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 	profileManagementDialog: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 ) = remember(user, customThemeColor, colorScheme) {
