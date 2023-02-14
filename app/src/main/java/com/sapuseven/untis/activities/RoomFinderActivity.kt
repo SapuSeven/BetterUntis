@@ -31,7 +31,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.MainActivity.Companion.EXTRA_SERIALIZABLE_PERIOD_ELEMENT
+import com.sapuseven.untis.activities.MainActivity.Companion.EXTRA_STRING_PERIOD_ELEMENT
 import com.sapuseven.untis.activities.RoomFinderState.Companion.ROOM_STATE_FREE
 import com.sapuseven.untis.activities.RoomFinderState.Companion.ROOM_STATE_OCCUPIED
 import com.sapuseven.untis.data.databases.RoomFinderDatabase
@@ -51,6 +51,7 @@ import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.functional.bottomInsets
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
@@ -557,8 +558,8 @@ class RoomFinderState constructor(
 	fun onRoomListItemClick(item: RoomStatusData) {
 		contextActivity.setResult(
 			Activity.RESULT_OK, Intent().putExtra(
-				EXTRA_SERIALIZABLE_PERIOD_ELEMENT,
-				item.periodElement
+				EXTRA_STRING_PERIOD_ELEMENT,
+				Json.encodeToString(PeriodElement.serializer(), item.periodElement)
 			)
 		)
 		contextActivity.finish()

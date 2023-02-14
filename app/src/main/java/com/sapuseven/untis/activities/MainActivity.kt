@@ -94,9 +94,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.*
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.builtins.PairSerializer
-import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import org.joda.time.*
 import org.joda.time.format.DateTimeFormat
@@ -109,7 +106,7 @@ class MainActivity : BaseComposeActivity() {
 	companion object {
 		const val MESSENGER_PACKAGE_NAME = "com.untis.chat"
 
-		const val EXTRA_SERIALIZABLE_PERIOD_ELEMENT = "com.sapuseven.untis.activities.main.element"
+		const val EXTRA_STRING_PERIOD_ELEMENT = "com.sapuseven.untis.activities.main.element"
 	}
 
 	private val weekViewRefreshHandler = Handler(Looper.getMainLooper())
@@ -231,10 +228,7 @@ private fun Drawer(
 	val shortcutLauncher =
 		rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
 			val periodElement: PeriodElement? = activityResult.data?.let { intent ->
-				state.contextActivity.getSerializable(
-					intent,
-					MainActivity.EXTRA_SERIALIZABLE_PERIOD_ELEMENT
-				)
+				Json.decodeFromString(PeriodElement.serializer(), intent.getStringExtra(MainActivity.EXTRA_STRING_PERIOD_ELEMENT) ?: "")
 			}
 
 			periodElement?.let {
@@ -1505,10 +1499,9 @@ fun rememberMainAppState(
 		user = user,
 		timetableDatabaseInterface = timetableDatabaseInterface
 	),
-	timetableItemDetailsDialog: MutableState<Pair<List<PeriodData>, Int>?> =
-		rememberSaveable {
-			mutableStateOf(null)
-		},
+	// TODO: Find another way of saving timetableItemDetailsDialog that doesn't require saving an entire Pair of List of PeriodData's.
+	//  Currently the dialog will close after state change (i.e. rotation).
+	timetableItemDetailsDialog: MutableState<Pair<List<PeriodData>, Int>?> = remember { mutableStateOf(null) },
 	showDatePicker: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 	profileManagementDialog: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 ) = remember(user, customThemeColor, colorScheme) {

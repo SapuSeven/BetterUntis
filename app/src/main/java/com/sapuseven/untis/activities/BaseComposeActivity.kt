@@ -296,15 +296,7 @@ open class BaseComposeActivity : ComponentActivity() {
 		}
 	}
 
-	inline fun <reified T : java.io.Serializable> getSerializable(intent: Intent, key: String): T? = when {
-		Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> intent.getSerializableExtra(
-			key,
-			T::class.java
-		)
-		else -> @Suppress("DEPRECATION") intent.getSerializableExtra(key) as? T
-	}
-
-	fun openUrl(url: String, onError: ((url: String) -> Unit)? = null) {
+	fun openUrl(url: String) {
 		val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
 			addCategory(Intent.CATEGORY_BROWSABLE)
 			flags = Intent.FLAG_ACTIVITY_NEW_TASK

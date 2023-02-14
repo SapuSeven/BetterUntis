@@ -1,9 +1,11 @@
 package com.sapuseven.untis.models.untis.response
 
+import android.os.Parcelable
 import com.sapuseven.untis.models.UnknownObject
 import com.sapuseven.untis.models.UntisAbsence
 import com.sapuseven.untis.models.UntisHomework
 import com.sapuseven.untis.models.untis.UntisTopic
+import kotlinx.android.parcel.Parcelize
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -18,11 +20,12 @@ data class PeriodDataResult(
 )
 
 @Serializable
+@Parcelize // No idea why this is needed, but otherwise it crashes the app on pause/resume
 data class UntisStudent(
 		val id: Int,
 		val firstName: String,
 		val lastName: String
-) {
+) : Parcelable {
 	fun fullName(): String = "$firstName $lastName"
 }
 
