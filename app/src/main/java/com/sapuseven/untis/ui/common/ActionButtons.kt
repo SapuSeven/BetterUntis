@@ -8,6 +8,7 @@ import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.R
@@ -26,7 +27,7 @@ fun ProfileSelectorAction(
 
 	if (!showProfileActions && hideIfSingleProfile && users.size <= 1) return
 
-	IconButton(onClick = { expanded = true }) {
+	IconButton(onClick = { expanded = true }, modifier = Modifier.testTag("action_profiles")) {
 		Icon(
 			imageVector = Icons.Outlined.AccountCircle,
 			contentDescription = stringResource(id = R.string.mainactivitydrawer_dropdown_show)

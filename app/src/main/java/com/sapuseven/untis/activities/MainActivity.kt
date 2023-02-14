@@ -89,6 +89,9 @@ import com.sapuseven.untis.views.weekview.listeners.ScaleListener
 import com.sapuseven.untis.views.weekview.listeners.ScrollListener
 import com.sapuseven.untis.views.weekview.listeners.TopLeftCornerClickListener
 import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
+import io.sentry.Breadcrumb
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -236,6 +239,21 @@ private fun Drawer(
 			}
 		}
 
+	LaunchedEffect(state.drawerState) {
+		snapshotFlow { state.drawerState.isOpen }
+			.distinctUntilChanged()
+			.drop(1)
+			.collect {
+				Log.i("Sentry", "Drawer isOpen: ${state.drawerState.isOpen}")
+				Breadcrumb().apply {
+					category = "ui.drawer"
+					level = SentryLevel.INFO
+					setData("isOpen", state.drawerState.isOpen)
+					Sentry.addBreadcrumb(this)
+				}
+			}
+	}
+
 	BackHandler(enabled = state.drawerState.isOpen) {
 		scope.launch {
 			state.drawerState.close()
@@ -351,6 +369,15 @@ private fun Drawer(
 						showElementPicker = item.elementType
 					},
 					onShortcutClick = { item ->
+						Log.i("Sentry", "Drawer onClick: ${item}")
+						Breadcrumb().apply {
+							category = "ui.drawer.click"
+							level = SentryLevel.INFO
+							setData("id", item.id)
+							setData("label", item.label)
+							Sentry.addBreadcrumb(this)
+						}
+
 						state.closeDrawer()
 						if (item.target == null) {
 							try {

@@ -23,6 +23,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.analytics.initSentry
@@ -33,6 +34,8 @@ import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.material.scheme.Scheme
 import com.sapuseven.untis.ui.theme.generateColorScheme
+import io.sentry.Sentry
+import io.sentry.android.core.SentryAndroid
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -75,12 +78,13 @@ open class BaseComposeActivity : ComponentActivity() {
 		invalidContent: @Composable () -> Unit = { InvalidProfileDialog() },
 		content: @Composable (UserDatabase.User) -> Unit
 	) {
+		/* Not working, can only be initialized once
 		val prefs = dataStorePreferences
-		rememberCoroutineScope().launch {
+		LaunchedEffect(prefs) {
 			prefs.analyticsUsageStats.getValueFlow().collect { enableUsageStats ->
 				initSentry(enableUsageStats)
 			}
-		}
+		}*/
 
 		user?.let {
 			content(it)

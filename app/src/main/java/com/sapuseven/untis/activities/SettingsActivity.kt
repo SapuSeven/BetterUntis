@@ -59,6 +59,7 @@ import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.preferences.*
 import com.sapuseven.untis.workers.AutoMuteSetupWorker
 import com.sapuseven.untis.workers.NotificationSetupWorker
+import io.sentry.compose.withSentryObservableEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
@@ -87,7 +88,7 @@ class SettingsActivity : BaseComposeActivity() {
 		setContent {
 			AppTheme(navBarInset = false) {
 				withUser { user ->
-					val navController = rememberNavController()
+					val navController = rememberNavController().withSentryObservableEffect()
 					var title by remember { mutableStateOf<String?>(null) }
 
 					val autoMutePref = dataStorePreferences.automuteEnable
@@ -1185,8 +1186,8 @@ class SettingsActivity : BaseComposeActivity() {
 	private fun VerticalScrollColumn(content: @Composable ColumnScope.() -> Unit) {
 		Column(
 			modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .bottomInsets(),
+				.verticalScroll(rememberScrollState())
+				.bottomInsets(),
 			content = content
 		)
 	}
