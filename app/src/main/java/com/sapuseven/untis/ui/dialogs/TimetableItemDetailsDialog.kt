@@ -31,6 +31,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
 import com.sapuseven.untis.R
+import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.activities.MainActivity
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_LESSON_TOPIC
@@ -70,7 +71,7 @@ import org.joda.time.format.DateTimeFormat
 	ExperimentalAnimationApi::class
 )
 @Composable
-fun MainActivity.TimetableItemDetailsDialog(
+fun BaseComposeActivity.TimetableItemDetailsDialog(
 	timegridItems: List<PeriodData>,
 	initialPage: Int = 0,
 	user: UserDatabase.User,

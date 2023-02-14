@@ -14,6 +14,7 @@ import androidx.compose.ui.geometry.Offset
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
 import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.common.disabled
+import com.sapuseven.untis.ui.common.ifNotNull
 import kotlinx.coroutines.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,7 +29,7 @@ fun <T> Preference(
 	supportingContent: @Composable ((value: T, enabled: Boolean) -> Unit)? = null,
 	trailingContent: @Composable ((value: T, enabled: Boolean) -> Unit)? = null,
 	scope: CoroutineScope = rememberCoroutineScope(),
-	onClick: (value: T) -> Unit = {},
+	onClick: ((value: T) -> Unit)? = null,
 	highlight: Boolean = false
 ) {
 	var enabled by remember {
@@ -50,7 +51,7 @@ fun <T> Preference(
 			}
 		}
 
-	scope.launch {
+	LaunchedEffect(Unit) {
 		awaitAll(
 			async { dataStore.getValueFlow().collect { newValue -> value.value = newValue } },
 			async { dependency?.getDependencyFlow()?.collect { enable -> enabled = enable } }
@@ -84,10 +85,12 @@ fun <T> Preference(
 		trailingContent = { trailingContent?.invoke(value.value, enabled) },
 		modifier = Modifier
 			.conditional(enabled) {
-				Modifier.clickable(
-					interactionSource = interactionSource,
-					indication = LocalIndication.current
-				) { onClick(value.value) }
+				ifNotNull(value = onClick) { onClick ->
+					clickable(
+						interactionSource = interactionSource,
+						indication = LocalIndication.current
+					) { onClick(value.value) }
+				}
 			}
 	)
 }

@@ -834,8 +834,18 @@ class SettingsActivity : BaseComposeActivity() {
 									VerticalScrollColumn {
 										Preference(
 											title = { Text(stringResource(R.string.app_name)) },
-											summary = { Text(stringResource(R.string.app_desc)) },
-											onClick = { /*TODO*/ },
+											summary = {
+												Text(
+													stringResource(
+														R.string.preference_info_app_version_desc,
+														BuildConfig.VERSION_NAME,
+														BuildConfig.VERSION_CODE
+													)
+												)
+											},
+											onClick = {
+												openUrl("$URL_GITHUB_REPOSITORY/releases")
+											},
 											icon = {
 												Icon(
 													painter = painterResource(R.drawable.settings_about_app_icon),
@@ -846,31 +856,7 @@ class SettingsActivity : BaseComposeActivity() {
 										)
 
 										PreferenceCategory(stringResource(id = R.string.preference_info_general)) {
-
 											val openDialog = remember { mutableStateOf(false) }
-
-											Preference(
-												title = { Text(stringResource(R.string.preference_info_app_version)) },
-												summary = {
-													Text(
-														stringResource(
-															R.string.preference_info_app_version_desc,
-															BuildConfig.VERSION_NAME,
-															BuildConfig.VERSION_CODE
-														)
-													)
-												},
-												onClick = {
-													openUrl("$URL_GITHUB_REPOSITORY/releases")
-												},
-												icon = {
-													Icon(
-														painter = painterResource(R.drawable.settings_info),
-														contentDescription = null
-													)
-												},
-												dataStore = UntisPreferenceDataStore.emptyDataStore()
-											)
 
 											Preference(
 												title = { Text(stringResource(R.string.preference_info_github)) },

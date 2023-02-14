@@ -167,7 +167,7 @@ class MainActivityScreenshot {
 				state.loading.value = Int.MIN_VALUE // Never show loading indicator
 
 				WithScreenshot {
-					MainApp(state)
+					rule.activity.MainApp(state)
 				}
 
 				//rule.mainClock.advanceTimeUntil(30000) { !state.isLoading } // Doesn't seem to work at all

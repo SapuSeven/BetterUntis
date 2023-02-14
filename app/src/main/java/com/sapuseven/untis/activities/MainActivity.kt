@@ -484,7 +484,7 @@ private fun Drawer(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainActivity.MainApp(state: MainAppState) {
+fun BaseComposeActivity.MainApp(state: MainAppState) {
 	val snackbarHostState = remember { SnackbarHostState() }
 	if (state.preferences.doubleTapToExit.getState().value)
 		BackPressConfirm(snackbarHostState)
