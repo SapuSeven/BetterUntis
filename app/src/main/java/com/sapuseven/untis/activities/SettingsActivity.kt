@@ -318,15 +318,10 @@ class SettingsActivity : BaseComposeActivity() {
 											)
 										}
 
-										// TODO: Extract string resources
-										PreferenceCategory("Analytics") {
+										PreferenceCategory(getString(R.string.preference_category_analytics)) {
 											Preference(
-												title = { Text("About error reporting") },
-												summary = { Text(
-													"These settings help to improve the application.\n" +
-														"No personal information is ever collected.\n" +
-														"Changes need an app restart to take effect."
-												) },
+												title = { Text(getString(R.string.preference_analytics_info)) },
+												summary = { Text(getString(R.string.preference_analytics_info_desc)) },
 												icon = {
 													Icon(
 														painter = painterResource(R.drawable.settings_info),
@@ -337,10 +332,8 @@ class SettingsActivity : BaseComposeActivity() {
 											)
 
 											SwitchPreference(
-												title = { Text("Send detailed errors") },
-												summary = {
-													Text("Include additional information about what happened before an error occured.")
-												},
+												title = { Text(getString(R.string.preference_analytics_breadcrumbs)) },
+												summary = { Text(getString(R.string.preference_analytics_breadcrumbs_desc)) },
 												dataStore = UntisPreferenceDataStore(
 													analyticsDataStore,
 													analyticsDataStoreEnable.first,

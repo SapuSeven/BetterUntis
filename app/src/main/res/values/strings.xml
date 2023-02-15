@@ -361,4 +361,9 @@
 	<string name="mainactivitydrawer_profile_edit_hint">Tap on a profile to edit</string>
     <string name="all_lesson_online">Taking place online</string>
 	<string name="all_open_link">Open link</string>
+	<string name="preference_category_analytics">Analytics</string>
+	<string name="preference_analytics_info">About error reporting</string>
+	<string name="preference_analytics_info_desc">These settings help to improve the application.\nNo personal information is ever collected.\nChanges need an app restart to take effect.</string>
+	<string name="preference_analytics_breadcrumbs">Send detailed errors</string>
+	<string name="preference_analytics_breadcrumbs_desc">Include additional information about what happened before an error occured.</string>
 </resources>
