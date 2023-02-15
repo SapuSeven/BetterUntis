@@ -27,12 +27,6 @@ fun ProfileSelectorAction(
 
 	if (!showProfileActions && hideIfSingleProfile && users.size <= 1) return
 
-	Button(
-		modifier = Modifier.testTag("button_crash"),
-		onClick = { val a = 1/0 }) {
-		Text(text = "Crash")
-	}
-
 	IconButton(onClick = { expanded = true }, modifier = Modifier.testTag("action_profiles")) {
 		Icon(
 			imageVector = Icons.Outlined.AccountCircle,
