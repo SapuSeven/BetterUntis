@@ -2,9 +2,9 @@ package com.sapuseven.untis.ui.activities
 
 import android.app.Activity
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.sapuseven.untis.activities.BaseComposeActivity
-import com.sapuseven.untis.activities.InfoCenterActivity
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
@@ -18,17 +18,22 @@ import com.sapuseven.untis.models.untis.params.*
 import com.sapuseven.untis.models.untis.response.*
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_MESSAGES
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.joda.time.LocalDate
 
 
-class InfoCenterState constructor(
+class InfoCenterState(
 	private val userDatabase: UserDatabase,
 	private val user: UserDatabase.User,
 	private val timetableDatabaseInterface: TimetableDatabaseInterface,
 	private val preferences: DataStorePreferences,
 	private val contextActivity: Activity,
 	var selectedItem: MutableState<Int>,
+	var absenceFilterConfiguration: MutableState<AbsenceOrder?>,
+	val showAbsenceFilter: MutableState<Boolean>,
 
 	val messagesLoading: MutableState<Boolean>,
 	val eventsLoading: MutableState<Boolean>,
@@ -221,6 +226,14 @@ class InfoCenterState constructor(
 		}
 	}
 
+	suspend fun updateAbsenceOrder(absenceOrder: AbsenceOrder) {
+		preferences.absencesOrder.saveValue(Json.encodeToString(absenceOrder))
+	}
+
+	suspend fun loadAbsenceOrder()  {
+		absenceFilterConfiguration.value = Json.decodeFromString(preferences.absencesOrder.getValue())
+	}
+
 	fun isItemSelected(itemId: Int): Boolean = selectedItem.value == itemId
 
 	fun selectItem(itemId: Int) { selectedItem.value = itemId }
@@ -238,6 +251,15 @@ fun rememberInfoCenterState(
 	preferences: DataStorePreferences,
 	contextActivity: BaseComposeActivity,
 	selectedItem: MutableState<Int> = rememberSaveable { mutableStateOf(ID_MESSAGES) },
+	absenceFilterConfiguration: MutableState<AbsenceOrder?> = rememberSaveable(
+		saver = Saver(
+			save = { Json.encodeToString(it.value) },
+			restore = { mutableStateOf(Json.decodeFromString(it)) }
+		)
+	) {
+		mutableStateOf(null)
+	},
+	showAbsenceFilter: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 	messages: MutableState<List<UntisMessage>?> = remember { mutableStateOf<List<UntisMessage>?>(null) },
 	officeHours: MutableState<List<UntisOfficeHour>?> = remember { mutableStateOf<List<UntisOfficeHour>?>(null) },
 	events: MutableState<List<EventListItem>?> = remember { mutableStateOf<List<EventListItem>?>(null) },
@@ -254,6 +276,8 @@ fun rememberInfoCenterState(
 		preferences = preferences,
 		contextActivity = contextActivity,
 		selectedItem = selectedItem,
+		absenceFilterConfiguration = absenceFilterConfiguration,
+		showAbsenceFilter = showAbsenceFilter,
 		messages = messages,
 		officeHours = officeHours,
 		events = events,
@@ -264,6 +288,65 @@ fun rememberInfoCenterState(
 		officeHoursLoading = officeHoursLoading,
 	)
 }
+
+@Serializable
+sealed class AbsenceOrder {
+
+	abstract val orderType: OrderType
+	abstract val id: Int
+
+	@Serializable
+	class LastSevenDays(override val orderType: OrderType, override val id: Int = 1): AbsenceOrder()
+	@Serializable
+	class LastFourteenDays(override val orderType: OrderType, override val id: Int = 2): AbsenceOrder()
+	@Serializable
+	class LastThirtyDays(override val orderType: OrderType, override val id: Int = 3): AbsenceOrder()
+	@Serializable
+	class LastNinetyDays(override val orderType: OrderType, override val id: Int = 4): AbsenceOrder()
+	@Serializable
+	class CurrentSchoolYear(override val orderType: OrderType, override val id: Int = 5): AbsenceOrder()
+
+	fun copy(orderType: OrderType): AbsenceOrder {
+		return when(this) {
+			is LastFourteenDays -> LastFourteenDays(orderType)
+			is LastNinetyDays -> LastNinetyDays(orderType)
+			is LastSevenDays -> LastSevenDays(orderType)
+			is LastThirtyDays -> LastThirtyDays(orderType)
+			is CurrentSchoolYear -> CurrentSchoolYear(orderType)
+		}
+	}
+
+	override fun toString(): String {
+		return when(this){
+			is CurrentSchoolYear -> "Current school year"
+			is LastFourteenDays -> "Show last 14 days"
+			is LastNinetyDays -> "Show last 90 days"
+			is LastSevenDays -> "Show last 7 days"
+			is LastThirtyDays -> "Show last 30 days"
+		}
+	}
+
+}
+@Serializable
+sealed class OrderType {
+
+	abstract val showOnlyUnexcused: Boolean
+
+	@Serializable
+	class Ascending(override val showOnlyUnexcused: Boolean) : OrderType()
+
+	@Serializable
+	class Descending(override val showOnlyUnexcused : Boolean) : OrderType()
+
+	fun copy(showOnlyUnexcused: Boolean): OrderType {
+		return when(this){
+			is Ascending -> Ascending(showOnlyUnexcused)
+			is Descending -> Descending(showOnlyUnexcused)
+		}
+	}
+}
+
+
 
 class EventListItem private constructor(
 	@Suppress("unused") private val init: Nothing? = null, // Dummy parameter to avoid infinite constructor loops below

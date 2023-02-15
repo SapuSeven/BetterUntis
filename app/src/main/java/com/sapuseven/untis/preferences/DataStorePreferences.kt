@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.helpers.config.*
+import com.sapuseven.untis.ui.activities.AbsenceOrder
 import com.sapuseven.untis.ui.preferences.materialColors
 
 val BaseComposeActivity.dataStorePreferences: DataStorePreferences
@@ -234,6 +235,11 @@ val BaseComposeActivity.dataStorePreferences: DataStorePreferences
 				"preference_school_background",
 				defaultValue = emptySet()
 			),
+			absencesOrder = this.stringDataStore(
+				currentUserId(),
+				"info_center_absences_order",
+				defaultValue = "{\"type\":\"com.sapuseven.untis.ui.activities.AbsenceOrder.CurrentSchoolYear\",\"orderType\":{\"type\":\"com.sapuseven.untis.ui.activities.OrderType.Descending\",\"showOnlyUnexcused\":false}}"
+			)
 		)
 	}
 
@@ -288,4 +294,5 @@ class DataStorePreferences(
 	val connectivityRefreshInBackground: UntisPreferenceDataStore<Boolean>,
 	val proxyHost: UntisPreferenceDataStore<String>,
 	val schoolBackground: UntisPreferenceDataStore<Set<String>>,
+	val absencesOrder: UntisPreferenceDataStore<String>
 )
