@@ -2,9 +2,9 @@
 <resources>
     <string name="app_desc">Eine alternative App für das Untis-Stundenplansystem.</string>
     <string name="all_success">erfolgreich</string>
-	<string name="all_exam">Klausur</string>
-	<string name="all_exit">Verlassen</string>
-	<string name="all_failed">fehlgeschlagen</string>
+    <string name="all_exam">Klausur</string>
+    <string name="all_exit">Verlassen</string>
+    <string name="all_failed">fehlgeschlagen</string>
     <string name="all_personal">Persönlich</string>
     <string name="all_subjects">Fächer</string>
     <string name="all_teachers">Lehrer</string>
@@ -18,16 +18,16 @@
     <string name="all_no">Nein</string>
     <string name="all_close">Schließen</string>
     <string name="all_cancel">Abbrechen</string>
-	<string name="all_edit">Bearbeiten</string>
-	<string name="all_error">Fehler</string>
+    <string name="all_edit">Bearbeiten</string>
+    <string name="all_error">Fehler</string>
     <string name="all_report">Melden</string>
     <string name="all_add">Hinzufügen</string>
     <string name="all_delete">Löschen</string>
     <string name="all_reset">Zurücksetzen</string>
     <string name="all_back">Zurück</string>
     <string name="all_lesson_details">Stundendetails</string>
-	<string name="all_homework">Hausaufgaben</string>
-	<string name="all_lesson_cancelled">%1$s (entfällt)</string>
+    <string name="all_homework">Hausaufgaben</string>
+    <string name="all_lesson_cancelled">%1$s (entfällt)</string>
     <string name="all_lesson_irregular">%1$s (irregulär)</string>
     <string name="all_lesson_exam">%1$s (Klausur!)</string>
     <string name="all_dialog_datepicker_button_today">Heute</string>
@@ -57,7 +57,7 @@
     <string name="main_dialog_itemdetails_image_homeworks">Hausaufgaben</string>
     <string name="main_last_refreshed">Zuletzt aktualisiert: %1$s</string>
     <string name="main_last_refreshed_never">nie</string>
-    <string name="main_anonymous_login_info_text">Du musst einen persönlichen Stundenplan auswählen, wenn du anonym angemeldet bist.</string>
+    <string name="main_anonymous_login_info_text">Für anonyme Profile muss ein persönlicher Stundenplan festgelegt werden.</string>
     <string name="main_go_to_settings">Zu den Einstellungen</string>
     <string name="main_drawer_open">Navigationsleiste öffnen</string>
     <string name="main_drawer_close">Navigationsleiste schließen</string>
@@ -76,19 +76,19 @@
     <string name="logindatainput_connecting">Verbindung wird hergestellt…</string>
     <string name="logindatainput_login">Anmelden</string>
     <string name="logindatainput_anonymous_login">Anonyme Anmeldung</string>
-	<string name="logindatainput_dialog_qrcodeinvalid_text">Der gescannte QR-Code hat ein ungültiges Format, oder wird
+    <string name="logindatainput_dialog_qrcodeinvalid_text">Der gescannte QR-Code hat ein ungültiges Format, oder wird
 		nicht von BetterUntis unterstützt.
 	</string>
-	<string name="logindatainput_dialog_qrcodeinvalid_title">Ungültiger QR-Code</string>
-	<string name="logindatainput_error_field_empty">Dieses Feld darf nicht leer sein!</string>
+    <string name="logindatainput_dialog_qrcodeinvalid_title">Ungültiger QR-Code</string>
+    <string name="logindatainput_error_field_empty">Dieses Feld darf nicht leer sein!</string>
     <string name="all_error_details">Fehler: %1$s</string>
     <string name="logindatainput_error_invalid_school">Ungültige Schul-ID!</string>
     <string name="logindatainput_error_invalid_format">Ungültiges Format!</string>
     <string name="logindatainput_data_loaded">Daten erfolgreich geladen.</string>
     <string name="logindatainput_aquiring_app_secret">Lade App-Secret…</string>
     <string name="logindatainput_aquiring_schoolid">Lade Schule…</string>
-	<string name="logindatainput_key_saved">Zugriffsschlüssel oder Passwort (gespeichert)</string>
-	<string name="logindatainput_loading_user_data">Lade Benutzerdaten…</string>
+    <string name="logindatainput_key_saved">Zugriffsschlüssel oder Passwort (gespeichert)</string>
+    <string name="logindatainput_loading_user_data">Lade Benutzerdaten…</string>
     <string name="logindatainput_adding_user_unknown_error">Beim Hinzufügen des Benutzers trat ein unbekannter Fehler auf.</string>
     <string name="logindatainput_title_add">Profil hinzufügen</string>
     <string name="logindatainput_title_edit">Profil bearbeiten</string>
@@ -124,9 +124,9 @@
     <string name="infocenter_events_empty">Keine Termine</string>
     <string name="infocenter_absences_empty">Keine Abwesenheiten</string>
     <string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
-	<string name="infocenter_absence_excused">Entschuldigt</string>
-	<string name="infocenter_absence_unexcused">Unentschuldigt</string>
-	<string name="infocenter_absence_unknown_reason">Unbekannter Grund</string>
+    <string name="infocenter_absence_excused">Entschuldigt</string>
+    <string name="infocenter_absence_unexcused">Unentschuldigt</string>
+    <string name="infocenter_absence_unknown_reason">Unbekannter Grund</string>
     <string name="elementpicker_hint_search">Suchen…</string>
     <string name="elementpicker_hint_search_classes">Klassen durchsuchen…</string>
     <string name="elementpicker_hint_search_teachers">Lehrer durchsuchen…</string>
@@ -199,7 +199,7 @@
     <string name="preference_notifications_first_lesson_time">Benachrichtigungszeit</string>
     <string name="preference_notifications_first_lesson_time_unit">min vor der ersten Stunde</string>
     <string name="preference_notifications_multiple">In mehrstündigem Unterricht aktivieren</string>
-    <string name="preference_notifications_multiple_desc">Benachrichtigungen für Pausen während mehrstündigem Unterricht anzeigen.</string>
+    <string name="preference_notifications_multiple_desc">Benachrichtigungen für Pausen werden während mehrstündigem Unterricht angezeigt</string>
     <string name="preference_notifications_visibility_hidden">Nicht anzeigen</string>
     <string name="preference_notifications_visibility_long">Langer Name</string>
     <string name="preference_notifications_visibility_short">Kurzer Name</string>
@@ -215,7 +215,7 @@
     <string name="preference_theme_stock">Standard</string>
     <string name="preference_theme_untis">Originale Untis-App</string>
     <string name="preference_timetable_background_irregular">Hintergrundfarbe berücksichtigen</string>
-    <string name="preference_timetable_background_irregular_desc">Nützlich wenn kein Zugriff auf Lehrer besteht</string>
+    <string name="preference_timetable_background_irregular_desc">Kennzeichne Stunden mit einem anderen Hintergrund als irregulär</string>
     <string name="preference_timetable_bold_lesson_name">Fetter Stundenname</string>
     <string name="preference_timetable_centered_lesson_info">Stundeninfo zentrieren</string>
     <string name="preference_timetable_colors_reset">Farben zurücksetzen</string>
@@ -274,12 +274,12 @@
     <string name="errors_button_report">Alle melden</string>
     <string name="loading">Wird geladen</string>
     <string name="loading_failed">Ladevorgang fehlgeschlagen</string>
-	<string name="settings_dialog_url_open_title">Keine kompatible App gefunden</string>
-	<string name="settings_dialog_url_open_text">BetterUntis konnte keine App finden, die mit dem Öffnen von Links
+    <string name="settings_dialog_url_open_title">Keine kompatible App gefunden</string>
+    <string name="settings_dialog_url_open_text">BetterUntis konnte keine App finden, die mit dem Öffnen von Links
 		umgehen kann. Bitte stellen Sie sicher, dass Sie einen Webbrowser installiert haben oder öffnen Sie den Link auf
 		einem anderen Gerät:
 	</string>
-	<string name="widget_configuration">Widget-Konfiguration</string>
+    <string name="widget_configuration">Widget-Konfiguration</string>
     <string name="widget_timetable">Stundenplan</string>
     <string name="widget_timetable_empty">Kein Stundenplan für heute verfügbar</string>
     <string name="widget_daily_messages">Tagesnachrichten</string>
@@ -318,28 +318,30 @@
     <string name="all_hint_tap_to_edit">(Durch Tippen hinzufügen)</string>
     <string name="all_dialog_crash_copied">Absturzprotokoll wurde in die Zwischenablage kopiert.</string>
     <string name="all_dialog_crash_title">Absturzprotokoll gefunden</string>
-	<string name="all_lessontopic_edit">Lehrstof bearbeiten</string>
-	<string name="all_lessontopic_none">(Kein Lehrstoff)</string>
+    <string name="all_lessontopic_edit">Lehrstof bearbeiten</string>
+    <string name="all_lessontopic_none">(Kein Lehrstoff)</string>
     <string name="main_dialog_itemdetails_timeformat">%1$s - %2$s</string>
     <string name="main_dialog_delete_bookmark">Dieses Lesezeichen löschen?</string>
-	<string name="mainactivitydrawer_profile_edit">Profile bearbeiten</string>
-	<string name="maindrawer_bookmarks_add">Stundenplan hinzufügen</string>
-	<string name="all_favourites">Favoriten</string>
-	<string name="preferences_theme_color">Designfarbe</string>
-	<string name="preferences_theme_color_system">Designfarbe des Systems</string>
-	<string name="all_dialog_absences_save">Abwesenheitskontrolle absenden</string>
-	<string name="all_lesson_info">Stundeninfo</string>
-	<string name="preference_category_display_options">Anzeigeoptionen</string>
-	<string name="roomfinder_error">Fehler beim Laden der Daten.</string>
-	<string name="roomfinder_error_details">Fehler: %1$s.</string>
-	<string name="all_datepicker_select">Datum auswählen</string>
-	<string name="all_datepicker_month_next">Nächster Monat</string>
-	<string name="all_datepicker_month_previous">Vorheriger Monat</string>
-	<string name="all_reload">Neu laden</string>
-	<string name="widget_disclaimer_title">Beta-Funktion</string>
-	<string name="widget_disclaimer_text">Die Widget-Funktion befindet sich noch in der Entwicklungsphase und funktioniert unter Umständen nicht auf jedem Gerät.</string>
-	<string name="login_demo">Zuerst ausprobieren</string>
-	<string name="mainactivitydrawer_profile_edit_hint">Tippe auf ein Profil, um es zu bearbeiten</string>
+    <string name="mainactivitydrawer_profile_edit">Profile bearbeiten</string>
+    <string name="maindrawer_bookmarks_add">Stundenplan hinzufügen</string>
+    <string name="all_favourites">Favoriten</string>
+    <string name="preferences_theme_color">Designfarbe</string>
+    <string name="preferences_theme_color_system">Designfarbe des Systems</string>
+    <string name="all_dialog_absences_save">Abwesenheitskontrolle absenden</string>
+    <string name="all_lesson_info">Stundeninfo</string>
+    <string name="preference_category_display_options">Anzeigeoptionen</string>
+    <string name="roomfinder_error">Fehler beim Laden der Daten.</string>
+    <string name="roomfinder_error_details">Fehler: %1$s.</string>
+    <string name="all_datepicker_select">Datum auswählen</string>
+    <string name="all_datepicker_month_next">Nächster Monat</string>
+    <string name="all_datepicker_month_previous">Vorheriger Monat</string>
+    <string name="all_reload">Neu laden</string>
+    <string name="widget_disclaimer_title">Beta-Funktion</string>
+    <string name="widget_disclaimer_text">Die Widget-Funktion befindet sich noch in der Entwicklungsphase und funktioniert unter Umständen nicht auf jedem Gerät.</string>
+    <string name="login_demo">Zuerst ausprobieren</string>
+    <string name="mainactivitydrawer_profile_edit_hint">Tippe auf ein Profil, um es zu bearbeiten</string>
     <string name="all_lesson_online">Findet online statt</string>
-	<string name="all_open_link">Link öffnen</string>
+    <string name="all_open_link">Link öffnen</string>
+    <string name="preference_range_from">von</string>
+    <string name="preference_range_to">bis</string>
 </resources>
