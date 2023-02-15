@@ -2,6 +2,7 @@ package com.sapuseven.untis.activities
 
 import android.Manifest
 import android.app.AlarmManager
+import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
@@ -319,10 +320,32 @@ class SettingsActivity : BaseComposeActivity() {
 
 										// TODO: Extract string resources
 										PreferenceCategory("Analytics") {
+											Preference(
+												title = { Text("About error reporting") },
+												summary = { Text(
+													"These settings help to improve the application.\n" +
+														"No personal information is ever collected.\n" +
+														"Changes need an app restart to take effect."
+												) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_info),
+														contentDescription = null
+													)
+												},
+												dataStore = UntisPreferenceDataStore.emptyDataStore()
+											)
+
 											SwitchPreference(
-												title = { Text("Send anonymous usage stats") },
-												summary = { Text("This helps to improve the application. Crash logs are always sent.") },
-												dataStore = dataStorePreferences.analyticsUsageStats
+												title = { Text("Send detailed errors") },
+												summary = {
+													Text("Include additional information about what happened before an error occured.")
+												},
+												dataStore = UntisPreferenceDataStore(
+													analyticsDataStore,
+													analyticsDataStoreEnable.first,
+													analyticsDataStoreEnable.second
+												)
 											)
 										}
 									}
