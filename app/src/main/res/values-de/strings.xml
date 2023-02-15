@@ -133,7 +133,7 @@
     <string name="preferences_connectivity">Verbindungseinstellungen</string>
     <string name="preferences_info">Informationen</string>
     <string name="preferences_notifications">Benachrichtigungen</string>
-    <string name="preferences_styling">Anpassung</string>
+    <string name="preferences_styling">Design</string>
     <string name="preferences_timetable">Stundenplan</string>
     <string name="preferences_general">Allgemein</string>
     <string name="preference_category_connectivity_proxy">WebUntis-Proxy</string>
@@ -192,7 +192,7 @@
     <string name="preference_marker">Zeitanzeige</string>
     <string name="preference_notifications_clear">Alle Benachrichtigungen löschen</string>
     <string name="preference_notifications_enable">Benachrichtigungen aktivieren</string>
-    <string name="preference_notifications_enable_desc">Zeigt während Pausen eine Benachrichtigung mit Infos zur nächsten Stunde an.</string>
+    <string name="preference_notifications_enable_desc">Zeigt während Pausen eine Benachrichtigung mit Infos zur nächsten Stunde an</string>
     <string name="preference_notifications_first_lesson">Benachrichtigung vor der ersten Stunde</string>
     <string name="preference_notifications_first_lesson_desc">Zeigt eine zusätzliche Benachrichtigung vor Beginn der ersten Stunde an</string>
     <string name="preference_notifications_first_lesson_time">Benachrichtigungszeit</string>
@@ -274,10 +274,8 @@
     <string name="loading">Wird geladen</string>
     <string name="loading_failed">Ladevorgang fehlgeschlagen</string>
     <string name="settings_dialog_url_open_title">Keine kompatible App gefunden</string>
-    <string name="settings_dialog_url_open_text">BetterUntis konnte keine App finden, die mit dem Öffnen von Links
-		umgehen kann. Bitte stellen Sie sicher, dass Sie einen Webbrowser installiert haben oder öffnen Sie den Link auf
-		einem anderen Gerät:
-	</string>
+    <string name="settings_dialog_url_open_text">BetterUntis konnte keine App finden, die mit dem Öffnen von Links umgehen kann.
+\nBitte stellen Sie sicher, dass Sie einen Webbrowser installiert haben oder öffnen Sie den Link auf einem anderen Gerät:</string>
     <string name="widget_configuration">Widget-Konfiguration</string>
     <string name="widget_timetable">Stundenplan</string>
     <string name="widget_timetable_empty">Kein Stundenplan für heute verfügbar</string>
