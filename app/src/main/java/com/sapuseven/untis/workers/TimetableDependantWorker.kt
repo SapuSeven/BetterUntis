@@ -1,10 +1,15 @@
 package com.sapuseven.untis.workers
 
+import android.app.AlarmManager
+import android.app.NotificationManager
 import android.content.Context
+import android.os.Build
+import androidx.activity.ComponentActivity
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
+import com.sapuseven.untis.helpers.config.booleanDataStore
 import com.sapuseven.untis.helpers.config.stringDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
@@ -76,6 +81,30 @@ abstract class TimetableDependantWorker(
 			}
 			completeWith(kotlin.Result.failure(Exception("Timetable loading failed")))
 		}.await()
+	}
+
+	internal fun canAutoMute(): Boolean {
+		val notificationManager =
+			applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+		return (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || notificationManager.isNotificationPolicyAccessGranted)
+	}
+
+	internal fun canPostNotifications(): Boolean {
+		val notificationManager =
+			applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+		return (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || notificationManager.areNotificationsEnabled())
+	}
+
+	internal fun canScheduleExactAlarms(): Boolean {
+		val alarmManager = applicationContext.getSystemService(ComponentActivity.ALARM_SERVICE) as AlarmManager
+		return (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms())
+	}
+
+	internal suspend fun disablePreference(key: String) {
+		UserDatabase.createInstance(applicationContext).getAllUsers().map { it.id }.forEach { userId ->
+			val pref = applicationContext.booleanDataStore(userId, key)
+			pref.saveValue(false)
+		}
 	}
 }
 
