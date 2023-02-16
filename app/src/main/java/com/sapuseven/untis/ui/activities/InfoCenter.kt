@@ -265,7 +265,7 @@ private fun AbsenceList(absences: List<UntisAbsence>?, loading: Boolean, prefere
 	val timeRangeAbsences by preferences.timeRangeAbsences.getState()
 
 	ItemList(
-		items = absences.also {
+		items = absences.let {
 			if (sortAbsencesAscending){
 				it?.sortedBy { absence ->
 					absence.id
@@ -275,11 +275,11 @@ private fun AbsenceList(absences: List<UntisAbsence>?, loading: Boolean, prefere
 					absence.id
 				}
 			}
-		}.also {
+		}.let {
 			it?.filter {absence ->
 				(showOnlyUnexcused != absence.excused) || !absence.excused
 			}
-		}.also {
+		}.let {
 			when (timeRangeAbsences) {
 				"fourteen_days" -> {
 					it?.filter {absence ->
@@ -303,6 +303,9 @@ private fun AbsenceList(absences: List<UntisAbsence>?, loading: Boolean, prefere
 					it?.filter {absence ->
 						LocalDateTime.now().minusDays(30).isBefore(absence.startDateTime.toLocalDateTime())
 					}
+				}
+				else -> {
+					it
 				}
 			}
 		},
