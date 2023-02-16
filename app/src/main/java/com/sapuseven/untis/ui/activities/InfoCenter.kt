@@ -79,7 +79,7 @@ fun InfoCenterActivity.InfoCenter(state: InfoCenterState) {
 								state.showAbsenceFilter.value = true
 							}
 						) {
-							Icon(painter = painterResource(id = R.drawable.all_filer), contentDescription = null)
+							Icon(painter = painterResource(id = R.drawable.all_filter), contentDescription = null)
 						}
 					}
 				}
