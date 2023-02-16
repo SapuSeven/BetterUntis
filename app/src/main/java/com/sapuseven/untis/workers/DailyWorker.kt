@@ -23,9 +23,9 @@ class DailyWorker(context: Context, params: WorkerParameters) :
 
 		private fun nextWorkRequest(hourOfDay: Int = 2): WorkRequest {
 			val currentTime = LocalDateTime.now()
-			var dueTime = currentTime.withHourOfDay(hourOfDay)
+			var dueTime = currentTime.withMillisOfDay(hourOfDay * 60 * 60 * 1000)
 
-			if (dueTime < currentTime)
+			if (dueTime <= currentTime)
 				dueTime = dueTime.plusDays(1)
 
 			return OneTimeWorkRequestBuilder<DailyWorker>()
