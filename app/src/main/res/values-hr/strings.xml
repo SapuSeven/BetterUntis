@@ -36,8 +36,6 @@
     <string name="widget_configuration">Konfiguracija programčića</string>
     <string name="loading_failed">Neuspjelo učitavanje</string>
     <string name="loading">Učitavanje</string>
-    <string name="errors_button_report">Prijavi sve</string>
-    <string name="errors_button_dismiss">Odbaci sve</string>
     <string name="errors_report">Pomogni popraviti program prijavljivanjem grešaka:</string>
     <string name="errors_crash_message">Žao nam je.</string>
     <string name="errors_crash_title">Čini se da je BetterUntis prekinuo rad.</string>

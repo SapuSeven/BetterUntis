@@ -6,10 +6,10 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.*
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
@@ -61,6 +61,8 @@ import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.preferences.*
 import com.sapuseven.untis.workers.AutoMuteSetupWorker
 import com.sapuseven.untis.workers.NotificationSetupWorker
+import io.sentry.Sentry
+import io.sentry.compose.withSentryObservableEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
@@ -89,7 +91,7 @@ class SettingsActivity : BaseComposeActivity() {
 		setContent {
 			AppTheme(navBarInset = false) {
 				withUser { user ->
-					val navController = rememberNavController()
+					val navController = rememberNavController().withSentryObservableEffect()
 					var title by remember { mutableStateOf<String?>(null) }
 
 					val autoMutePref = dataStorePreferences.automuteEnable
@@ -326,20 +328,39 @@ class SettingsActivity : BaseComposeActivity() {
 											)
 										}
 
-										// TODO: Extract string resources
-										PreferenceCategory("Error Reporting") {
-											SwitchPreference(
-												title = { Text("Enable additional error messages") },
-												summary = { Text("This is used for non-critical background errors") },
-												dataStore = dataStorePreferences.additionalErrorMessages
-											)
-
+										PreferenceCategory(stringResource(R.string.preference_category_reports)) {
 											Preference(
-												title = { Text("View logged errors") },
-												summary = { Text("Crash logs and non-critical background errors") },
-												onClick = { /*TODO*/ },
+												title = { Text(stringResource(R.string.preference_reports_info)) },
+												summary = { Text(stringResource(R.string.preference_reports_info_desc)) },
+												icon = {
+													Icon(
+														painter = painterResource(R.drawable.settings_info),
+														contentDescription = null
+													)
+												},
 												dataStore = UntisPreferenceDataStore.emptyDataStore()
 											)
+
+											SwitchPreference(
+												title = { Text(stringResource(R.string.preference_reports_breadcrumbs)) },
+												summary = { Text(stringResource(R.string.preference_reports_breadcrumbs_desc)) },
+												dataStore = UntisPreferenceDataStore(
+													reportsDataStore,
+													reportsDataStoreBreadcrumbsEnable.first,
+													reportsDataStoreBreadcrumbsEnable.second
+												)
+											)
+
+											//if (BuildConfig.DEBUG)
+												Preference(
+													title = { Text("Send test report") },
+													summary = { Text("Sends a report to Sentry to test error reporting") },
+													onClick = {
+														Sentry.captureException(java.lang.Exception("Test report"))
+														Toast.makeText(this@SettingsActivity, "Report has been sent", Toast.LENGTH_SHORT).show()
+													},
+													dataStore = UntisPreferenceDataStore.emptyDataStore()
+												)
 										}
 									}
 								}
@@ -1024,12 +1045,7 @@ class SettingsActivity : BaseComposeActivity() {
 									* about_libs.json
 									*/
 									LibrariesContainer(
-										Modifier
-											.fillMaxSize(),
-										librariesBlock = { ctx ->
-											Libs.Builder().withJson(ctx, R.raw.about_libs)
-												.build()
-										},
+										Modifier.fillMaxSize(),
 										contentPadding = insetsPaddingValues(),
 										colors = colors
 									)
@@ -1093,10 +1109,10 @@ class SettingsActivity : BaseComposeActivity() {
 								dialogScheduleExactAlarms = false
 							},
 							title = {
-								Text(text = getString(R.string.preference_dialog_permission_alarms_title))
+								Text(text = stringResource(R.string.preference_dialog_permission_alarms_title))
 							},
 							text = {
-								Text(text = getString(R.string.preference_dialog_permission_alarms_text))
+								Text(text = stringResource(R.string.preference_dialog_permission_alarms_text))
 							},
 							dismissButton = {
 								TextButton(onClick = {
@@ -1112,7 +1128,7 @@ class SettingsActivity : BaseComposeActivity() {
 										Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
 									)
 								}) {
-									Text(text = getString(R.string.all_dialog_open_settings))
+									Text(text = stringResource(R.string.all_dialog_open_settings))
 								}
 							}
 						)

@@ -1,8 +1,11 @@
-apply plugin: 'com.android.application'
+plugins {
+	id 'com.android.application'
+	id 'io.sentry.android.gradle' version '3.4.2'
+	id 'com.mikepenz.aboutlibraries.plugin'
+}
 
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlinx-serialization'
-apply plugin: 'com.mikepenz.aboutlibraries.plugin'
 
 // Auto-generates a new version code every minute
 static def generateVersionCode() {
@@ -22,6 +25,8 @@ android {
 		versionName "4.0.0-beta01"
 		vectorDrawables.useSupportLibrary = true
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+		buildConfigField "String", "SENTRY_DSN", '"https://d3b77222abce4fcfa74fda2185e0f8dc@o1136770.ingest.sentry.io/6188900"'
 	}
 
 	signingConfigs {
@@ -98,6 +103,11 @@ android {
 	}
 }
 
+aboutLibraries {
+	includePlatform = false
+	duplicationMode = com.mikepenz.aboutlibraries.plugin.DuplicateMode.MERGE
+}
+
 dependencies {
 	implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 	implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
@@ -135,10 +145,11 @@ dependencies {
 	implementation "com.google.accompanist:accompanist-pager-indicators:$accompanist_version"
 	implementation "com.google.accompanist:accompanist-flowlayout:$accompanist_version"
     implementation 'androidx.work:work-runtime-ktx:2.7.1'
-	implementation "com.mikepenz:aboutlibraries-compose:$latestAboutLibsRelease"
-	implementation "com.mikepenz:aboutlibraries-core:$latestAboutLibsRelease"
-
+	implementation 'io.sentry:sentry-android:6.14.0'
+	implementation 'io.sentry:sentry-compose-android:6.14.0'
 	implementation 'io.coil-kt:coil-compose:2.2.2'
+	implementation "com.mikepenz:aboutlibraries-core:$aboutlibraries_version"
+	implementation "com.mikepenz:aboutlibraries-compose:$aboutlibraries_version"
 
 	coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 

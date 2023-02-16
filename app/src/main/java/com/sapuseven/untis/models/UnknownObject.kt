@@ -1,6 +1,7 @@
 package com.sapuseven.untis.models
 
-import com.sapuseven.untis.helpers.ErrorLogger
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -29,11 +30,16 @@ class UnknownObject(val jsonString: String?) {
 			fields.forEach {
 				it.value?.let { value ->
 					if (value.jsonString?.isNotBlank() == true
-							&& value.jsonString.toIntOrNull() != 0
-							&& value.jsonString != "\"\""
-							&& value.jsonString != "[]"
-							&& value.jsonString != "{}")
-						ErrorLogger.instance?.log("Unknown JSON object \"${it.key}\" encountered, value: ${value.jsonString}")
+						&& value.jsonString.toIntOrNull() != 0
+						&& value.jsonString != "\"\""
+						&& value.jsonString != "[]"
+						&& value.jsonString != "{}"
+						&& value.jsonString != "null"
+					)
+						Sentry.captureMessage(
+							"Unknown JSON object \"${it.key}\" encountered, value: ${value.jsonString}",
+							SentryLevel.DEBUG
+						)
 				}
 			}
 		}

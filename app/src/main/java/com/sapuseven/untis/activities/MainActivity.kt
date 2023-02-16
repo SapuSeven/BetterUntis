@@ -21,7 +21,6 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.*
@@ -68,10 +67,7 @@ import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
-import com.sapuseven.untis.ui.common.AppScaffold
-import com.sapuseven.untis.ui.common.ProfileSelectorAction
-import com.sapuseven.untis.ui.common.Weekday
-import com.sapuseven.untis.ui.common.disabled
+import com.sapuseven.untis.ui.common.*
 import com.sapuseven.untis.ui.dialogs.DatePickerDialog
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
@@ -90,6 +86,9 @@ import com.sapuseven.untis.views.weekview.listeners.ScaleListener
 import com.sapuseven.untis.views.weekview.listeners.ScrollListener
 import com.sapuseven.untis.views.weekview.listeners.TopLeftCornerClickListener
 import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
+import io.sentry.Breadcrumb
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -198,8 +197,8 @@ private fun WeekViewCompose(state: MainAppState) {
 			state.updateViews(it)
 		},
 		modifier = Modifier
-            .fillMaxSize()
-            .disabled(state.isAnonymous)
+			.fillMaxSize()
+			.disabled(state.isAnonymous)
 	)
 }
 
@@ -229,13 +228,31 @@ private fun Drawer(
 	val shortcutLauncher =
 		rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
 			val periodElement: PeriodElement? = activityResult.data?.let { intent ->
-				Json.decodeFromString(PeriodElement.serializer(), intent.getStringExtra(MainActivity.EXTRA_STRING_PERIOD_ELEMENT) ?: "")
+				Json.decodeFromString(
+					PeriodElement.serializer(),
+					intent.getStringExtra(MainActivity.EXTRA_STRING_PERIOD_ELEMENT) ?: ""
+				)
 			}
 
 			periodElement?.let {
 				onShowTimetable(it to state.timetableDatabaseInterface.getLongName(it))
 			}
 		}
+
+	LaunchedEffect(state.drawerState) {
+		snapshotFlow { state.drawerState.isOpen }
+			.distinctUntilChanged()
+			.drop(1)
+			.collect {
+				Log.i("Sentry", "Drawer isOpen: ${state.drawerState.isOpen}")
+				Breadcrumb().apply {
+					category = "ui.drawer"
+					level = SentryLevel.INFO
+					setData("isOpen", state.drawerState.isOpen)
+					Sentry.addBreadcrumb(this)
+				}
+			}
+	}
 
 	BackHandler(enabled = state.drawerState.isOpen) {
 		scope.launch {
@@ -351,6 +368,15 @@ private fun Drawer(
 						showElementPicker = item.elementType
 					},
 					onShortcutClick = { item ->
+						Log.i("Sentry", "Drawer onClick: ${item}")
+						Breadcrumb().apply {
+							category = "ui.drawer.click"
+							level = SentryLevel.INFO
+							setData("id", item.id)
+							setData("label", item.label)
+							Sentry.addBreadcrumb(this)
+						}
+
 						state.closeDrawer()
 						if (item.target == null) {
 							try {
@@ -526,12 +552,12 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 						)
 					}
 				)
-			},
+			}
 		) { innerPadding ->
 			Box(
 				modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
+					.padding(innerPadding)
+					.fillMaxSize()
 			) {
 				WeekViewCompose(state)
 
@@ -542,10 +568,10 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 				Text(
 					text = state.lastRefreshText(),
 					modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(start = timeColumnWidth + 8.dp, bottom = 8.dp)
-                        .bottomInsets()
-                        .disabled(state.isAnonymous)
+						.align(Alignment.BottomStart)
+						.padding(start = timeColumnWidth + 8.dp, bottom = 8.dp)
+						.bottomInsets()
+						.disabled(state.isAnonymous)
 				)
 
 				if (state.isAnonymous) {
@@ -553,8 +579,8 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 						verticalArrangement = Arrangement.Center,
 						horizontalAlignment = Alignment.CenterHorizontally,
 						modifier = Modifier
-                            .fillMaxSize()
-                            .absolutePadding(left = 16.dp)
+							.fillMaxSize()
+							.absolutePadding(left = 16.dp)
 					) {
 						Text(
 							text = stringResource(id = R.string.main_anonymous_login_info_text),
@@ -594,10 +620,12 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 				if (state.isLoading)
 					CircularProgressIndicator(
 						modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(8.dp)
+							.align(Alignment.BottomEnd)
+							.padding(8.dp)
 					)
 			}
+
+			ReportsInfoBottomSheet()
 		}
 	}
 
@@ -1501,7 +1529,11 @@ fun rememberMainAppState(
 	),
 	// TODO: Find another way of saving timetableItemDetailsDialog that doesn't require saving an entire Pair of List of PeriodData's.
 	//  Currently the dialog will close after state change (i.e. rotation).
-	timetableItemDetailsDialog: MutableState<Pair<List<PeriodData>, Int>?> = remember { mutableStateOf(null) },
+	timetableItemDetailsDialog: MutableState<Pair<List<PeriodData>, Int>?> = remember {
+		mutableStateOf(
+			null
+		)
+	},
 	showDatePicker: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 	profileManagementDialog: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 ) = remember(user, customThemeColor, colorScheme) {
