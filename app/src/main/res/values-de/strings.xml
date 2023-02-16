@@ -84,7 +84,7 @@
     <string name="logindatainput_error_invalid_school">Ungültige Schul-ID!</string>
     <string name="logindatainput_error_invalid_format">Ungültiges Format!</string>
     <string name="logindatainput_data_loaded">Daten erfolgreich geladen.</string>
-    <string name="logindatainput_aquiring_app_secret">Lade App-Secret…</string>
+    <string name="logindatainput_aquiring_app_secret">Lade App-Secret …</string>
     <string name="logindatainput_aquiring_schoolid">Lade Schule…</string>
     <string name="logindatainput_key_saved">Zugriffsschlüssel oder Passwort (gespeichert)</string>
     <string name="logindatainput_loading_user_data">Lade Benutzerdaten…</string>
@@ -177,7 +177,7 @@
     <string name="preference_dialog_colors_reset_text">Dies wird alle oben stehenden Farben auf die Standardwerte zurücksetzen.</string>
     <string name="preference_double_tap_to_exit">Zurück-Button zweimal antippen zum Beenden</string>
     <string name="preference_flinging_enable">Schnelles Scrollen aktivieren</string>
-    <string name="preference_info_general">General</string>
+    <string name="preference_info_general">Allgemein</string>
     <string name="preference_info_app_version">App-Version</string>
     <string name="preference_info_app_version_desc">Version %1$s (%2$d)</string>
     <string name="preference_info_github">GitHub-Repository</string>
@@ -302,7 +302,7 @@
         <item quantity="one">%1$d Beitrag</item>
         <item quantity="other">%1$d Beiträge</item>
     </plurals>
-    <string name="all_absences">Abwesenheiten</string>
+    <string name="all_absences">Alle Abwesenheiten</string>
     <string name="all_lessontopic">Lehrstoff</string>
     <string name="all_dialog_absences_checked">Anwesenheit kontrolliert.</string>
     <string name="all_dialog_absences_not_checked">Anwesenheit noch nicht kontrolliert.</string>
@@ -312,7 +312,7 @@
     <string name="logindatainput_skip_app_secret">Passwort direkt verwenden</string>
     <string name="logindatainput_error_invalid_url">Ungültige URL!</string>
     <string name="logindatainput_api_url">Untis-API-Pfad</string>
-    <string name="all_hint_tap_to_edit">(Durch Tippen hinzufügen)</string>
+    <string name="all_hint_tap_to_edit">(Tippen um zu bearbeiten)</string>
     <string name="all_dialog_crash_copied">Absturzprotokoll wurde in die Zwischenablage kopiert.</string>
     <string name="all_dialog_crash_title">Absturzprotokoll gefunden</string>
     <string name="all_lessontopic_edit">Lehrstof bearbeiten</string>
@@ -335,7 +335,7 @@
     <string name="all_reload">Neu laden</string>
     <string name="widget_disclaimer_title">Beta-Funktion</string>
     <string name="widget_disclaimer_text">Die Widget-Funktion befindet sich noch in der Entwicklungsphase und funktioniert unter Umständen nicht auf jedem Gerät.</string>
-    <string name="login_demo">Zuerst ausprobieren</string>
+    <string name="login_demo">Zuerst ausprobieren!</string>
     <string name="mainactivitydrawer_profile_edit_hint">Tippe auf ein Profil, um es zu bearbeiten</string>
     <string name="all_lesson_online">Findet online statt</string>
     <string name="all_open_link">Link öffnen</string>
