@@ -208,7 +208,7 @@ private fun <T> ItemList(
 	items: List<T>?,
 	itemRenderer: @Composable (T) -> Unit,
 	@StringRes itemsEmptyMessage: Int,
-	loading: Boolean,
+	loading: Boolean
 ) {
 	if (loading) {
 		CircularProgressIndicator()
@@ -329,7 +329,7 @@ private fun OfficeHourList(officeHours: List<UntisOfficeHour>?, loading: Boolean
 @Composable
 private fun MessageItem(
 	item: UntisMessage,
-	onShowAttachments: (List<UntisAttachment>) -> Unit,
+	onShowAttachments: (List<UntisAttachment>) -> Unit
 ) {
 	val textColor = MaterialTheme.colorScheme.onSurfaceVariant
 
