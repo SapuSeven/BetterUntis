@@ -260,9 +260,9 @@ private fun EventList(events: List<EventListItem>?, loading: Boolean) {
 
 @Composable
 private fun AbsenceList(absences: List<UntisAbsence>?, loading: Boolean, preferences: DataStorePreferences) {
-	val showOnlyUnexcused by preferences.showOnlyUnexcused.getState()
-	val sortAbsencesAscending by preferences.sortAbsencesAscending.getState()
-	val timeRangeAbsences by preferences.timeRangeAbsences.getState()
+	val showOnlyUnexcused by preferences.infocenterAbsencesOnlyUnexcused.getState()
+	val sortAbsencesAscending by preferences.infocenterAbsencesSortAscending.getState()
+	val timeRangeAbsences by preferences.infocenterAbsencesTimeRange.getState()
 
 	ItemList(
 		items = absences.let {

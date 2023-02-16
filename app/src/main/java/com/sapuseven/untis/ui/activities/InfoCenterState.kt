@@ -18,10 +18,7 @@ import com.sapuseven.untis.models.untis.params.*
 import com.sapuseven.untis.models.untis.response.*
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_MESSAGES
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.joda.time.LocalDate
 
 
