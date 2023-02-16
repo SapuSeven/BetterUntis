@@ -5,6 +5,7 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion 33
     buildToolsVersion "33.0.0"
+	namespace 'com.sapuseven.untis.views.weekview'
 
     defaultConfig {
         minSdkVersion 21
@@ -16,7 +17,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion '1.3.0-beta01'
+        kotlinCompilerExtensionVersion '1.4.2'
     }
 }
 

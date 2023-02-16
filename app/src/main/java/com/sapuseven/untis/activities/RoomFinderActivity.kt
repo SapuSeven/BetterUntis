@@ -47,6 +47,7 @@ import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
+import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.functional.bottomInsets
 import kotlinx.coroutines.CoroutineScope
@@ -81,7 +82,7 @@ class RoomFinderActivity : BaseComposeActivity() {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun RoomFinder(state: RoomFinderState) {
-	Scaffold(
+	AppScaffold(
 		modifier = Modifier.bottomInsets(),
 		topBar = {
 			CenterAlignedTopAppBar(

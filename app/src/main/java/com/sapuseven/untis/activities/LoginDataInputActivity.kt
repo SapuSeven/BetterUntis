@@ -341,7 +341,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 						loadData()
 					}
 				else
-					Scaffold(
+					AppScaffold(
 						snackbarHost = { SnackbarHost(snackbarHostState) },
 						floatingActionButtonPosition = FabPosition.End,
 						floatingActionButton = {
