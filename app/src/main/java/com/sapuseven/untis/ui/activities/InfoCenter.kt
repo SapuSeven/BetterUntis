@@ -562,10 +562,10 @@ private fun AbsenceFilterDialog(
 	) { padding ->
 		Box(modifier = Modifier.padding(padding)){
 			VerticalScrollColumn {
-				val sortChecked by preferences.sortAbsencesAscending.getState()
+				val sortChecked by preferences.infocenterAbsencesSortAscending.getState()
 				SwitchPreference(
 					title = { Text(text = stringResource(id = R.string.infocenter_absences_filter_only_unexcused)) },
-					dataStore = preferences.showOnlyUnexcused
+					dataStore = preferences.infocenterAbsencesOnlyUnexcused
 				)
 				SwitchPreference(
 					title = { Text(text = stringResource(id = R.string.infocenter_absences_filter_sortby)) },
@@ -576,11 +576,11 @@ private fun AbsenceFilterDialog(
 							Text(text = stringResource(id = R.string.infocenter_absences_filter_descending))
 						}
 					},
-					dataStore = preferences.sortAbsencesAscending
+					dataStore = preferences.infocenterAbsencesSortAscending
 				)
 				ListPreference(
 					title = { Text(text = stringResource(id = R.string.infocenter_absences_filter_time_ranges)) },
-					dataStore = preferences.timeRangeAbsences,
+					dataStore = preferences.infocenterAbsencesTimeRange,
 					entries = stringArrayResource(id = R.array.infocenter_absences_list_values),
 					entryLabels = stringArrayResource(id = R.array.infocenter_absences_list)
 				)
