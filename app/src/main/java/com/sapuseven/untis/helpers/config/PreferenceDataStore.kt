@@ -5,9 +5,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
-import com.sapuseven.untis.ui.activities.AbsenceOrder
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 val Context.preferenceDataStore: DataStore<Preferences> by androidx.datastore.preferences.preferencesDataStore(
 	name = "preferences"
