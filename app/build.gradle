@@ -138,7 +138,7 @@ dependencies {
 	implementation "com.google.accompanist:accompanist-flowlayout:$accompanist_version"
     implementation 'androidx.work:work-runtime-ktx:2.7.1'
 	implementation 'io.sentry:sentry-android:6.13.1'
-	implementation 'io.sentry:sentry-compose-android:6.13.1'
+	implementation 'io.sentry:sentry-compose-android:6.14.0'
 	implementation 'io.coil-kt:coil-compose:2.2.2'
 	implementation "com.mikepenz:aboutlibraries-compose:$latestAboutLibsRelease"
 	implementation "com.mikepenz:aboutlibraries-core:$latestAboutLibsRelease"
