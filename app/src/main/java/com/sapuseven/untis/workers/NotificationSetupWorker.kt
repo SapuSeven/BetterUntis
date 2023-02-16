@@ -71,7 +71,15 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 
 	override suspend fun doWork(): Result {
 		setupNotificationChannels()
-		return scheduleNotifications()
+		return checkAlarmPermission() ?: scheduleNotifications()
+	}
+
+	private suspend fun checkAlarmPermission(): Result? {
+		if (canPostNotifications() && canScheduleExactAlarms()) return null
+
+		disablePreference("preference_notifications_enable")
+		Log.w(LOG_TAG, "Schedule exact alarm permission revoked, disabling notifications")
+		return Result.failure()
 	}
 
 	private suspend fun scheduleNotifications(): Result {

@@ -5,6 +5,8 @@ import android.app.AlarmManager
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.*
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -124,6 +126,14 @@ class SettingsActivity : BaseComposeActivity() {
 												BuildConfig.APPLICATION_ID
 											)
 									)
+								}
+						}
+					val alarmSettingsLauncher =
+						rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+							if (canScheduleExactAlarms())
+								scope.launch {
+									notificationPref.saveValue(true)
+									enqueueNotificationSetup(user)
 								}
 						}
 
@@ -1082,16 +1092,26 @@ class SettingsActivity : BaseComposeActivity() {
 								dialogScheduleExactAlarms = false
 							},
 							title = {
-								Text(text = "Permission needed")
+								Text(text = getString(R.string.preference_dialog_permission_alarms_title))
 							},
 							text = {
-								Text(text = "This feature requires additional permissions. Please allow BetterUntis access to schedule exact alarms.")
+								Text(text = getString(R.string.preference_dialog_permission_alarms_text))
+							},
+							dismissButton = {
+								TextButton(onClick = {
+									dialogScheduleExactAlarms = false
+								}) {
+									Text(text = stringResource(id = R.string.all_cancel))
+								}
 							},
 							confirmButton = {
 								TextButton(onClick = {
 									dialogScheduleExactAlarms = false
+									alarmSettingsLauncher.launch(
+										Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+									)
 								}) {
-									Text(text = stringResource(id = R.string.all_ok))
+									Text(text = getString(R.string.all_dialog_open_settings))
 								}
 							}
 						)
@@ -1191,8 +1211,8 @@ class SettingsActivity : BaseComposeActivity() {
 	private fun VerticalScrollColumn(content: @Composable ColumnScope.() -> Unit) {
 		Column(
 			modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .bottomInsets(),
+				.verticalScroll(rememberScrollState())
+				.bottomInsets(),
 			content = content
 		)
 	}

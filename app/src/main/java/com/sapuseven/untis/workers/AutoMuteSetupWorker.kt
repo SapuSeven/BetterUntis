@@ -6,7 +6,9 @@ import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
 import android.content.Context.ALARM_SERVICE
 import android.content.Intent
+import android.os.Build
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -44,7 +46,15 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 	}
 
 	override suspend fun doWork(): Result {
-		return scheduleAutoMute()
+		return checkAlarmPermission() ?: scheduleAutoMute()
+	}
+
+	private suspend fun checkAlarmPermission(): Result? {
+		if (canAutoMute() && canScheduleExactAlarms()) return null
+
+		disablePreference("preference_automute_enable")
+		Log.w(LOG_TAG, "Schedule exact alarm permission revoked, disabling auto mute")
+		return Result.failure()
 	}
 
 	private suspend fun scheduleAutoMute(): Result {
