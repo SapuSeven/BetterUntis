@@ -230,17 +230,17 @@ val BaseComposeActivity.dataStorePreferences: DataStorePreferences
 				"preference_school_background",
 				defaultValue = emptySet()
 			),
-			showOnlyUnexcused = this.booleanDataStore(
+			infocenterAbsencesOnlyUnexcused = this.booleanDataStore(
 				currentUserId(),
 				"infocenter_absences_unexcused_only",
 				defaultValue = false
 			),
-			sortAbsencesAscending = this.booleanDataStore(
+			infocenterAbsencesSortAscending = this.booleanDataStore(
 				currentUserId(),
 				"infocenter_absences_sort",
 				defaultValue = false
 			),
-			timeRangeAbsences = this.stringDataStore(
+			infocenterAbsencesTimeRange = this.stringDataStore(
 				currentUserId(),
 				"infocenter_absences_timerange",
 				defaultValue = "current_schoolyear"
