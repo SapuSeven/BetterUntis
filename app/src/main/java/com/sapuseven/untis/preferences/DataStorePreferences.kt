@@ -230,6 +230,21 @@ val BaseComposeActivity.dataStorePreferences: DataStorePreferences
 				"preference_school_background",
 				defaultValue = emptySet()
 			),
+			infocenterAbsencesOnlyUnexcused = this.booleanDataStore(
+				currentUserId(),
+				"infocenter_absences_unexcused_only",
+				defaultValue = false
+			),
+			infocenterAbsencesSortAscending = this.booleanDataStore(
+				currentUserId(),
+				"infocenter_absences_sort",
+				defaultValue = false
+			),
+			infocenterAbsencesTimeRange = this.stringDataStore(
+				currentUserId(),
+				"infocenter_absences_timerange",
+				defaultValue = "current_schoolyear"
+			)
 		)
 	}
 
@@ -283,4 +298,7 @@ class DataStorePreferences(
 	val connectivityRefreshInBackground: UntisPreferenceDataStore<Boolean>,
 	val proxyHost: UntisPreferenceDataStore<String>,
 	val schoolBackground: UntisPreferenceDataStore<Set<String>>,
+	val infocenterAbsencesOnlyUnexcused: UntisPreferenceDataStore<Boolean>,
+	val infocenterAbsencesSortAscending: UntisPreferenceDataStore<Boolean>,
+	val infocenterAbsencesTimeRange: UntisPreferenceDataStore<String>
 )

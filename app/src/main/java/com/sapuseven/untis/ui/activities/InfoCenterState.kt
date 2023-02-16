@@ -2,9 +2,9 @@ package com.sapuseven.untis.ui.activities
 
 import android.app.Activity
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.sapuseven.untis.activities.BaseComposeActivity
-import com.sapuseven.untis.activities.InfoCenterActivity
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
@@ -22,13 +22,14 @@ import kotlinx.serialization.decodeFromString
 import org.joda.time.LocalDate
 
 
-class InfoCenterState constructor(
+class InfoCenterState(
 	private val userDatabase: UserDatabase,
 	private val user: UserDatabase.User,
 	private val timetableDatabaseInterface: TimetableDatabaseInterface,
 	private val preferences: DataStorePreferences,
 	private val contextActivity: Activity,
 	var selectedItem: MutableState<Int>,
+	val showAbsenceFilter: MutableState<Boolean>,
 
 	val messagesLoading: MutableState<Boolean>,
 	val eventsLoading: MutableState<Boolean>,
@@ -221,6 +222,10 @@ class InfoCenterState constructor(
 		}
 	}
 
+	fun providePreferences() : DataStorePreferences {
+		return preferences
+	}
+
 	fun isItemSelected(itemId: Int): Boolean = selectedItem.value == itemId
 
 	fun selectItem(itemId: Int) { selectedItem.value = itemId }
@@ -238,6 +243,7 @@ fun rememberInfoCenterState(
 	preferences: DataStorePreferences,
 	contextActivity: BaseComposeActivity,
 	selectedItem: MutableState<Int> = rememberSaveable { mutableStateOf(ID_MESSAGES) },
+	showAbsenceFilter: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 	messages: MutableState<List<UntisMessage>?> = remember { mutableStateOf<List<UntisMessage>?>(null) },
 	officeHours: MutableState<List<UntisOfficeHour>?> = remember { mutableStateOf<List<UntisOfficeHour>?>(null) },
 	events: MutableState<List<EventListItem>?> = remember { mutableStateOf<List<EventListItem>?>(null) },
@@ -254,6 +260,7 @@ fun rememberInfoCenterState(
 		preferences = preferences,
 		contextActivity = contextActivity,
 		selectedItem = selectedItem,
+		showAbsenceFilter = showAbsenceFilter,
 		messages = messages,
 		officeHours = officeHours,
 		events = events,
