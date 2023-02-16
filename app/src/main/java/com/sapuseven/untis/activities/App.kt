@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 val Context.analyticsDataStore: DataStore<Preferences> by preferencesDataStore(name = "analytics")
-val analyticsDataStoreEnable = Pair(booleanPreferencesKey("analyticsEnable"), false)
+val analyticsDataStoreEnable = Pair(booleanPreferencesKey("analyticsEnable"), true)
 
 class App : Application(), Configuration.Provider {
 	override fun getWorkManagerConfiguration() =

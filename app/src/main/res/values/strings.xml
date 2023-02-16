@@ -371,4 +371,8 @@
 	<string name="preference_analytics_info_desc">These settings help to improve the application.\nNo personal information is ever collected.\nChanges need an app restart to take effect.</string>
 	<string name="preference_analytics_breadcrumbs">Send detailed errors</string>
 	<string name="preference_analytics_breadcrumbs_desc">Include additional information about what happened before an error occured.</string>
+	<string name="main_dialog_analytics_info_2">You can always change these values later in the app settings.</string>
+	<string name="main_dialog_analytics_info_1">BetterUntis uses Sentry to collect information about crashes and other errors.</string>
+	<string name="main_dialog_analytics_title">Error Reporting</string>
+	<string name="main_dialog_analytics_save">Save</string>
 </resources>
