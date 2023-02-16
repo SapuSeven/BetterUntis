@@ -1045,12 +1045,7 @@ class SettingsActivity : BaseComposeActivity() {
 									* about_libs.json
 									*/
 									LibrariesContainer(
-										Modifier
-											.fillMaxSize(),
-										librariesBlock = { ctx ->
-											Libs.Builder().withJson(ctx, R.raw.about_libs)
-												.build()
-										},
+										Modifier.fillMaxSize(),
 										contentPadding = insetsPaddingValues(),
 										colors = colors
 									)
