@@ -341,4 +341,7 @@
     <string name="all_open_link">Link öffnen</string>
     <string name="preference_range_from">von</string>
     <string name="preference_range_to">bis</string>
+    <string name="preference_dialog_permission_alarms_title">Berechtigung erforderlich</string>
+    <string name="preference_dialog_permission_alarms_text">Diese Funktion erfordert zusätzliche Berechtigungen. Bitte erlaube BetterUntis, genaue Alarme zu planen.</string>
+    <string name="all_dialog_open_settings">Einstellungen öffnen</string>
 </resources>
