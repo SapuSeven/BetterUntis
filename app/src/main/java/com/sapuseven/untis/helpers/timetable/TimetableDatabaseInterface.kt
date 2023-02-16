@@ -27,10 +27,10 @@ class TimetableDatabaseInterface(val database: UserDatabase, val id: Long) {
 	}
 
 	init {
-		database.getAdditionalUserData<Klasse>(id, Klasse())?.let { item -> allClasses = item.toList().sortedBy { it.second.name }.toMap() }
-		database.getAdditionalUserData<Teacher>(id, Teacher())?.let { item -> allTeachers = item.toList().sortedBy { it.second.name }.toMap() }
-		database.getAdditionalUserData<Subject>(id, Subject())?.let { item -> allSubjects = item.toList().sortedBy { it.second.name }.toMap() }
-		database.getAdditionalUserData<Room>(id, Room())?.let { item -> allRooms = item.toList().sortedBy { it.second.name }.toMap() }
+		database.getAdditionalUserData<Klasse>(id, Klasse())?.let { item -> allClasses = item.toList().filter { it.second.active }.sortedBy { it.second.name }.toMap() }
+		database.getAdditionalUserData<Teacher>(id, Teacher())?.let { item -> allTeachers = item.toList().filter { it.second.active }.sortedBy { it.second.name }.toMap() }
+		database.getAdditionalUserData<Subject>(id, Subject())?.let { item -> allSubjects = item.toList().filter { it.second.active }.sortedBy { it.second.name }.toMap() }
+		database.getAdditionalUserData<Room>(id, Room())?.let { item -> allRooms = item.toList().filter { it.second.active }.sortedBy { it.second.name }.toMap() }
 	}
 
 	fun getShortName(id: Int, type: Type?): String {
