@@ -33,7 +33,7 @@ jobs:
             echo 'export KEY_RELEASE_PASSWORD=$(echo "$KEY_RELEASE_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
       - run:
           name: Initial build
-          command: ./gradlew --no-daemon assemble bundle
+          command: ./gradlew --no-daemon assemble bundle $([ -z $SENTRY_PROJECT ] && echo "-x uploadSentryProguardMappingsRelease")
           environment:
             GRADLE_OPTS: '
               -Dorg.gradle.jvmargs="-Xmx3g -XX:+HeapDumpOnOutOfMemoryError -XX:MaxPermSize=512m"
