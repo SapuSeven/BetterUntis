@@ -328,10 +328,10 @@ class SettingsActivity : BaseComposeActivity() {
 											)
 										}
 
-										PreferenceCategory(getString(R.string.preference_category_analytics)) {
+										PreferenceCategory(stringResource(R.string.preference_category_analytics)) {
 											Preference(
-												title = { Text(getString(R.string.preference_analytics_info)) },
-												summary = { Text(getString(R.string.preference_analytics_info_desc)) },
+												title = { Text(stringResource(R.string.preference_analytics_info)) },
+												summary = { Text(stringResource(R.string.preference_analytics_info_desc)) },
 												icon = {
 													Icon(
 														painter = painterResource(R.drawable.settings_info),
@@ -342,8 +342,8 @@ class SettingsActivity : BaseComposeActivity() {
 											)
 
 											SwitchPreference(
-												title = { Text(getString(R.string.preference_analytics_breadcrumbs)) },
-												summary = { Text(getString(R.string.preference_analytics_breadcrumbs_desc)) },
+												title = { Text(stringResource(R.string.preference_analytics_breadcrumbs)) },
+												summary = { Text(stringResource(R.string.preference_analytics_breadcrumbs_desc)) },
 												dataStore = UntisPreferenceDataStore(
 													analyticsDataStore,
 													analyticsDataStoreEnable.first,
@@ -1103,10 +1103,10 @@ class SettingsActivity : BaseComposeActivity() {
 								dialogScheduleExactAlarms = false
 							},
 							title = {
-								Text(text = getString(R.string.preference_dialog_permission_alarms_title))
+								Text(text = stringResource(R.string.preference_dialog_permission_alarms_title))
 							},
 							text = {
-								Text(text = getString(R.string.preference_dialog_permission_alarms_text))
+								Text(text = stringResource(R.string.preference_dialog_permission_alarms_text))
 							},
 							dismissButton = {
 								TextButton(onClick = {
@@ -1122,7 +1122,7 @@ class SettingsActivity : BaseComposeActivity() {
 										Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
 									)
 								}) {
-									Text(text = getString(R.string.all_dialog_open_settings))
+									Text(text = stringResource(R.string.all_dialog_open_settings))
 								}
 							}
 						)
