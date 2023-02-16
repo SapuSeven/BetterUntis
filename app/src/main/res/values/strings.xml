@@ -366,13 +366,13 @@
 	<string name="preference_dialog_permission_alarms_title">Permission needed</string>
 	<string name="preference_dialog_permission_alarms_text">This feature requires additional permissions. Please allow BetterUntis access to schedule exact alarms.</string>
 	<string name="all_dialog_open_settings">Open settings</string>
-	<string name="preference_category_analytics">Analytics</string>
-	<string name="preference_analytics_info">About error reporting</string>
-	<string name="preference_analytics_info_desc">These settings help to improve the application.\nNo personal information is ever collected.\nChanges need an app restart to take effect.</string>
-	<string name="preference_analytics_breadcrumbs">Send detailed errors</string>
-	<string name="preference_analytics_breadcrumbs_desc">Include additional information about what happened before an error occured.</string>
-	<string name="main_dialog_analytics_info_2">You can always change these values later in the app settings.</string>
-	<string name="main_dialog_analytics_info_1">BetterUntis uses Sentry to collect information about crashes and other errors.</string>
-	<string name="main_dialog_analytics_title">Error Reporting</string>
-	<string name="main_dialog_analytics_save">Save</string>
+	<string name="preference_category_reports">Error Reporting</string>
+	<string name="preference_reports_info">About error reporting</string>
+	<string name="preference_reports_info_desc">These settings help to improve the application.\nNo personal information is ever collected.\nChanges need an app restart to take effect.</string>
+	<string name="preference_reports_breadcrumbs">Send detailed errors</string>
+	<string name="preference_reports_breadcrumbs_desc">Include additional information about what happened before an error occured.</string>
+	<string name="main_dialog_reports_info_2">You can always change these values later in the app settings.</string>
+	<string name="main_dialog_reports_info_1">BetterUntis uses Sentry to collect information about crashes and other errors.</string>
+	<string name="main_dialog_reports_title">Error Reporting</string>
+	<string name="main_dialog_reports_save">Save</string>
 </resources>

@@ -51,11 +51,6 @@ val BaseComposeActivity.dataStorePreferences: DataStorePreferences
 				currentUserId(),
 				"preference_automute_minimum_break_length"
 			),
-			analyticsUsageStats = this.booleanDataStore(
-				currentUserId(),
-				"preference_analytics_usage_stats",
-				defaultValue = true
-			),
 			timetableItemTextLight = this.booleanDataStore(
 				currentUserId(),
 				"preference_timetable_item_text_light"
@@ -248,7 +243,6 @@ class DataStorePreferences(
 	val automuteCancelledLessons: UntisPreferenceDataStore<Boolean>,
 	val automuteMutePriority: UntisPreferenceDataStore<Boolean>,
 	val automuteMinimumBreakLength: UntisPreferenceDataStore<Float>,
-	val analyticsUsageStats: UntisPreferenceDataStore<Boolean>,
 	val timetableItemTextLight: UntisPreferenceDataStore<Boolean>,
 	val backgroundFuture: UntisPreferenceDataStore<Int>,
 	val backgroundPast: UntisPreferenceDataStore<Int>,

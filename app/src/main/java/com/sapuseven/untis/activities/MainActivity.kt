@@ -625,7 +625,7 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 					)
 			}
 
-			AnalyticsInfoBottomSheet()
+			ReportsInfoBottomSheet()
 		}
 	}
 

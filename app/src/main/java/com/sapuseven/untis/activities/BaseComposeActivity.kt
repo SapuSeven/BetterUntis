@@ -78,14 +78,6 @@ open class BaseComposeActivity : ComponentActivity() {
 		invalidContent: @Composable () -> Unit = { InvalidProfileDialog() },
 		content: @Composable (UserDatabase.User) -> Unit
 	) {
-		/* Not working, can only be initialized once
-		val prefs = dataStorePreferences
-		LaunchedEffect(prefs) {
-			prefs.analyticsUsageStats.getValueFlow().collect { enableUsageStats ->
-				initSentry(enableUsageStats)
-			}
-		}*/
-
 		user?.let {
 			content(it)
 		} ?: run {

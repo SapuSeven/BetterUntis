@@ -14,13 +14,12 @@ import com.sapuseven.untis.helpers.analytics.initSentry
 import com.sapuseven.untis.workers.DailyWorker
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-val Context.analyticsDataStore: DataStore<Preferences> by preferencesDataStore(name = "analytics")
-val analyticsDataStoreEnable = Pair(booleanPreferencesKey("analyticsEnable"), true)
+val Context.reportsDataStore: DataStore<Preferences> by preferencesDataStore(name = "reports")
+val reportsDataStoreBreadcrumbsEnable = Pair(booleanPreferencesKey("reportBreadcrumbsEnable"), true)
 
 class App : Application(), Configuration.Provider {
 	override fun getWorkManagerConfiguration() =
@@ -33,9 +32,9 @@ class App : Application(), Configuration.Provider {
 		super.onCreate()
 
 		GlobalScope.launch {
-			val analyticsEnbaled = analyticsDataStore.loadPref(analyticsDataStoreEnable.first, false)
-			Log.d("Sentry", "Analytics enabled: $analyticsEnbaled")
-			initSentry(analyticsEnbaled)
+			val reportBreadcrumbsEnbaled = reportsDataStore.loadPref(reportsDataStoreBreadcrumbsEnable.first, false)
+			Log.d("Sentry", "Breadcrumbs enabled: $reportBreadcrumbsEnbaled")
+			initSentry(reportBreadcrumbsEnbaled)
 		}
 
 		WorkManager.getInstance(applicationContext).enqueue(OneTimeWorkRequestBuilder<DailyWorker>().build())

@@ -2,12 +2,10 @@ package com.sapuseven.untis.activities
 
 import android.Manifest
 import android.app.AlarmManager
-import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.*
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -328,10 +326,10 @@ class SettingsActivity : BaseComposeActivity() {
 											)
 										}
 
-										PreferenceCategory(stringResource(R.string.preference_category_analytics)) {
+										PreferenceCategory(stringResource(R.string.preference_category_reports)) {
 											Preference(
-												title = { Text(stringResource(R.string.preference_analytics_info)) },
-												summary = { Text(stringResource(R.string.preference_analytics_info_desc)) },
+												title = { Text(stringResource(R.string.preference_reports_info)) },
+												summary = { Text(stringResource(R.string.preference_reports_info_desc)) },
 												icon = {
 													Icon(
 														painter = painterResource(R.drawable.settings_info),
@@ -342,12 +340,12 @@ class SettingsActivity : BaseComposeActivity() {
 											)
 
 											SwitchPreference(
-												title = { Text(stringResource(R.string.preference_analytics_breadcrumbs)) },
-												summary = { Text(stringResource(R.string.preference_analytics_breadcrumbs_desc)) },
+												title = { Text(stringResource(R.string.preference_reports_breadcrumbs)) },
+												summary = { Text(stringResource(R.string.preference_reports_breadcrumbs_desc)) },
 												dataStore = UntisPreferenceDataStore(
-													analyticsDataStore,
-													analyticsDataStoreEnable.first,
-													analyticsDataStoreEnable.second
+													reportsDataStore,
+													reportsDataStoreBreadcrumbsEnable.first,
+													reportsDataStoreBreadcrumbsEnable.second
 												)
 											)
 										}

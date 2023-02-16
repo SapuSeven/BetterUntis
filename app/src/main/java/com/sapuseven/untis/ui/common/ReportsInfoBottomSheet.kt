@@ -13,8 +13,8 @@ import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.edit
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.BaseComposeActivity
-import com.sapuseven.untis.activities.analyticsDataStore
-import com.sapuseven.untis.activities.analyticsDataStoreEnable
+import com.sapuseven.untis.activities.reportsDataStore
+import com.sapuseven.untis.activities.reportsDataStoreBreadcrumbsEnable
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.preferences.SwitchPreference
@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BaseComposeActivity.AnalyticsInfoBottomSheet() {
+fun BaseComposeActivity.ReportsInfoBottomSheet() {
 
 	val scope = rememberCoroutineScope()
 	var bottomSheetVisible by rememberSaveable { mutableStateOf(false) }
@@ -33,8 +33,8 @@ fun BaseComposeActivity.AnalyticsInfoBottomSheet() {
 	var saveEnabled by rememberSaveable { mutableStateOf(true) }
 
 	LaunchedEffect(Unit) {
-		if (analyticsDataStore.data.map { prefs ->
-				prefs[analyticsDataStoreEnable.first]
+		if (reportsDataStore.data.map { prefs ->
+				prefs[reportsDataStoreBreadcrumbsEnable.first]
 			}.first() == null) {
 			bottomSheetVisible = true
 			bottomSheetState.show()
@@ -57,12 +57,12 @@ fun BaseComposeActivity.AnalyticsInfoBottomSheet() {
 						.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
 				) {
 					Text(
-						text = stringResource(R.string.main_dialog_analytics_title),
+						text = stringResource(R.string.main_dialog_reports_title),
 						style = MaterialTheme.typography.headlineLarge
 					)
 
 					Icon(
-						painter = painterResource(id = R.drawable.all_analytics_image),
+						painter = painterResource(id = R.drawable.all_reports_image),
 						modifier = Modifier
 							.size(72.dp)
 							.padding(start = 16.dp, end = 8.dp),
@@ -71,13 +71,13 @@ fun BaseComposeActivity.AnalyticsInfoBottomSheet() {
 				}
 
 				Text(
-					text = stringResource(R.string.main_dialog_analytics_info_1),
+					text = stringResource(R.string.main_dialog_reports_info_1),
 					modifier = Modifier
 						.padding(horizontal = 16.dp)
 				)
 
 				Text(
-					text = stringResource(R.string.preference_analytics_info_desc),
+					text = stringResource(R.string.preference_reports_info_desc),
 					modifier = Modifier
 						.padding(start = 16.dp, end = 16.dp, top = 8.dp)
 				)
@@ -89,12 +89,12 @@ fun BaseComposeActivity.AnalyticsInfoBottomSheet() {
 					Divider()
 
 					SwitchPreference(
-						title = { Text(stringResource(R.string.preference_analytics_breadcrumbs)) },
-						summary = { Text(stringResource(R.string.preference_analytics_breadcrumbs_desc)) },
+						title = { Text(stringResource(R.string.preference_reports_breadcrumbs)) },
+						summary = { Text(stringResource(R.string.preference_reports_breadcrumbs_desc)) },
 						dataStore = UntisPreferenceDataStore(
-							analyticsDataStore,
-							analyticsDataStoreEnable.first,
-							analyticsDataStoreEnable.second
+							reportsDataStore,
+							reportsDataStoreBreadcrumbsEnable.first,
+							reportsDataStoreBreadcrumbsEnable.second
 						)
 					)
 
@@ -102,7 +102,7 @@ fun BaseComposeActivity.AnalyticsInfoBottomSheet() {
 				}
 
 				Text(
-					text = stringResource(R.string.main_dialog_analytics_info_2),
+					text = stringResource(R.string.main_dialog_reports_info_2),
 					modifier = Modifier
 						.padding(horizontal = 16.dp)
 				)
@@ -118,10 +118,10 @@ fun BaseComposeActivity.AnalyticsInfoBottomSheet() {
 						onClick = {
 							saveEnabled = false
 							scope.launch {
-								analyticsDataStore.edit { prefs ->
-									prefs[analyticsDataStoreEnable.first] =
-										prefs[analyticsDataStoreEnable.first]
-											?: analyticsDataStoreEnable.second
+								reportsDataStore.edit { prefs ->
+									prefs[reportsDataStoreBreadcrumbsEnable.first] =
+										prefs[reportsDataStoreBreadcrumbsEnable.first]
+											?: reportsDataStoreBreadcrumbsEnable.second
 								}
 
 								bottomSheetState.hide()
@@ -132,7 +132,7 @@ fun BaseComposeActivity.AnalyticsInfoBottomSheet() {
 							}
 						}
 					) {
-						Text(text = stringResource(R.string.main_dialog_analytics_save))
+						Text(text = stringResource(R.string.main_dialog_reports_save))
 					}
 				}
 			}
