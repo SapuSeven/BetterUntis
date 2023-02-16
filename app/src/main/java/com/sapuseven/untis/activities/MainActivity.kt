@@ -66,8 +66,6 @@ import com.sapuseven.untis.models.untis.masterdata.Holiday
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
-import com.sapuseven.untis.ui.activities.AbsenceOrder
-import com.sapuseven.untis.ui.activities.OrderType
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
@@ -395,7 +393,6 @@ private fun Drawer(
 		},
 		content = content
 	)
-	println(Json.encodeToString(AbsenceOrder.CurrentSchoolYear(OrderType.Descending(false)) as AbsenceOrder))
 
 	AnimatedVisibility(
 		visible = showElementPicker != null,
