@@ -196,7 +196,6 @@ fun RangeInputPreference(
 			onDismissRequest = { showDialog = false },
 			title = title,
 			text = {
-				// TODO: Extract string resources
 				Row(
 					verticalAlignment = Alignment.CenterVertically,
 					modifier = Modifier.fillMaxWidth()
@@ -209,7 +208,7 @@ fun RangeInputPreference(
 						colors = TextFieldDefaults.textFieldColors(
 							containerColor = Color.Transparent
 						),
-						label = { Text(text = "from") },
+						label = { Text(text = stringResource(R.string.preference_range_from)) },
 						modifier = Modifier
 							.padding(end = 12.dp)
 							.weight(1f)
@@ -223,7 +222,7 @@ fun RangeInputPreference(
 						colors = TextFieldDefaults.textFieldColors(
 							containerColor = Color.Transparent
 						),
-						label = { Text(text = "to") },
+						label = { Text(text = stringResource(R.string.preference_range_to)) },
 						modifier = Modifier
 							.padding(start = 12.dp)
 							.weight(1f)

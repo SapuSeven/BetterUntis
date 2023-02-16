@@ -9,7 +9,10 @@ import android.util.Log
 import android.util.Patterns
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -24,6 +27,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.AutofillNode
 import androidx.compose.ui.autofill.AutofillType
+import androidx.compose.ui.focus.focusTarget
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalAutofillTree
@@ -36,6 +42,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -88,10 +95,11 @@ class LoginDataInputActivity : BaseComposeActivity() {
 	private var existingUser: UserDatabase.User? = null
 
 	@OptIn(ExperimentalMaterial3Api::class, ExperimentalSerializationApi::class,
-		ExperimentalComposeUiApi::class
+		ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class
 	)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+		WindowCompat.setDecorFitsSystemWindows(window, true) // Workaround for bringIntoView(). Unfortunately this also breaks insets...
 
 		getUserIdExtra(intent)?.let { userId ->
 			existingUserId = userId
@@ -333,7 +341,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 						loadData()
 					}
 				else
-					Scaffold(
+					AppScaffold(
 						snackbarHost = { SnackbarHost(snackbarHostState) },
 						floatingActionButtonPosition = FabPosition.End,
 						floatingActionButton = {
@@ -526,7 +534,9 @@ class LoginDataInputActivity : BaseComposeActivity() {
 		}
 	}
 
-	@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+	@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class,
+		ExperimentalFoundationApi::class
+	)
 	@Composable
 	private fun InputField(
 		state: MutableState<String?>,
@@ -538,10 +548,14 @@ class LoginDataInputActivity : BaseComposeActivity() {
 		errorText: String = "",
 		autofillType: AutofillType? = null
 	) {
+		val bringIntoViewRequester = remember { BringIntoViewRequester() }
+		val coroutineScope = rememberCoroutineScope()
+
 		Column(
 			modifier = Modifier
 				.fillMaxWidth()
 				.padding(horizontal = 16.dp, vertical = 8.dp)
+				.bringIntoViewRequester(bringIntoViewRequester)
 		) {
 			OutlinedTextField(
 				value = state.value ?: "",
@@ -554,6 +568,15 @@ class LoginDataInputActivity : BaseComposeActivity() {
 				isError = error,
 				modifier = Modifier
 					.fillMaxWidth()
+					.onFocusEvent { focusState ->
+						Log.d("LoginDataInput", "onFocus event")
+						if (focusState.isFocused) {
+							Log.d("LoginDataInput", "onFocus isFocused")
+							coroutineScope.launch {
+								bringIntoViewRequester.bringIntoView()
+							}
+						}
+					}
 					.ifNotNull(autofillType) {
 						autofill(listOf(it)) {
 							state.value = it

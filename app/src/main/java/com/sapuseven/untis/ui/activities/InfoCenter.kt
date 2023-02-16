@@ -31,6 +31,7 @@ import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_ABSENCES
 import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_EVENTS
 import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_MESSAGES
 import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_OFFICEHOURS
+import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.NavigationBarInset
 import com.sapuseven.untis.ui.dialogs.AttachmentsDialog
 import kotlinx.coroutines.launch
@@ -41,7 +42,7 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun InfoCenter(state: InfoCenterState) {
-	Scaffold(
+	AppScaffold(
 		topBar = {
 			CenterAlignedTopAppBar(
 				title = {

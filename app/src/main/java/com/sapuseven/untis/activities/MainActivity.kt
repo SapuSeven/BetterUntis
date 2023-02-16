@@ -68,6 +68,7 @@ import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
+import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
 import com.sapuseven.untis.ui.common.Weekday
 import com.sapuseven.untis.ui.common.disabled
@@ -264,10 +265,9 @@ private fun Drawer(
 		gesturesEnabled = state.drawerGesturesEnabled,
 		drawerState = state.drawerState,
 		drawerContent = {
-			Column(
+			ModalDrawerSheet(
 				modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(drawerScrollState)
+					.width(320.dp) // default: 360.dp
 			) {
 				Spacer(modifier = Modifier.height(24.dp))
 
@@ -524,7 +524,7 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 			}
 		}
 	) {
-		Scaffold(
+		AppScaffold(
 			snackbarHost = { SnackbarHost(snackbarHostState) },
 			topBar = {
 				CenterAlignedTopAppBar(

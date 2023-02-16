@@ -30,6 +30,7 @@ import androidx.compose.ui.window.Dialog
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.NavigationBarInset
 import com.sapuseven.untis.ui.common.disabled
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
@@ -66,7 +67,7 @@ fun ElementPickerDialogFullscreen(
 		onDismiss(false)
 	}
 
-	Scaffold(
+	AppScaffold(
 		topBar = {
 			CenterAlignedTopAppBar(
 				title = {
@@ -88,7 +89,13 @@ fun ElementPickerDialogFullscreen(
 									visualTransformation = VisualTransformation.None,
 									interactionSource = remember { MutableInteractionSource() },
 									placeholder = { Text("Search") },
-									contentPadding = PaddingValues(horizontal = 0.dp)
+									contentPadding = PaddingValues(horizontal = 0.dp),
+									colors = TextFieldDefaults.textFieldColors(
+										containerColor = Color.Transparent,
+										focusedIndicatorColor = Color.Transparent,
+										unfocusedIndicatorColor = Color.Transparent,
+										disabledIndicatorColor = Color.Transparent
+									)
 								)
 							},
 							textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),

@@ -7,6 +7,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.*
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -55,6 +56,7 @@ import com.sapuseven.untis.preferences.UntisPreferenceDataStore
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.receivers.AutoMuteReceiver
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_BOOLEAN_MUTE
+import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.preferences.*
@@ -129,8 +131,16 @@ class SettingsActivity : BaseComposeActivity() {
 									)
 								}
 						}
+					val alarmSettingsLauncher =
+						rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+							if (canScheduleExactAlarms())
+								scope.launch {
+									notificationPref.saveValue(true)
+									enqueueNotificationSetup(user)
+								}
+						}
 
-					Scaffold(
+					AppScaffold(
 						topBar = {
 							CenterAlignedTopAppBar(
 								title = {
@@ -1093,16 +1103,26 @@ class SettingsActivity : BaseComposeActivity() {
 								dialogScheduleExactAlarms = false
 							},
 							title = {
-								Text(text = "Permission needed")
+								Text(text = getString(R.string.preference_dialog_permission_alarms_title))
 							},
 							text = {
-								Text(text = "This feature requires additional permissions. Please allow BetterUntis access to schedule exact alarms.")
+								Text(text = getString(R.string.preference_dialog_permission_alarms_text))
+							},
+							dismissButton = {
+								TextButton(onClick = {
+									dialogScheduleExactAlarms = false
+								}) {
+									Text(text = stringResource(id = R.string.all_cancel))
+								}
 							},
 							confirmButton = {
 								TextButton(onClick = {
 									dialogScheduleExactAlarms = false
+									alarmSettingsLauncher.launch(
+										Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+									)
 								}) {
-									Text(text = stringResource(id = R.string.all_ok))
+									Text(text = getString(R.string.all_dialog_open_settings))
 								}
 							}
 						)

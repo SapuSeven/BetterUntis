@@ -77,5 +77,5 @@ fun ProfileSelectorAction(
 
 @Composable
 internal fun DropdownMenuDivider() {
-	MenuDefaults.Divider(modifier = Modifier.padding(vertical = 8.dp))
+	Divider(modifier = Modifier.padding(vertical = 8.dp))
 }

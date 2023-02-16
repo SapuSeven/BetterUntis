@@ -57,6 +57,7 @@ import com.sapuseven.untis.models.untis.timetable.Period
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
+import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.SmallCircularProgressIndicator
 import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.functional.bottomInsets
@@ -102,7 +103,7 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 		dismiss()
 	}
 
-	Scaffold(
+	AppScaffold(
 		topBar = {
 			CenterAlignedTopAppBar(
 				title = { Text(stringResource(id = R.string.all_lesson_details)) },
