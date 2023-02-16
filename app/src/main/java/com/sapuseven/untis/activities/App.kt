@@ -32,7 +32,7 @@ class App : Application(), Configuration.Provider {
 		super.onCreate()
 
 		GlobalScope.launch {
-			val reportBreadcrumbsEnbaled = reportsDataStore.loadPref(reportsDataStoreBreadcrumbsEnable.first, false)
+			val reportBreadcrumbsEnbaled = reportsDataStore.loadPref(reportsDataStoreBreadcrumbsEnable.first, reportsDataStoreBreadcrumbsEnable.second)
 			Log.d("Sentry", "Breadcrumbs enabled: $reportBreadcrumbsEnbaled")
 			initSentry(reportBreadcrumbsEnbaled)
 		}

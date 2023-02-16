@@ -9,6 +9,7 @@ import android.content.Intent.*
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
@@ -60,6 +61,7 @@ import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.preferences.*
 import com.sapuseven.untis.workers.AutoMuteSetupWorker
 import com.sapuseven.untis.workers.NotificationSetupWorker
+import io.sentry.Sentry
 import io.sentry.compose.withSentryObservableEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -348,6 +350,17 @@ class SettingsActivity : BaseComposeActivity() {
 													reportsDataStoreBreadcrumbsEnable.second
 												)
 											)
+
+											//if (BuildConfig.DEBUG)
+												Preference(
+													title = { Text("Send test report") },
+													summary = { Text("Sends a report to Sentry to test error reporting") },
+													onClick = {
+														Sentry.captureException(java.lang.Exception("Test report"))
+														Toast.makeText(this@SettingsActivity, "Report has been sent", Toast.LENGTH_SHORT).show()
+													},
+													dataStore = UntisPreferenceDataStore.emptyDataStore()
+												)
 										}
 									}
 								}

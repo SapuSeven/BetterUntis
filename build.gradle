@@ -22,7 +22,6 @@ buildscript {
 plugins {
 	id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version"
 	id 'com.mikepenz.aboutlibraries.plugin' version "$latestAboutLibsRelease" apply false
-	id 'io.sentry.android.gradle' version '3.4.2'
 }
 
 allprojects {
