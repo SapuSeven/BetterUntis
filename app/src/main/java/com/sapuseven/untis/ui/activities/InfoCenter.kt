@@ -38,6 +38,7 @@ import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_ABSENCES
 import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_EVENTS
 import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_MESSAGES
 import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_OFFICEHOURS
+import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.NavigationBarInset
@@ -53,12 +54,8 @@ import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun InfoCenterActivity.InfoCenter(state: InfoCenterState) {
-	val scope = rememberCoroutineScope()
-	scope.launch {
-		state.loadAbsenceOrder()
-	}
-	Scaffold(
+fun InfoCenter(state: InfoCenterState) {
+	AppScaffold(
 		topBar = {
 			CenterAlignedTopAppBar(
 				title = {

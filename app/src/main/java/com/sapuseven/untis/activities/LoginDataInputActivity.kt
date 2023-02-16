@@ -30,6 +30,7 @@ import androidx.compose.ui.autofill.AutofillType
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalAutofillTree
@@ -48,6 +49,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
@@ -114,7 +116,11 @@ class LoginDataInputActivity : BaseComposeActivity() {
 		userDatabase = UserDatabase.createInstance(this)
 
 		setContent {
-			AppTheme(navBarInset = false) {
+			val systemUiController = rememberSystemUiController()
+
+			AppTheme(navBarInset = false, systemUiController = systemUiController) {
+				setSystemUiColor(systemUiController, MaterialTheme.colorScheme.surface) // Part of the bringIntoView()-workaround - as system bars are transparent by default, set their color manually
+
 				val coroutineScope = rememberCoroutineScope()
 				val snackbarHostState = remember { SnackbarHostState() }
 
@@ -341,7 +347,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 						loadData()
 					}
 				else
-					Scaffold(
+					AppScaffold(
 						snackbarHost = { SnackbarHost(snackbarHostState) },
 						floatingActionButtonPosition = FabPosition.End,
 						floatingActionButton = {

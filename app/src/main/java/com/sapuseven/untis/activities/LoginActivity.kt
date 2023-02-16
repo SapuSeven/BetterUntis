@@ -38,6 +38,7 @@ import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.models.UntisSchoolInfo
 import com.sapuseven.untis.models.untis.params.SchoolSearchParams
 import com.sapuseven.untis.models.untis.response.SchoolSearchResponse
+import com.sapuseven.untis.ui.common.AppScaffold
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
@@ -88,7 +89,7 @@ class LoginActivity : BaseComposeActivity() {
 					searchMode = false
 				}
 
-				Scaffold(
+				AppScaffold(
 					topBar = {
 						CenterAlignedTopAppBar(
 							title = { Text(stringResource(id = R.string.app_name)) },

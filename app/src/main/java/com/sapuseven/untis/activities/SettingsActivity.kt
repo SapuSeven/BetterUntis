@@ -55,6 +55,7 @@ import com.sapuseven.untis.preferences.UntisPreferenceDataStore
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.receivers.AutoMuteReceiver
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_BOOLEAN_MUTE
+import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.preferences.*
@@ -137,7 +138,7 @@ class SettingsActivity : BaseComposeActivity() {
 								}
 						}
 
-					Scaffold(
+					AppScaffold(
 						topBar = {
 							CenterAlignedTopAppBar(
 								title = {

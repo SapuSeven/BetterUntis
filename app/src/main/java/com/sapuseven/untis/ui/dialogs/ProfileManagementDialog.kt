@@ -22,6 +22,7 @@ import com.sapuseven.untis.activities.LoginActivity
 import com.sapuseven.untis.activities.LoginDataInputActivity
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.config.deleteProfile
+import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import kotlinx.coroutines.launch
 
@@ -53,7 +54,7 @@ fun BaseComposeActivity.ProfileManagementDialog( // TODO: Remove inheritance of 
 		dismiss()
 	}
 
-	Scaffold(
+	AppScaffold(
 		topBar = {
 			CenterAlignedTopAppBar(
 				title = { Text(stringResource(id = R.string.mainactivitydrawer_profile_edit)) },

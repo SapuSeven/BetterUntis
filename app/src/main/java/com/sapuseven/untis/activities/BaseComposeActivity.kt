@@ -173,8 +173,6 @@ open class BaseComposeActivity : ComponentActivity() {
 						setSystemUiColor(it, Color.Transparent, !darkThemeBool)
 					}
 
-					// setStatusBarsColor() and setNavigationBarColor() also exist
-
 					val dynamicColor = themeColor == themeColorPref.defaultValue
 					customThemeColor = if (dynamicColor) null else Color(themeColor)
 
