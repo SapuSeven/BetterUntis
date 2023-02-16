@@ -56,6 +56,7 @@ import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.receivers.AutoMuteReceiver
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_BOOLEAN_MUTE
 import com.sapuseven.untis.ui.common.AppScaffold
+import com.sapuseven.untis.ui.common.VerticalScrollColumn
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.preferences.*
@@ -1208,15 +1209,6 @@ class SettingsActivity : BaseComposeActivity() {
 	private fun clearNotifications() =
 		(getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancelAll()
 
-	@Composable
-	private fun VerticalScrollColumn(content: @Composable ColumnScope.() -> Unit) {
-		Column(
-			modifier = Modifier
-				.verticalScroll(rememberScrollState())
-				.bottomInsets(),
-			content = content
-		)
-	}
 
 	private fun disableAutoMute() {
 		sendBroadcast(

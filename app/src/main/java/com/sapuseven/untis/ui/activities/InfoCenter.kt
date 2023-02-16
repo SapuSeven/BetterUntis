@@ -15,25 +15,24 @@ import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.InfoCenterActivity
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.UntisAbsence
 import com.sapuseven.untis.models.UntisMessage
 import com.sapuseven.untis.models.UntisOfficeHour
 import com.sapuseven.untis.models.untis.UntisAttachment
-import com.sapuseven.untis.preferences.PreferenceCategory
+import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_ABSENCES
 import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_EVENTS
 import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_MESSAGES
@@ -42,12 +41,12 @@ import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.NavigationBarInset
+import com.sapuseven.untis.ui.common.VerticalScrollColumn
 import com.sapuseven.untis.ui.dialogs.AttachmentsDialog
 import com.sapuseven.untis.ui.functional.bottomInsets
+import com.sapuseven.untis.ui.preferences.ListPreference
+import com.sapuseven.untis.ui.preferences.SwitchPreference
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
 import java.util.*
@@ -130,8 +129,7 @@ fun InfoCenter(state: InfoCenterState) {
 					ID_MESSAGES -> MessageList(state.messages.value, state.messagesLoading.value)
 					ID_EVENTS -> EventList(state.events.value, state.eventsLoading.value)
 					ID_ABSENCES -> AbsenceList(
-						state.absences.value, state.absencesLoading.value,
-						state.absenceFilterConfiguration.value!!
+						state.absences.value, state.absencesLoading.value, state.providePreferences()
 					)
 
 					ID_OFFICEHOURS -> OfficeHourList(state.officeHours.value, state.officeHoursLoading.value)
@@ -198,13 +196,9 @@ fun InfoCenter(state: InfoCenterState) {
 		exit = fullscreenDialogAnimationExit()
 	) {
 		AbsenceFilterDialog(
-			state.absenceFilterConfiguration.value!!,
+			state.providePreferences()
 		) {
 			state.showAbsenceFilter.value = false
-			state.absenceFilterConfiguration.value = it
-			scope.launch {
-				state.updateAbsenceOrder(it)
-			}
 		}
 	}
 }
@@ -214,7 +208,7 @@ private fun <T> ItemList(
 	items: List<T>?,
 	itemRenderer: @Composable (T) -> Unit,
 	@StringRes itemsEmptyMessage: Int,
-	loading: Boolean
+	loading: Boolean,
 ) {
 	if (loading) {
 		CircularProgressIndicator()
@@ -265,74 +259,49 @@ private fun EventList(events: List<EventListItem>?, loading: Boolean) {
 }
 
 @Composable
-private fun AbsenceList(absences: List<UntisAbsence>?, loading: Boolean, absenceOrder: AbsenceOrder) {
+private fun AbsenceList(absences: List<UntisAbsence>?, loading: Boolean, preferences: DataStorePreferences) {
+	val showOnlyUnexcused by preferences.showOnlyUnexcused.getState()
+	val sortAbsencesAscending by preferences.sortAbsencesAscending.getState()
+	val timeRangeAbsences by preferences.timeRangeAbsences.getState()
+
 	ItemList(
-		items = when (absenceOrder.orderType) {
-			is OrderType.Ascending -> {
-				when (absenceOrder) {
-					is AbsenceOrder.CurrentSchoolYear -> {
-						absences?.
-							sortedBy { it.id }?.
-							filter { (absenceOrder.orderType.showOnlyUnexcused != it.excused) || !it.excused }
-					}
-					is AbsenceOrder.LastFourteenDays -> {
-						absences?.
-							sortedBy { it.id }?.
-							filter { (absenceOrder.orderType.showOnlyUnexcused != it.excused) || !it.excused }?.
-							filter { LocalDateTime.now().minusDays(14).isBefore(it.startDateTime.toLocalDateTime()) }
-					}
-					is AbsenceOrder.LastNinetyDays -> {
-						absences?.
-							sortedBy { it.id }?.
-							filter { (absenceOrder.orderType.showOnlyUnexcused != it.excused) || !it.excused }?.
-							filter { LocalDateTime.now().minusDays(90).isBefore(it.startDateTime.toLocalDateTime()) }
-					}
-					is AbsenceOrder.LastSevenDays -> {
-						absences?.
-							sortedBy { it.id }?.
-							filter { (absenceOrder.orderType.showOnlyUnexcused != it.excused) || !it.excused }?.
-							filter { LocalDateTime.now().minusDays(7).isBefore(it.startDateTime.toLocalDateTime()) }
-					}
-					is AbsenceOrder.LastThirtyDays -> {
-						absences?.
-							sortedBy { it.id }?.
-							filter { (absenceOrder.orderType.showOnlyUnexcused != it.excused) || !it.excused }?.
-							filter { LocalDateTime.now().minusDays(30).isBefore(it.startDateTime.toLocalDateTime()) }
+		items = absences.also {
+			if (sortAbsencesAscending){
+				it?.sortedBy { absence ->
+					absence.id
+				}
+			} else {
+				it?.sortedByDescending {absence ->
+					absence.id
+				}
+			}
+		}.also {
+			it?.filter {absence ->
+				(showOnlyUnexcused != absence.excused) || !absence.excused
+			}
+		}.also {
+			when (timeRangeAbsences) {
+				"fourteen_days" -> {
+					it?.filter {absence ->
+						LocalDateTime.now().minusDays(14).isBefore(absence.startDateTime.toLocalDateTime())
 					}
 				}
 
-			}
+				"ninety_days" -> {
+					it?.filter {absence ->
+						LocalDateTime.now().minusDays(90).isBefore(absence.startDateTime.toLocalDateTime())
+					}
+				}
 
-			is OrderType.Descending -> {
-				when (absenceOrder) {
-					is AbsenceOrder.CurrentSchoolYear -> {
-						absences?.
-							sortedByDescending { it.id }?.
-							filter { (absenceOrder.orderType.showOnlyUnexcused != it.excused) || !it.excused }
+				"seven_days" -> {
+					it?.filter { absence ->
+						LocalDateTime.now().minusDays(7).isBefore(absence.startDateTime.toLocalDateTime())
 					}
-					is AbsenceOrder.LastFourteenDays -> {
-						absences?.
-							sortedByDescending { it.id }?.
-							filter { (absenceOrder.orderType.showOnlyUnexcused != it.excused) || !it.excused }?.
-							filter { LocalDateTime.now().minusDays(14).isBefore(it.startDateTime.toLocalDateTime()) }
-					}
-					is AbsenceOrder.LastNinetyDays -> {
-						absences?.
-							sortedByDescending { it.id }?.
-							filter { (absenceOrder.orderType.showOnlyUnexcused != it.excused) || !it.excused }?.
-							filter { LocalDateTime.now().minusDays(90).isBefore(it.startDateTime.toLocalDateTime()) }
-					}
-					is AbsenceOrder.LastSevenDays -> {
-						absences?.
-							sortedByDescending { it.id }?.
-							filter { (absenceOrder.orderType.showOnlyUnexcused != it.excused) || !it.excused }?.
-							filter { LocalDateTime.now().minusDays(7).isBefore(it.startDateTime.toLocalDateTime()) }
-					}
-					is AbsenceOrder.LastThirtyDays -> {
-						absences?.
-							sortedByDescending { it.id }?.
-							filter { (absenceOrder.orderType.showOnlyUnexcused != it.excused) || !it.excused }?.
-							filter { LocalDateTime.now().minusDays(30).isBefore(it.startDateTime.toLocalDateTime()) }
+				}
+
+				"thirty_days" -> {
+					it?.filter {absence ->
+						LocalDateTime.now().minusDays(30).isBefore(absence.startDateTime.toLocalDateTime())
 					}
 				}
 			}
@@ -357,7 +326,7 @@ private fun OfficeHourList(officeHours: List<UntisOfficeHour>?, loading: Boolean
 @Composable
 private fun MessageItem(
 	item: UntisMessage,
-	onShowAttachments: (List<UntisAttachment>) -> Unit
+	onShowAttachments: (List<UntisAttachment>) -> Unit,
 ) {
 	val textColor = MaterialTheme.colorScheme.onSurfaceVariant
 
@@ -522,7 +491,7 @@ private fun formatExamTime(startDateTime: LocalDateTime, endDateTime: LocalDateT
 @Composable
 private fun formatAbsenceTime(
 	startDateTime: LocalDateTime,
-	endDateTime: LocalDateTime
+	endDateTime: LocalDateTime,
 ): String {
 	return stringResource(
 		if (startDateTime.dayOfYear == endDateTime.dayOfYear)
@@ -539,7 +508,7 @@ private fun formatAbsenceTime(
 @Composable
 private fun formatOfficeHourTime(
 	startDateTime: LocalDateTime,
-	endDateTime: LocalDateTime
+	endDateTime: LocalDateTime,
 ): String {
 	return stringResource(
 		if (startDateTime.dayOfYear == endDateTime.dayOfYear)
@@ -557,36 +526,27 @@ private fun formatOfficeHourTime(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AbsenceFilterDialog(
-	initialOrder: AbsenceOrder,
-	onDismiss: (requestedAbsenceOrder: AbsenceOrder) -> Unit,
+	preferences: DataStorePreferences,
+	onDismiss: () -> Unit
 ) {
-	var absenceOrder by rememberSaveable(
-		saver = Saver(
-			save = { Json.encodeToString(it.value) },
-			restore = { mutableStateOf(Json.decodeFromString(it)) }
-		)
-	) { mutableStateOf(initialOrder) }
 	var dismissed by rememberSaveable { mutableStateOf(false) }
-
-
-	fun dismiss(absenceOrder: AbsenceOrder) {
-		onDismiss(absenceOrder)
+	fun dismiss() {
 		dismissed = true
+		onDismiss()
 	}
-
 	BackHandler(
 		enabled = !dismissed,
 	) {
-		dismiss(absenceOrder)
+		dismiss()
 	}
 
 	Scaffold(
 		topBar = {
 			CenterAlignedTopAppBar(
-				title = { Text(text = "Filter Absencses") },
+				title = { Text(text = stringResource(id = R.string.infocenter_absences_filter)) },
 				navigationIcon = {
 					IconButton(onClick = {
-						dismiss(absenceOrder)
+						dismiss()
 					}) {
 						Icon(
 							imageVector = Icons.Outlined.Close,
@@ -596,152 +556,32 @@ private fun AbsenceFilterDialog(
 				}
 			)
 		}
-	) { innerPadding ->
-		VerticalScrollColumn(paddingValues = innerPadding) {
-			PreferenceCategory(title = "") {
-				ListItem(
-					headlineText = {
-						Box {
-							Text(text = "Show unexcused only")
-						}
-					},
-					trailingContent = {
-						Switch(
-							checked = absenceOrder.orderType.showOnlyUnexcused,
-							onCheckedChange = { newValue ->
-								absenceOrder = absenceOrder.copy(absenceOrder.orderType.copy(newValue))
-							}
-						)
-					},
+	) { padding ->
+		Box(modifier = Modifier.padding(padding)){
+			VerticalScrollColumn {
+				val sortChecked by preferences.sortAbsencesAscending.getState()
+				SwitchPreference(
+					title = { Text(text = stringResource(id = R.string.infocenter_absences_filter_only_unexcused)) },
+					dataStore = preferences.showOnlyUnexcused
 				)
-				ListItem(
-					headlineText = {
-						Box {
-							Text(text = "Sort by")
-						}
-					},
-					supportingText = {
-						if (absenceOrder.orderType is OrderType.Ascending) {
-							Text(text = "Ascending")
+				SwitchPreference(
+					title = { Text(text = stringResource(id = R.string.infocenter_absences_filter_sortby)) },
+					summary = {
+						if (sortChecked) {
+							Text(text = stringResource(id = R.string.infocenter_absences_filter_ascending))
 						} else {
-							Text(text = "Descending")
+							Text(text = stringResource(id = R.string.infocenter_absences_filter_descending))
 						}
 					},
-					trailingContent = {
-						Switch(
-							checked = absenceOrder.orderType is OrderType.Ascending,
-							onCheckedChange = { ascending ->
-								absenceOrder = if (ascending) {
-									absenceOrder.copy(OrderType.Ascending(absenceOrder.orderType.showOnlyUnexcused))
-								} else {
-									absenceOrder.copy(OrderType.Descending(absenceOrder.orderType.showOnlyUnexcused))
-								}
-
-							}
-						)
-					},
+					dataStore = preferences.sortAbsencesAscending
 				)
-				ListSelector(
-					title = { Text(text = "Time Ranges") },
-					absenceOrder = absenceOrder,
-					entries = arrayOf(
-						AbsenceOrder.LastSevenDays(absenceOrder.orderType),
-						AbsenceOrder.LastFourteenDays(absenceOrder.orderType),
-						AbsenceOrder.LastThirtyDays(absenceOrder.orderType),
-						AbsenceOrder.LastNinetyDays(absenceOrder.orderType),
-						AbsenceOrder.CurrentSchoolYear(absenceOrder.orderType),
-					),
-				) {
-					absenceOrder = it
-				}
+				ListPreference(
+					title = { Text(text = stringResource(id = R.string.infocenter_absences_filter_time_ranges)) },
+					dataStore = preferences.timeRangeAbsences,
+					entries = stringArrayResource(id = R.array.infocenter_absences_list_values),
+					entryLabels = stringArrayResource(id = R.array.infocenter_absences_list)
+				)
 			}
 		}
 	}
-}
-
-@Composable
-private fun VerticalScrollColumn(paddingValues: PaddingValues, content: @Composable ColumnScope.() -> Unit) {
-	Column(
-		horizontalAlignment = Alignment.CenterHorizontally,
-		modifier = Modifier
-			.verticalScroll(rememberScrollState())
-			.bottomInsets()
-			.padding(paddingValues)
-			.fillMaxSize(),
-		content = content
-	)
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ListSelector(
-	title: @Composable () -> Unit,
-	absenceOrder: AbsenceOrder,
-	entries: Array<AbsenceOrder>,
-	updateAbsenceOrder: (AbsenceOrder) -> Unit,
-) {
-	var showDialog by remember { mutableStateOf(false) }
-	val interactionSource = remember { MutableInteractionSource() }
-
-	ListItem(
-		headlineText = {
-			Box {
-				title()
-			}
-		},
-		supportingText = {
-			absenceOrder.toString()
-		},
-		modifier = Modifier.clickable(
-			interactionSource = interactionSource,
-			indication = LocalIndication.current
-		) {
-			showDialog = true
-		}
-	)
-
-	if (showDialog)
-		AlertDialog(
-			onDismissRequest = { showDialog = false },
-			title = title,
-			text = {
-				LazyColumn(modifier = Modifier.fillMaxWidth()) {
-					items(entries.toList()) {
-						Row(
-							modifier = Modifier
-								.fillMaxWidth()
-								.selectableGroup()
-								.clickable(
-									role = Role.RadioButton
-								) {
-									showDialog = false
-								},
-							verticalAlignment = Alignment.CenterVertically
-						) {
-							RadioButton(
-								selected = absenceOrder.id == it.id,
-								onClick = {
-									updateAbsenceOrder(it.copy(absenceOrder.orderType))
-									showDialog = false
-								}
-							)
-							Text(
-								text = it.toString(),
-								modifier = Modifier.weight(1f),
-							)
-						}
-					}
-				}
-			},
-			confirmButton = {
-				TextButton(
-					onClick = {
-						showDialog = false
-					}) {
-					Text(stringResource(id = R.string.all_cancel))
-				}
-			}
-		)
-
-
 }

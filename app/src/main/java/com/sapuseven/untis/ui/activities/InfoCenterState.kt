@@ -226,12 +226,8 @@ class InfoCenterState(
 		}
 	}
 
-	suspend fun updateAbsenceOrder(absenceOrder: AbsenceOrder) {
-		preferences.absencesOrder.saveValue(Json.encodeToString(absenceOrder))
-	}
-
-	suspend fun loadAbsenceOrder()  {
-		absenceFilterConfiguration.value = Json.decodeFromString(preferences.absencesOrder.getValue())
+	fun providePreferences() : DataStorePreferences {
+		return preferences
 	}
 
 	fun isItemSelected(itemId: Int): Boolean = selectedItem.value == itemId
