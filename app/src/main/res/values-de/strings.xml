@@ -269,8 +269,8 @@
     <string name="errors_crash_title">Es sieht aus als wäre BetterUntis abgestürzt.</string>
     <string name="errors_crash_message">Entschuldigung.</string>
     <string name="errors_report">Bitte hilf, die App zu verbessern, indem du die Fehler unten meldest:</string>
-    <string name="errors_button_dismiss">Alle verwerfen</string>
-    <string name="errors_button_report">Alle melden</string>
+    <string name="errors_button_dismiss">Schließen</string>
+    <string name="errors_button_report">Senden</string>
     <string name="loading">Wird geladen</string>
     <string name="loading_failed">Ladevorgang fehlgeschlagen</string>
     <string name="settings_dialog_url_open_title">Keine kompatible App gefunden</string>

@@ -141,7 +141,6 @@
     <string name="infocenter_timeformat_sameday">%2$s — %4$s， %1$s</string>
     <string name="infocenter_timeformat">%2$s， %1$s — %4$s， %3$s</string>
     <string name="roomfinder_current_hour_time">%1$s — %2$s</string>
-    <string name="errors_button_dismiss">解散所有</string>
     <string name="errors_crash_title">似乎崩溃了。</string>
     <string name="notifications_channel_breakinfo_desc">显示当前休息及随后课程的信息</string>
     <string name="notifications_channel_breakinfo">信息中断</string>
@@ -176,7 +175,6 @@
     </plurals>
     <string name="loading_failed">加载失败</string>
     <string name="loading">加载中</string>
-    <string name="errors_button_report">报告所有</string>
     <string name="errors_report">请提交以下错误以帮助完善软件：</string>
     <string name="errors_crash_message">很抱歉。</string>
     <string name="homeworks_due_time">直到 %1$s</string>

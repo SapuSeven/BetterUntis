@@ -252,8 +252,6 @@
     <string name="preference_info_contributors_desc">En liste over bidragsyterne</string>
     <string name="preference_info_contributors">Bidragsytere</string>
     <string name="activity_title_errors">Feil</string>
-    <string name="errors_button_dismiss">Forkast alle</string>
-    <string name="errors_button_report">Rapporter alle</string>
     <string name="errors_github_attach_file_message">Legg ved loggfilene i denne problemrapporten.
 \nDe er lagret i \"%1$s\"</string>
     <string name="app_desc">En alternativ mobilklient for Untis-timeplanssystemet.</string>
