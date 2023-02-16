@@ -5,7 +5,7 @@
     <string name="activity_title_info_center">Info Center</string>
     <string name="activity_title_messenger">Messenger</string>
     <string name="activity_title_settings">Settings</string>
-    <string name="all_absences">Absences</string>
+    <string name="all_absences">All absences</string>
     <string name="all_add">Add</string>
     <string name="all_anonymous">Anonymous</string>
     <string name="all_back">Back</string>
@@ -122,7 +122,7 @@
     <string name="logindatainput_adding_user_unknown_error">An unknown error happened while adding the user.</string>
     <string name="logindatainput_anonymous_login">Anonymous login</string>
     <string name="logindatainput_api_url">Untis API path</string>
-    <string name="logindatainput_aquiring_app_secret">Acquiring app secret…</string>
+    <string name="logindatainput_aquiring_app_secret">Acquiring app secret …</string>
     <string name="logindatainput_aquiring_schoolid">Loading school…</string>
     <string name="logindatainput_connecting">Connecting…</string>
     <string name="logindatainput_data_loaded">Data loaded.</string>
