@@ -2,6 +2,7 @@ plugins {
 	id 'com.android.application'
 	id 'io.sentry.android.gradle' version '3.4.2'
 	id 'com.mikepenz.aboutlibraries.plugin'
+	id 'de.mannodermaus.android-junit5'
 }
 
 apply plugin: 'kotlin-android'
@@ -111,7 +112,6 @@ aboutLibraries {
 dependencies {
 	implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 	implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-	implementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
 	implementation "org.jetbrains.kotlinx:kotlinx-serialization-cbor:$serialization_version"
 	implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization_version"
 	implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
@@ -153,13 +153,18 @@ dependencies {
 
 	coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+
 	testImplementation 'junit:junit:4.13.2'
+	testImplementation 'io.mockk:mockk:1.13.4'
 	testImplementation 'org.mockito:mockito-core:4.6.1'
 	testImplementation 'org.hamcrest:hamcrest:2.2'
 	testImplementation 'org.hamcrest:hamcrest-library:2.2'
 	androidTestImplementation 'androidx.test:core:1.5.0-alpha02' // Version 1.5.0-alpha02 fixes crash on Android 13 - see https://github.com/android/android-test/issues/1412
 	androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
 	debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+
 
 
 	implementation project(':weekview')
