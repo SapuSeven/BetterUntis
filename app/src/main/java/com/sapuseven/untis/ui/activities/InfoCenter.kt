@@ -126,13 +126,10 @@ fun InfoCenter(state: InfoCenterState) {
 					.weight(1f)
 			) {
 				when (state.selectedItem.value) {
-					ID_MESSAGES -> MessageList(state.messages.value, state.messagesLoading.value)
-					ID_EVENTS -> EventList(state.events.value, state.eventsLoading.value)
-					ID_ABSENCES -> AbsenceList(
-						state.absences.value, state.absencesLoading.value, state.providePreferences()
-					)
-
-					ID_OFFICEHOURS -> OfficeHourList(state.officeHours.value, state.officeHoursLoading.value)
+					ID_MESSAGES -> MessageList(state.messageList, state.messagesLoading.value)
+					ID_EVENTS -> EventList(state.eventList, state.eventsLoading.value)
+					ID_ABSENCES -> AbsenceList(state.absenceList, state.absencesLoading.value)
+					ID_OFFICEHOURS -> OfficeHourList(state.officeHourList, state.officeHoursLoading.value)
 				}
 			}
 
@@ -195,9 +192,7 @@ fun InfoCenter(state: InfoCenterState) {
 		enter = fullscreenDialogAnimationEnter(),
 		exit = fullscreenDialogAnimationExit()
 	) {
-		AbsenceFilterDialog(
-			state.providePreferences()
-		) {
+		AbsenceFilterDialog(state.preferences) {
 			state.showAbsenceFilter.value = false
 		}
 	}
@@ -259,56 +254,9 @@ private fun EventList(events: List<EventListItem>?, loading: Boolean) {
 }
 
 @Composable
-private fun AbsenceList(absences: List<UntisAbsence>?, loading: Boolean, preferences: DataStorePreferences) {
-	val showOnlyUnexcused by preferences.infocenterAbsencesOnlyUnexcused.getState()
-	val sortAbsencesAscending by preferences.infocenterAbsencesSortAscending.getState()
-	val timeRangeAbsences by preferences.infocenterAbsencesTimeRange.getState()
-
+private fun AbsenceList(absences: List<UntisAbsence>?, loading: Boolean) {
 	ItemList(
-		items = absences.let {
-			if (sortAbsencesAscending){
-				it?.sortedBy { absence ->
-					absence.id
-				}
-			} else {
-				it?.sortedByDescending {absence ->
-					absence.id
-				}
-			}
-		}.let {
-			it?.filter {absence ->
-				(showOnlyUnexcused != absence.excused) || !absence.excused
-			}
-		}.let {
-			when (timeRangeAbsences) {
-				"fourteen_days" -> {
-					it?.filter {absence ->
-						LocalDateTime.now().minusDays(14).isBefore(absence.startDateTime.toLocalDateTime())
-					}
-				}
-
-				"ninety_days" -> {
-					it?.filter {absence ->
-						LocalDateTime.now().minusDays(90).isBefore(absence.startDateTime.toLocalDateTime())
-					}
-				}
-
-				"seven_days" -> {
-					it?.filter { absence ->
-						LocalDateTime.now().minusDays(7).isBefore(absence.startDateTime.toLocalDateTime())
-					}
-				}
-
-				"thirty_days" -> {
-					it?.filter {absence ->
-						LocalDateTime.now().minusDays(30).isBefore(absence.startDateTime.toLocalDateTime())
-					}
-				}
-				else -> {
-					it
-				}
-			}
-		},
+		items = absences,
 		itemRenderer = { AbsenceItem(it) },
 		itemsEmptyMessage = R.string.infocenter_absences_empty,
 		loading = loading
