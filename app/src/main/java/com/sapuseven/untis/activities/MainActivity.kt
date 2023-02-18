@@ -429,11 +429,7 @@ private fun Drawer(
 		val isSubjectElementPicker = showElementPicker == TimetableDatabaseInterface.Type.SUBJECT
 
 		ElementPickerDialogFullscreen(
-			title = {
-					if (isSubjectElementPicker){
-						Text(text = stringResource(id = R.string.maindrawer_hide_subjects_dialogue_title))
-					}
-			},
+			title = { /*TODO*/},
 			timetableDatabaseInterface = state.timetableDatabaseInterface,
 			onDismiss = { showElementPicker = null },
 			onMultiSelect = {
@@ -457,7 +453,31 @@ private fun Drawer(
 				}
 			},
 			selectedElements = if (isSubjectElementPicker) state.subjectList else null,
-			initialType = showElementPicker
+			initialType = showElementPicker,
+			additionalActions = {
+				if (isSubjectElementPicker){
+					var allSelected by remember {
+						mutableStateOf(state.subjectList.size == state.timetableDatabaseInterface.getElements(TimetableDatabaseInterface.Type.SUBJECT).size)
+					}
+					IconButton(onClick = {
+						allSelected = if (allSelected){
+							state.onElementPickerSelect(emptyList())
+							showElementPicker = null
+							false
+						} else {
+							state.onElementPickerSelect(state.timetableDatabaseInterface.getElements(TimetableDatabaseInterface.Type.SUBJECT))
+							showElementPicker = null
+							true
+						}
+					}) {
+						if (allSelected) {
+							Icon(painter = painterResource(id = R.drawable.all_checkbox_checked), contentDescription = null)
+						} else {
+							Icon(painter = painterResource(id = R.drawable.all_checkbox_unchecked), contentDescription = null)
+						}
+					}
+				}
+			}
 		)
 	}
 
