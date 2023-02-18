@@ -170,6 +170,8 @@
 	<string name="mainactivitydrawer_profile_delete_hint">Long-press a profile to edit</string>
 	<string name="mainactivitydrawer_profile_edit">Edit profiles</string>
 	<string name="maindrawer_bookmarks_add">Add Timetable</string>
+	<string name="maindrawer_hide_subjects">Subjects to hide</string>
+	<string name="maindrawer_hide_subjects_dialogue_title">Select Subjects</string>
 	<string name="menu_infocenter_absences">Absences</string>
 	<string name="menu_infocenter_events">Events</string>
 	<string name="menu_infocenter_messagesofday">Messages</string>

@@ -1,6 +1,7 @@
 package com.sapuseven.untis.activities.main
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -45,6 +46,12 @@ fun DrawerItems(
 			label = stringResource(id = R.string.all_rooms),
 			elementType = TimetableDatabaseInterface.Type.ROOM
 		),
+		NavItemTimetable(
+			id = 4,
+			icon = painterResource(id = R.drawable.all_hide_subjects),
+			label = stringResource(id = R.string.maindrawer_hide_subjects),
+			elementType = TimetableDatabaseInterface.Type.SUBJECT
+		)
 	)
 
 	var navItemsShortcuts = listOf(

@@ -225,10 +225,6 @@ private fun Drawer(
 		)
 	}
 
-	var classesElementPicker by remember {
-		mutableStateOf(false)
-	}
-
 	val shortcutLauncher =
 		rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
 			val periodElement: PeriodElement? = activityResult.data?.let { intent ->
@@ -361,15 +357,6 @@ private fun Drawer(
 					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 				)
 
-				NavigationDrawerItem(
-					label = { Text("Hide Subjects") },
-					selected = false,
-					onClick = {
-						state.closeDrawer()
-						classesElementPicker = true
-					}
-				)
-
 				DrawerText(stringResource(id = R.string.nav_all_timetables))
 
 				DrawerItems(
@@ -438,19 +425,38 @@ private fun Drawer(
 		enter = fullscreenDialogAnimationEnter(),
 		exit = fullscreenDialogAnimationExit()
 	) {
+
+		val isSubjectElementPicker = showElementPicker == TimetableDatabaseInterface.Type.SUBJECT
+
 		ElementPickerDialogFullscreen(
-			title = { /*TODO*/ },
+			title = {
+					if (isSubjectElementPicker){
+						Text(text = stringResource(id = R.string.maindrawer_hide_subjects_dialogue_title))
+					}
+			},
 			timetableDatabaseInterface = state.timetableDatabaseInterface,
 			onDismiss = { showElementPicker = null },
-			onSelect = { item ->
-				item?.let {
-					onShowTimetable(
-						item to state.timetableDatabaseInterface.getLongName(it)
-					)
-				} ?: run {
-					onShowTimetable(state.personalTimetable)
+			onMultiSelect = {
+				if (isSubjectElementPicker){
+					state.onElementPickerSelect(it)
+					showElementPicker = null
 				}
 			},
+			hideTypeSelectionPersonal = isSubjectElementPicker,
+			hideTypeSelection = isSubjectElementPicker,
+			multiSelect = isSubjectElementPicker,
+			onSelect = { item ->
+				if (!isSubjectElementPicker) {
+					item?.let {
+						onShowTimetable(
+							item to state.timetableDatabaseInterface.getLongName(it)
+						)
+					} ?: run {
+						onShowTimetable(state.personalTimetable)
+					}
+				}
+			},
+			selectedElements = if (isSubjectElementPicker) state.subjectList else null,
 			initialType = showElementPicker
 		)
 	}
@@ -497,29 +503,6 @@ private fun Drawer(
 		)
 	}
 
-	AnimatedVisibility(
-		visible = classesElementPicker,
-		enter = fullscreenDialogAnimationEnter(),
-		exit = fullscreenDialogAnimationExit()
-	) {
-		val context = LocalContext.current
-		ElementPickerDialogFullscreen(
-			title = { Text(text = "Select subjects to hide") },
-			timetableDatabaseInterface = state.timetableDatabaseInterface,
-			hideTypeSelectionPersonal = true,
-			hideTypeSelection = true,
-			onDismiss = {
-				classesElementPicker = false
-			},
-			multiSelect = true,
-			initialType = TimetableDatabaseInterface.Type.SUBJECT,
-			onMultiSelect = {
-				state.onElementPickerSelect(it)
-				classesElementPicker = false
-			},
-			selectedElements = state.subjectList
-		)
-	}
 
 	bookmarkDeleteDialog?.let { bookmark ->
 		AlertDialog(
