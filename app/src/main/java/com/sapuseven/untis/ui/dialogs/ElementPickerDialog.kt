@@ -47,7 +47,8 @@ fun ElementPickerDialogFullscreen(
 	onDismiss: (success: Boolean) -> Unit = {},
 	onSelect: (selectedItem: PeriodElement?) -> Unit = {},
 	onMultiSelect: (selectedItems: List<PeriodElement>) -> Unit = {},
-	additionalActions: (@Composable () -> Unit) = {}
+	additionalActions: (@Composable () -> Unit) = {},
+	selectedElements: List<PeriodElement>? = null
 ) {
 	var selectedType by remember { mutableStateOf(initialType) }
 	var showSearch by remember { mutableStateOf(false) }
@@ -56,7 +57,9 @@ fun ElementPickerDialogFullscreen(
 	val items = remember(selectedType) {
 		mutableStateMapOf<PeriodElement, Boolean>().apply {
 			timetableDatabaseInterface.getElements(selectedType)
-				.associateWith { false }
+				.associateWith {
+					selectedElements?.contains(it) ?: false
+				}
 				.also {
 					putAll(it)
 				}
@@ -275,7 +278,7 @@ fun ElementPickerElements(
 		contentAlignment = Alignment.Center,
 		modifier = modifier
 	) {
-		selectedType?.let {
+		selectedType?.let { type ->
 			LazyVerticalGrid(
 				columns = GridCells.Adaptive(if (multiSelect) 128.dp else 96.dp),
 				modifier = Modifier.fillMaxHeight(),
@@ -287,7 +290,7 @@ fun ElementPickerElements(
 							object {
 								val element = it
 								val name = timetableDatabaseInterface.getShortName(it)
-								val enabled = timetableDatabaseInterface.isAllowed(it)
+								val enabled = if (type != TimetableDatabaseInterface.Type.SUBJECT) { timetableDatabaseInterface.isAllowed(it) } else { true }
 							}
 						}
 						.filter { it.name.contains(filter, true) }

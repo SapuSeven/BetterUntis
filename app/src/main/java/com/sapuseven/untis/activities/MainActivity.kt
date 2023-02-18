@@ -225,6 +225,10 @@ private fun Drawer(
 		)
 	}
 
+	var classesElementPicker by remember {
+		mutableStateOf(false)
+	}
+
 	val shortcutLauncher =
 		rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
 			val periodElement: PeriodElement? = activityResult.data?.let { intent ->
@@ -357,6 +361,15 @@ private fun Drawer(
 					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 				)
 
+				NavigationDrawerItem(
+					label = { Text("Hide Subjects") },
+					selected = false,
+					onClick = {
+						state.closeDrawer()
+						classesElementPicker = true
+					}
+				)
+
 				DrawerText(stringResource(id = R.string.nav_all_timetables))
 
 				DrawerItems(
@@ -481,6 +494,30 @@ private fun Drawer(
 
 			},
 			initialType = bookmarksElementPicker
+		)
+	}
+
+	AnimatedVisibility(
+		visible = classesElementPicker,
+		enter = fullscreenDialogAnimationEnter(),
+		exit = fullscreenDialogAnimationExit()
+	) {
+		val context = LocalContext.current
+		ElementPickerDialogFullscreen(
+			title = { Text(text = "Select subjects to hide") },
+			timetableDatabaseInterface = state.timetableDatabaseInterface,
+			hideTypeSelectionPersonal = true,
+			hideTypeSelection = true,
+			onDismiss = {
+				classesElementPicker = false
+			},
+			multiSelect = true,
+			initialType = TimetableDatabaseInterface.Type.SUBJECT,
+			onMultiSelect = {
+				state.onElementPickerSelect(it)
+				classesElementPicker = false
+			},
+			selectedElements = state.subjectList
 		)
 	}
 
@@ -698,7 +735,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	val timetableLoader: TimetableLoader,
 	val timetableItemDetailsDialog: MutableState<Pair<List<PeriodData>, Int>?>,
 	val showDatePicker: MutableState<Boolean>,
-	val profileManagementDialog: MutableState<Boolean>
+	val profileManagementDialog: MutableState<Boolean>,
 ) {
 	companion object {
 		private const val MINUTE_MILLIS: Int = 60 * 1000
@@ -753,6 +790,17 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			return false
 		}
 
+
+
+	var subjectList = mutableListOf<PeriodElement>()
+		private set
+
+
+	fun onElementPickerSelect(selectedItems: List<PeriodElement>) {
+		subjectList = selectedItems.toMutableList()
+		onRefresh()
+		shouldUpdateWeekView = true
+	}
 
 	@OptIn(ExperimentalMaterial3Api::class)
 	val drawerGesturesEnabled: Boolean
@@ -816,6 +864,11 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		items: List<TimegridItem>
 	): List<TimegridItem> {
 		val newItems = mergeItems(items.mapNotNull { item ->
+			if (displayedElement.value?.type?.equals(TimetableDatabaseInterface.Type.SUBJECT.name) == false
+				&& item.periodData.subjects.isNotEmpty()
+				&& subjectList.contains(item.periodData.subjects.first())) {
+				return@mapNotNull null
+			}
 			if (item.periodData.isCancelled() && preferences.timetableHideCancelled.getValue())
 				return@mapNotNull null
 
@@ -830,8 +883,14 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 								&& item.periodData.element.backColor != UNTIS_DEFAULT_COLOR
 				}
 			}
+			/*for (element in subjectList){
+				if (item.periodData.subjects.contains(element)){
+					return@mapNotNull null
+				}
+			}*/
 			item
 		})
+
 		colorItems(newItems)
 		return newItems
 	}
