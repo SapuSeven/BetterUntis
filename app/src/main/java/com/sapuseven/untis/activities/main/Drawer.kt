@@ -45,12 +45,6 @@ fun DrawerItems(
 			icon = painterResource(id = R.drawable.all_rooms),
 			label = stringResource(id = R.string.all_rooms),
 			elementType = TimetableDatabaseInterface.Type.ROOM
-		),
-		NavItemTimetable(
-			id = 4,
-			icon = painterResource(id = R.drawable.all_hide_subjects),
-			label = stringResource(id = R.string.maindrawer_hide_subjects),
-			elementType = TimetableDatabaseInterface.Type.SUBJECT
 		)
 	)
 

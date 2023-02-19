@@ -76,6 +76,7 @@ import com.sapuseven.untis.ui.functional.BackPressConfirm
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.preferences.convertRangeToPair
+import com.sapuseven.untis.ui.preferences.decodeMultipleStoredTimetableValues
 import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
 import com.sapuseven.untis.views.weekview.HolidayChip
@@ -425,59 +426,20 @@ private fun Drawer(
 		enter = fullscreenDialogAnimationEnter(),
 		exit = fullscreenDialogAnimationExit()
 	) {
-
-		val isSubjectElementPicker = showElementPicker == TimetableDatabaseInterface.Type.SUBJECT
-
 		ElementPickerDialogFullscreen(
 			title = { /*TODO*/},
 			timetableDatabaseInterface = state.timetableDatabaseInterface,
 			onDismiss = { showElementPicker = null },
-			onMultiSelect = {
-				if (isSubjectElementPicker){
-					state.onElementPickerSelect(it)
-					showElementPicker = null
-				}
-			},
-			hideTypeSelectionPersonal = isSubjectElementPicker,
-			hideTypeSelection = isSubjectElementPicker,
-			multiSelect = isSubjectElementPicker,
 			onSelect = { item ->
-				if (!isSubjectElementPicker) {
-					item?.let {
-						onShowTimetable(
-							item to state.timetableDatabaseInterface.getLongName(it)
-						)
-					} ?: run {
-						onShowTimetable(state.personalTimetable)
-					}
+				item?.let {
+					onShowTimetable(
+						item to state.timetableDatabaseInterface.getLongName(it)
+					)
+				} ?: run {
+					onShowTimetable(state.personalTimetable)
 				}
 			},
-			selectedElements = if (isSubjectElementPicker) state.subjectList else null,
 			initialType = showElementPicker,
-			additionalActions = {
-				if (isSubjectElementPicker){
-					var allSelected by remember {
-						mutableStateOf(state.subjectList.size == state.timetableDatabaseInterface.getElements(TimetableDatabaseInterface.Type.SUBJECT).size)
-					}
-					IconButton(onClick = {
-						allSelected = if (allSelected){
-							state.onElementPickerSelect(emptyList())
-							showElementPicker = null
-							false
-						} else {
-							state.onElementPickerSelect(state.timetableDatabaseInterface.getElements(TimetableDatabaseInterface.Type.SUBJECT))
-							showElementPicker = null
-							true
-						}
-					}) {
-						if (allSelected) {
-							Icon(painter = painterResource(id = R.drawable.all_checkbox_checked), contentDescription = null)
-						} else {
-							Icon(painter = painterResource(id = R.drawable.all_checkbox_unchecked), contentDescription = null)
-						}
-					}
-				}
-			}
 		)
 	}
 
@@ -794,17 +756,6 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		}
 
 
-
-	var subjectList = mutableListOf<PeriodElement>()
-		private set
-
-
-	fun onElementPickerSelect(selectedItems: List<PeriodElement>) {
-		subjectList = selectedItems.toMutableList()
-		onRefresh()
-		shouldUpdateWeekView = true
-	}
-
 	@OptIn(ExperimentalMaterial3Api::class)
 	val drawerGesturesEnabled: Boolean
 		get() = drawerGestures || drawerState.isOpen
@@ -869,7 +820,8 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		val newItems = mergeItems(items.mapNotNull { item ->
 			if (displayedElement.value?.type?.equals(TimetableDatabaseInterface.Type.SUBJECT.name) == false
 				&& item.periodData.subjects.isNotEmpty()
-				&& subjectList.contains(item.periodData.subjects.first())) {
+				&& decodeMultipleStoredTimetableValues(preferences.timetableHiddenElements.getValue())?.contains(item.periodData.subjects.first()) == true
+			) {
 				return@mapNotNull null
 			}
 			if (item.periodData.isCancelled() && preferences.timetableHideCancelled.getValue())
@@ -886,11 +838,6 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 								&& item.periodData.element.backColor != UNTIS_DEFAULT_COLOR
 				}
 			}
-			/*for (element in subjectList){
-				if (item.periodData.subjects.contains(element)){
-					return@mapNotNull null
-				}
-			}*/
 			item
 		})
 
@@ -1598,6 +1545,7 @@ fun rememberMainAppState(
 	},
 	showDatePicker: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 	profileManagementDialog: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
+	subjectsToHide: State<String> = preferences.timetableHiddenElements.getState(),
 ) = remember(user, customThemeColor, colorScheme) {
 	MainAppState(
 		user = user,
@@ -1622,7 +1570,7 @@ fun rememberMainAppState(
 		timetableLoader = timetableLoader,
 		timetableItemDetailsDialog = timetableItemDetailsDialog,
 		showDatePicker = showDatePicker,
-		profileManagementDialog = profileManagementDialog
+		profileManagementDialog = profileManagementDialog,
 	)
 }
 

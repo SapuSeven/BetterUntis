@@ -2,7 +2,6 @@ package com.sapuseven.untis.ui.dialogs
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -262,6 +261,165 @@ fun ElementPickerDialog(
 	}
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SubjectsElementDialog(
+	title: (@Composable () -> Unit)?,
+	timetableDatabaseInterface: TimetableDatabaseInterface,
+	onDismiss: (success: Boolean) -> Unit = {},
+	onMultiSelect: (selectedItems: List<PeriodElement>) -> Unit = {},
+	selectedElements: List<PeriodElement>? = null
+) {
+	val items = remember(TimetableDatabaseInterface.Type.SUBJECT) {
+		mutableStateMapOf<PeriodElement, Boolean>().apply {
+			timetableDatabaseInterface.getElements(TimetableDatabaseInterface.Type.SUBJECT)
+				.associateWith { selectedElements?.contains(it) ?: false }
+				.also {
+					putAll(it)
+				}
+		}
+	}
+
+	var allSelected by remember {
+		mutableStateOf(items.toMap().values.all { it })
+	}
+
+	var showSearch by remember {
+		mutableStateOf(false)
+	}
+	var search by remember { mutableStateOf("") }
+
+	Dialog(onDismissRequest = { onDismiss(false) }) {
+		Surface(
+			modifier = Modifier.padding(vertical = 24.dp),
+			shape = AlertDialogDefaults.shape,
+			color = AlertDialogDefaults.containerColor,
+			tonalElevation = AlertDialogDefaults.TonalElevation
+		) {
+			Column {
+				Box(modifier = Modifier
+					.padding(top = 24.dp, bottom = 16.dp)
+					.padding(horizontal = 24.dp)
+				){
+					Row {
+						title?.let {
+							ProvideTextStyle(value = MaterialTheme.typography.headlineSmall) {
+								title()
+							}
+
+						}
+					}
+
+				}
+				Box(modifier = Modifier
+					.padding(top = 8.dp, bottom = 16.dp)
+					.padding(horizontal = 24.dp)
+				){
+					Row {
+						IconButton(
+							onClick = {
+								showSearch = !showSearch
+								if (!showSearch) {
+									search = ""
+								}
+							},
+							Modifier.alignByBaseline()
+						) {
+							Icon(
+								imageVector = Icons.Outlined.Search,
+								contentDescription = "TODO"
+							)
+						}
+						if (showSearch) {
+							val focusRequester = remember { FocusRequester() }
+							BasicTextField(
+								value = search,
+								onValueChange = { search = it },
+								singleLine = true,
+								decorationBox = { innerTextField ->
+									TextFieldDecorationBox(
+										value = search,
+										innerTextField = innerTextField,
+										enabled = true,
+										singleLine = true,
+										visualTransformation = VisualTransformation.None,
+										interactionSource = remember { MutableInteractionSource() },
+										placeholder = { Text("Search") },
+										colors = TextFieldDefaults.textFieldColors(
+											containerColor = Color.Transparent,
+											focusedIndicatorColor = Color.Transparent,
+											unfocusedIndicatorColor = Color.Transparent,
+											disabledIndicatorColor = Color.Transparent
+										)
+									)
+								},
+								textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+								cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+								modifier = Modifier
+									.focusRequester(focusRequester)
+									.alignByBaseline()
+									//.padding(bottom = 6.dp)
+							)
+							LaunchedEffect(Unit) {
+								focusRequester.requestFocus()
+							}
+						}
+
+						Spacer(modifier = Modifier.weight(1f))
+						IconButton(
+							onClick = {
+								for (key in items.keys){
+									items[key] = !allSelected
+								}
+								allSelected = !allSelected
+							},
+							Modifier.alignByBaseline()
+						) {
+							if (allSelected) {
+								Icon(painter = painterResource(id = R.drawable.all_checkbox_checked), contentDescription = null)
+							} else {
+								Icon(painter = painterResource(id = R.drawable.all_checkbox_unchecked), contentDescription = null)
+							}
+						}
+						IconButton(
+							onClick = {
+								onMultiSelect(items.filter { it.value }.keys.toList())
+								onDismiss(true)
+							},
+							Modifier.alignByBaseline()
+						) {
+							Icon(
+								imageVector = Icons.Outlined.Check,
+								contentDescription = "TODO",
+							)
+						}
+					}
+				}
+
+
+				ElementPickerElements(
+					timetableDatabaseInterface = timetableDatabaseInterface,
+					selectedType = TimetableDatabaseInterface.Type.SUBJECT,
+					onDismiss = onDismiss,
+					multiSelect = true,
+					onSelect = {element ->
+						element?.let {
+							items[it] = items[it] == false
+						}
+						allSelected = items.toMap().values.all { it }
+					},
+					filter = search,
+					items = items,
+					modifier = Modifier
+						.fillMaxWidth()
+						.weight(1f)
+						.padding(horizontal = 24.dp)
+				)
+			}
+		}
+	}
+}
+
 @Composable
 fun ElementPickerElements(
 	timetableDatabaseInterface: TimetableDatabaseInterface,
@@ -305,7 +463,10 @@ fun ElementPickerElements(
 						if (multiSelect)
 							Checkbox(
 								checked = items[item.element] ?: false,
-								onCheckedChange = { items[item.element] = it },
+								onCheckedChange = {
+									onSelect(item.element)
+									items[item.element] = it
+								},
 								interactionSource = interactionSource,
 								enabled = item.enabled
 							)
