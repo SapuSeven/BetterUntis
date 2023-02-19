@@ -52,7 +52,7 @@ import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PR
 import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_ROUTE
 import com.sapuseven.untis.activities.main.DrawerItems
 import com.sapuseven.untis.activities.main.DrawerText
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.DateTimeUtils
@@ -676,7 +676,7 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 }
 
 class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
-	val user: UserDatabase.User,
+	val user: LegacyUserDatabase.User,
 	val contextActivity: BaseComposeActivity,
 	val timetableDatabaseInterface: TimetableDatabaseInterface,
 	val weekViewSwipeRefresh: MutableState<WeekViewSwipeRefreshLayout?>,
@@ -1499,7 +1499,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun rememberMainAppState(
-	user: UserDatabase.User,
+	user: LegacyUserDatabase.User,
 	contextActivity: BaseComposeActivity,
 	customThemeColor: Color?,
 	timetableDatabaseInterface: TimetableDatabaseInterface,
@@ -1565,7 +1565,7 @@ fun rememberMainAppState(
 }
 
 private fun getPersonalTimetableElement(
-	user: UserDatabase.User,
+	user: LegacyUserDatabase.User,
 	context: Context
 ): Pair<PeriodElement?, String?>? {
 	return user.userData.elemType?.let { type ->

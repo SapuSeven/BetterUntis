@@ -7,7 +7,7 @@ import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.config.booleanDataStore
 import com.sapuseven.untis.helpers.config.stringDataStore
@@ -29,8 +29,8 @@ abstract class TimetableDependantWorker(
 ) : CoroutineWorker(context, params) {
 	companion object {
 		suspend fun loadPersonalTimetableElement(
-			user: UserDatabase.User,
-			context: Context
+            user: LegacyUserDatabase.User,
+            context: Context
 		): Pair<Int, String>? {
 			val customPersonalTimetable = decodeStoredTimetableValue(
 				context.stringDataStore(
@@ -51,10 +51,10 @@ abstract class TimetableDependantWorker(
 	}
 
 	protected suspend fun loadTimetable(
-		user: UserDatabase.User,
-		timetableDatabaseInterface: TimetableDatabaseInterface,
-		timetableElement: Pair<Int, String>,
-		skipCache: Boolean = false
+        user: LegacyUserDatabase.User,
+        timetableDatabaseInterface: TimetableDatabaseInterface,
+        timetableElement: Pair<Int, String>,
+        skipCache: Boolean = false
 	): TimetableLoader.TimetableItems {
 		val proxyHost = applicationContext.stringDataStore(
 			user.id,
@@ -101,7 +101,7 @@ abstract class TimetableDependantWorker(
 	}
 
 	internal suspend fun disablePreference(key: String) {
-		UserDatabase.createInstance(applicationContext).getAllUsers().map { it.id }.forEach { userId ->
+		LegacyUserDatabase.createInstance(applicationContext).getAllUsers().map { it.id }.forEach { userId ->
 			val pref = applicationContext.booleanDataStore(userId, key)
 			pref.saveValue(false)
 		}

@@ -6,14 +6,12 @@ import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
 import android.content.Context.ALARM_SERVICE
 import android.content.Intent
-import android.os.Build
 import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.helpers.config.booleanDataStore
 import com.sapuseven.untis.helpers.config.intDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
@@ -30,7 +28,7 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 		private const val LOG_TAG = "AutoMuteSetup"
 		private const val TAG_AUTO_MUTE_SETUP_WORK = "AutoMuteSetupWork"
 
-		fun enqueue(workManager: WorkManager, user: UserDatabase.User) {
+		fun enqueue(workManager: WorkManager, user: LegacyUserDatabase.User) {
 			val data: Data = Data.Builder().run {
 				put(WORKER_DATA_USER_ID, user.id)
 				build()
@@ -58,7 +56,7 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 	}
 
 	private suspend fun scheduleAutoMute(): Result {
-		val userDatabase = UserDatabase.createInstance(applicationContext)
+		val userDatabase = LegacyUserDatabase.createInstance(applicationContext)
 
 		userDatabase.getUser(inputData.getLong(WORKER_DATA_USER_ID, -1))?.let { user ->
 			try {

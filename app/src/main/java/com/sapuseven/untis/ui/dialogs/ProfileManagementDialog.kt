@@ -20,7 +20,7 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.activities.LoginActivity
 import com.sapuseven.untis.activities.LoginDataInputActivity
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.helpers.config.deleteProfile
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
@@ -41,7 +41,7 @@ fun BaseComposeActivity.ProfileManagementDialog( // TODO: Remove inheritance of 
 			profiles = this.userDatabase.getAllUsers()
 		}
 
-	var deleteDialog by rememberSaveable { mutableStateOf<UserDatabase.User?>(null) }
+	var deleteDialog by rememberSaveable { mutableStateOf<LegacyUserDatabase.User?>(null) }
 
 	fun dismiss() {
 		onDismiss()

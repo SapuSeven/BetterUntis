@@ -25,15 +25,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.autofill.AutofillNode
 import androidx.compose.ui.autofill.AutofillType
-import androidx.compose.ui.focus.focusTarget
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focus.onFocusEvent
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.boundsInWindow
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalAutofillTree
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -51,7 +44,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.api.LoginDataInfo
@@ -94,7 +87,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 	private var existingUserId: Long? = null
 
 	private var schoolInfoFromSearch: UntisSchoolInfo? = null
-	private var existingUser: UserDatabase.User? = null
+	private var existingUser: LegacyUserDatabase.User? = null
 
 	@OptIn(ExperimentalMaterial3Api::class, ExperimentalSerializationApi::class,
 		ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class
@@ -113,7 +106,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 			}
 		}
 
-		userDatabase = UserDatabase.createInstance(this)
+		userDatabase = LegacyUserDatabase.createInstance(this)
 
 		setContent {
 			val systemUiController = rememberSystemUiController()
@@ -279,7 +272,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 									)?.bookmarks?.toSet()
 								}
 									?: emptySet()
-							val user = UserDatabase.User(
+							val user = LegacyUserDatabase.User(
 								existingUserId ?: -1,
 								profileName.value ?: "",
 								untisApiUrl,

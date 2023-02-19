@@ -16,7 +16,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.config.booleanDataStore
@@ -54,7 +54,7 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 		const val CHANNEL_ID_BACKGROUNDERRORS = "notifications.backgrounderrors"
 		const val CHANNEL_ID_BREAKINFO = "notifications.breakinfo"
 
-		fun enqueue(workManager: WorkManager, user: UserDatabase.User) {
+		fun enqueue(workManager: WorkManager, user: LegacyUserDatabase.User) {
 			val data: Data = Data.Builder().run {
 				put(WORKER_DATA_USER_ID, user.id)
 				build()
@@ -83,7 +83,7 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 	}
 
 	private suspend fun scheduleNotifications(): Result {
-		val userDatabase = UserDatabase.createInstance(applicationContext)
+		val userDatabase = LegacyUserDatabase.createInstance(applicationContext)
 
 		userDatabase.getUser(inputData.getLong(WORKER_DATA_USER_ID, -1))?.let { user ->
 			var scheduledNotifications = 0

@@ -4,7 +4,7 @@ import android.content.ContentValues
 import android.provider.BaseColumns
 import com.sapuseven.untis.annotations.Table
 import com.sapuseven.untis.annotations.TableColumn
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.interfaces.TableModel
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.javaField
@@ -13,7 +13,7 @@ object UserDatabaseQueryHelper {
 	inline fun <reified T : Any> generateCreateTable(): String? {
 		val tableName = generateTableName<T>()
 		tableName?.let { _ ->
-			var query = "CREATE TABLE $tableName (${BaseColumns._ID} INTEGER PRIMARY KEY, ${UserDatabase.COLUMN_NAME_USER_ID} INTEGER"
+			var query = "CREATE TABLE $tableName (${BaseColumns._ID} INTEGER PRIMARY KEY, ${LegacyUserDatabase.COLUMN_NAME_USER_ID} INTEGER"
 			T::class.declaredMemberProperties.forEach { field ->
 				val column = field.javaField?.getAnnotation(TableColumn::class.java)
 				column?.let { query += ", " + field.name + " " + column.type }
@@ -37,7 +37,7 @@ object UserDatabaseQueryHelper {
 
 	fun generateValues(userId: Long, data: TableModel): ContentValues {
 		val values = data.generateValues()
-		values.put(UserDatabase.COLUMN_NAME_USER_ID, userId)
+		values.put(LegacyUserDatabase.COLUMN_NAME_USER_ID, userId)
 		return values
 	}
 

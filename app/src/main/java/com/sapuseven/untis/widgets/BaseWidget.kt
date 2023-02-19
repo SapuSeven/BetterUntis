@@ -1,18 +1,5 @@
 package com.sapuseven.untis.widgets
 
-import android.app.PendingIntent
-import android.appwidget.AppWidgetManager
-import android.appwidget.AppWidgetProvider
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.os.Build
-import android.util.Log
-import android.widget.RemoteViews
-import androidx.core.content.ContextCompat
-import com.sapuseven.untis.R
-import com.sapuseven.untis.data.databases.UserDatabase
-
 
 /*open class BaseWidget : AppWidgetProvider() {
 	private var user: UserDatabase.User? = null

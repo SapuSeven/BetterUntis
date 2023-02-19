@@ -1,6 +1,6 @@
 package com.sapuseven.untis.helpers.timetable
 
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.data.timetable.PeriodData.Companion.ELEMENT_NAME_UNKNOWN
 import com.sapuseven.untis.interfaces.TableModel
 import com.sapuseven.untis.models.untis.masterdata.Klasse
@@ -9,7 +9,7 @@ import com.sapuseven.untis.models.untis.masterdata.Subject
 import com.sapuseven.untis.models.untis.masterdata.Teacher
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 
-class TimetableDatabaseInterface(val database: UserDatabase, val id: Long) {
+class TimetableDatabaseInterface(val database: LegacyUserDatabase, val id: Long) {
 	private var allClasses: Map<Int, Klasse> = mapOf()
 	private var allTeachers: Map<Int, Teacher> = mapOf()
 	private var allSubjects: Map<Int, Subject> = mapOf()

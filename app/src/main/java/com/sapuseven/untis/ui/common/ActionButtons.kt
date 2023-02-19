@@ -12,16 +12,16 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 
 @Composable
 fun ProfileSelectorAction(
-	users: List<UserDatabase.User>,
-	currentSelectionId: Long, // TODO: Better to use a UserDatabase.User reference?
-	showProfileActions: Boolean = false,
-	hideIfSingleProfile: Boolean = false,
-	onSelectionChange: (UserDatabase.User) -> Unit,
-	onActionEdit: () -> Unit = {}
+    users: List<LegacyUserDatabase.User>,
+    currentSelectionId: Long, // TODO: Better to use a UserDatabase.User reference?
+    showProfileActions: Boolean = false,
+    hideIfSingleProfile: Boolean = false,
+    onSelectionChange: (LegacyUserDatabase.User) -> Unit,
+    onActionEdit: () -> Unit = {}
 ) {
 	var expanded by remember { mutableStateOf(false) }
 

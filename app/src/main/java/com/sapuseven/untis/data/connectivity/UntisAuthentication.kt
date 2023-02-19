@@ -1,6 +1,6 @@
 package com.sapuseven.untis.data.connectivity
 
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.helpers.Base32.decode
 import com.sapuseven.untis.models.untis.UntisAuth
 import org.joda.time.DateTime
@@ -56,7 +56,7 @@ object UntisAuthentication {
 		}
 	}
 
-	fun createAuthObject(user: UserDatabase.User): UntisAuth {
+	fun createAuthObject(user: LegacyUserDatabase.User): UntisAuth {
 		return if (user.anonymous)
 			createAuthObject()
 		else

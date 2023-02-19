@@ -32,7 +32,6 @@ import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.BaseComposeActivity
-import com.sapuseven.untis.activities.MainActivity
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_LESSON_TOPIC
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_STUDENT_ABSENCE
@@ -40,9 +39,8 @@ import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_WRITE_LESSON_
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_WRITE_STUDENT_ABSENCE
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.data.timetable.PeriodData
-import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
@@ -73,11 +71,11 @@ import org.joda.time.format.DateTimeFormat
 )
 @Composable
 fun BaseComposeActivity.TimetableItemDetailsDialog(
-	timegridItems: List<PeriodData>,
-	initialPage: Int = 0,
-	user: UserDatabase.User,
-	timetableDatabaseInterface: TimetableDatabaseInterface,
-	onDismiss: (requestedElement: PeriodElement?) -> Unit
+    timegridItems: List<PeriodData>,
+    initialPage: Int = 0,
+    user: LegacyUserDatabase.User,
+    timetableDatabaseInterface: TimetableDatabaseInterface,
+    onDismiss: (requestedElement: PeriodElement?) -> Unit
 ) {
 	var dismissed by rememberSaveable { mutableStateOf(false) }
 	val pagerState = rememberPagerState(initialPage)
@@ -774,8 +772,8 @@ private fun TimetableDatabaseInterface.TimetableItemDetailsDialogElement(
 }
 
 private suspend fun loadPeriodData(
-	user: UserDatabase.User,
-	period: Period
+    user: LegacyUserDatabase.User,
+    period: Period
 ): Result<PeriodDataResult> {
 	val query = UntisRequest.UntisRequestQuery(user).apply {
 		data.method = UntisApiConstants.METHOD_GET_PERIOD_DATA
@@ -800,11 +798,11 @@ private suspend fun loadPeriodData(
 }
 
 private suspend fun createAbsence(
-	user: UserDatabase.User,
-	ttId: Int,
-	student: UntisStudent,
-	startDateTime: LocalDateTime,
-	endDateTime: LocalDateTime
+    user: LegacyUserDatabase.User,
+    ttId: Int,
+    student: UntisStudent,
+    startDateTime: LocalDateTime,
+    endDateTime: LocalDateTime
 ): Result<UntisAbsence> {
 	val query =
 		UntisRequest.UntisRequestQuery(user).apply {
@@ -833,8 +831,8 @@ private suspend fun createAbsence(
 }
 
 private suspend fun deleteAbsence(
-	user: UserDatabase.User,
-	absence: UntisAbsence
+    user: LegacyUserDatabase.User,
+    absence: UntisAbsence
 ): Result<Boolean> {
 	val query =
 		UntisRequest.UntisRequestQuery(user).apply {
@@ -860,8 +858,8 @@ private suspend fun deleteAbsence(
 }
 
 private suspend fun submitAbsencesChecked(
-	user: UserDatabase.User,
-	ttId: Int
+    user: LegacyUserDatabase.User,
+    ttId: Int
 ): Result<Boolean> {
 	val query =
 		UntisRequest.UntisRequestQuery(user).apply {
@@ -887,9 +885,9 @@ private suspend fun submitAbsencesChecked(
 }
 
 private suspend fun submitLessonTopic(
-	user: UserDatabase.User,
-	ttId: Int,
-	lessonTopic: String
+    user: LegacyUserDatabase.User,
+    ttId: Int,
+    lessonTopic: String
 ): Result<String> {
 	val query =
 		UntisRequest.UntisRequestQuery(user).apply {

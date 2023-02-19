@@ -3,7 +3,7 @@ package com.sapuseven.untis.workers
 import android.content.Context
 import android.util.Log
 import androidx.work.*
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.helpers.config.booleanDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import org.joda.time.LocalDateTime
@@ -43,7 +43,7 @@ class DailyWorker(context: Context, params: WorkerParameters) :
 	}
 
 	override suspend fun doWork(): Result {
-		val userDatabase = UserDatabase.createInstance(applicationContext)
+		val userDatabase = LegacyUserDatabase.createInstance(applicationContext)
 		val workManager = WorkManager.getInstance(applicationContext)
 
 		userDatabase.getAllUsers().forEach { user ->

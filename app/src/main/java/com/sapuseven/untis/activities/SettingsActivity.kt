@@ -18,8 +18,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -40,13 +38,11 @@ import com.github.kittinunf.fuel.coroutines.awaitStringResult
 import com.github.kittinunf.fuel.httpGet
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.MainAxisAlignment
-import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults.libraryColors
-import com.mikepenz.aboutlibraries.util.withJson
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.models.github.GithubUser
 import com.sapuseven.untis.preferences.PreferenceCategory
@@ -57,7 +53,6 @@ import com.sapuseven.untis.receivers.AutoMuteReceiver
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_BOOLEAN_MUTE
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.VerticalScrollColumn
-import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.preferences.*
 import com.sapuseven.untis.workers.AutoMuteSetupWorker
@@ -1138,7 +1133,7 @@ class SettingsActivity : BaseComposeActivity() {
 		}
 	}
 
-	private fun enqueueNotificationSetup(user: UserDatabase.User) {
+	private fun enqueueNotificationSetup(user: LegacyUserDatabase.User) {
 		NotificationSetupWorker.enqueue(
 			WorkManager.getInstance(this@SettingsActivity),
 			user
@@ -1187,7 +1182,7 @@ class SettingsActivity : BaseComposeActivity() {
 	}
 
 	private fun updateAutoMutePref(
-		user: UserDatabase.User,
+		user: LegacyUserDatabase.User,
 		scope: CoroutineScope,
 		autoMutePref: UntisPreferenceDataStore<Boolean>,
 		enable: Boolean = false

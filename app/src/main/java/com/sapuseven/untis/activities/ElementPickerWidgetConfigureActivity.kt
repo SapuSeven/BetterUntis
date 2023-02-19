@@ -21,7 +21,7 @@ import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.work.WorkManager
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
@@ -49,7 +49,7 @@ class ElementPickerWidgetConfigureActivity : BaseComposeActivity() {
 			return
 		}
 
-		val userDatabase = UserDatabase.createInstance(this)
+		val userDatabase = LegacyUserDatabase.createInstance(this)
 		val users = userDatabase.getAllUsers()
 
 		setContent {

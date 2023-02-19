@@ -27,14 +27,15 @@ import kotlinx.serialization.encodeToString
 private const val DATABASE_VERSION = 7
 private const val DATABASE_NAME = "userdata.db"
 
-class UserDatabase private constructor(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+@Deprecated("Use the new UserDatabase instead")
+class LegacyUserDatabase private constructor(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 	companion object {
 		const val COLUMN_NAME_USER_ID = "_user_id"
 
-		private var instance: UserDatabase? = null
+		private var instance: LegacyUserDatabase? = null
 
-		fun createInstance(context: Context): UserDatabase {
-			return instance ?: UserDatabase(context)
+		fun createInstance(context: Context): LegacyUserDatabase {
+			return instance ?: LegacyUserDatabase(context)
 		}
 	}
 

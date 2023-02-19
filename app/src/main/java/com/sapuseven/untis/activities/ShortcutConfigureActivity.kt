@@ -14,7 +14,7 @@ import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat.createShortcutResultIntent
 import androidx.core.graphics.drawable.IconCompat
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
@@ -25,7 +25,7 @@ class ShortcutConfigureActivity : BaseComposeActivity() {
 		super.onCreate(savedInstanceState)
 		setResult(RESULT_CANCELED)
 
-		val userDatabase = UserDatabase.createInstance(this)
+		val userDatabase = LegacyUserDatabase.createInstance(this)
 		val users = userDatabase.getAllUsers()
 
 		setContent {

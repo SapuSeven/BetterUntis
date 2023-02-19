@@ -7,7 +7,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.activities.BaseComposeActivity
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.mocks.MOCK_USER_ID
 import com.sapuseven.untis.mocks.timeGrid
@@ -38,7 +38,7 @@ class InfoCenterActivityScreenshot {
 
 	@Before
 	fun setupUserDatabase() {
-		UserDatabase.createInstance(rule.activity).setAdditionalUserData(
+		LegacyUserDatabase.createInstance(rule.activity).setAdditionalUserData(
 			MOCK_USER_ID, UntisMasterData(
 				absenceReasons = emptyList(),
 				departments = emptyList(),
@@ -94,7 +94,7 @@ class InfoCenterActivityScreenshot {
 					user = rule.activity.user!!,
 					userDatabase = rule.activity.userDatabase,
 					timetableDatabaseInterface = TimetableDatabaseInterface(
-						database = UserDatabase.createInstance(rule.activity),
+						database = LegacyUserDatabase.createInstance(rule.activity),
 						id = MOCK_USER_ID
 					),
 					preferences = preferenceWithTheme(rule.activity.dataStorePreferences),
@@ -121,6 +121,6 @@ class InfoCenterActivityScreenshot {
 
 	@After
 	fun cleanupUserDatabase() {
-		UserDatabase.createInstance(rule.activity).deleteUser(MOCK_USER_ID)
+		LegacyUserDatabase.createInstance(rule.activity).deleteUser(MOCK_USER_ID)
 	}
 }

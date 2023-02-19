@@ -5,7 +5,7 @@ import android.util.Log
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
@@ -18,9 +18,9 @@ import org.joda.time.Instant
 import java.lang.ref.WeakReference
 
 class TimetableLoader(
-	private val context: WeakReference<Context>,
-	private val user: UserDatabase.User,
-	private val timetableDatabaseInterface: TimetableDatabaseInterface
+    private val context: WeakReference<Context>,
+    private val user: LegacyUserDatabase.User,
+    private val timetableDatabaseInterface: TimetableDatabaseInterface
 ) {
 	companion object {
 		const val CODE_REQUEST_FAILED = 2

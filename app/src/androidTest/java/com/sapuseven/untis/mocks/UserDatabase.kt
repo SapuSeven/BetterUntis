@@ -3,7 +3,7 @@ package com.sapuseven.untis.mocks
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.RIGHT_ABSENCES
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.RIGHT_CLASSREGISTER
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.RIGHT_OFFICEHOURS
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.models.untis.UntisTime
 import com.sapuseven.untis.models.untis.UntisUserData
 import com.sapuseven.untis.models.untis.masterdata.TimeGrid
@@ -13,7 +13,7 @@ import com.sapuseven.untis.utils.SCREENSHOT_PROFILE_NAME
 
 const val MOCK_USER_ID: Long = Long.MAX_VALUE
 
-fun userMock(profileName: String = SCREENSHOT_PROFILE_NAME, apiUrl: String = SCREENSHOT_API_URL): UserDatabase.User = UserDatabase.User(
+fun userMock(profileName: String = SCREENSHOT_PROFILE_NAME, apiUrl: String = SCREENSHOT_API_URL): LegacyUserDatabase.User = LegacyUserDatabase.User(
 	id = MOCK_USER_ID,
 	profileName = profileName,
 	apiUrl = apiUrl,

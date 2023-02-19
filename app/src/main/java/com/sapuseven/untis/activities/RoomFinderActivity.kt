@@ -35,7 +35,7 @@ import com.sapuseven.untis.activities.MainActivity.Companion.EXTRA_STRING_PERIOD
 import com.sapuseven.untis.activities.RoomFinderState.Companion.ROOM_STATE_FREE
 import com.sapuseven.untis.activities.RoomFinderState.Companion.ROOM_STATE_OCCUPIED
 import com.sapuseven.untis.data.databases.RoomFinderDatabase
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
@@ -361,7 +361,7 @@ fun RoomListItem(
 }
 
 class RoomFinderState constructor(
-	private val user: UserDatabase.User,
+	private val user: LegacyUserDatabase.User,
 	val timetableDatabaseInterface: TimetableDatabaseInterface,
 	private val preferences: DataStorePreferences,
 	private val contextActivity: Activity,
@@ -425,7 +425,7 @@ class RoomFinderState constructor(
 		}.toTypedArray()
 	)
 
-	private fun calculateMaxHourIndex(user: UserDatabase.User): Int {
+	private fun calculateMaxHourIndex(user: LegacyUserDatabase.User): Int {
 		var maxHourIndex = -1 // maxIndex = -1 + length
 		user.timeGrid.days.forEach { day ->
 			maxHourIndex += day.units.size
@@ -435,7 +435,7 @@ class RoomFinderState constructor(
 
 	@Throws(TimetableLoader.TimetableLoaderException::class)
 	private suspend fun loadStates(
-		user: UserDatabase.User,
+		user: LegacyUserDatabase.User,
 		roomId: Int,
 		proxyHost: String?
 	): List<Boolean> {
@@ -533,7 +533,7 @@ class RoomFinderState constructor(
 	 * @return A triple of the day, the unit index of day (1-indexed) and the unit corresponding to the provided hour index.
 	 */
 	private fun getUnitFromIndex(
-		user: UserDatabase.User,
+		user: LegacyUserDatabase.User,
 		index: Int
 	): Triple<Day, Int, com.sapuseven.untis.models.untis.masterdata.timegrid.Unit>? {
 		var indexCounter = index
@@ -647,7 +647,7 @@ class RoomFinderState constructor(
 	}
 }
 
-private fun calculateCurrentHourIndex(user: UserDatabase.User): Int {
+private fun calculateCurrentHourIndex(user: LegacyUserDatabase.User): Int {
 	val now = LocalDateTime.now()
 	var index = 0
 
@@ -671,7 +671,7 @@ private fun calculateCurrentHourIndex(user: UserDatabase.User): Int {
 
 @Composable
 private fun rememberRoomFinderState(
-	user: UserDatabase.User,
+	user: LegacyUserDatabase.User,
 	timetableDatabaseInterface: TimetableDatabaseInterface,
 	preferences: DataStorePreferences,
 	contextActivity: RoomFinderActivity,

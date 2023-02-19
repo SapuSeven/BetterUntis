@@ -17,7 +17,7 @@ import androidx.glance.text.Text
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.ui.widgets.WidgetListItemModel
 import com.sapuseven.untis.widgets.BaseComposeWidget.Companion.PREFERENCE_KEY_INT_ELEMENT_ID
@@ -46,7 +46,7 @@ class WidgetUpdateWorker(context: Context, params: WorkerParameters) :
 	}
 
 	override suspend fun doWork(): Result {
-		val userDatabase = UserDatabase.createInstance(applicationContext)
+		val userDatabase = LegacyUserDatabase.createInstance(applicationContext)
 		val timeFormatter = DateTimeFormat.forPattern("HH:mm")
 
 		GlanceAppWidgetManager(applicationContext).getGlanceIds(TimetableWidget::class.java)
@@ -58,7 +58,7 @@ class WidgetUpdateWorker(context: Context, params: WorkerParameters) :
 				val id = prefs[intPreferencesKey(PREFERENCE_KEY_INT_ELEMENT_ID)] ?: -1
 				val type = prefs[stringPreferencesKey(PREFERENCE_KEY_STRING_ELEMENT_TYPE)] ?: ""
 
-				val user = UserDatabase.createInstance(applicationContext).getUser(userId)
+				val user = LegacyUserDatabase.createInstance(applicationContext).getUser(userId)
 
 				user?.let {
 					try {

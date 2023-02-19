@@ -7,7 +7,7 @@ import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.*
@@ -23,8 +23,8 @@ import org.joda.time.LocalDateTime
 
 
 class InfoCenterState(
-	private val userDatabase: UserDatabase,
-	private val user: UserDatabase.User,
+	private val userDatabase: LegacyUserDatabase,
+	private val user: LegacyUserDatabase.User,
 	private val timetableDatabaseInterface: TimetableDatabaseInterface,
 	private val contextActivity: Activity,
 	val preferences: DataStorePreferences,
@@ -282,8 +282,8 @@ class InfoCenterState(
 
 @Composable
 fun rememberInfoCenterState(
-	userDatabase: UserDatabase,
-	user: UserDatabase.User,
+	userDatabase: LegacyUserDatabase,
+	user: LegacyUserDatabase.User,
 	timetableDatabaseInterface: TimetableDatabaseInterface,
 	preferences: DataStorePreferences,
 	contextActivity: BaseComposeActivity,

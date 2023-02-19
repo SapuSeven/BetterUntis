@@ -3,7 +3,6 @@ package com.sapuseven.untis.activities
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
@@ -23,10 +22,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.helpers.analytics.initSentry
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.helpers.config.globalDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.preferences.dataStorePreferences
@@ -34,17 +31,15 @@ import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.material.scheme.Scheme
 import com.sapuseven.untis.ui.theme.generateColorScheme
-import io.sentry.Sentry
-import io.sentry.android.core.SentryAndroid
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 @SuppressLint("Registered") // This activity is not intended to be used directly
 open class BaseComposeActivity : ComponentActivity() {
-	internal var user by mutableStateOf<UserDatabase.User?>(null)
+	internal var user by mutableStateOf<LegacyUserDatabase.User?>(null)
 	internal var customThemeColor by mutableStateOf<Color?>(null) // Workaround to allow legacy views to respond to theme color changes
 	internal var colorScheme by mutableStateOf<ColorScheme?>(null)
-	internal lateinit var userDatabase: UserDatabase
+	internal lateinit var userDatabase: LegacyUserDatabase
 	internal lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 
 	private var dialogOpenUrl: MutableState<String?>? = null
@@ -57,7 +52,7 @@ open class BaseComposeActivity : ComponentActivity() {
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
-		userDatabase = UserDatabase.createInstance(this)
+		userDatabase = LegacyUserDatabase.createInstance(this)
 		runBlocking { // Not ideal, but works well enough
 			loadInitialUser()
 		}
@@ -76,7 +71,7 @@ open class BaseComposeActivity : ComponentActivity() {
 	@Composable
 	fun withUser(
 		invalidContent: @Composable () -> Unit = { InvalidProfileDialog() },
-		content: @Composable (UserDatabase.User) -> Unit
+		content: @Composable (LegacyUserDatabase.User) -> Unit
 	) {
 		user?.let {
 			content(it)
@@ -119,7 +114,7 @@ open class BaseComposeActivity : ComponentActivity() {
 	}
 
 	@OptIn(DelicateCoroutinesApi::class)
-	fun setUser(user: UserDatabase.User, save: Boolean = false) {
+	fun setUser(user: LegacyUserDatabase.User, save: Boolean = false) {
 		this.user = user
 		this.customThemeColor = null
 
