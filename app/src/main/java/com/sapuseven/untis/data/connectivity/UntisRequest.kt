@@ -7,7 +7,7 @@ import com.github.kittinunf.fuel.coroutines.awaitStringResult
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_WEBUNTIS_HOST
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.models.untis.params.BaseParams
 import kotlinx.serialization.Serializable
@@ -27,7 +27,7 @@ class UntisRequest {
 	}
 
 
-	class UntisRequestQuery(val user: UserDatabase.User? = null, apiUrl: String? = null) {
+	class UntisRequestQuery(val user: User? = null, apiUrl: String? = null) {
 		var url = apiUrl ?: user?.apiUrl ?: user?.schoolId?.let {
 			UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + UntisApiConstants.DEFAULT_WEBUNTIS_PATH + it
 		} ?: ""

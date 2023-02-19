@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class PeriodElement(
 		val type: String,
 		val id: Int,
-		val orgId: Int
+		val orgId: Int = id
 )

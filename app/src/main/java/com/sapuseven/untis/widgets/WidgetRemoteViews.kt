@@ -1,33 +1,5 @@
 package com.sapuseven.untis.widgets
 
-import android.appwidget.AppWidgetManager
-import android.content.Context
-import android.content.Intent
-import android.util.Log
-import android.widget.RemoteViews
-import android.widget.RemoteViewsService
-import android.widget.RemoteViewsService.RemoteViewsFactory
-import androidx.core.text.HtmlCompat
-import com.sapuseven.untis.R
-import com.sapuseven.untis.data.connectivity.UntisApiConstants
-import com.sapuseven.untis.data.connectivity.UntisAuthentication
-import com.sapuseven.untis.data.connectivity.UntisRequest
-import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.data.timetable.PeriodData
-import com.sapuseven.untis.data.timetable.TimegridItem
-import com.sapuseven.untis.helpers.SerializationUtils
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.models.untis.UntisDate
-import com.sapuseven.untis.models.untis.params.MessageParams
-import com.sapuseven.untis.models.untis.params.TimetableParams
-import com.sapuseven.untis.models.untis.response.MessageResponse
-import com.sapuseven.untis.models.untis.response.TimetableResponse
-import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.decodeFromString
-import org.joda.time.LocalDate
-import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.DateTimeFormatter
-
 
 /*class WidgetRemoteViewsFactory(private val applicationContext: Context, intent: Intent) : RemoteViewsFactory {
 	companion object {

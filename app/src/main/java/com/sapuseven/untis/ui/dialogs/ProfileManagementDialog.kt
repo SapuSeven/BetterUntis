@@ -20,7 +20,7 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.activities.LoginActivity
 import com.sapuseven.untis.activities.LoginDataInputActivity
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.helpers.config.deleteProfile
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
@@ -32,16 +32,16 @@ fun BaseComposeActivity.ProfileManagementDialog( // TODO: Remove inheritance of 
 	onDismiss: () -> Unit
 ) {
 	var dismissed by remember { mutableStateOf(false) }
-	var profiles by remember { mutableStateOf(this.userDatabase.getAllUsers()) }
+	var profiles by remember { mutableStateOf(this.userDatabase.userDao().getAll()) }
 	val context = LocalContext.current
 	val scope = rememberCoroutineScope()
 
 	val loginDataInputLauncher =
 		rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-			profiles = this.userDatabase.getAllUsers()
+			profiles = this.userDatabase.userDao().getAll()
 		}
 
-	var deleteDialog by rememberSaveable { mutableStateOf<UserDatabase.User?>(null) }
+	var deleteDialog by rememberSaveable { mutableStateOf<User?>(null) }
 
 	fun dismiss() {
 		onDismiss()
@@ -168,9 +168,10 @@ fun BaseComposeActivity.ProfileManagementDialog( // TODO: Remove inheritance of 
 					TextButton(
 						onClick = {
 							scope.launch {
-								userDatabase.deleteUser(user.id)
+								userDatabase.userDao().delete(user)
 								deleteProfile(user.id)
-								profiles = this@ProfileManagementDialog.userDatabase.getAllUsers()
+								profiles =
+									this@ProfileManagementDialog.userDatabase.userDao().getAll()
 								if (profiles.isEmpty())
 									recreate()
 								deleteDialog = null

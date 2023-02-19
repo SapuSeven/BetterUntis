@@ -14,6 +14,7 @@ import androidx.glance.appwidget.state.getAppWidgetState
 import androidx.glance.background
 import androidx.glance.layout.*
 import androidx.glance.text.Text
+import androidx.room.Room
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
@@ -46,7 +47,8 @@ class WidgetUpdateWorker(context: Context, params: WorkerParameters) :
 	}
 
 	override suspend fun doWork(): Result {
-		val userDatabase = UserDatabase.createInstance(applicationContext)
+		val userDatabase = UserDatabase.getInstance(applicationContext)
+
 		val timeFormatter = DateTimeFormat.forPattern("HH:mm")
 
 		GlanceAppWidgetManager(applicationContext).getGlanceIds(TimetableWidget::class.java)
@@ -58,7 +60,7 @@ class WidgetUpdateWorker(context: Context, params: WorkerParameters) :
 				val id = prefs[intPreferencesKey(PREFERENCE_KEY_INT_ELEMENT_ID)] ?: -1
 				val type = prefs[stringPreferencesKey(PREFERENCE_KEY_STRING_ELEMENT_TYPE)] ?: ""
 
-				val user = UserDatabase.createInstance(applicationContext).getUser(userId)
+				val user = userDatabase.userDao().getById(userId)
 
 				user?.let {
 					try {

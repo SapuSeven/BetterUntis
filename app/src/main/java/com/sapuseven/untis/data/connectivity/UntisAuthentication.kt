@@ -1,6 +1,6 @@
 package com.sapuseven.untis.data.connectivity
 
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.helpers.Base32.decode
 import com.sapuseven.untis.models.untis.UntisAuth
 import org.joda.time.DateTime
@@ -42,7 +42,10 @@ object UntisAuthentication {
 	private fun createTimeBasedCode(timestamp: Long, secret: String?): Long {
 		return try {
 			if (secret?.isNotEmpty() == true)
-				verifyCode(decode(secret.toUpperCase(Locale.ROOT)), timestamp / 30000L).toLong() // Code will change every 30000 milliseconds
+				verifyCode(
+					decode(secret.uppercase(Locale.ROOT)),
+					timestamp / 30000L
+				).toLong() // Code will change every 30000 milliseconds
 			else
 				0L
 		} catch (e: Exception) {
@@ -56,7 +59,7 @@ object UntisAuthentication {
 		}
 	}
 
-	fun createAuthObject(user: UserDatabase.User): UntisAuth {
+	fun createAuthObject(user: User): UntisAuth {
 		return if (user.anonymous)
 			createAuthObject()
 		else

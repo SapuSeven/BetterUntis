@@ -8,6 +8,7 @@ import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.*
@@ -24,7 +25,7 @@ import org.joda.time.LocalDateTime
 
 class InfoCenterState(
 	private val userDatabase: UserDatabase,
-	private val user: UserDatabase.User,
+	private val user: User,
 	private val timetableDatabaseInterface: TimetableDatabaseInterface,
 	private val contextActivity: Activity,
 	val preferences: DataStorePreferences,
@@ -132,11 +133,8 @@ class InfoCenterState(
 	}
 
 	private suspend fun loadExams(): List<EventListItem>? {
-		val schoolYears = userDatabase.getAdditionalUserData<SchoolYear>(
-			user.id,
-			SchoolYear()
-		)?.values?.toList()
-			?: emptyList()
+		val schoolYears =
+			userDatabase.userDao().getByIdWithData(user.id)?.schoolYears ?: emptyList()
 		getCurrentYear(schoolYears)?.endDate?.let { currentSchoolYearEndDate ->
 			val query = UntisRequest.UntisRequestQuery(user)
 
@@ -169,11 +167,8 @@ class InfoCenterState(
 	}
 
 	private suspend fun loadHomeworks(): List<EventListItem>? {
-		val schoolYears = userDatabase.getAdditionalUserData<SchoolYear>(
-			user.id,
-			SchoolYear()
-		)?.values?.toList()
-			?: emptyList()
+		val schoolYears =
+			userDatabase.userDao().getByIdWithData(user.id)?.schoolYears ?: emptyList()
 		getCurrentYear(schoolYears)?.endDate?.let { currentSchoolYearEndDate ->
 			val query = UntisRequest.UntisRequestQuery(user)
 
@@ -283,7 +278,7 @@ class InfoCenterState(
 @Composable
 fun rememberInfoCenterState(
 	userDatabase: UserDatabase,
-	user: UserDatabase.User,
+	user: User,
 	timetableDatabaseInterface: TimetableDatabaseInterface,
 	preferences: DataStorePreferences,
 	contextActivity: BaseComposeActivity,
