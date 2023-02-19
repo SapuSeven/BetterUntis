@@ -29,7 +29,7 @@ class TimetableDatabaseInterface(val userDatabase: UserDatabase, val id: Long) {
 		val userDao = userDatabase.userDao()
 		userDao.getByIdWithData(id)?.let {
 			allClasses =
-				it.klasses.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
+				it.klassen.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
 			allTeachers =
 				it.teachers.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
 			allSubjects =

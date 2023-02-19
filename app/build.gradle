@@ -29,6 +29,10 @@ android {
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
 		buildConfigField "String", "SENTRY_DSN", '"https://d3b77222abce4fcfa74fda2185e0f8dc@o1136770.ingest.sentry.io/6188900"'
+
+		ksp {
+			arg("room.schemaLocation", "$projectDir/schemas".toString())
+		}
 	}
 
 	signingConfigs {

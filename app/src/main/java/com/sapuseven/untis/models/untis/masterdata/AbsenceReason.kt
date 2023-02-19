@@ -1,20 +1,25 @@
 package com.sapuseven.untis.models.untis.masterdata
 
-import android.content.ContentValues
-import android.database.Cursor
 import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.sapuseven.untis.annotations.Table
-import com.sapuseven.untis.annotations.TableColumn
-import com.sapuseven.untis.data.databases.TABLE_NAME_ABSENCE_REASONS
-import com.sapuseven.untis.interfaces.TableModel
+import androidx.room.ForeignKey
+import com.sapuseven.untis.data.databases.entities.User
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
-@Entity
+@Entity(
+	primaryKeys = ["id", "userId"],
+	foreignKeys = [ForeignKey(
+		entity = User::class,
+		parentColumns = ["id"],
+		childColumns = ["userId"],
+		onDelete = ForeignKey.CASCADE // TODO: Do this for others as well
+	)]
+)
 data class AbsenceReason(
-		@PrimaryKey val id: Int,
-		val name: String,
-		val longName: String,
-		val active: Boolean
+	val id: Int,
+	@Transient val userId: Long = -1,
+	val name: String,
+	val longName: String,
+	val active: Boolean
 )
