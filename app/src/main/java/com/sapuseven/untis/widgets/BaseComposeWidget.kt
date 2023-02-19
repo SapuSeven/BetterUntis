@@ -22,8 +22,9 @@ import androidx.glance.appwidget.unit.ColorProvider
 import androidx.glance.currentState
 import androidx.glance.layout.*
 import androidx.glance.text.Text
+import androidx.room.Room
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.databases.LegacyUserDatabase
+import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.config.intDataStore
 import com.sapuseven.untis.ui.preferences.materialColors
 import com.sapuseven.untis.ui.theme.generateColorScheme
@@ -87,7 +88,11 @@ open class BaseComposeWidget : GlanceAppWidget() {
 		val userId = prefs[longPreferencesKey(PREFERENCE_KEY_LONG_USER)] ?: -1
 		elementId = prefs[intPreferencesKey(PREFERENCE_KEY_INT_ELEMENT_ID)] ?: -1
 
-		val user = LegacyUserDatabase.createInstance(LocalContext.current).getUser(userId)
+		val userDatabase = Room.databaseBuilder(
+			LocalContext.current,
+			UserDatabase::class.java, "users"
+		).build()
+		val user = userDatabase.userDao().getById(userId)
 
 		AppWidgetTheme(userId) { colorSchemeDark, colorSchemeLight ->
 			val onSurface = ColorProvider(

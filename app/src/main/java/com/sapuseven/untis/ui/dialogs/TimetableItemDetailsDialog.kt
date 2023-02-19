@@ -39,7 +39,6 @@ import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_WRITE_LESSON_
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_WRITE_STUDENT_ABSENCE
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
-import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.helpers.DateTimeUtils

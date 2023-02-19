@@ -18,7 +18,6 @@ import androidx.room.Room
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.ui.widgets.WidgetListItemModel

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "f067b243286c29a2a11a7a9067cbdafe",
+    "identityHash": "49c055997a8b9fb81945799b54a91f26",
     "entities": [
       {
         "tableName": "User",
@@ -138,7 +138,26 @@
             "userId"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_AbsenceReason_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_AbsenceReason_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_AbsenceReason_userId",
+            "unique": false,
+            "columnNames": [
+              "userId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_AbsenceReason_userId` ON `${TABLE_NAME}` (`userId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "User",
@@ -189,7 +208,26 @@
             "userId"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_Department_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Department_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_Department_userId",
+            "unique": false,
+            "columnNames": [
+              "userId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Department_userId` ON `${TABLE_NAME}` (`userId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "User",
@@ -246,7 +284,26 @@
             "userId"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_Duty_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Duty_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_Duty_userId",
+            "unique": false,
+            "columnNames": [
+              "userId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Duty_userId` ON `${TABLE_NAME}` (`userId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "User",
@@ -315,7 +372,26 @@
             "userId"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_EventReason_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_EventReason_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_EventReason_userId",
+            "unique": false,
+            "columnNames": [
+              "userId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_EventReason_userId` ON `${TABLE_NAME}` (`userId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "User",
@@ -372,7 +448,26 @@
             "userId"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_EventReasonGroup_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_EventReasonGroup_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_EventReasonGroup_userId",
+            "unique": false,
+            "columnNames": [
+              "userId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_EventReasonGroup_userId` ON `${TABLE_NAME}` (`userId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "User",
@@ -435,7 +530,26 @@
             "userId"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_ExcuseStatus_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ExcuseStatus_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_ExcuseStatus_userId",
+            "unique": false,
+            "columnNames": [
+              "userId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ExcuseStatus_userId` ON `${TABLE_NAME}` (`userId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "User",
@@ -498,7 +612,26 @@
             "userId"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_Holiday_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Holiday_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_Holiday_userId",
+            "unique": false,
+            "columnNames": [
+              "userId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Holiday_userId` ON `${TABLE_NAME}` (`userId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "User",
@@ -591,7 +724,26 @@
             "userId"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_Klasse_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Klasse_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_Klasse_userId",
+            "unique": false,
+            "columnNames": [
+              "userId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Klasse_userId` ON `${TABLE_NAME}` (`userId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "User",
@@ -672,7 +824,26 @@
             "userId"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_Room_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Room_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_Room_userId",
+            "unique": false,
+            "columnNames": [
+              "userId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Room_userId` ON `${TABLE_NAME}` (`userId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "User",
@@ -753,7 +924,26 @@
             "userId"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_Subject_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Subject_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_Subject_userId",
+            "unique": false,
+            "columnNames": [
+              "userId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Subject_userId` ON `${TABLE_NAME}` (`userId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "User",
@@ -852,7 +1042,26 @@
             "userId"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_Teacher_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Teacher_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_Teacher_userId",
+            "unique": false,
+            "columnNames": [
+              "userId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Teacher_userId` ON `${TABLE_NAME}` (`userId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "User",
@@ -903,7 +1112,26 @@
             "userId"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_TeachingMethod_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_TeachingMethod_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_TeachingMethod_userId",
+            "unique": false,
+            "columnNames": [
+              "userId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_TeachingMethod_userId` ON `${TABLE_NAME}` (`userId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "User",
@@ -960,7 +1188,26 @@
             "userId"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_SchoolYear_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_SchoolYear_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_SchoolYear_userId",
+            "unique": false,
+            "columnNames": [
+              "userId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_SchoolYear_userId` ON `${TABLE_NAME}` (`userId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "User",
@@ -979,7 +1226,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f067b243286c29a2a11a7a9067cbdafe')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '49c055997a8b9fb81945799b54a91f26')"
     ]
   }
 }

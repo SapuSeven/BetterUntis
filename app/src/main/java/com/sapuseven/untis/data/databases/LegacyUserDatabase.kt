@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
+import com.sapuseven.untis.helpers.UserDatabaseQueryHelper.COLUMN_NAME_USER_ID
 import com.sapuseven.untis.helpers.UserDatabaseQueryHelper.generateCreateTable
 import com.sapuseven.untis.helpers.UserDatabaseQueryHelper.generateDropTable
 import com.sapuseven.untis.helpers.UserDatabaseQueryHelper.generateValues
@@ -28,9 +29,8 @@ private const val DATABASE_VERSION = 7
 private const val DATABASE_NAME = "userdata.db"
 
 @Deprecated("Use the new UserDatabase instead")
-class LegacyUserDatabase private constructor(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+private class LegacyUserDatabase private constructor(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 	companion object {
-		const val COLUMN_NAME_USER_ID = "_user_id"
 
 		private var instance: LegacyUserDatabase? = null
 
