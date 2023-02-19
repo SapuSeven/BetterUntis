@@ -137,6 +137,7 @@ dependencies {
 	implementation 'androidx.navigation:navigation-compose:2.5.0'
 	implementation 'androidx.datastore:datastore-preferences:1.0.0'
 	implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0'
+	implementation "androidx.room:room-runtime:$room_version"
 	implementation 'com.google.android.material:material:1.6.1'
 	implementation 'com.google.android.material:compose-theme-adapter:1.1.14'
 	implementation "com.google.accompanist:accompanist-swiperefresh:$accompanist_version"
@@ -153,6 +154,9 @@ dependencies {
 
 	coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
+	annotationProcessor "androidx.room:room-compiler:$room_version"
+	//ksp "androidx.room:room-compiler:$room_version"
+
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
 	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 
@@ -164,7 +168,6 @@ dependencies {
 	androidTestImplementation 'androidx.test:core:1.5.0-alpha02' // Version 1.5.0-alpha02 fixes crash on Android 13 - see https://github.com/android/android-test/issues/1412
 	androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
 	debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
-
 
 
 	implementation project(':weekview')
