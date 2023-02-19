@@ -9,7 +9,7 @@ import com.sapuseven.untis.models.untis.masterdata.Teacher
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 
 class TimetableDatabaseInterface(val userDatabase: UserDatabase, val id: Long) {
-	private var allClasses: Map<Int, Klasse> = mapOf()
+	var allClasses: Map<Int, Klasse> = mapOf()
 	private var allTeachers: Map<Int, Teacher> = mapOf()
 	private var allSubjects: Map<Int, Subject> = mapOf()
 	private var allRooms: Map<Int, Room> = mapOf()
@@ -93,7 +93,7 @@ class TimetableDatabaseInterface(val userDatabase: UserDatabase, val id: Long) {
 		return isAllowed(periodElement.id, periodElement.type)
 	}
 
-	private inline fun <reified T> convertToPeriodElement(values: Collection<T>): List<PeriodElement> {
+	inline fun <reified T> convertToPeriodElement(values: Collection<T>): List<PeriodElement> {
 		return values.map { item ->
 			when (T::class) {
 				Klasse::class -> PeriodElement(Type.CLASS.name, (item as Klasse).id)
@@ -115,15 +115,11 @@ class TimetableDatabaseInterface(val userDatabase: UserDatabase, val id: Long) {
 		} == 0
 	}
 
-	fun getElements(type: Type?): List<PeriodElement> {
-		return convertToPeriodElement(
-			when (type) {
-				Type.CLASS -> allClasses.values
-				Type.TEACHER -> allTeachers.values
-				Type.SUBJECT -> allSubjects.values
-				Type.ROOM -> allRooms.values
-				else -> emptyList()
-			}
-		)
+	fun getElements(type: Type?): List<PeriodElement> = when (type) {
+		Type.CLASS -> convertToPeriodElement(allClasses.values)
+		Type.TEACHER -> convertToPeriodElement(allTeachers.values)
+		Type.SUBJECT -> convertToPeriodElement(allSubjects.values)
+		Type.ROOM -> convertToPeriodElement(allRooms.values)
+		else -> emptyList()
 	}
 }
