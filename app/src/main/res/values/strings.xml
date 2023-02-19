@@ -84,12 +84,12 @@
     <string name="infocenter_officehours_empty">No office hours</string>
     <string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
     <string name="infocenter_timeformat_sameday">%2$s - %4$s, %1$s</string>
-	<string name="infocenter_absences_filter_only_unexcused">Show unexcused only</string>
-	<string name="infocenter_absences_filter_sort">Sort order</string>
-	<string name="infocenter_absences_filter_oldest_first">Oldest first</string>
-	<string name="infocenter_absences_filter_newest_first">Newest first</string>
-	<string name="infocenter_absences_filter_time_ranges">Time ranges</string>
-	<string name="infocenter_absences_filter">Filter Absences</string>
+    <string name="infocenter_absences_filter_only_unexcused">Show unexcused only</string>
+    <string name="infocenter_absences_filter_sort">Sort order</string>
+    <string name="infocenter_absences_filter_oldest_first">Oldest first</string>
+    <string name="infocenter_absences_filter_newest_first">Newest first</string>
+    <string name="infocenter_absences_filter_time_ranges">Time ranges</string>
+    <string name="infocenter_absences_filter">Filter absences</string>
     <string name="library_appcompat" translatable="false">Android AppCompat Library V7</string>
     <string name="library_code_scanner" translatable="false">CodeScanner</string>
     <string name="library_colorpicker_compat" translatable="false">ColorPicker Compat</string>
@@ -371,20 +371,18 @@
     <string name="preference_dialog_permission_alarms_title">Permission needed</string>
     <string name="preference_dialog_permission_alarms_text">This feature requires additional permissions. Please allow BetterUntis access to schedule exact alarms.</string>
     <string name="all_dialog_open_settings">Open settings</string>
-	<string name="preference_category_reports">Error Reporting</string>
-	<string name="preference_reports_info">About error reporting</string>
-	<string name="preference_reports_info_desc">These settings help to improve the application.\nNo personal information is ever collected.\nChanges need an app restart to take effect.</string>
-	<string name="preference_reports_breadcrumbs">Send detailed errors</string>
-	<string name="preference_reports_breadcrumbs_desc">Include additional information about what happened before an error occured.</string>
-	<string name="main_dialog_reports_info_2">You can always change these values later in the app settings.</string>
-	<string name="main_dialog_reports_info_1">BetterUntis uses Sentry to collect information about crashes and other errors.</string>
-	<string name="main_dialog_reports_title">Error Reporting</string>
-	<string name="main_dialog_reports_save">Save</string>
-
-	<string name="infocenter_absences_list_seven_days">Show last 7 days</string>
-	<string name="infocenter_absences_list_fourteen_days">Show last 14 days</string>
-	<string name="infocenter_absences_list_thirty_days">Show last 30 days</string>
-	<string name="infocenter_absences_list_ninety_days">Show last 90 days</string>
-	<string name="infocenter_absences_list_schoolyear">Current school year</string>
-
+    <string name="preference_category_reports">Error Reporting</string>
+    <string name="preference_reports_info">About error reporting</string>
+    <string name="preference_reports_info_desc">These settings help to improve the application.\nNo personal information is ever collected.\nChanges need an app restart to take effect.</string>
+    <string name="preference_reports_breadcrumbs">Send detailed errors</string>
+    <string name="preference_reports_breadcrumbs_desc">Include additional information about what happened before an error occured.</string>
+    <string name="main_dialog_reports_info_2">You can always change these values later in the app settings.</string>
+    <string name="main_dialog_reports_info_1">BetterUntis uses Sentry to collect information about crashes and other errors.</string>
+    <string name="main_dialog_reports_title">Error Reporting</string>
+    <string name="main_dialog_reports_save">Save</string>
+    <string name="infocenter_absences_list_seven_days">Show last 7 days</string>
+    <string name="infocenter_absences_list_fourteen_days">Show last 14 days</string>
+    <string name="infocenter_absences_list_thirty_days">Show last 30 days</string>
+    <string name="infocenter_absences_list_ninety_days">Show last 90 days</string>
+    <string name="infocenter_absences_list_schoolyear">Current school year</string>
 </resources>
