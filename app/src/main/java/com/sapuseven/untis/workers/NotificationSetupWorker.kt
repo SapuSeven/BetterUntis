@@ -85,10 +85,7 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 	}
 
 	private suspend fun scheduleNotifications(): Result {
-		val userDatabase = Room.databaseBuilder(
-			applicationContext,
-			UserDatabase::class.java, "users"
-		).build()
+		val userDatabase = UserDatabase.getInstance(applicationContext)
 
 		userDatabase.userDao().getById(inputData.getLong(WORKER_DATA_USER_ID, -1))?.let { user ->
 			var scheduledNotifications = 0

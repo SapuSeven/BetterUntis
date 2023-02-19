@@ -88,10 +88,7 @@ open class BaseComposeWidget : GlanceAppWidget() {
 		val userId = prefs[longPreferencesKey(PREFERENCE_KEY_LONG_USER)] ?: -1
 		elementId = prefs[intPreferencesKey(PREFERENCE_KEY_INT_ELEMENT_ID)] ?: -1
 
-		val userDatabase = Room.databaseBuilder(
-			LocalContext.current,
-			UserDatabase::class.java, "users"
-		).build()
+		val userDatabase = UserDatabase.getInstance(LocalContext.current)
 		val user = userDatabase.userDao().getById(userId)
 
 		AppWidgetTheme(userId) { colorSchemeDark, colorSchemeLight ->

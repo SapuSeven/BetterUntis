@@ -44,10 +44,7 @@ class DailyWorker(context: Context, params: WorkerParameters) :
 	}
 
 	override suspend fun doWork(): Result {
-		val userDatabase = Room.databaseBuilder(
-			applicationContext,
-			UserDatabase::class.java, "users"
-		).build()
+		val userDatabase = UserDatabase.getInstance(applicationContext)
 
 		val workManager = WorkManager.getInstance(applicationContext)
 

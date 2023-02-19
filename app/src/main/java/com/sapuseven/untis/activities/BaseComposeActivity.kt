@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.service.autofill.UserData
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -55,12 +56,7 @@ open class BaseComposeActivity : ComponentActivity() {
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
-		userDatabase = Room.databaseBuilder(
-			applicationContext,
-			UserDatabase::class.java, "users"
-		)
-			.allowMainThreadQueries() // TODO: Fix and delete this!
-			.build()
+		userDatabase = UserDatabase.getInstance(applicationContext)
 
 		runBlocking { // Not ideal, but works well enough
 			loadInitialUser()
