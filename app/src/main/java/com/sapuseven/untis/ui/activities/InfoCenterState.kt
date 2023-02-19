@@ -2,13 +2,13 @@ package com.sapuseven.untis.ui.activities
 
 import android.app.Activity
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.*
@@ -20,14 +20,15 @@ import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_MESSAGES
 import kotlinx.serialization.decodeFromString
 import org.joda.time.LocalDate
+import org.joda.time.LocalDateTime
 
 
 class InfoCenterState(
 	private val userDatabase: UserDatabase,
-	private val user: UserDatabase.User,
+	private val user: User,
 	private val timetableDatabaseInterface: TimetableDatabaseInterface,
-	private val preferences: DataStorePreferences,
 	private val contextActivity: Activity,
+	val preferences: DataStorePreferences,
 	var selectedItem: MutableState<Int>,
 	val showAbsenceFilter: MutableState<Boolean>,
 
@@ -40,6 +41,10 @@ class InfoCenterState(
 	val events: MutableState<List<EventListItem>?>,
 	val absences: MutableState<List<UntisAbsence>?>,
 	val officeHours: MutableState<List<UntisOfficeHour>?>,
+
+	val absencesOnlyUnexcused: State<Boolean>,
+	val absencesSortReversed: State<Boolean>,
+	val absencesTimeRange: State<String>,
 ) {
 	private var api: UntisRequest = UntisRequest()
 
@@ -52,6 +57,41 @@ class InfoCenterState(
 		const val ID_ABSENCES = 3
 		const val ID_OFFICEHOURS = 4
 	}
+
+	val messageList: List<UntisMessage>?
+		get() = messages.value
+
+	val eventList: List<EventListItem>?
+		get() = events.value
+
+	val officeHourList: List<UntisOfficeHour>?
+		get() = officeHours.value
+
+	val absenceList: List<UntisAbsence>?
+		get() = absences.value.let {
+			if (absencesSortReversed.value) {
+				it?.sortedBy { absence -> absence.startDateTime.toLocalDateTime() } // oldest first
+			} else {
+				it?.sortedByDescending { absence -> absence.startDateTime.toLocalDateTime() } // newest first
+			}
+		}.let {
+			it?.filter { absence ->
+				(absencesOnlyUnexcused.value != absence.excused) || !absence.excused
+			}
+		}.let {
+			when (absencesTimeRange.value) {
+				"seven_days" -> 7
+				"fourteen_days" -> 14
+				"thirty_days" -> 30
+				"ninety_days" -> 90
+				else -> null
+			}?.let { days ->
+				it?.filter { absence ->
+					LocalDateTime.now().minusDays(days)
+						.isBefore(absence.startDateTime.toLocalDateTime())
+				}
+			} ?: it
+		}
 
 	suspend fun loadMessages() {
 		messagesLoading.value = true
@@ -93,11 +133,8 @@ class InfoCenterState(
 	}
 
 	private suspend fun loadExams(): List<EventListItem>? {
-		val schoolYears = userDatabase.getAdditionalUserData<SchoolYear>(
-			user.id,
-			SchoolYear()
-		)?.values?.toList()
-			?: emptyList()
+		val schoolYears =
+			userDatabase.userDao().getByIdWithData(user.id)?.schoolYears ?: emptyList()
 		getCurrentYear(schoolYears)?.endDate?.let { currentSchoolYearEndDate ->
 			val query = UntisRequest.UntisRequestQuery(user)
 
@@ -115,20 +152,23 @@ class InfoCenterState(
 
 			val result = api.request(query)
 			return result.fold({ data ->
-				val untisResponse = SerializationUtils.getJSON().decodeFromString<ExamResponse>(data)
+				val untisResponse =
+					SerializationUtils.getJSON().decodeFromString<ExamResponse>(data)
 
-				untisResponse.result?.exams?.map { EventListItem(timetableDatabaseInterface, exam = it) }
+				untisResponse.result?.exams?.map {
+					EventListItem(
+						timetableDatabaseInterface,
+						exam = it
+					)
+				}
 			}, { null /* TODO: Show error */ })
 		}
 		return null
 	}
 
 	private suspend fun loadHomeworks(): List<EventListItem>? {
-		val schoolYears = userDatabase.getAdditionalUserData<SchoolYear>(
-			user.id,
-			SchoolYear()
-		)?.values?.toList()
-			?: emptyList()
+		val schoolYears =
+			userDatabase.userDao().getByIdWithData(user.id)?.schoolYears ?: emptyList()
 		getCurrentYear(schoolYears)?.endDate?.let { currentSchoolYearEndDate ->
 			val query = UntisRequest.UntisRequestQuery(user)
 
@@ -146,7 +186,8 @@ class InfoCenterState(
 
 			val result = api.request(query)
 			return result.fold({ data ->
-				val untisResponse = SerializationUtils.getJSON().decodeFromString<HomeworkResponse>(data)
+				val untisResponse =
+					SerializationUtils.getJSON().decodeFromString<HomeworkResponse>(data)
 
 				untisResponse.result?.homeWorks?.map {
 					EventListItem(
@@ -206,7 +247,8 @@ class InfoCenterState(
 		)
 
 		val result = api.request(query).fold({ data ->
-			val untisResponse = SerializationUtils.getJSON().decodeFromString<OfficeHoursResponse>(data)
+			val untisResponse =
+				SerializationUtils.getJSON().decodeFromString<OfficeHoursResponse>(data)
 
 			untisResponse.result?.officeHours
 		}, { null /* TODO: Show error */ })
@@ -222,13 +264,11 @@ class InfoCenterState(
 		}
 	}
 
-	fun providePreferences() : DataStorePreferences {
-		return preferences
-	}
-
 	fun isItemSelected(itemId: Int): Boolean = selectedItem.value == itemId
 
-	fun selectItem(itemId: Int) { selectedItem.value = itemId }
+	fun selectItem(itemId: Int) {
+		selectedItem.value = itemId
+	}
 
 	fun onItemSelect(itemId: Int): () -> Unit = { selectedItem.value = itemId }
 
@@ -238,20 +278,39 @@ class InfoCenterState(
 @Composable
 fun rememberInfoCenterState(
 	userDatabase: UserDatabase,
-	user: UserDatabase.User,
+	user: User,
 	timetableDatabaseInterface: TimetableDatabaseInterface,
 	preferences: DataStorePreferences,
 	contextActivity: BaseComposeActivity,
 	selectedItem: MutableState<Int> = rememberSaveable { mutableStateOf(ID_MESSAGES) },
 	showAbsenceFilter: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
-	messages: MutableState<List<UntisMessage>?> = remember { mutableStateOf<List<UntisMessage>?>(null) },
-	officeHours: MutableState<List<UntisOfficeHour>?> = remember { mutableStateOf<List<UntisOfficeHour>?>(null) },
-	events: MutableState<List<EventListItem>?> = remember { mutableStateOf<List<EventListItem>?>(null) },
-	absences: MutableState<List<UntisAbsence>?> = remember { mutableStateOf<List<UntisAbsence>?>(null) },
+	messages: MutableState<List<UntisMessage>?> = remember {
+		mutableStateOf<List<UntisMessage>?>(
+			null
+		)
+	},
+	officeHours: MutableState<List<UntisOfficeHour>?> = remember {
+		mutableStateOf<List<UntisOfficeHour>?>(
+			null
+		)
+	},
+	events: MutableState<List<EventListItem>?> = remember {
+		mutableStateOf<List<EventListItem>?>(
+			null
+		)
+	},
+	absences: MutableState<List<UntisAbsence>?> = remember {
+		mutableStateOf<List<UntisAbsence>?>(
+			null
+		)
+	},
 	messagesLoading: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 	eventsLoading: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 	absencesLoading: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 	officeHoursLoading: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
+	absencesOnlyUnexcused: State<Boolean> = preferences.infocenterAbsencesOnlyUnexcused.getState(),
+	absencesSortReversed: State<Boolean> = preferences.infocenterAbsencesSortReverse.getState(),
+	absencesTimeRange: State<String> = preferences.infocenterAbsencesTimeRange.getState(),
 ) = remember(user) {
 	InfoCenterState(
 		userDatabase = userDatabase,
@@ -269,6 +328,9 @@ fun rememberInfoCenterState(
 		eventsLoading = eventsLoading,
 		absencesLoading = absencesLoading,
 		officeHoursLoading = officeHoursLoading,
+		absencesOnlyUnexcused = absencesOnlyUnexcused,
+		absencesSortReversed = absencesSortReversed,
+		absencesTimeRange = absencesTimeRange
 	)
 }
 
@@ -285,7 +347,11 @@ class EventListItem private constructor(
 		exam = exam
 	)
 
-	constructor(timetableDatabaseInterface: TimetableDatabaseInterface, homework: UntisHomework, lessonsById: Map<String, UntisHomeworkLesson>) : this(
+	constructor(
+		timetableDatabaseInterface: TimetableDatabaseInterface,
+		homework: UntisHomework,
+		lessonsById: Map<String, UntisHomeworkLesson>
+	) : this(
 		init = null,
 		timetableDatabaseInterface = timetableDatabaseInterface,
 		homework = homework,

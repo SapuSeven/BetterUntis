@@ -5,9 +5,11 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import androidx.activity.ComponentActivity
+import androidx.room.Room
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.config.booleanDataStore
 import com.sapuseven.untis.helpers.config.stringDataStore
@@ -29,7 +31,7 @@ abstract class TimetableDependantWorker(
 ) : CoroutineWorker(context, params) {
 	companion object {
 		suspend fun loadPersonalTimetableElement(
-			user: UserDatabase.User,
+			user: User,
 			context: Context
 		): Pair<Int, String>? {
 			val customPersonalTimetable = decodeStoredTimetableValue(
@@ -43,7 +45,9 @@ abstract class TimetableDependantWorker(
 			val elemId = customPersonalTimetable?.id ?: user.userData.elemId
 			val elemType = customPersonalTimetable?.type ?: user.userData.elemType ?: ""
 
-			return if (TimetableDatabaseInterface.Type.values().find { it.name == elemType } == null)
+			return if (TimetableDatabaseInterface.Type.values()
+					.find { it.name == elemType } == null
+			)
 				null // Anonymous / no custom personal timetable
 			else
 				elemId to elemType
@@ -51,7 +55,7 @@ abstract class TimetableDependantWorker(
 	}
 
 	protected suspend fun loadTimetable(
-		user: UserDatabase.User,
+		user: User,
 		timetableDatabaseInterface: TimetableDatabaseInterface,
 		timetableElement: Pair<Int, String>,
 		skipCache: Boolean = false
@@ -96,12 +100,16 @@ abstract class TimetableDependantWorker(
 	}
 
 	internal fun canScheduleExactAlarms(): Boolean {
-		val alarmManager = applicationContext.getSystemService(ComponentActivity.ALARM_SERVICE) as AlarmManager
+		val alarmManager =
+			applicationContext.getSystemService(ComponentActivity.ALARM_SERVICE) as AlarmManager
 		return (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms())
 	}
 
 	internal suspend fun disablePreference(key: String) {
-		UserDatabase.createInstance(applicationContext).getAllUsers().map { it.id }.forEach { userId ->
+		Room.databaseBuilder(
+			applicationContext,
+			UserDatabase::class.java, "users"
+		).build().userDao().getAll().map { it.id }.forEach { userId ->
 			val pref = applicationContext.booleanDataStore(userId, key)
 			pref.saveValue(false)
 		}

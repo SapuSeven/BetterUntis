@@ -14,19 +14,17 @@ import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat.createShortcutResultIntent
 import androidx.core.graphics.drawable.IconCompat
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
+import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 
 class ShortcutConfigureActivity : BaseComposeActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setResult(RESULT_CANCELED)
 
-		val userDatabase = UserDatabase.createInstance(this)
-		val users = userDatabase.getAllUsers()
+		val users = userDatabase.userDao().getAll()
 
 		setContent {
 			AppTheme {
@@ -56,11 +54,11 @@ class ShortcutConfigureActivity : BaseComposeActivity() {
 						},
 						additionalActions = {
 							ProfileSelectorAction(
-								users = userDatabase.getAllUsers(),
+								users = userDatabase.userDao().getAll(),
 								currentSelectionId = selectedUserId,
 								hideIfSingleProfile = true,
-								onSelectionChange =  {
-									selectedUserId = it.id ?: -1
+								onSelectionChange = {
+									selectedUserId = it.id
 								}
 							)
 						}

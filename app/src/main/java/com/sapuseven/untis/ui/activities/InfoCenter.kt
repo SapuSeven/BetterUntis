@@ -5,11 +5,9 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Close
@@ -22,7 +20,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
@@ -43,7 +40,6 @@ import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.NavigationBarInset
 import com.sapuseven.untis.ui.common.VerticalScrollColumn
 import com.sapuseven.untis.ui.dialogs.AttachmentsDialog
-import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.preferences.ListPreference
 import com.sapuseven.untis.ui.preferences.SwitchPreference
 import kotlinx.coroutines.launch
@@ -126,13 +122,10 @@ fun InfoCenter(state: InfoCenterState) {
 					.weight(1f)
 			) {
 				when (state.selectedItem.value) {
-					ID_MESSAGES -> MessageList(state.messages.value, state.messagesLoading.value)
-					ID_EVENTS -> EventList(state.events.value, state.eventsLoading.value)
-					ID_ABSENCES -> AbsenceList(
-						state.absences.value, state.absencesLoading.value, state.providePreferences()
-					)
-
-					ID_OFFICEHOURS -> OfficeHourList(state.officeHours.value, state.officeHoursLoading.value)
+					ID_MESSAGES -> MessageList(state.messageList, state.messagesLoading.value)
+					ID_EVENTS -> EventList(state.eventList, state.eventsLoading.value)
+					ID_ABSENCES -> AbsenceList(state.absenceList, state.absencesLoading.value)
+					ID_OFFICEHOURS -> OfficeHourList(state.officeHourList, state.officeHoursLoading.value)
 				}
 			}
 
@@ -195,9 +188,7 @@ fun InfoCenter(state: InfoCenterState) {
 		enter = fullscreenDialogAnimationEnter(),
 		exit = fullscreenDialogAnimationExit()
 	) {
-		AbsenceFilterDialog(
-			state.providePreferences()
-		) {
+		AbsenceFilterDialog(state.preferences) {
 			state.showAbsenceFilter.value = false
 		}
 	}
@@ -259,56 +250,9 @@ private fun EventList(events: List<EventListItem>?, loading: Boolean) {
 }
 
 @Composable
-private fun AbsenceList(absences: List<UntisAbsence>?, loading: Boolean, preferences: DataStorePreferences) {
-	val showOnlyUnexcused by preferences.infocenterAbsencesOnlyUnexcused.getState()
-	val sortAbsencesAscending by preferences.infocenterAbsencesSortAscending.getState()
-	val timeRangeAbsences by preferences.infocenterAbsencesTimeRange.getState()
-
+private fun AbsenceList(absences: List<UntisAbsence>?, loading: Boolean) {
 	ItemList(
-		items = absences.let {
-			if (sortAbsencesAscending){
-				it?.sortedBy { absence ->
-					absence.id
-				}
-			} else {
-				it?.sortedByDescending {absence ->
-					absence.id
-				}
-			}
-		}.let {
-			it?.filter {absence ->
-				(showOnlyUnexcused != absence.excused) || !absence.excused
-			}
-		}.let {
-			when (timeRangeAbsences) {
-				"fourteen_days" -> {
-					it?.filter {absence ->
-						LocalDateTime.now().minusDays(14).isBefore(absence.startDateTime.toLocalDateTime())
-					}
-				}
-
-				"ninety_days" -> {
-					it?.filter {absence ->
-						LocalDateTime.now().minusDays(90).isBefore(absence.startDateTime.toLocalDateTime())
-					}
-				}
-
-				"seven_days" -> {
-					it?.filter { absence ->
-						LocalDateTime.now().minusDays(7).isBefore(absence.startDateTime.toLocalDateTime())
-					}
-				}
-
-				"thirty_days" -> {
-					it?.filter {absence ->
-						LocalDateTime.now().minusDays(30).isBefore(absence.startDateTime.toLocalDateTime())
-					}
-				}
-				else -> {
-					it
-				}
-			}
-		},
+		items = absences,
 		itemRenderer = { AbsenceItem(it) },
 		itemsEmptyMessage = R.string.infocenter_absences_empty,
 		loading = loading
@@ -562,21 +506,20 @@ private fun AbsenceFilterDialog(
 	) { padding ->
 		Box(modifier = Modifier.padding(padding)){
 			VerticalScrollColumn {
-				val sortChecked by preferences.infocenterAbsencesSortAscending.getState()
+				val sortReversed by preferences.infocenterAbsencesSortReverse.getState()
 				SwitchPreference(
 					title = { Text(text = stringResource(id = R.string.infocenter_absences_filter_only_unexcused)) },
 					dataStore = preferences.infocenterAbsencesOnlyUnexcused
 				)
 				SwitchPreference(
-					title = { Text(text = stringResource(id = R.string.infocenter_absences_filter_sortby)) },
+					title = { Text(text = stringResource(id = R.string.infocenter_absences_filter_sort)) },
 					summary = {
-						if (sortChecked) {
-							Text(text = stringResource(id = R.string.infocenter_absences_filter_ascending))
-						} else {
-							Text(text = stringResource(id = R.string.infocenter_absences_filter_descending))
-						}
+						if (sortReversed)
+							Text(text = stringResource(id = R.string.infocenter_absences_filter_oldest_first))
+						else
+							Text(text = stringResource(id = R.string.infocenter_absences_filter_newest_first))
 					},
-					dataStore = preferences.infocenterAbsencesSortAscending
+					dataStore = preferences.infocenterAbsencesSortReverse
 				)
 				ListPreference(
 					title = { Text(text = stringResource(id = R.string.infocenter_absences_filter_time_ranges)) },

@@ -10,7 +10,7 @@ import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.activities.RoomFinder
 import com.sapuseven.untis.activities.RoomFinderState
 import com.sapuseven.untis.data.databases.RoomFinderDatabase
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.mocks.MOCK_USER_ID
 import com.sapuseven.untis.mocks.timeGrid
@@ -35,7 +35,7 @@ class RoomFinderActivityScreenshot {
 
 	@Before
 	fun setupUserDatabase() {
-		UserDatabase.createInstance(rule.activity).setAdditionalUserData(
+		LegacyUserDatabase.createInstance(rule.activity).setAdditionalUserData(
 			MOCK_USER_ID, UntisMasterData(
 				absenceReasons = emptyList(),
 				departments = emptyList(),
@@ -71,7 +71,7 @@ class RoomFinderActivityScreenshot {
 					RoomFinder(RoomFinderState(
 						user = rule.activity.user!!,
 						timetableDatabaseInterface = TimetableDatabaseInterface(
-							database = UserDatabase.createInstance(rule.activity),
+							database = LegacyUserDatabase.createInstance(rule.activity),
 							id = MOCK_USER_ID
 						),
 						preferences = preferenceWithTheme(rule.activity.dataStorePreferences),
@@ -89,7 +89,7 @@ class RoomFinderActivityScreenshot {
 
 	@After
 	fun cleanupUserDatabase() {
-		UserDatabase.createInstance(rule.activity).deleteUser(MOCK_USER_ID)
+		LegacyUserDatabase.createInstance(rule.activity).deleteUser(MOCK_USER_ID)
 	}
 }
 

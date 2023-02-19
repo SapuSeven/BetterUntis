@@ -235,7 +235,7 @@ val BaseComposeActivity.dataStorePreferences: DataStorePreferences
 				"infocenter_absences_unexcused_only",
 				defaultValue = false
 			),
-			infocenterAbsencesSortAscending = this.booleanDataStore(
+			infocenterAbsencesSortReverse = this.booleanDataStore(
 				currentUserId(),
 				"infocenter_absences_sort",
 				defaultValue = false
@@ -304,7 +304,7 @@ class DataStorePreferences(
 	val proxyHost: UntisPreferenceDataStore<String>,
 	val schoolBackground: UntisPreferenceDataStore<Set<String>>,
 	val infocenterAbsencesOnlyUnexcused: UntisPreferenceDataStore<Boolean>,
-	val infocenterAbsencesSortAscending: UntisPreferenceDataStore<Boolean>,
+	val infocenterAbsencesSortReverse: UntisPreferenceDataStore<Boolean>,
 	val infocenterAbsencesTimeRange: UntisPreferenceDataStore<String>,
 	val timetableHiddenElements: UntisPreferenceDataStore<String>
 )

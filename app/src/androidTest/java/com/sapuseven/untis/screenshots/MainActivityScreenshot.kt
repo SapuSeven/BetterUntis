@@ -5,10 +5,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.activities.*
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.helpers.config.globalDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.mocks.MOCK_USER_ID
@@ -20,17 +19,11 @@ import kotlinx.coroutines.runBlocking
 import org.joda.time.DateTime
 import org.joda.time.DateTimeUtils
 import org.junit.After
-import org.junit.AfterClass
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.io.File
-import kotlin.test.AfterTest
-import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 @RunWith(AndroidJUnit4::class)
 class MainActivityScreenshot {
@@ -43,7 +36,7 @@ class MainActivityScreenshot {
 
 		assertNotNull(masterData)
 
-		UserDatabase.createInstance(rule.activity).setAdditionalUserData(
+		LegacyUserDatabase.createInstance(rule.activity).setAdditionalUserData(
 			MOCK_USER_ID, masterData
 		)
 		DateTimeUtils.setCurrentMillisFixed(
@@ -152,7 +145,7 @@ class MainActivityScreenshot {
 					user = rule.activity.user!!,
 					contextActivity = rule.activity,
 					timetableDatabaseInterface = TimetableDatabaseInterface(
-						database = UserDatabase.createInstance(rule.activity),
+						database = LegacyUserDatabase.createInstance(rule.activity),
 						id = MOCK_USER_ID
 					),
 					preferences = preferenceWithTheme(
@@ -179,6 +172,6 @@ class MainActivityScreenshot {
 
 	@After
 	fun cleanupUserDatabase() {
-		UserDatabase.createInstance(rule.activity).deleteUser(MOCK_USER_ID)
+		LegacyUserDatabase.createInstance(rule.activity).deleteUser(MOCK_USER_ID)
 	}
 }

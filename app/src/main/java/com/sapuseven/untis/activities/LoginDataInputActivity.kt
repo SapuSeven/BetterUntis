@@ -25,15 +25,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.autofill.AutofillNode
 import androidx.compose.ui.autofill.AutofillType
-import androidx.compose.ui.focus.focusTarget
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focus.onFocusEvent
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.boundsInWindow
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalAutofillTree
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -51,7 +44,8 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.entities.User
+import com.sapuseven.untis.data.databases.entities.UserWithData
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.api.LoginDataInfo
@@ -94,32 +88,37 @@ class LoginDataInputActivity : BaseComposeActivity() {
 	private var existingUserId: Long? = null
 
 	private var schoolInfoFromSearch: UntisSchoolInfo? = null
-	private var existingUser: UserDatabase.User? = null
+	private var existingUser: User? = null
 
-	@OptIn(ExperimentalMaterial3Api::class, ExperimentalSerializationApi::class,
+	@OptIn(
+		ExperimentalMaterial3Api::class, ExperimentalSerializationApi::class,
 		ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class
 	)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		WindowCompat.setDecorFitsSystemWindows(window, true) // Workaround for bringIntoView(). Unfortunately this also breaks insets...
+		WindowCompat.setDecorFitsSystemWindows(
+			window,
+			true
+		) // Workaround for bringIntoView(). Unfortunately this also breaks insets...
 
 		getUserIdExtra(intent)?.let { userId ->
 			existingUserId = userId
 
 			existingUserId?.let { id ->
-				existingUser = userDatabase.getUser(id)?.also { user ->
+				existingUser = userDatabase.userDao().getById(id)?.also { user ->
 					setUser(user)
 				}
 			}
 		}
 
-		userDatabase = UserDatabase.createInstance(this)
-
 		setContent {
 			val systemUiController = rememberSystemUiController()
 
 			AppTheme(navBarInset = false, systemUiController = systemUiController) {
-				setSystemUiColor(systemUiController, MaterialTheme.colorScheme.surface) // Part of the bringIntoView()-workaround - as system bars are transparent by default, set their color manually
+				setSystemUiColor(
+					systemUiController,
+					MaterialTheme.colorScheme.surface
+				) // Part of the bringIntoView()-workaround - as system bars are transparent by default, set their color manually
 
 				val coroutineScope = rememberCoroutineScope()
 				val snackbarHostState = remember { SnackbarHostState() }
@@ -189,7 +188,8 @@ class LoginDataInputActivity : BaseComposeActivity() {
 
 				val schoolIdError = schoolId.value.isNullOrEmpty()
 				val usernameError = anonymous.value != true && username.value.isNullOrEmpty()
-				val passwordError = anonymous.value != true && existingUser?.key == null && password.value.isNullOrEmpty()
+				val passwordError =
+					anonymous.value != true && existingUser?.key == null && password.value.isNullOrEmpty()
 				val proxyUrlError =
 					!proxyUrl.value.isNullOrEmpty() && !Patterns.WEB_URL.matcher(proxyUrl.value!!)
 						.matches()
@@ -233,7 +233,10 @@ class LoginDataInputActivity : BaseComposeActivity() {
 
 								loading = false
 								coroutineScope.launch {
-									snackbarHostState.showSnackbar(errorMessage, duration = SnackbarDuration.Long)
+									snackbarHostState.showSnackbar(
+										errorMessage,
+										duration = SnackbarDuration.Long
+									)
 								}
 							}).run {
 							val schoolInfo = (
@@ -274,13 +277,12 @@ class LoginDataInputActivity : BaseComposeActivity() {
 									?: return@run
 							val bookmarks =
 								existingUserId?.let { user ->
-									userDatabase.getUser(
-										user
-									)?.bookmarks?.toSet()
+									userDatabase.userDao().getById(user)?.bookmarks?.toSet()
 								}
 									?: emptySet()
-							val user = UserDatabase.User(
-								existingUserId ?: -1,
+							var userId = existingUserId ?: 0
+							val user = User(
+								userId,
 								profileName.value ?: "",
 								untisApiUrl,
 								schoolInfo.schoolId.toString(),
@@ -295,27 +297,24 @@ class LoginDataInputActivity : BaseComposeActivity() {
 								bookmarks = bookmarks
 							)
 
-							val userId =
-								if (existingUserId == null) userDatabase.addUser(
-									user
-								) else userDatabase.editUser(
-									user
-								)
+							userDatabase.userDao().let { dao ->
+								if (existingUserId == null)
+									userId = dao.insert(user)
+								else
+									dao.update(user)
 
-							userId?.let {
-								userDatabase.setAdditionalUserData(
+								dao.deleteUserData(userId)
+								dao.insertUserData(
 									userId,
 									userDataResponse.masterData
 								)
-
-								if (advanced && !proxyUrl.value.isNullOrEmpty())
-									proxyHostPref.saveValue(proxyUrl.value)
-
-								setResult(Activity.RESULT_OK)
-								finish()
-							} ?: run {
-								onError(LoginErrorInfo(errorMessageStringRes = R.string.logindatainput_adding_user_unknown_error))
 							}
+
+							if (advanced && !proxyUrl.value.isNullOrEmpty())
+								proxyHostPref.saveValue(proxyUrl.value)
+
+							setResult(Activity.RESULT_OK)
+							finish()
 						}
 					}
 				}
@@ -445,12 +444,14 @@ class LoginDataInputActivity : BaseComposeActivity() {
 									InputField(
 										state = password,
 										type = KeyboardType.Password,
-										label = { Text(
-											if (existingUser?.key == null || password.value != null)
-												stringResource(id = R.string.logindatainput_key)
-											else
-												stringResource(id = R.string.logindatainput_key_saved)
-										) },
+										label = {
+											Text(
+												if (existingUser?.key == null || password.value != null)
+													stringResource(id = R.string.logindatainput_key)
+												else
+													stringResource(id = R.string.logindatainput_key_saved)
+											)
+										},
 										prefKey = PREFS_BACKUP_PASSWORD,
 										enabled = !loading,
 										error = validate && passwordError,
@@ -499,9 +500,10 @@ class LoginDataInputActivity : BaseComposeActivity() {
 									)
 								}
 							}
-							Spacer(modifier = Modifier
-								.bottomInsets()
-								.height(80.dp)
+							Spacer(
+								modifier = Modifier
+									.bottomInsets()
+									.height(80.dp)
 							)
 
 							if (qrCodeErrorDialog) {
@@ -540,7 +542,8 @@ class LoginDataInputActivity : BaseComposeActivity() {
 		}
 	}
 
-	@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class,
+	@OptIn(
+		ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class,
 		ExperimentalFoundationApi::class
 	)
 	@Composable
