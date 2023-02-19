@@ -13,7 +13,7 @@ import com.sapuseven.untis.utils.SCREENSHOT_PROFILE_NAME
 
 const val MOCK_USER_ID: Long = Long.MAX_VALUE
 
-fun userMock(profileName: String = SCREENSHOT_PROFILE_NAME, apiUrl: String = SCREENSHOT_API_URL): LegacyUserDatabase.User = LegacyUserDatabase.User(
+fun userMock(profileName: String = SCREENSHOT_PROFILE_NAME, apiUrl: String = SCREENSHOT_API_URL): User = User(
 	id = MOCK_USER_ID,
 	profileName = profileName,
 	apiUrl = apiUrl,

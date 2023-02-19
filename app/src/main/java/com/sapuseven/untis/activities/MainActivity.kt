@@ -52,7 +52,7 @@ import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PR
 import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_ROUTE
 import com.sapuseven.untis.activities.main.DrawerItems
 import com.sapuseven.untis.activities.main.DrawerText
-import com.sapuseven.untis.data.databases.LegacyUserDatabase
+import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.DateTimeUtils
@@ -61,7 +61,6 @@ import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.models.TimetableBookmark
 import com.sapuseven.untis.models.untis.UntisDate
-import com.sapuseven.untis.models.untis.masterdata.Holiday
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
@@ -184,16 +183,15 @@ private fun WeekViewCompose(state: MainAppState) {
 		},
 		update = {
 			state.weekView.value = weekViewGlobal
-			state.userDatabase.getAdditionalUserData<Holiday>(state.user.id, Holiday())
-				?.let { item ->
-					state.weekView.value?.addHolidays(item.map { holiday ->
-						HolidayChip(
-							text = holiday.value.longName,
-							startDate = holiday.value.startDate,
-							endDate = holiday.value.endDate
-						)
-					})
-				}
+			state.userDatabase.userDao().getByIdWithData(state.user.id)?.holidays?.let {
+				state.weekView.value?.addHolidays(it.map { holiday ->
+					HolidayChip(
+						text = holiday.longName,
+						startDate = holiday.startDate,
+						endDate = holiday.endDate
+					)
+				})
+			}
 			state.updateViews(it)
 		},
 		modifier = Modifier
@@ -472,7 +470,7 @@ private fun Drawer(
 							.show()
 					else {
 						state.user.bookmarks = state.user.bookmarks.plus(newBookmark)
-						state.userDatabase.editUser(state.user)
+						state.userDatabase.userDao().update(state.user)
 						onShowTimetable(
 							item to state.timetableDatabaseInterface.getLongName(it)
 						)
@@ -492,7 +490,7 @@ private fun Drawer(
 				TextButton(
 					onClick = {
 						state.user.bookmarks = state.user.bookmarks.minus(bookmark)
-						state.userDatabase.editUser(state.user)
+						state.userDatabase.userDao().update(state.user)
 						bookmarkDeleteDialog = null
 					}) {
 					Text(stringResource(id = R.string.all_delete))
@@ -540,7 +538,7 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 					},
 					actions = {
 						ProfileSelectorAction(
-							users = state.userDatabase.getAllUsers(),
+							users = state.userDatabase.userDao().getAll(),
 							currentSelectionId = state.user.id,
 							showProfileActions = true,
 							onSelectionChange = {
@@ -676,7 +674,7 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 }
 
 class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
-	val user: LegacyUserDatabase.User,
+	val user: User,
 	val contextActivity: BaseComposeActivity,
 	val timetableDatabaseInterface: TimetableDatabaseInterface,
 	val weekViewSwipeRefresh: MutableState<WeekViewSwipeRefreshLayout?>,
@@ -1499,7 +1497,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun rememberMainAppState(
-	user: LegacyUserDatabase.User,
+	user: User,
 	contextActivity: BaseComposeActivity,
 	customThemeColor: Color?,
 	timetableDatabaseInterface: TimetableDatabaseInterface,
@@ -1565,7 +1563,7 @@ fun rememberMainAppState(
 }
 
 private fun getPersonalTimetableElement(
-	user: LegacyUserDatabase.User,
+	user: User,
 	context: Context
 ): Pair<PeriodElement?, String?>? {
 	return user.userData.elemType?.let { type ->

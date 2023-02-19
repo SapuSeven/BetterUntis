@@ -7,11 +7,13 @@ import android.content.Context
 import android.content.Context.ALARM_SERVICE
 import android.content.Intent
 import android.util.Log
+import androidx.room.Room
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.sapuseven.untis.data.databases.LegacyUserDatabase
+import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.helpers.config.booleanDataStore
 import com.sapuseven.untis.helpers.config.intDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
@@ -28,7 +30,7 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 		private const val LOG_TAG = "AutoMuteSetup"
 		private const val TAG_AUTO_MUTE_SETUP_WORK = "AutoMuteSetupWork"
 
-		fun enqueue(workManager: WorkManager, user: LegacyUserDatabase.User) {
+		fun enqueue(workManager: WorkManager, user: User) {
 			val data: Data = Data.Builder().run {
 				put(WORKER_DATA_USER_ID, user.id)
 				build()
@@ -56,9 +58,12 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 	}
 
 	private suspend fun scheduleAutoMute(): Result {
-		val userDatabase = LegacyUserDatabase.createInstance(applicationContext)
+		val userDatabase = Room.databaseBuilder(
+			applicationContext,
+			UserDatabase::class.java, "users"
+		).build()
 
-		userDatabase.getUser(inputData.getLong(WORKER_DATA_USER_ID, -1))?.let { user ->
+		userDatabase.userDao().getById(inputData.getLong(WORKER_DATA_USER_ID, -1))?.let { user ->
 			try {
 				val personalTimetable = loadPersonalTimetableElement(user, applicationContext)
 					?: return@let // Anonymous / no custom personal timetable

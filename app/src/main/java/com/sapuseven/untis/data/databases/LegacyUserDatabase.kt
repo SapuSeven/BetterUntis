@@ -378,7 +378,7 @@ class LegacyUserDatabase private constructor(context: Context) : SQLiteOpenHelpe
 		val db = writableDatabase
 		db.beginTransaction()
 
-		listOf(
+		/*listOf(
 				AbsenceReason.TABLE_NAME to masterData.absenceReasons,
 				Department.TABLE_NAME to masterData.departments,
 				Duty.TABLE_NAME to masterData.duties,
@@ -392,7 +392,7 @@ class LegacyUserDatabase private constructor(context: Context) : SQLiteOpenHelpe
 				Teacher.TABLE_NAME to masterData.teachers,
 				TeachingMethod.TABLE_NAME to masterData.teachingMethods,
 				SchoolYear.TABLE_NAME to masterData.schoolyears
-		).forEach { refreshAdditionalUserData(db, userId, it.first, it.second) }
+		).forEach { refreshAdditionalUserData(db, userId, it.first, it.second) }*/
 
 		val values = ContentValues()
 		values.put(UserDatabaseContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP, masterData.timeStamp)

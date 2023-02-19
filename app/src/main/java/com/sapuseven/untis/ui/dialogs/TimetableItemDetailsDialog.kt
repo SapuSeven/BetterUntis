@@ -40,6 +40,7 @@ import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_WRITE_STUDENT
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.LegacyUserDatabase
+import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.SerializationUtils
@@ -71,11 +72,11 @@ import org.joda.time.format.DateTimeFormat
 )
 @Composable
 fun BaseComposeActivity.TimetableItemDetailsDialog(
-    timegridItems: List<PeriodData>,
-    initialPage: Int = 0,
-    user: LegacyUserDatabase.User,
-    timetableDatabaseInterface: TimetableDatabaseInterface,
-    onDismiss: (requestedElement: PeriodElement?) -> Unit
+	timegridItems: List<PeriodData>,
+	initialPage: Int = 0,
+	user: User,
+	timetableDatabaseInterface: TimetableDatabaseInterface,
+	onDismiss: (requestedElement: PeriodElement?) -> Unit
 ) {
 	var dismissed by rememberSaveable { mutableStateOf(false) }
 	val pagerState = rememberPagerState(initialPage)
@@ -772,7 +773,7 @@ private fun TimetableDatabaseInterface.TimetableItemDetailsDialogElement(
 }
 
 private suspend fun loadPeriodData(
-    user: LegacyUserDatabase.User,
+    user: User,
     period: Period
 ): Result<PeriodDataResult> {
 	val query = UntisRequest.UntisRequestQuery(user).apply {
@@ -798,7 +799,7 @@ private suspend fun loadPeriodData(
 }
 
 private suspend fun createAbsence(
-    user: LegacyUserDatabase.User,
+    user: User,
     ttId: Int,
     student: UntisStudent,
     startDateTime: LocalDateTime,
@@ -831,7 +832,7 @@ private suspend fun createAbsence(
 }
 
 private suspend fun deleteAbsence(
-    user: LegacyUserDatabase.User,
+    user: User,
     absence: UntisAbsence
 ): Result<Boolean> {
 	val query =
@@ -858,7 +859,7 @@ private suspend fun deleteAbsence(
 }
 
 private suspend fun submitAbsencesChecked(
-    user: LegacyUserDatabase.User,
+    user: User,
     ttId: Int
 ): Result<Boolean> {
 	val query =
@@ -885,7 +886,7 @@ private suspend fun submitAbsencesChecked(
 }
 
 private suspend fun submitLessonTopic(
-    user: LegacyUserDatabase.User,
+    user: User,
     ttId: Int,
     lessonTopic: String
 ): Result<String> {

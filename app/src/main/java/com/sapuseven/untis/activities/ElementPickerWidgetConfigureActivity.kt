@@ -10,8 +10,11 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -21,7 +24,6 @@ import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.work.WorkManager
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
@@ -49,8 +51,7 @@ class ElementPickerWidgetConfigureActivity : BaseComposeActivity() {
 			return
 		}
 
-		val userDatabase = LegacyUserDatabase.createInstance(this)
-		val users = userDatabase.getAllUsers()
+		val users = userDatabase.userDao().getAll()
 
 		setContent {
 			AppTheme(navBarInset = false) {
@@ -75,7 +76,7 @@ class ElementPickerWidgetConfigureActivity : BaseComposeActivity() {
 						onDismiss = { finish() },
 						onSelect = { element ->
 							runBlocking {
-								val user = userDatabase.getUser(selectedUserId) ?: run {
+								val user = userDatabase.userDao().getById(selectedUserId) ?: run {
 									setResult(Activity.RESULT_CANCELED)
 									finish()
 									return@runBlocking
@@ -120,7 +121,7 @@ class ElementPickerWidgetConfigureActivity : BaseComposeActivity() {
 						},
 						additionalActions = {
 							ProfileSelectorAction(
-								users = userDatabase.getAllUsers(),
+								users = userDatabase.userDao().getAll(),
 								currentSelectionId = selectedUserId,
 								hideIfSingleProfile = true,
 								onSelectionChange = {

@@ -2,8 +2,10 @@ package com.sapuseven.untis.workers
 
 import android.content.Context
 import android.util.Log
+import androidx.room.Room
 import androidx.work.*
 import com.sapuseven.untis.data.databases.LegacyUserDatabase
+import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.config.booleanDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import org.joda.time.LocalDateTime
@@ -43,10 +45,14 @@ class DailyWorker(context: Context, params: WorkerParameters) :
 	}
 
 	override suspend fun doWork(): Result {
-		val userDatabase = LegacyUserDatabase.createInstance(applicationContext)
+		val userDatabase = Room.databaseBuilder(
+			applicationContext,
+			UserDatabase::class.java, "users"
+		).build()
+
 		val workManager = WorkManager.getInstance(applicationContext)
 
-		userDatabase.getAllUsers().forEach { user ->
+		userDatabase.userDao().getAll().forEach { user ->
 			val personalTimetable = loadPersonalTimetableElement(user, applicationContext)
 				?: return@forEach // Anonymous / no custom personal timetable
 

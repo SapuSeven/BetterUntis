@@ -20,10 +20,12 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.room.Room
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.databases.LegacyUserDatabase
+import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.helpers.config.globalDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.preferences.dataStorePreferences
@@ -36,23 +38,30 @@ import kotlinx.coroutines.flow.*
 
 @SuppressLint("Registered") // This activity is not intended to be used directly
 open class BaseComposeActivity : ComponentActivity() {
-	internal var user by mutableStateOf<LegacyUserDatabase.User?>(null)
+	internal var user by mutableStateOf<User?>(null)
 	internal var customThemeColor by mutableStateOf<Color?>(null) // Workaround to allow legacy views to respond to theme color changes
 	internal var colorScheme by mutableStateOf<ColorScheme?>(null)
-	internal lateinit var userDatabase: LegacyUserDatabase
+	internal lateinit var userDatabase: UserDatabase
 	internal lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
 
 	private var dialogOpenUrl: MutableState<String?>? = null
 
 	companion object {
 		private const val EXTRA_LONG_USER_ID = "com.sapuseven.untis.activities.profileid"
-		private const val EXTRA_INT_BACKGROUND_COLOR = "com.sapuseven.untis.activities.backgroundcolor"
+		private const val EXTRA_INT_BACKGROUND_COLOR =
+			"com.sapuseven.untis.activities.backgroundcolor"
 
 		val DATASTORE_KEY_USER_ID = longPreferencesKey("userid")
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
-		userDatabase = LegacyUserDatabase.createInstance(this)
+		userDatabase = Room.databaseBuilder(
+			applicationContext,
+			UserDatabase::class.java, "users"
+		)
+			.allowMainThreadQueries() // TODO: Fix and delete this!
+			.build()
+
 		runBlocking { // Not ideal, but works well enough
 			loadInitialUser()
 		}
@@ -71,7 +80,7 @@ open class BaseComposeActivity : ComponentActivity() {
 	@Composable
 	fun withUser(
 		invalidContent: @Composable () -> Unit = { InvalidProfileDialog() },
-		content: @Composable (LegacyUserDatabase.User) -> Unit
+		content: @Composable (User) -> Unit
 	) {
 		user?.let {
 			content(it)
@@ -105,8 +114,10 @@ open class BaseComposeActivity : ComponentActivity() {
 	}
 
 	private suspend fun loadInitialUser() {
-		val user = userDatabase.getUser(getUserIdExtra(intent) ?: loadSelectedUserId()
-		) ?: userDatabase.getAllUsers().getOrNull(0)
+		val userDao = userDatabase.userDao()
+		val user = userDao.getById(
+			getUserIdExtra(intent) ?: loadSelectedUserId()
+		) ?: userDao.getAll().getOrNull(0)
 
 		user?.let {
 			setUser(it)
@@ -114,7 +125,7 @@ open class BaseComposeActivity : ComponentActivity() {
 	}
 
 	@OptIn(DelicateCoroutinesApi::class)
-	fun setUser(user: LegacyUserDatabase.User, save: Boolean = false) {
+	fun setUser(user: User, save: Boolean = false) {
 		this.user = user
 		this.customThemeColor = null
 

@@ -1,15 +1,14 @@
 package com.sapuseven.untis.helpers.timetable
 
-import com.sapuseven.untis.data.databases.LegacyUserDatabase
+import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.PeriodData.Companion.ELEMENT_NAME_UNKNOWN
-import com.sapuseven.untis.interfaces.TableModel
 import com.sapuseven.untis.models.untis.masterdata.Klasse
 import com.sapuseven.untis.models.untis.masterdata.Room
 import com.sapuseven.untis.models.untis.masterdata.Subject
 import com.sapuseven.untis.models.untis.masterdata.Teacher
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 
-class TimetableDatabaseInterface(val database: LegacyUserDatabase, val id: Long) {
+class TimetableDatabaseInterface(val userDatabase: UserDatabase, val id: Long) {
 	private var allClasses: Map<Int, Klasse> = mapOf()
 	private var allTeachers: Map<Int, Teacher> = mapOf()
 	private var allSubjects: Map<Int, Subject> = mapOf()
@@ -27,10 +26,17 @@ class TimetableDatabaseInterface(val database: LegacyUserDatabase, val id: Long)
 	}
 
 	init {
-		database.getAdditionalUserData<Klasse>(id, Klasse())?.let { item -> allClasses = item.toList().filter { it.second.active }.sortedBy { it.second.name }.toMap() }
-		database.getAdditionalUserData<Teacher>(id, Teacher())?.let { item -> allTeachers = item.toList().filter { it.second.active }.sortedBy { it.second.name }.toMap() }
-		database.getAdditionalUserData<Subject>(id, Subject())?.let { item -> allSubjects = item.toList().filter { it.second.active }.sortedBy { it.second.name }.toMap() }
-		database.getAdditionalUserData<Room>(id, Room())?.let { item -> allRooms = item.toList().filter { it.second.active }.sortedBy { it.second.name }.toMap() }
+		val userDao = userDatabase.userDao()
+		userDao.getByIdWithData(id)?.let {
+			allClasses =
+				it.klasses.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
+			allTeachers =
+				it.teachers.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
+			allSubjects =
+				it.subjects.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
+			allRooms =
+				it.rooms.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
+		}
 	}
 
 	fun getShortName(id: Int, type: Type?): String {
@@ -87,13 +93,13 @@ class TimetableDatabaseInterface(val database: LegacyUserDatabase, val id: Long)
 		return isAllowed(periodElement.id, periodElement.type)
 	}
 
-	private fun tableModelToPeriodElement(values: Collection<TableModel>): List<PeriodElement> {
-		return values.map { item: TableModel ->
-			when (item) {
-				is Klasse -> PeriodElement(Type.CLASS.name, item.id, item.id)
-				is Teacher -> PeriodElement(Type.TEACHER.name, item.id, item.id)
-				is Subject -> PeriodElement(Type.SUBJECT.name, item.id, item.id)
-				is Room -> PeriodElement(Type.ROOM.name, item.id, item.id)
+	private inline fun <reified T> convertToPeriodElement(values: Collection<T>): List<PeriodElement> {
+		return values.map { item ->
+			when (T::class) {
+				Klasse::class -> PeriodElement(Type.CLASS.name, (item as Klasse).id)
+				Teacher::class -> PeriodElement(Type.TEACHER.name, (item as Teacher).id)
+				Subject::class -> PeriodElement(Type.SUBJECT.name, (item as Subject).id)
+				Room::class -> PeriodElement(Type.ROOM.name, (item as Room).id)
 				else -> PeriodElement("", -1, -1)
 			}
 		}
@@ -110,12 +116,14 @@ class TimetableDatabaseInterface(val database: LegacyUserDatabase, val id: Long)
 	}
 
 	fun getElements(type: Type?): List<PeriodElement> {
-		return tableModelToPeriodElement(when (type) {
-			Type.CLASS -> allClasses.values
-			Type.TEACHER -> allTeachers.values
-			Type.SUBJECT -> allSubjects.values
-			Type.ROOM -> allRooms.values
-			else -> emptyList()
-		})
+		return convertToPeriodElement(
+			when (type) {
+				Type.CLASS -> allClasses.values
+				Type.TEACHER -> allTeachers.values
+				Type.SUBJECT -> allSubjects.values
+				Type.ROOM -> allRooms.values
+				else -> emptyList()
+			}
+		)
 	}
 }

@@ -42,7 +42,7 @@ import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults.libraryColors
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.databases.LegacyUserDatabase
+import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.models.github.GithubUser
 import com.sapuseven.untis.preferences.PreferenceCategory
@@ -348,15 +348,19 @@ class SettingsActivity : BaseComposeActivity() {
 											)
 
 											//if (BuildConfig.DEBUG)
-												Preference(
-													title = { Text("Send test report") },
-													summary = { Text("Sends a report to Sentry to test error reporting") },
-													onClick = {
-														Sentry.captureException(java.lang.Exception("Test report"))
-														Toast.makeText(this@SettingsActivity, "Report has been sent", Toast.LENGTH_SHORT).show()
-													},
-													dataStore = UntisPreferenceDataStore.emptyDataStore()
-												)
+											Preference(
+												title = { Text("Send test report") },
+												summary = { Text("Sends a report to Sentry to test error reporting") },
+												onClick = {
+													Sentry.captureException(java.lang.Exception("Test report"))
+													Toast.makeText(
+														this@SettingsActivity,
+														"Report has been sent",
+														Toast.LENGTH_SHORT
+													).show()
+												},
+												dataStore = UntisPreferenceDataStore.emptyDataStore()
+											)
 										}
 									}
 								}
@@ -1133,7 +1137,7 @@ class SettingsActivity : BaseComposeActivity() {
 		}
 	}
 
-	private fun enqueueNotificationSetup(user: LegacyUserDatabase.User) {
+	private fun enqueueNotificationSetup(user: User) {
 		NotificationSetupWorker.enqueue(
 			WorkManager.getInstance(this@SettingsActivity),
 			user
@@ -1182,7 +1186,7 @@ class SettingsActivity : BaseComposeActivity() {
 	}
 
 	private fun updateAutoMutePref(
-		user: LegacyUserDatabase.User,
+		user: User,
 		scope: CoroutineScope,
 		autoMutePref: UntisPreferenceDataStore<Boolean>,
 		enable: Boolean = false

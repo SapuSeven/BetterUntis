@@ -10,13 +10,15 @@ import android.content.Context.ALARM_SERVICE
 import android.content.Intent
 import android.os.Build
 import android.util.Log
+import androidx.room.Room
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.databases.LegacyUserDatabase
+import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.config.booleanDataStore
@@ -54,7 +56,7 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 		const val CHANNEL_ID_BACKGROUNDERRORS = "notifications.backgrounderrors"
 		const val CHANNEL_ID_BREAKINFO = "notifications.breakinfo"
 
-		fun enqueue(workManager: WorkManager, user: LegacyUserDatabase.User) {
+		fun enqueue(workManager: WorkManager, user: User) {
 			val data: Data = Data.Builder().run {
 				put(WORKER_DATA_USER_ID, user.id)
 				build()
@@ -83,9 +85,12 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 	}
 
 	private suspend fun scheduleNotifications(): Result {
-		val userDatabase = LegacyUserDatabase.createInstance(applicationContext)
+		val userDatabase = Room.databaseBuilder(
+			applicationContext,
+			UserDatabase::class.java, "users"
+		).build()
 
-		userDatabase.getUser(inputData.getLong(WORKER_DATA_USER_ID, -1))?.let { user ->
+		userDatabase.userDao().getById(inputData.getLong(WORKER_DATA_USER_ID, -1))?.let { user ->
 			var scheduledNotifications = 0
 
 			try {

@@ -45,6 +45,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.LegacyUserDatabase
+import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.api.LoginDataInfo
@@ -87,7 +88,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 	private var existingUserId: Long? = null
 
 	private var schoolInfoFromSearch: UntisSchoolInfo? = null
-	private var existingUser: LegacyUserDatabase.User? = null
+	private var existingUser: User? = null
 
 	@OptIn(ExperimentalMaterial3Api::class, ExperimentalSerializationApi::class,
 		ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class
@@ -100,13 +101,11 @@ class LoginDataInputActivity : BaseComposeActivity() {
 			existingUserId = userId
 
 			existingUserId?.let { id ->
-				existingUser = userDatabase.getUser(id)?.also { user ->
+				existingUser = userDatabase.userDao().getById(id)?.also { user ->
 					setUser(user)
 				}
 			}
 		}
-
-		userDatabase = LegacyUserDatabase.createInstance(this)
 
 		setContent {
 			val systemUiController = rememberSystemUiController()
@@ -267,12 +266,10 @@ class LoginDataInputActivity : BaseComposeActivity() {
 									?: return@run
 							val bookmarks =
 								existingUserId?.let { user ->
-									userDatabase.getUser(
-										user
-									)?.bookmarks?.toSet()
+									userDatabase.userDao().getById(user)?.bookmarks?.toSet()
 								}
 									?: emptySet()
-							val user = LegacyUserDatabase.User(
+							val user = User(
 								existingUserId ?: -1,
 								profileName.value ?: "",
 								untisApiUrl,
@@ -289,13 +286,14 @@ class LoginDataInputActivity : BaseComposeActivity() {
 							)
 
 							val userId =
-								if (existingUserId == null) userDatabase.addUser(
+								if (existingUserId == null) userDatabase.userDao().insert(
 									user
-								) else userDatabase.editUser(
+								) else userDatabase.userDao().update(
 									user
 								)
 
-							userId?.let {
+							// TODO
+							/*userId?.let {
 								userDatabase.setAdditionalUserData(
 									userId,
 									userDataResponse.masterData
@@ -308,7 +306,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 								finish()
 							} ?: run {
 								onError(LoginErrorInfo(errorMessageStringRes = R.string.logindatainput_adding_user_unknown_error))
-							}
+							}*/
 						}
 					}
 				}
