@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d2a6e85c6d9fac58f0e880ee72a94532",
+    "identityHash": "f067b243286c29a2a11a7a9067cbdafe",
     "entities": [
       {
         "tableName": "User",
@@ -155,7 +155,7 @@
       },
       {
         "tableName": "Department",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `longName` TEXT NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `longName` TEXT NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -193,7 +193,7 @@
         "foreignKeys": [
           {
             "table": "User",
-            "onDelete": "NO ACTION",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "userId"
@@ -206,7 +206,7 @@
       },
       {
         "tableName": "Duty",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `longName` TEXT NOT NULL, `type` TEXT NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `longName` TEXT NOT NULL, `type` TEXT NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -250,7 +250,7 @@
         "foreignKeys": [
           {
             "table": "User",
-            "onDelete": "NO ACTION",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "userId"
@@ -263,7 +263,7 @@
       },
       {
         "tableName": "EventReason",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `longName` TEXT NOT NULL, `elementType` TEXT NOT NULL, `groupId` INTEGER NOT NULL, `active` INTEGER NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `longName` TEXT NOT NULL, `elementType` TEXT NOT NULL, `groupId` INTEGER NOT NULL, `active` INTEGER NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -319,7 +319,7 @@
         "foreignKeys": [
           {
             "table": "User",
-            "onDelete": "NO ACTION",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "userId"
@@ -332,7 +332,7 @@
       },
       {
         "tableName": "EventReasonGroup",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `longName` TEXT NOT NULL, `active` INTEGER NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `longName` TEXT NOT NULL, `active` INTEGER NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -376,7 +376,7 @@
         "foreignKeys": [
           {
             "table": "User",
-            "onDelete": "NO ACTION",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "userId"
@@ -389,7 +389,7 @@
       },
       {
         "tableName": "ExcuseStatus",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `longName` TEXT NOT NULL, `excused` INTEGER NOT NULL, `active` INTEGER NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `longName` TEXT NOT NULL, `excused` INTEGER NOT NULL, `active` INTEGER NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -439,7 +439,7 @@
         "foreignKeys": [
           {
             "table": "User",
-            "onDelete": "NO ACTION",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "userId"
@@ -452,7 +452,7 @@
       },
       {
         "tableName": "Holiday",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `longName` TEXT NOT NULL, `startDate` TEXT NOT NULL, `endDate` TEXT NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `longName` TEXT NOT NULL, `startDate` TEXT NOT NULL, `endDate` TEXT NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -502,7 +502,7 @@
         "foreignKeys": [
           {
             "table": "User",
-            "onDelete": "NO ACTION",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "userId"
@@ -515,7 +515,7 @@
       },
       {
         "tableName": "Klasse",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `longName` TEXT NOT NULL, `departmentId` INTEGER NOT NULL, `startDate` TEXT NOT NULL, `endDate` TEXT NOT NULL, `foreColor` TEXT, `backColor` TEXT, `active` INTEGER NOT NULL, `displayable` INTEGER NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `longName` TEXT NOT NULL, `departmentId` INTEGER NOT NULL, `startDate` TEXT NOT NULL, `endDate` TEXT NOT NULL, `foreColor` TEXT, `backColor` TEXT, `active` INTEGER NOT NULL, `displayable` INTEGER NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -595,7 +595,7 @@
         "foreignKeys": [
           {
             "table": "User",
-            "onDelete": "NO ACTION",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "userId"
@@ -608,7 +608,7 @@
       },
       {
         "tableName": "Room",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `longName` TEXT NOT NULL, `departmentId` INTEGER NOT NULL, `foreColor` TEXT, `backColor` TEXT, `active` INTEGER NOT NULL, `displayAllowed` INTEGER NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `longName` TEXT NOT NULL, `departmentId` INTEGER NOT NULL, `foreColor` TEXT, `backColor` TEXT, `active` INTEGER NOT NULL, `displayAllowed` INTEGER NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -676,7 +676,7 @@
         "foreignKeys": [
           {
             "table": "User",
-            "onDelete": "NO ACTION",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "userId"
@@ -689,7 +689,7 @@
       },
       {
         "tableName": "Subject",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `longName` TEXT NOT NULL, `departmentIds` TEXT NOT NULL, `foreColor` TEXT, `backColor` TEXT, `active` INTEGER NOT NULL, `displayAllowed` INTEGER NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `longName` TEXT NOT NULL, `departmentIds` TEXT NOT NULL, `foreColor` TEXT, `backColor` TEXT, `active` INTEGER NOT NULL, `displayAllowed` INTEGER NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -757,7 +757,7 @@
         "foreignKeys": [
           {
             "table": "User",
-            "onDelete": "NO ACTION",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "userId"
@@ -770,7 +770,7 @@
       },
       {
         "tableName": "Teacher",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `firstName` TEXT NOT NULL, `lastName` TEXT NOT NULL, `departmentIds` TEXT NOT NULL, `foreColor` TEXT, `backColor` TEXT, `entryDate` TEXT, `exitDate` TEXT, `active` INTEGER NOT NULL, `displayAllowed` INTEGER NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `firstName` TEXT NOT NULL, `lastName` TEXT NOT NULL, `departmentIds` TEXT NOT NULL, `foreColor` TEXT, `backColor` TEXT, `entryDate` TEXT, `exitDate` TEXT, `active` INTEGER NOT NULL, `displayAllowed` INTEGER NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -856,7 +856,7 @@
         "foreignKeys": [
           {
             "table": "User",
-            "onDelete": "NO ACTION",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "userId"
@@ -869,7 +869,7 @@
       },
       {
         "tableName": "TeachingMethod",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `longName` TEXT NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `longName` TEXT NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -907,7 +907,7 @@
         "foreignKeys": [
           {
             "table": "User",
-            "onDelete": "NO ACTION",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "userId"
@@ -920,7 +920,7 @@
       },
       {
         "tableName": "SchoolYear",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `startDate` TEXT NOT NULL, `endDate` TEXT NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `startDate` TEXT NOT NULL, `endDate` TEXT NOT NULL, PRIMARY KEY(`id`, `userId`), FOREIGN KEY(`userId`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -964,7 +964,7 @@
         "foreignKeys": [
           {
             "table": "User",
-            "onDelete": "NO ACTION",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "userId"
@@ -979,7 +979,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd2a6e85c6d9fac58f0e880ee72a94532')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f067b243286c29a2a11a7a9067cbdafe')"
     ]
   }
 }

@@ -13,7 +13,7 @@ import kotlinx.serialization.Transient
 		entity = User::class,
 		parentColumns = ["id"],
 		childColumns = ["userId"],
-		onDelete = ForeignKey.CASCADE // TODO: Do this for others as well
+		onDelete = ForeignKey.CASCADE
 	)]
 )
 data class AbsenceReason(
