@@ -12,7 +12,6 @@ import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.*
 import com.sapuseven.untis.models.untis.UntisDate
-import com.sapuseven.untis.models.untis.UntisDateTime
 import com.sapuseven.untis.models.untis.masterdata.SchoolYear
 import com.sapuseven.untis.models.untis.params.*
 import com.sapuseven.untis.models.untis.response.*
@@ -43,7 +42,7 @@ class InfoCenterState(
 	val officeHours: MutableState<List<UntisOfficeHour>?>,
 
 	val absencesOnlyUnexcused: State<Boolean>,
-	val absencesSortAscending: State<Boolean>,
+	val absencesSortReversed: State<Boolean>,
 	val absencesTimeRange: State<String>,
 ) {
 	private var api: UntisRequest = UntisRequest()
@@ -69,14 +68,10 @@ class InfoCenterState(
 
 	val absenceList: List<UntisAbsence>?
 		get() = absences.value.let {
-			if (absencesSortAscending.value) {
-				it?.sortedBy { absence ->
-					absence.id
-				}
+			if (absencesSortReversed.value) {
+				it?.sortedBy { absence -> absence.startDateTime.toLocalDateTime() } // oldest first
 			} else {
-				it?.sortedByDescending { absence ->
-					absence.id
-				}
+				it?.sortedByDescending { absence -> absence.startDateTime.toLocalDateTime() } // newest first
 			}
 		}.let {
 			it?.filter { absence ->
@@ -319,7 +314,7 @@ fun rememberInfoCenterState(
 	absencesLoading: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 	officeHoursLoading: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 	absencesOnlyUnexcused: State<Boolean> = preferences.infocenterAbsencesOnlyUnexcused.getState(),
-	absencesSortAscending: State<Boolean> = preferences.infocenterAbsencesSortAscending.getState(),
+	absencesSortReversed: State<Boolean> = preferences.infocenterAbsencesSortReverse.getState(),
 	absencesTimeRange: State<String> = preferences.infocenterAbsencesTimeRange.getState(),
 ) = remember(user) {
 	InfoCenterState(
@@ -339,7 +334,7 @@ fun rememberInfoCenterState(
 		absencesLoading = absencesLoading,
 		officeHoursLoading = officeHoursLoading,
 		absencesOnlyUnexcused = absencesOnlyUnexcused,
-		absencesSortAscending = absencesSortAscending,
+		absencesSortReversed = absencesSortReversed,
 		absencesTimeRange = absencesTimeRange
 	)
 }

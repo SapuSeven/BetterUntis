@@ -85,9 +85,9 @@
 	<string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
 	<string name="infocenter_timeformat_sameday">%2$s - %4$s, %1$s</string>
 	<string name="infocenter_absences_filter_only_unexcused">Show unexcused only</string>
-	<string name="infocenter_absences_filter_sortby">Sort by</string>
-	<string name="infocenter_absences_filter_ascending">Ascending</string>
-	<string name="infocenter_absences_filter_descending">Descending</string>
+	<string name="infocenter_absences_filter_sort">Sort order</string>
+	<string name="infocenter_absences_filter_oldest_first">Oldest first</string>
+	<string name="infocenter_absences_filter_newest_first">Newest first</string>
 	<string name="infocenter_absences_filter_time_ranges">Time ranges</string>
 	<string name="infocenter_absences_filter">Filter Absences</string>
 	<string name="library_appcompat" translatable="false">Android AppCompat Library V7</string>

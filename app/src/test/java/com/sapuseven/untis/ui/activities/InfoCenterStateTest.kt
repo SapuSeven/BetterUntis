@@ -1,18 +1,7 @@
 package com.sapuseven.untis.ui.activities
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import com.sapuseven.untis.activities.BaseComposeActivity
-import com.sapuseven.untis.data.connectivity.UntisApiConstants
-import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.UntisAbsence
-import com.sapuseven.untis.models.UntisMessage
-import com.sapuseven.untis.models.UntisOfficeHour
 import com.sapuseven.untis.models.untis.UntisDateTime
-import com.sapuseven.untis.models.untis.UntisUserData
-import com.sapuseven.untis.preferences.DataStorePreferences
 import io.mockk.every
 import io.mockk.mockk
 import org.joda.time.LocalDateTime
@@ -23,8 +12,8 @@ class InfoCenterStateTest {
 	val testAbsences = listOf(
 		UntisAbsence(
 			1, 1, 1,
-			UntisDateTime(LocalDateTime.now().minusDays(1)),
 			UntisDateTime(LocalDateTime.now().minusDays(1).plusHours(2)),
+			UntisDateTime(LocalDateTime.now().minusDays(1).plusHours(4)),
 			true,
 			false,
 			null,
@@ -84,7 +73,7 @@ class InfoCenterStateTest {
 		val infoCenterState = mockk<InfoCenterState>()
 
 		every { infoCenterState.absences.value } returns testAbsences
-		every { infoCenterState.absencesSortAscending.value } returns true
+		every { infoCenterState.absencesSortReversed.value } returns true
 		every { infoCenterState.absencesOnlyUnexcused.value } returns true
 		every { infoCenterState.absencesTimeRange.value } returns ""
 		every { infoCenterState.absenceList } answers { callOriginal() }
@@ -95,11 +84,11 @@ class InfoCenterStateTest {
 	}
 
 	@Test
-	fun absenceSettings_sortAscending() {
+	fun absenceSettings_sortReversedUnchecked_newestFirst() {
 		val infoCenterState = mockk<InfoCenterState>()
 
 		every { infoCenterState.absences.value } returns testAbsences
-		every { infoCenterState.absencesSortAscending.value } returns true
+		every { infoCenterState.absencesSortReversed.value } returns false
 		every { infoCenterState.absencesOnlyUnexcused.value } returns false
 		every { infoCenterState.absencesTimeRange.value } returns ""
 		every { infoCenterState.absenceList } answers { callOriginal() }
@@ -116,11 +105,11 @@ class InfoCenterStateTest {
 	}
 
 	@Test
-	fun absenceSettings_sortDescending() {
+	fun absenceSettings_sortReversedChecked_oldestFirst() {
 		val infoCenterState = mockk<InfoCenterState>()
 
 		every { infoCenterState.absences.value } returns testAbsences
-		every { infoCenterState.absencesSortAscending.value } returns false
+		every { infoCenterState.absencesSortReversed.value } returns true
 		every { infoCenterState.absencesOnlyUnexcused.value } returns false
 		every { infoCenterState.absencesTimeRange.value } returns ""
 		every { infoCenterState.absenceList } answers { callOriginal() }
@@ -141,7 +130,7 @@ class InfoCenterStateTest {
 		val infoCenterState = mockk<InfoCenterState>()
 
 		every { infoCenterState.absences.value } returns testAbsences
-		every { infoCenterState.absencesSortAscending.value } returns true
+		every { infoCenterState.absencesSortReversed.value } returns false
 		every { infoCenterState.absencesOnlyUnexcused.value } returns false
 		every { infoCenterState.absencesTimeRange.value } returns "fourteen_days"
 		every { infoCenterState.absenceList } answers { callOriginal() }

@@ -5,11 +5,9 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Close
@@ -22,7 +20,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
@@ -43,7 +40,6 @@ import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.NavigationBarInset
 import com.sapuseven.untis.ui.common.VerticalScrollColumn
 import com.sapuseven.untis.ui.dialogs.AttachmentsDialog
-import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.preferences.ListPreference
 import com.sapuseven.untis.ui.preferences.SwitchPreference
 import kotlinx.coroutines.launch
@@ -510,21 +506,20 @@ private fun AbsenceFilterDialog(
 	) { padding ->
 		Box(modifier = Modifier.padding(padding)){
 			VerticalScrollColumn {
-				val sortChecked by preferences.infocenterAbsencesSortAscending.getState()
+				val sortReversed by preferences.infocenterAbsencesSortReverse.getState()
 				SwitchPreference(
 					title = { Text(text = stringResource(id = R.string.infocenter_absences_filter_only_unexcused)) },
 					dataStore = preferences.infocenterAbsencesOnlyUnexcused
 				)
 				SwitchPreference(
-					title = { Text(text = stringResource(id = R.string.infocenter_absences_filter_sortby)) },
+					title = { Text(text = stringResource(id = R.string.infocenter_absences_filter_sort)) },
 					summary = {
-						if (sortChecked) {
-							Text(text = stringResource(id = R.string.infocenter_absences_filter_ascending))
-						} else {
-							Text(text = stringResource(id = R.string.infocenter_absences_filter_descending))
-						}
+						if (sortReversed)
+							Text(text = stringResource(id = R.string.infocenter_absences_filter_oldest_first))
+						else
+							Text(text = stringResource(id = R.string.infocenter_absences_filter_newest_first))
 					},
-					dataStore = preferences.infocenterAbsencesSortAscending
+					dataStore = preferences.infocenterAbsencesSortReverse
 				)
 				ListPreference(
 					title = { Text(text = stringResource(id = R.string.infocenter_absences_filter_time_ranges)) },
