@@ -127,8 +127,9 @@ dependencies {
 	implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01'
 	implementation 'androidx.recyclerview:recyclerview:1.2.1'
 	implementation 'androidx.preference:preference-ktx:1.2.0'
-	implementation 'com.github.kittinunf.fuel:fuel:2.3.1'
-	implementation 'com.github.kittinunf.fuel:fuel-coroutines:2.3.1'
+	implementation "com.github.kittinunf.fuel:fuel:$fuel_version"
+	implementation "com.github.kittinunf.fuel:fuel-coroutines:$fuel_version"
+	implementation "com.github.kittinunf.fuel:fuel-kotlinx-serialization:$fuel_version"
 	implementation 'joda-time:joda-time:2.10.14'
 	implementation 'com.google.android.material:material:1.7.0-alpha03'
 	implementation 'com.budiyev.android:code-scanner:2.1.0'

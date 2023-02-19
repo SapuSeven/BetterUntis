@@ -45,12 +45,8 @@ class LoginHelper(
 			if (schoolId != null) listOf(SchoolSearchParams(schoolid = schoolId))
 			else listOf(SchoolSearchParams(search = school))
 
-		val result = api.request(query)
-		result.fold({ data ->
+		api.request<SchoolSearchResponse>(query).fold({ untisResponse ->
 			try {
-				val untisResponse =
-					SerializationUtils.getJSON().decodeFromString<SchoolSearchResponse>(data)
-
 				untisResponse.result?.let {
 					if (it.schools.isNotEmpty()) {
 						val schoolResult =
@@ -107,13 +103,8 @@ class LoginHelper(
 		query.data.method = UntisApiConstants.METHOD_GET_APP_SHARED_SECRET
 		query.data.params = listOf(AppSharedSecretParams(loginData.user, loginData.password))
 
-		val appSharedSecretResult = api.request(query)
-
-		appSharedSecretResult.fold({ data ->
+		api.request<AppSharedSecretResponse>(query).fold({ untisResponse ->
 			try {
-				val untisResponse =
-					SerializationUtils.getJSON().decodeFromString<AppSharedSecretResponse>(data)
-
 				if (untisResponse.error?.code == ErrorMessageDictionary.ERROR_CODE_INVALID_CREDENTIALS)
 					return loginData.password
 				if (untisResponse.result.isNullOrEmpty())
@@ -172,13 +163,8 @@ class LoginHelper(
 			)
 		}
 
-		val userDataResult = api.request(query)
-
-		userDataResult.fold({ data ->
+		api.request<UserDataResponse>(query).fold({ untisResponse ->
 			try {
-				val untisResponse =
-					SerializationUtils.getJSON().decodeFromString<UserDataResponse>(data)
-
 				if (untisResponse.result != null) {
 					return untisResponse.result
 				} else {

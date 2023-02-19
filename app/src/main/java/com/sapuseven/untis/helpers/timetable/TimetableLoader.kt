@@ -8,7 +8,6 @@ import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
-import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.params.TimetableParams
 import com.sapuseven.untis.models.untis.response.TimetableResponse
@@ -16,7 +15,6 @@ import com.sapuseven.untis.models.untis.timetable.Period
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import kotlinx.serialization.decodeFromString
 import org.joda.time.Instant
 import java.lang.ref.WeakReference
 
@@ -169,10 +167,7 @@ class TimetableLoader(
 		query.data.method = UntisApiConstants.METHOD_GET_TIMETABLE
 		query.data.params = listOf(params)
 
-		val userDataResult = api.request(query)
-		userDataResult.fold({ data ->
-			val untisResponse = getJSON().decodeFromString<TimetableResponse>(data)
-
+		api.request<TimetableResponse>(query).fold({ untisResponse ->
 			if (untisResponse.result != null) {
 				Log.d(
 					"TimetableLoaderDebug",
