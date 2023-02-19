@@ -344,4 +344,21 @@
     <string name="preference_dialog_permission_alarms_title">Berechtigung erforderlich</string>
     <string name="preference_dialog_permission_alarms_text">Diese Funktion erfordert zusätzliche Berechtigungen. Bitte erlaube BetterUntis, genaue Alarme zu planen.</string>
     <string name="all_dialog_open_settings">Einstellungen öffnen</string>
+    <string name="infocenter_absences_filter_oldest_first">Älteste zuerst</string>
+    <string name="preference_reports_info">Über Fehlerberichte</string>
+    <string name="infocenter_absences_filter_sort">Sortierung</string>
+    <string name="infocenter_absences_filter_newest_first">Neueste zuerst</string>
+    <string name="infocenter_absences_filter">Abwesenheiten filtern</string>
+    <string name="main_dialog_reports_info_1">BetterUntis verwendet Sentry, um Informationen über Abstürze und andere Fehler zu sammeln.</string>
+    <string name="infocenter_absences_filter_only_unexcused">Nur unentschuldigte anzeigen</string>
+    <string name="infocenter_absences_filter_time_ranges">Zeitraum</string>
+    <string name="preference_reports_breadcrumbs">Detaillierte Fehlerberichte senden</string>
+    <string name="preference_category_reports">Fehlerberichte</string>
+    <string name="preference_reports_info_desc">Diese Einstellungen helfen dabei, die App zu verbessern.
+\nPersönliche Daten werden nie gesammelt.
+\nÄnderungen benötigen einen App-Neustart, um wirksam zu werden.</string>
+    <string name="preference_reports_breadcrumbs_desc">Beinhaltet zusätzliche Informationen darüber, was passiert ist, bevor ein Fehler aufgetreten ist.</string>
+    <string name="main_dialog_reports_info_2">Du kannst diese Werte jederzeit in den App-Einstellungen ändern.</string>
+    <string name="main_dialog_reports_title">Fehlerberichte</string>
+    <string name="main_dialog_reports_save">Speichern</string>
 </resources>
