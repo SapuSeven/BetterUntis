@@ -1,9 +1,11 @@
 package com.sapuseven.untis.ui.weekview
 
 import android.text.format.DateFormat
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -32,7 +34,6 @@ import org.joda.time.LocalDateTime
 import org.joda.time.LocalTime
 import org.joda.time.Minutes
 import org.joda.time.format.DateTimeFormat
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -175,7 +176,8 @@ fun WeekViewSidebarLabel(
 	hour: WeekViewHour,
 	modifier: Modifier = Modifier,
 ) {
-	val timeFormat = if (DateFormat.is24HourFormat(LocalContext.current)) timeFormat24h else timeFormat12h
+	val timeFormat =
+		if (DateFormat.is24HourFormat(LocalContext.current)) timeFormat24h else timeFormat12h
 
 	Column(
 		verticalArrangement = Arrangement.SpaceBetween,
@@ -228,9 +230,10 @@ fun WeekViewSidebar(
 	label: @Composable (hour: WeekViewHour) -> Unit = { WeekViewSidebarLabel(hour = it) },
 ) {
 	// TODO: This implementation is prone to alignment issues due to rounding errors. Maybe use a Box with absolute padding instead (like the hour lines).
-	Column(modifier = modifier
-		.width(IntrinsicSize.Max)
-		.padding(bottom = bottomPadding)
+	Column(
+		modifier = modifier
+			.width(IntrinsicSize.Max)
+			.padding(bottom = bottomPadding)
 	) {
 		var lastEndTime: LocalTime? = null
 		hourList.forEach { hour ->
@@ -386,7 +389,14 @@ fun WeekViewCompose(
 		HorizontalPager(
 			state = pagerState,
 			pageCount = Int.MAX_VALUE,
-			pageSpacing = with(LocalDensity.current) { dividerWidth.toDp() }
+			pageSpacing = with(LocalDensity.current) { dividerWidth.toDp() },
+			flingBehavior = PagerDefaults.flingBehavior(
+				state = pagerState,
+				lowVelocityAnimationSpec = tween(
+					easing = CubicBezierEasing(0.17f, 0.84f, 0.44f, 1f),
+					durationMillis = 500
+				)
+			)
 		) { index ->
 			val pageOffset = index - startPage
 			val visibleStartDate =
