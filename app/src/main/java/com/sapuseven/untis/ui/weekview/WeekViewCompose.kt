@@ -44,6 +44,7 @@ data class Event(
 	val top: String = "",
 	val bottom: String = "",
 	val color: Color,
+	val textColor: Color,
 	val start: LocalDateTime,
 	val end: LocalDateTime,
 )
@@ -67,7 +68,7 @@ fun WeekViewEvent(
 			fontSize = 10.sp,
 			textAlign = TextAlign.Start,
 			maxLines = 1,
-			color = MaterialTheme.colorScheme.onPrimary,
+			color = event.textColor,
 			modifier = Modifier
 				.fillMaxWidth()
 				.align(Alignment.TopCenter)
@@ -78,7 +79,7 @@ fun WeekViewEvent(
 			fontWeight = FontWeight.Bold,
 			textAlign = TextAlign.Center,
 			maxLines = 1,
-			color = MaterialTheme.colorScheme.onPrimary,
+			color = event.textColor,
 			modifier = Modifier
 				.fillMaxWidth()
 				.align(Alignment.Center)
@@ -89,7 +90,7 @@ fun WeekViewEvent(
 			fontSize = 10.sp,
 			textAlign = TextAlign.End,
 			maxLines = 1,
-			color = MaterialTheme.colorScheme.onPrimary,
+			color = event.textColor,
 			modifier = Modifier
 				.fillMaxWidth()
 				.align(Alignment.BottomCenter)
@@ -105,6 +106,7 @@ fun EventPreview() {
 		event = Event(
 			title = "Test",
 			color = Color(0xFFAFBBF2),
+			textColor = Color(0xFF000000),
 			start = LocalDateTime.parse("2021-05-18T09:00:00"),
 			end = LocalDateTime.parse("2021-05-18T11:00:00"),
 		), modifier = Modifier.sizeIn(maxHeight = 64.dp)

@@ -71,9 +71,10 @@ class TimegridItem(
 			title = title.toString(),
 			top = top.toString(),
 			bottom = bottom.toString(),
-			Color(color),
-			startTime.toLocalDateTime(),
-			endTime.toLocalDateTime()
+			color = Color(color),
+			textColor = Color(textColor),
+			start = startTime.toLocalDateTime(),
+			end = endTime.toLocalDateTime()
 		)
 	}
 

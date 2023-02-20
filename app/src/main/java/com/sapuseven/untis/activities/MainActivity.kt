@@ -26,6 +26,7 @@ import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -558,53 +559,6 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 					.padding(innerPadding)
 					.fillMaxSize()
 			) {
-				fun setupHours(
-					user: User,
-					range: Pair<Int, Int>?,
-					rangeIndexReset: Boolean
-				): List<WeekViewHour> {
-					val hourLines = mutableListOf<LocalTime>()
-					val hourLabels = mutableListOf<String>()
-
-					val hourList = mutableListOf<WeekViewHour>()
-
-					user.timeGrid.days.maxByOrNull { it.units.size }?.units?.forEachIndexed { index, hour ->
-						if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
-
-						val startTime = hour.startTime.toLocalTime()
-						//.toString(DateTimeUtils.shortDisplayableTime())
-						val endTime = hour.endTime.toLocalTime()
-						//.toString(DateTimeUtils.shortDisplayableTime())
-
-						hourList.add(
-							WeekViewHour(
-								startTime,
-								endTime,
-								hour.label
-							)
-						)
-					}
-
-					//if (!rangeIndexReset)
-					//hourIndexOffset = (range?.first ?: 1) - 1
-					val l = hourLabels.toTypedArray().let { hourLabelArray ->
-						// If provided hour labels are completely empty, generate them
-						if (hourLabelArray.joinToString("") == "") IntArray(
-							hourLabels.size,
-							fun(idx: Int): Int { return idx + 1 }).map { it.toString() }
-							.toTypedArray()
-						else hourLabelArray
-					}
-
-					return hourList
-
-					/*weekViewPreferences.startTime = hourList.first().startTime
-					weekViewPreferences.endTime = hourList.last().endTime
-					weekViewPreferences.endTimeOffset = additionalSpaceBelow*/
-				}
-
-				val hourList = remember(state.user) { mutableStateListOf<WeekViewHour>() }
-
 				val density = LocalDensity.current
 				val insets = insetsPaddingValues()
 				val navBarHeight = remember { with(density) {
@@ -613,32 +567,16 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 
 				val prefs = dataStorePreferences
 				LaunchedEffect(state.user) {
-
-
-					with(prefs) {
-						val timetableRange = timetableRange.getValueFlow()
-						val timetableRangeIndexReset = timetableRangeIndexReset.getValueFlow()
-
-						timetableRange.combine(timetableRangeIndexReset) { range, rangeIndexReset ->
-							setupHours(
-								state.user,
-								range.convertRangeToPair(),
-								rangeIndexReset
-							)
-						}.collect {
-							hourList.clear()
-							hourList.addAll(it)
-						}
-					}
+					state.loadPrefs2(prefs)
 				}
 
 				WeekViewCompose(
 					dependency = state.user,
-					startTime = hourList.firstOrNull()?.startTime ?: LocalTime.MIDNIGHT,
-					endTime = hourList.lastOrNull()?.endTime ?: LocalTime.MIDNIGHT,
+					startTime = state.hourList.firstOrNull()?.startTime ?: LocalTime.MIDNIGHT,
+					endTime = state.hourList.lastOrNull()?.endTime ?: LocalTime.MIDNIGHT,
 					endTimeOffset = navBarHeight,
 					hourHeight = state.weekViewPreferences.hourHeight ?: 72.dp,
-					hourList = hourList,
+					hourList = state.hourList,
 					dividerWidth = state.weekViewPreferences.dividerWidth ?: Stroke.HairlineWidth,
 					dividerColor = state.weekViewPreferences.dividerColor ?: MaterialTheme.colorScheme.outline,
 					loadItems = { startDate, endDate ->
@@ -650,6 +588,7 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 					state.weekView.value?.config?.timeColumnWidth?.toDp()
 						?: 48.dp
 				}
+
 				Text(
 					text = state.lastRefreshText(),
 					modifier = Modifier
@@ -791,7 +730,8 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	val timetableLoader: TimetableLoader,
 	val timetableItemDetailsDialog: MutableState<Pair<List<PeriodData>, Int>?>,
 	val showDatePicker: MutableState<Boolean>,
-	val profileManagementDialog: MutableState<Boolean>
+	val profileManagementDialog: MutableState<Boolean>,
+	val hourList: SnapshotStateList<WeekViewHour>
 ) {
 	companion object {
 		private const val MINUTE_MILLIS: Int = 60 * 1000
@@ -1175,6 +1115,24 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		}
 	}
 
+	suspend fun loadPrefs2(dataStorePreferences: DataStorePreferences) {
+		with(dataStorePreferences) {
+			val timetableRange = timetableRange.getValueFlow()
+			val timetableRangeIndexReset = timetableRangeIndexReset.getValueFlow()
+
+			timetableRange.combine(timetableRangeIndexReset) { range, rangeIndexReset ->
+				setupHours2(
+					user,
+					range.convertRangeToPair(),
+					rangeIndexReset
+				)
+			}.collect {
+				hourList.clear()
+				hourList.addAll(it)
+			}
+		}
+	}
+
 	fun loadPrefs(dataStorePreferences: DataStorePreferences) {
 		val personalTimetableFlow = dataStorePreferences.timetablePersonalTimetable.getValueFlow()
 
@@ -1442,6 +1400,51 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		weekViewPreferences.startTime = hourList.first().startTime
 		weekViewPreferences.endTime = hourList.last().endTime
 		weekViewPreferences.endTimeOffset = additionalSpaceBelow
+	}
+
+	fun setupHours2(
+		user: User,
+		range: Pair<Int, Int>?,
+		rangeIndexReset: Boolean
+	): List<WeekViewHour> {
+		val hourLines = mutableListOf<LocalTime>()
+		val hourLabels = mutableListOf<String>()
+
+		val hourList = mutableListOf<WeekViewHour>()
+
+		user.timeGrid.days.maxByOrNull { it.units.size }?.units?.forEachIndexed { index, hour ->
+			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
+
+			val startTime = hour.startTime.toLocalTime()
+			//.toString(DateTimeUtils.shortDisplayableTime())
+			val endTime = hour.endTime.toLocalTime()
+			//.toString(DateTimeUtils.shortDisplayableTime())
+
+			hourList.add(
+				WeekViewHour(
+					startTime,
+					endTime,
+					hour.label
+				)
+			)
+		}
+
+		//if (!rangeIndexReset)
+		//hourIndexOffset = (range?.first ?: 1) - 1
+		val l = hourLabels.toTypedArray().let { hourLabelArray ->
+			// If provided hour labels are completely empty, generate them
+			if (hourLabelArray.joinToString("") == "") IntArray(
+				hourLabels.size,
+				fun(idx: Int): Int { return idx + 1 }).map { it.toString() }
+				.toTypedArray()
+			else hourLabelArray
+		}
+
+		return hourList
+
+		/*weekViewPreferences.startTime = hourList.first().startTime
+		weekViewPreferences.endTime = hourList.last().endTime
+		weekViewPreferences.endTimeOffset = additionalSpaceBelow*/
 	}
 
 	private fun <T> WeekView<T>.setupHours(
@@ -1762,7 +1765,8 @@ fun rememberMainAppState(
 		)
 	},
 	showDatePicker: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
-	profileManagementDialog: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
+	profileManagementDialog: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
+	hourList: SnapshotStateList<WeekViewHour> = remember { mutableStateListOf<WeekViewHour>() }
 ) = remember(user, customThemeColor, colorScheme) {
 	MainAppState(
 		user = user,
@@ -1787,7 +1791,8 @@ fun rememberMainAppState(
 		timetableLoader = timetableLoader,
 		timetableItemDetailsDialog = timetableItemDetailsDialog,
 		showDatePicker = showDatePicker,
-		profileManagementDialog = profileManagementDialog
+		profileManagementDialog = profileManagementDialog,
+		hourList = hourList
 	)
 }
 
