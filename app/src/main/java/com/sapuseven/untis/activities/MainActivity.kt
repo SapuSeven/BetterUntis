@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -39,6 +40,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.ColorUtils
@@ -556,9 +558,89 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 					.padding(innerPadding)
 					.fillMaxSize()
 			) {
-				state.loadWeekViewPreferences(state.preferences)
+				fun setupHours(
+					user: User,
+					range: Pair<Int, Int>?,
+					rangeIndexReset: Boolean
+				): List<WeekViewHour> {
+					val hourLines = mutableListOf<LocalTime>()
+					val hourLabels = mutableListOf<String>()
+
+					val hourList = mutableListOf<WeekViewHour>()
+
+					user.timeGrid.days.maxByOrNull { it.units.size }?.units?.forEachIndexed { index, hour ->
+						if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
+
+						val startTime = hour.startTime.toLocalTime()
+						//.toString(DateTimeUtils.shortDisplayableTime())
+						val endTime = hour.endTime.toLocalTime()
+						//.toString(DateTimeUtils.shortDisplayableTime())
+
+						hourList.add(
+							WeekViewHour(
+								startTime,
+								endTime,
+								hour.label
+							)
+						)
+					}
+
+					//if (!rangeIndexReset)
+					//hourIndexOffset = (range?.first ?: 1) - 1
+					val l = hourLabels.toTypedArray().let { hourLabelArray ->
+						// If provided hour labels are completely empty, generate them
+						if (hourLabelArray.joinToString("") == "") IntArray(
+							hourLabels.size,
+							fun(idx: Int): Int { return idx + 1 }).map { it.toString() }
+							.toTypedArray()
+						else hourLabelArray
+					}
+
+					return hourList
+
+					/*weekViewPreferences.startTime = hourList.first().startTime
+					weekViewPreferences.endTime = hourList.last().endTime
+					weekViewPreferences.endTimeOffset = additionalSpaceBelow*/
+				}
+
+				val hourList = remember(state.user) { mutableStateListOf<WeekViewHour>() }
+
+				val density = LocalDensity.current
+				val insets = insetsPaddingValues()
+				val navBarHeight = remember { with(density) {
+					(insets.calculateBottomPadding() + 48.dp).toPx()
+				}}
+
+				val prefs = dataStorePreferences
+				LaunchedEffect(state.user) {
+
+
+					with(prefs) {
+						val timetableRange = timetableRange.getValueFlow()
+						val timetableRangeIndexReset = timetableRangeIndexReset.getValueFlow()
+
+						timetableRange.combine(timetableRangeIndexReset) { range, rangeIndexReset ->
+							setupHours(
+								state.user,
+								range.convertRangeToPair(),
+								rangeIndexReset
+							)
+						}.collect {
+							hourList.clear()
+							hourList.addAll(it)
+						}
+					}
+				}
+
 				WeekViewCompose(
-					preferences = state.weekViewPreferences,
+					dependency = state.user,
+					startTime = hourList.firstOrNull()?.startTime ?: LocalTime.MIDNIGHT,
+					endTime = hourList.lastOrNull()?.endTime ?: LocalTime.MIDNIGHT,
+					endTimeOffset = navBarHeight,
+					hourHeight = state.weekViewPreferences.hourHeight ?: 72.dp,
+					hourList = hourList,
+					dividerWidth = state.weekViewPreferences.dividerWidth ?: Stroke.HairlineWidth,
+					dividerColor = state.weekViewPreferences.dividerColor ?: MaterialTheme.colorScheme.outline,
 					loadItems = { startDate, endDate ->
 						state.loadEventsFlow(startDate, endDate)
 					}
@@ -709,8 +791,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	val timetableLoader: TimetableLoader,
 	val timetableItemDetailsDialog: MutableState<Pair<List<PeriodData>, Int>?>,
 	val showDatePicker: MutableState<Boolean>,
-	val profileManagementDialog: MutableState<Boolean>,
-	val weekViewPreferences: WeekViewPreferences
+	val profileManagementDialog: MutableState<Boolean>
 ) {
 	companion object {
 		private const val MINUTE_MILLIS: Int = 60 * 1000
@@ -764,6 +845,8 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			}
 			return false
 		}
+
+	val weekViewPreferences = WeekViewPreferences()
 
 	@OptIn(ExperimentalMaterial3Api::class)
 	val drawerGesturesEnabled: Boolean
@@ -1110,15 +1193,13 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		}
 	}
 
-	@Composable
-	fun loadWeekViewPreferences(
+	suspend fun loadWeekViewPreferences(
+		density: Density,
+		paddingValues: PaddingValues,
 		dataStorePreferences: DataStorePreferences
 	) {
-		val currentDensity = LocalDensity.current
-		val scope = rememberCoroutineScope()
-
-		val navBarHeight = with(LocalDensity.current) {
-			(insetsPaddingValues().calculateBottomPadding() + 48.dp).toPx()
+		val navBarHeight = with(density) {
+			(paddingValues.calculateBottomPadding() + 48.dp).toPx()
 		}
 
 		with(dataStorePreferences) {
@@ -1595,18 +1676,20 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			UntisDate.fromLocalDate(LocalDate(startDate)) to
 					UntisDate.fromLocalDate(LocalDate(endDate))
 
-		return loadTimetableFlow(
-			timetableLoader,
-			TimetableLoader.TimetableLoaderTarget(
-				dateRange.first,
-				dateRange.second,
-				displayedElement.value!!.id, // TODO: Handle nullability
-				displayedElement.value!!.type
-			),
-			false
-		).map {
-			prepareItems(it.items).map { item -> item.toEvent() }
-		}
+		return displayedElement.value?.let { element ->
+			loadTimetableFlow(
+				timetableLoader,
+				TimetableLoader.TimetableLoaderTarget(
+					dateRange.first,
+					dateRange.second,
+					element.id, // TODO: Handle nullability
+					element.type
+				),
+				false
+			).map {
+				prepareItems(it.items).map { item -> item.toEvent() }
+			}
+		} ?: emptyFlow()
 
 		/*try {
 			displayedElement.value?.let { element ->
@@ -1628,6 +1711,16 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			//cont.resumeWithException(e)
 		}*/
 	}
+
+	data class WeekViewPreferences(
+		var hourHeight: Dp? = null,
+		var hourList: List<WeekViewHour>? = null,
+		var dividerColor: Color? = null,
+		var dividerWidth: Float? = null,
+		var startTime: LocalTime? = null,
+		var endTime: LocalTime? = null,
+		var endTimeOffset: Float? = null,
+	)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1669,8 +1762,7 @@ fun rememberMainAppState(
 		)
 	},
 	showDatePicker: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
-	profileManagementDialog: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
-	weekViewPreferences: WeekViewPreferences = rememberWeekViewPreferences(),
+	profileManagementDialog: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
 ) = remember(user, customThemeColor, colorScheme) {
 	MainAppState(
 		user = user,
@@ -1695,8 +1787,7 @@ fun rememberMainAppState(
 		timetableLoader = timetableLoader,
 		timetableItemDetailsDialog = timetableItemDetailsDialog,
 		showDatePicker = showDatePicker,
-		profileManagementDialog = profileManagementDialog,
-		weekViewPreferences = weekViewPreferences
+		profileManagementDialog = profileManagementDialog
 	)
 }
 
