@@ -6,9 +6,9 @@ import java.util.*
 
 open class WeekViewEvent<T>(
 		var id: Long = 0,
-		var title: CharSequence = "",
-		var top: CharSequence = "",
-		var bottom: CharSequence = "",
+		var title: String = "",
+		var top: String = "",
+		var bottom: String = "",
 		var startTime: DateTime,
 		var endTime: DateTime,
 		var color: Int = 0,

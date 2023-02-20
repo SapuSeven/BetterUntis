@@ -7,28 +7,42 @@ import com.sapuseven.untis.views.weekview.WeekViewEvent
 import org.joda.time.DateTime
 
 class TimegridItem(
-		id: Long,
-		val startDateTime: DateTime,
-		val endDateTime: DateTime,
-		contextType: String,
-		val periodData: PeriodData,
-		includeOrgIds: Boolean = true
+	id: Long,
+	val startDateTime: DateTime,
+	val endDateTime: DateTime,
+	contextType: String,
+	val periodData: PeriodData,
+	includeOrgIds: Boolean = true
 ) : WeekViewEvent<TimegridItem>(id, startTime = startDateTime, endTime = endDateTime) {
 
 	init {
 		periodData.setup()
 
 		title = periodData.getShort(TimetableDatabaseInterface.Type.SUBJECT)
-		top =
+		top = (
 				if (contextType == TimetableDatabaseInterface.Type.TEACHER.name)
-					periodData.getShortSpanned(TimetableDatabaseInterface.Type.CLASS, includeOrgIds = includeOrgIds)
+					periodData.getShortSpanned(
+						TimetableDatabaseInterface.Type.CLASS,
+						includeOrgIds = includeOrgIds
+					)
 				else
-					periodData.getShortSpanned(TimetableDatabaseInterface.Type.TEACHER, includeOrgIds = includeOrgIds)
-		bottom =
+					periodData.getShortSpanned(
+						TimetableDatabaseInterface.Type.TEACHER,
+						includeOrgIds = includeOrgIds
+					)
+				).toString()
+		bottom = (
 				if (contextType == TimetableDatabaseInterface.Type.ROOM.name)
-					periodData.getShortSpanned(TimetableDatabaseInterface.Type.CLASS, includeOrgIds = includeOrgIds)
+					periodData.getShortSpanned(
+						TimetableDatabaseInterface.Type.CLASS,
+						includeOrgIds = includeOrgIds
+					)
 				else
-					periodData.getShortSpanned(TimetableDatabaseInterface.Type.ROOM, includeOrgIds = includeOrgIds)
+					periodData.getShortSpanned(
+						TimetableDatabaseInterface.Type.ROOM,
+						includeOrgIds = includeOrgIds
+					)
+				).toString()
 
 		hasIndicator = !periodData.element.homeWorks.isNullOrEmpty()
 				|| periodData.element.text.lesson.isNotEmpty()
@@ -37,12 +51,26 @@ class TimegridItem(
 	}
 
 	override fun toWeekViewEvent(): WeekViewEvent<TimegridItem> {
-		return WeekViewEvent(id, title, top, bottom, startTime, endTime, color, pastColor,  textColor, this, hasIndicator)
+		return WeekViewEvent(
+			id,
+			title,
+			top,
+			bottom,
+			startTime,
+			endTime,
+			color,
+			pastColor,
+			textColor,
+			this,
+			hasIndicator
+		)
 	}
 
 	fun toEvent(): Event {
 		return Event(
-			title.toString(),
+			title = title.toString(),
+			top = top.toString(),
+			bottom = bottom.toString(),
 			Color(color),
 			startTime.toLocalDateTime(),
 			endTime.toLocalDateTime()
@@ -76,5 +104,6 @@ class TimegridItem(
 		}
 	}
 
-	fun equalsIgnoreTime(secondItem: TimegridItem) = periodData.element.equalsIgnoreTime(secondItem.periodData.element)
+	fun equalsIgnoreTime(secondItem: TimegridItem) =
+		periodData.element.equalsIgnoreTime(secondItem.periodData.element)
 }

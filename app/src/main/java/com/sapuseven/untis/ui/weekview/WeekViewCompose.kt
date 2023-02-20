@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -40,11 +41,12 @@ import java.util.*
 import kotlin.math.roundToInt
 
 data class Event(
-	val name: String,
+	val title: String,
+	val top: String = "",
+	val bottom: String = "",
 	val color: Color,
 	val start: LocalDateTime,
 	val end: LocalDateTime,
-	val description: String? = null,
 )
 
 val eventTimeFormat = DateTimeFormat.forPattern("h:mm a")
@@ -54,29 +56,45 @@ fun WeekViewEvent(
 	event: Event,
 	modifier: Modifier = Modifier,
 ) {
-	Column(
+	Box(
 		modifier = modifier
 			.fillMaxSize()
 			.padding(2.dp) // Outer padding
 			.background(event.color, shape = RoundedCornerShape(4.dp))
-			.padding(4.dp) // Inner padding
+			.padding(horizontal = 2.dp) // Inner padding
 	) {
 		Text(
-			text = "${eventTimeFormat.print(event.start)} - ${eventTimeFormat.print(event.end)}"
+			text = event.top,
+			fontSize = 10.sp,
+			textAlign = TextAlign.Start,
+			maxLines = 1,
+			color = MaterialTheme.colorScheme.onPrimary,
+			modifier = Modifier
+				.fillMaxWidth()
+				.align(Alignment.TopCenter)
 		)
 
 		Text(
-			text = event.name,
+			text = event.title,
 			fontWeight = FontWeight.Bold,
+			textAlign = TextAlign.Center,
+			maxLines = 1,
+			color = MaterialTheme.colorScheme.onPrimary,
+			modifier = Modifier
+				.fillMaxWidth()
+				.align(Alignment.Center)
 		)
 
-		if (event.description != null) {
-			Text(
-				text = event.description,
-				maxLines = 1,
-				overflow = TextOverflow.Ellipsis,
-			)
-		}
+		Text(
+			text = event.bottom,
+			fontSize = 10.sp,
+			textAlign = TextAlign.End,
+			maxLines = 1,
+			color = MaterialTheme.colorScheme.onPrimary,
+			modifier = Modifier
+				.fillMaxWidth()
+				.align(Alignment.BottomCenter)
+		)
 	}
 }
 
@@ -86,11 +104,10 @@ fun WeekViewEvent(
 fun EventPreview() {
 	WeekViewEvent(
 		event = Event(
-			name = "Test event",
+			title = "Test",
 			color = Color(0xFFAFBBF2),
 			start = LocalDateTime.parse("2021-05-18T09:00:00"),
 			end = LocalDateTime.parse("2021-05-18T11:00:00"),
-			description = "This is an example event.",
 		), modifier = Modifier.sizeIn(maxHeight = 64.dp)
 	)
 }
