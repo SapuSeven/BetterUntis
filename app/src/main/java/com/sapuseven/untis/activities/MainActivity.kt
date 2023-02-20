@@ -32,6 +32,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -76,6 +77,7 @@ import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.preferences.convertRangeToPair
 import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
+import com.sapuseven.untis.ui.weekview.WeekViewCompose
 import com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
 import com.sapuseven.untis.views.weekview.HolidayChip
 import com.sapuseven.untis.views.weekview.WeekView
@@ -162,7 +164,7 @@ class MainActivity : BaseComposeActivity() {
 
 }
 
-@Composable
+/*@Composable
 private fun WeekViewCompose(state: MainAppState) {
 	var weekViewGlobal by remember { mutableStateOf(state.weekView.value) }
 	state.loadWeekViewPreferences(weekViewGlobal, state.preferences)
@@ -198,7 +200,7 @@ private fun WeekViewCompose(state: MainAppState) {
 			.fillMaxSize()
 			.disabled(state.isAnonymous)
 	)
-}
+}*/
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -557,7 +559,7 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 					.padding(innerPadding)
 					.fillMaxSize()
 			) {
-				WeekViewCompose(state)
+				WeekViewCompose(/*state*/)
 
 				val timeColumnWidth = with(LocalDensity.current) {
 					state.weekView.value?.config?.timeColumnWidth?.toDp()
@@ -570,6 +572,14 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 						.padding(start = timeColumnWidth + 8.dp, bottom = 8.dp)
 						.bottomInsets()
 						.disabled(state.isAnonymous)
+				)
+
+				Text(
+					text = state.currentWeekIndex.value.toString(),
+					modifier = Modifier
+						.align(Alignment.BottomEnd)
+						.padding(end = 8.dp, bottom = 8.dp)
+						.bottomInsets()
 				)
 
 				if (state.isAnonymous) {
