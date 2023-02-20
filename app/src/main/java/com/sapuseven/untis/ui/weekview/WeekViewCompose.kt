@@ -103,6 +103,8 @@ fun WeekViewHeaderDay(
 	day: LocalDate,
 	modifier: Modifier = Modifier,
 ) {
+	val isToday = LocalDate.now().equals(day)
+
 	Column(
 		modifier = Modifier
 			.padding(8.dp)
@@ -112,6 +114,7 @@ fun WeekViewHeaderDay(
 			textAlign = TextAlign.Center,
 			fontSize = 20.sp,
 			fontWeight = FontWeight.Medium,
+			color = if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
 			modifier = modifier
 				.fillMaxWidth()
 		)
@@ -119,7 +122,7 @@ fun WeekViewHeaderDay(
 			text = dayDateFormat.print(day),
 			textAlign = TextAlign.Center,
 			fontSize = 14.sp,
-			color = MaterialTheme.colorScheme.onSurfaceVariant,
+			color = if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
 			modifier = modifier
 				.fillMaxWidth()
 		)
@@ -217,19 +220,8 @@ fun WeekViewCompose(
 	var sidebarWidth by remember { mutableStateOf(0) }
 	var headerHeight by remember { mutableStateOf(0) }
 
-
-	val yourList = (1..5).map { it.toString() }
-	val colors = listOf(Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Magenta)
-
-	val positionFromIWantToStart = 3
-	val itemsCount = yourList.size
-
-	val numPages = Int.MAX_VALUE / itemsCount
-	val startPage = numPages / 2
-	val startIndex = (startPage * itemsCount) + positionFromIWantToStart
-
-
-	val pagerState = rememberPagerState(initialPage = startIndex)
+	val startPage = Int.MAX_VALUE / 2
+	val pagerState = rememberPagerState(initialPage = startPage)
 
 	Row(modifier = modifier) {
 		WeekViewSidebar(
@@ -244,21 +236,22 @@ fun WeekViewCompose(
 			state = pagerState,
 			pageCount = Int.MAX_VALUE,
 		) { index ->
+			val pageOffset = index - startPage
+			val visibleStartDate = startDate.withDayOfWeek(1).plusWeeks(pageOffset) // 1 = Monday, 7 = Sunday
+
 			Column {
 				WeekViewHeader(
-					startDate = startDate,
+					startDate = visibleStartDate,
 					numDays = 5,
 					dayHeader = dayHeader,
 					modifier = Modifier
 						.onGloballyPositioned { headerHeight = it.size.height }
 				)
 
-				val page = index % itemsCount
-
 				WeekViewContent(
 					events = events,
 					eventContent = eventContent,
-					startDate = startDate,
+					startDate = visibleStartDate,
 					numDays = 5,
 					hourHeight = hourHeight,
 					modifier = Modifier
