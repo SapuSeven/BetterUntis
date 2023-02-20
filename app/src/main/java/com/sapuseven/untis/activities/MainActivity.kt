@@ -32,7 +32,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -42,7 +41,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.ColorUtils
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -78,8 +76,10 @@ import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.preferences.convertRangeToPair
 import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import com.sapuseven.untis.ui.weekview.WeekViewCompose
+import com.sapuseven.untis.ui.weekview.WeekViewHour
+import com.sapuseven.untis.ui.weekview.WeekViewPreferences
+import com.sapuseven.untis.ui.weekview.rememberWeekViewPreferences
 import com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
-import com.sapuseven.untis.views.weekview.HolidayChip
 import com.sapuseven.untis.views.weekview.WeekView
 import com.sapuseven.untis.views.weekview.WeekViewDisplayable
 import com.sapuseven.untis.views.weekview.listeners.EventClickListener
@@ -559,7 +559,8 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 					.padding(innerPadding)
 					.fillMaxSize()
 			) {
-				WeekViewCompose(/*state*/)
+				state.loadWeekViewPreferences(state.preferences)
+				WeekViewCompose(preferences = state.weekViewPreferences)
 
 				val timeColumnWidth = with(LocalDensity.current) {
 					state.weekView.value?.config?.timeColumnWidth?.toDp()
@@ -706,7 +707,8 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	val timetableLoader: TimetableLoader,
 	val timetableItemDetailsDialog: MutableState<Pair<List<PeriodData>, Int>?>,
 	val showDatePicker: MutableState<Boolean>,
-	val profileManagementDialog: MutableState<Boolean>
+	val profileManagementDialog: MutableState<Boolean>,
+	val weekViewPreferences: WeekViewPreferences
 ) {
 	companion object {
 		private const val MINUTE_MILLIS: Int = 60 * 1000
@@ -760,7 +762,6 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			}
 			return false
 		}
-
 
 	@OptIn(ExperimentalMaterial3Api::class)
 	val drawerGesturesEnabled: Boolean
@@ -1097,6 +1098,33 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	}
 
 	@Composable
+	fun loadWeekViewPreferences(
+		dataStorePreferences: DataStorePreferences
+	) {
+		val currentDensity = LocalDensity.current
+		val scope = rememberCoroutineScope()
+
+		val navBarHeight = with(LocalDensity.current) {
+			(insetsPaddingValues().calculateBottomPadding() + 48.dp).toPx()
+		}
+
+		with(dataStorePreferences) {
+			val timetableRange = timetableRange.getValueFlow()
+			val timetableRangeIndexReset = timetableRangeIndexReset.getValueFlow()
+
+			scope.launch {
+				timetableRange.combine(timetableRangeIndexReset) { range, rangeIndexReset ->
+					setupHours(
+						range.convertRangeToPair(),
+						rangeIndexReset,
+						navBarHeight
+					)
+				}.collect()
+			}
+		}
+	}
+
+	@Composable
 	fun <T> loadWeekViewPreferences(
 		weekView: WeekView<T>?,
 		dataStorePreferences: DataStorePreferences
@@ -1275,6 +1303,49 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 				}
 			}
 		}
+	}
+
+	fun setupHours(
+		range: Pair<Int, Int>?,
+		rangeIndexReset: Boolean,
+		additionalSpaceBelow: Float = 0f
+	) {
+		val hourLines = mutableListOf<LocalTime>()
+		val hourLabels = mutableListOf<String>()
+
+		val hourList = mutableListOf<WeekViewHour>()
+
+		user.timeGrid.days.maxByOrNull { it.units.size }?.units?.forEachIndexed { index, hour ->
+			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
+
+			val startTime = hour.startTime.toLocalTime()
+					//.toString(DateTimeUtils.shortDisplayableTime())
+			val endTime = hour.endTime.toLocalTime()
+				//.toString(DateTimeUtils.shortDisplayableTime())
+
+			hourList.add(WeekViewHour(
+				startTime,
+				endTime,
+				hour.label
+			))
+		}
+
+		//if (!rangeIndexReset)
+			//hourIndexOffset = (range?.first ?: 1) - 1
+		val l = hourLabels.toTypedArray().let { hourLabelArray ->
+			// If provided hour labels are completely empty, generate them
+			if (hourLabelArray.joinToString("") == "") IntArray(
+				hourLabels.size,
+				fun(idx: Int): Int { return idx + 1 }).map { it.toString() }
+				.toTypedArray()
+			else hourLabelArray
+		}
+
+		weekViewPreferences.hourList = hourList
+
+		weekViewPreferences.startTime = hourList.first().startTime
+		weekViewPreferences.endTime = hourList.last().endTime
+		weekViewPreferences.endTimeOffset = additionalSpaceBelow
 	}
 
 	private fun <T> WeekView<T>.setupHours(
@@ -1544,6 +1615,7 @@ fun rememberMainAppState(
 	},
 	showDatePicker: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 	profileManagementDialog: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
+	weekViewPreferences: WeekViewPreferences = rememberWeekViewPreferences(),
 ) = remember(user, customThemeColor, colorScheme) {
 	MainAppState(
 		user = user,
@@ -1568,7 +1640,8 @@ fun rememberMainAppState(
 		timetableLoader = timetableLoader,
 		timetableItemDetailsDialog = timetableItemDetailsDialog,
 		showDatePicker = showDatePicker,
-		profileManagementDialog = profileManagementDialog
+		profileManagementDialog = profileManagementDialog,
+		weekViewPreferences = weekViewPreferences
 	)
 }
 

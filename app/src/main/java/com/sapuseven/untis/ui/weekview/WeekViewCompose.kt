@@ -1,5 +1,6 @@
 package com.sapuseven.untis.ui.weekview
 
+import android.text.format.DateFormat
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
@@ -12,11 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -31,6 +32,8 @@ import org.joda.time.LocalDateTime
 import org.joda.time.LocalTime
 import org.joda.time.Minutes
 import org.joda.time.format.DateTimeFormat
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.math.roundToInt
 
 data class Event(
@@ -99,6 +102,8 @@ private fun Modifier.eventData(event: Event) = this.then(EventDataModifier(event
 
 private val dayNameFormat = DateTimeFormat.forPattern("EEE")
 private val dayDateFormat = DateTimeFormat.forPattern("d. MMM")
+private val timeFormat12h = DateTimeFormat.forPattern("h:mm a")
+private val timeFormat24h = DateTimeFormat.forPattern("H:mm")
 
 @Composable
 fun WeekViewHeaderDay(
@@ -165,48 +170,101 @@ fun WeekViewHeaderPreview() {
 	)
 }
 
-private val HourFormatter = DateTimeFormat.forPattern("hh")
-
 @Composable
 fun WeekViewSidebarLabel(
-	time: LocalTime,
+	hour: WeekViewHour,
 	modifier: Modifier = Modifier,
 ) {
-	Text(
-		text = HourFormatter.print(time),
+	val timeFormat = if (DateFormat.is24HourFormat(LocalContext.current)) timeFormat24h else timeFormat12h
+
+	Column(
+		verticalArrangement = Arrangement.SpaceBetween,
 		modifier = modifier
+			.padding(horizontal = 4.dp)
 			.fillMaxHeight()
-			.padding(4.dp)
-	)
+	) {
+		Text(
+			text = timeFormat.print(hour.startTime),
+			textAlign = TextAlign.Left,
+			fontSize = 12.sp,
+			color = MaterialTheme.colorScheme.onSurfaceVariant,
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(end = 4.dp)
+		)
+		Text(
+			text = hour.label,
+			textAlign = TextAlign.Center,
+			fontSize = 16.sp,
+			fontWeight = FontWeight.Medium,
+			color = MaterialTheme.colorScheme.onSurface,
+			modifier = Modifier
+				.fillMaxWidth()
+		)
+		Text(
+			text = timeFormat.print(hour.endTime),
+			textAlign = TextAlign.Right,
+			fontSize = 12.sp,
+			color = MaterialTheme.colorScheme.onSurfaceVariant,
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(start = 4.dp)
+		)
+	}
 }
 
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun BasicSidebarLabelPreview() {
 	WeekViewSidebarLabel(time = LocalTime.MIDNIGHT, Modifier.sizeIn(maxHeight = 64.dp))
-}
+}*/
 
 @Composable
 fun WeekViewSidebar(
 	hourHeight: Dp,
+	bottomPadding: Dp,
 	modifier: Modifier = Modifier,
-	label: @Composable (time: LocalTime) -> Unit = { WeekViewSidebarLabel(time = it) },
+	hourList: List<WeekViewHour>,
+	label: @Composable (hour: WeekViewHour) -> Unit = { WeekViewSidebarLabel(hour = it) },
 ) {
-	Column(modifier = modifier) {
-		val startTime = LocalTime.MIDNIGHT
-		repeat(24) { i ->
-			Box(modifier = Modifier.height(hourHeight)) {
-				label(startTime.plusHours(i))
+	// TODO: This implementation is prone to alignment issues due to rounding errors. Maybe use a Box with absolute padding instead (like the hour lines).
+	Column(modifier = modifier
+		.width(IntrinsicSize.Max)
+		.padding(bottom = bottomPadding)
+	) {
+		var lastEndTime: LocalTime? = null
+		hourList.forEach { hour ->
+			val totalHourHeight = hourHeight *
+					(Minutes.minutesBetween(hour.startTime, hour.endTime).minutes / 60f)
+
+			val topPadding = lastEndTime?.let {
+				hourHeight *
+						(Minutes.minutesBetween(lastEndTime, hour.startTime).minutes / 60f)
+			} ?: 0.dp
+
+			Box(
+				modifier = Modifier
+					.padding(top = topPadding)
+					.height(totalHourHeight)
+					.fillMaxWidth()
+			) {
+				label(hour)
 			}
+
+			lastEndTime = hour.endTime
 		}
 	}
 }
 
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun WeekViewSidebarPreview() {
-	WeekViewSidebar(hourHeight = 64.dp)
-}
+	WeekViewSidebar(
+		hourHeight = 64.dp,
+		startTime = LocalTime.MIDNIGHT.plusHours(5),
+		endTime = LocalTime.MIDNIGHT.plusHours(18)
+	)
+}*/
 
 @Composable
 fun WeekViewContent(
@@ -215,7 +273,11 @@ fun WeekViewContent(
 	eventContent: @Composable (event: Event) -> Unit = { WeekViewEvent(event = it) },
 	startDate: LocalDate,
 	numDays: Int = 5,
+	startTime: LocalTime,
+	endTime: LocalTime,
+	endTimeOffset: Float,
 	hourHeight: Dp,
+	hourList: List<WeekViewHour>,
 	dividerColor: Color = MaterialTheme.colorScheme.outline,
 	dividerWidth: Float = Stroke.HairlineWidth,
 ) {
@@ -229,11 +291,18 @@ fun WeekViewContent(
 		},
 		modifier = modifier
 			.drawBehind {
-				repeat(23) {
+				val hours = hourList.map { listOf(it.startTime, it.endTime) }.flatten().toSet()
+
+				hours.forEach {
+					val yPos =
+						Minutes.minutesBetween(startTime, it).minutes / 60f * hourHeight.toPx()
+
+					if (yPos == 0f || yPos == size.height) return@forEach
+
 					drawLine(
 						dividerColor,
-						start = Offset(0f, (it + 1) * hourHeight.toPx()),
-						end = Offset(size.width, (it + 1) * hourHeight.toPx()),
+						start = Offset(0f, yPos),
+						end = Offset(size.width, yPos),
 						strokeWidth = dividerWidth
 					)
 				}
@@ -254,7 +323,8 @@ fun WeekViewContent(
 				)
 			}
 	) { measureables, constraints ->
-		val height = hourHeight.roundToPx() * 24
+		val height = (Minutes.minutesBetween(startTime, endTime).minutes / 60f * hourHeight.toPx()
+				+ endTimeOffset).roundToInt()
 		val width = constraints.maxWidth
 		val placeablesWithEvents = measureables.map { measurable ->
 			val event = measurable.parentData as Event
@@ -290,20 +360,23 @@ fun WeekViewCompose(
 	eventContent: @Composable (event: Event) -> Unit = { WeekViewEvent(event = it) },
 	dayHeader: @Composable (day: LocalDate) -> Unit = { WeekViewHeaderDay(day = it) },
 	startDate: LocalDate = LocalDate.now(),
+	preferences: WeekViewPreferences
 ) {
-	val hourHeight = 64.dp
 	val dividerWidth = Stroke.HairlineWidth
 
 	val verticalScrollState = rememberScrollState()
 	var sidebarWidth by remember { mutableStateOf(0) }
 	var headerHeight by remember { mutableStateOf(0) }
+	var contentHeight by remember { mutableStateOf(0) }
 
 	val startPage = Int.MAX_VALUE / 2
 	val pagerState = rememberPagerState(initialPage = startPage)
 
 	Row(modifier = modifier) {
 		WeekViewSidebar(
-			hourHeight = hourHeight,
+			hourHeight = preferences.hourHeight,
+			bottomPadding = with(LocalDensity.current) { preferences.endTimeOffset.toDp() },
+			hourList = preferences.hourList,
 			modifier = Modifier
 				.padding(top = with(LocalDensity.current) { headerHeight.toDp() })
 				.onGloballyPositioned { sidebarWidth = it.size.width }
@@ -316,7 +389,8 @@ fun WeekViewCompose(
 			pageSpacing = with(LocalDensity.current) { dividerWidth.toDp() }
 		) { index ->
 			val pageOffset = index - startPage
-			val visibleStartDate = startDate.withDayOfWeek(1).plusWeeks(pageOffset) // 1 = Monday, 7 = Sunday
+			val visibleStartDate =
+				startDate.withDayOfWeek(1).plusWeeks(pageOffset) // 1 = Monday, 7 = Sunday
 
 			Column {
 				WeekViewHeader(
@@ -332,10 +406,15 @@ fun WeekViewCompose(
 					eventContent = eventContent,
 					startDate = visibleStartDate,
 					numDays = 5,
-					hourHeight = hourHeight,
-					dividerWidth = dividerWidth,
+					startTime = preferences.startTime,
+					endTime = preferences.endTime,
+					endTimeOffset = preferences.endTimeOffset,
+					hourHeight = preferences.hourHeight,
+					hourList = preferences.hourList,
+					dividerWidth = preferences.dividerWidth,
 					modifier = Modifier
 						.weight(1f)
+						.onGloballyPositioned { contentHeight = it.size.height }
 						.verticalScroll(verticalScrollState)
 				)
 			}
@@ -346,5 +425,52 @@ fun WeekViewCompose(
 @Preview(showBackground = true)
 @Composable
 fun WeekViewPreview() {
-	WeekViewCompose()
+	WeekViewCompose(
+		preferences = rememberWeekViewPreferences()
+	)
 }
+
+@Composable
+fun rememberWeekViewPreferences(
+	hourHeight: Dp = 72.dp,
+	hourList: List<WeekViewHour> = emptyList(),
+	dividerColor: Color = MaterialTheme.colorScheme.outline,
+	dividerWidth: Float = Stroke.HairlineWidth,
+	startTime: LocalTime = hourList.firstOrNull()?.startTime ?: LocalTime.MIDNIGHT.plusHours(6),
+	endTime: LocalTime = hourList.lastOrNull()?.endTime ?: LocalTime.MIDNIGHT.plusHours(18),
+	endTimeOffset: Float = 0f,
+) = remember(
+	hourHeight,
+	hourList,
+	dividerColor,
+	dividerWidth,
+	startTime,
+	endTime,
+	endTimeOffset,
+) {
+	WeekViewPreferences(
+		hourHeight = hourHeight,
+		hourList = hourList,
+		dividerColor = dividerColor,
+		dividerWidth = dividerWidth,
+		startTime = startTime,
+		endTime = endTime,
+		endTimeOffset = endTimeOffset,
+	)
+}
+
+data class WeekViewPreferences(
+	var hourHeight: Dp,
+	var hourList: List<WeekViewHour>,
+	var dividerColor: Color,
+	var dividerWidth: Float,
+	var startTime: LocalTime,
+	var endTime: LocalTime,
+	var endTimeOffset: Float,
+)
+
+data class WeekViewHour(
+	val startTime: LocalTime,
+	val endTime: LocalTime,
+	val label: String
+)
