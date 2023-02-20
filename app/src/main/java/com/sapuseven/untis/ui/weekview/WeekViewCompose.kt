@@ -12,6 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -206,63 +208,6 @@ fun WeekViewSidebarPreview() {
 	WeekViewSidebar(hourHeight = 64.dp)
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun WeekViewCompose(
-	events: List<Event> = emptyList(),
-	modifier: Modifier = Modifier,
-	eventContent: @Composable (event: Event) -> Unit = { WeekViewEvent(event = it) },
-	dayHeader: @Composable (day: LocalDate) -> Unit = { WeekViewHeaderDay(day = it) },
-	startDate: LocalDate = LocalDate.now(),
-) {
-	val hourHeight = 64.dp
-	val verticalScrollState = rememberScrollState()
-	var sidebarWidth by remember { mutableStateOf(0) }
-	var headerHeight by remember { mutableStateOf(0) }
-
-	val startPage = Int.MAX_VALUE / 2
-	val pagerState = rememberPagerState(initialPage = startPage)
-
-	Row(modifier = modifier) {
-		WeekViewSidebar(
-			hourHeight = hourHeight,
-			modifier = Modifier
-				.padding(top = with(LocalDensity.current) { headerHeight.toDp() })
-				.onGloballyPositioned { sidebarWidth = it.size.width }
-				.verticalScroll(verticalScrollState)
-		)
-
-		HorizontalPager(
-			state = pagerState,
-			pageCount = Int.MAX_VALUE,
-		) { index ->
-			val pageOffset = index - startPage
-			val visibleStartDate = startDate.withDayOfWeek(1).plusWeeks(pageOffset) // 1 = Monday, 7 = Sunday
-
-			Column {
-				WeekViewHeader(
-					startDate = visibleStartDate,
-					numDays = 5,
-					dayHeader = dayHeader,
-					modifier = Modifier
-						.onGloballyPositioned { headerHeight = it.size.height }
-				)
-
-				WeekViewContent(
-					events = events,
-					eventContent = eventContent,
-					startDate = visibleStartDate,
-					numDays = 5,
-					hourHeight = hourHeight,
-					modifier = Modifier
-						.weight(1f)
-						.verticalScroll(verticalScrollState)
-				)
-			}
-		}
-	}
-}
-
 @Composable
 fun WeekViewContent(
 	events: List<Event>,
@@ -271,10 +216,9 @@ fun WeekViewContent(
 	startDate: LocalDate,
 	numDays: Int = 5,
 	hourHeight: Dp,
+	dividerColor: Color = MaterialTheme.colorScheme.outline,
+	dividerWidth: Float = Stroke.HairlineWidth,
 ) {
-	val dividerColor = MaterialTheme.colorScheme.outline
-	var dayWidth by remember { mutableStateOf(0f) }
-
 	Layout(
 		content = {
 			events.sortedBy(Event::start).forEach { event ->
@@ -284,24 +228,30 @@ fun WeekViewContent(
 			}
 		},
 		modifier = modifier
-			.onGloballyPositioned { dayWidth = it.size.width / numDays.toFloat() }
 			.drawBehind {
 				repeat(23) {
 					drawLine(
 						dividerColor,
 						start = Offset(0f, (it + 1) * hourHeight.toPx()),
 						end = Offset(size.width, (it + 1) * hourHeight.toPx()),
-						strokeWidth = 1.dp.toPx()
+						strokeWidth = dividerWidth
 					)
 				}
 				repeat(numDays - 1) {
+					val xPos = (it + 1) * (size.width / numDays)
 					drawLine(
 						dividerColor,
-						start = Offset((it + 1) * dayWidth, 0f),
-						end = Offset((it + 1) * dayWidth, size.height),
-						strokeWidth = 1.dp.toPx()
+						start = Offset(xPos, 0f),
+						end = Offset(xPos, size.height),
+						strokeWidth = dividerWidth
 					)
 				}
+				drawLine(
+					dividerColor,
+					start = Offset(size.width + dividerWidth, 0f),
+					end = Offset(size.width + dividerWidth, size.height),
+					strokeWidth = dividerWidth
+				)
 			}
 	) { measureables, constraints ->
 		val height = hourHeight.roundToPx() * 24
@@ -327,6 +277,67 @@ fun WeekViewContent(
 					Minutes.minutesBetween(startDate, event.start.toLocalDate()).minutes
 				val eventX = eventOffsetDays * (constraints.maxWidth / numDays)
 				placeable.place(eventX, eventY)
+			}
+		}
+	}
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun WeekViewCompose(
+	events: List<Event> = emptyList(),
+	modifier: Modifier = Modifier,
+	eventContent: @Composable (event: Event) -> Unit = { WeekViewEvent(event = it) },
+	dayHeader: @Composable (day: LocalDate) -> Unit = { WeekViewHeaderDay(day = it) },
+	startDate: LocalDate = LocalDate.now(),
+) {
+	val hourHeight = 64.dp
+	val dividerWidth = 2f//Stroke.HairlineWidth
+
+	val verticalScrollState = rememberScrollState()
+	var sidebarWidth by remember { mutableStateOf(0) }
+	var headerHeight by remember { mutableStateOf(0) }
+
+	val startPage = Int.MAX_VALUE / 2
+	val pagerState = rememberPagerState(initialPage = startPage)
+
+	Row(modifier = modifier) {
+		WeekViewSidebar(
+			hourHeight = hourHeight,
+			modifier = Modifier
+				.padding(top = with(LocalDensity.current) { headerHeight.toDp() })
+				.onGloballyPositioned { sidebarWidth = it.size.width }
+				.verticalScroll(verticalScrollState)
+		)
+
+		HorizontalPager(
+			state = pagerState,
+			pageCount = Int.MAX_VALUE,
+			pageSpacing = with(LocalDensity.current) { dividerWidth.toDp() }
+		) { index ->
+			val pageOffset = index - startPage
+			val visibleStartDate = startDate.withDayOfWeek(1).plusWeeks(pageOffset) // 1 = Monday, 7 = Sunday
+
+			Column {
+				WeekViewHeader(
+					startDate = visibleStartDate,
+					numDays = 5,
+					dayHeader = dayHeader,
+					modifier = Modifier
+						.onGloballyPositioned { headerHeight = it.size.height }
+				)
+
+				WeekViewContent(
+					events = events,
+					eventContent = eventContent,
+					startDate = visibleStartDate,
+					numDays = 5,
+					hourHeight = hourHeight,
+					dividerWidth = dividerWidth,
+					modifier = Modifier
+						.weight(1f)
+						.verticalScroll(verticalScrollState)
+				)
 			}
 		}
 	}
