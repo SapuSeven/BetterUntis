@@ -20,16 +20,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
+import androidx.compose.ui.unit.sp
+import org.joda.time.LocalDate
+import org.joda.time.LocalDateTime
+import org.joda.time.LocalTime
+import org.joda.time.Minutes
+import org.joda.time.format.DateTimeFormat
 import kotlin.math.roundToInt
 
 data class Event(
@@ -40,7 +39,7 @@ data class Event(
 	val description: String? = null,
 )
 
-val EventTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
+val eventTimeFormat = DateTimeFormat.forPattern("h:mm a")
 
 @Composable
 fun WeekViewEvent(
@@ -55,11 +54,7 @@ fun WeekViewEvent(
 			.padding(4.dp)
 	) {
 		Text(
-			text = "${event.start.format(EventTimeFormatter)} - ${
-				event.end.format(
-					EventTimeFormatter
-				)
-			}"
+			text = "${eventTimeFormat.print(event.start)} - ${eventTimeFormat.print(event.end)}"
 		)
 
 		Text(
@@ -81,13 +76,15 @@ fun WeekViewEvent(
 @Preview(showBackground = true)
 @Composable
 fun EventPreview() {
-	WeekViewEvent(event = Event(
-		name = "Test event",
-		color = Color(0xFFAFBBF2),
-		start = LocalDateTime.parse("2021-05-18T09:00:00"),
-		end = LocalDateTime.parse("2021-05-18T11:00:00"),
-		description = "This is an example event.",
-	), modifier = Modifier.sizeIn(maxHeight = 64.dp))
+	WeekViewEvent(
+		event = Event(
+			name = "Test event",
+			color = Color(0xFFAFBBF2),
+			start = LocalDateTime.parse("2021-05-18T09:00:00"),
+			end = LocalDateTime.parse("2021-05-18T11:00:00"),
+			description = "This is an example event.",
+		), modifier = Modifier.sizeIn(maxHeight = 64.dp)
+	)
 }
 
 private class EventDataModifier(
@@ -98,20 +95,35 @@ private class EventDataModifier(
 
 private fun Modifier.eventData(event: Event) = this.then(EventDataModifier(event))
 
-private val DayFormatter = DateTimeFormatter.ofPattern("EE")
+private val dayNameFormat = DateTimeFormat.forPattern("EEE")
+private val dayDateFormat = DateTimeFormat.forPattern("d. MMM")
 
 @Composable
 fun WeekViewHeaderDay(
 	day: LocalDate,
 	modifier: Modifier = Modifier,
 ) {
-	Text(
-		text = day.format(DayFormatter),
-		textAlign = TextAlign.Center,
-		modifier = modifier
-			.fillMaxWidth()
-			.padding(4.dp)
-	)
+	Column(
+		modifier = Modifier
+			.padding(8.dp)
+	) {
+		Text(
+			text = dayNameFormat.print(day),
+			textAlign = TextAlign.Center,
+			fontSize = 20.sp,
+			fontWeight = FontWeight.Medium,
+			modifier = modifier
+				.fillMaxWidth()
+		)
+		Text(
+			text = dayDateFormat.print(day),
+			textAlign = TextAlign.Center,
+			fontSize = 14.sp,
+			color = MaterialTheme.colorScheme.onSurfaceVariant,
+			modifier = modifier
+				.fillMaxWidth()
+		)
+	}
 }
 
 @Preview(showBackground = true)
@@ -133,7 +145,7 @@ fun WeekViewHeader(
 	) {
 		repeat(numDays) { i ->
 			Box(modifier = Modifier.weight(1f)) {
-				dayHeader(startDate.plusDays(i.toLong()))
+				dayHeader(startDate.plusDays(i))
 			}
 		}
 	}
@@ -148,7 +160,7 @@ fun WeekViewHeaderPreview() {
 	)
 }
 
-private val HourFormatter = DateTimeFormatter.ofPattern("hh")
+private val HourFormatter = DateTimeFormat.forPattern("hh")
 
 @Composable
 fun WeekViewSidebarLabel(
@@ -156,7 +168,7 @@ fun WeekViewSidebarLabel(
 	modifier: Modifier = Modifier,
 ) {
 	Text(
-		text = time.format(HourFormatter),
+		text = HourFormatter.print(time),
 		modifier = modifier
 			.fillMaxHeight()
 			.padding(4.dp)
@@ -166,7 +178,7 @@ fun WeekViewSidebarLabel(
 @Preview(showBackground = true)
 @Composable
 fun BasicSidebarLabelPreview() {
-	WeekViewSidebarLabel(time = LocalTime.NOON, Modifier.sizeIn(maxHeight = 64.dp))
+	WeekViewSidebarLabel(time = LocalTime.MIDNIGHT, Modifier.sizeIn(maxHeight = 64.dp))
 }
 
 @Composable
@@ -176,10 +188,10 @@ fun WeekViewSidebar(
 	label: @Composable (time: LocalTime) -> Unit = { WeekViewSidebarLabel(time = it) },
 ) {
 	Column(modifier = modifier) {
-		val startTime = LocalTime.MIN
+		val startTime = LocalTime.MIDNIGHT
 		repeat(24) { i ->
 			Box(modifier = Modifier.height(hourHeight)) {
-				label(startTime.plusHours(i.toLong()))
+				label(startTime.plusHours(i))
 			}
 		}
 	}
@@ -223,9 +235,9 @@ fun WeekViewCompose(
 		WeekViewSidebar(
 			hourHeight = hourHeight,
 			modifier = Modifier
-				.verticalScroll(verticalScrollState)
-				.onGloballyPositioned { sidebarWidth = it.size.width }
 				.padding(top = with(LocalDensity.current) { headerHeight.toDp() })
+				.onGloballyPositioned { sidebarWidth = it.size.width }
+				.verticalScroll(verticalScrollState)
 		)
 
 		HorizontalPager(
@@ -303,7 +315,7 @@ fun WeekViewContent(
 		val width = constraints.maxWidth
 		val placeablesWithEvents = measureables.map { measurable ->
 			val event = measurable.parentData as Event
-			val eventDurationMinutes = ChronoUnit.MINUTES.between(event.start, event.end)
+			val eventDurationMinutes = Minutes.minutesBetween(event.start, event.end).minutes
 			val eventHeight = ((eventDurationMinutes / 60f) * hourHeight.toPx()).roundToInt()
 			val placeable = measurable.measure(
 				constraints.copy(
@@ -316,10 +328,10 @@ fun WeekViewContent(
 		layout(width, height) {
 			placeablesWithEvents.forEach { (placeable, event) ->
 				val eventOffsetMinutes =
-					ChronoUnit.MINUTES.between(LocalTime.MIN, event.start.toLocalTime())
+					Minutes.minutesBetween(LocalTime.MIDNIGHT, event.start.toLocalTime()).minutes
 				val eventY = ((eventOffsetMinutes / 60f) * hourHeight.toPx()).roundToInt()
 				val eventOffsetDays =
-					ChronoUnit.DAYS.between(startDate, event.start.toLocalDate()).toInt()
+					Minutes.minutesBetween(startDate, event.start.toLocalDate()).minutes
 				val eventX = eventOffsetDays * (constraints.maxWidth / numDays)
 				placeable.place(eventX, eventY)
 			}
