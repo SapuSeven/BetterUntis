@@ -5,8 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -59,20 +59,17 @@ fun WeekViewEvent(
 				event.end.format(
 					EventTimeFormatter
 				)
-			}",
-			style = MaterialTheme.typography.caption,
+			}"
 		)
 
 		Text(
 			text = event.name,
-			style = MaterialTheme.typography.body1,
 			fontWeight = FontWeight.Bold,
 		)
 
 		if (event.description != null) {
 			Text(
 				text = event.description,
-				style = MaterialTheme.typography.body2,
 				maxLines = 1,
 				overflow = TextOverflow.Ellipsis,
 			)
@@ -270,7 +267,7 @@ fun WeekViewContent(
 	numDays: Int = 5,
 	hourHeight: Dp,
 ) {
-	val dividerColor = if (MaterialTheme.colors.isLight) Color.LightGray else Color.DarkGray
+	val dividerColor = MaterialTheme.colorScheme.outline
 	var dayWidth by remember { mutableStateOf(0f) }
 
 	Layout(
