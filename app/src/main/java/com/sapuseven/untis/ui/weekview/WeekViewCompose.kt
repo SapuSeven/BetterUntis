@@ -1,6 +1,7 @@
 package com.sapuseven.untis.ui.weekview
 
 import android.text.format.DateFormat
+import android.util.Log
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.ParentDataModifier
@@ -29,10 +31,10 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.joda.time.LocalDate
-import org.joda.time.LocalDateTime
-import org.joda.time.LocalTime
-import org.joda.time.Minutes
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.onEach
+import org.joda.time.*
 import org.joda.time.format.DateTimeFormat
 import java.util.*
 import kotlin.math.roundToInt
@@ -55,9 +57,9 @@ fun WeekViewEvent(
 	Column(
 		modifier = modifier
 			.fillMaxSize()
-			.padding(end = 2.dp, bottom = 2.dp)
+			.padding(2.dp) // Outer padding
 			.background(event.color, shape = RoundedCornerShape(4.dp))
-			.padding(4.dp)
+			.padding(4.dp) // Inner padding
 	) {
 		Text(
 			text = "${eventTimeFormat.print(event.start)} - ${eventTimeFormat.print(event.end)}"
@@ -269,6 +271,46 @@ fun WeekViewSidebarPreview() {
 	)
 }*/
 
+fun DrawScope.WeekViewContentGrid(
+	numDays: Int = 5,
+	startTime: LocalTime,
+	hourHeight: Dp,
+	hourList: List<WeekViewHour>,
+	dividerColor: Color,
+	dividerWidth: Float,
+) {
+	val hours = hourList.map { listOf(it.startTime, it.endTime) }.flatten().toSet()
+
+	hours.forEach {
+		val yPos =
+			Minutes.minutesBetween(startTime, it).minutes / 60f * hourHeight.toPx()
+
+		if (yPos == 0f || yPos == size.height) return@forEach
+
+		drawLine(
+			dividerColor,
+			start = Offset(0f, yPos),
+			end = Offset(size.width, yPos),
+			strokeWidth = dividerWidth
+		)
+	}
+	repeat(numDays - 1) {
+		val xPos = (it + 1) * (size.width / numDays)
+		drawLine(
+			dividerColor,
+			start = Offset(xPos, 0f),
+			end = Offset(xPos, size.height),
+			strokeWidth = dividerWidth
+		)
+	}
+	drawLine(
+		dividerColor,
+		start = Offset(size.width + dividerWidth, 0f),
+		end = Offset(size.width + dividerWidth, size.height),
+		strokeWidth = dividerWidth
+	)
+}
+
 @Composable
 fun WeekViewContent(
 	events: List<Event>,
@@ -294,47 +336,28 @@ fun WeekViewContent(
 		},
 		modifier = modifier
 			.drawBehind {
-				val hours = hourList.map { listOf(it.startTime, it.endTime) }.flatten().toSet()
-
-				hours.forEach {
-					val yPos =
-						Minutes.minutesBetween(startTime, it).minutes / 60f * hourHeight.toPx()
-
-					if (yPos == 0f || yPos == size.height) return@forEach
-
-					drawLine(
-						dividerColor,
-						start = Offset(0f, yPos),
-						end = Offset(size.width, yPos),
-						strokeWidth = dividerWidth
-					)
-				}
-				repeat(numDays - 1) {
-					val xPos = (it + 1) * (size.width / numDays)
-					drawLine(
-						dividerColor,
-						start = Offset(xPos, 0f),
-						end = Offset(xPos, size.height),
-						strokeWidth = dividerWidth
-					)
-				}
-				drawLine(
-					dividerColor,
-					start = Offset(size.width + dividerWidth, 0f),
-					end = Offset(size.width + dividerWidth, size.height),
-					strokeWidth = dividerWidth
+				WeekViewContentGrid(
+					numDays = numDays,
+					startTime = startTime,
+					hourHeight = hourHeight,
+					hourList = hourList,
+					dividerColor = dividerColor,
+					dividerWidth = dividerWidth
 				)
 			}
 	) { measureables, constraints ->
 		val height = (Minutes.minutesBetween(startTime, endTime).minutes / 60f * hourHeight.toPx()
 				+ endTimeOffset).roundToInt()
 		val width = constraints.maxWidth
+		val dayWidth = width / numDays;
 		val placeablesWithEvents = measureables.map { measurable ->
 			val event = measurable.parentData as Event
 			val eventDurationMinutes = Minutes.minutesBetween(event.start, event.end).minutes
 			val eventHeight = ((eventDurationMinutes / 60f) * hourHeight.toPx()).roundToInt()
 			val placeable = measurable.measure(
 				constraints.copy(
+					minWidth = dayWidth,
+					maxWidth = dayWidth,
 					minHeight = eventHeight,
 					maxHeight = eventHeight
 				)
@@ -344,11 +367,10 @@ fun WeekViewContent(
 		layout(width, height) {
 			placeablesWithEvents.forEach { (placeable, event) ->
 				val eventOffsetMinutes =
-					Minutes.minutesBetween(LocalTime.MIDNIGHT, event.start.toLocalTime()).minutes
+					Minutes.minutesBetween(startTime, event.start.toLocalTime()).minutes
 				val eventY = ((eventOffsetMinutes / 60f) * hourHeight.toPx()).roundToInt()
-				val eventOffsetDays =
-					Minutes.minutesBetween(startDate, event.start.toLocalDate()).minutes
-				val eventX = eventOffsetDays * (constraints.maxWidth / numDays)
+				val eventOffsetDays = Days.daysBetween(startDate, event.start.toLocalDate()).days
+				val eventX = eventOffsetDays * dayWidth
 				placeable.place(eventX, eventY)
 			}
 		}
@@ -358,7 +380,7 @@ fun WeekViewContent(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WeekViewCompose(
-	events: List<Event> = emptyList(),
+	loadItems: suspend (startDate: LocalDate, endDate: LocalDate) -> Flow<List<Event>>,
 	modifier: Modifier = Modifier,
 	eventContent: @Composable (event: Event) -> Unit = { WeekViewEvent(event = it) },
 	dayHeader: @Composable (day: LocalDate) -> Unit = { WeekViewHeaderDay(day = it) },
@@ -374,6 +396,9 @@ fun WeekViewCompose(
 
 	val startPage = Int.MAX_VALUE / 2
 	val pagerState = rememberPagerState(initialPage = startPage)
+	val numDays = 5
+
+	val events = remember { mutableStateMapOf<LocalDate, List<Event>>() }
 
 	Row(modifier = modifier) {
 		WeekViewSidebar(
@@ -402,20 +427,32 @@ fun WeekViewCompose(
 			val visibleStartDate =
 				startDate.withDayOfWeek(1).plusWeeks(pageOffset) // 1 = Monday, 7 = Sunday
 
+			LaunchedEffect(Unit) {
+				if (!events.contains(visibleStartDate)) {
+					loadItems(visibleStartDate, visibleStartDate.plusDays(numDays))
+						.cancellable()
+						.collect {
+							Log.d("WeekView", "New items received for $visibleStartDate")
+							events[visibleStartDate] = it
+						}
+					Log.d("WeekView", "All items received for $visibleStartDate")
+				}
+			}
+
 			Column {
 				WeekViewHeader(
 					startDate = visibleStartDate,
-					numDays = 5,
+					numDays = numDays,
 					dayHeader = dayHeader,
 					modifier = Modifier
 						.onGloballyPositioned { headerHeight = it.size.height }
 				)
 
 				WeekViewContent(
-					events = events,
+					events = events.getOrDefault(visibleStartDate, emptyList()),
 					eventContent = eventContent,
 					startDate = visibleStartDate,
-					numDays = 5,
+					numDays = numDays,
 					startTime = preferences.startTime,
 					endTime = preferences.endTime,
 					endTimeOffset = preferences.endTimeOffset,
@@ -432,13 +469,14 @@ fun WeekViewCompose(
 	}
 }
 
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun WeekViewPreview() {
 	WeekViewCompose(
-		preferences = rememberWeekViewPreferences()
+		preferences = rememberWeekViewPreferences(),
+		loadItems = { _, _, _ -> }
 	)
-}
+}*/
 
 @Composable
 fun rememberWeekViewPreferences(

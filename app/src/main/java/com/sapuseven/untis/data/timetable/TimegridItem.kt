@@ -1,6 +1,8 @@
 package com.sapuseven.untis.data.timetable
 
+import androidx.compose.ui.graphics.Color
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import com.sapuseven.untis.ui.weekview.Event
 import com.sapuseven.untis.views.weekview.WeekViewEvent
 import org.joda.time.DateTime
 
@@ -36,6 +38,15 @@ class TimegridItem(
 
 	override fun toWeekViewEvent(): WeekViewEvent<TimegridItem> {
 		return WeekViewEvent(id, title, top, bottom, startTime, endTime, color, pastColor,  textColor, this, hasIndicator)
+	}
+
+	fun toEvent(): Event {
+		return Event(
+			title.toString(),
+			Color(color),
+			startTime.toLocalDateTime(),
+			endTime.toLocalDateTime()
+		)
 	}
 
 	fun mergeWith(items: MutableList<TimegridItem>): Boolean {

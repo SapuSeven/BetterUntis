@@ -75,10 +75,7 @@ import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.preferences.convertRangeToPair
 import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
-import com.sapuseven.untis.ui.weekview.WeekViewCompose
-import com.sapuseven.untis.ui.weekview.WeekViewHour
-import com.sapuseven.untis.ui.weekview.WeekViewPreferences
-import com.sapuseven.untis.ui.weekview.rememberWeekViewPreferences
+import com.sapuseven.untis.ui.weekview.*
 import com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
 import com.sapuseven.untis.views.weekview.WeekView
 import com.sapuseven.untis.views.weekview.WeekViewDisplayable
@@ -90,10 +87,8 @@ import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.*
 import kotlinx.serialization.json.Json
 import org.joda.time.*
@@ -512,6 +507,8 @@ private fun Drawer(
 @Composable
 fun BaseComposeActivity.MainApp(state: MainAppState) {
 	val snackbarHostState = remember { SnackbarHostState() }
+	val scope = rememberCoroutineScope()
+
 	if (state.preferences.doubleTapToExit.getState().value)
 		BackPressConfirm(snackbarHostState)
 
@@ -560,7 +557,12 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 					.fillMaxSize()
 			) {
 				state.loadWeekViewPreferences(state.preferences)
-				WeekViewCompose(preferences = state.weekViewPreferences)
+				WeekViewCompose(
+					preferences = state.weekViewPreferences,
+					loadItems = { startDate, endDate ->
+						state.loadEventsFlow(startDate, endDate)
+					}
+				)
 
 				val timeColumnWidth = with(LocalDensity.current) {
 					state.weekView.value?.config?.timeColumnWidth?.toDp()
@@ -975,6 +977,17 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		)
 	}
 
+	private suspend fun loadTimetableFlow(
+		loader: TimetableLoader,
+		target: TimetableLoader.TimetableLoaderTarget,
+		forceRefresh: Boolean = false
+	): Flow<TimetableLoader.TimetableItems> = loader.loadFlow(
+		target,
+		preferences.proxyHost.getValue(),
+		loadFromCache = !forceRefresh,
+		loadFromServer = forceRefresh || preferences.connectivityRefreshInBackground.getValue(),
+	)
+
 	private suspend fun loadWeeklyTimetableItems(
 		loader: TimetableLoader?,
 		startDate: LocalDate,
@@ -1319,19 +1332,21 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
 
 			val startTime = hour.startTime.toLocalTime()
-					//.toString(DateTimeUtils.shortDisplayableTime())
+			//.toString(DateTimeUtils.shortDisplayableTime())
 			val endTime = hour.endTime.toLocalTime()
-				//.toString(DateTimeUtils.shortDisplayableTime())
+			//.toString(DateTimeUtils.shortDisplayableTime())
 
-			hourList.add(WeekViewHour(
-				startTime,
-				endTime,
-				hour.label
-			))
+			hourList.add(
+				WeekViewHour(
+					startTime,
+					endTime,
+					hour.label
+				)
+			)
 		}
 
 		//if (!rangeIndexReset)
-			//hourIndexOffset = (range?.first ?: 1) - 1
+		//hourIndexOffset = (range?.first ?: 1) - 1
 		val l = hourLabels.toTypedArray().let { hourLabelArray ->
 			// If provided hour labels are completely empty, generate them
 			if (hourLabelArray.joinToString("") == "") IntArray(
@@ -1572,6 +1587,46 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	private fun restoreWeekViewScrollPosition() {
 		if (currentWeekIndex.value % 100 > 0)
 			weekView.value?.goToDate(convertWeekIndexToDateTime(currentWeekIndex.value))
+	}
+
+	@OptIn(ExperimentalCoroutinesApi::class)
+	suspend fun loadEventsFlow(startDate: LocalDate, endDate: LocalDate): Flow<List<Event>> {
+		val dateRange =
+			UntisDate.fromLocalDate(LocalDate(startDate)) to
+					UntisDate.fromLocalDate(LocalDate(endDate))
+
+		return loadTimetableFlow(
+			timetableLoader,
+			TimetableLoader.TimetableLoaderTarget(
+				dateRange.first,
+				dateRange.second,
+				displayedElement.value!!.id, // TODO: Handle nullability
+				displayedElement.value!!.type
+			),
+			false
+		).map {
+			prepareItems(it.items).map { item -> item.toEvent() }
+		}
+
+		/*try {
+			displayedElement.value?.let { element ->
+					loadTimetableFlow(
+						timetableLoader,
+						TimetableLoader.TimetableLoaderTarget(
+							dateRange.first,
+							dateRange.second,
+							element.id,
+							element.type
+						),
+						false//forceRefresh
+					)
+						.onEach { timetableItems ->
+							setItems(runBlocking { prepareItems(timetableItems.items) }.map { item -> item.toEvent() })
+						}
+			}
+		} catch (e: TimetableLoader.TimetableLoaderException) {
+			//cont.resumeWithException(e)
+		}*/
 	}
 }
 
