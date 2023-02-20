@@ -109,7 +109,7 @@ fun WeekViewHeaderDay(
 
 	Column(
 		modifier = Modifier
-			.padding(8.dp)
+			.padding(4.dp)
 	) {
 		Text(
 			text = dayNameFormat.print(day),
@@ -292,7 +292,7 @@ fun WeekViewCompose(
 	startDate: LocalDate = LocalDate.now(),
 ) {
 	val hourHeight = 64.dp
-	val dividerWidth = 2f//Stroke.HairlineWidth
+	val dividerWidth = Stroke.HairlineWidth
 
 	val verticalScrollState = rememberScrollState()
 	var sidebarWidth by remember { mutableStateOf(0) }
