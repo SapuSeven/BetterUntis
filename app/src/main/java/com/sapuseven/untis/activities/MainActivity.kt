@@ -144,7 +144,11 @@ class MainActivity : BaseComposeActivity() {
 							globalPreferences = globalDataStore,
 							colorScheme = MaterialTheme.colorScheme//!! // Can't be null, AppTheme content isn't rendered if colorScheme is null
 						)
-					//state.loadPrefs(dataStorePreferences)
+
+					val prefs = dataStorePreferences
+					LaunchedEffect(Unit) {
+						state.loadPrefs(prefs)
+					}
 
 					MainApp(state)
 				}
@@ -567,12 +571,12 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 				}
 
 				val prefs = dataStorePreferences
-				LaunchedEffect(state.user) {
+				LaunchedEffect(state) {
 					state.loadPrefs(prefs)
 				}
 
 				WeekViewCompose(
-					dependency = state.user,
+					dependency = state,
 					startTime = state.weekViewPreferences.hourList.firstOrNull()?.startTime ?: LocalTime.MIDNIGHT,
 					endTime = state.weekViewPreferences.hourList.lastOrNull()?.endTime ?: LocalTime.MIDNIGHT,
 					endTimeOffset = navBarHeight,
@@ -920,14 +924,14 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	private suspend fun colorItems(
 		items: List<TimegridItem>
 	) {
-		val regularColor = preferences.backgroundRegular.getValue()
-		val regularPastColor = preferences.backgroundRegularPast.getValue()
-		val examColor = preferences.backgroundExam.getValue()
-		val examPastColor = preferences.backgroundExamPast.getValue()
-		val cancelledColor = preferences.backgroundCancelled.getValue()
-		val cancelledPastColor = preferences.backgroundCancelledPast.getValue()
-		val irregularColor = preferences.backgroundIrregular.getValue()
-		val irregularPastColor = preferences.backgroundIrregularPast.getValue()
+		val regularColor = weekViewPreferences.backgroundRegular.value
+		val regularPastColor = weekViewPreferences.backgroundRegularPast.value
+		val examColor = weekViewPreferences.backgroundExam.value
+		val examPastColor = weekViewPreferences.backgroundExamPast.value
+		val cancelledColor = weekViewPreferences.backgroundCancelled.value
+		val cancelledPastColor = weekViewPreferences.backgroundCancelledPast.value
+		val irregularColor = weekViewPreferences.backgroundIrregular.value
+		val irregularPastColor = weekViewPreferences.backgroundIrregularPast.value
 
 		val useDefault = preferences.schoolBackground.getValue()
 
@@ -1637,6 +1641,14 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		var hourList: SnapshotStateList<WeekViewHour>,
 		var dividerColor: Color,
 		var dividerWidth: Float,
+		var backgroundRegular: State<Int>,
+		var backgroundRegularPast: State<Int>,
+		var backgroundExam: State<Int>,
+		var backgroundExamPast: State<Int>,
+		var backgroundCancelled: State<Int>,
+		var backgroundCancelledPast: State<Int>,
+		var backgroundIrregular: State<Int>,
+		var backgroundIrregularPast: State<Int>,
 		/*var hourHeight: Dp,
 		var startTime: LocalTime,
 		var endTime: LocalTime,
@@ -1684,7 +1696,7 @@ fun rememberMainAppState(
 	},
 	showDatePicker: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 	profileManagementDialog: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
-	weekViewPreferences: MainAppState.WeekViewPreferences = rememberWeekViewPreferences(),
+	weekViewPreferences: MainAppState.WeekViewPreferences = rememberWeekViewPreferences(preferences),
 ) = remember(user, customThemeColor, colorScheme) {
 	MainAppState(
 		user = user,
@@ -1716,15 +1728,31 @@ fun rememberMainAppState(
 
 @Composable
 fun rememberWeekViewPreferences(
+	preferences: DataStorePreferences,
 	hourList: SnapshotStateList<WeekViewHour> = remember { mutableStateListOf<WeekViewHour>() },
 	dividerWidth: Float = Stroke.HairlineWidth,
 	dividerColor: Color = MaterialTheme.colorScheme.outline,
-
-	) = remember {
+	backgroundRegular: State<Int> = preferences.backgroundRegular.getState(),
+	backgroundRegularPast: State<Int> = preferences.backgroundRegularPast.getState(),
+	backgroundExam: State<Int> = preferences.backgroundExam.getState(),
+	backgroundExamPast: State<Int> = preferences.backgroundExamPast.getState(),
+	backgroundCancelled: State<Int> = preferences.backgroundCancelled.getState(),
+	backgroundCancelledPast: State<Int> = preferences.backgroundCancelledPast.getState(),
+	backgroundIrregular: State<Int> = preferences.backgroundIrregular.getState(),
+	backgroundIrregularPast: State<Int> = preferences.backgroundIrregularPast.getState(),
+) = remember {
 	MainAppState.WeekViewPreferences(
 		hourList = hourList,
 		dividerWidth = dividerWidth,
 		dividerColor = dividerColor,
+		backgroundRegular = backgroundRegular,
+		backgroundRegularPast = backgroundRegularPast,
+		backgroundExam = backgroundExam,
+		backgroundExamPast = backgroundExamPast,
+		backgroundCancelled = backgroundCancelled,
+		backgroundCancelledPast = backgroundCancelledPast,
+		backgroundIrregular = backgroundIrregular,
+		backgroundIrregularPast = backgroundIrregularPast
 	)
 }
 
