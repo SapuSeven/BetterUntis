@@ -398,8 +398,8 @@ fun WeekViewContent(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WeekViewCompose(
-	dependency: Any? = null,
-	loadItems: suspend (startDate: LocalDate, endDate: LocalDate) -> Flow<List<Event>>,
+	events: Map<LocalDate, List<Event>>,
+	loadEvents: suspend (startDate: LocalDate, endDate: LocalDate) -> Unit,
 	modifier: Modifier = Modifier,
 	eventContent: @Composable (event: Event) -> Unit = { WeekViewEvent(event = it) },
 	dayHeader: @Composable (day: LocalDate) -> Unit = { WeekViewHeaderDay(day = it) },
@@ -420,8 +420,6 @@ fun WeekViewCompose(
 	val startPage = Int.MAX_VALUE / 2
 	val pagerState = rememberPagerState(initialPage = startPage)
 	val numDays = 5
-
-	val events = remember(dependency) { mutableStateMapOf<LocalDate, List<Event>>() }
 
 	Row(modifier = modifier) {
 		WeekViewSidebar(
@@ -451,16 +449,9 @@ fun WeekViewCompose(
 			val visibleStartDate =
 				startDate.withDayOfWeek(1).plusWeeks(pageOffset) // 1 = Monday, 7 = Sunday
 
-			LaunchedEffect(dependency) {
-				if (!events.contains(visibleStartDate)) {
-					loadItems(visibleStartDate, visibleStartDate.plusDays(numDays))
-						.cancellable()
-						.collect {
-							Log.d("WeekView", "New items received for $visibleStartDate")
-							events[visibleStartDate] = it
-						}
-					Log.d("WeekView", "All items received for $visibleStartDate")
-				}
+			LaunchedEffect(events) {
+				if (!events.contains(visibleStartDate))
+					loadEvents(visibleStartDate, visibleStartDate.plusDays(numDays))
 			}
 
 			Column {
@@ -472,23 +463,24 @@ fun WeekViewCompose(
 						.onGloballyPositioned { headerHeight = it.size.height }
 				)
 
-				WeekViewContent(
-					events = events.getOrDefault(visibleStartDate, emptyList()),
-					eventContent = eventContent,
-					startDate = visibleStartDate,
-					numDays = numDays,
-					startTime = startTime,
-					endTime = endTime,
-					endTimeOffset = endTimeOffset,
-					hourHeight = hourHeight,
-					hourList = hourList,
-					dividerWidth = dividerWidth,
-					dividerColor = dividerColor,
-					modifier = Modifier
-						.weight(1f)
-						.onGloballyPositioned { contentHeight = it.size.height }
-						.verticalScroll(verticalScrollState)
-				)
+				if (hourList.isNotEmpty())
+					WeekViewContent(
+						events = events.getOrDefault(visibleStartDate, emptyList()),
+						eventContent = eventContent,
+						startDate = visibleStartDate,
+						numDays = numDays,
+						startTime = startTime,
+						endTime = endTime,
+						endTimeOffset = endTimeOffset,
+						hourHeight = hourHeight,
+						hourList = hourList,
+						dividerWidth = dividerWidth,
+						dividerColor = dividerColor,
+						modifier = Modifier
+							.weight(1f)
+							.onGloballyPositioned { contentHeight = it.size.height }
+							.verticalScroll(verticalScrollState)
+					)
 			}
 		}
 	}
@@ -502,6 +494,17 @@ fun WeekViewPreview() {
 		loadItems = { _, _, _ -> }
 	)
 }*/
+
+@Composable
+fun WeekViewTest(
+	bg: Color
+) {
+	Box(
+		modifier = Modifier
+			.fillMaxSize()
+			.background(bg)
+	)
+}
 
 data class WeekViewHour(
 	val startTime: LocalTime,
