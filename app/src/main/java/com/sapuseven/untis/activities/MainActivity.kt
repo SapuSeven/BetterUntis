@@ -579,6 +579,7 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 				WeekViewCompose(
 					events = state.weekViewEvents,
 					loadEvents = { startDate, endDate ->
+						Log.d("WeekView", "Loading items for $startDate")
 						state.loadEventsFlow(startDate, endDate)
 							.cancellable()
 							.collect {

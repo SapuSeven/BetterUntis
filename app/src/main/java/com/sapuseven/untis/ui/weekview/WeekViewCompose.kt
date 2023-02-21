@@ -1,7 +1,6 @@
 package com.sapuseven.untis.ui.weekview
 
 import android.text.format.DateFormat
-import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
@@ -32,8 +31,9 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.cancellable
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.launch
 import org.joda.time.*
 import org.joda.time.format.DateTimeFormat
 import java.util.*
@@ -463,24 +463,39 @@ fun WeekViewCompose(
 						.onGloballyPositioned { headerHeight = it.size.height }
 				)
 
-				if (hourList.isNotEmpty())
-					WeekViewContent(
-						events = events.getOrDefault(visibleStartDate, emptyList()),
-						eventContent = eventContent,
-						startDate = visibleStartDate,
-						numDays = numDays,
-						startTime = startTime,
-						endTime = endTime,
-						endTimeOffset = endTimeOffset,
-						hourHeight = hourHeight,
-						hourList = hourList,
-						dividerWidth = dividerWidth,
-						dividerColor = dividerColor,
-						modifier = Modifier
-							.weight(1f)
-							.onGloballyPositioned { contentHeight = it.size.height }
-							.verticalScroll(verticalScrollState)
-					)
+				if (hourList.isNotEmpty()) {
+					var isRefreshing by remember { mutableStateOf(false) }
+					val scope = rememberCoroutineScope()
+
+					SwipeRefresh(
+						state = rememberSwipeRefreshState(isRefreshing),
+						onRefresh = {
+							isRefreshing = true
+							scope.launch {
+								loadEvents(visibleStartDate, visibleStartDate.plusDays(numDays))
+								isRefreshing = false
+							}
+						},
+					) {
+						WeekViewContent(
+							events = events.getOrDefault(visibleStartDate, emptyList()),
+							eventContent = eventContent,
+							startDate = visibleStartDate,
+							numDays = numDays,
+							startTime = startTime,
+							endTime = endTime,
+							endTimeOffset = endTimeOffset,
+							hourHeight = hourHeight,
+							hourList = hourList,
+							dividerWidth = dividerWidth,
+							dividerColor = dividerColor,
+							modifier = Modifier
+								.weight(1f)
+								.onGloballyPositioned { contentHeight = it.size.height }
+								.verticalScroll(verticalScrollState)
+						)
+					}
+				}
 			}
 		}
 	}
