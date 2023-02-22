@@ -1,23 +1,18 @@
 package com.sapuseven.untis.activities
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.RectF
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.MotionEvent
-import android.view.View
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -45,7 +40,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.ColorUtils
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_HIGHLIGHT
@@ -78,12 +72,6 @@ import com.sapuseven.untis.ui.preferences.convertRangeToPair
 import com.sapuseven.untis.ui.weekview.*
 import com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
 import com.sapuseven.untis.views.weekview.WeekView
-import com.sapuseven.untis.views.weekview.WeekViewDisplayable
-import com.sapuseven.untis.views.weekview.listeners.EventClickListener
-import com.sapuseven.untis.views.weekview.listeners.ScaleListener
-import com.sapuseven.untis.views.weekview.listeners.ScrollListener
-import com.sapuseven.untis.views.weekview.listeners.TopLeftCornerClickListener
-import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -95,7 +83,6 @@ import org.joda.time.*
 import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
 import java.util.*
-import kotlin.math.max
 import kotlin.math.roundToInt
 
 class MainActivity : BaseComposeActivity() {
@@ -578,16 +565,16 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 
 				WeekViewCompose(
 					events = state.weekViewEvents,
-					loadEvents = { startDate, endDate ->
-						Log.d("WeekView", "Loading items for $startDate")
-						state.loadEventsFlow(startDate, endDate)
-							.cancellable()
-							.collect {
-								Log.d("WeekView", "New items received for $startDate")
-								state.weekViewEvents[startDate] = it
-							}
-						Log.d("WeekView", "All items received for $startDate")
+					onPageChange = { pageOffset ->
+						state.weekViewPage = pageOffset
+						state.loadAllEvents(pageOffset)
 					},
+					onReload = { pageOffset ->
+						state.loadEvents(state.startDateForPage(pageOffset))
+					},
+					/*loadEvents = { startDate, endDate ->
+						state.loadEvents(startDate, endDate)
+					},*/
 					startTime = state.weekViewPreferences.hourList.value.firstOrNull()?.startTime
 						?: LocalTime.MIDNIGHT,
 					endTime = state.weekViewPreferences.hourList.value.lastOrNull()?.endTime
@@ -741,7 +728,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	val loading: MutableState<Int>,
 	val currentWeekIndex: MutableState<Int>,
 	val lastRefreshTimestamp: MutableState<Long>,
-	val weeklyTimetableItems: SnapshotStateMap<Int, WeeklyTimetableItems?>,
+	//val weeklyTimetableItems: SnapshotStateMap<Int, WeeklyTimetableItems?>,
 	val timetableLoader: TimetableLoader,
 	val timetableItemDetailsDialog: MutableState<Pair<List<PeriodData>, Int>?>,
 	val showDatePicker: MutableState<Boolean>,
@@ -786,9 +773,11 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 	private var shouldUpdateWeekView = true
 
+	var weekViewPage: Int = 0
+
 	val isMessengerAvailable: Boolean
 		get() {
-			for (item in this.weeklyTimetableItems.values) {
+			/*for (item in this.weeklyTimetableItems.values) {
 				if (item != null) {
 					for (it in item.items) {
 						if (it.data?.periodData?.element?.messengerChannel != null) {
@@ -798,7 +787,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 					}
 				}
 
-			}
+			}*/
 			return false
 		}
 
@@ -816,8 +805,27 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		displayedName.value = name ?: element?.let { timetableDatabaseInterface.getLongName(it) }
 				?: defaultDisplayedName
 
-		weeklyTimetableItems.clear()
-		weekView.value?.notifyDataSetChanged()
+		weekViewEvents.clear()
+		scope.launch {
+			loadEvents()
+		}
+	}
+
+	suspend fun loadEvents(startDate: LocalDate = startDateForPage(weekViewPage)) = loadEvents(
+		startDate,
+		startDate.plusDays(weekViewPreferences.weekLength.value)
+	)
+
+	suspend fun loadEvents(startDate: LocalDate, endDate: LocalDate) {
+		Log.d("WeekView", "Loading items for $startDate")
+		weekViewEvents[startDate] = emptyList()
+		loadEventsFlow(startDate, endDate)
+			.cancellable()
+			.collect {
+				Log.d("WeekView", "New items received for $startDate")
+				weekViewEvents[startDate] = it
+			}
+		Log.d("WeekView", "All items received for $startDate")
 	}
 
 	@Composable
@@ -1106,7 +1114,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	private fun convertWeekIndexToDateTime(weekIndex: Int) =
 		DateTime.now().withYear(weekIndex.floorDiv(100)).withDayOfYear(weekIndex % 100 * 7)
 
-	private fun onRefresh() {
+	/*private fun onRefresh() {
 		displayedElement.value?.let { element ->
 			val weekIndex = currentWeekIndex.value
 
@@ -1129,7 +1137,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		}
 	}
 
-	/*fun loadPrefs(dataStorePreferences: DataStorePreferences) {
+	fun loadPrefs(dataStorePreferences: DataStorePreferences) {
 		val personalTimetableFlow = dataStorePreferences.timetablePersonalTimetable.getValueFlow()
 
 		scope.launch {
@@ -1293,10 +1301,12 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 						preferences.backgroundIrregularPast.getValueFlow(),
 						preferences.schoolBackground.getValueFlow()
 					).collect {
-						weeklyTimetableItems.map {
+						/*weeklyTimetableItems.map {
 							it.key to it.value?.let { value -> colorItems(value.items) }
-						}
-						weekView.notifyDataSetChanged()
+						}*/
+
+						// TODO: colorItems()
+						//weekView.notifyDataSetChanged()
 					}
 				}
 
@@ -1318,7 +1328,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		}
 	}
 
-	@SuppressLint("ClickableViewAccessibility")
+	/*@SuppressLint("ClickableViewAccessibility")
 	fun updateViews(container: WeekViewSwipeRefreshLayout) {
 		val touchListener = View.OnTouchListener { view, motionEvent ->
 			if (isAnonymous) true else view.onTouchEvent(motionEvent)
@@ -1497,7 +1507,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	private fun restoreWeekViewScrollPosition() {
 		if (currentWeekIndex.value % 100 > 0)
 			weekView.value?.goToDate(convertWeekIndexToDateTime(currentWeekIndex.value))
-	}
+	}*/
 
 	@OptIn(ExperimentalCoroutinesApi::class)
 	suspend fun loadEventsFlow(startDate: LocalDate, endDate: LocalDate): Flow<List<Event>> {
@@ -1541,6 +1551,21 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		}*/
 	}
 
+	fun startDateForPage(pageOffset: Int): LocalDate = LocalDate.now()
+		.withDayOfWeek(weekViewPreferences.weekStartOffset.value).plusWeeks(pageOffset)
+
+	suspend fun loadAllEvents(pageOffset: Int) {
+		coroutineScope {
+			((pageOffset - 1)..(pageOffset + 1)).map {
+				async {
+					val startDate = startDateForPage(it)
+					if (!weekViewEvents.contains(startDate))
+						loadEvents(startDate)
+				}
+			}.awaitAll()
+		}
+	}
+
 	data class WeekViewPreferences(
 		var hourList: State<List<WeekViewHour>>,
 		var dividerColor: Color,
@@ -1553,6 +1578,8 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		var backgroundCancelledPast: State<Int>,
 		var backgroundIrregular: State<Int>,
 		var backgroundIrregularPast: State<Int>,
+		var weekLength: State<Int>,
+		var weekStartOffset: State<Int>,
 		/*var hourHeight: Dp,
 		var startTime: LocalTime,
 		var endTime: LocalTime,
@@ -1600,7 +1627,10 @@ fun rememberMainAppState(
 	},
 	showDatePicker: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 	profileManagementDialog: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
-	weekViewPreferences: MainAppState.WeekViewPreferences = rememberWeekViewPreferences(preferences, user),
+	weekViewPreferences: MainAppState.WeekViewPreferences = rememberWeekViewPreferences(
+		preferences,
+		user
+	),
 	weekViewEvents: SnapshotStateMap<LocalDate, List<Event>> = remember(user) { mutableStateMapOf<LocalDate, List<Event>>() }
 ) = remember(user, customThemeColor, colorScheme) {
 	MainAppState(
@@ -1622,7 +1652,7 @@ fun rememberMainAppState(
 		loading = loading,
 		currentWeekIndex = currentWeekIndex,
 		lastRefreshTimestamp = lastRefreshTimestamp,
-		weeklyTimetableItems = weeklyTimetableItems,
+		//weeklyTimetableItems = weeklyTimetableItems,
 		timetableLoader = timetableLoader,
 		timetableItemDetailsDialog = timetableItemDetailsDialog,
 		showDatePicker = showDatePicker,
@@ -1690,6 +1720,17 @@ fun rememberWeekViewPreferences(
 	backgroundCancelledPast: State<Int> = preferences.backgroundCancelledPast.getState(),
 	backgroundIrregular: State<Int> = preferences.backgroundIrregular.getState(),
 	backgroundIrregularPast: State<Int> = preferences.backgroundIrregularPast.getState(),
+	weekLength: State<Int> = preferences.weekCustomRange.getValueFlow()
+		.transform<Set<String>, Int> {
+			it.size.zeroToNull ?: user.timeGrid.days.size
+		}.collectAsState(initial = 5),
+	weekStartOffset: State<Int> = preferences.weekCustomRange.getValueFlow()
+		.transform<Set<String>, Int> {
+			it.map { day -> Weekday.valueOf(day) }.minOrNull()?.ordinal
+				?: DateTimeFormat.forPattern("E")
+					.withLocale(Locale.ENGLISH) // TODO: Correct locale?
+					.parseDateTime(user.timeGrid.days[0].day).dayOfWeek
+		}.collectAsState(initial = DateTimeConstants.MONDAY),
 ) = remember {
 	MainAppState.WeekViewPreferences(
 		hourList = hourList,
@@ -1702,7 +1743,9 @@ fun rememberWeekViewPreferences(
 		backgroundCancelled = backgroundCancelled,
 		backgroundCancelledPast = backgroundCancelledPast,
 		backgroundIrregular = backgroundIrregular,
-		backgroundIrregularPast = backgroundIrregularPast
+		backgroundIrregularPast = backgroundIrregularPast,
+		weekLength = weekLength,
+		weekStartOffset = weekStartOffset,
 	)
 }
 

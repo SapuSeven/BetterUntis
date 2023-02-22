@@ -37,7 +37,6 @@ import kotlinx.coroutines.launch
 import org.joda.time.*
 import org.joda.time.format.DateTimeFormat
 import java.util.*
-import kotlin.math.floor
 import kotlin.math.roundToInt
 
 data class Event(
@@ -413,7 +412,8 @@ fun WeekViewContent(
 @Composable
 fun WeekViewCompose(
 	events: Map<LocalDate, List<Event>>,
-	loadEvents: suspend (startDate: LocalDate, endDate: LocalDate) -> Unit,
+	onPageChange: suspend (pageIndex: Int) -> Unit,
+	onReload: suspend (pageIndex: Int) -> Unit,
 	modifier: Modifier = Modifier,
 	eventContent: @Composable (event: Event) -> Unit = { WeekViewEvent(event = it) },
 	dayHeader: @Composable (day: LocalDate) -> Unit = { WeekViewHeaderDay(day = it) },
@@ -447,6 +447,12 @@ fun WeekViewCompose(
 				.animateContentSize()
 		)
 
+		LaunchedEffect(pagerState) {
+			snapshotFlow { pagerState.currentPage - startPage }.collect { page ->
+				onPageChange(page)
+			}
+		}
+
 		HorizontalPager(
 			state = pagerState,
 			pageCount = Int.MAX_VALUE,
@@ -462,11 +468,6 @@ fun WeekViewCompose(
 			val pageOffset = index - startPage
 			val visibleStartDate =
 				startDate.withDayOfWeek(1).plusWeeks(pageOffset) // 1 = Monday, 7 = Sunday
-
-			LaunchedEffect(events) {
-				if (!events.contains(visibleStartDate))
-					loadEvents(visibleStartDate, visibleStartDate.plusDays(numDays))
-			}
 
 			Column {
 				WeekViewHeader(
@@ -486,7 +487,7 @@ fun WeekViewCompose(
 						onRefresh = {
 							isRefreshing = true
 							scope.launch {
-								loadEvents(visibleStartDate, visibleStartDate.plusDays(numDays))
+								onReload(pageOffset)
 								isRefreshing = false
 							}
 						},
