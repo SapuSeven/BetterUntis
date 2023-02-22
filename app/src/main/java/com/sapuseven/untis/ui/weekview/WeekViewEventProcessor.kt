@@ -17,12 +17,13 @@ private data class TimelineEvent(
 
 private class EventComparator : Comparator<TimelineEvent> {
 	override fun compare(o1: TimelineEvent, o2: TimelineEvent): Int {
-		if (o1.eventTime < o2.eventTime) return -1
 		if (o1.eventTime > o2.eventTime) return 1
+		if (o1.eventTime < o2.eventTime) return -1
 		if (o1.eventType === EventType.EVENT_START && o2.eventType === EventType.EVENT_STOP) return 1
 		if (o1.eventType === EventType.EVENT_STOP && o2.eventType === EventType.EVENT_START) return -1
+		if (o1.eventId > o2.eventId) return 1
 		if (o1.eventId < o2.eventId) return -1
-		return if (o1.eventId > o2.eventId) 1 else 0
+		return 0
 	}
 }
 

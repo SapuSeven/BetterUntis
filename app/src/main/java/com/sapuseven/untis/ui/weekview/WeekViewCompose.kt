@@ -351,6 +351,12 @@ fun WeekViewContent(
 	dividerColor: Color = MaterialTheme.colorScheme.outline,
 	dividerWidth: Float = Stroke.HairlineWidth,
 ) {
+	// TODO: Find a way to arrange events before layout, but calculate minEventWidth to determine maxSimultaneous
+	// TODO: Display indicator if there are more events than can be displayed
+	//val minEventWidth = 24.dp
+	val maxSimultaneous = 100//(dayWidth.toFloat() / minEventWidth.toPx()).toInt()
+	arrangeEvents(events, maxSimultaneous);
+
 	Layout(
 		content = {
 			events.sortedBy(Event::start).forEach { event ->
@@ -389,10 +395,6 @@ fun WeekViewContent(
 			)
 			Pair(placeable, event)
 		}
-
-		val minEventWidth = 24.dp
-		val maxSimultaneous = (dayWidth.toFloat() / minEventWidth.toPx()).toInt()
-		arrangeEvents(events, maxSimultaneous);
 
 		layout(width, height) {
 			placeablesWithEvents.forEach { (placeable, event) ->
