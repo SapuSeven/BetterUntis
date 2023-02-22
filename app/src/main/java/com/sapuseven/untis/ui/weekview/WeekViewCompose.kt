@@ -37,6 +37,7 @@ import kotlinx.coroutines.launch
 import org.joda.time.*
 import org.joda.time.format.DateTimeFormat
 import java.util.*
+import kotlin.math.floor
 import kotlin.math.roundToInt
 
 data class Event(
@@ -47,7 +48,14 @@ data class Event(
 	val textColor: Color,
 	val start: LocalDateTime,
 	val end: LocalDateTime,
-)
+) {
+	var numSimultaneous: Int = 1 // relative width is determined by 1/x
+	var offsetSteps: Int = 0 // x-offset in multiples of width
+
+	// temp
+	var leftX = 0
+	var rightX = 0
+}
 
 val eventTimeFormat = DateTimeFormat.forPattern("h:mm a")
 
@@ -374,21 +382,27 @@ fun WeekViewContent(
 			val eventHeight = ((eventDurationMinutes / 60f) * hourHeight.toPx()).roundToInt()
 			val placeable = measurable.measure(
 				constraints.copy(
-					minWidth = dayWidth,
-					maxWidth = dayWidth,
+					minWidth = dayWidth / event.numSimultaneous,
+					maxWidth = dayWidth / event.numSimultaneous,
 					minHeight = eventHeight,
 					maxHeight = eventHeight
 				)
 			)
 			Pair(placeable, event)
 		}
+
+		val minEventWidth = 24.dp
+		val maxSimultaneous = (dayWidth.toFloat() / minEventWidth.toPx()).toInt()
+		arrangeEvents(events, maxSimultaneous);
+
 		layout(width, height) {
 			placeablesWithEvents.forEach { (placeable, event) ->
 				val eventOffsetMinutes =
 					Minutes.minutesBetween(startTime, event.start.toLocalTime()).minutes
 				val eventY = ((eventOffsetMinutes / 60f) * hourHeight.toPx()).roundToInt()
 				val eventOffsetDays = Days.daysBetween(startDate, event.start.toLocalDate()).days
-				val eventX = eventOffsetDays * dayWidth
+				val eventOffset = event.offsetSteps * (dayWidth / event.numSimultaneous)
+				val eventX = eventOffsetDays * dayWidth + eventOffset
 				placeable.place(eventX, eventY)
 			}
 		}
