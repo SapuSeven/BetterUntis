@@ -6,6 +6,7 @@ plugins {
 	id 'com.google.devtools.ksp' version '1.8.10-1.0.9'
 }
 
+apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlinx-serialization'
 
@@ -160,7 +161,7 @@ dependencies {
 
 	coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
-	ksp "androidx.room:room-compiler:$room_version"
+	//ksp "androidx.room:room-compiler:$room_version"
 
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
 	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
@@ -173,6 +174,8 @@ dependencies {
 	androidTestImplementation 'androidx.test:core:1.5.0-alpha02' // Version 1.5.0-alpha02 fixes crash on Android 13 - see https://github.com/android/android-test/issues/1412
 	androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
 	debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+
+	kapt "androidx.room:room-compiler:$room_version"
 
 
 	implementation project(':weekview')
