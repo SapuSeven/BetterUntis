@@ -23,6 +23,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -57,6 +59,7 @@ import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.SmallCircularProgressIndicator
+import com.sapuseven.untis.ui.common.VerticalScrollColumn
 import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
@@ -84,6 +87,9 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 
 	var absenceCheck by rememberSaveable { mutableStateOf<Triple<Int, UntisDateTime, UntisDateTime>?>(null) }
 
+	var detailedAbsenceCheck by rememberSaveable { mutableStateOf<Pair<Pair<Int, UntisStudent>, Pair<UntisDateTime, UntisDateTime>>?>(null) }
+	var studentName by rememberSaveable { mutableStateOf<String?>(null) }
+
 	var untisPeriodData by remember { mutableStateOf<UntisPeriodData?>(null) }
 	var untisStudents by rememberSaveable { mutableStateOf<List<UntisStudent>?>(null) }
 	var error by remember { mutableStateOf<Throwable?>(null) }
@@ -104,11 +110,13 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 	AppScaffold(
 		topBar = {
 			CenterAlignedTopAppBar(
-				title = { Text(stringResource(id = R.string.all_lesson_details)) },
+				title = { Text(studentName ?: stringResource(id = R.string.all_lesson_details)) },
 				navigationIcon = {
 					IconButton(onClick = {
-						if (absenceCheck != null)
+						if (absenceCheck != null && detailedAbsenceCheck == null)
 							absenceCheck = null
+						else if (detailedAbsenceCheck != null)
+							detailedAbsenceCheck = null
 						else
 							dismiss()
 					}) {
@@ -132,6 +140,22 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 					modifier = Modifier.bottomInsets(),
 					onClick = {
 						loading = true
+
+						if (detailedAbsenceCheck != null){
+							scope.launch {
+								createAbsence(
+									user = user,
+									ttId = detailedAbsenceCheck?.first?.first ?: -1,
+									student = detailedAbsenceCheck?.first?.second!!,
+									startDateTime = detailedAbsenceCheck?.second?.first!!.toLocalDateTime(),
+									endDateTime = detailedAbsenceCheck?.second?.second!!.toLocalDateTime()
+								)
+								detailedAbsenceCheck = null
+								loading = false
+							}
+							return@FloatingActionButton
+						}
+
 
 						scope.launch {
 							submitAbsencesChecked(
@@ -574,7 +598,7 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 			exit = fullscreenDialogAnimationExit()
 		) {
 			BackHandler(
-				enabled = absenceCheck != null,
+				enabled = absenceCheck != null && detailedAbsenceCheck == null,
 			) {
 				absenceCheck = null
 			}
@@ -618,56 +642,181 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 									contentDescription = "Present"
 								)
 						},
-						modifier = Modifier.clickable {
-							absence?.let {
-								loading = true
+						modifier = Modifier.conditional(
+							detailedAbsenceCheck == null,
+						) {
+							this.clickable {
+								absence?.let {
+									loading = true
 
-								scope.launch {
-									deleteAbsence(
-										user,
-										absence
-									).fold({
-										if (it)
-											untisPeriodData = untisPeriodData?.copy(
-												absences = untisPeriodData?.absences?.minus(
-													absence
+									scope.launch {
+										deleteAbsence(
+											user,
+											absence
+										).fold({
+											if (it)
+												untisPeriodData = untisPeriodData?.copy(
+													absences = untisPeriodData?.absences?.minus(
+														absence
+													)
 												)
-											)
-										else
+											else
+												Toast
+													.makeText(context, errorMessageGeneric, Toast.LENGTH_LONG)
+													.show()
+										}, {
 											Toast
-												.makeText(context, errorMessageGeneric, Toast.LENGTH_LONG)
+												.makeText(context, it.message, Toast.LENGTH_LONG)
 												.show()
-									}, {
-										Toast
-											.makeText(context, it.message, Toast.LENGTH_LONG)
-											.show()
-									})
-									loading = false
-								}
-							} ?: absenceCheck?.let { absenceCheckPeriod ->
-								loading = true
+										})
+										loading = false
+									}
+								} ?: absenceCheck?.let { absenceCheckPeriod ->
+									loading = true
 
-								scope.launch {
-									createAbsence(
-										user,
-										absenceCheckPeriod.first,
-										student,
-										absenceCheckPeriod.second.toLocalDateTime(),
-										absenceCheckPeriod.third.toLocalDateTime()
-									).fold({
-										untisPeriodData = untisPeriodData?.copy(
-											absences = untisPeriodData?.absences?.plus(it)
-										)
-									}, {
-										Toast
-											.makeText(context, it.message, Toast.LENGTH_LONG)
-											.show()
-									})
-									loading = false
+									scope.launch {
+										createAbsence(
+											user,
+											absenceCheckPeriod.first,
+											student,
+											absenceCheckPeriod.second.toLocalDateTime(),
+											absenceCheckPeriod.third.toLocalDateTime()
+										).fold({
+											untisPeriodData = untisPeriodData?.copy(
+												absences = untisPeriodData?.absences?.plus(it)
+											)
+										}, {
+											Toast
+												.makeText(context, it.message, Toast.LENGTH_LONG)
+												.show()
+										})
+										loading = false
+									}
 								}
+							}
+						},
+						trailingContent = {
+							IconButton(
+								onClick = {
+									detailedAbsenceCheck = (absenceCheck!!.first to student) to (absenceCheck!!.second to absenceCheck!!.third)
+								}
+							){
+								Icon(painter = painterResource(id = R.drawable.notification_clock), contentDescription = null)
 							}
 						}
 					)
+				}
+			}
+		}
+
+		AnimatedVisibility(
+			visible = detailedAbsenceCheck != null,
+			enter = fullscreenDialogAnimationEnter(),
+			exit = fullscreenDialogAnimationExit()
+		) {
+			studentName = detailedAbsenceCheck?.first?.second?.fullName()
+
+			val startTimePickerState = rememberTimePickerState(
+				initialHour = detailedAbsenceCheck?.second?.first?.toLocalDateTime()?.hourOfDay ?: LocalDateTime.now().hourOfDay,
+				initialMinute = detailedAbsenceCheck?.second?.first?.toLocalDateTime()?.minuteOfHour?: LocalDateTime.now().minuteOfHour,
+				is24Hour = true
+			)
+			val endTimePickerState = rememberTimePickerState(
+				initialHour = detailedAbsenceCheck?.second?.second?.toLocalDateTime()?.hourOfDay ?: LocalDateTime.now().hourOfDay,
+				initialMinute = detailedAbsenceCheck?.second?.second?.toLocalDateTime()?.minuteOfHour?: LocalDateTime.now().minuteOfHour,
+				is24Hour = true
+			)
+
+			BackHandler(
+				enabled = detailedAbsenceCheck != null,
+			) {
+				detailedAbsenceCheck = null
+				studentName = null
+			}
+			Box(
+				modifier = Modifier
+					.padding(innerPadding)
+					.fillMaxSize()
+					.background(MaterialTheme.colorScheme.surface)
+			) {
+				VerticalScrollColumn {
+					var showStartTimePicker by remember { mutableStateOf(false) }
+					var showEndTimePicker by remember { mutableStateOf(false) }
+
+
+					ListItem(
+						modifier = Modifier.clickable {
+							showStartTimePicker = true
+						},
+						headlineText = {
+							Text(text = "Start")
+						},
+						trailingContent = {
+							Text(
+								text = detailedAbsenceCheck?.second?.first?.toLocalDateTime()
+									?.toString(DateTimeFormat.forStyle("MS").withLocale(context.resources.configuration.locale))
+									?: "",
+								style = MaterialTheme.typography.labelLarge
+							)
+						}
+					)
+
+					ListItem(
+						modifier = Modifier.clickable {
+							showEndTimePicker = true
+						},
+						headlineText = {
+							Text(text = "End")
+						},
+						trailingContent = {
+							Text(
+								text = detailedAbsenceCheck?.second?.second?.toLocalDateTime()
+									?.toString(DateTimeFormat.forStyle("MS").withLocale(context.resources.configuration.locale))
+									?: "",
+								style = MaterialTheme.typography.labelLarge
+							)
+						}
+					)
+
+					if (showStartTimePicker){
+						TimePickerDialog(
+							onConfirm = {
+								val time = detailedAbsenceCheck!!.second.first.toLocalDateTime()
+									.withTime(startTimePickerState.hour, startTimePickerState.minute, 0, 0)
+								detailedAbsenceCheck =
+									detailedAbsenceCheck!!.first to (UntisDateTime(time) to detailedAbsenceCheck?.second?.second!!)
+								showStartTimePicker = false
+							},
+							onCancel = {
+								showStartTimePicker = false
+							}
+						) {
+							TimePicker(
+								state = startTimePickerState
+							)
+						}
+					}
+					if (showEndTimePicker) {
+						TimePickerDialog(
+							onConfirm = {
+								val time = detailedAbsenceCheck!!.second.second.toLocalDateTime()
+									.withTime(endTimePickerState.hour, endTimePickerState.minute, 0, 0)
+								detailedAbsenceCheck =
+									detailedAbsenceCheck!!.first to (detailedAbsenceCheck?.second?.first!! to UntisDateTime(
+										time
+									))
+								showEndTimePicker = false
+							},
+							onCancel = {
+								showEndTimePicker = false
+							}
+						) {
+							TimePicker(
+								state = endTimePickerState
+							)
+						}
+					}
+
 				}
 			}
 		}
