@@ -149,7 +149,15 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 									student = detailedAbsenceCheck?.first?.second!!,
 									startDateTime = detailedAbsenceCheck?.second?.first!!.toLocalDateTime(),
 									endDateTime = detailedAbsenceCheck?.second?.second!!.toLocalDateTime()
-								)
+								).fold({
+									untisPeriodData = untisPeriodData?.copy(
+										absences = untisPeriodData?.absences?.plus(it)
+									)
+								}, {
+									Toast
+										.makeText(context, it.message, Toast.LENGTH_LONG)
+										.show()
+								})
 								detailedAbsenceCheck = null
 								loading = false
 							}
