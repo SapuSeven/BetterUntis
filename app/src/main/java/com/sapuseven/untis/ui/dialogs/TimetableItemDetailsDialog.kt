@@ -942,10 +942,7 @@ private suspend fun loadPeriodData(
 		)
 	}
 
-	val result = UntisRequest().request(query)
-	return result.fold({ data ->
-		val untisResponse = SerializationUtils.getJSON().decodeFromString<PeriodDataResponse>(data)
-
+	return UntisRequest().request<PeriodDataResponse>(query).fold({ untisResponse ->
 		untisResponse.result?.let {
 			Result.success(it)
 		} ?: Result.failure(UntisApiException(untisResponse.error))
@@ -975,10 +972,7 @@ private suspend fun createAbsence(
 			)
 		}
 
-	return UntisRequest().request(query).fold({ data ->
-		val untisResponse =
-			SerializationUtils.getJSON().decodeFromString<CreateImmediateAbsenceResponse>(data)
-
+	return UntisRequest().request<CreateImmediateAbsenceResponse>(query).fold({ untisResponse ->
 		untisResponse.result?.let {
 			Result.success(it.absences[0])
 		} ?: Result.failure(UntisApiException(untisResponse.error))
@@ -1002,10 +996,7 @@ private suspend fun deleteAbsence(
 			)
 		}
 
-	return UntisRequest().request(query).fold({ data ->
-		val untisResponse =
-			SerializationUtils.getJSON().decodeFromString<DeleteAbsenceResponse>(data)
-
+	return UntisRequest().request<DeleteAbsenceResponse>(query).fold({ untisResponse ->
 		untisResponse.result?.let {
 			Result.success(it.success)
 		} ?: Result.failure(UntisApiException(untisResponse.error))
@@ -1029,10 +1020,8 @@ private suspend fun submitAbsencesChecked(
 			)
 		}
 
-	return UntisRequest().request(query).fold({ data ->
-		// TODO: Create corresponding data model
-		val untisResponse = SerializationUtils.getJSON().decodeFromString<BaseResponse>(data)
-
+	// TODO: Create corresponding data model
+	return UntisRequest().request<BaseResponse>(query).fold({ untisResponse ->
 		untisResponse.error?.let {
 			Result.failure(UntisApiException(it))
 		} ?: Result.success(true)
@@ -1058,9 +1047,8 @@ private suspend fun submitLessonTopic(
 			)
 		}
 
-	return UntisRequest().request(query).fold({ data ->
-		// TODO: Create corresponding data model
-		val untisResponse = SerializationUtils.getJSON().decodeFromString<BaseResponse>(data)
+	// TODO: Create corresponding data model
+	return UntisRequest().request<BaseResponse>(query).fold({ untisResponse ->
 
 		untisResponse.error?.let {
 			Result.failure(UntisApiException(it))

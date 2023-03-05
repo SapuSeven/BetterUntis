@@ -107,13 +107,10 @@ class InfoCenterState(
 			)
 		)
 
-		val result = api.request(query).fold({ data ->
-			val untisResponse = SerializationUtils.getJSON().decodeFromString<MessageResponse>(data)
-
+		messages.value = api.request<MessageResponse>(query).fold({ untisResponse ->
 			untisResponse.result?.messages
 		}, { null /* TODO: Show error */ })
 
-		messages.value = result
 		messagesLoading.value = false
 	}
 
@@ -150,11 +147,7 @@ class InfoCenterState(
 				)
 			)
 
-			val result = api.request(query)
-			return result.fold({ data ->
-				val untisResponse =
-					SerializationUtils.getJSON().decodeFromString<ExamResponse>(data)
-
+			return api.request<ExamResponse>(query).fold({ untisResponse ->
 				untisResponse.result?.exams?.map {
 					EventListItem(
 						timetableDatabaseInterface,
@@ -184,11 +177,7 @@ class InfoCenterState(
 				)
 			)
 
-			val result = api.request(query)
-			return result.fold({ data ->
-				val untisResponse =
-					SerializationUtils.getJSON().decodeFromString<HomeworkResponse>(data)
-
+			return api.request<HomeworkResponse>(query).fold({ untisResponse ->
 				untisResponse.result?.homeWorks?.map {
 					EventListItem(
 						timetableDatabaseInterface,
@@ -219,13 +208,10 @@ class InfoCenterState(
 			)
 		)
 
-		val result = api.request(query).fold({ data ->
-			val untisResponse = SerializationUtils.getJSON().decodeFromString<AbsenceResponse>(data)
-
+		absences.value = api.request<AbsenceResponse>(query).fold({ untisResponse ->
 			untisResponse.result?.absences?.sortedBy { it.excused }
 		}, { null /* TODO: Show error */ })
 
-		absences.value = result
 		absencesLoading.value = false
 	}
 
@@ -246,14 +232,10 @@ class InfoCenterState(
 			)
 		)
 
-		val result = api.request(query).fold({ data ->
-			val untisResponse =
-				SerializationUtils.getJSON().decodeFromString<OfficeHoursResponse>(data)
-
+		officeHours.value = api.request<OfficeHoursResponse>(query).fold({ untisResponse ->
 			untisResponse.result?.officeHours
 		}, { null /* TODO: Show error */ })
 
-		officeHours.value = result
 		officeHoursLoading.value = false
 	}
 

@@ -10,7 +10,7 @@ data class UntisUserData(
 		val displayName: String,
 		val schoolName: String,
 		val departmentId: Int,
-		val children: List<UnknownObject>, // TODO: This value type is unknown
+		val children: List<UnknownObject>, // Probably UntisStudent
 		val klassenIds: List<Int>,
 		val rights: List<String>
 ) {
