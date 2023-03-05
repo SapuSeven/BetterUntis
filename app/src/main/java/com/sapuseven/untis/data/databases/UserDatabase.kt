@@ -43,6 +43,7 @@ abstract class UserDatabase : RoomDatabase() {
 				UserDatabase::class.java, "userdata.db"
 			)
 				.allowMainThreadQueries() // TODO: Fix and delete this!
+				.enableMultiInstanceInvalidation()
 				.addMigrations(MIGRATION_7_8)
 				.build()
 	}
