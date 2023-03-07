@@ -65,6 +65,7 @@ import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
+import org.joda.time.DateTime
 import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
 
@@ -725,13 +726,13 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 			studentName = detailedAbsenceCheck?.first?.second?.fullName()
 
 			val startTimePickerState = rememberTimePickerState(
-				initialHour = detailedAbsenceCheck?.second?.first?.toLocalDateTime()?.hourOfDay ?: LocalDateTime.now().hourOfDay,
-				initialMinute = detailedAbsenceCheck?.second?.first?.toLocalDateTime()?.minuteOfHour?: LocalDateTime.now().minuteOfHour,
+				initialHour = detailedAbsenceCheck?.second?.first?.toDateTime()?.hourOfDay ?: DateTime.now().hourOfDay,
+				initialMinute = detailedAbsenceCheck?.second?.first?.toDateTime()?.minuteOfHour?: DateTime.now().minuteOfHour,
 				is24Hour = true
 			)
 			val endTimePickerState = rememberTimePickerState(
-				initialHour = detailedAbsenceCheck?.second?.second?.toLocalDateTime()?.hourOfDay ?: LocalDateTime.now().hourOfDay,
-				initialMinute = detailedAbsenceCheck?.second?.second?.toLocalDateTime()?.minuteOfHour?: LocalDateTime.now().minuteOfHour,
+				initialHour = detailedAbsenceCheck?.second?.second?.toDateTime()?.hourOfDay ?: DateTime.now().hourOfDay,
+				initialMinute = detailedAbsenceCheck?.second?.second?.toDateTime()?.minuteOfHour?: DateTime.now().minuteOfHour,
 				is24Hour = true
 			)
 
@@ -757,7 +758,7 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 							showStartTimePicker = true
 						},
 						headlineText = {
-							Text(text = "Start")
+							Text(text = stringResource(id = R.string.all_start_time))
 						},
 						trailingContent = {
 							Text(
@@ -774,7 +775,7 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 							showEndTimePicker = true
 						},
 						headlineText = {
-							Text(text = "End")
+							Text(text = stringResource(id = R.string.all_end_time))
 						},
 						trailingContent = {
 							Text(
@@ -831,7 +832,6 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TimetableItemDetailsDialogWithPeriodData(
 	periodData: PeriodData,

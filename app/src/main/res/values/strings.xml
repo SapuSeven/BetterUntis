@@ -385,4 +385,8 @@
     <string name="infocenter_absences_list_thirty_days">Show last 30 days</string>
     <string name="infocenter_absences_list_ninety_days">Show last 90 days</string>
     <string name="infocenter_absences_list_schoolyear">Current school year</string>
+	<string name="all_default_time_dialog_title">Select Time</string>
+	<string name="all_start_time">Start time</string>
+	<string name="all_end_time">End time</string>
+
 </resources>
