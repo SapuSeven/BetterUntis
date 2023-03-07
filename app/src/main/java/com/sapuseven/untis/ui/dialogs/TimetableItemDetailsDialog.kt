@@ -23,8 +23,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -44,13 +42,13 @@ import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.helpers.DateTimeUtils
-import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.UntisAbsence
 import com.sapuseven.untis.models.untis.UntisAttachment
 import com.sapuseven.untis.models.untis.UntisDateTime
 import com.sapuseven.untis.models.untis.UntisError
 import com.sapuseven.untis.models.untis.UntisTime
+import com.sapuseven.untis.models.untis.masterdata.AbsenceReason
 import com.sapuseven.untis.models.untis.params.*
 import com.sapuseven.untis.models.untis.response.*
 import com.sapuseven.untis.models.untis.timetable.Period
@@ -64,7 +62,6 @@ import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
 import org.joda.time.DateTime
 import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
@@ -751,6 +748,17 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 				VerticalScrollColumn {
 					var showStartTimePicker by remember { mutableStateOf(false) }
 					var showEndTimePicker by remember { mutableStateOf(false) }
+					/*
+					* See line 800 for explaination.
+					*
+					var isDropdownExpanded by remember { mutableStateOf(false) }
+					var menuOptions = listOf<AbsenceReason>()
+					var selectedOptionText by remember {
+						mutableStateOf(untisPeriodData?.absences?.findLast {
+							it.studentId == detailedAbsenceCheck?.first?.second?.id
+						}?.absenceReason ?: "Absence reason unknown")
+					}*/
+
 
 
 					ListItem(
@@ -786,6 +794,56 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 							)
 						}
 					)
+
+
+					/*
+					* This is experimental code we have to test with a real teacher account.
+					* The PR can be merged without this as this is only a little addition to the functionality
+					* The outcommented aims to get a dropdown working for the absence reasons
+					* ListItem(
+						modifier = Modifier.clickable {
+							scope.launch {
+								menuOptions =
+									userDatabase.userDao().getByIdWithData(user.id)?.absenceReasons ?: listOf()
+							}
+
+						},
+						headlineText = {
+							Text(text = "Absence reason")
+						},
+						trailingContent = {
+							ExposedDropdownMenuBox(
+								expanded = isDropdownExpanded,
+								onExpandedChange = {
+									isDropdownExpanded = !isDropdownExpanded
+								})
+							{
+								TextField(
+									modifier = Modifier.menuAnchor(),
+									readOnly = true,
+									value = selectedOptionText,
+									onValueChange = {}
+								)
+								ExposedDropdownMenu(
+									expanded = isDropdownExpanded,
+									onDismissRequest = { isDropdownExpanded = false }
+								) {
+									menuOptions.forEach { selectionOption ->
+										DropdownMenuItem(
+											text = {
+												Text(text = selectionOption.longName)
+											},
+											onClick = {
+												selectedOptionText = selectionOption.longName
+												isDropdownExpanded = false
+											},
+											contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+										)
+									}
+								}
+							}
+						}
+					)*/
 
 					if (showStartTimePicker){
 						TimePickerDialog(
