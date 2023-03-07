@@ -53,6 +53,7 @@ class TimetableCache(val context: WeakReference<Context>) {
 			val items: List<Period>
 	)
 
+	// TODO: May cause conflicts between multiple users. Include UserID
 	private inner class CacheTarget(
 			val startDate: UntisDate,
 			val endDate: UntisDate,

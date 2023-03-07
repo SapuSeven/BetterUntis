@@ -8,12 +8,13 @@ import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
-import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.params.TimetableParams
 import com.sapuseven.untis.models.untis.response.TimetableResponse
 import com.sapuseven.untis.models.untis.timetable.Period
-import kotlinx.serialization.decodeFromString
+import io.sentry.Breadcrumb
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import org.joda.time.Instant
 import java.lang.ref.WeakReference
 
@@ -86,6 +87,8 @@ class TimetableLoader(
 				"TimetableLoaderDebug",
 				"target $target (requestId $requestId): cached file found"
 			)
+			sendBreadcrumb(target, "cache hit", cache = cache)
+
 			cache.load()?.let { cacheObject ->
 				TimetableItems(
 					items = cacheObject.items.map {
@@ -104,6 +107,7 @@ class TimetableLoader(
 					"TimetableLoaderDebug",
 					"target $target (requestId $requestId): cached file corrupted"
 				)
+				sendBreadcrumb(target, "cache corrupted", cache = cache)
 				null
 			}
 		} else {
@@ -111,7 +115,26 @@ class TimetableLoader(
 				"TimetableLoaderDebug",
 				"target $target (requestId $requestId): cached file missing"
 			)
+			sendBreadcrumb(target, "cache miss", cache = cache)
 			null
+		}
+	}
+
+	private fun sendBreadcrumb(
+		target: TimetableLoaderTarget,
+		status: String,
+		cache: TimetableCache? = null,
+		error: String? = null
+	) {
+		Breadcrumb().apply {
+			type = "query"
+			category = "timetable"
+			level = SentryLevel.INFO
+			setData("target", target)
+			setData("status", status)
+			cache?.let { setData("cache_id", cache.toString()) }
+			error?.let { setData("error", error) }
+			Sentry.addBreadcrumb(this)
 		}
 	}
 
@@ -144,15 +167,13 @@ class TimetableLoader(
 		query.data.method = UntisApiConstants.METHOD_GET_TIMETABLE
 		query.data.params = listOf(params)
 
-		val userDataResult = api.request(query)
-		userDataResult.fold({ data ->
-			val untisResponse = getJSON().decodeFromString<TimetableResponse>(data)
-
+		api.request<TimetableResponse>(query).fold({ untisResponse ->
 			if (untisResponse.result != null) {
 				Log.d(
 					"TimetableLoaderDebug",
 					"target $target (requestId $requestId): network request success, returning"
 				)
+				sendBreadcrumb(target, "network success")
 
 				val items = untisResponse.result.timetable.periods
 				val timestamp = Instant.now().millis
@@ -174,6 +195,7 @@ class TimetableLoader(
 					"target $target (requestId $requestId): saving to cache: $cache"
 				)
 				cache.save(TimetableCache.CacheObject(timestamp, items))
+				sendBreadcrumb(target, "cache save", cache = cache)
 
 				// TODO: Interpret masterData in the response
 			} else {
@@ -181,6 +203,7 @@ class TimetableLoader(
 					"TimetableLoaderDebug",
 					"target $target (requestId $requestId): network request failed at Untis API level"
 				)
+				sendBreadcrumb(target, "network failure api", error = untisResponse.error?.message)
 				throw TimetableLoaderException(
 					requestId,
 					untisResponse.error?.code,
@@ -192,6 +215,7 @@ class TimetableLoader(
 				"TimetableLoaderDebug",
 				"target $target (requestId $requestId): network request failed at OS level"
 			)
+			sendBreadcrumb(target, "network failure local", error = error.message)
 			throw TimetableLoaderException(
 				requestId,
 				CODE_REQUEST_FAILED,

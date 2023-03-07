@@ -263,9 +263,8 @@ class LoginActivity : BaseComposeActivity() {
 				query.url = SCHOOL_SEARCH_URL
 				query.data.params = listOf(SchoolSearchParams(searchText))
 
-				val result = api.request(query)
-				result.fold({ data ->
-					untisResponse = getJSON().decodeFromString(data)
+				api.request<SchoolSearchResponse>(query).fold({ data ->
+					untisResponse = data
 				}, { error ->
 					println("An error of type ${error.exception} happened: ${error.message}") // TODO: Implement proper error handling
 				})

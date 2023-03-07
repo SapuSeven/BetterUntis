@@ -348,20 +348,20 @@ class SettingsActivity : BaseComposeActivity() {
 												)
 											)
 
-											//if (BuildConfig.DEBUG)
-											Preference(
-												title = { Text("Send test report") },
-												summary = { Text("Sends a report to Sentry to test error reporting") },
-												onClick = {
-													Sentry.captureException(java.lang.Exception("Test report"))
-													Toast.makeText(
-														this@SettingsActivity,
-														"Report has been sent",
-														Toast.LENGTH_SHORT
-													).show()
-												},
-												dataStore = UntisPreferenceDataStore.emptyDataStore()
-											)
+											if (BuildConfig.DEBUG)
+												Preference(
+													title = { Text("Send test report") },
+													summary = { Text("Sends a report to Sentry to test error reporting") },
+													onClick = {
+														Sentry.captureException(java.lang.Exception("Test report"))
+														Toast.makeText(
+															this@SettingsActivity,
+															"Report has been sent",
+															Toast.LENGTH_SHORT
+														).show()
+													},
+													dataStore = UntisPreferenceDataStore.emptyDataStore()
+												)
 										}
 									}
 								}
