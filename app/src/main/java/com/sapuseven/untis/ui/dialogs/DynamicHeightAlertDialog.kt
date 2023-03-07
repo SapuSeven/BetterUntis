@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun DynamicHeightAlertDialog(
 	onDismissRequest: () -> Unit,

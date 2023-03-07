@@ -5,6 +5,8 @@ buildscript {
 	ext.accompanist_version = '0.24.13-rc'
 	ext.aboutlibraries_version = '10.5.2'
 	ext.room_version = '2.5.0'
+	ext.fuel_version = '2.3.1'
+	ext.sentry_version = "6.15.0"
 
 	repositories {
 		google()

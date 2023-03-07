@@ -19,9 +19,7 @@ data class TimetableBookmark @OptIn(ExperimentalSerializationApi::class) constru
 		other as TimetableBookmark
 
 		if (elementId != other.elementId) return false
-		if (elementType != other.elementType) return false
-
-		return true
+		return elementType == other.elementType
 	}
 
 	override fun hashCode(): Int {

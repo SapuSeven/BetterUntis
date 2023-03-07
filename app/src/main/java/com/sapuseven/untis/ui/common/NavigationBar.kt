@@ -1,4 +1,4 @@
-package com.sapuseven.untis.ui.common;
+package com.sapuseven.untis.ui.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -9,7 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.surfaceColorAtElevation
-import androidx.compose.runtime.Composable;
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp

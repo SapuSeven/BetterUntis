@@ -20,7 +20,6 @@ import androidx.compose.ui.window.Dialog
 import com.sapuseven.untis.R
 import com.sapuseven.untis.models.untis.UntisAttachment
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AttachmentsDialog(
 	attachments: List<UntisAttachment>,

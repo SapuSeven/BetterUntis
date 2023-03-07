@@ -1,9 +1,9 @@
 package com.sapuseven.untis.ui.colorpicker
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.drag
-import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -17,11 +17,13 @@ import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.unit.dp
 
 /**
- * Hue side bar Component that invokes onHueChanged when the value is mutated.
+ * Hue side bar Component that invokes onHueChanged when the value is
+ * mutated.
  *
  * @param modifier modifiers to set to the hue bar.
  * @param currentColor the initial color to set on the hue bar.
- * @param onHueChanged the callback that is invoked when hue value changes. Hue is between 0 - 360.
+ * @param onHueChanged the callback that is invoked when hue value changes.
+ *     Hue is between 0 - 360.
  */
 @Composable
 internal fun HueBar(
@@ -36,14 +38,15 @@ internal fun HueBar(
 		modifier = modifier
 			.fillMaxSize()
 			.pointerInput(Unit) {
-				forEachGesture {
-					awaitPointerEventScope {
-						val down = awaitFirstDown()
-						onHueChanged(getHueFromPoint(down.position.y, size.height.toFloat()))
-						drag(down.id) { change ->
-							if (change.positionChange() != Offset.Zero) change.consume()
-							onHueChanged(getHueFromPoint(change.position.y, size.height.toFloat()))
-						}
+				awaitEachGesture {
+
+					val down = awaitFirstDown()
+					onHueChanged(getHueFromPoint(down.position.y, size.height.toFloat()))
+					drag(down.id) { change ->
+						if (change.positionChange() != Offset.Zero) change.consume()
+						onHueChanged(getHueFromPoint(change.position.y, size.height.toFloat()))
+
+
 					}
 				}
 			}

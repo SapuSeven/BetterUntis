@@ -135,9 +135,11 @@ class WeekViewDrawConfig(context: Context) {
 			private val secondaryDatePattern = "d. MMM"
 			private val timePattern = DateUtils.getTimeFormat(context).toPattern()
 
-			override fun interpretDate(date: DateTime) = date.toString(datePattern, Locale.getDefault()).toUpperCase(Locale.getDefault())
+			override fun interpretDate(date: DateTime) = date.toString(datePattern, Locale.getDefault())
+                .uppercase(Locale.getDefault())
 
-			override fun interpretSecondaryDate(date: DateTime) = date.toString(secondaryDatePattern, Locale.getDefault()).toUpperCase(Locale.getDefault())
+			override fun interpretSecondaryDate(date: DateTime) =
+                date.toString(secondaryDatePattern, Locale.getDefault()).uppercase(Locale.getDefault())
 
 			override fun interpretTime(minutes: Int) = DateTime()
 					.withHourOfDay(minutes / DateTimeConstants.MINUTES_PER_HOUR)
