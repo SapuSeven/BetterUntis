@@ -16,11 +16,13 @@ import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.helpers.config.booleanDataStore
 import com.sapuseven.untis.helpers.config.intDataStore
+import com.sapuseven.untis.helpers.config.stringDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.receivers.AutoMuteReceiver
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_BOOLEAN_MUTE
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_INT_ID
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_LONG_USER_ID
+import com.sapuseven.untis.ui.preferences.decodeMultipleStoredTimetableValues
 import com.sapuseven.untis.workers.DailyWorker.Companion.WORKER_DATA_USER_ID
 import org.joda.time.LocalDateTime
 
@@ -81,6 +83,11 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 					"preference_automute_minimum_break_length"
 				).getValue()
 
+				val hiddenSubjects = decodeMultipleStoredTimetableValues(applicationContext.stringDataStore(
+					user.id,
+					"timetable_hidden_elements"
+				).getValue()) ?: emptyList()
+
 				timetable.items.merged().sortedBy { it.startDateTime }.zipWithNext().withLast()
 					.forEach {
 						it.first?.let { item ->
@@ -93,6 +100,11 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 
 							if (item.periodData.isCancelled() && !automuteCancelledLessons)
 								return@forEach // lesson is cancelled
+
+
+							if (hiddenSubjects.contains(item.periodData.subjects.first()))
+								return@forEach // lesson is hidden
+
 
 							val muteIntent =
 								Intent(applicationContext, AutoMuteReceiver::class.java)
