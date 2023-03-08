@@ -21,6 +21,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.*
@@ -265,6 +266,7 @@ private fun Drawer(
 			ModalDrawerSheet(
 				modifier = Modifier
 					.width(320.dp) // default: 360.dp
+					.verticalScroll(drawerScrollState)
 			) {
 				Spacer(modifier = Modifier.height(24.dp))
 
