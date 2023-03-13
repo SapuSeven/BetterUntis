@@ -266,6 +266,7 @@ private fun Drawer(
 			ModalDrawerSheet(
 				modifier = Modifier
 					.width(320.dp) // default: 360.dp
+					.fillMaxHeight()
 					.verticalScroll(drawerScrollState)
 			) {
 				Spacer(modifier = Modifier.height(24.dp))
