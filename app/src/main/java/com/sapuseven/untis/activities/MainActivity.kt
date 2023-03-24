@@ -34,9 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.graphics.ColorUtils
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -47,10 +45,7 @@ import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PR
 import com.sapuseven.untis.activities.main.DrawerItems
 import com.sapuseven.untis.activities.main.DrawerText
 import com.sapuseven.untis.data.databases.entities.User
-import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
-import com.sapuseven.untis.helpers.DateTimeUtils
-import com.sapuseven.untis.helpers.config.globalDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.models.TimetableBookmark
@@ -61,17 +56,11 @@ import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.*
-import com.sapuseven.untis.ui.dialogs.DatePickerDialog
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
-import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
-import com.sapuseven.untis.ui.dialogs.TimetableItemDetailsDialog
-import com.sapuseven.untis.ui.functional.BackPressConfirm
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.preferences.convertRangeToPair
 import com.sapuseven.untis.ui.weekview.*
-import com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
-import com.sapuseven.untis.views.weekview.WeekView
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -81,9 +70,11 @@ import kotlinx.serialization.*
 import kotlinx.serialization.json.Json
 import org.joda.time.*
 import org.joda.time.format.DateTimeFormat
-import java.lang.ref.WeakReference
 import java.util.*
-import kotlin.math.roundToInt
+import com.sapuseven.untis.helpers.DateTimeUtils
+import com.sapuseven.untis.helpers.config.globalDataStore
+import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
+import java.lang.ref.WeakReference
 
 class MainActivity : BaseComposeActivity() {
 	companion object {
@@ -123,16 +114,36 @@ class MainActivity : BaseComposeActivity() {
 						rememberMainAppState(
 							user = user,
 							contextActivity = this,
-							customThemeColor = customThemeColor,
-							timetableDatabaseInterface = timetableDatabaseInterface,
+							//customThemeColor = customThemeColor,
 							preferences = dataStorePreferences,
 							globalPreferences = globalDataStore,
-							colorScheme = MaterialTheme.colorScheme//!! // Can't be null, AppTheme content isn't rendered if colorScheme is null
+							//colorScheme = MaterialTheme.colorScheme//!! // Can't be null, AppTheme content isn't rendered if colorScheme is null*/
 						)
 
-					/*val prefs = dataStorePreferences
+					val prefs = dataStorePreferences
 					LaunchedEffect(Unit) {
-						state.loadPrefs(prefs)
+						val personalTimetableFlow = prefs.timetablePersonalTimetable.getValueFlow()
+
+						state.scope.launch {
+							personalTimetableFlow.collect { customTimetable ->
+								if (user.anonymous || customTimetable != "") {
+									val element = decodeStoredTimetableValue(customTimetable)
+									val previousElement = state.personalTimetable?.first
+									state.personalTimetable =
+										element to element?.let { timetableDatabaseInterface.getLongName(it) }
+
+									if (element != previousElement)
+										state.displayElement(state.personalTimetable?.first, state.personalTimetable?.second)
+								}
+							}
+						}
+					}
+
+					/*LaunchedEffect(user) {
+						state.displayElement(
+							state.personalTimetable?.first,
+							state.personalTimetable?.second
+						)
 					}*/
 
 					MainApp(state)
@@ -150,44 +161,6 @@ class MainActivity : BaseComposeActivity() {
 
 }
 
-/*@Composable
-private fun WeekViewCompose(state: MainAppState) {
-	var weekViewGlobal by remember { mutableStateOf(state.weekView.value) }
-	state.loadWeekViewPreferences(weekViewGlobal, state.preferences)
-
-	AndroidView(
-		factory = { context ->
-			if (weekViewGlobal == null) { // Create weekView if it doesn't already exist
-				WeekView<TimegridItem>(context).also {
-					weekViewGlobal = it
-					state.weekView.value = it
-				}
-			}
-
-			state.weekViewSwipeRefresh.value ?: WeekViewSwipeRefreshLayout(context).apply {
-				state.weekViewSwipeRefresh.value = this
-				addView(weekViewGlobal)
-			}
-		},
-		update = {
-			state.weekView.value = weekViewGlobal
-			state.userDatabase.userDao().getByIdWithData(state.user.id)?.holidays?.let {
-				state.weekView.value?.addHolidays(it.map { holiday ->
-					HolidayChip(
-						text = holiday.longName,
-						startDate = holiday.startDate,
-						endDate = holiday.endDate
-					)
-				})
-			}
-			state.updateViews(it)
-		},
-		modifier = Modifier
-			.fillMaxSize()
-			.disabled(state.isAnonymous)
-	)
-}*/
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Drawer(
@@ -196,8 +169,6 @@ private fun Drawer(
 	content: @Composable () -> Unit
 ) {
 	val scope = rememberCoroutineScope()
-	val drawerScrollState = rememberScrollState()
-	var bookmarkDeleteDialog by remember { mutableStateOf<TimetableBookmark?>(null) }
 
 	var showElementPicker by remember {
 		mutableStateOf<TimetableDatabaseInterface.Type?>(
@@ -300,7 +271,7 @@ private fun Drawer(
 						},
 						badge = {
 							IconButton(
-								onClick = { bookmarkDeleteDialog = bookmark }
+								onClick = { state.bookmarkDeleteDialog.value = bookmark }
 							) {
 								Icon(
 									painter = painterResource(id = R.drawable.all_bookmark_remove),
@@ -338,7 +309,6 @@ private fun Drawer(
 					onClick = {
 						state.closeDrawer()
 						bookmarksElementPicker = TimetableDatabaseInterface.Type.CLASS
-						//selectedItem.value = item
 					},
 					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 				)
@@ -366,21 +336,21 @@ private fun Drawer(
 						state.closeDrawer()
 						if (item.target == null) {
 							try {
-								state.context.startActivity(
-									state.context.packageManager.getLaunchIntentForPackage(
+								state.contextActivity.startActivity(
+									state.contextActivity.packageManager.getLaunchIntentForPackage(
 										MainActivity.MESSENGER_PACKAGE_NAME
 									)
 								)
 							} catch (e: Exception) {
 								try {
-									state.context.startActivity(
+									state.contextActivity.startActivity(
 										Intent(
 											Intent.ACTION_VIEW,
 											Uri.parse("market://details?id=${MainActivity.MESSENGER_PACKAGE_NAME}")
 										)
 									)
 								} catch (e: Exception) {
-									state.context.startActivity(
+									state.contextActivity.startActivity(
 										Intent(
 											Intent.ACTION_VIEW,
 											Uri.parse("https://play.google.com/store/apps/details?id=${MainActivity.MESSENGER_PACKAGE_NAME}")
@@ -391,7 +361,7 @@ private fun Drawer(
 						} else {
 							shortcutLauncher.launch(
 								Intent(
-									state.context,
+									state.contextActivity,
 									item.target
 								).apply {
 									state.contextActivity.putUserIdExtra(this, state.user.id)
@@ -433,8 +403,6 @@ private fun Drawer(
 		enter = fullscreenDialogAnimationEnter(),
 		exit = fullscreenDialogAnimationExit()
 	) {
-		val context = LocalContext.current
-
 		ElementPickerDialogFullscreen(
 			title = { Text(stringResource(id = R.string.maindrawer_bookmarks_add)) },
 			timetableDatabaseInterface = state.timetableDatabaseInterface,
@@ -442,51 +410,28 @@ private fun Drawer(
 			onDismiss = { bookmarksElementPicker = null },
 			onSelect = { item ->
 				item?.let {
-					val newBookmark = TimetableBookmark(
-						elementId = it.id,
-						elementType = TimetableDatabaseInterface.Type.valueOf(it.type).name,
-						displayName = state.timetableDatabaseInterface.getLongName(it)
-					)
-
-					if (state.user.bookmarks.contains(newBookmark))
-						Toast
-							.makeText(
-								context,
-								"Bookmark already exists",
-								Toast.LENGTH_LONG
-							) // TODO: Extract string resource
-							.show()
-					else {
-						state.user.bookmarks = state.user.bookmarks.plus(newBookmark)
-						state.userDatabase.userDao().update(state.user)
-						onShowTimetable(
-							item to state.timetableDatabaseInterface.getLongName(it)
-						)
-					}
+					state.createBookmark(item)
 				}
-
 			},
 			initialType = bookmarksElementPicker
 		)
 	}
 
-	bookmarkDeleteDialog?.let { bookmark ->
+	state.bookmarkDeleteDialog.value?.let { bookmark ->
 		AlertDialog(
 			text = { Text(stringResource(id = R.string.main_dialog_delete_bookmark)) },
-			onDismissRequest = { bookmarkDeleteDialog = null },
+			onDismissRequest = { state.bookmarkDeleteDialog.value = null },
 			confirmButton = {
 				TextButton(
 					onClick = {
-						state.user.bookmarks = state.user.bookmarks.minus(bookmark)
-						state.userDatabase.userDao().update(state.user)
-						bookmarkDeleteDialog = null
+						state.removeBookmark(bookmark)
 					}) {
 					Text(stringResource(id = R.string.all_delete))
 				}
 			},
 			dismissButton = {
 				TextButton(
-					onClick = { bookmarkDeleteDialog = null }) {
+					onClick = { state.bookmarkDeleteDialog.value = null }) {
 					Text(stringResource(id = R.string.all_cancel))
 				}
 			}
@@ -498,10 +443,9 @@ private fun Drawer(
 @Composable
 fun BaseComposeActivity.MainApp(state: MainAppState) {
 	val snackbarHostState = remember { SnackbarHostState() }
-	val scope = rememberCoroutineScope()
 
-	if (state.preferences.doubleTapToExit.getState().value)
-		BackPressConfirm(snackbarHostState)
+	/*if (state.preferences.doubleTapToExit.getState().value)
+		BackPressConfirm(snackbarHostState)*/
 
 	Drawer(
 		state = state,
@@ -528,14 +472,14 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 					},
 					actions = {
 						ProfileSelectorAction(
-							users = state.userDatabase.userDao().getAll(),
+							users = state.listUsers(),
 							currentSelectionId = state.user.id,
 							showProfileActions = true,
 							onSelectionChange = {
-								state.contextActivity.setUser(it, true)
+								state.switchUser(it)
 							},
 							onActionEdit = {
-								state.profileManagementDialog.value = true
+								state.editUsers()
 							}
 						)
 					}
@@ -555,108 +499,104 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 					}
 				}
 
-				/*val prefs = dataStorePreferences
-				LaunchedEffect(state) {
-					state.loadPrefs(prefs)
-				}
+				Text(
+					text = state.weekViewEvents.size.toString(),
+				)
 
-				val color = dataStorePreferences.backgroundRegular.getState()*/
+				/*val color = dataStorePreferences.backgroundRegular.getState()*/
 				//WeekViewTest(bg = Color(state.weekViewPreferences.backgroundRegular.value))
 
 				WeekViewCompose(
-					events = state.weekViewEvents,
-					onPageChange = { pageOffset ->
-						state.weekViewPage = pageOffset
-						state.loadAllEvents(pageOffset)
-					},
-					onReload = { pageOffset ->
-						state.loadEvents(state.startDateForPage(pageOffset))
-					},
-					/*loadEvents = { startDate, endDate ->
-						state.loadEvents(startDate, endDate)
-					},*/
-					startTime = state.weekViewPreferences.hourList.value.firstOrNull()?.startTime
-						?: LocalTime.MIDNIGHT,
-					endTime = state.weekViewPreferences.hourList.value.lastOrNull()?.endTime
-						?: LocalTime.MIDNIGHT,
-					endTimeOffset = navBarHeight,
-					hourHeight = /*state.weekViewPreferences.hourHeight ?:*/ 72.dp,
-					hourList = state.weekViewPreferences.hourList.value,
-					dividerWidth = state.weekViewPreferences.dividerWidth,
-					dividerColor = state.weekViewPreferences.dividerColor,
-				)
+						events = state.weekViewEvents,
+						onPageChange = { pageOffset ->
+							state.weekViewPage.value = pageOffset
+							state.loadAllEvents(pageOffset)
+						},
+						onReload = { pageOffset ->
+							state.loadEvents(state.startDateForPage(pageOffset))
+						},
+						startTime = state.weekViewPreferences.hourList.value.firstOrNull()?.startTime
+							?: LocalTime.MIDNIGHT,
+						endTime = state.weekViewPreferences.hourList.value.lastOrNull()?.endTime
+							?: LocalTime.MIDNIGHT,
+						endTimeOffset = navBarHeight,
+						hourHeight = /*state.weekViewPreferences.hourHeight ?:*/ 72.dp,
+						hourList = state.weekViewPreferences.hourList.value,
+						dividerWidth = state.weekViewPreferences.dividerWidth,
+						dividerColor = state.weekViewPreferences.dividerColor,
+					)
 
-				val timeColumnWidth = with(LocalDensity.current) {
-					state.weekView.value?.config?.timeColumnWidth?.toDp()
-						?: 48.dp
-				}
-
-				Text(
-					text = state.lastRefreshText(),
-					modifier = Modifier
-						.align(Alignment.BottomStart)
-						.padding(start = timeColumnWidth + 8.dp, bottom = 8.dp)
-						.bottomInsets()
-						.disabled(state.isAnonymous)
-				)
-
-				Text(
-					text = state.currentWeekIndex.value.toString(),
-					modifier = Modifier
-						.align(Alignment.BottomEnd)
-						.padding(end = 8.dp, bottom = 8.dp)
-						.bottomInsets()
-				)
-
-				if (state.isAnonymous) {
-					Column(
-						verticalArrangement = Arrangement.Center,
-						horizontalAlignment = Alignment.CenterHorizontally,
-						modifier = Modifier
-							.fillMaxSize()
-							.absolutePadding(left = 16.dp)
-					) {
-						Text(
-							text = stringResource(id = R.string.main_anonymous_login_info_text),
-							textAlign = TextAlign.Center,
-							modifier = Modifier
-								.padding(horizontal = 32.dp)
-						)
-
-						Button(
-							onClick = {
-								state.contextActivity.startActivity(
-									Intent(
-										state.contextActivity,
-										SettingsActivity::class.java
-									).apply {
-										state.contextActivity.putUserIdExtra(this, state.user.id)
-										putExtra(
-											EXTRA_STRING_PREFERENCE_ROUTE,
-											"preferences_timetable"
-										)
-										putExtra(
-											EXTRA_STRING_PREFERENCE_HIGHLIGHT,
-											"preference_timetable_personal_timetable"
-										)
-										state.contextActivity.putBackgroundColorExtra(this)
-									}
-								)
-							},
-							modifier = Modifier
-								.padding(top = 16.dp)
-						) {
-							Text(text = stringResource(id = R.string.main_go_to_settings))
-						}
+					val timeColumnWidth = with(LocalDensity.current) {
+						/*state.weekView.value?.config?.timeColumnWidth?.toDp()
+							?: */48.dp
 					}
-				}
 
-				if (state.isLoading)
-					CircularProgressIndicator(
+					Text(
+						text = state.lastRefreshText(),
+						modifier = Modifier
+							.align(Alignment.BottomStart)
+							.padding(start = timeColumnWidth + 8.dp, bottom = 8.dp)
+							.bottomInsets()
+							.disabled(state.isAnonymous)
+					)
+
+					/*Text(
+						text = state.testValue.value,
 						modifier = Modifier
 							.align(Alignment.BottomEnd)
-							.padding(8.dp)
-					)
+							.padding(end = 52.dp, bottom = 8.dp)
+							.bottomInsets()
+					)*/
+
+					if (state.isAnonymous) {
+						Column(
+							verticalArrangement = Arrangement.Center,
+							horizontalAlignment = Alignment.CenterHorizontally,
+							modifier = Modifier
+								.fillMaxSize()
+								.absolutePadding(left = 16.dp)
+						) {
+							Text(
+								text = stringResource(id = R.string.main_anonymous_login_info_text),
+								textAlign = TextAlign.Center,
+								modifier = Modifier
+									.padding(horizontal = 32.dp)
+							)
+
+							Button(
+								onClick = {
+									state.contextActivity.startActivity(
+										Intent(
+											state.contextActivity,
+											SettingsActivity::class.java
+										).apply {
+											state.contextActivity.putUserIdExtra(this, state.user.id)
+											putExtra(
+												EXTRA_STRING_PREFERENCE_ROUTE,
+												"preferences_timetable"
+											)
+											putExtra(
+												EXTRA_STRING_PREFERENCE_HIGHLIGHT,
+												"preference_timetable_personal_timetable"
+											)
+											state.contextActivity.putBackgroundColorExtra(this)
+										}
+									)
+								},
+								modifier = Modifier
+									.padding(top = 16.dp)
+							) {
+								Text(text = stringResource(id = R.string.main_go_to_settings))
+							}
+						}
+					}
+
+					/*if (state.isLoading)
+						CircularProgressIndicator(
+							modifier = Modifier
+								.align(Alignment.BottomEnd)
+								.padding(8.dp)
+						)*/
 			}
 
 			ReportsInfoBottomSheet()
@@ -664,7 +604,7 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 	}
 
 	// TODO: Implement a smoother animation (see https://m3.material.io/components/dialogs/guidelines#007536b9-76b1-474a-a152-2f340caaff6f)
-	AnimatedVisibility(
+	/*AnimatedVisibility(
 		visible = state.timetableItemDetailsDialog.value != null,
 		enter = fullscreenDialogAnimationEnter(),
 		exit = fullscreenDialogAnimationExit()
@@ -706,35 +646,35 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 			state.showDatePicker.value = false
 			state.lastSelectedDate = it
 			state.weekView.value?.goToDate(it.toDateTime(LocalTime.now()))
-		}
+		}*/
 }
 
 class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	val user: User,
 	val contextActivity: BaseComposeActivity,
-	val timetableDatabaseInterface: TimetableDatabaseInterface,
-	val weekViewSwipeRefresh: MutableState<WeekViewSwipeRefreshLayout?>,
+	/*val weekViewSwipeRefresh: MutableState<WeekViewSwipeRefreshLayout?>,
 	val weekView: MutableState<WeekView<TimegridItem>?>,
-	val context: Context,
+	val context: Context,*/
 	val scope: CoroutineScope,
 	val colorScheme: ColorScheme,
-	val currentDensity: Density,
+	//val currentDensity: Density,
 	val preferences: DataStorePreferences,
 	val globalPreferences: DataStore<Preferences>,
 	var personalTimetable: Pair<PeriodElement?, String?>?,
 	val defaultDisplayedName: String,
 	val drawerState: DrawerState,
 	var drawerGestureState: MutableState<Boolean>,
-	val loading: MutableState<Int>,
-	val currentWeekIndex: MutableState<Int>,
+	/*val loading: MutableState<Int>,
+	val currentWeekIndex: MutableState<Int>,*/
 	val lastRefreshTimestamp: MutableState<Long>,
 	//val weeklyTimetableItems: SnapshotStateMap<Int, WeeklyTimetableItems?>,
-	val timetableLoader: TimetableLoader,
-	val timetableItemDetailsDialog: MutableState<Pair<List<PeriodData>, Int>?>,
-	val showDatePicker: MutableState<Boolean>,
+	//val timetableItemDetailsDialog: MutableState<Pair<List<PeriodData>, Int>?>,
+	//val showDatePicker: MutableState<Boolean>,
 	val profileManagementDialog: MutableState<Boolean>,
+	val bookmarkDeleteDialog: MutableState<TimetableBookmark?>,
 	val weekViewPreferences: MainAppState.WeekViewPreferences,
-	val weekViewEvents: SnapshotStateMap<LocalDate, List<Event>>
+	val weekViewEvents: SnapshotStateMap<LocalDate, List<Event>>,
+	val weekViewPage: MutableState<Int>
 ) {
 	companion object {
 		private const val MINUTE_MILLIS: Int = 60 * 1000
@@ -746,15 +686,27 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		private val DATASTORE_KEY_WEEKVIEW_SCALE = intPreferencesKey("weekView.hourHeight")
 	}
 
-	val userDatabase = contextActivity.userDatabase
+	/*init {
+	    weekViewEvents.clear()
+	}*/
 
+	private val userDatabase = contextActivity.userDatabase
 	private var drawerGestures by drawerGestureState
 
-	var lastSelectedDate: LocalDate = LocalDate.now()
+	val timetableLoader = TimetableLoader(
+		context = WeakReference(contextActivity),
+		user = user,
+		timetableDatabaseInterface = contextActivity.timetableDatabaseInterface
+	)
+
+	val timetableDatabaseInterface: TimetableDatabaseInterface =
+		contextActivity.timetableDatabaseInterface
+
+	//var lastSelectedDate: LocalDate = LocalDate.now()
 
 	var displayedElement: MutableState<PeriodElement?> = mutableStateOf(personalTimetable?.first)
 	var displayedName: MutableState<String> =
-		mutableStateOf(personalTimetable?.second ?: defaultDisplayedName)
+		mutableStateOf(/*personalTimetable?.second ?:*/ defaultDisplayedName)
 
 	val isPersonalTimetable: Boolean
 		get() = displayedElement.value == personalTimetable?.first
@@ -762,7 +714,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	val isAnonymous: Boolean
 		get() = personalTimetable != null && displayedElement.value == null
 
-	val isLoading: Boolean
+	/*val isLoading: Boolean
 		get() = loading.value > 0
 
 	private var isRefreshing: Boolean
@@ -771,9 +723,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			weekViewSwipeRefresh.value?.isRefreshing = value
 		}
 
-	private var shouldUpdateWeekView = true
-
-	var weekViewPage: Int = 0
+	private var shouldUpdateWeekView = true*/
 
 	val isMessengerAvailable: Boolean
 		get() {
@@ -807,18 +757,60 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 		weekViewEvents.clear()
 		scope.launch {
-			loadEvents()
+			loadAllEvents()
 		}
 	}
 
-	suspend fun loadEvents(startDate: LocalDate = startDateForPage(weekViewPage)) = loadEvents(
+	fun editUsers() {
+		profileManagementDialog.value = true
+	}
+
+	fun switchUser(user: User) {
+		contextActivity.setUser(user, true)
+		scope.launch {
+			loadAllEvents()
+		}
+	}
+
+	fun listUsers(): List<User> {
+		return userDatabase.userDao().getAll()
+	}
+
+	fun createBookmark(item: PeriodElement) {
+		val newBookmark = TimetableBookmark(
+			elementId = item.id,
+			elementType = TimetableDatabaseInterface.Type.valueOf(item.type).name,
+			displayName = timetableDatabaseInterface.getLongName(item)
+		)
+
+		if (user.bookmarks.contains(newBookmark))
+			Toast
+				.makeText(
+					contextActivity,
+					"Bookmark already exists",
+					Toast.LENGTH_LONG
+				) // TODO: Extract string resource
+				.show()
+		else {
+			user.bookmarks = user.bookmarks.plus(newBookmark)
+			userDatabase.userDao().update(user)
+			displayElement(item)
+		}
+	}
+
+	fun removeBookmark(bookmark: TimetableBookmark) {
+		user.bookmarks = user.bookmarks.minus(bookmark)
+		userDatabase.userDao().update(user)
+		bookmarkDeleteDialog.value = null
+	}
+
+	suspend fun loadEvents(startDate: LocalDate = startDateForPage(weekViewPage.value)) = loadEvents(
 		startDate,
 		startDate.plusDays(weekViewPreferences.weekLength.value)
 	)
 
 	suspend fun loadEvents(startDate: LocalDate, endDate: LocalDate) {
 		Log.d("WeekView", "Loading items for $startDate")
-		weekViewEvents[startDate] = emptyList()
 		loadEventsFlow(startDate, endDate)
 			.cancellable()
 			.collect {
@@ -1033,7 +1025,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		loadFromServer = forceRefresh || preferences.connectivityRefreshInBackground.getValue(),
 	)
 
-	private suspend fun loadWeeklyTimetableItems(
+	/*private suspend fun loadWeeklyTimetableItems(
 		loader: TimetableLoader?,
 		startDate: LocalDate,
 		endDate: LocalDate,
@@ -1132,24 +1124,6 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 						}
 					)
 					isRefreshing = false
-				}
-			}
-		}
-	}
-
-	fun loadPrefs(dataStorePreferences: DataStorePreferences) {
-		val personalTimetableFlow = dataStorePreferences.timetablePersonalTimetable.getValueFlow()
-
-		scope.launch {
-			personalTimetableFlow.collect { customTimetable ->
-				if (user.anonymous || customTimetable != "") {
-					val element = decodeStoredTimetableValue(customTimetable)
-					val previousElement = personalTimetable?.first
-					personalTimetable =
-						element to element?.let { timetableDatabaseInterface.getLongName(it) }
-
-					if (element != previousElement)
-						displayElement(personalTimetable?.first, personalTimetable?.second)
 				}
 			}
 		}
@@ -1507,7 +1481,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	private fun restoreWeekViewScrollPosition() {
 		if (currentWeekIndex.value % 100 > 0)
 			weekView.value?.goToDate(convertWeekIndexToDateTime(currentWeekIndex.value))
-	}*/
+	}*/*/
 
 	@OptIn(ExperimentalCoroutinesApi::class)
 	suspend fun loadEventsFlow(startDate: LocalDate, endDate: LocalDate): Flow<List<Event>> {
@@ -1554,11 +1528,15 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	fun startDateForPage(pageOffset: Int): LocalDate = LocalDate.now()
 		.withDayOfWeek(weekViewPreferences.weekStartOffset.value).plusWeeks(pageOffset)
 
-	suspend fun loadAllEvents(pageOffset: Int) {
+	suspend fun loadAllEvents(pageOffset: Int = weekViewPage.value) {
 		coroutineScope {
 			((pageOffset - 1)..(pageOffset + 1)).map {
 				async {
 					val startDate = startDateForPage(it)
+					Log.d(
+						"WeekView",
+						"Items available for $startDate: ${weekViewEvents.contains(startDate)}"
+					)
 					if (!weekViewEvents.contains(startDate))
 						loadEvents(startDate)
 				}
@@ -1592,73 +1570,66 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 fun rememberMainAppState(
 	user: User,
 	contextActivity: BaseComposeActivity,
-	customThemeColor: Color?,
-	timetableDatabaseInterface: TimetableDatabaseInterface,
+	//customThemeColor: Color?,
 	preferences: DataStorePreferences,
 	globalPreferences: DataStore<Preferences>,
-	weekViewSwipeRefresh: MutableState<WeekViewSwipeRefreshLayout?> = remember { mutableStateOf(null) },
-	weekView: MutableState<WeekView<TimegridItem>?> = remember { mutableStateOf(null) },
-	context: Context = LocalContext.current,
+	/*weekViewSwipeRefresh: MutableState<WeekViewSwipeRefreshLayout?> = remember { mutableStateOf(null) },
+	weekView: MutableState<WeekView<TimegridItem>?> = remember { mutableStateOf(null) },*/
 	coroutineScope: CoroutineScope = rememberCoroutineScope(),
 	colorScheme: ColorScheme = MaterialTheme.colorScheme,
-	currentDensity: Density = LocalDensity.current,
+	//currentDensity: Density = LocalDensity.current,
 	personalTimetable: Pair<PeriodElement?, String?>? = getPersonalTimetableElement(
 		user,
-		context
+		contextActivity
 	),
-	defaultDisplayedName: String = stringResource(id = R.string.app_name),
+	defaultDisplayedName: String = user.getDisplayedName(),// stringResource(id = R.string.app_name),
 	drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
 	drawerGestures: MutableState<Boolean> = rememberSaveable { mutableStateOf(true) },
-	loading: MutableState<Int> = rememberSaveable { mutableStateOf(0) },
-	currentWeekIndex: MutableState<Int> = rememberSaveable { mutableStateOf(0) },
+	/*loading: MutableState<Int> = rememberSaveable { mutableStateOf(0) },
+	currentWeekIndex: MutableState<Int> = rememberSaveable { mutableStateOf(0) },*/
 	lastRefreshTimestamp: MutableState<Long> = rememberSaveable { mutableStateOf(0L) },
-	weeklyTimetableItems: SnapshotStateMap<Int, MainAppState.WeeklyTimetableItems?> = remember { mutableStateMapOf() },
-	timetableLoader: TimetableLoader = TimetableLoader(
-		context = WeakReference(context),
-		user = user,
-		timetableDatabaseInterface = timetableDatabaseInterface
-	),
 	// TODO: Find another way of saving timetableItemDetailsDialog that doesn't require saving an entire Pair of List of PeriodData's.
 	//  Currently the dialog will close after state change (i.e. rotation).
-	timetableItemDetailsDialog: MutableState<Pair<List<PeriodData>, Int>?> = remember {
+	/*timetableItemDetailsDialog: MutableState<Pair<List<PeriodData>, Int>?> = remember {
 		mutableStateOf(
 			null
 		)
 	},
-	showDatePicker: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
+	showDatePicker: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },*/
 	profileManagementDialog: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
+	bookmarkDeleteDialog: MutableState<TimetableBookmark?> = rememberSaveable { mutableStateOf(null) },
 	weekViewPreferences: MainAppState.WeekViewPreferences = rememberWeekViewPreferences(
-		preferences,
+		contextActivity.dataStorePreferences,
 		user
 	),
-	weekViewEvents: SnapshotStateMap<LocalDate, List<Event>> = remember(user) { mutableStateMapOf<LocalDate, List<Event>>() }
-) = remember(user, customThemeColor, colorScheme) {
+	weekViewEvents: SnapshotStateMap<LocalDate, List<Event>> = mutableStateMapOf<LocalDate, List<Event>>(),
+	weekViewPage: MutableState<Int> = rememberSaveable { mutableStateOf(0) },
+) = remember(user) {
 	MainAppState(
 		user = user,
 		contextActivity = contextActivity,
-		timetableDatabaseInterface = timetableDatabaseInterface,
-		weekViewSwipeRefresh = weekViewSwipeRefresh,
-		weekView = weekView,
-		context = context,
+//		weekViewSwipeRefresh = weekViewSwipeRefresh,
+//		weekView = weekView,
+//		context = context,
 		preferences = preferences,
 		globalPreferences = globalPreferences,
 		scope = coroutineScope,
 		colorScheme = colorScheme,
-		currentDensity = currentDensity,
+//		currentDensity = currentDensity,
 		personalTimetable = personalTimetable,
 		defaultDisplayedName = defaultDisplayedName,
 		drawerState = drawerState,
 		drawerGestureState = drawerGestures,
-		loading = loading,
-		currentWeekIndex = currentWeekIndex,
+//		loading = loading,
+//		currentWeekIndex = currentWeekIndex,
 		lastRefreshTimestamp = lastRefreshTimestamp,
-		//weeklyTimetableItems = weeklyTimetableItems,
-		timetableLoader = timetableLoader,
-		timetableItemDetailsDialog = timetableItemDetailsDialog,
-		showDatePicker = showDatePicker,
+//		timetableItemDetailsDialog = timetableItemDetailsDialog,
+//		showDatePicker = showDatePicker,
 		profileManagementDialog = profileManagementDialog,
+		bookmarkDeleteDialog = bookmarkDeleteDialog,
 		weekViewPreferences = weekViewPreferences,
-		weekViewEvents = weekViewEvents
+		weekViewEvents = weekViewEvents,
+		weekViewPage = weekViewPage
 	)
 }
 
