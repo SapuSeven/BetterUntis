@@ -102,7 +102,7 @@ class TimetableLoader(
 		requestId: Int
 	): TimetableItems? {
 		val cache = TimetableCache(context)
-		cache.setTarget(target.startDate, target.endDate, target.id, target.type)
+		cache.setTarget(target.startDate, target.endDate, target.id, target.type, user.id)
 
 		return if (cache.exists()) {
 			Log.d(
@@ -167,7 +167,7 @@ class TimetableLoader(
 		onItemsReceived: (timetableItems: TimetableItems) -> Unit
 	) {
 		val cache = TimetableCache(context)
-		cache.setTarget(target.startDate, target.endDate, target.id, target.type)
+		cache.setTarget(target.startDate, target.endDate, target.id, target.type, user.id)
 
 		query.proxyHost = proxyHost
 
