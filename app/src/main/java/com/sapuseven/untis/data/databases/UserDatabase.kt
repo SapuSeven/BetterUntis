@@ -44,7 +44,10 @@ abstract class UserDatabase : RoomDatabase() {
 			)
 				.allowMainThreadQueries() // TODO: Fix and delete this!
 				.enableMultiInstanceInvalidation()
-				.addMigrations(MIGRATION_7_8)
+				.addMigrations(
+					*MIGRATIONS_LEGACY.toTypedArray(),
+					MIGRATION_7_8,
+				)
 				.build()
 	}
 }
