@@ -10,8 +10,8 @@ body:
         Thanks for taking the time to fill out this bug report!
         
         Please note that while you may submit reports in German and English,
-        _all communication regarding the report will be in English only
-        to encourage open collaboration within the project._
+        _all communication regarding the report will be in English only_
+        to encourage open collaboration within the project.
   - type: textarea
     id: repro
     attributes:

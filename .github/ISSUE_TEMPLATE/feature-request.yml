@@ -10,8 +10,8 @@ body:
         Thanks for taking the time to fill out this feature request!
         
         Please note that while you may submit requests in German and English,
-        _all communication regarding the request will be in English only
-        to encourage open collaboration within the project._
+        _all communication regarding the request will be in English only_
+        to encourage open collaboration within the project.
   - type: textarea
     id: problem
     attributes:
