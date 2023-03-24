@@ -1302,6 +1302,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 		if (!rangeIndexReset)
 			hourIndexOffset = (range?.first ?: 1) - 1
+
 		hourLines = lines.toIntArray()
 		hourLabels = labels.toTypedArray().let { hourLabelArray ->
 			if (hourLabelArray.joinToString("") == "") IntArray(
@@ -1310,8 +1311,12 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 				.toTypedArray()
 			else hourLabelArray
 		}
-		startTime = lines.first()
-		endTime = lines.last()
+
+		if (lines.isNotEmpty()) {
+			startTime = lines.first()
+			endTime = lines.last()
+		}
+
 		endTimeOffset = additionalSpaceBelow
 	}
 
