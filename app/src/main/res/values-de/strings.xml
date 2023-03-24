@@ -35,7 +35,7 @@
     <string name="activity_title_errors">Fehler</string>
     <string name="activity_title_free_rooms">Freie Räume</string>
     <string name="activity_title_info_center">Info-Center</string>
-    <string name="activity_title_messenger">Messenger</string>
+    <string name="activity_title_messenger">Nachrichten</string>
     <string name="activity_title_settings">Einstellungen</string>
     <string name="errors_github_attach_file_message">Bitte füge die komprimierten Log-Dateien als Anhang hinzu.\nDiese wurden hier gespeichert: `%1$s`</string>
     <string name="nav_all_timetables">Stundenpläne</string>
