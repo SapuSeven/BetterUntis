@@ -26,6 +26,8 @@ class TimetableLoader(
 	companion object {
 		const val CODE_REQUEST_FAILED = 2
 		const val CODE_REQUEST_PARSING_EXCEPTION = 3
+		const val MAX_RETRY_COUNT = 3
+		const val RETRY_DELAY_MS = 500L
 	}
 
 	private val requestList = ArrayList<TimetableLoaderTarget>()
@@ -71,8 +73,28 @@ class TimetableLoader(
 				shouldLoadFromServer = !loadFromCacheOnly // fall back to server loading
 			}
 
-		if (shouldLoadFromServer)
-			loadFromServer(target, requestList.size - 1, proxyHost, onItemsReceived)
+		if (shouldLoadFromServer) {
+			for (i in 1..MAX_RETRY_COUNT) {
+				try {
+					loadFromServer(target, requestList.size - 1, proxyHost, onItemsReceived)
+					break
+				} catch (e: TimetableLoaderException) {
+					if (i < MAX_RETRY_COUNT) {
+						Log.d(
+							"TimetableLoaderDebug",
+							"target $target (requestId ${requestList.size - 1}): Attempt $i unsuccessful, retrying"
+						)
+						Thread.sleep(RETRY_DELAY_MS)
+					} else {
+						Log.d(
+							"TimetableLoaderDebug",
+							"target $target (requestId ${requestList.size - 1}): Attempt $i unsuccessful, max retry limit reached"
+						)
+						throw e
+					}
+				}
+			}
+		}
 	}
 
 	private fun loadFromCache(
@@ -124,7 +146,7 @@ class TimetableLoader(
 		target: TimetableLoaderTarget,
 		status: String,
 		cache: TimetableCache? = null,
-		error: String? = null
+		throwable: Throwable? = null
 	) {
 		Breadcrumb().apply {
 			type = "query"
@@ -133,7 +155,7 @@ class TimetableLoader(
 			setData("target", target)
 			setData("status", status)
 			cache?.let { setData("cache_id", cache.toString()) }
-			error?.let { setData("error", error) }
+			throwable?.let { setData("throwable", throwable) }
 			Sentry.addBreadcrumb(this)
 		}
 	}
@@ -199,28 +221,32 @@ class TimetableLoader(
 
 				// TODO: Interpret masterData in the response
 			} else {
-				Log.d(
-					"TimetableLoaderDebug",
-					"target $target (requestId $requestId): network request failed at Untis API level"
-				)
-				sendBreadcrumb(target, "network failure api", error = untisResponse.error?.message)
-				throw TimetableLoaderException(
+				val e = TimetableLoaderException(
 					requestId,
 					untisResponse.error?.code,
 					untisResponse.error?.message
 				)
+				Log.d(
+					"TimetableLoaderDebug",
+					"target $target (requestId $requestId): network request failed at Untis API level",
+					e
+				)
+				sendBreadcrumb(target, "network failure api", throwable = e)
+				throw e
 			}
 		}, { error ->
-			Log.d(
-				"TimetableLoaderDebug",
-				"target $target (requestId $requestId): network request failed at OS level"
-			)
-			sendBreadcrumb(target, "network failure local", error = error.message)
-			throw TimetableLoaderException(
+			val e = TimetableLoaderException(
 				requestId,
 				CODE_REQUEST_FAILED,
 				error.message
 			)
+			Log.d(
+				"TimetableLoaderDebug",
+				"target $target (requestId $requestId): network request failed at OS level",
+				e
+			)
+			sendBreadcrumb(target, "network failure local", throwable = e)
+			throw e
 		})
 	}
 
