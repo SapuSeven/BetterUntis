@@ -130,6 +130,7 @@ jobs:
           name: Deploy to Play Store testing track
           command: |
             echo $GOOGLE_PLAY_KEY_ENCODED | base64 --decode > fastlane/key.json
+            for f in fastlane/metadata/android/*/changelogs; do cp "$f/$CIRCLE_TAG.txt" "$f/default.txt"; done;
             bundle exec fastlane deploy aab:'workspace/outputs/bundle/release/app-release.aab' track:<<parameters.track>>
 
   deploy_github:
