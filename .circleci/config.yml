@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  gh: circleci/github-cli@2.1.0
+  gh: circleci/github-cli@2.2.0
 filters: &release
   branches:
     ignore: /.*/
@@ -130,7 +130,7 @@ jobs:
           name: Deploy to Play Store testing track
           command: |
             echo $GOOGLE_PLAY_KEY_ENCODED | base64 --decode > fastlane/key.json
-            for f in fastlane/metadata/android/*/changelogs; do cp "$f/$CIRCLE_TAG.txt" "$f/default.txt"; done;
+            for f in fastlane/metadata/android/*/changelogs; do [[ -e "$f/$CIRCLE_TAG.txt" ]] && cp "$f/$CIRCLE_TAG.txt" "$f/default.txt"; done;
             bundle exec fastlane deploy aab:'workspace/outputs/bundle/release/app-release.aab' track:<<parameters.track>>
 
   deploy_github:
@@ -139,14 +139,13 @@ jobs:
     working_directory: ~/betteruntis
     steps:
       - gh/setup
-      - gh/clone
+      - checkout
       - attach_workspace:
           at: workspace
       - run:
           name: Deploy Release to GitHub
           command: |
-            VERSION=$(grep -sw versionName app/build.gradle | cut -d " " -f2- | tr -d '"')
-            gh release create $CIRCLE_TAG --prerelease --title "BetterUntis ${CIRCLE_TAG}" --notes-file "./fastlane/metadata/android/en-US/changelogs/${VERSION}.txt" "./workspace/outputs/apk/debug/app-debug.apk#BetterUntis ${CIRCLE_TAG}.apk"
+            gh release create $CIRCLE_TAG --prerelease --title "BetterUntis $CIRCLE_TAG" --notes-file "./fastlane/metadata/android/en-US/changelogs/$CIRCLE_TAG.txt" "./workspace/outputs/apk/debug/app-debug.apk#BetterUntis $CIRCLE_TAG.apk"
 
 workflows:
   version: 2
