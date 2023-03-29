@@ -1,0 +1,4 @@
+- Fix notifications not being dismissed
+- Fix multiple possible crashes
+- Update network request handling
+- Update error reporting
