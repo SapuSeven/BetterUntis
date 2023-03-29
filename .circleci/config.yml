@@ -139,14 +139,13 @@ jobs:
     working_directory: ~/betteruntis
     steps:
       - gh/setup
-      - gh/clone
+      - checkout
       - attach_workspace:
           at: workspace
       - run:
           name: Deploy Release to GitHub
           command: |
-            VERSION=$(grep -sw versionName app/build.gradle | cut -d " " -f2- | tr -d '"')
-            gh release create $CIRCLE_TAG --prerelease --title "BetterUntis ${CIRCLE_TAG}" --notes-file "./fastlane/metadata/android/en-US/changelogs/${VERSION}.txt" "./workspace/outputs/apk/debug/app-debug.apk#BetterUntis ${CIRCLE_TAG}.apk"
+            gh release create $CIRCLE_TAG --prerelease --title "BetterUntis $CIRCLE_TAG" --notes-file "./fastlane/metadata/android/en-US/changelogs/$CIRCLE_TAG.txt" "./workspace/outputs/apk/debug/app-debug.apk#BetterUntis $CIRCLE_TAG.apk"
 
 workflows:
   version: 2
