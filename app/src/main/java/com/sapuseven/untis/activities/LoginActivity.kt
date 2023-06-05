@@ -41,7 +41,6 @@ import com.sapuseven.untis.models.untis.response.SchoolSearchResponse
 import com.sapuseven.untis.ui.common.AppScaffold
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
 class LoginActivity : BaseComposeActivity() {
@@ -244,7 +243,8 @@ class LoginActivity : BaseComposeActivity() {
 		var loading by remember { mutableStateOf(false) }
 		var error by remember { mutableStateOf<String?>(null) }
 		val api: UntisRequest = remember { UntisRequest() }
-		val query: UntisRequest.UntisRequestQuery = remember { UntisRequest.UntisRequestQuery() }
+		val query: UntisRequest.UntisRequestQuery =
+			remember { UntisRequest.UntisRequestQuery(apiUrl = SCHOOL_SEARCH_URL) }
 		val composableScope = rememberCoroutineScope()
 
 		LaunchedEffect(searchText) {
@@ -260,7 +260,6 @@ class LoginActivity : BaseComposeActivity() {
 				var untisResponse = SchoolSearchResponse()
 
 				query.data.method = UntisApiConstants.METHOD_SEARCH_SCHOOLS
-				query.url = SCHOOL_SEARCH_URL
 				query.data.params = listOf(SchoolSearchParams(searchText))
 
 				api.request<SchoolSearchResponse>(query).fold({ data ->
