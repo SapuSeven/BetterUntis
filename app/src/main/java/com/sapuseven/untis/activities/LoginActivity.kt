@@ -39,6 +39,8 @@ import com.sapuseven.untis.models.UntisSchoolInfo
 import com.sapuseven.untis.models.untis.params.SchoolSearchParams
 import com.sapuseven.untis.models.untis.response.SchoolSearchResponse
 import com.sapuseven.untis.ui.common.AppScaffold
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
@@ -237,8 +239,10 @@ class LoginActivity : BaseComposeActivity() {
 	@Composable
 	fun SchoolSearch(
 		modifier: Modifier,
-		searchText: String
+		searchText: String,
+		debounceMillis: Long = 500
 	) {
+
 		var items by remember { mutableStateOf(emptyList<UntisSchoolInfo>()) }
 		var loading by remember { mutableStateOf(false) }
 		var error by remember { mutableStateOf<String?>(null) }
@@ -246,17 +250,21 @@ class LoginActivity : BaseComposeActivity() {
 		val query: UntisRequest.UntisRequestQuery =
 			remember { UntisRequest.UntisRequestQuery(apiUrl = SCHOOL_SEARCH_URL) }
 		val composableScope = rememberCoroutineScope()
+		var searchJob by remember { mutableStateOf<Job?>(null) }
 
-		LaunchedEffect(searchText) {
+		DisposableEffect(searchText) {
 			error = null
 			items = emptyList()
 
-			if (searchText.isEmpty())
-				return@LaunchedEffect
+			searchJob?.cancel()
+			searchJob = composableScope.launch {
+				if (searchText.isEmpty())
+					return@launch
 
-			loading = true
+				loading = true
 
-			composableScope.launch {
+				delay(debounceMillis)
+
 				var untisResponse = SchoolSearchResponse()
 
 				query.data.method = UntisApiConstants.METHOD_SEARCH_SCHOOLS
@@ -279,6 +287,10 @@ class LoginActivity : BaseComposeActivity() {
 						untisResponse.error?.message.orEmpty()
 					)
 				}
+			}
+
+			onDispose {
+				searchJob?.cancel()
 			}
 		}
 
