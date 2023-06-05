@@ -346,7 +346,7 @@ fun ElementPickerElements(
 						.size(96.dp)
 						.padding(bottom = 24.dp)
 				)
-				Text("Select a Timetable")
+				Text(stringResource(R.string.elementpicker_timetable_select))
 			}
 		}
 	}
