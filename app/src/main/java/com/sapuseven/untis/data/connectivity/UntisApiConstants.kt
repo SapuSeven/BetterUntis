@@ -3,7 +3,7 @@ package com.sapuseven.untis.data.connectivity
 object UntisApiConstants {
 	const val DEFAULT_WEBUNTIS_HOST = "mobile.webuntis.com"
 	const val DEFAULT_WEBUNTIS_PATH = "/ms/app/"
-	const val SCHOOL_SEARCH_URL = "https:///schoolsearch.webuntis.com/schoolquery2"
+	const val SCHOOL_SEARCH_URL = "https://schoolsearch.webuntis.com/schoolquery2"
 
 	const val METHOD_CREATE_IMMEDIATE_ABSENCE = "createImmediateAbsence2017"
 	const val METHOD_DELETE_ABSENCE = "deleteAbsence2017"
