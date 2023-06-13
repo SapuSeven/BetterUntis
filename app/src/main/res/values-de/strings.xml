@@ -6,6 +6,7 @@
     <string name="all_exit">Verlassen</string>
     <string name="all_failed">fehlgeschlagen</string>
     <string name="all_personal">Persönlich</string>
+    <string name="all_personal_abbr">Persönl.</string>
     <string name="all_subjects">Fächer</string>
     <string name="all_teachers">Lehrer</string>
     <string name="all_classes">Klassen</string>

@@ -41,6 +41,7 @@
     <string name="all_no">No</string>
     <string name="all_ok">OK</string>
     <string name="all_personal">Personal</string>
+    <string name="all_personal_abbr">Pers.</string>
     <string name="all_personal_timetable">Personal Timetable</string>
     <string name="all_report">Report</string>
     <string name="all_reset">Reset</string>
