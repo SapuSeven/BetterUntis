@@ -1,3 +1,6 @@
+### Run this script manually from the project dir if you need to generate new screenshots.
+### As of now, the screenshots have to be manually copied and uploaded from the newly generated `screenshots` dir.
+
 #!/bin/sh
 # Workaround (weird bug that locks a file and prevents any other tests from being run`)
 kill $(lsof -t app/build/outputs/androidTest-results/connected/*/.fuse_hidden*)
@@ -22,7 +25,7 @@ cd screenshots
 
 SPLIT_IMAGE_1=activity-main-4-green.png
 SPLIT_IMAGE_2=activity-main-dark-6-indigo.png
-SPLIT_IMAGE_DST=main-activity-theme.png
+SPLIT_IMAGE_DST=activity-main-theme.png
 SPLIT_RATIO=0.35
 
 linespec=$(convert $SPLIT_IMAGE_1 -format "%[fx:int(w*$SPLIT_RATIO)],%[fx:h] %[fx:w],%[fx:h] %[fx:w],0 %[fx:int(w*$((1-SPLIT_RATIO)))],0" info:)

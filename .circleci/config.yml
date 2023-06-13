@@ -126,7 +126,7 @@ jobs:
       - attach_workspace:
           at: workspace
       - run:
-          name: Deploy to Play Store testing track
+          name: Deploy to Play Store
           command: |
             echo $GOOGLE_PLAY_KEY_ENCODED | base64 --decode > fastlane/key.json
             for f in fastlane/metadata/android/*/changelogs; do [[ -e "$f/$CIRCLE_TAG.txt" ]] && cp "$f/$CIRCLE_TAG.txt" "$f/default.txt"; done;
