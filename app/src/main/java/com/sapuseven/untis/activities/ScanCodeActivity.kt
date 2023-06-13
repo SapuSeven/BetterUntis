@@ -3,11 +3,12 @@ package com.sapuseven.untis.activities
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.compose.setContent
+import androidx.compose.ui.viewinterop.AndroidView
 import com.budiyev.android.codescanner.*
 import com.google.zxing.BarcodeFormat
-import com.sapuseven.untis.R
 
-class ScanCodeActivity : BaseActivity() {
+class ScanCodeActivity : BaseComposeActivity() {
 	private lateinit var codeScanner: CodeScanner
 
 	companion object {
@@ -16,10 +17,18 @@ class ScanCodeActivity : BaseActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		setContentView(R.layout.activity_scancode)
-		val scannerView = findViewById<CodeScannerView>(R.id.codescannerview_scancode)
 
-		codeScanner = CodeScanner(this, scannerView)
+		val codeScannerView = CodeScannerView(this).apply {
+			isAutoFocusButtonVisible = false
+		}
+
+		setContent {
+			AppTheme {
+				AndroidView(factory = { codeScannerView })
+			}
+		}
+
+		codeScanner = CodeScanner(this, codeScannerView)
 
 		codeScanner.camera = CodeScanner.CAMERA_BACK
 		codeScanner.formats = listOf(BarcodeFormat.QR_CODE)
@@ -39,7 +48,7 @@ class ScanCodeActivity : BaseActivity() {
 			finish()
 		}
 
-		scannerView.setOnClickListener {
+		codeScannerView.setOnClickListener {
 			codeScanner.startPreview()
 		}
 	}

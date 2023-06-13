@@ -9,29 +9,27 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
 
 @Serializable
 class UntisDateTime(
 		val dateTime: String
 ) {
+	@OptIn(ExperimentalSerializationApi::class)
 	@Serializer(forClass = UntisDateTime::class)
 	companion object : KSerializer<UntisDateTime> {
 		override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("UntisDateTime", PrimitiveKind.STRING)
 
-		override fun serialize(encoder: Encoder, obj: UntisDateTime) {
-			encoder.encodeString(obj.dateTime)
+		override fun serialize(encoder: Encoder, value: UntisDateTime) {
+			encoder.encodeString(value.dateTime)
 		}
 
 		override fun deserialize(decoder: Decoder): UntisDateTime {
 			return UntisDateTime(decoder.decodeString())
 		}
-
-		fun fromLocalDate(localDate: LocalDate): UntisDateTime {
-			return UntisDateTime(localDate.toString(DateTimeUtils.isoDateTimeNoSeconds()))
-		}
 	}
+
+	constructor(localDateTime: LocalDateTime) : this(localDateTime.toString(DateTimeUtils.isoDateTimeNoSeconds()) + "Z") // Not sure why 'Z' isn't added by the format
 
 	override fun toString(): String {
 		return dateTime

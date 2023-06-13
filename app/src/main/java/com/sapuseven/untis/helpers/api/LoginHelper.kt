@@ -21,11 +21,11 @@ import java.net.UnknownHostException
 
 class LoginHelper(
 	val loginData: LoginDataInfo,
+	val proxyHost: String? = null,
 	val onStatusUpdate: (statusStringRes: Int) -> Unit,
 	val onError: (error: LoginErrorInfo) -> Unit
 ) {
 	private val api: UntisRequest = UntisRequest()
-	private val proxyHost: String? = null // TODO: Pass proxy host
 
 	init {
 		onStatusUpdate(R.string.logindatainput_connecting)
@@ -45,22 +45,22 @@ class LoginHelper(
 			if (schoolId != null) listOf(SchoolSearchParams(schoolid = schoolId))
 			else listOf(SchoolSearchParams(search = school))
 
-		val result = api.request(query)
-		result.fold({ data ->
+		api.request<SchoolSearchResponse>(query).fold({ untisResponse ->
 			try {
-				val untisResponse =
-					SerializationUtils.getJSON().decodeFromString<SchoolSearchResponse>(data)
-
 				untisResponse.result?.let {
 					if (it.schools.isNotEmpty()) {
-						val schoolResult = it.schools.find { schoolInfoResult ->
-							schoolInfoResult.schoolId == schoolId || schoolInfoResult.loginName.equals(
-								school,
-								true
-							)
-						}
+						val schoolResult =
+							if (it.schools.size == 1)
+								it.schools.first()
+							else
+							// TODO: Show manual selection dialog when more than one results are returned
+								it.schools.find { schoolInfoResult ->
+									schoolInfoResult.schoolId == schoolId || schoolInfoResult.loginName.equals(
+										school,
+										true
+									)
+								}
 
-						// TODO: Show manual selection dialog when there are more than one results are returned
 						if (schoolResult != null)
 							return schoolResult
 					}
@@ -76,7 +76,7 @@ class LoginHelper(
 			} catch (e: SerializationException) {
 				onError(
 					LoginErrorInfo(
-						errorMessageStringRes = R.string.logindatainput_error_generic,
+						errorMessageStringRes = R.string.all_error_details,
 						errorMessage = e.message
 					)
 				)
@@ -84,7 +84,7 @@ class LoginHelper(
 		}, { error ->
 			onError(
 				LoginErrorInfo(
-					errorMessageStringRes = R.string.logindatainput_error_generic,
+					errorMessageStringRes = R.string.all_error_details,
 					errorMessage = error.message
 				)
 			)
@@ -103,13 +103,8 @@ class LoginHelper(
 		query.data.method = UntisApiConstants.METHOD_GET_APP_SHARED_SECRET
 		query.data.params = listOf(AppSharedSecretParams(loginData.user, loginData.password))
 
-		val appSharedSecretResult = api.request(query)
-
-		appSharedSecretResult.fold({ data ->
+		api.request<AppSharedSecretResponse>(query).fold({ untisResponse ->
 			try {
-				val untisResponse =
-					SerializationUtils.getJSON().decodeFromString<AppSharedSecretResponse>(data)
-
 				if (untisResponse.error?.code == ErrorMessageDictionary.ERROR_CODE_INVALID_CREDENTIALS)
 					return loginData.password
 				if (untisResponse.result.isNullOrEmpty())
@@ -124,7 +119,7 @@ class LoginHelper(
 			} catch (e: SerializationException) {
 				onError(
 					LoginErrorInfo(
-						errorMessageStringRes = R.string.logindatainput_error_generic,
+						errorMessageStringRes = R.string.all_error_details,
 						errorMessage = e.message
 					)
 				)
@@ -134,7 +129,7 @@ class LoginHelper(
 				is UnknownHostException -> onError(LoginErrorInfo(errorCode = ErrorMessageDictionary.ERROR_CODE_NO_SERVER_FOUND))
 				else -> onError(
 					LoginErrorInfo(
-						errorMessageStringRes = R.string.logindatainput_error_generic,
+						errorMessageStringRes = R.string.all_error_details,
 						errorMessage = error.message
 					)
 				)
@@ -168,13 +163,8 @@ class LoginHelper(
 			)
 		}
 
-		val userDataResult = api.request(query)
-
-		userDataResult.fold({ data ->
+		api.request<UserDataResponse>(query).fold({ untisResponse ->
 			try {
-				val untisResponse =
-					SerializationUtils.getJSON().decodeFromString<UserDataResponse>(data)
-
 				if (untisResponse.result != null) {
 					return untisResponse.result
 				} else {
@@ -188,7 +178,7 @@ class LoginHelper(
 			} catch (e: SerializationException) {
 				onError(
 					LoginErrorInfo(
-						errorMessageStringRes = R.string.logindatainput_error_generic,
+						errorMessageStringRes = R.string.all_error_details,
 						errorMessage = e.message
 					)
 				)
@@ -196,7 +186,7 @@ class LoginHelper(
 		}, { error ->
 			onError(
 				LoginErrorInfo(
-					errorMessageStringRes = R.string.logindatainput_error_generic,
+					errorMessageStringRes = R.string.all_error_details,
 					errorMessage = error.message
 				)
 			)

@@ -6,21 +6,17 @@
 	android:layout_height="match_parent"
 	tools:context="activities.SettingsActivity">
 
-	<com.cesar.materialcomponents.Banner
-		android:id="@+id/banner_settings_designing"
+	<FrameLayout
+		android:id="@+id/banner_settings_recommend"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginStart="8dp"
-		android:layout_marginTop="8dp"
-		android:layout_marginEnd="8dp"
 		android:visibility="gone"
-		app:bannerBackgroundColor="?attr/colorPrimary"
-		app:contentText="@string/settings_designing_message"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toTopOf="parent"
-		app:leftButtonText="@string/settings_designing_hide"
-		app:rightButtonText="@string/settings_designing_info" />
+		app:layout_constraintTop_toTopOf="parent">
+
+		<include layout="@layout/settings_banner" />
+	</FrameLayout>
 
 	<FrameLayout
 		android:id="@+id/framelayout_settings_content"
@@ -29,5 +25,5 @@
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@+id/banner_settings_designing" />
+		app:layout_constraintTop_toBottomOf="@+id/banner_settings_recommend" />
 </androidx.constraintlayout.widget.ConstraintLayout>

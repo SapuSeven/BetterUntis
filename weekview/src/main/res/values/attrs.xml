@@ -98,6 +98,7 @@
 
         <attr name="topLeftCornerDrawable" format="reference" />
         <attr name="topLeftCornerPadding" format="dimension" />
+        <attr name="topLeftCornerTint" format="color" />
 
 	    <attr name="snapToWeek" format="boolean" />
 

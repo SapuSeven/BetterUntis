@@ -8,11 +8,11 @@ platform :android do
     gradle(task: "test")
   end
 
-  desc "Deploy a built version to the Google Play Beta track"
+  desc "Deploy a built version to Google Play"
   lane :deploy do |options|
     if options[:aab]
       upload_to_play_store(
-        track: 'beta',
+        track: options.fetch(:track, 'beta'),
         aab: options[:aab],
         skip_upload_metadata: 'true',
         skip_upload_images: 'true',

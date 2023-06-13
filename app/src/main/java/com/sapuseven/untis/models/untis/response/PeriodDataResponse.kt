@@ -1,5 +1,6 @@
 package com.sapuseven.untis.models.untis.response
 
+import android.os.Parcelable
 import com.sapuseven.untis.models.UnknownObject
 import com.sapuseven.untis.models.UntisAbsence
 import com.sapuseven.untis.models.UntisHomework
@@ -18,12 +19,13 @@ data class PeriodDataResult(
 )
 
 @Serializable
+//@Parcelize // No idea why this is needed, but otherwise it crashes the app on pause/resume
 data class UntisStudent(
 		val id: Int,
 		val firstName: String,
 		val lastName: String
 ) {
-	fun fullName(): String = "$lastName $firstName"
+	fun fullName(): String = "$firstName $lastName"
 }
 
 @Serializable

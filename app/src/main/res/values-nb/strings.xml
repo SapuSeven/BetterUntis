@@ -9,7 +9,6 @@
     <string name="all_rooms">Rom</string>
     <string name="all_anonymous">Anonym</string>
     <string name="all_personal_timetable">Personlig timeplan</string>
-    <string name="all_contact_email">betteruntis-nb@sapuseven.com</string>
     <string name="all_ok">OK</string>
     <string name="all_yes">Ja</string>
     <string name="all_no">Nei</string>
@@ -67,7 +66,7 @@
     <string name="logindatainput_login">Logg inn</string>
     <string name="logindatainput_anonymous_login">Anonym innlogging</string>
     <string name="logindatainput_error_field_empty">Dette feltet kan ikke være tomt.</string>
-    <string name="logindatainput_error_generic">Feil: %1$s</string>
+    <string name="all_error_details">Feil: %1$s</string>
     <string name="logindatainput_error_invalid_school">Ugyldig skole-ID.</string>
     <string name="logindatainput_data_loaded">Data lastet.</string>
     <string name="logindatainput_aquiring_app_secret">Henter hemmelig nøkkel…</string>
@@ -111,7 +110,7 @@
     <string name="elementpicker_hint_search_teachers">Søk etter lærere…</string>
     <string name="elementpicker_hint_search_rooms">Søk etter rom…</string>
     <string name="preferences_connectivity">Tilkobling</string>
-    <string name="preferences_infos">Om</string>
+    <string name="preferences_info">Om</string>
     <string name="preferences_notifications">Varsler</string>
     <string name="preferences_styling">Tilpasning</string>
     <string name="preferences_timetable">Timeplan</string>
@@ -144,7 +143,6 @@
     <string name="preference_connectivity_refresh_in_background">Oppdater alltid timeplanen</string>
     <string name="preference_connectivity_refresh_in_background_desc">Deaktiver for å lagre data sjeldnere med mindre hyppige timeplan-oppdateringer</string>
     <string name="preference_dark_theme">Mørkt tema</string>
-    <string name="preference_dark_theme_auto">Aktiver på lavt batteri</string>
     <string name="preference_dark_theme_off">Alltid av</string>
     <string name="preference_dark_theme_oled">Bruk helt svart bakgrunn</string>
     <string name="preference_dark_theme_oled_desc">Nyttig for OLED-skjermer</string>
@@ -207,9 +205,6 @@
     <string name="preference_week_display_length_summary">Sett til 0 for å bruke ukelengde</string>
     <string name="preference_week_snap_to_days">Sett visning på linje med dagene</string>
     <string name="preference_week_snap_to_days_summary">i stedet for uker</string>
-    <string name="settings_designing_message">Bidra ved å opprette de manglende innstillingsikonene!</string>
-    <string name="settings_designing_hide">Ikke vis igjen</string>
-    <string name="settings_designing_info">Finn ut mer</string>
     <string name="notifications_channel_breakinfo">Pause-info</string>
     <string name="notifications_channel_breakinfo_desc">Viser informasjon om den gjeldende pausen og den følgende leksjonen</string>
     <string name="notifications_channel_backgrounderrors">Feil fra bakgrunnsoppgaver</string>
@@ -246,8 +241,8 @@
     <string name="preference_schoolcolors_exam">For leksjoner med tester</string>
     <string name="preference_schoolcolors_irregular">For uvanlige leksjoner</string>
     <string name="preference_schoolcolors_cancelled">For kansellerte leksjoner</string>
-    <string name="preference_timetable_hide_time_stamps">Skjul tidsstempel</string>
-    <string name="preference_timetable_hide_time_stamps_desc">Skjul tidsstempel ved siden av timeplanen</string>
+    <string name="preference_timetable_hide_timestamps">Skjul tidsstempel</string>
+    <string name="preference_timetable_hide_timestamps_desc">Skjul tidsstempel ved siden av timeplanen</string>
     <string name="errors_crash_title">Det ser ut til at BetterUntis krasjet.</string>
     <string name="loading_failed">Innlasting mislyktes</string>
     <string name="loading">Laster</string>
@@ -257,8 +252,6 @@
     <string name="preference_info_contributors_desc">En liste over bidragsyterne</string>
     <string name="preference_info_contributors">Bidragsytere</string>
     <string name="activity_title_errors">Feil</string>
-    <string name="errors_button_dismiss">Forkast alle</string>
-    <string name="errors_button_report">Rapporter alle</string>
     <string name="errors_github_attach_file_message">Legg ved loggfilene i denne problemrapporten.
 \nDe er lagret i \"%1$s\"</string>
     <string name="app_desc">En alternativ mobilklient for Untis-timeplanssystemet.</string>
@@ -282,7 +275,7 @@
     <string name="logindatainput_skip_app_secret">Hopp over programhemmeligehtsutledelse</string>
     <string name="logindatainput_error_invalid_url">Ugyldig nettadresse.</string>
     <string name="logindatainput_api_url">Untis-API-sti</string>
-    <string name="activity_title_messenger">Meldingstjeneste</string>
+    <string name="activity_title_messenger">Messenger</string>
     <string name="all_hint_tap_to_edit">(Trykk for å redigere)</string>
     <string name="all_dialog_crash_copied">Krasjlogg kopiert til utklippstavle.</string>
     <string name="all_dialog_crash_title">Krasjlogg funnet</string>
@@ -293,4 +286,12 @@
     <string name="all_lesson_details">Leksjonsdetaljer</string>
     <string name="all_lessontopic_none">(Uten emne)</string>
     <string name="main_dialog_itemdetails_timeformat">%1$s - %2$s</string>
+    <string name="all_back">Tilbake</string>
+    <string name="all_exam">Eksamen</string>
+    <string name="all_exit">Gå ut</string>
+    <string name="all_homework">Hjemmearbeid</string>
+    <string name="all_lesson_info">Informasjon</string>
+    <string name="all_dialog_absences_save">Send inn fraværskontroll</string>
+    <string name="all_edit">Rediger</string>
+    <string name="all_lessontopic_edit">Rediger leksjonstema</string>
 </resources>

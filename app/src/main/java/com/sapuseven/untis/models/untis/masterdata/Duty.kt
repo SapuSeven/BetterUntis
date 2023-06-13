@@ -1,45 +1,27 @@
 package com.sapuseven.untis.models.untis.masterdata
 
-import android.content.ContentValues
-import android.database.Cursor
-import com.sapuseven.untis.annotations.Table
-import com.sapuseven.untis.annotations.TableColumn
-import com.sapuseven.untis.data.databases.TABLE_NAME_DUTIES
-import com.sapuseven.untis.interfaces.TableModel
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import com.sapuseven.untis.data.databases.entities.User
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
-@Table(TABLE_NAME_DUTIES)
+@Entity(
+	primaryKeys = ["id", "userId"],
+	indices = [Index("id"), Index("userId")],
+	foreignKeys = [ForeignKey(
+		entity = User::class,
+		parentColumns = ["id"],
+		childColumns = ["userId"],
+		onDelete = ForeignKey.CASCADE
+	)]
+)
 data class Duty(
-		@field:TableColumn("INTEGER NOT NULL") val id: Int,
-		@field:TableColumn("VARCHAR(255) NOT NULL") val name: String,
-		@field:TableColumn("VARCHAR(255) NOT NULL") val longName: String,
-		@field:TableColumn("VARCHAR(255) NOT NULL") val type: String
-) : TableModel {
-	companion object {
-		const val TABLE_NAME = TABLE_NAME_DUTIES
-	}
-
-	override val tableName = TABLE_NAME
-	override val elementId = id
-
-	override fun generateValues(): ContentValues {
-		val values = ContentValues()
-
-		values.put("id", id)
-		values.put("name", name)
-		values.put("longName", longName)
-		values.put("type", type)
-
-		return values
-	}
-
-	override fun parseCursor(cursor: Cursor): TableModel {
-		return Duty(
-				cursor.getInt(cursor.getColumnIndex("id")),
-				cursor.getString(cursor.getColumnIndex("name")),
-				cursor.getString(cursor.getColumnIndex("longName")),
-				cursor.getString(cursor.getColumnIndex("type"))
-		)
-	}
-}
+	val id: Int,
+	@Transient val userId: Long = -1,
+	val name: String,
+	val longName: String,
+	val type: String
+)

@@ -12,3 +12,5 @@ signing.properties
 **/fastlane/report.xml
 **/fastlane/metadata/android/screenshots.html
 /vendor
+/screenshots
+sentry.properties

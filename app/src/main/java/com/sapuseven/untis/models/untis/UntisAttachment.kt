@@ -5,11 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UntisAttachment(
-		val id: UnknownObject?,
+		val id: Int,
 		val name: String,
 		val url: String
-) {
-	init {
-		UnknownObject.validate(mapOf("id" to id))
-	}
-}
+)

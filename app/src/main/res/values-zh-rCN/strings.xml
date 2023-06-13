@@ -10,7 +10,6 @@
     <string name="all_rooms">教室</string>
     <string name="all_anonymous">匿名</string>
     <string name="all_personal_timetable">个人时间表</string>
-    <string name="all_contact_email">betteruntis@sapuseven.com</string>
     <string name="all_ok">好的</string>
     <string name="all_yes">是的</string>
     <string name="all_no">不了</string>
@@ -73,7 +72,7 @@
     <string name="logindatainput_login">登录</string>
     <string name="logindatainput_anonymous_login">匿名登录</string>
     <string name="logindatainput_error_field_empty">此处不能为空！</string>
-    <string name="logindatainput_error_generic">错误： %1$s</string>
+    <string name="all_error_details">错误： %1$s</string>
     <string name="logindatainput_error_invalid_school">学校ID无效！</string>
     <string name="logindatainput_data_loaded">数据已加载。</string>
     <string name="logindatainput_aquiring_app_secret">正在获取软件 secret…</string>
@@ -115,7 +114,7 @@
     <string name="elementpicker_hint_search_teachers">搜索教师…</string>
     <string name="elementpicker_hint_search_rooms">搜索教室…</string>
     <string name="preferences_connectivity">连接</string>
-    <string name="preferences_infos">关于</string>
+    <string name="preferences_info">关于</string>
     <string name="preferences_notifications">提示</string>
     <string name="preferences_styling">自定义</string>
     <string name="preferences_timetable">课程表</string>
@@ -142,11 +141,9 @@
     <string name="infocenter_timeformat_sameday">%2$s — %4$s， %1$s</string>
     <string name="infocenter_timeformat">%2$s， %1$s — %4$s， %3$s</string>
     <string name="roomfinder_current_hour_time">%1$s — %2$s</string>
-    <string name="errors_button_dismiss">解散所有</string>
     <string name="errors_crash_title">似乎崩溃了。</string>
     <string name="notifications_channel_breakinfo_desc">显示当前休息及随后课程的信息</string>
     <string name="notifications_channel_breakinfo">信息中断</string>
-    <string name="settings_designing_message">通过创建缺少的设置图标进行贡献！</string>
     <string name="preference_week_snap_to_days">切换到每天</string>
     <string name="preference_week_snap_to_days_summary">替换每周</string>
     <string name="preference_week_custom_range_summary">%1$s 至 %2$s</string>
@@ -178,7 +175,6 @@
     </plurals>
     <string name="loading_failed">加载失败</string>
     <string name="loading">加载中</string>
-    <string name="errors_button_report">报告所有</string>
     <string name="errors_report">请提交以下错误以帮助完善软件：</string>
     <string name="errors_crash_message">很抱歉。</string>
     <string name="homeworks_due_time">直到 %1$s</string>
@@ -192,8 +188,6 @@
     <string name="notifications_text_error_title">加载课程表失败</string>
     <string name="notifications_channel_backgrounderrors_desc">显示后台任务错误信息</string>
     <string name="notifications_channel_backgrounderrors">后台错误</string>
-    <string name="settings_designing_info">了解更多</string>
-    <string name="settings_designing_hide">不再显示</string>
     <string name="preference_week_display_length_summary">一周范围设置为0</string>
     <string name="preference_week_display_length">显示天数</string>
     <string name="preference_week_custom_range">自定义一周范围</string>
@@ -210,8 +204,8 @@
     <string name="preference_timetable_item_padding_overlap">叠加格子填充</string>
     <string name="preference_timetable_item_padding">格子填充</string>
     <string name="preference_timetable_item_corner_radius">格子圆角弧度</string>
-    <string name="preference_timetable_hide_time_stamps_desc">下一次进入课程表时隐藏时间标记</string>
-    <string name="preference_timetable_hide_time_stamps">隐藏时间标记</string>
+    <string name="preference_timetable_hide_timestamps_desc">下一次进入课程表时隐藏时间标记</string>
+    <string name="preference_timetable_hide_timestamps">隐藏时间标记</string>
     <string name="preference_timetable_hide_cancelled_desc">设置改变后需要重新加载课程表</string>
     <string name="preference_timetable_hide_cancelled">隐藏已删除课程</string>
     <string name="preference_timetable_colors_reset">重置颜色</string>
@@ -251,7 +245,6 @@
     <string name="preference_dark_theme_on">总是开启</string>
     <string name="preference_dark_theme_oled">使用全黑背景</string>
     <string name="preference_dark_theme_off">总是关闭</string>
-    <string name="preference_dark_theme_auto">低电量可用</string>
     <string name="preference_dark_theme">黑暗主题</string>
     <string name="preference_connectivity_refresh_in_background_desc">更新频率较低的课程表无法保存数据</string>
     <string name="preference_connectivity_refresh_in_background">总是更新课程表</string>

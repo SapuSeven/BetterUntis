@@ -8,13 +8,13 @@
 	<bool name="preference_timetable_bold_lesson_name_default">true</bool>
 	<bool name="preference_timetable_item_text_light_default">true</bool>
 	<bool name="preference_timetable_hide_cancelled_default">false</bool>
-	<bool name="preference_timetable_hide_time_stamps_default">false</bool>
+	<bool name="preference_timetable_hide_timestamps_default">false</bool>
 	<bool name="preference_timetable_range_index_reset_default">false</bool>
-	<bool name="preference_timetable_substitutions_irregular_default">false</bool>
+	<bool name="preference_timetable_substitutions_irregular_default">true</bool>
 	<bool name="preference_notifications_before_first_default">false</bool>
-	<bool name="preference_notifications_enable_default">true</bool>
+	<bool name="preference_notifications_enable_default">false</bool>
 	<bool name="preference_notifications_in_multiple_default">true</bool>
-	<bool name="preference_double_tap_to_exit_default">true</bool>
+	<bool name="preference_double_tap_to_exit_default">false</bool>
 	<bool name="preference_fling_enable_default">false</bool>
 	<bool name="preference_week_snap_to_days_default">false</bool>
 	<bool name="preference_automute_enable_default">false</bool>
@@ -42,7 +42,7 @@
 	<integer name="preference_automute_minimum_break_length_default">0</integer>
 
 	<string name="preference_theme_default">default</string>
-	<string name="preference_dark_theme_default">off</string>
+	<string name="preference_dark_theme_default">auto</string>
 	<string name="preference_notifications_visibility_subjects_default">long</string>
 	<string name="preference_notifications_visibility_rooms_default">short</string>
 	<string name="preference_notifications_visibility_teachers_default">short</string>

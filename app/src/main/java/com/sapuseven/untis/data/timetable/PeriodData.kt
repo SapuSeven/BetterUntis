@@ -7,12 +7,14 @@ import android.text.style.StrikethroughSpan
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.Period
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import java.io.Serializable
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
+@Serializable
 class PeriodData(
-		private var timetableDatabaseInterface: TimetableDatabaseInterface? = null,
+		@Transient private var timetableDatabaseInterface: TimetableDatabaseInterface? = null,
 		var element: Period
-) : Serializable {
+) {
 	val classes = HashSet<PeriodElement>()
 	val teachers = HashSet<PeriodElement>()
 	val subjects = HashSet<PeriodElement>()
@@ -47,17 +49,17 @@ class PeriodData(
 
 	fun setup() = parseElements()
 
-	fun getShort(list: HashSet<PeriodElement>, type: TimetableDatabaseInterface.Type) =
+	fun getShort(type: TimetableDatabaseInterface.Type, list: HashSet<PeriodElement> = getListFor(type)) =
 			list.joinToString(ELEMENT_NAME_SEPARATOR) {
 				timetableDatabaseInterface?.getShortName(it.id, type) ?: ELEMENT_NAME_UNKNOWN
 			}
 
-	fun getLong(list: HashSet<PeriodElement>, type: TimetableDatabaseInterface.Type) =
+	fun getLong(type: TimetableDatabaseInterface.Type, list: HashSet<PeriodElement> = getListFor(type)) =
 			list.joinToString(ELEMENT_NAME_SEPARATOR) {
 				timetableDatabaseInterface?.getLongName(it.id, type) ?: ELEMENT_NAME_UNKNOWN
 			}
 
-	fun getShortSpanned(list: HashSet<PeriodElement>, type: TimetableDatabaseInterface.Type, includeOrgIds: Boolean = true): SpannableString {
+	fun getShortSpanned(type: TimetableDatabaseInterface.Type, list: HashSet<PeriodElement> = getListFor(type), includeOrgIds: Boolean = true): SpannableString {
 		val builder = SpannableStringBuilder()
 
 		list.forEach {
@@ -75,6 +77,15 @@ class PeriodData(
 
 		return SpannableString.valueOf(builder)
 	}
+
+	private fun getListFor(type: TimetableDatabaseInterface.Type): java.util.HashSet<PeriodElement> =
+		when (type) {
+			TimetableDatabaseInterface.Type.CLASS -> classes
+			TimetableDatabaseInterface.Type.TEACHER -> teachers
+			TimetableDatabaseInterface.Type.SUBJECT -> subjects
+			TimetableDatabaseInterface.Type.ROOM -> rooms
+			else -> hashSetOf()
+		}
 
 	@Deprecated("Use getShort instead.")
 	fun getShortTitle() = subjects.joinToString(ELEMENT_NAME_SEPARATOR) {

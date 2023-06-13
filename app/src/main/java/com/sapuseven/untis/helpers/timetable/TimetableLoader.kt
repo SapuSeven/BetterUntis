@@ -5,35 +5,29 @@ import android.util.Log
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
-import com.sapuseven.untis.helpers.SerializationUtils.getJSON
-import com.sapuseven.untis.interfaces.TimetableDisplay
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.params.TimetableParams
 import com.sapuseven.untis.models.untis.response.TimetableResponse
 import com.sapuseven.untis.models.untis.timetable.Period
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
+import io.sentry.Breadcrumb
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import org.joda.time.Instant
 import java.lang.ref.WeakReference
 
 class TimetableLoader(
-		private val context: WeakReference<Context>,
-		private val timetableDisplay: TimetableDisplay,
-		private val user: UserDatabase.User,
-		private val timetableDatabaseInterface: TimetableDatabaseInterface
+	private val context: WeakReference<Context>,
+	private val user: User,
+	private val timetableDatabaseInterface: TimetableDatabaseInterface
 ) {
 	companion object {
-		const val FLAG_LOAD_CACHE = 0b00000001
-		const val FLAG_LOAD_SERVER = 0b00000010
-
-		const val CODE_CACHE_MISSING = 1
 		const val CODE_REQUEST_FAILED = 2
 		const val CODE_REQUEST_PARSING_EXCEPTION = 3
+		const val MAX_RETRY_COUNT = 3
+		const val RETRY_DELAY_MS = 500L
 	}
 
 	private val requestList = ArrayList<TimetableLoaderTarget>()
@@ -41,84 +35,218 @@ class TimetableLoader(
 	private var api: UntisRequest = UntisRequest()
 	private var query: UntisRequest.UntisRequestQuery = UntisRequest.UntisRequestQuery(user)
 
-	fun load(target: TimetableLoaderTarget, flags: Int = 0, proxyHost: String? = null) = GlobalScope.launch(Dispatchers.Main) {
+	/*@OptIn(DelicateCoroutinesApi::class)
+	fun load(target: TimetableLoaderTarget, flags: Int = 0, proxyHost: String? = null) =
+		GlobalScope.launch(Dispatchers.IO) {
+			loadAsync(target, flags, proxyHost)
+		}*/
+
+	data class TimetableItems(
+		val items: List<TimegridItem>,
+		val startDate: UntisDate,
+		val endDate: UntisDate,
+		val timestamp: Long
+	)
+
+	class TimetableLoaderException(
+		val requestId: Int,
+		val untisErrorCode: Int?,
+		val untisErrorMessage: String?
+	) : Exception(untisErrorMessage)
+
+	suspend fun loadAsync(
+		target: TimetableLoaderTarget,
+		proxyHost: String? = null,
+		loadFromServer: Boolean = false,
+		loadFromCache: Boolean = false,
+		loadFromCacheOnly: Boolean = false,
+		onItemsReceived: (timetableItems: TimetableItems) -> Unit
+	) {
 		requestList.add(target)
 
-		if (flags and FLAG_LOAD_CACHE > 0)
-			loadFromCache(target, requestList.size - 1)
-		if (flags and FLAG_LOAD_SERVER > 0)
-			loadFromServer(target, requestList.size - 1, proxyHost)
-	}
+		var shouldLoadFromServer = loadFromServer
 
-	private fun loadFromCache(target: TimetableLoaderTarget, requestId: Int) {
-		val cache = TimetableCache(context)
-		cache.setTarget(target.startDate, target.endDate, target.id, target.type)
-
-		if (cache.exists()) {
-			Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): cached file found")
-			cache.load()?.let { cacheObject ->
-				timetableDisplay.addTimetableItems(cacheObject.items.map { periodToTimegridItem(it, target.type) }, target.startDate, target.endDate, cacheObject.timestamp)
+		if (loadFromCache)
+			loadFromCache(target, requestList.size - 1)?.let {
+				onItemsReceived(it)
 			} ?: run {
-				cache.delete()
-				Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): cached file corrupted")
-				timetableDisplay.onTimetableLoadingError(requestId, CODE_CACHE_MISSING, "cached timetable corrupted")
+				shouldLoadFromServer = !loadFromCacheOnly // fall back to server loading
 			}
-		} else {
-			Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): cached file missing")
-			timetableDisplay.onTimetableLoadingError(requestId, CODE_CACHE_MISSING, "no cached timetable found")
+
+		if (shouldLoadFromServer) {
+			for (i in 1..MAX_RETRY_COUNT) {
+				try {
+					loadFromServer(target, requestList.size - 1, proxyHost, onItemsReceived)
+					break
+				} catch (e: TimetableLoaderException) {
+					if (i < MAX_RETRY_COUNT) {
+						Log.d(
+							"TimetableLoaderDebug",
+							"target $target (requestId ${requestList.size - 1}): Attempt $i unsuccessful, retrying"
+						)
+						Thread.sleep(RETRY_DELAY_MS)
+					} else {
+						Log.d(
+							"TimetableLoaderDebug",
+							"target $target (requestId ${requestList.size - 1}): Attempt $i unsuccessful, max retry limit reached"
+						)
+						throw e
+					}
+				}
+			}
 		}
 	}
 
-	private suspend fun loadFromServer(target: TimetableLoaderTarget, requestId: Int, proxyHost: String? = null) {
+	private fun loadFromCache(
+		target: TimetableLoaderTarget,
+		requestId: Int
+	): TimetableItems? {
 		val cache = TimetableCache(context)
-		cache.setTarget(target.startDate, target.endDate, target.id, target.type)
+		cache.setTarget(target.startDate, target.endDate, target.id, target.type, user.id)
+
+		return if (cache.exists()) {
+			Log.d(
+				"TimetableLoaderDebug",
+				"target $target (requestId $requestId): cached file found"
+			)
+			sendBreadcrumb(target, "cache hit", cache = cache)
+
+			cache.load()?.let { cacheObject ->
+				TimetableItems(
+					items = cacheObject.items.map {
+						periodToTimegridItem(
+							it,
+							target.type
+						)
+					},
+					startDate = target.startDate,
+					endDate = target.endDate,
+					timestamp = cacheObject.timestamp
+				)
+			} ?: run {
+				cache.delete()
+				Log.d(
+					"TimetableLoaderDebug",
+					"target $target (requestId $requestId): cached file corrupted"
+				)
+				sendBreadcrumb(target, "cache corrupted", cache = cache)
+				null
+			}
+		} else {
+			Log.d(
+				"TimetableLoaderDebug",
+				"target $target (requestId $requestId): cached file missing"
+			)
+			sendBreadcrumb(target, "cache miss", cache = cache)
+			null
+		}
+	}
+
+	private fun sendBreadcrumb(
+		target: TimetableLoaderTarget,
+		status: String,
+		cache: TimetableCache? = null,
+		throwable: Throwable? = null
+	) {
+		Breadcrumb().apply {
+			type = "query"
+			category = "timetable"
+			level = SentryLevel.INFO
+			setData("target", target)
+			setData("status", status)
+			cache?.let { setData("cache_id", cache.toString()) }
+			throwable?.let { setData("throwable", throwable) }
+			Sentry.addBreadcrumb(this)
+		}
+	}
+
+	private suspend fun loadFromServer(
+		target: TimetableLoaderTarget,
+		requestId: Int,
+		proxyHost: String? = null,
+		onItemsReceived: (timetableItems: TimetableItems) -> Unit
+	) {
+		val cache = TimetableCache(context)
+		cache.setTarget(target.startDate, target.endDate, target.id, target.type, user.id)
 
 		query.proxyHost = proxyHost
 
 		val params = TimetableParams(
-				target.id,
-				target.type,
-				target.startDate,
-				target.endDate,
-				user.masterDataTimestamp,
-				0, // TODO: Figure out how timetableTimestamp works
-				emptyList(),
-				if (user.anonymous) UntisAuthentication.createAuthObject() else UntisAuthentication.createAuthObject(user.user, user.key)
+			target.id,
+			target.type,
+			target.startDate,
+			target.endDate,
+			user.masterDataTimestamp,
+			0, // TODO: Figure out how timetableTimestamp works
+			emptyList(),
+			if (user.anonymous) UntisAuthentication.createAuthObject() else UntisAuthentication.createAuthObject(
+				user.user,
+				user.key
+			)
 		)
 
 		query.data.id = requestId.toString()
 		query.data.method = UntisApiConstants.METHOD_GET_TIMETABLE
 		query.data.params = listOf(params)
 
-		val userDataResult = api.request(query)
-		userDataResult.fold({ data ->
-			try {
-				val untisResponse = getJSON().decodeFromString<TimetableResponse>(data)
+		api.request<TimetableResponse>(query).fold({ untisResponse ->
+			if (untisResponse.result != null) {
+				Log.d(
+					"TimetableLoaderDebug",
+					"target $target (requestId $requestId): network request success, returning"
+				)
+				sendBreadcrumb(target, "network success")
 
-				if (untisResponse.result != null) {
-					Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): network request success, returning")
+				val items = untisResponse.result.timetable.periods
+				val timestamp = Instant.now().millis
+				onItemsReceived(
+					TimetableItems(
+						items = items.map {
+							periodToTimegridItem(
+								it,
+								target.type
+							)
+						},
+						startDate = target.startDate,
+						endDate = target.endDate,
+						timestamp = timestamp
+					)
+				)
+				Log.d(
+					"TimetableLoaderDebug",
+					"target $target (requestId $requestId): saving to cache: $cache"
+				)
+				cache.save(TimetableCache.CacheObject(timestamp, items))
+				sendBreadcrumb(target, "cache save", cache = cache)
 
-					val items = untisResponse.result.timetable.periods
-					val timestamp = Instant.now().millis
-					timetableDisplay.addTimetableItems(items.map { periodToTimegridItem(it, target.type) }, target.startDate, target.endDate, timestamp)
-					Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): saving to cache: $cache")
-					cache.save(TimetableCache.CacheObject(timestamp, items))
-
-					// TODO: Interpret masterData in the response
-				} else {
-					Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): network request failed at Untis API level")
-					timetableDisplay.onTimetableLoadingError(requestId, untisResponse.error?.code, untisResponse.error?.message)
-				}
-			} catch (e: Exception) {
-				val msg = when (e) {
-					//is JsonDecodingException -> formatJsonParsingException(e, data)
-					else -> e.toString()
-				}
-				timetableDisplay.onTimetableLoadingError(requestId, CODE_REQUEST_PARSING_EXCEPTION, msg)
+				// TODO: Interpret masterData in the response
+			} else {
+				val e = TimetableLoaderException(
+					requestId,
+					untisResponse.error?.code,
+					untisResponse.error?.message
+				)
+				Log.d(
+					"TimetableLoaderDebug",
+					"target $target (requestId $requestId): network request failed at Untis API level",
+					e
+				)
+				sendBreadcrumb(target, "network failure api", throwable = e)
+				throw e
 			}
 		}, { error ->
-			Log.d("TimetableLoaderDebug", "target $target (requestId $requestId): network request failed at OS level")
-			timetableDisplay.onTimetableLoadingError(requestId, CODE_REQUEST_FAILED, error.message)
+			val e = TimetableLoaderException(
+				requestId,
+				CODE_REQUEST_FAILED,
+				error.message
+			)
+			Log.d(
+				"TimetableLoaderDebug",
+				"target $target (requestId $requestId): network request failed at OS level",
+				e
+			)
+			sendBreadcrumb(target, "network failure local", throwable = e)
+			throw e
 		})
 	}
 
@@ -137,23 +265,26 @@ class TimetableLoader(
 
 	private fun periodToTimegridItem(period: Period, type: String): TimegridItem {
 		return TimegridItem(
-				period.id.toLong(),
-				period.startDateTime.toLocalDateTime().toDateTime(),
-				period.endDateTime.toLocalDateTime().toDateTime(),
-				type,
-				PeriodData(timetableDatabaseInterface, period)
+			period.id.toLong(),
+			period.startDateTime.toLocalDateTime().toDateTime(),
+			period.endDateTime.toLocalDateTime().toDateTime(),
+			type,
+			PeriodData(timetableDatabaseInterface, period)
 		)
 	}
 
-	fun repeat(requestId: Int, flags: Int = 0, proxyHost: String? = null) {
-		Log.d("TimetableLoaderDebug", "target ${requestList[requestId]} (requestId $requestId): repeat")
+	/*fun repeat(requestId: Int, flags: Int = 0, proxyHost: String? = null) {
+		Log.d(
+			"TimetableLoaderDebug",
+			"target ${requestList[requestId]} (requestId $requestId): repeat"
+		)
 		load(requestList[requestId], flags, proxyHost)
-	}
+	}*/
 
 	data class TimetableLoaderTarget(
-			val startDate: UntisDate,
-			val endDate: UntisDate,
-			val id: Int,
-			val type: String
+		val startDate: UntisDate,
+		val endDate: UntisDate,
+		val id: Int,
+		val type: String
 	)
 }

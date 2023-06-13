@@ -1,16 +1,16 @@
 version: 2.1
 orbs:
-  gh: circleci/github-cli@2.1.0
+  gh: circleci/github-cli@2.2.0
 filters: &release
   branches:
     ignore: /.*/
   tags:
-    only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
+    only: /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
 jobs:
   build:
     working_directory: ~/betteruntis
     docker:
-      - image: cimg/android:2022.09
+      - image: cimg/android:2023.06.1
     resource_class: large
     steps:
       - checkout
@@ -33,10 +33,9 @@ jobs:
             echo 'export KEY_RELEASE_PASSWORD=$(echo "$KEY_RELEASE_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
       - run:
           name: Initial build
-          command: ./gradlew assemble bundle
+          command: ./gradlew --no-daemon assemble bundle $([ -z $SENTRY_PROJECT ] && echo "-x uploadSentryProguardMappingsRelease")
           environment:
             GRADLE_OPTS: '
-              -Dorg.gradle.jvmargs="-Xmx3g -XX:+HeapDumpOnOutOfMemoryError -XX:MaxPermSize=512m"
               -Dorg.gradle.daemon=false
               -Dorg.gradle.parallel=true
               -Dorg.gradle.workers.max=3
@@ -109,6 +108,10 @@ jobs:
     docker:
       - image: cimg/ruby:3.1.2
     working_directory: ~/betteruntis
+    parameters:
+      track:
+        type: string
+        default: 'beta'
     steps:
       - checkout
       - restore_cache:
@@ -123,10 +126,11 @@ jobs:
       - attach_workspace:
           at: workspace
       - run:
-          name: Deploy to Play Store Beta track
+          name: Deploy to Play Store
           command: |
             echo $GOOGLE_PLAY_KEY_ENCODED | base64 --decode > fastlane/key.json
-            bundle exec fastlane deploy aab:'workspace/outputs/bundle/release/app-release.aab'
+            for f in fastlane/metadata/android/*/changelogs; do [[ -e "$f/$CIRCLE_TAG.txt" ]] && cp "$f/$CIRCLE_TAG.txt" "$f/default.txt"; done;
+            bundle exec fastlane deploy aab:'workspace/outputs/bundle/release/app-release.aab' track:<<parameters.track>>
 
   deploy_github:
     docker:
@@ -134,14 +138,13 @@ jobs:
     working_directory: ~/betteruntis
     steps:
       - gh/setup
-      - gh/clone
+      - checkout
       - attach_workspace:
           at: workspace
       - run:
           name: Deploy Release to GitHub
           command: |
-            VERSION=$(grep versionCode app/build.gradle | cut -d " " -f2-)
-            gh release create $CIRCLE_TAG --prerelease --title "BetterUntis ${CIRCLE_TAG}" --notes-file "./fastlane/metadata/android/en-US/changelogs/${VERSION}.txt" "./workspace/outputs/apk/debug/app-debug.apk#BetterUntis ${CIRCLE_TAG}.apk"
+            gh release create $CIRCLE_TAG --prerelease --title "BetterUntis $CIRCLE_TAG" --notes-file "./fastlane/metadata/android/en-US/changelogs/$CIRCLE_TAG.txt" "./workspace/outputs/apk/debug/app-debug.apk#BetterUntis $CIRCLE_TAG.apk"
 
 workflows:
   version: 2
@@ -165,6 +168,15 @@ workflows:
           requires:
             - build
           filters: *release
+      - deploy_fastlane:
+          name: deploy_fastlane_material3
+          requires:
+            - build
+          filters:
+            branches:
+              #only: 287-material-design-3
+              ignore: /.*/ # Disables this job. Remove this line if you enable the branch above.
+          track: 'material-3'
       - deploy_github:
           requires:
             - build

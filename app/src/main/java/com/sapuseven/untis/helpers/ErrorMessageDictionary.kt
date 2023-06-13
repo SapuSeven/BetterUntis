@@ -1,7 +1,6 @@
 package com.sapuseven.untis.helpers
 
 import android.content.res.Resources
-
 import com.sapuseven.untis.R
 
 object ErrorMessageDictionary {

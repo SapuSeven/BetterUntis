@@ -1,829 +1,834 @@
 package com.sapuseven.untis.activities
 
+import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.DialogInterface
+import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.graphics.RectF
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.*
-import android.widget.*
-import androidx.activity.viewModels
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AlertDialog
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.view.MotionEvent
+import android.view.View
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateMap
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.ColorUtils
-import androidx.core.view.GravityCompat
-import androidx.core.view.get
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import ca.antonious.materialdaypicker.MaterialDayPicker
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.textfield.TextInputEditText
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_PROFILE_UPDATE
-import com.sapuseven.untis.adapters.ProfileListAdapter
-import com.sapuseven.untis.data.connectivity.UntisApiConstants
-import com.sapuseven.untis.data.connectivity.UntisAuthentication
-import com.sapuseven.untis.data.connectivity.UntisRequest
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_HIGHLIGHT
+import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_ROUTE
+import com.sapuseven.untis.activities.main.DrawerItems
+import com.sapuseven.untis.activities.main.DrawerText
+import com.sapuseven.untis.data.databases.entities.User
+import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
-import com.sapuseven.untis.dialogs.DatePickerDialog
-import com.sapuseven.untis.dialogs.ElementPickerDialog
-import com.sapuseven.untis.dialogs.ErrorReportingDialog
-import com.sapuseven.untis.fragments.AbsenceCheckFragment
-import com.sapuseven.untis.fragments.TimetableItemDetailsFragment
-import com.sapuseven.untis.helpers.ConversionUtils
 import com.sapuseven.untis.helpers.DateTimeUtils
-import com.sapuseven.untis.helpers.ErrorMessageDictionary
-import com.sapuseven.untis.helpers.SerializationUtils
-import com.sapuseven.untis.helpers.config.PreferenceUtils
+import com.sapuseven.untis.helpers.config.globalDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
-import com.sapuseven.untis.interfaces.TimetableDisplay
-import com.sapuseven.untis.models.UntisMessage
-import com.sapuseven.untis.models.untis.UntisDate
-import com.sapuseven.untis.models.untis.masterdata.Holiday
-import com.sapuseven.untis.models.untis.masterdata.SchoolYear
 import com.sapuseven.untis.models.TimetableBookmark
-import com.sapuseven.untis.models.untis.params.MessageParams
-import com.sapuseven.untis.models.untis.response.MessageResponse
+import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import com.sapuseven.untis.preferences.ElementPickerPreference
-import com.sapuseven.untis.preferences.RangePreference
-import com.sapuseven.untis.receivers.NotificationSetup.Companion.EXTRA_BOOLEAN_MANUAL
-import com.sapuseven.untis.receivers.StartupReceiver
-import com.sapuseven.untis.viewmodels.PeriodDataViewModel
+import com.sapuseven.untis.preferences.DataStorePreferences
+import com.sapuseven.untis.preferences.dataStorePreferences
+import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
+import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
+import com.sapuseven.untis.ui.common.*
+import com.sapuseven.untis.ui.dialogs.DatePickerDialog
+import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
+import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
+import com.sapuseven.untis.ui.dialogs.TimetableItemDetailsDialog
+import com.sapuseven.untis.ui.functional.BackPressConfirm
+import com.sapuseven.untis.ui.functional.bottomInsets
+import com.sapuseven.untis.ui.functional.insetsPaddingValues
+import com.sapuseven.untis.ui.preferences.convertRangeToPair
+import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
+import com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
 import com.sapuseven.untis.views.weekview.HolidayChip
 import com.sapuseven.untis.views.weekview.WeekView
 import com.sapuseven.untis.views.weekview.WeekViewDisplayable
-import com.sapuseven.untis.views.weekview.WeekViewEvent
 import com.sapuseven.untis.views.weekview.listeners.EventClickListener
 import com.sapuseven.untis.views.weekview.listeners.ScaleListener
 import com.sapuseven.untis.views.weekview.listeners.ScrollListener
 import com.sapuseven.untis.views.weekview.listeners.TopLeftCornerClickListener
 import com.sapuseven.untis.views.weekview.loaders.WeekViewLoader
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main_content.*
-import kotlinx.android.synthetic.main.activity_main_drawer_header.*
-import kotlinx.android.synthetic.main.item_profiles_add.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import io.sentry.Breadcrumb
+import io.sentry.Sentry
+import io.sentry.SentryLevel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
-import org.joda.time.DateTime
-import org.joda.time.DateTimeConstants
-import org.joda.time.Instant
-import org.joda.time.LocalDate
+import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.*
+import kotlinx.serialization.json.Json
+import org.joda.time.*
 import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
-import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.max
+import kotlin.math.roundToInt
 
-class MainActivity :
-		BaseActivity(),
-		NavigationView.OnNavigationItemSelectedListener,
-		WeekViewLoader.PeriodChangeListener<TimegridItem>,
-		EventClickListener<TimegridItem>,
-		TopLeftCornerClickListener,
-		TimetableDisplay,
-		TimetableItemDetailsFragment.TimetableItemDetailsDialogListener{
+class MainActivity : BaseComposeActivity() {
+	companion object {
+		const val MESSENGER_PACKAGE_NAME = "com.untis.chat"
 
+		const val EXTRA_STRING_PERIOD_ELEMENT = "com.sapuseven.untis.activities.main.element"
+	}
+
+	private val weekViewRefreshHandler = Handler(Looper.getMainLooper())
+
+	// TODO
+	/*private val weekViewUpdate = object : Runnable {
+		override fun run() {
+			weekView.invalidate()
+			weekViewRefreshHandler.postDelayed(this, 60 * 1000)
+		}
+	}*/
+
+	private val loginLauncher =
+		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+			if (it.resultCode == Activity.RESULT_OK)
+				recreate() // TODO: Look at it.data for potential actions (e.g. show a specific timetable)
+			else
+				finish()
+		}
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+
+		setContent {
+			AppTheme(navBarInset = false) {
+				withUser(
+					invalidContent = { login() }
+				) { user ->
+					val state =
+						rememberMainAppState(
+							user = user,
+							contextActivity = this,
+							customThemeColor = customThemeColor,
+							timetableDatabaseInterface = timetableDatabaseInterface,
+							preferences = dataStorePreferences,
+							globalPreferences = globalDataStore,
+							colorScheme = MaterialTheme.colorScheme//!! // Can't be null, AppTheme content isn't rendered if colorScheme is null
+						)
+					state.loadPrefs(dataStorePreferences)
+
+					MainApp(state)
+				}
+			}
+		}
+	}
+
+	private fun login() {
+		loginLauncher.launch(Intent(this, LoginActivity::class.java).apply {
+			putUserIdExtra(this)
+			putBackgroundColorExtra(this)
+		})
+	}
+
+}
+
+@Composable
+private fun WeekViewCompose(state: MainAppState) {
+	var weekViewGlobal by remember { mutableStateOf(state.weekView.value) }
+	state.loadWeekViewPreferences(weekViewGlobal, state.preferences)
+
+	AndroidView(
+		factory = { context ->
+			if (weekViewGlobal == null) { // Create weekView if it doesn't already exist
+				WeekView<TimegridItem>(context).also {
+					weekViewGlobal = it
+					state.weekView.value = it
+				}
+			}
+
+			state.weekViewSwipeRefresh.value ?: WeekViewSwipeRefreshLayout(context).apply {
+				state.weekViewSwipeRefresh.value = this
+				addView(weekViewGlobal)
+			}
+		},
+		update = {
+			state.weekView.value = weekViewGlobal
+			state.userDatabase.userDao().getByIdWithData(state.user.id)?.holidays?.let {
+				state.weekView.value?.addHolidays(it.map { holiday ->
+					HolidayChip(
+						text = holiday.longName,
+						startDate = holiday.startDate,
+						endDate = holiday.endDate
+					)
+				})
+			}
+			state.updateViews(it)
+		},
+		modifier = Modifier
+			.fillMaxSize()
+			.disabled(state.isAnonymous)
+	)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun Drawer(
+	state: MainAppState,
+	onShowTimetable: (Pair<PeriodElement?, String?>?) -> Unit,
+	content: @Composable () -> Unit
+) {
+	val scope = rememberCoroutineScope()
+	val drawerScrollState = rememberScrollState()
+	var bookmarkDeleteDialog by remember { mutableStateOf<TimetableBookmark?>(null) }
+
+	var showElementPicker by remember {
+		mutableStateOf<TimetableDatabaseInterface.Type?>(
+			null
+		)
+	}
+
+	var bookmarksElementPicker by remember {
+		mutableStateOf<TimetableDatabaseInterface.Type?>(
+			null
+		)
+	}
+
+	val shortcutLauncher =
+		rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
+			val periodElement: PeriodElement? = activityResult.data?.let { intent ->
+				Json.decodeFromString(
+					PeriodElement.serializer(),
+					intent.getStringExtra(MainActivity.EXTRA_STRING_PERIOD_ELEMENT) ?: ""
+				)
+			}
+
+			periodElement?.let {
+				onShowTimetable(it to state.timetableDatabaseInterface.getLongName(it))
+			}
+		}
+
+	LaunchedEffect(state.drawerState) {
+		snapshotFlow { state.drawerState.isOpen }
+			.distinctUntilChanged()
+			.drop(1)
+			.collect {
+				Log.i("Sentry", "Drawer isOpen: ${state.drawerState.isOpen}")
+				Breadcrumb().apply {
+					category = "ui.drawer"
+					level = SentryLevel.INFO
+					setData("isOpen", state.drawerState.isOpen)
+					Sentry.addBreadcrumb(this)
+				}
+			}
+	}
+
+	BackHandler(enabled = state.drawerState.isOpen) {
+		scope.launch {
+			state.drawerState.close()
+		}
+	}
+
+	ModalNavigationDrawer(
+		gesturesEnabled = state.drawerGesturesEnabled,
+		drawerState = state.drawerState,
+		drawerContent = {
+			ModalDrawerSheet(
+				modifier = Modifier
+					.width(320.dp) // default: 360.dp
+					.fillMaxHeight()
+					.verticalScroll(drawerScrollState)
+			) {
+				Spacer(modifier = Modifier.height(24.dp))
+
+				DrawerText(stringResource(id = R.string.all_favourites))
+
+				NavigationDrawerItem(
+					icon = {
+						Icon(
+							painterResource(id = R.drawable.all_prefs_personal),
+							contentDescription = null
+						)
+					},
+					label = { Text(stringResource(id = R.string.all_personal_timetable)) },
+					selected = state.isPersonalTimetable,
+					onClick = {
+						state.closeDrawer()
+						onShowTimetable(state.personalTimetable)
+					},
+					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+				)
+
+				var isBookmarkSelected = false
+				state.user.bookmarks.forEach { bookmark ->
+					val isDisplayed = state.displayedElement.value?.let {
+						it.id == bookmark.elementId && it.type == bookmark.elementType
+					} == true
+					isBookmarkSelected = isBookmarkSelected || isDisplayed
+
+					NavigationDrawerItem(
+						icon = {
+							Icon(
+								painter = painterResource(
+									id = when (TimetableDatabaseInterface.Type.valueOf(
+										bookmark.elementType
+									)) {
+										TimetableDatabaseInterface.Type.CLASS -> R.drawable.all_classes
+										TimetableDatabaseInterface.Type.TEACHER -> R.drawable.all_teachers
+										TimetableDatabaseInterface.Type.SUBJECT -> R.drawable.all_subject
+										TimetableDatabaseInterface.Type.ROOM -> R.drawable.all_rooms
+										else -> R.drawable.all_prefs_personal
+									}
+								),
+								contentDescription = null
+							)
+						},
+						badge = {
+							IconButton(
+								onClick = { bookmarkDeleteDialog = bookmark }
+							) {
+								Icon(
+									painter = painterResource(id = R.drawable.all_bookmark_remove),
+									contentDescription = "Remove Bookmark"
+								) //TODO: Extract String resource
+							}
+						},
+						label = { Text(text = bookmark.displayName) },
+						selected = isDisplayed,
+						onClick = {
+							state.closeDrawer()
+							val items = state.timetableDatabaseInterface.getElements(
+								TimetableDatabaseInterface.Type.valueOf(bookmark.elementType)
+							)
+							val item = items.find {
+								it.id == bookmark.elementId && it.type == bookmark.elementType
+							}
+							onShowTimetable(
+								item to state.timetableDatabaseInterface.getLongName(item!!)
+							)
+						},
+						modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+					)
+				}
+
+				NavigationDrawerItem(
+					icon = {
+						Icon(
+							painterResource(id = R.drawable.all_add),
+							contentDescription = null
+						)
+					},
+					label = { Text(stringResource(id = R.string.maindrawer_bookmarks_add)) },
+					selected = false,
+					onClick = {
+						state.closeDrawer()
+						bookmarksElementPicker = TimetableDatabaseInterface.Type.CLASS
+						//selectedItem.value = item
+					},
+					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+				)
+
+				DrawerText(stringResource(id = R.string.nav_all_timetables))
+
+				DrawerItems(
+					isMessengerAvailable = state.isMessengerAvailable,
+					disableTypeSelection = state.isPersonalTimetable || isBookmarkSelected,
+					displayedElement = state.displayedElement.value,
+					onTimetableClick = { item ->
+						state.closeDrawer()
+						showElementPicker = item.elementType
+					},
+					onShortcutClick = { item ->
+						Log.i("Sentry", "Drawer onClick: ${item}")
+						Breadcrumb().apply {
+							category = "ui.drawer.click"
+							level = SentryLevel.INFO
+							setData("id", item.id)
+							setData("label", item.label)
+							Sentry.addBreadcrumb(this)
+						}
+
+						state.closeDrawer()
+						if (item.target == null) {
+							try {
+								state.context.startActivity(
+									state.context.packageManager.getLaunchIntentForPackage(
+										MainActivity.MESSENGER_PACKAGE_NAME
+									)
+								)
+							} catch (e: Exception) {
+								try {
+									state.context.startActivity(
+										Intent(
+											Intent.ACTION_VIEW,
+											Uri.parse("market://details?id=${MainActivity.MESSENGER_PACKAGE_NAME}")
+										)
+									)
+								} catch (e: Exception) {
+									state.context.startActivity(
+										Intent(
+											Intent.ACTION_VIEW,
+											Uri.parse("https://play.google.com/store/apps/details?id=${MainActivity.MESSENGER_PACKAGE_NAME}")
+										)
+									)
+								}
+							}
+						} else {
+							shortcutLauncher.launch(
+								Intent(
+									state.context,
+									item.target
+								).apply {
+									state.contextActivity.putUserIdExtra(this, state.user.id)
+									state.contextActivity.putBackgroundColorExtra(this)
+								}
+							)
+						}
+					}
+				)
+			}
+		},
+		content = content
+	)
+
+	AnimatedVisibility(
+		visible = showElementPicker != null,
+		enter = fullscreenDialogAnimationEnter(),
+		exit = fullscreenDialogAnimationExit()
+	) {
+		ElementPickerDialogFullscreen(
+			title = { /*TODO*/ },
+			timetableDatabaseInterface = state.timetableDatabaseInterface,
+			onDismiss = { showElementPicker = null },
+			onSelect = { item ->
+				item?.let {
+					onShowTimetable(
+						item to state.timetableDatabaseInterface.getLongName(it)
+					)
+				} ?: run {
+					onShowTimetable(state.personalTimetable)
+				}
+			},
+			initialType = showElementPicker
+		)
+	}
+
+	AnimatedVisibility(
+		visible = bookmarksElementPicker != null,
+		enter = fullscreenDialogAnimationEnter(),
+		exit = fullscreenDialogAnimationExit()
+	) {
+		val context = LocalContext.current
+
+		ElementPickerDialogFullscreen(
+			title = { Text(stringResource(id = R.string.maindrawer_bookmarks_add)) },
+			timetableDatabaseInterface = state.timetableDatabaseInterface,
+			hideTypeSelectionPersonal = true,
+			onDismiss = { bookmarksElementPicker = null },
+			onSelect = { item ->
+				item?.let {
+					val newBookmark = TimetableBookmark(
+						elementId = it.id,
+						elementType = TimetableDatabaseInterface.Type.valueOf(it.type).name,
+						displayName = state.timetableDatabaseInterface.getLongName(it)
+					)
+
+					if (state.user.bookmarks.contains(newBookmark))
+						Toast
+							.makeText(
+								context,
+								"Bookmark already exists",
+								Toast.LENGTH_LONG
+							) // TODO: Extract string resource
+							.show()
+					else {
+						state.user.bookmarks = state.user.bookmarks.plus(newBookmark)
+						state.userDatabase.userDao().update(state.user)
+						onShowTimetable(
+							item to state.timetableDatabaseInterface.getLongName(it)
+						)
+					}
+				}
+
+			},
+			initialType = bookmarksElementPicker
+		)
+	}
+
+	bookmarkDeleteDialog?.let { bookmark ->
+		AlertDialog(
+			text = { Text(stringResource(id = R.string.main_dialog_delete_bookmark)) },
+			onDismissRequest = { bookmarkDeleteDialog = null },
+			confirmButton = {
+				TextButton(
+					onClick = {
+						state.user.bookmarks = state.user.bookmarks.minus(bookmark)
+						state.userDatabase.userDao().update(state.user)
+						bookmarkDeleteDialog = null
+					}) {
+					Text(stringResource(id = R.string.all_delete))
+				}
+			},
+			dismissButton = {
+				TextButton(
+					onClick = { bookmarkDeleteDialog = null }) {
+					Text(stringResource(id = R.string.all_cancel))
+				}
+			}
+		)
+	}
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BaseComposeActivity.MainApp(state: MainAppState) {
+	val snackbarHostState = remember { SnackbarHostState() }
+	if (state.preferences.doubleTapToExit.getState().value)
+		BackPressConfirm(snackbarHostState)
+
+	Drawer(
+		state = state,
+		onShowTimetable = {
+			it.let { element ->
+				state.displayElement(element?.first, element?.second)
+			}
+		}
+	) {
+		AppScaffold(
+			snackbarHost = { SnackbarHost(snackbarHostState) },
+			topBar = {
+				CenterAlignedTopAppBar(
+					title = { Text(state.displayedName.value) },
+					navigationIcon = {
+						IconButton(onClick = {
+							state.scope.launch { state.drawerState.open() }
+						}) {
+							Icon(
+								imageVector = Icons.Outlined.Menu,
+								contentDescription = stringResource(id = R.string.main_drawer_open)
+							)
+						}
+					},
+					actions = {
+						ProfileSelectorAction(
+							users = state.userDatabase.userDao().getAll(),
+							currentSelectionId = state.user.id,
+							showProfileActions = true,
+							onSelectionChange = {
+								state.contextActivity.setUser(it, true)
+							},
+							onActionEdit = {
+								state.profileManagementDialog.value = true
+							}
+						)
+					}
+				)
+			}
+		) { innerPadding ->
+			Box(
+				modifier = Modifier
+					.padding(innerPadding)
+					.fillMaxSize()
+			) {
+				WeekViewCompose(state)
+
+				val timeColumnWidth = with(LocalDensity.current) {
+					state.weekView.value?.config?.timeColumnWidth?.toDp()
+						?: 48.dp
+				}
+				Text(
+					text = state.lastRefreshText(),
+					modifier = Modifier
+						.align(Alignment.BottomStart)
+						.padding(start = timeColumnWidth + 8.dp, bottom = 8.dp)
+						.bottomInsets()
+						.disabled(state.isAnonymous)
+				)
+
+				if (state.isAnonymous) {
+					Column(
+						verticalArrangement = Arrangement.Center,
+						horizontalAlignment = Alignment.CenterHorizontally,
+						modifier = Modifier
+							.fillMaxSize()
+							.absolutePadding(left = 16.dp)
+					) {
+						Text(
+							text = stringResource(id = R.string.main_anonymous_login_info_text),
+							textAlign = TextAlign.Center,
+							modifier = Modifier
+								.padding(horizontal = 32.dp)
+						)
+
+						Button(
+							onClick = {
+								state.contextActivity.startActivity(
+									Intent(
+										state.contextActivity,
+										SettingsActivity::class.java
+									).apply {
+										state.contextActivity.putUserIdExtra(this, state.user.id)
+										putExtra(
+											EXTRA_STRING_PREFERENCE_ROUTE,
+											"preferences_timetable"
+										)
+										putExtra(
+											EXTRA_STRING_PREFERENCE_HIGHLIGHT,
+											"preference_timetable_personal_timetable"
+										)
+										state.contextActivity.putBackgroundColorExtra(this)
+									}
+								)
+							},
+							modifier = Modifier
+								.padding(top = 16.dp)
+						) {
+							Text(text = stringResource(id = R.string.main_go_to_settings))
+						}
+					}
+				}
+
+				if (state.isLoading)
+					CircularProgressIndicator(
+						modifier = Modifier
+							.align(Alignment.BottomEnd)
+							.padding(8.dp)
+					)
+			}
+
+			ReportsInfoBottomSheet()
+		}
+	}
+
+	// TODO: Implement a smoother animation (see https://m3.material.io/components/dialogs/guidelines#007536b9-76b1-474a-a152-2f340caaff6f)
+	AnimatedVisibility(
+		visible = state.timetableItemDetailsDialog.value != null,
+		enter = fullscreenDialogAnimationEnter(),
+		exit = fullscreenDialogAnimationExit()
+	) {
+		// TODO: Incorrect insets
+		TimetableItemDetailsDialog(
+			timegridItems = remember {
+				state.timetableItemDetailsDialog.value?.first ?: emptyList()
+			},
+			initialPage = remember {
+				state.timetableItemDetailsDialog.value?.second ?: 0
+			},
+			user = state.user,
+			timetableDatabaseInterface = state.timetableDatabaseInterface,
+			onDismiss = {
+				state.timetableItemDetailsDialog.value = null
+				it?.let { state.displayElement(it) }
+			}
+		)
+	}
+
+	AnimatedVisibility(
+		visible = state.profileManagementDialog.value,
+		enter = fullscreenDialogAnimationEnter(),
+		exit = fullscreenDialogAnimationExit()
+	) {
+		state.contextActivity.ProfileManagementDialog(
+			onDismiss = {
+				state.profileManagementDialog.value = false
+			}
+		)
+	}
+
+	if (state.showDatePicker.value)
+		DatePickerDialog(
+			initialSelection = state.lastSelectedDate,
+			onDismiss = { state.showDatePicker.value = false }
+		) {
+			state.showDatePicker.value = false
+			state.lastSelectedDate = it
+			state.weekView.value?.goToDate(it.toDateTime(LocalTime.now()))
+		}
+}
+
+class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
+	val user: User,
+	val contextActivity: BaseComposeActivity,
+	val timetableDatabaseInterface: TimetableDatabaseInterface,
+	val weekViewSwipeRefresh: MutableState<WeekViewSwipeRefreshLayout?>,
+	val weekView: MutableState<WeekView<TimegridItem>?>,
+	val context: Context,
+	val scope: CoroutineScope,
+	val colorScheme: ColorScheme,
+	val currentDensity: Density,
+	val preferences: DataStorePreferences,
+	val globalPreferences: DataStore<Preferences>,
+	var personalTimetable: Pair<PeriodElement?, String?>?,
+	val defaultDisplayedName: String,
+	val drawerState: DrawerState,
+	var drawerGestureState: MutableState<Boolean>,
+	val loading: MutableState<Int>,
+	val currentWeekIndex: MutableState<Int>,
+	val lastRefreshTimestamp: MutableState<Long>,
+	val weeklyTimetableItems: SnapshotStateMap<Int, WeeklyTimetableItems?>,
+	val timetableLoader: TimetableLoader,
+	val timetableItemDetailsDialog: MutableState<Pair<List<PeriodData>, Int>?>,
+	val showDatePicker: MutableState<Boolean>,
+	val profileManagementDialog: MutableState<Boolean>
+) {
 	companion object {
 		private const val MINUTE_MILLIS: Int = 60 * 1000
 		private const val HOUR_MILLIS: Int = 60 * MINUTE_MILLIS
 		private const val DAY_MILLIS: Int = 24 * HOUR_MILLIS
 
-		private const val REQUEST_CODE_ROOM_FINDER = 1
-		private const val REQUEST_CODE_SETTINGS = 2
-		private const val REQUEST_CODE_LOGINDATAINPUT_ADD = 3
-		private const val REQUEST_CODE_LOGINDATAINPUT_EDIT = 4
-		private const val REQUEST_CODE_ERRORS = 5
-
 		private const val UNTIS_DEFAULT_COLOR = "#f49f25"
 
-		private const val PERSISTENT_INT_ZOOM_LEVEL = "persistent_zoom_level"
-
-		private const val MESSENGER_PACKAGE_NAME = "com.untis.chat"
-
-		private const val FRAGMENT_TAG_LESSON_INFO = "com.sapuseven.untis.fragments.lessoninfo"
-		private const val FRAGMENT_TAG_ABSENCE_CHECK = "com.sapuseven.untis.fragments.absencecheck"
-
+		private val DATASTORE_KEY_WEEKVIEW_SCALE = intPreferencesKey("weekView.hourHeight")
 	}
 
-	private val userDatabase = UserDatabase.createInstance(this)
-	private var lastBackPress: Long = 0
-	private var profileId: Long = -1
-	private val weeklyTimetableItems: MutableMap<Int, WeeklyTimetableItems?> = mutableMapOf()
-	private var displayedElement: PeriodElement? = null
-	private var selectedElement: Int? = null
-	private var lastPickedDate: DateTime? = null
-	private var proxyHost: String? = null
-	private var profileUpdateDialog: AlertDialog? = null
-	private var currentWeekIndex = 0
-	private var currentSchoolYearId = -1
-	private val weekViewRefreshHandler = Handler(Looper.getMainLooper())
-	private var displayNameCache: CharSequence = ""
-	private var timetableLoader: TimetableLoader? = null
-	private lateinit var profileUser: UserDatabase.User
-	private lateinit var profileListAdapter: ProfileListAdapter
-	private lateinit var timetableDatabaseInterface: TimetableDatabaseInterface
-	private lateinit var weekView: WeekView<TimegridItem>
-	private var BOOKMARKS_ADD_ID: Int = 0
-	private val timetableItemDetailsViewModel: PeriodDataViewModel by viewModels()
+	val userDatabase = contextActivity.userDatabase
 
-	private val weekViewUpdate = object : Runnable {
-		override fun run() {
-			weekView.invalidate()
-			weekViewRefreshHandler.postDelayed(this, 60 * 1000)
-		}
-	}
+	private var drawerGestures by drawerGestureState
 
-	override fun onCreate(savedInstanceState: Bundle?) {
-		hasOwnToolbar = true
+	var lastSelectedDate: LocalDate = LocalDate.now()
 
-		super.onCreate(savedInstanceState)
+	var displayedElement: MutableState<PeriodElement?> = mutableStateOf(personalTimetable?.first)
+	var displayedName: MutableState<String> =
+		mutableStateOf(personalTimetable?.second ?: defaultDisplayedName)
 
-		if (!loadProfile())
-			return
+	val isPersonalTimetable: Boolean
+		get() = displayedElement.value == personalTimetable?.first
 
-		setupNotifications()
+	val isAnonymous: Boolean
+		get() = personalTimetable != null && displayedElement.value == null
 
-		setContentView(R.layout.activity_main)
+	val isLoading: Boolean
+		get() = loading.value > 0
 
-		if (checkForCrashes()) {
-			startActivityForResult(Intent(this, ErrorsActivity::class.java).apply {
-				putExtra(ErrorsActivity.EXTRA_BOOLEAN_SHOW_CRASH_MESSAGE, true)
-			}, REQUEST_CODE_ERRORS)
-		} else {
-			setupActionBar()
-			setupNavDrawer()
-
-			setupViews()
-			setupHours()
-			setupHolidays()
-
-			setupTimetableLoader()
-			if (!checkShortcut()) showPersonalTimetable()
-			refreshNavigationViewSelection()
-		}
-	}
-
-	private fun checkForProfileUpdateRequired(): Boolean {
-		return profileUser.schoolId.isBlank() || profileUser.apiUrl.isBlank()
-	}
-
-	private fun checkForNewSchoolYear(): Boolean {
-		currentSchoolYearId = getCurrentSchoolYear()?.id ?: -1
-
-		return if (preferences.defaultPrefs.getInt("school_year", -1) != currentSchoolYearId) {
-			preferences.defaultPrefs.contains("school_year")
-		} else false
-	}
-
-	private fun getCurrentSchoolYear(): SchoolYear? {
-		val schoolYears = userDatabase.getAdditionalUserData<SchoolYear>(
-			profileUser.id
-				?: -1, SchoolYear()
-		)?.values?.toList() ?: emptyList()
-
-		return schoolYears.find {
-			val now = LocalDate.now()
-			now.isAfter(LocalDate(it.startDate)) && now.isBefore(LocalDate(it.endDate))
-		}
-	}
-
-	override fun onPause() {
-		weekViewRefreshHandler.removeCallbacks(weekViewUpdate)
-		super.onPause()
-	}
-
-	override fun onResume() {
-		super.onResume()
-		if (timetableLoader == null) return
-
-		refreshMessages(profileUser, navigationview_main)
-
-		if (::weekView.isInitialized) {
-			proxyHost =
-				preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
-			setupWeekViewConfig()
-
-			weekViewRefreshHandler.post(weekViewUpdate)
-		}
-	}
-
-	override fun onErrorLogFound() {
-		// TODO: Extract string resources
-		if (PreferenceUtils.getPrefBool(preferences, "preference_additional_error_messages"))
-			Snackbar.make(content_main, "Some errors have been found.", Snackbar.LENGTH_INDEFINITE)
-				.setAction("Show") {
-					startActivity(Intent(this, ErrorsActivity::class.java))
-				}
-				.show()
-	}
-
-	private fun showProfileUpdateRequired() {
-		profileUpdateDialog = MaterialAlertDialogBuilder(this)
-			.setTitle(getString(R.string.main_dialog_update_profile_title))
-			.setMessage(getString(R.string.main_dialog_update_profile_message))
-			.setPositiveButton(getString(R.string.main_dialog_update_profile_button)) { _, _ ->
-				updateProfile(profileUser)
-			}
-			.setCancelable(false)
-			.show()
-	}
-
-	private fun login() {
-		val loginIntent = Intent(this, LoginActivity::class.java)
-		startActivityForResult(loginIntent, REQUEST_CODE_LOGINDATAINPUT_ADD)
-		finish()
-	}
-
-	private fun showPersonalTimetable(): Boolean {
-		val customType = TimetableDatabaseInterface.Type.valueOf(
-			PreferenceUtils.getPrefString(
-				preferences,
-				"preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_TYPE}",
-				TimetableDatabaseInterface.Type.SUBJECT.toString()
-			) ?: TimetableDatabaseInterface.Type.SUBJECT.toString()
-		)
-		selectedElement = R.id.nav_show_personal
-		if (customType === TimetableDatabaseInterface.Type.SUBJECT) {
-			profileUser.userData.elemType?.let { type ->
-				return setTarget(
-					profileUser.userData.elemId,
-					type,
-					profileUser.getDisplayedName(applicationContext)
-				)
-			} ?: run {
-				return setTarget(true, profileUser.getDisplayedName(applicationContext))
-			}
-		} else {
-			val customId = preferences.defaultPrefs.getInt(
-				"preference_timetable_personal_timetable${ElementPickerPreference.KEY_SUFFIX_ID}",
-				-1
-			)
-			return setTarget(
-				customId,
-				customType.toString(),
-				timetableDatabaseInterface.getLongName(customId, customType)
-			)
-		}
-	}
-
-	private fun checkShortcut(): Boolean {
-		return intent.extras?.let { extras ->
-			val userId = extras.getLong("user")
-			if (preferences.currentProfileId() != userId)
-				switchToProfile(userDatabase.getUser(userId) ?: return false)
-
-			val element = PeriodElement(
-				type = extras.getString("type") ?: return false,
-				id = extras.getInt("id"),
-				orgId = extras.getInt("orgId")
-			)
-			val useOrgId = extras.getBoolean("useOrgId")
-			setTarget(
-				if (useOrgId) element.orgId else element.id,
-				element.type,
-				timetableDatabaseInterface.getLongName(
-					if (useOrgId) element.orgId else element.id,
-					TimetableDatabaseInterface.Type.valueOf(element.type)
-				)
-			)
-			true
-		} ?: false
-	}
-
-	private fun setupNotifications() {
-		val intent = Intent(this, StartupReceiver::class.java)
-		intent.putExtra(EXTRA_BOOLEAN_MANUAL, true)
-		sendBroadcast(intent)
-	}
-
-	private fun setupTimetableLoader() {
-		timetableLoader =
-			TimetableLoader(WeakReference(this), this, profileUser, timetableDatabaseInterface)
-	}
-
-	private fun setupNavDrawer() {
-		navigationview_main.setNavigationItemSelectedListener(this)
-		navigationview_main.setCheckedItem(R.id.nav_show_personal)
-
-		updateNavDrawer(navigationview_main)
-
-		val header = navigationview_main.getHeaderView(0)
-		val dropdown =
-			header.findViewById<ConstraintLayout>(R.id.constraintlayout_mainactivitydrawer_dropdown)
-		val dropdownView =
-			header.findViewById<LinearLayout>(R.id.linearlayout_mainactivitydrawer_dropdown_view)
-		val dropdownImage =
-			header.findViewById<ImageView>(R.id.imageview_mainactivitydrawer_dropdown_arrow)
-		val dropdownList =
-			header.findViewById<RecyclerView>(R.id.recyclerview_mainactivitydrawer_profile_list)
-
-		profileListAdapter = ProfileListAdapter(
-			this,
-			userDatabase.getAllUsers().toMutableList(),
-			{ view ->
-				toggleProfileDropdown(dropdownView, dropdownImage, dropdownList)
-				switchToProfile(profileListAdapter.itemAt(dropdownList.getChildLayoutPosition(view)))
-			},
-			{ view ->
-				closeDrawer()
-				editProfile(profileListAdapter.itemAt(dropdownList.getChildLayoutPosition(view)))
-				true
-			})
-		dropdownList.adapter = profileListAdapter
-		dropdown.setOnClickListener {
-			toggleProfileDropdown(dropdownView, dropdownImage, dropdownList)
+	private var isRefreshing: Boolean
+		get() = weekViewSwipeRefresh.value?.isRefreshing ?: false
+		set(value) {
+			weekViewSwipeRefresh.value?.isRefreshing = value
 		}
 
-		val profileListAdd =
-			header.findViewById<ConstraintLayout>(R.id.constraintlayout_mainactivitydrawer_add)
-		profileListAdd.setOnClickListener {
-			closeDrawer()
-			addProfile()
-		}
-	}
+	private var shouldUpdateWeekView = true
 
-	private fun updateNavDrawer(navigationView: NavigationView) {
-		val line1 = profileUser.getDisplayedName(applicationContext)
-		val line2 = profileUser.userData.schoolName
-		(navigationView.getHeaderView(0)
-			.findViewById<View>(R.id.textview_mainactivtydrawer_line1) as TextView).text =
-			if (line1.isBlank()) getString(R.string.app_name) else line1
-		(navigationView.getHeaderView(0)
-			.findViewById<View>(R.id.textview_mainactivitydrawer_line2) as TextView).text =
-			if (line2.isBlank()) getString(R.string.all_contact_email) else line2
-
-		navigationView.menu.findItem(R.id.nav_messenger).isVisible = false
-	}
-
-	private fun toggleProfileDropdown(
-		dropdownView: ViewGroup,
-		dropdownImage: ImageView,
-		dropdownList: RecyclerView
-	) {
-		if (dropdownImage.scaleY < 0) {
-			dropdownImage.scaleY = 1F
-			dropdownView.visibility = View.GONE
-		} else {
-			dropdownImage.scaleY = -1F
-
-			dropdownList.setHasFixedSize(true)
-			dropdownList.layoutManager = LinearLayoutManager(this)
-
-			dropdownView.visibility = View.VISIBLE
-		}
-	}
-
-	private fun addProfile() {
-		val loginIntent = Intent(this, LoginActivity::class.java)
-		startActivityForResult(loginIntent, REQUEST_CODE_LOGINDATAINPUT_ADD)
-	}
-
-	private fun editProfile(user: UserDatabase.User) {
-		val loginIntent = Intent(this, LoginDataInputActivity::class.java)
-			.putExtra(LoginDataInputActivity.EXTRA_LONG_PROFILE_ID, user.id)
-		startActivityForResult(loginIntent, REQUEST_CODE_LOGINDATAINPUT_EDIT)
-	}
-
-	private fun updateProfile(user: UserDatabase.User) {
-		val loginIntent = Intent(this, LoginDataInputActivity::class.java)
-			.putExtra(LoginDataInputActivity.EXTRA_LONG_PROFILE_ID, user.id)
-			.putExtra(EXTRA_BOOLEAN_PROFILE_UPDATE, true)
-		startActivityForResult(loginIntent, REQUEST_CODE_LOGINDATAINPUT_EDIT)
-	}
-
-	private fun switchToProfile(user: UserDatabase.User) {
-		profileId = user.id!!
-		preferences.saveProfileId(profileId)
-		preferences.reload(profileId)
-		if (loadProfile()) {
-			updateNavDrawer(findViewById(R.id.navigationview_main))
-
-			closeDrawer()
-			setupTimetableLoader()
-			showPersonalTimetable()
-			refreshNavigationViewSelection()
-
-			recreate()
-		} else {
-			timetableLoader = null
-		}
-	}
-
-	private fun refreshMessages(user: UserDatabase.User, navigationView: NavigationView) =
-		GlobalScope.launch(Dispatchers.Main) {
-			loadMessages(user)?.let {
-				navigationView.menu.findItem(R.id.nav_infocenter).icon = if (
-					it.size > preferences.defaultPrefs.getInt(
-						"preference_last_messages_count",
-						0
-					) ||
-					(SimpleDateFormat(
-						"dd-MM-yyyy",
-						Locale.US
-					).format(Calendar.getInstance().time) != preferences.defaultPrefs.getString(
-						"preference_last_messages_date",
-						""
-					)
-							&& it.isNotEmpty())
-				) {
-					getDrawable(R.drawable.all_infocenter_dot)
-				} else {
-					getDrawable(R.drawable.all_infocenter)
-				}
-			}
-		}
-
-	//TODO: Duplicated function from info center
-	private suspend fun loadMessages(user: UserDatabase.User): List<UntisMessage>? {
-
-		val query = UntisRequest.UntisRequestQuery(user)
-
-		query.data.method = UntisApiConstants.METHOD_GET_MESSAGES
-		query.proxyHost =
-			preferences.defaultPrefs.getString("preference_connectivity_proxy_host", null)
-		query.data.params = listOf(
-			MessageParams(
-				UntisDate.fromLocalDate(LocalDate.now()),
-				auth = UntisAuthentication.createAuthObject(user)
-			)
-		)
-
-		val result = UntisRequest().request(query)
-		return result.fold({ data ->
-			val untisResponse = SerializationUtils.getJSON().decodeFromString<MessageResponse>(data)
-
-			untisResponse.result?.messages
-		}, { null })
-	}
-
-	private fun setupViews() {
-		setupWeekView()
-		restoreZoomLevel()
-
-		textview_main_lastrefresh?.text =
-			getString(R.string.main_last_refreshed, getString(R.string.main_last_refreshed_never))
-
-		button_main_settings.setOnClickListener {
-			val intent = Intent(this@MainActivity, SettingsActivity::class.java)
-			intent.putExtra(SettingsActivity.EXTRA_LONG_PROFILE_ID, profileId)
-			// TODO: Find a way to jump directly to the personal timetable setting
-			startActivityForResult(intent, REQUEST_CODE_SETTINGS)
-		}
-
-		setupSwipeRefresh()
-	}
-
-	private fun setupSwipeRefresh() {
-		swiperefreshlayout_main_timetable.setOnRefreshListener {
-			displayedElement?.let { element ->
-				weeklyTimetableItems[currentWeekIndex]?.dateRange?.let { dateRange ->
-					loadTimetable(
-						TimetableLoader.TimetableLoaderTarget(
-							dateRange.first,
-							dateRange.second,
-							element.id,
-							element.type
-						), true
-					)
-				}
-			}
-		}
-	}
-
-	private fun loadTimetable(
-		target: TimetableLoader.TimetableLoaderTarget,
-		forceRefresh: Boolean = false
-	) {
-		if (timetableLoader == null) return
-
-		weekView.notifyDataSetChanged()
-		if (!forceRefresh) showLoading(true)
-
-		val alwaysLoad = PreferenceUtils.getPrefBool(
-			preferences,
-			"preference_connectivity_refresh_in_background"
-		)
-		val flags =
-			(if (!forceRefresh) TimetableLoader.FLAG_LOAD_CACHE else 0) or (if (alwaysLoad || forceRefresh) TimetableLoader.FLAG_LOAD_SERVER else 0)
-		timetableLoader!!.load(target, flags, proxyHost)
-	}
-
-	private fun loadProfile(): Boolean {
-		if (userDatabase.getUsersCount() < 1) {
-			login()
-			return false
-		}
-
-		profileId = preferences.currentProfileId()
-		if (profileId == 0L || userDatabase.getUser(profileId) == null)
-			profileId = userDatabase.getAllUsers()[0].id
-				?: 0 // Fall back to the first user if an invalid user id is saved
-		profileUser = userDatabase.getUser(profileId) ?: return false
-
-		preferences.saveProfileId(profileId)
-		preferences.reload(profileId)
-		timetableDatabaseInterface = TimetableDatabaseInterface(userDatabase, profileUser.id ?: 0)
-
-		if (checkForProfileUpdateRequired()) {
-			showProfileUpdateRequired()
-			return false
-		}
-
-		if (checkForNewSchoolYear()) {
-			updateProfile(profileUser)
-			return false
-		}
-
-		return true
-	}
-
-	private fun setupWeekView() {
-		weekView = findViewById(R.id.weekview_main_timetable)
-		weekView.setOnEventClickListener(this)
-		weekView.setOnCornerClickListener(this)
-		weekView.setPeriodChangeListener(this)
-		weekView.scrollListener = object : ScrollListener {
-			override fun onFirstVisibleDayChanged(
-				newFirstVisibleDay: LocalDate,
-				oldFirstVisibleDay: LocalDate?
-			) {
-				currentWeekIndex = convertDateTimeToWeekIndex(newFirstVisibleDay)
-				setLastRefresh(
-					weeklyTimetableItems[currentWeekIndex]?.lastUpdated
-						?: 0
-				)
-			}
-		}
-		weekView.scaleListener = object : ScaleListener {
-			override fun onScaleFinished() {
-				saveZoomLevel()
-			}
-		}
-		setupWeekViewConfig()
-	}
-
-	private fun saveZoomLevel() {
-		preferences.defaultPrefs.edit().apply {
-			putInt(PERSISTENT_INT_ZOOM_LEVEL, weekView.hourHeight)
-			apply()
-		}
-	}
-
-	private fun restoreZoomLevel() {
-		weekView.hourHeight =
-			preferences.defaultPrefs.getInt(PERSISTENT_INT_ZOOM_LEVEL, weekView.hourHeight)
-	}
-
-	private fun setupWeekViewConfig() {
-		weekView.weekLength = preferences.defaultPrefs.getStringSet(
-			"preference_week_custom_range",
-			emptySet()
-		)?.size?.zeroToNull
-			?: profileUser.timeGrid.days.size
-		weekView.numberOfVisibleDays =
-			preferences.defaultPrefs.getInt("preference_week_custom_display_length", 0).zeroToNull
-				?: weekView.weekLength
-		weekView.firstDayOfWeek =
-			preferences.defaultPrefs.getStringSet("preference_week_custom_range", emptySet())
-				?.map { MaterialDayPicker.Weekday.valueOf(it) }?.minOrNull()?.ordinal
-				?: DateTimeFormat.forPattern("E").withLocale(Locale.ENGLISH)
-					.parseDateTime(profileUser.timeGrid.days[0].day).dayOfWeek
-
-		weekView.timeColumnVisibility =
-			!PreferenceUtils.getPrefBool(preferences, "preference_timetable_hide_time_stamps")
-
-		weekView.columnGap = ConversionUtils.dpToPx(
-			PreferenceUtils.getPrefInt(
-				preferences,
-				"preference_timetable_item_padding"
-			).toFloat(), this
-		).toInt()
-		weekView.overlappingEventGap = ConversionUtils.dpToPx(
-			PreferenceUtils.getPrefInt(
-				preferences,
-				"preference_timetable_item_padding_overlap"
-			).toFloat(), this
-		).toInt()
-		weekView.eventCornerRadius = ConversionUtils.dpToPx(
-			PreferenceUtils.getPrefInt(
-				preferences,
-				"preference_timetable_item_corner_radius"
-			).toFloat(), this
-		).toInt()
-		weekView.eventSecondaryTextCentered =
-			PreferenceUtils.getPrefBool(preferences, "preference_timetable_centered_lesson_info")
-		weekView.eventTextBold =
-			PreferenceUtils.getPrefBool(preferences, "preference_timetable_bold_lesson_name")
-		weekView.eventTextSize = ConversionUtils.spToPx(
-			PreferenceUtils.getPrefInt(
-				preferences,
-				"preference_timetable_lesson_name_font_size"
-			).toFloat(), this
-		)
-		weekView.eventSecondaryTextSize = ConversionUtils.spToPx(
-			PreferenceUtils.getPrefInt(
-				preferences,
-				"preference_timetable_lesson_info_font_size"
-			).toFloat(), this
-		)
-		weekView.eventTextColor = if (PreferenceUtils.getPrefBool(
-				preferences,
-				"preference_timetable_item_text_light"
-			)
-		) Color.WHITE else Color.BLACK
-		weekView.pastBackgroundColor =
-			PreferenceUtils.getPrefInt(preferences, "preference_background_past")
-		weekView.futureBackgroundColor =
-			PreferenceUtils.getPrefInt(preferences, "preference_background_future")
-		weekView.nowLineColor = PreferenceUtils.getPrefInt(preferences, "preference_marker")
-
-		weekView.horizontalFlingEnabled =
-			PreferenceUtils.getPrefBool(preferences, "preference_fling_enable")
-		weekView.snapToWeek = !PreferenceUtils.getPrefBool(
-			preferences,
-			"preference_week_snap_to_days"
-		) && weekView.numberOfVisibleDays != 1
-	}
-
-	override fun onPeriodChange(
-		startDate: LocalDate,
-		endDate: LocalDate
-	): List<WeekViewDisplayable<TimegridItem>> {
-		val weekIndex = convertDateTimeToWeekIndex(startDate)
-		return weeklyTimetableItems[weekIndex]?.items ?: run {
-			displayedElement?.let { displayedElement ->
-				weeklyTimetableItems[weekIndex] = WeeklyTimetableItems().apply {
-					dateRange =
-						(UntisDate.fromLocalDate(LocalDate(startDate)) to UntisDate.fromLocalDate(
-							LocalDate(endDate)
-						)).also { dateRange ->
-							loadTimetable(
-								TimetableLoader.TimetableLoaderTarget(
-									dateRange.first,
-									dateRange.second,
-									displayedElement.id,
-									displayedElement.type
-								)
-							)
+	val isMessengerAvailable: Boolean
+		get() {
+			for (item in this.weeklyTimetableItems.values) {
+				if (item != null) {
+					for (it in item.items) {
+						if (it.data?.periodData?.element?.messengerChannel != null) {
+							return true
 						}
+						break
+					}
 				}
+
 			}
-			emptyList()
+			return false
 		}
+
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	val drawerGesturesEnabled: Boolean
+		get() = drawerGestures || drawerState.isOpen
+
+	@OptIn(ExperimentalMaterial3Api::class)
+	fun closeDrawer() {
+		scope.launch { drawerState.close() }
 	}
 
-	private fun convertDateTimeToWeekIndex(date: LocalDate) = date.year * 100 + date.dayOfYear / 7
+	fun displayElement(element: PeriodElement?, name: String? = null) {
+		displayedElement.value = element
+		displayedName.value = name ?: element?.let { timetableDatabaseInterface.getLongName(it) }
+				?: defaultDisplayedName
 
-	private fun setupHours() {
-		val lines = MutableList(0) { return@MutableList 0 }
-		val labels = MutableList(0) { return@MutableList "" }
-		val range = RangePreference.convertToPair(
-			PreferenceUtils.getPrefString(
-				preferences,
-				"preference_timetable_range",
-				null
+		weeklyTimetableItems.clear()
+		weekView.value?.notifyDataSetChanged()
+	}
+
+	@Composable
+	fun lastRefreshText() = stringResource(
+		id = R.string.main_last_refreshed,
+		if (lastRefreshTimestamp.value > 0L)
+			formatTimeDiff(Instant.now().millis - lastRefreshTimestamp.value)
+		else
+			stringResource(id = R.string.main_last_refreshed_never)
+	)
+
+	@OptIn(ExperimentalComposeUiApi::class)
+	@Composable
+	private fun formatTimeDiff(diff: Long): String {
+		return when {
+			diff < MINUTE_MILLIS -> stringResource(R.string.main_time_diff_just_now)
+			diff < HOUR_MILLIS -> pluralStringResource(
+				R.plurals.main_time_diff_minutes,
+				((diff / MINUTE_MILLIS).toInt()),
+				diff / MINUTE_MILLIS
 			)
-		)
-
-		profileUser.timeGrid.days.maxByOrNull { it.units.size }?.units?.forEachIndexed { index, hour ->
-			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
-
-			val startTime =
-				hour.startTime.toLocalTime().toString(DateTimeUtils.shortDisplayableTime())
-			val endTime = hour.endTime.toLocalTime().toString(DateTimeUtils.shortDisplayableTime())
-
-			val startTimeParts = startTime.split(":")
-			val endTimeParts = endTime.split(":")
-
-			val startTimeInt = startTimeParts[0].toInt() * 60 + startTimeParts[1].toInt()
-			val endTimeInt = endTimeParts[0].toInt() * 60 + endTimeParts[1].toInt()
-
-			lines.add(startTimeInt)
-			lines.add(endTimeInt)
-			labels.add(hour.label)
-		}
-
-		if (!PreferenceUtils.getPrefBool(preferences, "preference_timetable_range_index_reset"))
-			weekView.hourIndexOffset = (range?.first ?: 1) - 1
-		weekView.hourLines = lines.toIntArray()
-		weekView.hourLabels = labels.toTypedArray().let { hourLabelArray ->
-			if (hourLabelArray.joinToString("") == "") IntArray(
-				labels.size,
-				fun(idx: Int): Int { return idx + 1 }).map { it.toString() }.toTypedArray()
-			else hourLabelArray
-		}
-		weekView.startTime = lines.first()
-		weekView.endTime = lines.last() + 30 // TODO: Don't hard-code this offset
-	}
-
-	private fun setupHolidays() {
-		userDatabase.getAdditionalUserData<Holiday>(profileUser.id!!, Holiday())?.let { item ->
-			weekView.addHolidays(item.map {
-				HolidayChip(
-					text = it.value.longName,
-					startDate = it.value.startDate,
-					endDate = it.value.endDate
-				)
-			})
+			diff < DAY_MILLIS -> pluralStringResource(
+				R.plurals.main_time_diff_hours,
+				((diff / HOUR_MILLIS).toInt()),
+				diff / HOUR_MILLIS
+			)
+			else -> pluralStringResource(
+				R.plurals.main_time_diff_days,
+				((diff / DAY_MILLIS).toInt()),
+				diff / DAY_MILLIS
+			)
 		}
 	}
 
-	private fun setupActionBar() {
-		setSupportActionBar(toolbar_main)
-		val toggle = ActionBarDrawerToggle(
-			this,
-			drawer_layout,
-			toolbar_main,
-			R.string.main_drawer_open,
-			R.string.main_drawer_close
-		)
-		drawer_layout.addDrawerListener(toggle)
-		toolbar_main.setNavigationOnClickListener { setBookmarksLongClickListeners() ; openDrawer() }
-		toggle.syncState()
-		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-		window.statusBarColor = Color.TRANSPARENT
-		supportFragmentManager.addOnBackStackChangedListener {
-			if (supportFragmentManager.backStackEntryCount > 0) {
-				toggle.isDrawerIndicatorEnabled = false
-				supportActionBar?.setDisplayHomeAsUpEnabled(true)
-				drawer_layout.setDrawerLockMode(
-					DrawerLayout.LOCK_MODE_LOCKED_CLOSED,
-					GravityCompat.START
-				)
-				toolbar_main.setNavigationOnClickListener { onBackPressed() }
-				// TODO: Set actionBar title to match fragment
-			} else {
-				supportActionBar?.setDisplayHomeAsUpEnabled(false)
-				toggle.isDrawerIndicatorEnabled = true
-				toggle.syncState()
-				drawer_layout.setDrawerLockMode(
-					DrawerLayout.LOCK_MODE_UNLOCKED,
-					GravityCompat.START
-				)
-				toolbar_main.setNavigationOnClickListener {  setBookmarksLongClickListeners() ; openDrawer() }
-				// TODO: Set actionBar title to default
-			}
-		}
-	}
+	private fun Int.darken(ratio: Float) = ColorUtils.blendARGB(this, Color.Black.toArgb(), ratio)
 
-	override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-		var i = 0
-		navigationview_main.menu.findItem(R.id.nav_personal_bookmarks_title).subMenu.let {
-			// remove everything except personal timetable (in case menu has been invalidated)
-			for(index in 0 until it.size()){
-				it.removeItem(index)
-			}
-			userDatabase.getUser(profileId)?.bookmarks?.forEach { bookmark ->
-				it.add(0, i, Menu.FIRST + i, bookmark.displayName).setIcon(bookmark.drawableId).isCheckable = true
-				++i
-			}
-			BOOKMARKS_ADD_ID = i
-			it.add(0, BOOKMARKS_ADD_ID, Menu.FIRST + i, getString(R.string.maindrawer_bookmarks_add)).setIcon(getDrawable(R.drawable.all_add))
-			refreshNavigationViewSelection()
-		}
-		return super.onPrepareOptionsMenu(menu)
-	}
+	data class WeeklyTimetableItems(
+		var items: List<TimegridItem> = emptyList(),
+		var lastUpdated: Long = 0,
+		var dateRange: Pair<UntisDate, UntisDate>? = null
+	)
 
-	private fun prepareItems(items: List<TimegridItem>): List<TimegridItem> {
+	private suspend fun prepareItems(
+		items: List<TimegridItem>
+	): List<TimegridItem> {
 		val newItems = mergeItems(items.mapNotNull { item ->
-			if (PreferenceUtils.getPrefBool(
-					preferences,
-					"preference_timetable_hide_cancelled"
-				) && item.periodData.isCancelled()
-			) return@mapNotNull null
+			if (item.periodData.isCancelled() && preferences.timetableHideCancelled.getValue())
+				return@mapNotNull null
 
-			if (PreferenceUtils.getPrefBool(
-					preferences,
-					"preference_timetable_substitutions_irregular"
-				)
-			) {
+			if (preferences.timetableSubstitutionsIrregular.getValue()) {
 				item.periodData.apply {
 					forceIrregular =
 						classes.find { it.id != it.orgId } != null
 								|| teachers.find { it.id != it.orgId } != null
 								|| subjects.find { it.id != it.orgId } != null
 								|| rooms.find { it.id != it.orgId } != null
-								|| (PreferenceUtils.getPrefBool(
-							preferences,
-							"preference_timetable_background_irregular"
-						) && item.periodData.element.backColor != UNTIS_DEFAULT_COLOR)
+								|| preferences.timetableBackgroundIrregular.getValue()
+								&& item.periodData.element.backColor != UNTIS_DEFAULT_COLOR
 				}
 			}
 			item
@@ -833,7 +838,7 @@ class MainActivity :
 	}
 
 	private fun mergeItems(items: List<TimegridItem>): List<TimegridItem> {
-		val days = profileUser.timeGrid.days
+		val days = user.timeGrid.days
 		val itemGrid: Array<Array<MutableList<TimegridItem>>> =
 			Array(days.size) { Array(days.maxByOrNull { it.units.size }!!.units.size) { mutableListOf() } }
 		val leftover: MutableList<TimegridItem> = mutableListOf()
@@ -880,39 +885,29 @@ class MainActivity :
 		return newItems
 	}
 
-	private fun colorItems(items: List<TimegridItem>) {
-		val regularColor = PreferenceUtils.getPrefInt(preferences, "preference_background_regular")
-		val examColor = PreferenceUtils.getPrefInt(preferences, "preference_background_exam")
-		val cancelledColor =
-			PreferenceUtils.getPrefInt(preferences, "preference_background_cancelled")
-		val irregularColor =
-			PreferenceUtils.getPrefInt(preferences, "preference_background_irregular")
+	private suspend fun colorItems(
+		items: List<TimegridItem>
+	) {
+		val regularColor = preferences.backgroundRegular.getValue()
+		val regularPastColor = preferences.backgroundRegularPast.getValue()
+		val examColor = preferences.backgroundExam.getValue()
+		val examPastColor = preferences.backgroundExamPast.getValue()
+		val cancelledColor = preferences.backgroundCancelled.getValue()
+		val cancelledPastColor = preferences.backgroundCancelledPast.getValue()
+		val irregularColor = preferences.backgroundIrregular.getValue()
+		val irregularPastColor = preferences.backgroundIrregularPast.getValue()
 
-		val regularPastColor =
-			PreferenceUtils.getPrefInt(preferences, "preference_background_regular_past")
-		val examPastColor =
-			PreferenceUtils.getPrefInt(preferences, "preference_background_exam_past")
-		val cancelledPastColor =
-			PreferenceUtils.getPrefInt(preferences, "preference_background_cancelled_past")
-		val irregularPastColor =
-			PreferenceUtils.getPrefInt(preferences, "preference_background_irregular_past")
-
-		val useDefault =
-			preferences.defaultPrefs.getStringSet("preference_school_background", emptySet())
-				?: emptySet()
-		val useTheme = if (!useDefault.contains("regular")) PreferenceUtils.getPrefBool(
-			preferences,
-			"preference_use_theme_background"
-		) else false
+		val useDefault = preferences.schoolBackground.getValue()
 
 		items.forEach { item ->
-			val defaultColor = Color.parseColor(item.periodData.element.backColor)
+			val defaultColor = android.graphics.Color.parseColor(item.periodData.element.backColor)
+			val defaultTextColor =
+				android.graphics.Color.parseColor(item.periodData.element.foreColor)
 
 			item.color = when {
 				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor else examColor
 				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else cancelledColor
 				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else irregularColor
-				useTheme -> getAttr(R.attr.colorPrimary)
 				else -> if (useDefault.contains("regular")) defaultColor else regularColor
 			}
 
@@ -926,485 +921,665 @@ class MainActivity :
 				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(
 					0.25f
 				) else irregularPastColor
-				useTheme -> if (currentTheme == "pixel") getAttr(R.attr.colorPrimary).darken(0.25f) else getAttr(
-					R.attr.colorPrimaryDark
-				)
 				else -> if (useDefault.contains("regular")) defaultColor.darken(0.25f) else regularPastColor
 			}
+
+			item.textColor = when {
+				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultTextColor else colorOn(
+					Color(examColor)
+				).toArgb()
+				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultTextColor else colorOn(
+					Color(cancelledColor)
+				).toArgb()
+				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultTextColor else colorOn(
+					Color(irregularColor)
+				).toArgb()
+				else -> if (useDefault.contains("regular")) defaultTextColor else colorOn(
+					Color(
+						regularColor
+					)
+				).toArgb()
+			}
 		}
 	}
 
-	override fun onNavigationItemSelected(item: MenuItem): Boolean {
-		when (item.itemId) {
-			R.id.nav_show_personal -> {
-				showPersonalTimetable()
-				refreshNavigationViewSelection()
-			}
-			BOOKMARKS_ADD_ID -> {
-				ElementPickerDialog.newInstance(
-						timetableDatabaseInterface,
-						ElementPickerDialog.Companion.ElementPickerDialogConfig(TimetableDatabaseInterface.Type.CLASS),
-						object: ElementPickerDialog.ElementPickerDialogListener {
-							override fun onDialogDismissed(dialog: DialogInterface?) { /* ignore */ }
+	private fun colorOn(color: Color): Color {
+		return when (color.copy(alpha = 1f)) {
+			colorScheme.primary -> colorScheme.onPrimary
+			colorScheme.secondary -> colorScheme.onSecondary
+			colorScheme.tertiary -> colorScheme.onTertiary
+			else -> if (ColorUtils.calculateLuminance(color.toArgb()) < 0.5) Color.White else Color.Black
+		}.copy(alpha = color.alpha)
+	}
 
-							override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
-								if(fragment is DialogFragment)
-									fragment.dismiss()
-								else
-									removeFragment(fragment)
-								val user = userDatabase.getUser(profileId)
-								if(user != null) {
-									element?.let {
-										user.bookmarks = user.bookmarks.plus(TimetableBookmark(it.id, it.type, timetableDatabaseInterface.getShortName(it.id,
-												TimetableDatabaseInterface.Type.valueOf(it.type)),
-												when(TimetableDatabaseInterface.Type.valueOf(it.type)) {
-													TimetableDatabaseInterface.Type.CLASS -> R.drawable.all_classes
-													TimetableDatabaseInterface.Type.ROOM -> R.drawable.all_rooms
-													TimetableDatabaseInterface.Type.TEACHER -> R.drawable.all_teacher
-													TimetableDatabaseInterface.Type.SUBJECT -> R.drawable.all_subject }))
-										userDatabase.editUser(user)
-										updateNavDrawer(findViewById(R.id.navigationview_main))
-										selectedElement = user.bookmarks.size - 1
-										invalidateOptionsMenu()
-										setTarget(it.id,it.type,timetableDatabaseInterface.getLongName(it.id, TimetableDatabaseInterface.Type.valueOf(it.type)))
-									}
-								}
+	private suspend fun loadTimetable(
+		loader: TimetableLoader,
+		target: TimetableLoader.TimetableLoaderTarget,
+		forceRefresh: Boolean = false,
+		onItemsReceived: (timetableItems: TimetableLoader.TimetableItems) -> Unit
+	) {
+		loader.loadAsync(
+			target,
+			preferences.proxyHost.getValue(),
+			loadFromCache = !forceRefresh,
+			loadFromServer = forceRefresh || preferences.connectivityRefreshInBackground.getValue(),
+			onItemsReceived = onItemsReceived
+		)
+	}
+
+	private suspend fun loadWeeklyTimetableItems(
+		loader: TimetableLoader?,
+		startDate: LocalDate,
+		endDate: LocalDate,
+		element: PeriodElement,
+		onItemsChanged: (items: WeeklyTimetableItems) -> Unit,
+		forceRefresh: Boolean = false
+	) {
+		loader?.let {
+			val dateRange =
+				UntisDate.fromLocalDate(LocalDate(startDate)) to
+						UntisDate.fromLocalDate(LocalDate(endDate))
+
+			try {
+				loadTimetable(
+					loader,
+					TimetableLoader.TimetableLoaderTarget(
+						dateRange.first,
+						dateRange.second,
+						element.id,
+						element.type
+					),
+					forceRefresh
+				) { timetableItems ->
+					/*for (item in timetableItems.items) {
+						if (item.periodData.element.messengerChannel != null) {
+							navigationview_main.menu.findItem(R.id.nav_messenger).isVisible = true
+							break
+						}
+					}*/
+					onItemsChanged(
+						WeeklyTimetableItems(
+							dateRange = dateRange,
+							items = runBlocking { prepareItems(timetableItems.items) },
+							lastUpdated = timetableItems.timestamp
+						)
+					)
+				}
+			} catch (e: TimetableLoader.TimetableLoaderException) {
+				Log.e(
+					"MainActivity",
+					e.untisErrorMessage ?: e.message ?: "unknown error"
+				)
+
+				// TODO
+				when (e.untisErrorCode) {
+					/*TimetableLoader.CODE_CACHE_MISSING -> timetableLoader!!.repeat(
+					it.requestId,
+					TimetableLoader.FLAG_LOAD_SERVER,
+					proxyHost
+				)*/
+					else -> {
+						/*Snackbar.make(
+						content_main,
+						if (code != null) ErrorMessageDictionary.getErrorMessage(
+							resources,
+							code
+						) else message
+							?: getString(R.string.all_error),
+						Snackbar.LENGTH_INDEFINITE
+					)
+						.setAction("Show") {
+							ErrorReportingDialog(this).showRequestErrorDialog(
+								requestId,
+								code,
+								message
+							)
+						}
+						.show()*/
+					}
+				}
+			}
+		}
+	}
+
+	private fun convertLocalDateToWeekIndex(date: LocalDate) =
+		date.year * 100 + date.dayOfYear.floorDiv(7) + 1
+
+	private fun convertWeekIndexToDateTime(weekIndex: Int) =
+		DateTime.now().withYear(weekIndex.floorDiv(100)).withDayOfYear(weekIndex % 100 * 7)
+
+	private fun onRefresh() {
+		displayedElement.value?.let { element ->
+			val weekIndex = currentWeekIndex.value
+
+			weeklyTimetableItems[weekIndex]?.dateRange?.let { dateRange ->
+				scope.launch {
+					loadWeeklyTimetableItems(
+						timetableLoader,
+						dateRange.first.toLocalDate(),
+						dateRange.second.toLocalDate(),
+						element,
+						forceRefresh = true,
+						onItemsChanged = { items ->
+							weeklyTimetableItems[weekIndex] = items
+							weekView.value?.notifyDataSetChanged()
+						}
+					)
+					isRefreshing = false
+				}
+			}
+		}
+	}
+
+	fun loadPrefs(dataStorePreferences: DataStorePreferences) {
+		val personalTimetableFlow = dataStorePreferences.timetablePersonalTimetable.getValueFlow()
+
+		scope.launch {
+			personalTimetableFlow.collect { customTimetable ->
+				if (user.anonymous || customTimetable != "") {
+					val element = decodeStoredTimetableValue(customTimetable)
+					val previousElement = personalTimetable?.first
+					personalTimetable =
+						element to element?.let { timetableDatabaseInterface.getLongName(it) }
+
+					if (element != previousElement)
+						displayElement(personalTimetable?.first, personalTimetable?.second)
+				}
+			}
+		}
+	}
+
+	@Composable
+	fun <T> loadWeekViewPreferences(
+		weekView: WeekView<T>?,
+		dataStorePreferences: DataStorePreferences
+	) {
+		val currentDensity = LocalDensity.current
+		val scope = rememberCoroutineScope()
+
+		with(dataStorePreferences) {
+			val flingEnable = flingEnable.getValueFlow()
+			val snapToDays = weekSnapToDays.getValueFlow()
+			val weekRange = weekCustomRange.getValueFlow()
+			val numberOfVisibleDays = weekCustomLength.getValueFlow()
+			val eventTextColor = timetableItemTextLight.getValueFlow()
+			val pastBackgroundColor = backgroundPast.getValueFlow()
+			val futureBackgroundColor = backgroundFuture.getValueFlow()
+			val nowLineColor = marker.getValueFlow()
+			val minimalTimeColumn = timetableHideTimeStamps.getValueFlow()
+			val eventGap = timetableItemPadding.getValueFlow()
+			val overlappingEventGap = timetableItemPaddingOverlap.getValueFlow()
+			val eventCornerRadius = timetableItemCornerRadius.getValueFlow()
+			val eventSecondaryTextCentered = timetableCenteredLessonInfo.getValueFlow()
+			val eventTextBold = timetableBoldLessonName.getValueFlow()
+			val eventTextSize = timetableLessonNameFontSize.getValueFlow()
+			val eventSecondaryTextSize = timetableLessonInfoFontSize.getValueFlow()
+			val timetableRange = timetableRange.getValueFlow()
+			val timetableRangeIndexReset = timetableRangeIndexReset.getValueFlow()
+
+			weekView?.let {
+				val navBarHeight = with(LocalDensity.current) {
+					(insetsPaddingValues().calculateBottomPadding() + 32.dp).toPx()
+				}.roundToInt()
+
+				scope.launch {
+					flingEnable.collect { weekView.horizontalFlingEnabled = it }
+				}
+
+				scope.launch {
+					snapToDays.combine(numberOfVisibleDays) { f1, f2 ->
+						!f1 && f2.roundToInt() != 1
+					}.collect { weekView.snapToWeek = it }
+				}
+
+				scope.launch {
+					weekRange.collect {
+						weekView.weekLength = it.size.zeroToNull ?: user.timeGrid.days.size
+						weekView.firstDayOfWeek =
+							it.map { day -> Weekday.valueOf(day) }.minOrNull()?.ordinal
+								?: DateTimeFormat.forPattern("E")
+									.withLocale(Locale.ENGLISH) // TODO: Correct locale?
+									.parseDateTime(user.timeGrid.days[0].day).dayOfWeek
+					}
+				}
+
+				scope.launch {
+					numberOfVisibleDays.combine(snapToDays) { numberOfVisibleDaysValue, snapToDaysValue ->
+						// Ignore numberOfVisibleDays when snapping to weeks
+						if (snapToDaysValue) numberOfVisibleDaysValue else 0f
+					}.collect {
+						weekView.numberOfVisibleDays =
+							it.roundToInt().zeroToNull ?: weekView.weekLength
+					}
+				}
+
+				scope.launch {
+					eventTextColor.collect {
+						weekView.eventTextColor = (if (it) Color.White else Color.Black).toArgb()
+					}
+				}
+
+				scope.launch {
+					pastBackgroundColor.collect { weekView.pastBackgroundColor = it }
+				}
+
+				scope.launch {
+					futureBackgroundColor.collect { weekView.futureBackgroundColor = it }
+				}
+
+				scope.launch {
+					nowLineColor.collect { weekView.nowLineColor = it }
+				}
+
+				scope.launch {
+					minimalTimeColumn.collect { weekView.timeColumnVisibility = !it }
+				}
+
+				scope.launch {
+					eventGap.collect {
+						with(currentDensity) {
+							weekView.columnGap = it.dp.toPx().roundToInt()
+						}
+					}
+				}
+
+				scope.launch {
+					overlappingEventGap.collect {
+						with(currentDensity) {
+							weekView.overlappingEventGap = it.dp.toPx().roundToInt()
+						}
+					}
+				}
+
+				scope.launch {
+					eventCornerRadius.collect {
+						with(currentDensity) {
+							weekView.eventCornerRadius = it.dp.toPx().roundToInt()
+						}
+					}
+				}
+
+				scope.launch {
+					eventSecondaryTextCentered.collect { weekView.eventSecondaryTextCentered = it }
+				}
+
+				scope.launch {
+					eventTextBold.collect { weekView.eventTextBold = it }
+				}
+
+				scope.launch {
+					eventTextSize.collect {
+						with(currentDensity) {
+							weekView.eventTextSize = it.sp.toPx()
+						}
+					}
+				}
+
+				scope.launch {
+					eventSecondaryTextSize.collect {
+						with(currentDensity) {
+							weekView.eventSecondaryTextSize = it.sp.toPx()
+						}
+					}
+				}
+
+				scope.launch {
+					timetableRange.combine(timetableRangeIndexReset) { range, rangeIndexReset ->
+						weekView.setupHours(
+							range.convertRangeToPair(),
+							rangeIndexReset,
+							navBarHeight
+						)
+					}.collect()
+				}
+
+				scope.launch {
+					merge(
+						preferences.backgroundRegular.getValueFlow(),
+						preferences.backgroundRegularPast.getValueFlow(),
+						preferences.backgroundExam.getValueFlow(),
+						preferences.backgroundExamPast.getValueFlow(),
+						preferences.backgroundCancelled.getValueFlow(),
+						preferences.backgroundCancelledPast.getValueFlow(),
+						preferences.backgroundIrregular.getValueFlow(),
+						preferences.backgroundIrregularPast.getValueFlow(),
+						preferences.schoolBackground.getValueFlow()
+					).collect {
+						weeklyTimetableItems.map {
+							it.key to it.value?.let { value -> colorItems(value.items) }
+						}
+						weekView.notifyDataSetChanged()
+					}
+				}
+
+				/*scope.launch {
+					merge(
+						preferences.themeColor.getValueFlow(),
+						preferences.darkTheme.getValueFlow()
+					) {
+						weekView
+					}
+				}*/
+
+				scope.launch {
+					weekView.hourHeight = globalPreferences.data
+						.map { prefs -> prefs[DATASTORE_KEY_WEEKVIEW_SCALE] ?: -1 }
+						.first()
+				}
+			}
+		}
+	}
+
+	private fun <T> WeekView<T>.setupHours(
+		range: Pair<Int, Int>?,
+		rangeIndexReset: Boolean,
+		additionalSpaceBelow: Int = 0
+	) {
+		val lines = MutableList(0) { 0 }
+		val labels = MutableList(0) { "" }
+
+		user.timeGrid.days.maxByOrNull { it.units.size }?.units?.forEachIndexed { index, hour ->
+			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
+
+			val startTime =
+				hour.startTime.toLocalTime()
+					.toString(DateTimeUtils.shortDisplayableTime())
+			val endTime = hour.endTime.toLocalTime()
+				.toString(DateTimeUtils.shortDisplayableTime())
+
+			val startTimeParts = startTime.split(":")
+			val endTimeParts = endTime.split(":")
+
+			val startTimeInt =
+				startTimeParts[0].toInt() * 60 + startTimeParts[1].toInt()
+			val endTimeInt =
+				endTimeParts[0].toInt() * 60 + endTimeParts[1].toInt()
+
+			lines.add(startTimeInt)
+			lines.add(endTimeInt)
+			labels.add(hour.label)
+		}
+
+		if (!rangeIndexReset)
+			hourIndexOffset = (range?.first ?: 1) - 1
+
+		hourLines = lines.toIntArray()
+		hourLabels = labels.toTypedArray().let { hourLabelArray ->
+			if (hourLabelArray.joinToString("") == "") IntArray(
+				labels.size,
+				fun(idx: Int): Int { return idx + 1 }).map { it.toString() }
+				.toTypedArray()
+			else hourLabelArray
+		}
+
+		if (lines.isNotEmpty()) {
+			startTime = lines.first()
+			endTime = lines.last()
+		}
+
+		endTimeOffset = additionalSpaceBelow
+	}
+
+	@SuppressLint("ClickableViewAccessibility")
+	fun updateViews(container: WeekViewSwipeRefreshLayout) {
+		val touchListener = View.OnTouchListener { view, motionEvent ->
+			if (isAnonymous) true else view.onTouchEvent(motionEvent)
+		}
+
+		container.apply {
+			isRefreshing = this@MainAppState.isRefreshing
+		}
+
+		if (!shouldUpdateWeekView) return
+
+		container.apply {
+			setOnRefreshListener { onRefresh() }
+			setOnTouchListener(touchListener)
+		}
+
+		weekView.value?.apply {
+			val outlineAlpha = 0.4f
+
+			// Workaround to enable drawer gestures only when swiping from the left edge (won't work with RTL layout)
+			onMotionEvent = { event -> onMotionEvent(event) }
+
+			setOnTouchListener(touchListener)
+
+			setPeriodChangeListener(object :
+				WeekViewLoader.PeriodChangeListener<TimegridItem> {
+				override fun onPeriodChange(
+					startDate: LocalDate,
+					endDate: LocalDate
+				): List<WeekViewDisplayable<TimegridItem>> {
+					return this@MainAppState.onPeriodChange(startDate, endDate)
+				}
+			})
+
+			setOnEventClickListener(object :
+				EventClickListener<TimegridItem> {
+				override fun onEventClick(
+					data: TimegridItem,
+					eventRect: RectF
+				) {
+					val items =
+						(weeklyTimetableItems[convertLocalDateToWeekIndex(data.startDateTime.toLocalDate())]?.items
+							?: emptyList())
+							.filter {
+								it.startDateTime.millis <= data.startDateTime.millis &&
+										it.endDateTime.millis >= data.endDateTime.millis
 							}
 
-							override fun onPositiveButtonClicked(dialog: ElementPickerDialog) { /* not used */ }
+					timetableItemDetailsDialog.value =
+						items.map { it.periodData } to max(0, items.indexOf(data))
+				}
+			})
 
+			setOnCornerClickListener(object : TopLeftCornerClickListener {
+				override fun onCornerClick() {
+					showDatePicker.value = true
+				}
+
+				override fun onCornerLongClick() {
+					goToToday()
+				}
+			})
+
+			scrollListener = object : ScrollListener {
+				override fun onFirstVisibleDayChanged(
+					newFirstVisibleDay: LocalDate,
+					oldFirstVisibleDay: LocalDate?
+				) {
+					onScroll(newFirstVisibleDay)
+				}
+			}
+
+			scaleListener = object : ScaleListener {
+				override fun onScaleFinished() {
+					scope.launch {
+						globalPreferences.edit { prefs ->
+							weekView.value?.let {
+								prefs[DATASTORE_KEY_WEEKVIEW_SCALE] = it.hourHeight
+							}
 						}
-
-				).show(supportFragmentManager, "elementPicker")
-			}
-			R.id.nav_show_classes -> {
-				showItemList(TimetableDatabaseInterface.Type.CLASS)
-			}
-			R.id.nav_show_teachers -> {
-				showItemList(TimetableDatabaseInterface.Type.TEACHER)
-			}
-			R.id.nav_show_rooms -> {
-				showItemList(TimetableDatabaseInterface.Type.ROOM)
-			}
-			R.id.nav_settings -> {
-				val i = Intent(this@MainActivity, SettingsActivity::class.java)
-				i.putExtra(SettingsActivity.EXTRA_LONG_PROFILE_ID, profileId)
-				startActivityForResult(i, REQUEST_CODE_SETTINGS)
-			}
-			R.id.nav_infocenter -> {
-				val i = Intent(this@MainActivity, InfoCenterActivity::class.java)
-				i.putExtra(InfoCenterActivity.EXTRA_LONG_PROFILE_ID, profileId)
-				startActivityForResult(i, REQUEST_CODE_ROOM_FINDER)
-			}
-			R.id.nav_messenger -> {
-				try {
-					startActivity(packageManager.getLaunchIntentForPackage(MESSENGER_PACKAGE_NAME))
-				} catch (e: Exception) {
-					try {
-						startActivity(
-							Intent(
-								Intent.ACTION_VIEW,
-								Uri.parse("market://details?id=$MESSENGER_PACKAGE_NAME")
-							)
-						)
-					} catch (e: Exception) {
-						startActivity(
-							Intent(
-								Intent.ACTION_VIEW,
-								Uri.parse("https://play.google.com/store/apps/details?id=$MESSENGER_PACKAGE_NAME")
-							)
-						)
 					}
 				}
 			}
-			R.id.nav_free_rooms -> {
-				val i = Intent(this@MainActivity, RoomFinderActivity::class.java)
-				i.putExtra(RoomFinderActivity.EXTRA_LONG_PROFILE_ID, profileId)
-				startActivityForResult(i, REQUEST_CODE_ROOM_FINDER)
-			}
-			else -> {
-				val bookmarks = userDatabase.getUser(profileId)?.bookmarks
-				if (bookmarks != null) {
-					if(item.itemId < bookmarks.size){
-						val target = bookmarks[item.itemId]
-						selectedElement = item.itemId
-						setTarget(target.classId,target.type,timetableDatabaseInterface.getLongName(target.classId, TimetableDatabaseInterface.Type.valueOf(target.type)))
-					}
+
+			config.apply {
+				with(currentDensity) {
+					daySeparatorColor = colorScheme.outline.copy(alpha = outlineAlpha).toArgb()
+					defaultEventColor = colorScheme.primary.toArgb()
+					eventMarginVertical = 4.dp.roundToPx()
+					eventPadding = 4.dp.roundToPx()
+					headerRowBackgroundColor = Color.Transparent.toArgb()
+					headerRowPadding = 8.dp.roundToPx()
+					headerRowSecondaryTextColor = colorScheme.onSurfaceVariant.toArgb()
+					headerRowSecondaryTextSize = 12.sp.toPx()
+					headerRowTextColor = colorScheme.onSurface.toArgb()
+					headerRowTextSize = 18.sp.toPx()
+					headerRowTextSpacing = 10.dp.roundToPx()
+					holidayTextColor = colorScheme.onSurface.toArgb()
+					holidayTextSize = 16.sp.toPx()
+					hourHeight = 72.dp.roundToPx()
+					hourSeparatorColor = colorScheme.outline.copy(alpha = outlineAlpha).toArgb()
+					nowLineStrokeWidth = 2.dp.toPx()
+					scrollDuration = 100
+					showHourSeparator = true
+					showNowLine = true
+					timeColumnBackground = Color.Transparent.toArgb()
+					timeColumnCaptionColor = colorScheme.onSurface.toArgb()
+					timeColumnCaptionSize = 16.sp.toPx()
+					timeColumnPadding = 4.dp.roundToPx()
+					timeColumnTextColor = colorScheme.onSurfaceVariant.toArgb()
+					timeColumnTextSize = 12.sp.toPx()
+					todayHeaderTextColor = colorScheme.primary.toArgb()
+					topLeftCornerDrawable =
+						AppCompatResources.getDrawable(context, R.drawable.all_calendar_adjusted)
+					topLeftCornerPadding = 4.dp.roundToPx()
+					topLeftCornerTint = colorScheme.onSurface.toArgb()
 				}
 			}
-		}
-		closeDrawer()
-		return true
-	}
-
-	private fun showItemList(type: TimetableDatabaseInterface.Type) {
-		ElementPickerDialog.newInstance(
-				timetableDatabaseInterface,
-				ElementPickerDialog.Companion.ElementPickerDialogConfig(type),
-				object: ElementPickerDialog.ElementPickerDialogListener {
-					override fun onDialogDismissed(dialog: DialogInterface?) { refreshNavigationViewSelection() }
-
-					override fun onPeriodElementClick(fragment: Fragment, element: PeriodElement?, useOrgId: Boolean) {
-						if (fragment is DialogFragment)
-							fragment.dismiss()
-						else
-							removeFragment(fragment)
-						element?.let {
-							setTarget(if (useOrgId) element.orgId else element.id, element.type, timetableDatabaseInterface.getLongName(
-									if (useOrgId) element.orgId else element.id, TimetableDatabaseInterface.Type.valueOf(element.type)))
-						} ?: run {
-							showPersonalTimetable()
-						}
-						selectedElement = when (element?.type) {
-							TimetableDatabaseInterface.Type.CLASS.name -> R.id.nav_show_classes
-							TimetableDatabaseInterface.Type.TEACHER.name -> R.id.nav_show_teachers
-							TimetableDatabaseInterface.Type.ROOM.name -> R.id.nav_show_rooms
-							else -> {R.id.nav_show_personal}
-						}
-						refreshNavigationViewSelection()
-					}
-
-					override fun onPositiveButtonClicked(dialog: ElementPickerDialog) { /* not used */ }
-
-				}
-		).show(supportFragmentManager, "elementPicker") // TODO: Do not hard-code the tag
-	}
-
-	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-		super.onActivityResult(requestCode, resultCode, intent)
-
-		when (requestCode) {
-			REQUEST_CODE_ROOM_FINDER ->
-				if (resultCode == Activity.RESULT_OK)
-					(data?.getIntExtra(RoomFinderActivity.EXTRA_INT_ROOM_ID, -1)
-						?: -1).let { roomId ->
-						if (roomId != -1)
-							@Suppress("RemoveRedundantQualifierName")
-							setTarget(
-								roomId,
-								TimetableDatabaseInterface.Type.ROOM.toString(),
-								timetableDatabaseInterface.getLongName(
-									roomId,
-									TimetableDatabaseInterface.Type.ROOM
-								)
-							)
-					}
-			REQUEST_CODE_SETTINGS -> recreate()
-			REQUEST_CODE_LOGINDATAINPUT_ADD ->
-				if (resultCode == Activity.RESULT_OK)
-					recreate()
-			REQUEST_CODE_LOGINDATAINPUT_EDIT ->
-				if (resultCode == Activity.RESULT_OK) {
-					preferences.defaultPrefs.edit()
-						.putInt("school_year", currentSchoolYearId)
-						.apply()
-					recreate()
-				} else if (checkForNewSchoolYear()) {
-					finish()
-				}
-			REQUEST_CODE_ERRORS -> recreate()
-		}
-	}
-
-	override fun onBackPressed() {
-		if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
-			closeDrawer(drawer_layout)
-		} else if (supportFragmentManager.backStackEntryCount > 0) {
-			super.onBackPressed()
-		} else if (!showPersonalTimetable()) {
-			if (System.currentTimeMillis() - 2000 > lastBackPress && PreferenceUtils.getPrefBool(
-					preferences,
-					"preference_double_tap_to_exit"
-				)
-			) {
-				Snackbar.make(
-					content_main,
-					R.string.main_press_back_double, 2000
-				).show()
-				lastBackPress = System.currentTimeMillis()
-			} else {
-				super.onBackPressed()
-			}
-		} else {
-			refreshNavigationViewSelection()
-		}
-	}
-
-	private fun setTarget(anonymous: Boolean, displayName: CharSequence): Boolean {
-		supportActionBar?.title = displayName
-		if (anonymous) {
-			showLoading(false)
 
 			weeklyTimetableItems.clear()
-			weekView.notifyDataSetChanged()
-
-			constraintlayout_main_anonymouslogininfo.visibility = View.VISIBLE
-
-			if (displayedElement == null) return false
-			displayedElement = null
-		} else {
-			constraintlayout_main_anonymouslogininfo.visibility = View.GONE
-		}
-		return true
-	}
-
-	private fun setTarget(id: Int, type: String, displayName: String?): Boolean {
-		displayNameCache = displayName ?: getString(R.string.app_name)
-		PeriodElement(type, id, id).let {
-			if (it == displayedElement) return false
-			displayedElement = it
+			notifyDataSetChanged()
+			restoreWeekViewScrollPosition()
 		}
 
-		setTarget(false, displayNameCache)
-
-		weeklyTimetableItems.clear()
-		weekView.notifyDataSetChanged()
-		return true
+		shouldUpdateWeekView = false
 	}
 
-	internal fun setFullscreenDialogActionBar() {
-		supportActionBar?.setHomeAsUpIndicator(R.drawable.all_close)
-		supportActionBar?.setTitle(R.string.all_lesson_details)
-	}
-
-	internal fun setDefaultActionBar() {
-		supportActionBar?.title = displayNameCache
-	}
-
-	override fun onEventClick(data: TimegridItem, eventRect: RectF) {
-		viewModelStore.clear() // TODO: Doesn't seem like the best solution. This could potentially interfere with other ViewModels scoped to this activity.
-		val fragment = TimetableItemDetailsFragment(data, timetableDatabaseInterface, profileUser)
-
-		supportFragmentManager.beginTransaction().run {
-			setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-			add(R.id.content_main, fragment, FRAGMENT_TAG_LESSON_INFO)
-			addToBackStack(fragment.tag)
-			commit()
-		}
-	}
-
-	override fun onPeriodElementClick(
-		fragment: Fragment,
-		element: PeriodElement?,
-		useOrgId: Boolean
-	) {
-		if (fragment is DialogFragment)
-			fragment.dismiss()
-		else
-			removeFragment(fragment)
-		element?.let {
-			setTarget(
-				if (useOrgId) element.orgId else element.id,
-				element.type,
-				timetableDatabaseInterface.getLongName(
-					if (useOrgId) element.orgId else element.id,
-					TimetableDatabaseInterface.Type.valueOf(element.type)
-				)
-			)
-		} ?: run {
-			showPersonalTimetable()
-		}
-		refreshNavigationViewSelection()
-	}
-
-	override fun onPeriodAbsencesClick() {
-		val absenceEditFragment = AbsenceCheckFragment()
-
-		supportFragmentManager.beginTransaction().run {
-			setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-			add(R.id.content_main, absenceEditFragment, FRAGMENT_TAG_ABSENCE_CHECK)
-			addToBackStack(absenceEditFragment.tag)
-			commit()
-		}
-	}
-
-	override fun onLessonTopicClick() {
-		val dialogView = layoutInflater.inflate(R.layout.dialog_edit_lessontopic, null)
-		val etLessonTopic = dialogView.findViewById<TextInputEditText>(R.id.edittext_dialog)
-
-		etLessonTopic.setText(timetableItemDetailsViewModel.periodData().value?.topic?.text ?: "")
-
-		MaterialAlertDialogBuilder(this)
-			.setView(dialogView)
-			.setPositiveButton(R.string.all_ok) { dialog, _ ->
-				val lessonTopic = etLessonTopic.text.toString()
-				timetableItemDetailsViewModel.submitLessonTopic(lessonTopic)
-				dialog.dismiss()
+	private fun onMotionEvent(event: MotionEvent) {
+		when (event.action) {
+			MotionEvent.ACTION_DOWN -> {
+				drawerGestures =
+					event.x < with(currentDensity) { 48.dp.toPx() }
 			}
-			.show()
-	}
-
-
-	private fun removeFragment(fragment: Fragment) {
-		supportFragmentManager.popBackStack(fragment.tag, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-	}
-
-	private fun refreshNavigationViewSelection() {
-		selectedElement?.let { (navigationview_main as NavigationView).setCheckedItem(it) }
-	}
-
-	private fun setLastRefresh(timestamp: Long) {
-		textview_main_lastrefresh?.text = if (timestamp > 0L)
-			getString(
-				R.string.main_last_refreshed,
-				formatTimeDiff(Instant.now().millis - timestamp)
-			)
-		else
-			getString(R.string.main_last_refreshed, getString(R.string.main_last_refreshed_never))
-	}
-
-	private fun formatTimeDiff(diff: Long): String {
-		return when {
-			diff < MINUTE_MILLIS -> getString(R.string.main_time_diff_just_now)
-			diff < HOUR_MILLIS -> resources.getQuantityString(
-				R.plurals.main_time_diff_minutes,
-				((diff / MINUTE_MILLIS).toInt()),
-				diff / MINUTE_MILLIS
-			)
-			diff < DAY_MILLIS -> resources.getQuantityString(
-				R.plurals.main_time_diff_hours,
-				((diff / HOUR_MILLIS).toInt()),
-				diff / HOUR_MILLIS
-			)
-			else -> resources.getQuantityString(
-				R.plurals.main_time_diff_days,
-				((diff / DAY_MILLIS).toInt()),
-				diff / DAY_MILLIS
-			)
-		}
-	}
-
-	override fun addTimetableItems(
-		items: List<TimegridItem>,
-		startDate: UntisDate,
-		endDate: UntisDate,
-		timestamp: Long
-	) {
-		for (item in items) {
-			if (item.periodData.element.messengerChannel != null) {
-				navigationview_main.menu.findItem(R.id.nav_messenger).isVisible = true
-				break
-			}
-		}
-
-		weeklyTimetableItems[convertDateTimeToWeekIndex(startDate.toLocalDate())]?.apply {
-			this.items = prepareItems(items).map { it.toWeekViewEvent() }
-			lastUpdated = timestamp
-		}
-		weekView.notifyDataSetChanged()
-
-		// TODO: Only disable these loading indicators when everything finished loading
-		showLoading(false)
-	}
-
-	override fun onTimetableLoadingError(requestId: Int, code: Int?, message: String?) {
-		if (timetableLoader == null) return
-
-		when (code) {
-			TimetableLoader.CODE_CACHE_MISSING -> timetableLoader!!.repeat(
-				requestId,
-				TimetableLoader.FLAG_LOAD_SERVER,
-				proxyHost
-			)
-			else -> {
-				showLoading(false)
-				Snackbar.make(
-					content_main,
-					if (code != null) ErrorMessageDictionary.getErrorMessage(
-						resources,
-						code
-					) else message
-						?: getString(R.string.all_error),
-					Snackbar.LENGTH_INDEFINITE
-				)
-					.setAction("Show") {
-						ErrorReportingDialog(this).showRequestErrorDialog(
-							requestId,
-							code,
-							message
-						)
-					}
-					.show()
+			MotionEvent.ACTION_UP -> {
+				drawerGestures = true
 			}
 		}
 	}
 
-	private fun showLoading(loading: Boolean) {
-		if (!loading) swiperefreshlayout_main_timetable.isRefreshing = false
-		progressbar_main_loading?.visibility = if (loading) View.VISIBLE else View.GONE
-	}
-
-	override fun onCornerClick() {
-		val fragment = DatePickerDialog()
-
-		lastPickedDate?.let {
-			val args = Bundle()
-			args.putInt("year", it.year)
-			args.putInt("month", it.monthOfYear)
-			args.putInt("day", it.dayOfMonth)
-			fragment.arguments = args
-		}
-		fragment.dateSetListener =
-			android.app.DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-				DateTime().withDate(year, month + 1, dayOfMonth).let {
-					// +1 compensates for conversion from Calendar to DateTime
-					weekView.goToDate(it)
-					lastPickedDate = it
-				}
-			}
-		fragment.show(supportFragmentManager, "datePicker")
-	}
-
-	override fun onCornerLongClick() = weekView.goToToday()
-
-	private fun openDrawer(drawer: DrawerLayout = drawer_layout) =
-		drawer.openDrawer(GravityCompat.START)
-
-	private fun closeDrawer(drawer: DrawerLayout = drawer_layout) =
-		drawer.closeDrawer(GravityCompat.START)
-
-	private fun Int.darken(ratio: Float) = ColorUtils.blendARGB(this, Color.BLACK, ratio)
-
-	internal class WeeklyTimetableItems {
-		var items: List<WeekViewEvent<TimegridItem>> = emptyList()
-		var lastUpdated: Long = 0
-		var dateRange: Pair<UntisDate, UntisDate>? = null
-	}
-
-	private fun setBookmarksLongClickListeners() {
-		(navigationview_main[0] as RecyclerView).let { rv ->
-			rv.post {
-				for (index in 3..rv.layoutManager?.itemCount!!) {
-					val bookmarks = userDatabase.getUser(profileId)?.bookmarks
-					if(bookmarks != null){
-						if(index-3 < bookmarks.size) {
-							rv.layoutManager?.findViewByPosition(index)?.setOnLongClickListener {
-								Log.d("Bookmark", "$index")
-								closeDrawer()
-								MaterialAlertDialogBuilder(this).setMessage(getString(R.string.main_dialog_delete_bookmark))
-										.setPositiveButton(getString(R.string.all_yes)) { _, _ ->
-											userDatabase.getUser(profileId)?.let { user ->
-												if(selectedElement == index-3) {
-													showPersonalTimetable()
-												}
-												user.bookmarks = user.bookmarks.minus(bookmarks[index-3])
-												if(selectedElement!! < bookmarks.size && selectedElement!! > index-3){
-													selectedElement = selectedElement!! - 1
-												}
-												userDatabase.editUser(user)
-												invalidateOptionsMenu()
-											}
-										}
-										.setNegativeButton(getString(R.string.all_no)) { _, _ -> }
-										.show()
-								true
+	fun onPeriodChange(
+		startDate: LocalDate,
+		endDate: LocalDate
+	): List<WeekViewDisplayable<TimegridItem>> {
+		val weekIndex =
+			convertLocalDateToWeekIndex(startDate)
+		return weeklyTimetableItems[weekIndex]?.items?.map { item -> item.toWeekViewEvent() }
+			?: run {
+				weeklyTimetableItems[weekIndex] =
+					WeeklyTimetableItems()
+				displayedElement.value?.let { displayedElement ->
+					scope.launch {
+						loading.value++
+						loadWeeklyTimetableItems(
+							timetableLoader,
+							startDate,
+							endDate,
+							displayedElement,
+							onItemsChanged = { items ->
+								weeklyTimetableItems[weekIndex] =
+									items
+								weekView.value?.notifyDataSetChanged()
 							}
-						}
+						)
+						loading.value--
 					}
-
 				}
+				emptyList()
 			}
-		}
+	}
+
+	fun onScroll(newFirstVisibleDay: LocalDate) {
+		currentWeekIndex.value = convertLocalDateToWeekIndex(newFirstVisibleDay)
+		lastRefreshTimestamp.value = weeklyTimetableItems[currentWeekIndex.value]?.lastUpdated ?: 0
+	}
+
+	private fun restoreWeekViewScrollPosition() {
+		if (currentWeekIndex.value % 100 > 0)
+			weekView.value?.goToDate(convertWeekIndexToDateTime(currentWeekIndex.value))
+	}
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun rememberMainAppState(
+	user: User,
+	contextActivity: BaseComposeActivity,
+	customThemeColor: Color?,
+	timetableDatabaseInterface: TimetableDatabaseInterface,
+	preferences: DataStorePreferences,
+	globalPreferences: DataStore<Preferences>,
+	weekViewSwipeRefresh: MutableState<WeekViewSwipeRefreshLayout?> = remember { mutableStateOf(null) },
+	weekView: MutableState<WeekView<TimegridItem>?> = remember { mutableStateOf(null) },
+	context: Context = LocalContext.current,
+	coroutineScope: CoroutineScope = rememberCoroutineScope(),
+	colorScheme: ColorScheme = MaterialTheme.colorScheme,
+	currentDensity: Density = LocalDensity.current,
+	personalTimetable: Pair<PeriodElement?, String?>? = getPersonalTimetableElement(
+		user,
+		context
+	),
+	defaultDisplayedName: String = stringResource(id = R.string.app_name),
+	drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
+	drawerGestures: MutableState<Boolean> = rememberSaveable { mutableStateOf(true) },
+	loading: MutableState<Int> = rememberSaveable { mutableStateOf(0) },
+	currentWeekIndex: MutableState<Int> = rememberSaveable { mutableStateOf(0) },
+	lastRefreshTimestamp: MutableState<Long> = rememberSaveable { mutableStateOf(0L) },
+	weeklyTimetableItems: SnapshotStateMap<Int, MainAppState.WeeklyTimetableItems?> = remember { mutableStateMapOf() },
+	timetableLoader: TimetableLoader = TimetableLoader(
+		context = WeakReference(context),
+		user = user,
+		timetableDatabaseInterface = timetableDatabaseInterface
+	),
+	// TODO: Find another way of saving timetableItemDetailsDialog that doesn't require saving an entire Pair of List of PeriodData's.
+	//  Currently the dialog will close after state change (i.e. rotation).
+	timetableItemDetailsDialog: MutableState<Pair<List<PeriodData>, Int>?> = remember {
+		mutableStateOf(
+			null
+		)
+	},
+	showDatePicker: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
+	profileManagementDialog: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
+) = remember(user, customThemeColor, colorScheme) {
+	MainAppState(
+		user = user,
+		contextActivity = contextActivity,
+		timetableDatabaseInterface = timetableDatabaseInterface,
+		weekViewSwipeRefresh = weekViewSwipeRefresh,
+		weekView = weekView,
+		context = context,
+		preferences = preferences,
+		globalPreferences = globalPreferences,
+		scope = coroutineScope,
+		colorScheme = colorScheme,
+		currentDensity = currentDensity,
+		personalTimetable = personalTimetable,
+		defaultDisplayedName = defaultDisplayedName,
+		drawerState = drawerState,
+		drawerGestureState = drawerGestures,
+		loading = loading,
+		currentWeekIndex = currentWeekIndex,
+		lastRefreshTimestamp = lastRefreshTimestamp,
+		weeklyTimetableItems = weeklyTimetableItems,
+		timetableLoader = timetableLoader,
+		timetableItemDetailsDialog = timetableItemDetailsDialog,
+		showDatePicker = showDatePicker,
+		profileManagementDialog = profileManagementDialog
+	)
+}
+
+private fun getPersonalTimetableElement(
+	user: User,
+	context: Context
+): Pair<PeriodElement?, String?>? {
+	return user.userData.elemType?.let { type ->
+		PeriodElement(
+			type = type,
+			id = user.userData.elemId,
+			orgId = user.userData.elemId,
+		) to user.getDisplayedName(context)
 	}
 }
 
