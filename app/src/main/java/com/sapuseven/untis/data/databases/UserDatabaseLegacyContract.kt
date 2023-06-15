@@ -3,7 +3,7 @@ package com.sapuseven.untis.data.databases
 import android.provider.BaseColumns
 
 
-object UserDatabaseContract {
+object UserDatabaseLegacyContract {
 	object Users : BaseColumns {
 		const val TABLE_NAME = "users"
 		const val COLUMN_NAME_APIURL = "apiUrl"

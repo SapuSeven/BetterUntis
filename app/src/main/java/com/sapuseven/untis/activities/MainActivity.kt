@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.*
@@ -169,6 +170,7 @@ private fun Drawer(
 	content: @Composable () -> Unit
 ) {
 	val scope = rememberCoroutineScope()
+	val drawerScrollState = rememberScrollState()
 
 	var showElementPicker by remember {
 		mutableStateOf<TimetableDatabaseInterface.Type?>(
@@ -224,6 +226,8 @@ private fun Drawer(
 			ModalDrawerSheet(
 				modifier = Modifier
 					.width(320.dp) // default: 360.dp
+					.fillMaxHeight()
+					.verticalScroll(drawerScrollState)
 			) {
 				Spacer(modifier = Modifier.height(24.dp))
 

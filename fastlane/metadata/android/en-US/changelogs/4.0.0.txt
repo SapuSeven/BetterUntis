@@ -1,0 +1,5 @@
+The big update to Material 3 is here!
+
+This version brings a lot of visual improvements and bug fixes.
+You can now customize even more aspects of BetterUntis to fit your personal expectations.
+The changes also made the app more responsive and reliable.

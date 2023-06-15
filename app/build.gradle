@@ -3,7 +3,7 @@ plugins {
 	id 'io.sentry.android.gradle' version '3.4.2'
 	id 'com.mikepenz.aboutlibraries.plugin'
 	id 'de.mannodermaus.android-junit5'
-	id 'com.google.devtools.ksp' version '1.8.10-1.0.9'
+	id 'com.google.devtools.ksp' version '1.8.21-1.0.11'
 }
 
 apply plugin: 'kotlin-android'
@@ -24,7 +24,7 @@ android {
 		minSdkVersion 21
 		targetSdkVersion 33
 		versionCode generateVersionCode()
-		versionName "4.0.0-beta03"
+		versionName "4.0.0-beta04"
 		vectorDrawables.useSupportLibrary = true
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -92,16 +92,16 @@ android {
 	compileOptions {
 		coreLibraryDesugaringEnabled true
 
-		sourceCompatibility JavaVersion.VERSION_1_8
-		targetCompatibility JavaVersion.VERSION_1_8
-	}
-
-	composeOptions {
-		kotlinCompilerExtensionVersion '1.4.2'
+		sourceCompatibility JavaVersion.VERSION_17
+		targetCompatibility JavaVersion.VERSION_17
 	}
 
 	kotlinOptions {
-		jvmTarget = JavaVersion.VERSION_1_8.toString()
+		jvmTarget = JavaVersion.VERSION_17.toString()
+	}
+
+	composeOptions {
+		kotlinCompilerExtensionVersion '1.4.7'
 	}
 
 	lint {

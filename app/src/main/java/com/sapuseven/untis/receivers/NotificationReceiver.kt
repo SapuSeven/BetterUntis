@@ -41,19 +41,27 @@ class NotificationReceiver : BroadcastReceiver() {
 	override fun onReceive(context: Context, intent: Intent) = runBlocking {
 		Log.d(LOG_TAG, "NotificationReceiver received")
 
-		val notificationsEnable = context.booleanDataStore(
-			intent.getLongExtra(EXTRA_LONG_USER_ID, -1),
-			"preference_notifications_enable"
-		).getValue()
+		if (intent.getBooleanExtra(EXTRA_BOOLEAN_CLEAR, false)) {
+			Log.d(
+				LOG_TAG,
+				"Attempting to cancel notification #${intent.getIntExtra(EXTRA_INT_ID, -1)}"
+			)
+			with(NotificationManagerCompat.from(context)) {
+				cancel(intent.getIntExtra(EXTRA_INT_ID, -1))
+			}
+		} else {
+			val notificationsEnable = context.booleanDataStore(
+				intent.getLongExtra(EXTRA_LONG_USER_ID, -1),
+				"preference_notifications_enable"
+			).getValue()
 
-		if (!notificationsEnable) return@runBlocking
+			if (!notificationsEnable) return@runBlocking // Notifications disabled
 
-		if (intent.hasExtra(EXTRA_STRING_BREAK_END_TIME)) {
 			if (LocalDateTime.now().millisOfDay >= intent.getIntExtra(
 					EXTRA_INT_BREAK_END_TIME,
 					0
 				)
-			) return@runBlocking // Notification delayed for too long
+			) return@runBlocking // Break is already over
 
 			val pendingIntent = PendingIntent.getActivity(
 				context,
@@ -120,14 +128,6 @@ class NotificationReceiver : BroadcastReceiver() {
 				notify(intent.getIntExtra(EXTRA_INT_ID, -1), builder.build())
 			}
 			Log.d(LOG_TAG, "Notification delivered: $title")
-		} else {
-			Log.d(
-				LOG_TAG,
-				"Attempting to cancel notification #${intent.getIntExtra(EXTRA_INT_ID, -1)}"
-			)
-			with(NotificationManagerCompat.from(context)) {
-				cancel(intent.getIntExtra(EXTRA_INT_ID, -1))
-			}
 		}
 	}
 

@@ -1,15 +1,112 @@
 package com.sapuseven.untis.data.databases
 
+import android.provider.BaseColumns
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-// TODO: Missing migrations for pre-room versions. Use old migration logic from LegacyUserDatabase to migrate up to v7.
+val MIGRATIONS_LEGACY = listOf(
+	object : Migration(1, 2) {
+		override fun migrate(db: SupportSQLiteDatabase) {
+			db.execSQL("ALTER TABLE ${UserDatabaseLegacyContract.Users.TABLE_NAME} RENAME TO ${UserDatabaseLegacyContract.Users.TABLE_NAME}_v1")
+			db.execSQL(UserDatabaseLegacyContract.Users.SQL_CREATE_ENTRIES_V2)
+			db.execSQL("INSERT INTO ${UserDatabaseLegacyContract.Users.TABLE_NAME} SELECT _id, apiUrl, NULL, user, ${UserDatabaseLegacyContract.Users.TABLE_NAME}_v1.\"key\", anonymous, timeGrid, masterDataTimestamp, userData, settings, time_created FROM ${UserDatabaseLegacyContract.Users.TABLE_NAME}_v1;")
+			db.execSQL("DROP TABLE ${UserDatabaseLegacyContract.Users.TABLE_NAME}_v1")
+		}
+	},
+	object : Migration(2, 3) {
+		override fun migrate(db: SupportSQLiteDatabase) {
+			db.execSQL("ALTER TABLE ${UserDatabaseLegacyContract.Users.TABLE_NAME} RENAME TO ${UserDatabaseLegacyContract.Users.TABLE_NAME}_v2")
+			db.execSQL(UserDatabaseLegacyContract.Users.SQL_CREATE_ENTRIES_V3)
+			db.execSQL("INSERT INTO ${UserDatabaseLegacyContract.Users.TABLE_NAME} SELECT * FROM ${UserDatabaseLegacyContract.Users.TABLE_NAME}_v2;")
+			db.execSQL("DROP TABLE ${UserDatabaseLegacyContract.Users.TABLE_NAME}_v2")
+		}
+	},
+	object : Migration(3, 4) {
+		override fun migrate(db: SupportSQLiteDatabase) {
+			db.execSQL("ALTER TABLE ${UserDatabaseLegacyContract.Users.TABLE_NAME} RENAME TO ${UserDatabaseLegacyContract.Users.TABLE_NAME}_v3")
+			db.execSQL(UserDatabaseLegacyContract.Users.SQL_CREATE_ENTRIES_V4)
+			db.execSQL("INSERT INTO ${UserDatabaseLegacyContract.Users.TABLE_NAME} SELECT * FROM ${UserDatabaseLegacyContract.Users.TABLE_NAME}_v3;")
+			db.execSQL("DROP TABLE ${UserDatabaseLegacyContract.Users.TABLE_NAME}_v3")
+		}
+	},
+	object : Migration(4, 5) {
+		override fun migrate(db: SupportSQLiteDatabase) {
+			db.execSQL("ALTER TABLE ${UserDatabaseLegacyContract.Users.TABLE_NAME} RENAME TO ${UserDatabaseLegacyContract.Users.TABLE_NAME}_v4")
+			db.execSQL(UserDatabaseLegacyContract.Users.SQL_CREATE_ENTRIES_V5)
+			db.execSQL(
+				"INSERT INTO ${UserDatabaseLegacyContract.Users.TABLE_NAME} SELECT " +
+						"${BaseColumns._ID}," +
+						"'', " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_APIURL}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_SCHOOL_ID}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_USER}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_KEY}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_ANONYMOUS}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_TIMEGRID}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_USERDATA}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_SETTINGS}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_CREATED} " +
+						"FROM ${UserDatabaseLegacyContract.Users.TABLE_NAME}_v4;"
+			)
+			db.execSQL("DROP TABLE ${UserDatabaseLegacyContract.Users.TABLE_NAME}_v4")
+		}
+	},
+	object : Migration(5, 6) {
+		override fun migrate(db: SupportSQLiteDatabase) {
+			db.execSQL("ALTER TABLE ${UserDatabaseLegacyContract.Users.TABLE_NAME} RENAME TO ${UserDatabaseLegacyContract.Users.TABLE_NAME}_v5")
+			db.execSQL(UserDatabaseLegacyContract.Users.SQL_CREATE_ENTRIES_V6)
+			db.execSQL(
+				"INSERT INTO ${UserDatabaseLegacyContract.Users.TABLE_NAME} SELECT " +
+						"${BaseColumns._ID}," +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_PROFILENAME}, " +
+						"'', " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_SCHOOL_ID}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_USER}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_KEY}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_ANONYMOUS}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_TIMEGRID}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_USERDATA}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_SETTINGS}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_CREATED} " +
+						"FROM ${UserDatabaseLegacyContract.Users.TABLE_NAME}_v5;"
+			)
+			db.execSQL("DROP TABLE ${UserDatabaseLegacyContract.Users.TABLE_NAME}_v5")
+		}
+	},
+	object : Migration(6, 7) {
+		override fun migrate(db: SupportSQLiteDatabase) {
+			db.execSQL("ALTER TABLE ${UserDatabaseLegacyContract.Users.TABLE_NAME} RENAME TO ${UserDatabaseLegacyContract.Users.TABLE_NAME}_v6")
+			db.execSQL(UserDatabaseLegacyContract.Users.SQL_CREATE_ENTRIES_V7)
+			db.execSQL(
+				"INSERT INTO ${UserDatabaseLegacyContract.Users.TABLE_NAME} SELECT " +
+						"${BaseColumns._ID}," +
+						"'', " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_APIURL}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_SCHOOL_ID}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_USER}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_KEY}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_ANONYMOUS}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_TIMEGRID}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_MASTERDATATIMESTAMP}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_USERDATA}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_SETTINGS}, " +
+						"${UserDatabaseLegacyContract.Users.COLUMN_NAME_CREATED}, " +
+						"'[]' " +
+						"FROM ${UserDatabaseLegacyContract.Users.TABLE_NAME}_v6;"
+			)
+			db.execSQL("DROP TABLE ${UserDatabaseLegacyContract.Users.TABLE_NAME}_v6")
+		}
+	}
+)
+
 val MIGRATION_7_8 = object : Migration(7, 8) {
 	fun SupportSQLiteDatabase.createIndices(tableName: String) {
 		execSQL("CREATE INDEX IF NOT EXISTS `index_${tableName}_id` ON `${tableName}` (`id`)")
 		execSQL("CREATE INDEX IF NOT EXISTS `index_${tableName}_userId` ON `${tableName}` (`userId`)")
 	}
-	
+
 	override fun migrate(db: SupportSQLiteDatabase) {
 		db.execSQL("CREATE TABLE IF NOT EXISTS `User` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `profileName` TEXT NOT NULL, `apiUrl` TEXT NOT NULL, `schoolId` TEXT NOT NULL, `user` TEXT, `key` TEXT, `anonymous` INTEGER NOT NULL, `timeGrid` TEXT NOT NULL, `masterDataTimestamp` INTEGER NOT NULL, `userData` TEXT NOT NULL, `settings` TEXT, `created` INTEGER, `bookmarks` TEXT NOT NULL)")
 		db.execSQL("INSERT INTO User SELECT _id, profileName, apiUrl, schoolId, user, auth, anonymous, timeGrid, masterDataTimestamp, userData, settings, time_created, bookmarks FROM users")

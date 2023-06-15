@@ -6,6 +6,7 @@
     <string name="all_exit">Verlassen</string>
     <string name="all_failed">fehlgeschlagen</string>
     <string name="all_personal">Persönlich</string>
+    <string name="all_personal_abbr">Persönl.</string>
     <string name="all_subjects">Fächer</string>
     <string name="all_teachers">Lehrer</string>
     <string name="all_classes">Klassen</string>
@@ -35,7 +36,7 @@
     <string name="activity_title_errors">Fehler</string>
     <string name="activity_title_free_rooms">Freie Räume</string>
     <string name="activity_title_info_center">Info-Center</string>
-    <string name="activity_title_messenger">Messenger</string>
+    <string name="activity_title_messenger">Nachrichten</string>
     <string name="activity_title_settings">Einstellungen</string>
     <string name="errors_github_attach_file_message">Bitte füge die komprimierten Log-Dateien als Anhang hinzu.\nDiese wurden hier gespeichert: `%1$s`</string>
     <string name="nav_all_timetables">Stundenpläne</string>
@@ -130,7 +131,8 @@
     <string name="elementpicker_hint_search_classes">Klassen durchsuchen…</string>
     <string name="elementpicker_hint_search_teachers">Lehrer durchsuchen…</string>
     <string name="elementpicker_hint_search_rooms">Räume durchsuchen…</string>
-    <string name="preferences_connectivity">Verbindungseinstellungen</string>
+	<string name="elementpicker_timetable_select">Wähle einen Stundenplan</string>
+	<string name="preferences_connectivity">Verbindungseinstellungen</string>
     <string name="preferences_info">Informationen</string>
     <string name="preferences_notifications">Benachrichtigungen</string>
     <string name="preferences_styling">Design</string>
@@ -302,7 +304,7 @@
         <item quantity="one">%1$d Beitrag</item>
         <item quantity="other">%1$d Beiträge</item>
     </plurals>
-    <string name="all_absences">Alle Abwesenheiten</string>
+    <string name="all_absences">Abwesenheiten</string>
     <string name="all_lessontopic">Lehrstoff</string>
     <string name="all_dialog_absences_checked">Anwesenheit kontrolliert.</string>
     <string name="all_dialog_absences_not_checked">Anwesenheit noch nicht kontrolliert.</string>
