@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.sapuseven.untis.ui.dialogs.DatePickerDialog
 import kotlinx.coroutines.launch
 import org.joda.time.*
 import org.joda.time.format.DateTimeFormat
@@ -427,8 +428,6 @@ fun WeekViewCompose(
 	startTime: LocalTime = hourList.firstOrNull()?.startTime ?: LocalTime.MIDNIGHT.plusHours(6),
 	endTime: LocalTime = hourList.lastOrNull()?.endTime ?: LocalTime.MIDNIGHT.plusHours(18),
 	endTimeOffset: Float = 0f,
-	onShowDatePicker: () -> Unit, // TODO: Does the date picker need to be part of MainAppState?
-	jumpToDate: LocalDate? = null
 ) {
 	val verticalScrollState = rememberScrollState()
 	var sidebarWidth by remember { mutableStateOf(0) }
@@ -440,6 +439,9 @@ fun WeekViewCompose(
 	val numDays = 5
 
 	val currentOnPageChange by rememberUpdatedState(onPageChange)
+
+	var datePickerDialog by remember { mutableStateOf(false) }
+	var jumpToDate by remember { mutableStateOf<LocalDate?>(null) }
 
 	LaunchedEffect(currentOnPageChange) {
 		// initial event to update data
@@ -460,10 +462,11 @@ fun WeekViewCompose(
 					.width(with(LocalDensity.current) { sidebarWidth.toDp() })
 					.height(with(LocalDensity.current) { headerHeight.toDp() })
 					.clickable {
-						onShowDatePicker()
+						datePickerDialog = true
 					}
 			) {
 				Text("Date")
+				// TODO: Date Picker Icon
 			}
 
 			WeekViewSidebar(
@@ -545,6 +548,15 @@ fun WeekViewCompose(
 			}
 		}
 	}
+
+	if (datePickerDialog)
+		DatePickerDialog(
+			initialSelection = jumpToDate ?: LocalDate.now(),
+			onDismiss = { datePickerDialog = false }
+		) {
+			datePickerDialog = false
+			jumpToDate = it
+		}
 }
 
 /*@Preview(showBackground = true)

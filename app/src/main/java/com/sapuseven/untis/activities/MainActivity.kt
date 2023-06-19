@@ -484,7 +484,6 @@ fun MainApp(state: NewMainAppState) {
 						state.loadEvents(state.startDateForPage(pageOffset))
 					},
 					//TODO onItemClick = { state.timetableItemDetailsDialog =  },
-					onShowDatePicker = { state.datePickerDialog = true },
 					startTime = state.weekViewPreferences.hourList.value.firstOrNull()?.startTime
 						?: LocalTime.MIDNIGHT,
 					endTime = state.weekViewPreferences.hourList.value.lastOrNull()?.endTime
@@ -494,7 +493,6 @@ fun MainApp(state: NewMainAppState) {
 					hourList = state.weekViewPreferences.hourList.value,
 					dividerWidth = state.weekViewPreferences.dividerWidth,
 					dividerColor = state.weekViewPreferences.dividerColor,
-					jumpToDate = state.weekViewJumpToDate
 				)
 
 				val timeColumnWidth = with(LocalDensity.current) {
@@ -583,14 +581,6 @@ fun MainApp(state: NewMainAppState) {
 			}
 		)
 	}
-
-	if (state.datePickerDialog)
-		com.sapuseven.untis.ui.dialogs.DatePickerDialog(
-			initialSelection = state.lastSelectedDate,
-			onDismiss = { state.datePickerDialog = false }
-		) {
-			state.onDatePicked(it)
-		}
 }
 
 class MainDrawerState constructor(
@@ -740,11 +730,9 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 	var timetableItemDetailsDialog by mutableStateOf<Pair<List<PeriodData>, Int>?>(null)
 	var profileManagementDialog by mutableStateOf(false)
-	var datePickerDialog by mutableStateOf(false)
 
 	var weekViewPage by mutableStateOf<Int>(0)
 	var weekViewEvents = mutableStateMapOf<LocalDate, List<Event>>()
-	var weekViewJumpToDate by mutableStateOf<LocalDate?>(null)
 
 	init {
 		mainDrawerState.displayedElement = displayedElement
@@ -1093,11 +1081,6 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	}
 
 	private fun Int.darken(ratio: Float) = ColorUtils.blendARGB(this, Color.Black.toArgb(), ratio)
-	fun onDatePicked(date: LocalDate) {
-		datePickerDialog = false
-		lastSelectedDate = date
-		weekViewJumpToDate = date
-	}
 
 	// Event listeners
 	val onAnonymousSettingsClick: () -> Unit = {
