@@ -9,6 +9,10 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -24,6 +28,7 @@ import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.sapuseven.untis.R
 import com.sapuseven.untis.ui.dialogs.DatePickerDialog
 import kotlinx.coroutines.launch
 import org.joda.time.*
@@ -457,15 +463,21 @@ fun WeekViewCompose(
 	Row(modifier = modifier) {
 		Column {
 			Box(
+				contentAlignment = Alignment.Center,
 				modifier = Modifier
 					.width(with(LocalDensity.current) { sidebarWidth.toDp() })
 					.height(with(LocalDensity.current) { headerHeight.toDp() })
-					.clickable {
+			) {
+				IconButton(
+					onClick = {
 						datePickerDialog = true
 					}
-			) {
-				Text("Date")
-				// TODO: Date Picker Icon
+				) {
+					Icon(
+						imageVector = Icons.Outlined.DateRange,
+						contentDescription = stringResource(R.string.all_open_datepicker)
+					)
+				}
 			}
 
 			WeekViewSidebar(
