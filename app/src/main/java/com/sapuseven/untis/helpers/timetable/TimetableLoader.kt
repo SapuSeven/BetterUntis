@@ -16,7 +16,10 @@ import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.cancel
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.flow.transformWhile
 import org.joda.time.Instant
 import java.lang.ref.WeakReference
 import kotlin.coroutines.resume
@@ -286,7 +289,7 @@ class TimetableLoader(
 		proxyHost: String? = null
 	): Result<TimetableItems> {
 		val cache = TimetableCache(context)
-		cache.setTarget(target.startDate, target.endDate, target.id, target.type)
+		cache.setTarget(target.startDate, target.endDate, target.id, target.type, user.id)
 
 		query.proxyHost = proxyHost
 
@@ -346,14 +349,20 @@ class TimetableLoader(
 					)
 					// TODO: Interpret masterData in the response
 				} else {
+					val e = TimetableLoaderException(
+						requestId,
+						CODE_REQUEST_FAILED,
+						untisResponse.error?.message
+					)
 					Log.d(
 						"TimetableLoaderDebug",
-						"target $target (requestId $requestId): network request failed at Untis API level"
+						"target $target (requestId $requestId): network request failed at Untis API level",
+						e
 					)
 					sendBreadcrumb(
 						target,
 						"network failure api",
-						error = untisResponse.error?.message
+						throwable = e
 					)
 					cont.resume(
 						Result.failure(
@@ -366,11 +375,17 @@ class TimetableLoader(
 					)
 				}
 			}, { error ->
+				val e = TimetableLoaderException(
+					requestId,
+					CODE_REQUEST_FAILED,
+					error.message
+				)
 				Log.d(
 					"TimetableLoaderDebug",
-					"target $target (requestId $requestId): network request failed at OS level"
+					"target $target (requestId $requestId): network request failed at OS level",
+					e
 				)
-				sendBreadcrumb(target, "network failure local", error = error.message)
+				sendBreadcrumb(target, "network failure local", throwable = e)
 				cont.resume(
 					Result.failure(
 						TimetableLoaderException(

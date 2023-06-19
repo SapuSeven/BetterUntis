@@ -7,12 +7,14 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.activities.reportsDataStore
 import com.sapuseven.untis.activities.reportsDataStoreBreadcrumbsEnable
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
@@ -25,8 +27,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BaseComposeActivity.ReportsInfoBottomSheet() {
-
+fun ReportsInfoBottomSheet(reportsDataStore: DataStore<Preferences> = LocalContext.current.reportsDataStore) {
 	val scope = rememberCoroutineScope()
 	var bottomSheetVisible by rememberSaveable { mutableStateOf(false) }
 	val bottomSheetState = rememberSheetState(skipHalfExpanded = true)

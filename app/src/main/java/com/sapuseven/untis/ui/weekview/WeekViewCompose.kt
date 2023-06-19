@@ -427,6 +427,8 @@ fun WeekViewCompose(
 	startTime: LocalTime = hourList.firstOrNull()?.startTime ?: LocalTime.MIDNIGHT.plusHours(6),
 	endTime: LocalTime = hourList.lastOrNull()?.endTime ?: LocalTime.MIDNIGHT.plusHours(18),
 	endTimeOffset: Float = 0f,
+	onShowDatePicker: () -> Unit, // TODO: Does the date picker need to be part of MainAppState?
+	jumpToDate: LocalDate? = null
 ) {
 	val verticalScrollState = rememberScrollState()
 	var sidebarWidth by remember { mutableStateOf(0) }
@@ -437,21 +439,48 @@ fun WeekViewCompose(
 	val pagerState = rememberPagerState(initialPage = startPage)
 	val numDays = 5
 
+	val currentOnPageChange by rememberUpdatedState(onPageChange)
+
+	LaunchedEffect(currentOnPageChange) {
+		// initial event to update data
+		currentOnPageChange(pagerState.currentPage - startPage)
+	}
+
+	LaunchedEffect(jumpToDate) {
+		jumpToDate?.let {
+			val newPage = (Days.daysBetween(startDate.withDayOfWeek(1), it).days / 7.0).toInt()
+			pagerState.scrollToPage(startPage + 2) // TODO: Determine correct page
+		}
+	}
+
 	Row(modifier = modifier) {
-		WeekViewSidebar(
-			hourHeight = hourHeight,
-			bottomPadding = with(LocalDensity.current) { endTimeOffset.toDp() },
-			hourList = hourList,
-			modifier = Modifier
-				.padding(top = with(LocalDensity.current) { headerHeight.toDp() })
-				.onGloballyPositioned { sidebarWidth = it.size.width }
-				.verticalScroll(verticalScrollState)
-				.animateContentSize()
-		)
+		Column {
+			Box(
+				modifier = Modifier
+					.width(with(LocalDensity.current) { sidebarWidth.toDp() })
+					.height(with(LocalDensity.current) { headerHeight.toDp() })
+					.clickable {
+						onShowDatePicker()
+					}
+			) {
+				Text("Date")
+			}
+
+			WeekViewSidebar(
+				hourHeight = hourHeight,
+				bottomPadding = with(LocalDensity.current) { endTimeOffset.toDp() },
+				hourList = hourList,
+				modifier = Modifier
+					.onGloballyPositioned { sidebarWidth = it.size.width }
+					.verticalScroll(verticalScrollState)
+					.animateContentSize()
+			)
+
+		}
 
 		LaunchedEffect(pagerState) {
 			snapshotFlow { pagerState.currentPage - startPage }.collect { page ->
-				onPageChange(page)
+				currentOnPageChange(page)
 			}
 		}
 
