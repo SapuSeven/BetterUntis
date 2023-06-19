@@ -450,8 +450,7 @@ fun WeekViewCompose(
 
 	LaunchedEffect(jumpToDate) {
 		jumpToDate?.let {
-			val newPage = (Days.daysBetween(startDate.withDayOfWeek(1), it).days / 7.0).toInt()
-			pagerState.scrollToPage(startPage + 2) // TODO: Determine correct page
+			pagerState.scrollToPage(startPage + pageIndexForDate(it))
 		}
 	}
 
