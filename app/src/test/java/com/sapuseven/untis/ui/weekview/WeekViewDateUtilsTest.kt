@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 internal class WeekViewDateUtilsTest {
 	@Test
@@ -48,6 +50,12 @@ internal class WeekViewDateUtilsTest {
 		assertEquals(LocalDate(2023, 6, 19), startDateForPageIndex(0))
 		assertEquals(LocalDate(2023, 6, 26), startDateForPageIndex(1))
 		assertEquals(LocalDate(2023, 6, 12), startDateForPageIndex(-1))
+	}
+
+	@ParameterizedTest
+	@ValueSource(ints = [-5, -1, 0, 1, 2, 5, 100])
+	fun startDateForPageIndex_pageIndexForDate_isIsomorphic(pageIndex: Int) {
+		assertEquals(pageIndex, pageIndexForDate(startDateForPageIndex(pageIndex)))
 	}
 
 	companion object {
