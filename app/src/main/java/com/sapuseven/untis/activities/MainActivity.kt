@@ -477,11 +477,10 @@ fun MainApp(state: NewMainAppState) {
 				WeekViewCompose(
 					events = state.weekViewEvents,
 					onPageChange = { pageOffset ->
-						state.weekViewPage = pageOffset
-						state.loadAllEvents(pageOffset)
+						state.onPageChange(pageOffset)
 					},
 					onReload = { pageOffset ->
-						state.loadEvents(state.startDateForPage(pageOffset))
+						state.loadEvents(startDateForPageIndex(pageOffset))
 					},
 					//TODO onItemClick = { state.timetableItemDetailsDialog =  },
 					startTime = state.weekViewPreferences.hourList.value.firstOrNull()?.startTime
@@ -733,6 +732,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 	var weekViewPage by mutableStateOf<Int>(0)
 	var weekViewEvents = mutableStateMapOf<LocalDate, List<Event>>()
+	private var weekViewRefreshTimestamps = mutableStateMapOf<Int, Long>()
 
 	init {
 		mainDrawerState.displayedElement = displayedElement
@@ -796,9 +796,6 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	}
 
 	// WeekView
-	fun startDateForPage(pageOffset: Int): LocalDate = LocalDate.now()
-		.withDayOfWeek(weekViewPreferences.weekStartOffset.value).plusWeeks(pageOffset)
-
 	data class WeeklyTimetableItems(
 		var items: List<TimegridItem> = emptyList(),
 		var lastUpdated: Long = 0,
@@ -971,7 +968,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	)
 
 	@OptIn(ExperimentalCoroutinesApi::class)
-	suspend fun loadEventsFlow(startDate: LocalDate, endDate: LocalDate): Flow<List<Event>> {
+	suspend fun loadEventsFlow(startDate: LocalDate, endDate: LocalDate): Flow<Pair<Long, List<Event>>> {
 		val dateRange =
 			UntisDate.fromLocalDate(LocalDate(startDate)) to
 					UntisDate.fromLocalDate(LocalDate(endDate))
@@ -987,7 +984,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 				),
 				false
 			).map {
-				prepareItems(it.items).map { item -> item.toEvent() }
+				it.timestamp to prepareItems(it.items).map { item -> item.toEvent() }
 			}
 		} ?: emptyFlow()
 
@@ -1012,7 +1009,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		}*/
 	}
 
-	suspend fun loadEvents(startDate: LocalDate = startDateForPage(weekViewPage)) = loadEvents(
+	suspend fun loadEvents(startDate: LocalDate = startDateForPageIndex(weekViewPage)) = loadEvents(
 		startDate,
 		startDate.plusDays(weekViewPreferences.weekLength.value)
 	)
@@ -1027,7 +1024,8 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			}
 			.collect {
 				Log.d("WeekView", "New items received for $startDate")
-				weekViewEvents[startDate] = it
+				weekViewRefreshTimestamps[pageIndexForDate(startDate)] = it.first
+				weekViewEvents[startDate] = it.second
 			}
 	}
 
@@ -1035,7 +1033,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		coroutineScope {
 			((pageOffset - 1)..(pageOffset + 1)).map {
 				async {
-					val startDate = startDateForPage(it)
+					val startDate = startDateForPageIndex(it)
 					Log.d(
 						"WeekView",
 						"Items available for $startDate: ${weekViewEvents.contains(startDate)}"
@@ -1051,9 +1049,9 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	@Composable
 	fun lastRefreshText() = stringResource(
 		id = R.string.main_last_refreshed,
-		/*if (lastRefreshTimestamp.value > 0L)
-			formatTimeDiff(Instant.now().millis - lastRefreshTimestamp.value)
-		else*/
+		if (weekViewRefreshTimestamps[weekViewPage] ?: 0L > 0L)
+			formatTimeDiff(Instant.now().millis - weekViewRefreshTimestamps[weekViewPage]!!)
+		else
 			stringResource(id = R.string.main_last_refreshed_never)
 	)
 
@@ -1101,6 +1099,11 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 				contextActivity.putBackgroundColorExtra(this)
 			}
 		)
+	}
+
+	val onPageChange: suspend (Int) -> Unit = { pageOffset ->
+		weekViewPage = pageOffset
+		loadAllEvents(pageOffset)
 	}
 
 	data class WeekViewPreferences(
