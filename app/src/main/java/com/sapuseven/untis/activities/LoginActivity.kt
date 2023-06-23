@@ -1,9 +1,7 @@
 package com.sapuseven.untis.activities
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
@@ -26,10 +24,16 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.core.content.ContextCompat
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanIntentResult
+import com.journeyapps.barcodescanner.ScanOptions
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_DEMO_LOGIN
-import com.sapuseven.untis.activities.ScanCodeActivity.Companion.EXTRA_STRING_SCAN_RESULT
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.SCHOOL_SEARCH_URL
 import com.sapuseven.untis.data.connectivity.UntisRequest
@@ -45,24 +49,8 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 
+
 class LoginActivity : BaseComposeActivity() {
-	private val requestPermissionLauncher =
-		registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-			if (isGranted)
-				scanCodeLauncher.launch(Intent(this, ScanCodeActivity::class.java))
-		}
-
-	private val scanCodeLauncher =
-		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-			if (it.resultCode == Activity.RESULT_OK) {
-				loginLauncher.launch(Intent(this, LoginDataInputActivity::class.java).apply {
-					it.data?.let { scanResult ->
-						data = Uri.parse(scanResult.getStringExtra(EXTRA_STRING_SCAN_RESULT))
-					}
-				})
-			}
-		}
-
 	private val loginLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
 			if (it.resultCode == Activity.RESULT_OK) {
@@ -70,6 +58,50 @@ class LoginActivity : BaseComposeActivity() {
 				finish()
 			}
 		}
+
+	private val scanCodeLauncher =
+		registerForActivityResult<ScanOptions, ScanIntentResult>(ScanContract()) {
+			it.contents?.let { url ->
+				loginLauncher.launch(Intent(this, LoginDataInputActivity::class.java).apply {
+					data = Uri.parse(url)
+				})
+			}
+		}
+
+	private fun scanCode() {
+		val googleApiAvailability = GoogleApiAvailability.getInstance()
+		val status = googleApiAvailability.isGooglePlayServicesAvailable(this)
+		if (status == ConnectionResult.SUCCESS)
+			scanCodeMlKit()
+		else
+			scanCodeFallback()
+	}
+
+	private fun scanCodeMlKit() {
+		val options = GmsBarcodeScannerOptions.Builder()
+			.setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+			.build()
+
+		GmsBarcodeScanning.getClient(this, options).startScan()
+			.addOnSuccessListener { barcode ->
+				barcode.rawValue?.let { url ->
+					loginLauncher.launch(Intent(this, LoginDataInputActivity::class.java).apply {
+						data = Uri.parse(url)
+					})
+				}
+			}.addOnFailureListener {
+				scanCodeFallback()
+			}
+	}
+
+	private fun scanCodeFallback() {
+		val options = ScanOptions().apply {
+			setDesiredBarcodeFormats(ScanOptions.QR_CODE)
+			setBeepEnabled(false)
+			setPrompt(getString(R.string.login_scan_code))
+		}
+		this.scanCodeLauncher.launch(options)
+	}
 
 	@OptIn(ExperimentalMaterial3Api::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,76 +122,66 @@ class LoginActivity : BaseComposeActivity() {
 					searchMode = false
 				}
 
-				AppScaffold(
-					topBar = {
-						CenterAlignedTopAppBar(
-							title = { Text(stringResource(id = R.string.app_name)) },
-							actions = {
-								IconButton(onClick = { scanCode() }) {
-									Icon(
-										painter = painterResource(id = R.drawable.login_scan_code),
-										contentDescription = stringResource(id = R.string.login_scan_code)
-									)
-								}
-							},
-							navigationIcon = {
-								if (searchMode)
-									IconButton(onClick = {
-										focusManager.clearFocus()
-										searchText = ""
-										searchMode = false
-									}) {
-										Icon(
-											imageVector = Icons.Outlined.ArrowBack,
-											contentDescription = stringResource(id = R.string.all_back)
-										)
-									}
+				AppScaffold(topBar = {
+					CenterAlignedTopAppBar(title = { Text(stringResource(id = R.string.app_name)) },
+						actions = {
+							IconButton(onClick = { scanCode() }) {
+								Icon(
+									painter = painterResource(id = R.drawable.login_scan_code),
+									contentDescription = stringResource(id = R.string.login_scan_code)
+								)
 							}
-						)
-					}
-				) { innerPadding ->
+						},
+						navigationIcon = {
+							if (searchMode) IconButton(onClick = {
+								focusManager.clearFocus()
+								searchText = ""
+								searchMode = false
+							}) {
+								Icon(
+									imageVector = Icons.Outlined.ArrowBack,
+									contentDescription = stringResource(id = R.string.all_back)
+								)
+							}
+						})
+				}) { innerPadding ->
 					Column(
 						modifier = Modifier
 							.padding(innerPadding)
 							.fillMaxSize()
 					) {
-						if (!searchMode)
-							Column(
-								verticalArrangement = Arrangement.Center,
-								modifier = Modifier
-									.fillMaxWidth()
-									.weight(1f)
-							) {
-								Icon(
-									painter = painterResource(id = R.drawable.settings_about_app_icon),
-									contentDescription = null,
-									tint = MaterialTheme.colorScheme.primary,
-									modifier = Modifier
-										.width(dimensionResource(id = R.dimen.size_login_icon))
-										.height(dimensionResource(id = R.dimen.size_login_icon))
-										.align(Alignment.CenterHorizontally)
-										.padding(bottom = dimensionResource(id = R.dimen.margin_login_pleaselogin_top))
-								)
-								Text(
-									text = stringResource(id = R.string.login_welcome),
-									style = MaterialTheme.typography.headlineLarge,
-									textAlign = TextAlign.Center,
-									modifier = Modifier.fillMaxWidth()
-								)
-							}
-						else
-							SchoolSearch(
-								modifier = Modifier
-									.fillMaxWidth()
-									.weight(1f),
-								searchText = searchText
-							)
-						Column(
+						if (!searchMode) Column(
+							verticalArrangement = Arrangement.Center,
 							modifier = Modifier
 								.fillMaxWidth()
+								.weight(1f)
 						) {
-							OutlinedTextField(
-								value = searchText,
+							Icon(
+								painter = painterResource(id = R.drawable.settings_about_app_icon),
+								contentDescription = null,
+								tint = MaterialTheme.colorScheme.primary,
+								modifier = Modifier
+									.width(dimensionResource(id = R.dimen.size_login_icon))
+									.height(dimensionResource(id = R.dimen.size_login_icon))
+									.align(Alignment.CenterHorizontally)
+									.padding(bottom = dimensionResource(id = R.dimen.margin_login_pleaselogin_top))
+							)
+							Text(
+								text = stringResource(id = R.string.login_welcome),
+								style = MaterialTheme.typography.headlineLarge,
+								textAlign = TextAlign.Center,
+								modifier = Modifier.fillMaxWidth()
+							)
+						}
+						else SchoolSearch(
+							modifier = Modifier
+								.fillMaxWidth()
+								.weight(1f), searchText = searchText
+						)
+						Column(
+							modifier = Modifier.fillMaxWidth()
+						) {
+							OutlinedTextField(value = searchText,
 								onValueChange = { searchText = it },
 								singleLine = true,
 								modifier = Modifier
@@ -167,56 +189,47 @@ class LoginActivity : BaseComposeActivity() {
 									.padding(horizontal = dimensionResource(id = R.dimen.margin_login_input_horizontal))
 									.onFocusChanged { if (it.isFocused) searchMode = true }
 									.then(
-										if (searchMode)
-											Modifier.padding(bottom = dimensionResource(id = R.dimen.margin_login_input_horizontal))
-										else
-											Modifier
+										if (searchMode) Modifier.padding(
+											bottom = dimensionResource(
+												id = R.dimen.margin_login_input_horizontal
+											)
+										)
+										else Modifier
 									),
 								label = {
 									Text(stringResource(id = R.string.login_search_by_school_name_or_address))
+								})
+							if (!searchMode) Row(
+								modifier = Modifier
+									.fillMaxWidth()
+									.padding(
+										horizontal = dimensionResource(id = R.dimen.margin_login_input_horizontal),
+										vertical = dimensionResource(id = R.dimen.margin_login_input_vertical)
+									), horizontalArrangement = Arrangement.SpaceBetween
+							) {
+								TextButton(onClick = {
+									loginLauncher.launch(Intent(
+										this@LoginActivity,
+										LoginDataInputActivity::class.java
+									).apply {
+										putBackgroundColorExtra(this)
+										putExtra(EXTRA_BOOLEAN_DEMO_LOGIN, true)
+									})
+								}) {
+									Text(text = stringResource(id = R.string.login_demo))
 								}
-							)
-							if (!searchMode)
-								Row(
-									modifier = Modifier
-										.fillMaxWidth()
-										.padding(
-											horizontal = dimensionResource(id = R.dimen.margin_login_input_horizontal),
-											vertical = dimensionResource(id = R.dimen.margin_login_input_vertical)
-										),
-									horizontalArrangement = Arrangement.SpaceBetween
-								) {
-									TextButton(
-										onClick = {
-											loginLauncher.launch(
-												Intent(
-													this@LoginActivity,
-													LoginDataInputActivity::class.java
-												).apply {
-													putBackgroundColorExtra(this)
-													putExtra(EXTRA_BOOLEAN_DEMO_LOGIN, true)
-												}
-											)
-										}
-									) {
-										Text(text = stringResource(id = R.string.login_demo))
-									}
 
-									TextButton(
-										onClick = {
-											loginLauncher.launch(
-												Intent(
-													this@LoginActivity,
-													LoginDataInputActivity::class.java
-												).apply {
-													putBackgroundColorExtra(this)
-												}
-											)
-										}
-									) {
-										Text(text = stringResource(id = R.string.login_manual_data_input))
-									}
+								TextButton(onClick = {
+									loginLauncher.launch(Intent(
+										this@LoginActivity,
+										LoginDataInputActivity::class.java
+									).apply {
+										putBackgroundColorExtra(this)
+									})
+								}) {
+									Text(text = stringResource(id = R.string.login_manual_data_input))
 								}
+							}
 						}
 					}
 				}
@@ -224,23 +237,10 @@ class LoginActivity : BaseComposeActivity() {
 		}
 	}
 
-	private fun scanCode() {
-		if (ContextCompat.checkSelfPermission(
-				this,
-				Manifest.permission.CAMERA
-			) != PackageManager.PERMISSION_GRANTED
-		)
-			requestPermissionLauncher.launch(Manifest.permission.CAMERA)
-		else
-			scanCodeLauncher.launch(Intent(this, ScanCodeActivity::class.java))
-	}
-
 	@OptIn(ExperimentalSerializationApi::class, ExperimentalMaterial3Api::class)
 	@Composable
 	fun SchoolSearch(
-		modifier: Modifier,
-		searchText: String,
-		debounceMillis: Long = 500
+		modifier: Modifier, searchText: String, debounceMillis: Long = 500
 	) {
 
 		var items by remember { mutableStateOf(emptyList<UntisSchoolInfo>()) }
@@ -258,8 +258,7 @@ class LoginActivity : BaseComposeActivity() {
 
 			searchJob?.cancel()
 			searchJob = composableScope.launch {
-				if (searchText.isEmpty())
-					return@launch
+				if (searchText.isEmpty()) return@launch
 
 				loading = true
 
@@ -282,9 +281,7 @@ class LoginActivity : BaseComposeActivity() {
 					untisResponse.result?.let { items = it.schools }
 				} else {
 					error = ErrorMessageDictionary.getErrorMessage(
-						resources,
-						untisResponse.error?.code,
-						untisResponse.error?.message.orEmpty()
+						resources, untisResponse.error?.code, untisResponse.error?.message.orEmpty()
 					)
 				}
 			}
@@ -294,39 +291,30 @@ class LoginActivity : BaseComposeActivity() {
 			}
 		}
 
-		if (items.isNotEmpty())
-			LazyColumn(modifier) {
-				items(items) {
-					ListItem(
-						headlineText = { Text(it.displayName) },
-						supportingText = { Text(it.address) },
-						modifier = Modifier.clickable {
-							val builder = Uri.Builder()
-								.appendQueryParameter("schoolInfo", getJSON().encodeToString(it))
+		if (items.isNotEmpty()) LazyColumn(modifier) {
+			items(items) {
+				ListItem(headlineText = { Text(it.displayName) },
+					supportingText = { Text(it.address) },
+					modifier = Modifier.clickable {
+						val builder = Uri.Builder()
+							.appendQueryParameter("schoolInfo", getJSON().encodeToString(it))
 
-							loginLauncher.launch(
-								Intent(
-									this@LoginActivity,
-									LoginDataInputActivity::class.java
-								).apply {
-									data = builder.build()
-								})
-						}
-					)
-				}
+						loginLauncher.launch(Intent(
+							this@LoginActivity, LoginDataInputActivity::class.java
+						).apply {
+							data = builder.build()
+						})
+					})
 			}
-		else
-			Column(
-				verticalArrangement = Arrangement.Center,
-				horizontalAlignment = Alignment.CenterHorizontally,
-				modifier = modifier
-			) {
-				if (loading)
-					CircularProgressIndicator()
-				else if (!error.isNullOrEmpty())
-					Text(text = error!!)
-				else if (items.isEmpty())
-					Text(text = stringResource(id = R.string.login_no_results))
-			}
+		}
+		else Column(
+			verticalArrangement = Arrangement.Center,
+			horizontalAlignment = Alignment.CenterHorizontally,
+			modifier = modifier
+		) {
+			if (loading) CircularProgressIndicator()
+			else if (!error.isNullOrEmpty()) Text(text = error!!)
+			else if (items.isEmpty()) Text(text = stringResource(id = R.string.login_no_results))
+		}
 	}
 }
