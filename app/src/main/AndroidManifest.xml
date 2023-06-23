@@ -31,6 +31,7 @@
 		android:enableOnBackInvokedCallback="true">
 
 		<meta-data android:name="io.sentry.auto-init" android:value="false" />
+		<meta-data android:name="com.google.mlkit.vision.DEPENDENCIES" android:value="barcode_ui"/>
 
 		<activity
 			android:name=".activities.ShortcutConfigureActivity"
@@ -132,6 +133,11 @@
 				android:name="android.support.PARENT_ACTIVITY"
 				android:value=".activities.MainActivity" />
 		</activity>
+
+		<activity
+			android:name="com.journeyapps.barcodescanner.CaptureActivity"
+			android:screenOrientation="portrait"
+			tools:replace="screenOrientation" />
 
 		<receiver android:name=".receivers.NotificationReceiver" />
 

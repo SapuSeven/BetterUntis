@@ -132,8 +132,9 @@ dependencies {
 	implementation "com.github.kittinunf.fuel:fuel-kotlinx-serialization:$fuel_version"
 	implementation 'joda-time:joda-time:2.10.14'
 	implementation 'com.google.android.material:material:1.7.0-alpha03'
-	implementation 'com.budiyev.android:code-scanner:2.1.0'
+	implementation 'com.google.android.gms:play-services-code-scanner:16.0.0'
 	implementation 'com.github.ajalt.colormath:colormath:3.2.0'
+	implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 	implementation 'androidx.activity:activity-compose:1.6.1'
 	implementation "androidx.compose.animation:animation:$compose_version"
 	implementation "androidx.compose.ui:ui:$compose_version"
