@@ -141,6 +141,7 @@ fun BaseComposeActivity.ProfileManagementDialog( // TODO: Remove inheritance of 
 								LoginActivity::class.java
 							).apply {
 								putBackgroundColorExtra(this)
+								putExtra(LoginActivity.EXTRA_BOOLEAN_SHOW_BACK_BUTTON, true)
 							}
 						)
 					}
