@@ -144,7 +144,7 @@ jobs:
       - run:
           name: Deploy Release to GitHub
           command: |
-            gh release create $CIRCLE_TAG --prerelease --title "BetterUntis $CIRCLE_TAG" --notes-file "./fastlane/metadata/android/en-US/changelogs/$CIRCLE_TAG.txt" "./workspace/outputs/apk/debug/app-debug.apk#BetterUntis $CIRCLE_TAG.apk"
+            gh release create $CIRCLE_TAG --prerelease --title "BetterUntis $CIRCLE_TAG" --notes-file "./fastlane/metadata/android/en-US/changelogs/$CIRCLE_TAG.txt" "./workspace/outputs/apk/release/app-release.apk#BetterUntis $CIRCLE_TAG.apk"
 
 workflows:
   version: 2
