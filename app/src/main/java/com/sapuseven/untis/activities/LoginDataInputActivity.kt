@@ -45,11 +45,9 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.entities.User
-import com.sapuseven.untis.data.databases.entities.UserWithData
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.api.LoginDataInfo
-import com.sapuseven.untis.helpers.api.LoginErrorInfo
 import com.sapuseven.untis.helpers.api.LoginHelper
 import com.sapuseven.untis.models.UntisSchoolInfo
 import com.sapuseven.untis.models.untis.masterdata.TimeGrid
@@ -186,19 +184,38 @@ class LoginDataInputActivity : BaseComposeActivity() {
 					}
 				}
 
-				val schoolIdError = schoolId.value.isNullOrEmpty()
-				val usernameError = anonymous.value != true && username.value.isNullOrEmpty()
-				val passwordError =
-					anonymous.value != true && existingUser?.key == null && password.value.isNullOrEmpty()
-				val proxyUrlError =
-					!proxyUrl.value.isNullOrEmpty() && !Patterns.WEB_URL.matcher(proxyUrl.value!!)
-						.matches()
-				val apiUrlError =
-					!apiUrl.value.isNullOrEmpty() && !Patterns.WEB_URL.matcher(apiUrl.value!!)
-						.matches()
-
-				val anyError =
-					schoolIdError || usernameError || passwordError || proxyUrlError || apiUrlError
+				val schoolIdError = remember(validate) {
+					derivedStateOf {
+						schoolId.value.isNullOrEmpty()
+					}
+				}
+				val usernameError = remember(validate) {
+					derivedStateOf {
+						anonymous.value != true && username.value.isNullOrEmpty()
+					}
+				}
+				val passwordError = remember(validate) {
+					derivedStateOf {
+						anonymous.value != true && existingUser?.key == null && password.value.isNullOrEmpty()
+					}
+				}
+				val proxyUrlError = remember(validate) {
+					derivedStateOf {
+						!proxyUrl.value.isNullOrEmpty() && !Patterns.WEB_URL.matcher(proxyUrl.value!!)
+							.matches()
+					}
+				}
+				val apiUrlError = remember(validate) {
+					derivedStateOf {
+						!apiUrl.value.isNullOrEmpty() && !Patterns.WEB_URL.matcher(apiUrl.value!!)
+							.matches()
+					}
+				}
+				val anyError = remember(validate) {
+					derivedStateOf {
+						schoolIdError.value || usernameError.value || passwordError.value || proxyUrlError.value || apiUrlError.value
+					}
+				}
 
 				fun loadData() {
 					loading = true
@@ -223,10 +240,12 @@ class LoginDataInputActivity : BaseComposeActivity() {
 										error.errorCode,
 										error.errorMessage
 									)
+
 									error.errorMessageStringRes != null -> getString(
 										error.errorMessageStringRes,
 										error.errorMessage
 									)
+
 									else -> error.errorMessage
 										?: getString(R.string.all_error)
 								}
@@ -254,6 +273,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 											serverUrl = apiUrl.value ?: "",
 											mobileServiceUrl = apiUrl.value
 										)
+
 										else -> loadSchoolInfo(
 											schoolId.value ?: ""
 										)
@@ -361,7 +381,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 								text = { Text(stringResource(id = R.string.logindatainput_login)) },
 								onClick = {
 									validate = true
-									if (!anyError) {
+									if (!anyError.value) {
 										snackbarHostState.currentSnackbarData?.dismiss()
 										loadData()
 									}
@@ -418,7 +438,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 								label = { Text(stringResource(id = R.string.logindatainput_school)) },
 								prefKey = PREFS_BACKUP_SCHOOLID,
 								enabled = !loading && !schoolIdLocked,
-								error = validate && schoolIdError,
+								error = validate && schoolIdError.value,
 								errorText = stringResource(id = R.string.logindatainput_error_field_empty)
 							)
 							Spacer(
@@ -437,7 +457,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 										label = { Text(stringResource(id = R.string.logindatainput_username)) },
 										prefKey = PREFS_BACKUP_USERNAME,
 										enabled = !loading,
-										error = validate && usernameError,
+										error = validate && usernameError.value,
 										errorText = stringResource(id = R.string.logindatainput_error_field_empty),
 										autofillType = AutofillType.Username
 									)
@@ -454,7 +474,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 										},
 										prefKey = PREFS_BACKUP_PASSWORD,
 										enabled = !loading,
-										error = validate && passwordError,
+										error = validate && passwordError.value,
 										errorText = stringResource(id = R.string.logindatainput_error_field_empty),
 										autofillType = AutofillType.Password
 									)
@@ -480,7 +500,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 										label = { Text(stringResource(id = R.string.logindatainput_proxy_host)) },
 										prefKey = PREFS_BACKUP_PROXYURL,
 										enabled = !loading,
-										error = validate && proxyUrlError,
+										error = validate && proxyUrlError.value,
 										errorText = stringResource(id = R.string.logindatainput_error_invalid_url)
 									)
 									InputField(
@@ -489,7 +509,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 										label = { Text(stringResource(id = R.string.logindatainput_api_url)) },
 										prefKey = PREFS_BACKUP_APIURL,
 										enabled = !loading,
-										error = validate && apiUrlError,
+										error = validate && apiUrlError.value,
 										errorText = stringResource(id = R.string.logindatainput_error_invalid_url)
 									)
 									InputCheckbox(
