@@ -184,38 +184,10 @@ class LoginDataInputActivity : BaseComposeActivity() {
 					}
 				}
 
-				val schoolIdError = remember(validate) {
-					derivedStateOf {
-						schoolId.value.isNullOrEmpty()
-					}
-				}
-				val usernameError = remember(validate) {
-					derivedStateOf {
-						anonymous.value != true && username.value.isNullOrEmpty()
-					}
-				}
-				val passwordError = remember(validate) {
-					derivedStateOf {
-						anonymous.value != true && existingUser?.key == null && password.value.isNullOrEmpty()
-					}
-				}
-				val proxyUrlError = remember(validate) {
-					derivedStateOf {
-						!proxyUrl.value.isNullOrEmpty() && !Patterns.WEB_URL.matcher(proxyUrl.value!!)
-							.matches()
-					}
-				}
-				val apiUrlError = remember(validate) {
-					derivedStateOf {
-						!apiUrl.value.isNullOrEmpty() && !Patterns.WEB_URL.matcher(apiUrl.value!!)
-							.matches()
-					}
-				}
-				val anyError = remember(validate) {
-					derivedStateOf {
-						schoolIdError.value || usernameError.value || passwordError.value || proxyUrlError.value || apiUrlError.value
-					}
-				}
+				val schoolIdValid = remember(validate) { mutableStateOf(true) }
+				val usernameValid = remember(validate) { mutableStateOf(true) }
+				val proxyUrlValid = remember(validate) { mutableStateOf(true) }
+				val apiUrlValid = remember(validate) { mutableStateOf(true) }
 
 				fun loadData() {
 					loading = true
@@ -381,7 +353,8 @@ class LoginDataInputActivity : BaseComposeActivity() {
 								text = { Text(stringResource(id = R.string.logindatainput_login)) },
 								onClick = {
 									validate = true
-									if (!anyError.value) {
+									val allValid = schoolIdValid.value && usernameValid.value && proxyUrlValid.value && apiUrlValid.value
+									if (allValid) {
 										snackbarHostState.currentSnackbarData?.dismiss()
 										loadData()
 									}
@@ -438,7 +411,11 @@ class LoginDataInputActivity : BaseComposeActivity() {
 								label = { Text(stringResource(id = R.string.logindatainput_school)) },
 								prefKey = PREFS_BACKUP_SCHOOLID,
 								enabled = !loading && !schoolIdLocked,
-								error = validate && schoolIdError.value,
+								valid = schoolIdValid,
+								validate = validate,
+								validator = {
+									!it.isNullOrEmpty()
+								},
 								errorText = stringResource(id = R.string.logindatainput_error_field_empty)
 							)
 							Spacer(
@@ -457,7 +434,11 @@ class LoginDataInputActivity : BaseComposeActivity() {
 										label = { Text(stringResource(id = R.string.logindatainput_username)) },
 										prefKey = PREFS_BACKUP_USERNAME,
 										enabled = !loading,
-										error = validate && usernameError.value,
+										valid = usernameValid,
+										validate = validate,
+										validator = {
+											anonymous.value == true || !it.isNullOrEmpty()
+										},
 										errorText = stringResource(id = R.string.logindatainput_error_field_empty),
 										autofillType = AutofillType.Username
 									)
@@ -474,8 +455,6 @@ class LoginDataInputActivity : BaseComposeActivity() {
 										},
 										prefKey = PREFS_BACKUP_PASSWORD,
 										enabled = !loading,
-										error = validate && passwordError.value,
-										errorText = stringResource(id = R.string.logindatainput_error_field_empty),
 										autofillType = AutofillType.Password
 									)
 									Spacer(
@@ -500,7 +479,11 @@ class LoginDataInputActivity : BaseComposeActivity() {
 										label = { Text(stringResource(id = R.string.logindatainput_proxy_host)) },
 										prefKey = PREFS_BACKUP_PROXYURL,
 										enabled = !loading,
-										error = validate && proxyUrlError.value,
+										valid = proxyUrlValid,
+										validate = validate,
+										validator = {
+											it.isNullOrEmpty() || Patterns.WEB_URL.matcher(it).matches()
+										},
 										errorText = stringResource(id = R.string.logindatainput_error_invalid_url)
 									)
 									InputField(
@@ -509,7 +492,11 @@ class LoginDataInputActivity : BaseComposeActivity() {
 										label = { Text(stringResource(id = R.string.logindatainput_api_url)) },
 										prefKey = PREFS_BACKUP_APIURL,
 										enabled = !loading,
-										error = validate && apiUrlError.value,
+										valid = apiUrlValid,
+										validate = validate,
+										validator = {
+											it.isNullOrEmpty() || Patterns.WEB_URL.matcher(it).matches()
+										},
 										errorText = stringResource(id = R.string.logindatainput_error_invalid_url)
 									)
 									InputCheckbox(
@@ -573,12 +560,15 @@ class LoginDataInputActivity : BaseComposeActivity() {
 		label: @Composable (() -> Unit)? = null,
 		prefKey: Preferences.Key<String>? = null,
 		enabled: Boolean = true,
-		error: Boolean = false,
+		valid: MutableState<Boolean> = mutableStateOf(true),
+		validate: Boolean = false,
+		validator: (String?) -> Boolean = { true },
 		errorText: String = "",
 		autofillType: AutofillType? = null
 	) {
 		val bringIntoViewRequester = remember { BringIntoViewRequester() }
 		val coroutineScope = rememberCoroutineScope()
+		valid.value = validator(state.value)
 
 		Column(
 			modifier = Modifier
@@ -594,7 +584,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 				visualTransformation = if (type == KeyboardType.Password) PasswordVisualTransformation() else VisualTransformation.None,
 				label = label,
 				enabled = enabled,
-				isError = error,
+				isError = validate && !valid.value,
 				modifier = Modifier
 					.fillMaxWidth()
 					.onFocusEvent { focusState ->
@@ -613,7 +603,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 					}
 			)
 
-			AnimatedVisibility(visible = error) {
+			AnimatedVisibility(visible = validate && !valid.value) {
 				Text(
 					modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
 					color = MaterialTheme.colorScheme.error,
