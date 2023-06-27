@@ -10,7 +10,7 @@ data class UntisUserData(
 		val displayName: String,
 		val schoolName: String,
 		val departmentId: Int,
-		val children: List<UntisStudent>, // Probably UntisStudent
+		val children: List<UntisStudent?>,
 		val klassenIds: List<Int>,
 		val rights: List<String>
 )

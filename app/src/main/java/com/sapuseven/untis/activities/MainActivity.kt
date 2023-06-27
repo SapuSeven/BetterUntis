@@ -764,6 +764,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			).apply {
 				user?.id?.let { contextActivity.putUserIdExtra(this, it) }
 				contextActivity.putBackgroundColorExtra(this)
+				putExtra(LoginActivity.EXTRA_BOOLEAN_SHOW_BACK_BUTTON, true)
 			})
 	}
 

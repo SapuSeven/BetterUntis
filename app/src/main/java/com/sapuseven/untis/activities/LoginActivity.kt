@@ -51,6 +51,10 @@ import kotlinx.serialization.encodeToString
 
 
 class LoginActivity : BaseComposeActivity() {
+	companion object {
+		const val EXTRA_BOOLEAN_SHOW_BACK_BUTTON = "com.sapuseven.untis.activities.login.showBackButton"
+	}
+
 	private val loginLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
 			if (it.resultCode == Activity.RESULT_OK) {
@@ -114,6 +118,8 @@ class LoginActivity : BaseComposeActivity() {
 
 				val focusManager = LocalFocusManager.current
 
+				val showBackButton = searchMode || intent.getBooleanExtra(EXTRA_BOOLEAN_SHOW_BACK_BUTTON, false)
+
 				BackHandler(
 					enabled = searchMode
 				) {
@@ -133,10 +139,14 @@ class LoginActivity : BaseComposeActivity() {
 							}
 						},
 						navigationIcon = {
-							if (searchMode) IconButton(onClick = {
-								focusManager.clearFocus()
-								searchText = ""
-								searchMode = false
+							if (showBackButton) IconButton(onClick = {
+								if (searchMode) {
+									focusManager.clearFocus()
+									searchText = ""
+									searchMode = false
+								} else {
+									onBackPressedDispatcher.onBackPressed()
+								}
 							}) {
 								Icon(
 									imageVector = Icons.Outlined.ArrowBack,
