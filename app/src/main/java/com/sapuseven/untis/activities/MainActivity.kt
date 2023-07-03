@@ -52,6 +52,8 @@ import com.sapuseven.untis.activities.main.DrawerText
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.data.timetable.TimegridItem
+import com.sapuseven.untis.helpers.DateTimeUtils
+import com.sapuseven.untis.helpers.config.deleteProfile
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.models.TimetableBookmark
@@ -63,6 +65,11 @@ import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.*
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
+import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
+import com.sapuseven.untis.ui.dialogs.TimetableItemDetailsDialog
+import com.sapuseven.untis.ui.functional.bottomInsets
+import com.sapuseven.untis.ui.functional.insetsPaddingValues
+import com.sapuseven.untis.ui.models.NavItemShortcut
 import com.sapuseven.untis.ui.preferences.convertRangeToPair
 import com.sapuseven.untis.ui.weekview.*
 import io.sentry.Breadcrumb
@@ -74,15 +81,8 @@ import kotlinx.serialization.*
 import kotlinx.serialization.json.Json
 import org.joda.time.*
 import org.joda.time.format.DateTimeFormat
-import java.util.*
-import com.sapuseven.untis.helpers.DateTimeUtils
-import com.sapuseven.untis.helpers.config.deleteProfile
-import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
-import com.sapuseven.untis.ui.dialogs.TimetableItemDetailsDialog
-import com.sapuseven.untis.ui.functional.bottomInsets
-import com.sapuseven.untis.ui.functional.insetsPaddingValues
-import com.sapuseven.untis.ui.models.NavItemShortcut
 import java.lang.ref.WeakReference
+import java.util.*
 
 class MainActivity : BaseComposeActivity() {
 	companion object {
@@ -455,6 +455,7 @@ fun MainApp(state: NewMainAppState) {
 								state.switchUser(it)
 							},
 							onActionEdit = {
+								state.editUsers()
 							}
 						)
 					}
@@ -599,7 +600,8 @@ class MainDrawerState constructor(
 	val drawerGesturesEnabled: Boolean
 		get() = drawerGestureState.value || drawerState.isOpen
 
-	val timetableDatabaseInterface: TimetableDatabaseInterface = contextActivity.timetableDatabaseInterface
+	val timetableDatabaseInterface: TimetableDatabaseInterface =
+		contextActivity.timetableDatabaseInterface
 
 	fun getBookmarks() = user.bookmarks
 
@@ -713,7 +715,8 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 	private val userId = user.id
 	private val userDatabase = contextActivity.userDatabase
-	internal val timetableDatabaseInterface: TimetableDatabaseInterface = contextActivity.timetableDatabaseInterface
+	internal val timetableDatabaseInterface: TimetableDatabaseInterface =
+		contextActivity.timetableDatabaseInterface
 	private val timetableLoader = TimetableLoader(
 		context = WeakReference(contextActivity),
 		user = user,
@@ -723,7 +726,8 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 	private val defaultDisplayedName = user.getDisplayedName(contextActivity)
 	private val personalTimetable = getPersonalTimetableElement(user, contextActivity)
-	private var displayedElement: MutableState<PeriodElement?> = mutableStateOf(personalTimetable?.first)
+	private var displayedElement: MutableState<PeriodElement?> =
+		mutableStateOf(personalTimetable?.first)
 	private var displayedName: MutableState<String> = mutableStateOf(defaultDisplayedName)
 	private var loading by mutableStateOf(0)
 
@@ -755,12 +759,12 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 	fun editUser(
 		user: User?,
-		loginDataInputLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
+		loginLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
 	) {
-		loginDataInputLauncher.launch(
+		loginLauncher.launch(
 			Intent(
 				contextActivity,
-				LoginDataInputActivity::class.java
+				user?.let { LoginDataInputActivity::class.java } ?: LoginActivity::class.java
 			).apply {
 				user?.id?.let { contextActivity.putUserIdExtra(this, it) }
 				contextActivity.putBackgroundColorExtra(this)
@@ -792,8 +796,9 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 	fun setDisplayedElement(element: PeriodElement?, displayName: String? = null) {
 		displayedElement.value = element
-		displayedName.value = displayName ?: element?.let { timetableDatabaseInterface.getLongName(it) }
-				?: defaultDisplayedName
+		displayedName.value =
+			displayName ?: element?.let { timetableDatabaseInterface.getLongName(it) }
+					?: defaultDisplayedName
 	}
 
 	// WeekView
@@ -905,12 +910,15 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor.darken(
 					0.25f
 				) else examPastColor
+
 				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor.darken(
 					0.25f
 				) else cancelledPastColor
+
 				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(
 					0.25f
 				) else irregularPastColor
+
 				else -> if (useDefault.contains("regular")) defaultColor.darken(0.25f) else regularPastColor
 			}
 
@@ -918,12 +926,15 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultTextColor else colorOn(
 					Color(examColor)
 				).toArgb()
+
 				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultTextColor else colorOn(
 					Color(cancelledColor)
 				).toArgb()
+
 				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultTextColor else colorOn(
 					Color(irregularColor)
 				).toArgb()
+
 				else -> if (useDefault.contains("regular")) defaultTextColor else colorOn(
 					Color(
 						regularColor
@@ -969,7 +980,10 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	)
 
 	@OptIn(ExperimentalCoroutinesApi::class)
-	suspend fun loadEventsFlow(startDate: LocalDate, endDate: LocalDate): Flow<Pair<Long, List<Event>>> {
+	suspend fun loadEventsFlow(
+		startDate: LocalDate,
+		endDate: LocalDate
+	): Flow<Pair<Long, List<Event>>> {
 		val dateRange =
 			UntisDate.fromLocalDate(LocalDate(startDate)) to
 					UntisDate.fromLocalDate(LocalDate(endDate))
@@ -1066,11 +1080,13 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 				((diff / MINUTE_MILLIS).toInt()),
 				diff / MINUTE_MILLIS
 			)
+
 			diff < DAY_MILLIS -> pluralStringResource(
 				R.plurals.main_time_diff_hours,
 				((diff / HOUR_MILLIS).toInt()),
 				diff / HOUR_MILLIS
 			)
+
 			else -> pluralStringResource(
 				R.plurals.main_time_diff_days,
 				((diff / DAY_MILLIS).toInt()),
@@ -1104,6 +1120,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 	val onPageChange: suspend (Int) -> Unit = { pageOffset ->
 		weekViewPage = pageOffset
+		Log.d("WeekView", "Page changed to $pageOffset")
 		loadAllEvents(pageOffset)
 	}
 
@@ -1878,13 +1895,15 @@ fun rememberMainDrawerState(
 	coroutineScope: CoroutineScope = rememberCoroutineScope(),
 	drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
 	bookmarkDeleteDialog: MutableState<TimetableBookmark?> = rememberSaveable { mutableStateOf(null) },
-) = remember(user.id) { MainDrawerState(
-	user = user,
-	contextActivity = contextActivity,
-	scope = coroutineScope,
-	drawerState = drawerState,
-	bookmarkDeleteDialog = bookmarkDeleteDialog,
-) }
+) = remember(user.id) {
+	MainDrawerState(
+		user = user,
+		contextActivity = contextActivity,
+		scope = coroutineScope,
+		drawerState = drawerState,
+		bookmarkDeleteDialog = bookmarkDeleteDialog,
+	)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -1899,15 +1918,17 @@ fun rememberNewMainAppState(
 		user
 	),
 	colorScheme: ColorScheme = MaterialTheme.colorScheme,
-) = remember(user) { NewMainAppState(
-	user = user,
-	contextActivity = contextActivity,
-	preferences = preferences,
-	scope = coroutineScope,
-	mainDrawerState = mainDrawerState,
-	weekViewPreferences = weekViewPreferences,
-	colorScheme = colorScheme,
-) }
+) = remember(user) {
+	NewMainAppState(
+		user = user,
+		contextActivity = contextActivity,
+		preferences = preferences,
+		scope = coroutineScope,
+		mainDrawerState = mainDrawerState,
+		weekViewPreferences = weekViewPreferences,
+		colorScheme = colorScheme,
+	)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

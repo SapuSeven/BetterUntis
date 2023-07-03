@@ -31,9 +31,9 @@ fun ProfileManagementDialog(
 	var users = state.listUsers()
 	val context = LocalContext.current
 
-	val loginDataInputLauncher =
+	val loginLauncher =
 		rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-			users = state.listUsers()
+			users = state.listUsers() // TODO: Doesn't work, user database is probably read before it's updated
 		}
 
 	var deleteDialog by rememberSaveable { mutableStateOf<User?>(null) }
@@ -107,7 +107,7 @@ fun ProfileManagementDialog(
 						}
 					},
 					modifier = Modifier.clickable {
-						state.editUser(user, loginDataInputLauncher)
+						state.editUser(user, loginLauncher)
 					}
 				)
 			}
@@ -122,7 +122,7 @@ fun ProfileManagementDialog(
 						)
 					},
 					modifier = Modifier.clickable {
-						state.editUser(null, loginDataInputLauncher)
+						state.editUser(null, loginLauncher)
 					}
 				)
 			}
