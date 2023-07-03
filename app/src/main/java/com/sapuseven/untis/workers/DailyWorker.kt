@@ -18,8 +18,7 @@ import java.util.concurrent.TimeUnit
 class DailyWorker(context: Context, params: WorkerParameters) :
 	TimetableDependantWorker(context, params) {
 	companion object {
-		private const val TAG_DAILY_WORK = "DailyWork"
-
+		const val TAG_DAILY_WORK = "DailyWork"
 		const val WORKER_DATA_USER_ID = "UserId"
 
 		private fun nextWorkRequest(hourOfDay: Int = 2): WorkRequest {
