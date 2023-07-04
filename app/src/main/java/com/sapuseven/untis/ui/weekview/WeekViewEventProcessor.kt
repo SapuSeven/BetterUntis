@@ -12,7 +12,8 @@ private enum class EventType {
 private data class TimelineEvent(
 	val eventTime: LocalDateTime,
 	val eventType: EventType,
-	val eventId: Int
+	val eventId: Int,
+	val eventData: Event
 )
 
 private class EventComparator : Comparator<TimelineEvent> {
@@ -32,11 +33,12 @@ private class EventComparator : Comparator<TimelineEvent> {
 internal fun arrangeEvents(events: List<Event>, maxSimultaneous: Int) {
 	val eventQueue: PriorityQueue<TimelineEvent> = PriorityQueue(EventComparator())
 	val regionQueue: Queue<TimelineEvent> = LinkedList()
+	val startedEventIds: MutableList<Int> = mutableListOf()
 
-	for (i in 0 until events.size) {
-		val startEvent = TimelineEvent(events[i].start, EventType.EVENT_START, i)
+	events.forEachIndexed { i, event ->
+		val startEvent = TimelineEvent(event.start, EventType.EVENT_START, i, event)
 		eventQueue.add(startEvent)
-		val stopEvent = TimelineEvent(events[i].end, EventType.EVENT_STOP, i)
+		val stopEvent = TimelineEvent(event.end, EventType.EVENT_STOP, i, event)
 		eventQueue.add(stopEvent)
 	}
 
@@ -47,7 +49,18 @@ internal fun arrangeEvents(events: List<Event>, maxSimultaneous: Int) {
 		while (!eventQueue.isEmpty()) { // take from the event queue
 			event = eventQueue.remove()
 			regionQueue.add(event) // save in the region queue
-			if (event.eventType === EventType.EVENT_START) overlap++ else overlap--
+
+			// There may be a solution with using the region queue for this, but for now handle it manually.
+			// If any 2+ events are started together, update the simultaneous event list for both.
+			startedEventIds.forEach { events[it].simultaneousEvents.addAll(startedEventIds.map { events[it] }) }
+
+			if (event.eventType === EventType.EVENT_START) {
+				overlap++
+				startedEventIds.add(event.eventId)
+			} else {
+				overlap--
+				startedEventIds.remove(event.eventId)
+			}
 			if (overlap == 0) // reached the end of a region
 				break
 			if (overlap > numOverlappping) numOverlappping = overlap

@@ -4,6 +4,7 @@ import android.graphics.Color
 import org.joda.time.DateTime
 import java.util.*
 
+@Deprecated("Replaced by WeekViewCompose Event")
 open class WeekViewEvent<T>(
 		var id: Long = 0,
 		var title: String = "",

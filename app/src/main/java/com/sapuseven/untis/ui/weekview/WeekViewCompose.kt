@@ -39,6 +39,8 @@ import androidx.compose.ui.unit.sp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.sapuseven.untis.R
+import com.sapuseven.untis.data.timetable.PeriodData
+import com.sapuseven.untis.ui.common.ifNotNull
 import com.sapuseven.untis.ui.dialogs.DatePickerDialog
 import kotlinx.coroutines.launch
 import org.joda.time.*
@@ -54,9 +56,11 @@ data class Event(
 	val textColor: Color,
 	val start: LocalDateTime,
 	val end: LocalDateTime,
+	val periodData: PeriodData? = null
 ) {
 	var numSimultaneous: Int = 1 // relative width is determined by 1/x
 	var offsetSteps: Int = 0 // x-offset in multiples of width
+	var simultaneousEvents = mutableSetOf<Event>()
 
 	// temp
 	var leftX = 0
@@ -69,6 +73,7 @@ val eventTimeFormat = DateTimeFormat.forPattern("h:mm a")
 fun WeekViewEvent(
 	event: Event,
 	modifier: Modifier = Modifier,
+	onClick: (() -> Unit)? = null,
 ) {
 	Box(
 		modifier = modifier
@@ -76,6 +81,9 @@ fun WeekViewEvent(
 			.padding(2.dp) // Outer padding
 			.background(event.color, shape = RoundedCornerShape(4.dp))
 			.padding(horizontal = 2.dp) // Inner padding
+			.ifNotNull(onClick) {
+				clickable(onClick = it)
+			}
 	) {
 		Text(
 			text = event.top,
@@ -123,7 +131,8 @@ fun EventPreview() {
 			textColor = Color(0xFF000000),
 			start = LocalDateTime.parse("2021-05-18T09:00:00"),
 			end = LocalDateTime.parse("2021-05-18T11:00:00"),
-		), modifier = Modifier.sizeIn(maxHeight = 64.dp)
+		),
+		modifier = Modifier.sizeIn(maxHeight = 64.dp)
 	)
 }
 
@@ -347,7 +356,6 @@ fun DrawScope.WeekViewContentGrid(
 fun WeekViewContent(
 	events: List<Event>,
 	modifier: Modifier = Modifier,
-	eventContent: @Composable (event: Event) -> Unit = { WeekViewEvent(event = it) },
 	startDate: LocalDate,
 	numDays: Int = 5,
 	startTime: LocalTime,
@@ -357,6 +365,7 @@ fun WeekViewContent(
 	hourList: List<WeekViewHour>,
 	dividerColor: Color = MaterialTheme.colorScheme.outline,
 	dividerWidth: Float = Stroke.HairlineWidth,
+	eventContent: @Composable (event: Event) -> Unit = { WeekViewEvent(event = it) }
 ) {
 	// TODO: Find a way to arrange events before layout, but calculate minEventWidth to determine maxSimultaneous
 	// TODO: Display indicator if there are more events than can be displayed
@@ -417,14 +426,26 @@ fun WeekViewContent(
 	}
 }
 
+/**
+ * @param onItemClick Callback on event click. First value contains a list of all simultaneous events
+ * (including the clicked one) and second value the index of the actually clicked event.
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WeekViewCompose(
 	events: Map<LocalDate, List<Event>>,
 	onPageChange: suspend (pageIndex: Int) -> Unit,
 	onReload: suspend (pageIndex: Int) -> Unit,
+	onItemClick: (Pair<List<PeriodData>, Int>) -> Unit,
 	modifier: Modifier = Modifier,
-	eventContent: @Composable (event: Event) -> Unit = { WeekViewEvent(event = it) },
+	eventContent: @Composable (event: Event) -> Unit = {
+		WeekViewEvent(event = it, onClick = {
+			onItemClick(
+				it.simultaneousEvents.mapNotNull { it.periodData }
+						to it.simultaneousEvents.indexOf(it)
+			)
+		})
+	},
 	dayHeader: @Composable (day: LocalDate) -> Unit = { WeekViewHeaderDay(day = it) },
 	startDate: LocalDate = LocalDate.now(),
 	hourHeight: Dp = 72.dp,

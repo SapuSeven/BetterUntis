@@ -483,7 +483,7 @@ fun MainApp(state: NewMainAppState) {
 					onReload = { pageOffset ->
 						state.loadEvents(startDateForPageIndex(pageOffset))
 					},
-					//TODO onItemClick = { state.timetableItemDetailsDialog =  },
+					onItemClick = { state.timetableItemDetailsDialog = it },
 					startTime = state.weekViewPreferences.hourList.value.firstOrNull()?.startTime
 						?: LocalTime.MIDNIGHT,
 					endTime = state.weekViewPreferences.hourList.value.lastOrNull()?.endTime
