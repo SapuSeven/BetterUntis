@@ -82,7 +82,7 @@ jobs:
           command: |
             echo $SSH_DEPLOY_KEY_ENCODED | base64 --decode > id_rsa
             chmod 600 id_rsa
-            scp -r -P $SSH_DEPLOY_PORT -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null workspace/outputs/apk/debug "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/debug/$CIRCLE_BUILD_NUM"
+            scp -r -P $SSH_DEPLOY_PORT -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null workspace/outputs/apk/gms/debug "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/debug/$CIRCLE_BUILD_NUM"
   deploy_release:
     docker:
       - image: cimg/base:stable
@@ -101,8 +101,8 @@ jobs:
           command: |
             echo $SSH_DEPLOY_KEY_ENCODED | base64 --decode > id_rsa
             chmod 600 id_rsa
-            scp -r -P $SSH_DEPLOY_PORT -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null workspace/outputs/apk/release "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG"
-            scp -P $SSH_DEPLOY_PORT -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null workspace/outputs/mapping/release/* "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG/"
+            scp -r -P $SSH_DEPLOY_PORT -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null workspace/outputs/apk/gms/release "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG"
+            scp -P $SSH_DEPLOY_PORT -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null workspace/outputs/mapping/gmsRelease/* "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG/"
 
   deploy_fastlane:
     docker:
@@ -130,7 +130,7 @@ jobs:
           command: |
             echo $GOOGLE_PLAY_KEY_ENCODED | base64 --decode > fastlane/key.json
             for f in fastlane/metadata/android/*/changelogs; do [[ -e "$f/$CIRCLE_TAG.txt" ]] && cp "$f/$CIRCLE_TAG.txt" "$f/default.txt"; done;
-            bundle exec fastlane deploy aab:'workspace/outputs/bundle/release/app-release.aab' track:<<parameters.track>>
+            bundle exec fastlane deploy aab:'workspace/outputs/bundle/gmsRelease/app-gms-release.aab' track:<<parameters.track>>
 
   deploy_github:
     docker:
@@ -144,7 +144,7 @@ jobs:
       - run:
           name: Deploy Release to GitHub
           command: |
-            gh release create $CIRCLE_TAG --prerelease --title "BetterUntis $CIRCLE_TAG" --notes-file "./fastlane/metadata/android/en-US/changelogs/$CIRCLE_TAG.txt" "./workspace/outputs/apk/release/app-release.apk#BetterUntis $CIRCLE_TAG.apk"
+            gh release create $CIRCLE_TAG --prerelease --title "BetterUntis $CIRCLE_TAG" --notes-file "./fastlane/metadata/android/en-US/changelogs/$CIRCLE_TAG.txt" "./workspace/outputs/apk/gms/release/app-gms-release.apk#BetterUntis $CIRCLE_TAG.apk"
 
 workflows:
   version: 2
