@@ -131,8 +131,8 @@
     <string name="elementpicker_hint_search_classes">Klassen durchsuchen…</string>
     <string name="elementpicker_hint_search_teachers">Lehrer durchsuchen…</string>
     <string name="elementpicker_hint_search_rooms">Räume durchsuchen…</string>
-	<string name="elementpicker_timetable_select">Wähle einen Stundenplan</string>
-	<string name="preferences_connectivity">Verbindungseinstellungen</string>
+    <string name="elementpicker_timetable_select">Wähle einen Stundenplan</string>
+    <string name="preferences_connectivity">Verbindungseinstellungen</string>
     <string name="preferences_info">Informationen</string>
     <string name="preferences_notifications">Benachrichtigungen</string>
     <string name="preferences_styling">Design</string>
@@ -271,7 +271,7 @@
     <string name="errors_crash_title">Es sieht aus als wäre BetterUntis abgestürzt.</string>
     <string name="errors_crash_message">Entschuldigung.</string>
     <string name="errors_report">Bitte hilf, die App zu verbessern, indem du die Fehler unten meldest:</string>
-    <string name="errors_button_dismiss">Schließen</string>
+    <string name="errors_button_dismiss">Alles schließen</string>
     <string name="errors_button_report">Senden</string>
     <string name="loading">Wird geladen</string>
     <string name="loading_failed">Ladevorgang fehlgeschlagen</string>
