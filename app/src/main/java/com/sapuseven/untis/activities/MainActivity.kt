@@ -757,7 +757,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 	@OptIn(ExperimentalMaterial3Api::class)
 	val drawerGesturesEnabled: Boolean
-		get() = drawerGestures || drawerState.isOpen
+		get() = drawerState.isOpen
 
 	@OptIn(ExperimentalMaterial3Api::class)
 	fun closeDrawer() {
