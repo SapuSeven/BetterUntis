@@ -276,7 +276,7 @@
     <string name="loading">Wird geladen</string>
     <string name="loading_failed">Ladevorgang fehlgeschlagen</string>
     <string name="settings_dialog_url_open_title">Keine kompatible App gefunden</string>
-    <string name="settings_dialog_url_open_text">BetterUntis konnte keine App finden, die mit dem Links öffnen kann.
+    <string name="settings_dialog_url_open_text">BetterUntis konnte keine App finden, die Links öffnen kann.
 \nBitte stelle sicher, dass du einen Webbrowser installiert hast oder öffne den Link auf einem anderen Gerät:</string>
     <string name="widget_configuration">Widget-Konfiguration</string>
     <string name="widget_timetable">Stundenplan</string>
