@@ -2,7 +2,7 @@
 <resources>
     <string name="app_desc">Eine alternative App für das Untis-Stundenplansystem.</string>
     <string name="all_success">erfolgreich</string>
-    <string name="all_exam">Klausur</string>
+    <string name="all_exam">Klausur/Arbeit</string>
     <string name="all_exit">Verlassen</string>
     <string name="all_failed">fehlgeschlagen</string>
     <string name="all_personal">Persönlich</string>
@@ -276,7 +276,7 @@
     <string name="loading">Wird geladen</string>
     <string name="loading_failed">Ladevorgang fehlgeschlagen</string>
     <string name="settings_dialog_url_open_title">Keine kompatible App gefunden</string>
-    <string name="settings_dialog_url_open_text">BetterUntis konnte keine App finden, die mit dem Öffnen von Links umgehen kann.
+    <string name="settings_dialog_url_open_text">BetterUntis konnte keine App finden, die mit dem Links öffnen kann.
 \nBitte stelle sicher, dass du einen Webbrowser installiert hast oder öffne den Link auf einem anderen Gerät:</string>
     <string name="widget_configuration">Widget-Konfiguration</string>
     <string name="widget_timetable">Stundenplan</string>
