@@ -149,7 +149,7 @@
     <string name="preference_category_general_behaviour">Verhalten</string>
     <string name="preference_category_general_week_display">Wochenanzeige</string>
     <string name="preference_category_general_automute">Automatisches Stummschalten</string>
-    <string name="preference_automute_enable">Automatisches Stummschalten</string>
+    <string name="preference_automute_enable">Automatisches Stummschalten aktivieren</string>
     <string name="preference_automute_enable_summary">Aktiviert während jeder Stunde automatisch den „Bitte nicht stören“-Modus</string>
     <string name="preference_automute_cancelled_lessons">Auch in entfallenen Stunden stumm schalten</string>
     <string name="preference_automute_mute_priority">Ausnahmen für \"Bitte nicht Stören\" ignorieren</string>
