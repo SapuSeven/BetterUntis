@@ -373,4 +373,6 @@
     <string name="infocenter_absences_list_schoolyear">Aktualna školska godina</string>
     <string name="main_dialog_reports_info_2">Ove vrijednosti možeš kasnije promijeniti u postavkama programa.</string>
     <string name="main_dialog_reports_info_1">BetterUntis koristi Sentry za prikupljanje informacija o prekidima rada programa i o drugim greškama.</string>
+    <string name="elementpicker_timetable_select">Odaberi raspored sati</string>
+    <string name="all_personal_abbr">Osobno</string>
 </resources>

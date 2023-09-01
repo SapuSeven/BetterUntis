@@ -62,4 +62,7 @@
     <string name="activity_title_errors">Błędy</string>
     <string name="all_subjects">Przedmioty</string>
     <string name="activity_title_info_center">Centrum informacji</string>
+    <string name="all_back">Wstecz</string>
+    <string name="all_edit">Edytuj</string>
+    <string name="all_error_details">Błąd: %1$s</string>
 </resources>
