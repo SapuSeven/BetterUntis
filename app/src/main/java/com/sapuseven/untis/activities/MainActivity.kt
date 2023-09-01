@@ -1523,7 +1523,7 @@ fun rememberMainAppState(
 	),
 	defaultDisplayedName: String = stringResource(id = R.string.app_name),
 	drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
-	drawerGestures: MutableState<Boolean> = rememberSaveable { mutableStateOf(true) },
+	drawerGestures: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 	loading: MutableState<Int> = rememberSaveable { mutableStateOf(0) },
 	currentWeekIndex: MutableState<Int> = rememberSaveable { mutableStateOf(0) },
 	lastRefreshTimestamp: MutableState<Long> = rememberSaveable { mutableStateOf(0L) },
