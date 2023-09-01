@@ -121,6 +121,10 @@ android {
 	}
 }
 
+sentry {
+	autoUploadProguardMapping = System.getenv('SENTRY_PROJECT') != null
+}
+
 aboutLibraries {
 	includePlatform = false
 	duplicationMode = com.mikepenz.aboutlibraries.plugin.DuplicateMode.MERGE

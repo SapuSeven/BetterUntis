@@ -33,7 +33,7 @@ jobs:
             echo 'export KEY_RELEASE_PASSWORD=$(echo "$KEY_RELEASE_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
       - run:
           name: Initial build
-          command: ./gradlew --no-daemon assemble bundle $([ -z $SENTRY_PROJECT ] && echo "-x uploadSentryProguardMappingsRelease")
+          command: ./gradlew --no-daemon assemble bundle
           environment:
             GRADLE_OPTS: '
               -Dorg.gradle.daemon=false
