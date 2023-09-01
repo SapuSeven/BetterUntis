@@ -1,0 +1,4 @@
+- Fix background workers not stopping properly
+- Fix drawer opening accidentally
+
+This release aims to be the first F-Droid compatible 4.x version of BetterUntis.
