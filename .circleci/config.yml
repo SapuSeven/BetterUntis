@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   gh: circleci/github-cli@2.2.0
+  jq: circleci/jq@2.2.0
 filters: &release
   branches:
     ignore: /.*/
@@ -146,6 +147,31 @@ jobs:
           command: |
             gh release create $CIRCLE_TAG --prerelease --title "BetterUntis $CIRCLE_TAG" --notes-file "./fastlane/metadata/android/en-US/changelogs/$CIRCLE_TAG.txt" "./workspace/outputs/apk/gms/release/app-gms-release.apk#BetterUntis $CIRCLE_TAG.apk"
 
+  deploy_fdroid:
+    docker:
+      - image: cimg/base:stable
+    working_directory: ~/betteruntis
+    steps:
+      - checkout
+      - jq/install
+      - attach_workspace:
+          at: workspace
+      - run:
+          name: Prepare release for F-Droid
+          command: |
+            git config user.email "ci@sapuseven.com"
+            git config user.name "CircleCI"
+            
+            git checkout -B release
+            git merge $CIRCLE_TAG
+            
+            versionCode=$(jq '.elements[0].versionCode' ./workspace/outputs/apk/gms/release/output-metadata.json)
+            sed -i "s/versionCode generateVersionCode()/versionCode $versionCode/" ./app/build.gradle
+
+            git commit -m "[skip ci] Update F-Droid release"
+            git tag fdroid-$CIRCLE_TAG
+            git push
+            git push origin fdroid-$CIRCLE_TAG
 workflows:
   version: 2
   build-and-deploy:
@@ -181,3 +207,10 @@ workflows:
           requires:
             - build
           filters: *release
+      - deploy_fdroid:
+          requires:
+            - build
+          #filters: *release TODO just testing
+          filters:
+            tags:
+              only: /.*/
