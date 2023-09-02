@@ -180,7 +180,7 @@ workflows:
       - build:
           filters:
             tags:
-              only: /.*/
+              ignore: /^fdroid-.*/
       - deploy_debug:
           requires:
             - build
@@ -211,7 +211,4 @@ workflows:
       - deploy_fdroid:
           requires:
             - build
-          #filters: *release TODO just testing
-          filters:
-            tags:
-              only: /.*/
+          filters: *release
