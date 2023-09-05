@@ -16,8 +16,11 @@ static def generateVersionCode() {
 
 android {
 	compileSdkVersion 33
-	buildToolsVersion '33.0.0'
 	namespace 'com.sapuseven.untis'
+
+	androidResources {
+		generateLocaleConfig true
+	}
 
 	defaultConfig {
 		applicationId "com.sapuseven.untis"
