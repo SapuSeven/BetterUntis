@@ -5,7 +5,6 @@ import android.app.AlarmManager
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.*
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -258,7 +257,7 @@ class SettingsActivity : BaseComposeActivity() {
 											)
 										}
 										if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-											PreferenceCategory(stringResource(id = R.string.preference_app_language)) {
+											PreferenceCategory(stringResource(id = R.string.preference_category_app_language)) {
 												val packageName = LocalContext.current.packageName
 												Preference(
 													title = { Text(text = stringResource(id = R.string.preference_app_language)) },
