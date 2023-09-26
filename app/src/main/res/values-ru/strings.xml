@@ -42,15 +42,15 @@
     <string name="all_lessontopic_none">(Нет темы)</string>
     <string name="preference_background_future">Будущий день</string>
     <string name="all_edit">Изменить</string>
-    <string name="logindatainput_error_invalid_school">Неверное школьное ID!</string>
+    <string name="logindatainput_error_invalid_school">Неверный ID школы!</string>
     <string name="logindatainput_loading_user_data">Загрузка данных пользователя…</string>
     <string name="preference_range_from">от</string>
     <string name="all_dialog_error_title">Информация об ошибке</string>
-    <string name="errors_button_report">Сообщить все</string>
+    <string name="errors_button_report">Пожаловаться на все</string>
     <string name="elementpicker_hint_search">Поиск…</string>
     <string name="main_dialog_itemdetails_timeformat">%1$s - %2$s</string>
     <string name="all_error">Ошибка</string>
-    <string name="login_scan_code">Сканировать код QR</string>
+    <string name="login_scan_code">Сканировать QR-код</string>
     <string name="preference_automute_minimum_break_length">Минимальная длина перерыва</string>
     <string name="all_lesson_info">Информация</string>
     <string name="main_dialog_update_profile_title">Требуется обновление профиля</string>
@@ -82,7 +82,7 @@
     <string name="errormessagedictionary_no_public_access">Анонимный доступ отключен.</string>
     <string name="all_lesson_cancelled">%1$s (отменено)</string>
     <string name="all_ok">OK</string>
-    <string name="login_manual_data_input">Ввод данных вручную</string>
+    <string name="login_manual_data_input">Ручной ввод данных</string>
     <string name="all_lesson_irregular">%1$s (нерегулярно)</string>
     <string name="logindatainput_dialog_qrcodeinvalid_title">Недейственный QR-код</string>
     <string name="all_back">Назад</string>
@@ -114,7 +114,31 @@
     <string name="mainactivitydrawer_dropdown_show">Список профиля</string>
     <string name="roomfinder_item_desc_occupied">Эта комната занята.</string>
     <string name="all_homework">Домашнее задание</string>
-    <string name="errormessagedictionary_invalid_server_url">Неверный URL-адрес сервера!</string>
+    <string name="errormessagedictionary_invalid_server_url">Неверный адрес сервера!</string>
     <string name="main_dialog_itemdetails_image_homeworks">Домашнее задание</string>
     <string name="preference_background_irregular_past">Неправильные уроки</string>
+    <string name="all_dialog_error_message">ID запроса: %1$d
+\nКод ошибки: %2$d
+\nОписание ошибки: %3$s</string>
+    <string name="login_no_results">Результатов нет</string>
+    <string name="logindatainput_data_loaded">Данные загружены.</string>
+    <string name="errors_github_attach_file_message">Пожалуйста, прикрепите сжатые логи.
+\nОни сохранены в \"%1$s\".</string>
+    <string name="logindatainput_title_edit">Редактировать профиль</string>
+    <string name="logindatainput_title_add">Добавить профиль</string>
+    <string name="main_dialog_update_profile_message">С недавним обновлением приложения было изменено хранение данных пользователя. Для продолжения использования, пожалуйста, обновите свой профиль.</string>
+    <string name="menu_infocenter_events">События</string>
+    <string name="main_dialog_update_profile_button">Обновить профиль</string>
+    <string name="logindatainput_delete">Удалить профиль</string>
+    <string name="main_dialog_delete_profile_title">Удалить профиль\?</string>
+    <string name="infocenter_events_empty">Событий нет</string>
+    <string name="logindatainput_anonymous_login">Анонимный вход</string>
+    <string name="errors_crash_title">Похоже, что BetterUntis вылетело.</string>
+    <string name="infocenter_messages_empty">Сообщений нет</string>
+    <string name="loading_failed">Загрузка не удалась</string>
+    <string name="menu_infocenter_messagesofday">Сообщения</string>
+    <string name="errormessagedictionary_invalid_school">Указанная школа не существует!</string>
+    <string name="errors_button_dismiss">Отклонить все</string>
+    <string name="main_dialog_delete_bookmark">Вы точно хотите удалить эту закладку\?</string>
+    <string name="main_dialog_delete_profile_message">Вы точно хотите удалить свой профиль пользователя %1$s в школе %2$s\?</string>
 </resources>
