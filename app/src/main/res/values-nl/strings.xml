@@ -1,2 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="all_dialog_error_message">Aanvraag ID: %1$d
+\nFoutcode: %2$d
+\nFoutbericht: %3$s</string>
+    <string name="elementpicker_hint_search_teachers">Zoeken naar leraren…</string>
+    <string name="all_error_details">Foutmelding: %1$s</string>
+    <string name="infocenter_absences_filter_sort">Sorteer volgorde</string>
+    <string name="all_yes">Ja</string>
+    <string name="all_hint_tap_to_edit">(Tikken om te bewerken)</string>
+    <string name="all_lesson_exam">%1$s (examen!)</string>
+    <string name="all_success">succes</string>
+    <string name="all_dialog_crash_title">Crashlog gevonden</string>
+    <string name="errors_github_attach_file_message">Voeg de gecomprimeerde logbestanden bij dit probleem.
+\nZe zijn opgeslagen op`%1$s`</string>
+    <string name="errormessagedictionary_invalid_time_settings">Ongeldige datum- en/of tijdinstellingen!</string>
+    <string name="elementpicker_hint_search_rooms">Zoek naar lokalen…</string>
+    <string name="activity_title_errors">Foutmeldingen</string>
+    <string name="all_dialog_datepicker_button_today">Vandaag</string>
+    <string name="all_classes">Klassen</string>
+    <string name="all_no">Nee</string>
+    <string name="all_lessontopic">Lesonderwerp</string>
+    <string name="infocenter_officehours_empty">Geen kantooruren</string>
+    <string name="all_lessontopic_none">(Geen onderwerp)</string>
+    <string name="all_edit">Bewerk</string>
+    <string name="infocenter_absence_excused">Gexcuseerd</string>
+    <string name="all_dialog_error_title">Foutinformatie</string>
+    <string name="errors_button_report">Alles melden</string>
+    <string name="elementpicker_hint_search">Zoeken…</string>
+    <string name="errormessagedictionary_server_webuntis_not_installed">De opgegeven server heeft WebUntis niet geïnstalleerd!</string>
+    <string name="all_error">Fout</string>
+    <string name="infocenter_absences_filter">Filter afwezigheden</string>
+    <string name="all_lesson_info">Info</string>
+    <string name="errors_report">Help de app te verbeteren door de foutmeldingen hieronder te melden:</string>
+    <string name="errormessagedictionary_invalid_credentials">Verkeerde gebruikersnaam of sleutel!</string>
+    <string name="elementpicker_timetable_select">Selecteer een tijdschema</string>
+    <string name="all_close">Sluiten</string>
+    <string name="all_reset">Reset</string>
+    <string name="infocenter_absences_filter_newest_first">Nieuwste eerst</string>
+    <string name="all_lessontopic_edit">Lesonderwerp bewerken</string>
+    <string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
+    <string name="all_lesson_details">Lesdetails</string>
+    <string name="infocenter_events_empty">Geen gebeurtenissen</string>
+    <string name="all_failed">mislukt</string>
+    <string name="infocenter_absence_unknown_reason">Onbekende reden</string>
+    <string name="infocenter_messages_attachments">Bijlagen</string>
+    <string name="errors_crash_message">Sorry daarvoor.</string>
+    <string name="all_personal_timetable">Persoonlijk rooster</string>
+    <string name="all_personal">Persoonlijk</string>
+    <string name="errormessagedictionary_too_many_results">Te veel resultaten</string>
+    <string name="all_dialog_absences_checked">Afwezigheden gecontroleerd.</string>
+    <string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
+    <string name="errormessagedictionary_generic">Onbekende fout</string>
+    <string name="errormessagedictionary_no_public_access">Anonieme toegang is uitgeschakeld.</string>
+    <string name="all_anonymous">Anoniem</string>
+    <string name="all_lesson_cancelled">%1$s (geannuleerd)</string>
+    <string name="errors_crash_title">Het lijkt erop dat BetterUntis is gecrasht.</string>
+    <string name="infocenter_messages_empty">Geen berichten</string>
+    <string name="all_lesson_irregular">%1$s (onregelmatig)</string>
+    <string name="all_back">Terug</string>
+    <string name="all_dialog_absences_not_checked">Afwezigheden niet gecontroleerd.</string>
+    <string name="all_delete">Verwijder</string>
+    <string name="infocenter_absences_empty">Geen afwezigheden</string>
+    <string name="all_add">Toevoegen</string>
+    <string name="activity_title_settings">Instellingen</string>
+    <string name="infocenter_timeformat_sameday">%2$s - %4$s, %1$s</string>
+    <string name="errormessagedictionary_invalid_school">De opgegeven school bestaat niet!</string>
+    <string name="all_rooms">Lokalen</string>
+    <string name="activity_title_info_center">Info Center</string>
+    <string name="errors_button_dismiss">Alles afwijzen</string>
+    <string name="all_exam">Examen</string>
+    <string name="errormessagedictionary_user_locked">Gebruiker vergrendeld!</string>
+    <string name="all_subjects">Onderwerpen</string>
+    <string name="infocenter_absences_filter_oldest_first">Oudste eerst</string>
+    <string name="elementpicker_hint_search_classes">Zoek naar klassen…</string>
+    <string name="all_absences">Afwezigheden</string>
+    <string name="all_homework">Huiswerk</string>
+    <string name="errormessagedictionary_invalid_server_url">Ongeldige server URL!</string>
+</resources>
