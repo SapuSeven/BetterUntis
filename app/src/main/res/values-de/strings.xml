@@ -204,10 +204,13 @@
     <string name="preference_notifications_visibility_hidden">Nicht anzeigen</string>
     <string name="preference_notifications_visibility_long">Langer Name</string>
     <string name="preference_notifications_visibility_short">Kurzer Name</string>
-    <string name="preference_schoolcolors_regular">Für normale Stunden</string>
+	<string name="preference_school_background">Farben der Schule verwenden</string>
+	<string name="preference_school_background_desc">Manche Schulen senden eigene Hintergrundfarben</string>
+	<string name="preference_schoolcolors_cancelled">Für entfallene Stunden</string>
     <string name="preference_schoolcolors_exam">Für Stunden mit Tests</string>
     <string name="preference_schoolcolors_irregular">Für irreguläre Stunden</string>
-    <string name="preference_schoolcolors_cancelled">Für entfallene Stunden</string>
+	<string name="preference_schoolcolors_regular">Für normale Stunden</string>
+	<string name="preference_schoolcolors_subjects">Für Fächer</string>
     <string name="preference_theme">Design auswählen</string>
     <string name="preference_theme_blue">Blau</string>
     <string name="preference_theme_cyan">Türkis</string>
@@ -237,8 +240,6 @@
     <string name="preference_timetable_range_index_reset">Stundennummerierung zurücksetzen</string>
     <string name="preference_timetable_substitutions_irregular">Irreguläre Stunden erkennen</string>
     <string name="preference_timetable_substitutions_irregular_desc">Vertretungsstunden als irregulär behandeln</string>
-    <string name="preference_school_background">Farben der Schule verwenden</string>
-    <string name="preference_school_background_desc">Manche Schulen senden eigene Hintergrundfarben</string>
     <string name="preference_use_theme_background">Designfarben verwenden</string>
     <string name="preference_use_theme_background_desc">Dies gilt nur für normale Stunden</string>
     <string name="preference_week_custom_range">Wochenlänge</string>
