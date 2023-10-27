@@ -96,7 +96,7 @@ fun ColorPicker(
 				onValueChange = { newColor ->
 					if (newColor.matches(Regex("^#[0-9a-fA-F]{0,8}$"))) {
 						colorHex = newColor
-						newColor.toUIntOrNull(16)?.let {
+						newColor.replace("#", "").toUIntOrNull(16)?.let {
 							onColorChanged(HsvColor.from(Color(it.toInt())), false)
 						}
 					}
