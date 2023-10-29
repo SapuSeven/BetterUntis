@@ -896,21 +896,22 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		val cancelledPastColor = preferences.backgroundCancelledPast.getValue()
 		val irregularColor = preferences.backgroundIrregular.getValue()
 		val irregularPastColor = preferences.backgroundIrregularPast.getValue()
-		val schoolColors = preferences.schoolBackground.getValue()
-		val useSubjectColors = schoolColors.contains("subjects")
+		val schoolColorsPref = preferences.schoolBackground.getValue()
 
 		items.forEach { item ->
-			var schoolColor = android.graphics.Color.parseColor(item.periodData.element.backColor)
-			val schoolTextColor = android.graphics.Color.parseColor(item.periodData.element.foreColor)
 
-			if (useSubjectColors) {
-				schoolColor = timetableDatabaseInterface.getBackColor(item.periodData.subjects.elementAtOrNull(0))
-						?: schoolColor
-			}
+			// With "subject" specific schools colors, things are getting more complex regarding the priority of the colors.
+			// As long as we cannot yet combine subject colors with other item category colors,
+			// exam/cancelled/irregular school colors still rule over subject colors, if they are selected.
+			// Subject colors only apply to regular items.
+			// When "regular" AND "subject" is selected as school colors, "subject" wins.
+
+			var schoolColor = android.graphics.Color.parseColor(item.periodData.element.backColor)
+			var schoolTextColor = android.graphics.Color.parseColor(item.periodData.element.foreColor)
 
 			when {
 				item.periodData.isExam() ->
-					if (schoolColors.contains("exam") || useSubjectColors) {
+					if (schoolColorsPref.contains("exam")) {
 						item.color = schoolColor
 						item.pastColor = schoolColor.darken(0.25f)
 						item.textColor = schoolTextColor
@@ -921,7 +922,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 					}
 
 				item.periodData.isCancelled() ->
-					if (schoolColors.contains("cancelled") || useSubjectColors) {
+					if (schoolColorsPref.contains("cancelled")) {
 						item.color = schoolColor
 						item.pastColor = schoolColor.darken(0.25f)
 						item.textColor = schoolTextColor
@@ -932,7 +933,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 					}
 
 				item.periodData.isIrregular() ->
-					if (schoolColors.contains("irregular") || useSubjectColors) {
+					if (schoolColorsPref.contains("irregular")) {
 						item.color = schoolColor
 						item.pastColor = schoolColor.darken(0.25f)
 						item.textColor = schoolTextColor
@@ -942,16 +943,25 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 						item.textColor = colorOn(Color(irregularColor)).toArgb()
 					}
 
-				else ->
-					if (schoolColors.contains("regular") || useSubjectColors) {
-						item.color = schoolColor
-						item.pastColor = schoolColor.darken(0.25f)
-						item.textColor = schoolTextColor
-					} else {
-						item.color = regularColor
-						item.pastColor = regularPastColor
-						item.textColor = colorOn(Color(regularColor)).toArgb()
-					}
+				schoolColorsPref.contains("subjects") -> {
+					schoolColor = timetableDatabaseInterface.getBackColor(item.periodData.subjects.elementAtOrNull(0))
+							?: regularColor
+					schoolTextColor = timetableDatabaseInterface.getForeColor(item.periodData.subjects.elementAtOrNull(0))
+							?: colorOn(Color(schoolColor)).toArgb()
+					item.color = schoolColor
+					item.pastColor = schoolColor.darken(0.25f)
+					item.textColor = schoolTextColor
+				}
+
+				else -> if (schoolColorsPref.contains("regular")) {
+					item.color = schoolColor
+					item.pastColor = schoolColor
+					item.textColor = colorOn(Color(schoolTextColor)).toArgb()
+				} else {
+					item.color = regularColor
+					item.pastColor = regularPastColor
+					item.textColor = colorOn(Color(regularColor)).toArgb()
+				}
 
 			}
 

@@ -96,6 +96,26 @@ class TimetableDatabaseInterface(val userDatabase: UserDatabase, val id: Long) {
 		}
 	}
 
+	private fun getForeColor(id: Int, type: Type): Int? {
+		return when (type) {
+			Type.CLASS -> allClasses[id]?.foreColor
+			Type.TEACHER -> allTeachers[id]?.foreColor
+			Type.SUBJECT -> allSubjects[id]?.foreColor
+			Type.ROOM ->  allRooms[id]?.foreColor
+			else -> null
+		}?.let{Color.parseColor(it)}
+	}
+
+	private fun getForeColor(id: Int, type: String): Int? {
+		return getForeColor(id, Type.valueOf(type))
+	}
+
+	fun getForeColor(periodElement: PeriodElement?): Int? {
+		return periodElement?.let {
+			getForeColor(it.id , it.type)
+		}
+	}
+
 	fun isAllowed(id: Int, type: Type?): Boolean {
 		return when (type) {
 			Type.CLASS -> allClasses[id]?.displayable
