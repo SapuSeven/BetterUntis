@@ -1,1 +1,2 @@
 include ':app', ':weekview', ':material-color-utils'
+include ':api'

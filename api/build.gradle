@@ -1,0 +1,35 @@
+plugins {
+	id 'java-library'
+	id 'org.jetbrains.kotlin.jvm'
+	id 'org.openapi.generator' version '7.0.1'
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
+}
+
+compileKotlin.dependsOn tasks.openApiGenerate
+
+dependencies {
+	implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization_version"
+	implementation "io.ktor:ktor-client-core:$ktor_version"
+	implementation "io.ktor:ktor-client-content-negotiation:$ktor_version"
+}
+
+openApiGenerate {
+	generatorName.set("kotlin")
+	inputSpec.set("$projectDir/spec/untis.yaml")
+	outputDir.set("$buildDir/generated")
+	apiPackage.set("com.sapuseven.untis.api")
+	modelPackage.set("com.sapuseven.untis.model")
+	configOptions.set([
+			library: 'jvm-ktor',
+			dateLibrary: 'java8',
+			serializationLibrary: 'kotlinx_serialization'
+	])
+}
+
+kotlin.sourceSets.named("main") {
+	kotlin.srcDir("$buildDir/generated/src/main/kotlin")
+}
