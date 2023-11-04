@@ -9,6 +9,7 @@ import com.github.kittinunf.fuel.coroutines.awaitStringResult
 import com.github.kittinunf.fuel.serialization.kotlinxDeserializerOf
 import com.github.kittinunf.result.Result
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_WEBUNTIS_HOST
+import com.sapuseven.untis.data.connectivity.UntisApiConstants.DEFAULT_WEBUNTIS_PATH
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.models.untis.params.BaseParams
@@ -45,7 +46,7 @@ class UntisRequest {
 
 	class UntisRequestQuery(val user: User? = null, apiUrl: String? = null) {
 		var url = apiUrl ?: user?.apiUrl ?: user?.schoolId?.let {
-			UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL + DEFAULT_WEBUNTIS_HOST + UntisApiConstants.DEFAULT_WEBUNTIS_PATH + it
+			"https://" + DEFAULT_WEBUNTIS_HOST + DEFAULT_WEBUNTIS_PATH + it
 		} ?: ""
 		var data: UntisRequestData = UntisRequestData()
 		var proxyHost: String? = null

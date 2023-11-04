@@ -275,7 +275,7 @@
     <string name="logindatainput_skip_app_secret">Hopp over programhemmeligehtsutledelse</string>
     <string name="logindatainput_error_invalid_url">Ugyldig nettadresse.</string>
     <string name="logindatainput_api_url">Untis-API-sti</string>
-    <string name="activity_title_messenger">Meldingstjeneste</string>
+    <string name="activity_title_messenger">Messenger</string>
     <string name="all_hint_tap_to_edit">(Trykk for å redigere)</string>
     <string name="all_dialog_crash_copied">Krasjlogg kopiert til utklippstavle.</string>
     <string name="all_dialog_crash_title">Krasjlogg funnet</string>
@@ -286,4 +286,12 @@
     <string name="all_lesson_details">Leksjonsdetaljer</string>
     <string name="all_lessontopic_none">(Uten emne)</string>
     <string name="main_dialog_itemdetails_timeformat">%1$s - %2$s</string>
+    <string name="all_back">Tilbake</string>
+    <string name="all_exam">Eksamen</string>
+    <string name="all_exit">Gå ut</string>
+    <string name="all_homework">Hjemmearbeid</string>
+    <string name="all_lesson_info">Informasjon</string>
+    <string name="all_dialog_absences_save">Send inn fraværskontroll</string>
+    <string name="all_edit">Rediger</string>
+    <string name="all_lessontopic_edit">Rediger leksjonstema</string>
 </resources>

@@ -12,6 +12,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.sapuseven.untis.helpers.analytics.initSentry
 import com.sapuseven.untis.workers.DailyWorker
+import com.sapuseven.untis.workers.DailyWorker.Companion.TAG_DAILY_WORK
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
@@ -37,7 +38,12 @@ class App : Application(), Configuration.Provider {
 			initSentry(reportBreadcrumbsEnbaled)
 		}
 
-		WorkManager.getInstance(applicationContext).enqueue(OneTimeWorkRequestBuilder<DailyWorker>().build())
+		GlobalScope.launch {
+			WorkManager.getInstance(applicationContext).apply {
+				cancelAllWorkByTag(TAG_DAILY_WORK)
+				enqueue(OneTimeWorkRequestBuilder<DailyWorker>().build())
+			}
+		}
 	}
 }
 
