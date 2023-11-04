@@ -19,10 +19,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -42,7 +44,6 @@ import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.helpers.DateTimeUtils
-import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.UntisAbsence
 import com.sapuseven.untis.models.untis.UntisAttachment
@@ -61,9 +62,9 @@ import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
 import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
+
 
 @OptIn(
 	ExperimentalMaterial3Api::class, ExperimentalPagerApi::class,
@@ -81,6 +82,7 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 	val pagerState = rememberPagerState(initialPage)
 	val scope = rememberCoroutineScope()
 	val context = LocalContext.current
+	val clipboardManager = LocalClipboardManager.current
 
 	var absenceCheck by rememberSaveable { mutableStateOf<Triple<Int, UntisDateTime, UntisDateTime>?>(null) }
 
@@ -357,7 +359,10 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 												)
 											}
 										}
-									} else null
+									} else null,
+									modifier = Modifier.clickable {
+										clipboardManager.setText(AnnotatedString(it.text))
+									}
 								)
 							}
 
