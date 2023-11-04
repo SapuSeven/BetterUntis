@@ -48,7 +48,6 @@ import com.sapuseven.untis.models.untis.UntisAttachment
 import com.sapuseven.untis.models.untis.UntisDateTime
 import com.sapuseven.untis.models.untis.UntisError
 import com.sapuseven.untis.models.untis.UntisTime
-import com.sapuseven.untis.models.untis.masterdata.AbsenceReason
 import com.sapuseven.untis.models.untis.params.*
 import com.sapuseven.untis.models.untis.response.*
 import com.sapuseven.untis.models.untis.timetable.Period
@@ -63,8 +62,8 @@ import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import kotlinx.coroutines.launch
-import org.joda.time.DateTime
 import org.joda.time.LocalDateTime
+import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormat
 
 
@@ -91,7 +90,11 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 		)
 	}
 
-	var detailedAbsenceCheck by rememberSaveable { mutableStateOf<Pair<Pair<Int, UntisStudent>, Pair<UntisDateTime, UntisDateTime>>?>(null) }
+	var detailedAbsenceCheck by rememberSaveable {
+		mutableStateOf<Pair<Pair<Int, UntisStudent>, Pair<UntisDateTime, UntisDateTime>>?>(
+			null
+		)
+	}
 	var studentName by rememberSaveable { mutableStateOf<String?>(null) }
 
 	var untisPeriodData by remember { mutableStateOf<UntisPeriodData?>(null) }
@@ -145,7 +148,7 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 					onClick = {
 						loading = true
 
-						if (detailedAbsenceCheck != null){
+						if (detailedAbsenceCheck != null) {
 							scope.launch {
 								createAbsence(
 									user = user,
@@ -684,7 +687,11 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 												)
 											else
 												Toast
-													.makeText(context, errorMessageGeneric, Toast.LENGTH_LONG)
+													.makeText(
+														context,
+														errorMessageGeneric,
+														Toast.LENGTH_LONG
+													)
 													.show()
 										}, {
 											Toast
@@ -720,10 +727,14 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 						trailingContent = {
 							IconButton(
 								onClick = {
-									detailedAbsenceCheck = (absenceCheck!!.first to student) to (absenceCheck!!.second to absenceCheck!!.third)
+									detailedAbsenceCheck =
+										(absenceCheck!!.first to student) to (absenceCheck!!.second to absenceCheck!!.third)
 								}
-							){
-								Icon(painter = painterResource(id = R.drawable.notification_clock), contentDescription = null)
+							) {
+								Icon(
+									painter = painterResource(id = R.drawable.notification_clock),
+									contentDescription = null
+								)
 							}
 						}
 					)
@@ -737,17 +748,6 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 			exit = fullscreenDialogAnimationExit()
 		) {
 			studentName = detailedAbsenceCheck?.first?.second?.fullName()
-
-			val startTimePickerState = rememberTimePickerState(
-				initialHour = detailedAbsenceCheck?.second?.first?.toDateTime()?.hourOfDay ?: DateTime.now().hourOfDay,
-				initialMinute = detailedAbsenceCheck?.second?.first?.toDateTime()?.minuteOfHour?: DateTime.now().minuteOfHour,
-				is24Hour = true
-			)
-			val endTimePickerState = rememberTimePickerState(
-				initialHour = detailedAbsenceCheck?.second?.second?.toDateTime()?.hourOfDay ?: DateTime.now().hourOfDay,
-				initialMinute = detailedAbsenceCheck?.second?.second?.toDateTime()?.minuteOfHour?: DateTime.now().minuteOfHour,
-				is24Hour = true
-			)
 
 			BackHandler(
 				enabled = detailedAbsenceCheck != null,
@@ -787,7 +787,10 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 						trailingContent = {
 							Text(
 								text = detailedAbsenceCheck?.second?.first?.toLocalDateTime()
-									?.toString(DateTimeFormat.forStyle("MS").withLocale(context.resources.configuration.locale))
+									?.toString(
+										DateTimeFormat.forStyle("MS")
+											.withLocale(context.resources.configuration.locales[0])
+									)
 									?: "",
 								style = MaterialTheme.typography.labelLarge
 							)
@@ -804,7 +807,10 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 						trailingContent = {
 							Text(
 								text = detailedAbsenceCheck?.second?.second?.toLocalDateTime()
-									?.toString(DateTimeFormat.forStyle("MS").withLocale(context.resources.configuration.locale))
+									?.toString(
+										DateTimeFormat.forStyle("MS")
+											.withLocale(context.resources.configuration.locales[0])
+									)
 									?: "",
 								style = MaterialTheme.typography.labelLarge
 							)
@@ -861,45 +867,40 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 						}
 					)*/
 
-					if (showStartTimePicker){
+					if (showStartTimePicker) {
+						val startTime = detailedAbsenceCheck?.let {
+							it.second.first.toLocalDateTime()
+						} ?: LocalDateTime()
 						TimePickerDialog(
-							onConfirm = {
-								val time = detailedAbsenceCheck!!.second.first.toLocalDateTime()
-									.withTime(startTimePickerState.hour, startTimePickerState.minute, 0, 0)
-								detailedAbsenceCheck =
-									detailedAbsenceCheck!!.first to (UntisDateTime(time) to detailedAbsenceCheck?.second?.second!!)
-								showStartTimePicker = false
-							},
-							onCancel = {
+							initialSelection = startTime.toLocalTime(),
+							onDismiss = {
 								showStartTimePicker = false
 							}
-						) {
-							TimePicker(
-								state = startTimePickerState
-							)
+						) { time ->
+							detailedAbsenceCheck =
+								detailedAbsenceCheck!!.first to (UntisDateTime(
+									time.toDateTime(startTime.toDateTime()).toLocalDateTime()
+								) to detailedAbsenceCheck?.second?.second!!)
+							showStartTimePicker = false
 						}
 					}
 					if (showEndTimePicker) {
+						val endTime = detailedAbsenceCheck?.let {
+							it.second.second.toLocalDateTime()
+						} ?: LocalDateTime().plusHours(1)
 						TimePickerDialog(
-							onConfirm = {
-								val time = detailedAbsenceCheck!!.second.second.toLocalDateTime()
-									.withTime(endTimePickerState.hour, endTimePickerState.minute, 0, 0)
-								detailedAbsenceCheck =
-									detailedAbsenceCheck!!.first to (detailedAbsenceCheck?.second?.first!! to UntisDateTime(
-										time
-									))
-								showEndTimePicker = false
-							},
-							onCancel = {
+							initialSelection = endTime.toLocalTime(),
+							onDismiss = {
 								showEndTimePicker = false
 							}
-						) {
-							TimePicker(
-								state = endTimePickerState
-							)
+						) { time ->
+							detailedAbsenceCheck =
+								detailedAbsenceCheck!!.first to (detailedAbsenceCheck?.second?.first!! to UntisDateTime(
+									time.toDateTime(endTime.toDateTime()).toLocalDateTime()
+								))
+							showEndTimePicker = false
 						}
 					}
-
 				}
 			}
 		}

@@ -17,69 +17,86 @@
 
 package com.sapuseven.untis.ui.dialogs
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.sapuseven.untis.R
+import org.joda.time.LocalTime
+import java.text.DateFormat
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimePickerDialog(
-	title: String = stringResource(id = R.string.all_default_time_dialog_title),
-	onCancel: () -> Unit,
-	onConfirm: () -> Unit,
-	toggle: @Composable RowScope.() -> Unit = {},
-	content: @Composable () -> Unit,
+	context: Context? = null,
+	initialSelection: LocalTime = LocalTime.now(),
+	onDismiss: () -> Unit,
+	onTimeSelected: (LocalTime) -> Unit,
 ) {
-	Dialog(
-		onDismissRequest = onCancel,
-		properties = DialogProperties(usePlatformDefaultWidth = false),
-	) {
+	Dialog(onDismissRequest = onDismiss) {
+		val timePickerState = rememberTimePickerState(
+			initialHour = initialSelection.hourOfDay,
+			initialMinute = initialSelection.minuteOfHour,
+			is24Hour = context?.let { android.text.format.DateFormat.is24HourFormat(context) } ?: true
+		)
+
 		Surface(
-			shape = MaterialTheme.shapes.extraLarge,
-			tonalElevation = 6.dp,
-			modifier = Modifier
-				.width(IntrinsicSize.Min)
-				.background(
-					shape = MaterialTheme.shapes.extraLarge,
-					color = MaterialTheme.colorScheme.surface
-				),
+			shape = AlertDialogDefaults.shape,
+			color = AlertDialogDefaults.containerColor
 		) {
 			Column(
-				modifier = Modifier.padding(24.dp),
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
 				Text(
+					text = stringResource(R.string.all_timepicker_select).uppercase(),
+					style = MaterialTheme.typography.labelSmall,
+					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					modifier = Modifier
 						.fillMaxWidth()
-						.padding(bottom = 20.dp),
-					text = title,
-					style = MaterialTheme.typography.labelMedium
+						.padding(horizontal = 24.dp, vertical = 16.dp)
+						.padding(bottom = 8.dp)
 				)
-				content()
+
+				TimePicker(
+					state = timePickerState
+				)
+
 				Row(
+					horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
 					modifier = Modifier
-						.height(40.dp)
 						.fillMaxWidth()
+						.padding(horizontal = 24.dp, vertical = 16.dp)
 				) {
-					toggle()
-					Spacer(modifier = Modifier.weight(1f))
 					TextButton(
-						onClick = onCancel
-					) { Text(stringResource(id = R.string.all_cancel)) }
+						onClick = onDismiss
+					) {
+						Text(text = stringResource(id = R.string.all_cancel))
+					}
+
 					TextButton(
-						onClick = onConfirm
-					) { Text(stringResource(id = R.string.all_ok)) }
+						onClick = { onTimeSelected(LocalTime(timePickerState.hour, timePickerState.minute)) }
+					) {
+						Text(text = stringResource(id = R.string.all_ok))
+					}
 				}
 			}
 		}
