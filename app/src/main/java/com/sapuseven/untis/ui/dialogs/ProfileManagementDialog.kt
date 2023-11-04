@@ -80,7 +80,7 @@ fun BaseComposeActivity.ProfileManagementDialog( // TODO: Remove inheritance of 
 		) {
 			item {
 				ListItem(
-					headlineText = { Text(stringResource(R.string.mainactivitydrawer_profile_edit_hint)) },
+					headlineContent = { Text(stringResource(R.string.mainactivitydrawer_profile_edit_hint)) },
 					leadingContent = {
 						Icon(
 							imageVector = Icons.Outlined.Info,
@@ -94,8 +94,8 @@ fun BaseComposeActivity.ProfileManagementDialog( // TODO: Remove inheritance of 
 
 			items(profiles) { profile ->
 				ListItem(
-					headlineText = { Text(profile.getDisplayedName()) },
-					supportingText = { Text(profile.userData.schoolName) },
+					headlineContent = { Text(profile.getDisplayedName()) },
+					supportingContent = { Text(profile.userData.schoolName) },
 					leadingContent = {
 						Icon(
 							imageVector = Icons.Outlined.Person,
@@ -127,7 +127,7 @@ fun BaseComposeActivity.ProfileManagementDialog( // TODO: Remove inheritance of 
 
 			item {
 				ListItem(
-					headlineText = { Text(stringResource(id = R.string.mainactivitydrawer_profile_add)) },
+					headlineContent = { Text(stringResource(id = R.string.mainactivitydrawer_profile_add)) },
 					leadingContent = {
 						Icon(
 							imageVector = Icons.Outlined.Add,

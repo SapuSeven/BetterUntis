@@ -47,7 +47,6 @@ import java.text.DateFormat
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimePickerDialog(
-	context: Context? = null,
 	initialSelection: LocalTime = LocalTime.now(),
 	onDismiss: () -> Unit,
 	onTimeSelected: (LocalTime) -> Unit,
@@ -55,8 +54,7 @@ fun TimePickerDialog(
 	Dialog(onDismissRequest = onDismiss) {
 		val timePickerState = rememberTimePickerState(
 			initialHour = initialSelection.hourOfDay,
-			initialMinute = initialSelection.minuteOfHour,
-			is24Hour = context?.let { android.text.format.DateFormat.is24HourFormat(context) } ?: true
+			initialMinute = initialSelection.minuteOfHour
 		)
 
 		Surface(

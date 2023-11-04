@@ -270,8 +270,9 @@ class LoginActivity : BaseComposeActivity() {
 
 		if (items.isNotEmpty()) LazyColumn(modifier) {
 			items(items) {
-				ListItem(headlineText = { Text(it.displayName) },
-					supportingText = { Text(it.address) },
+				ListItem(
+					headlineContent = { Text(it.displayName) },
+					supportingContent = { Text(it.address) },
 					modifier = Modifier.clickable {
 						val builder = Uri.Builder()
 							.appendQueryParameter("schoolInfo", getJSON().encodeToString(it))

@@ -111,8 +111,8 @@ open class BaseComposeWidget : GlanceAppWidget() {
 						.fillMaxWidth(),
 					dayColorScheme = colorSchemeLight,
 					nightColorScheme = colorSchemeDark,
-					headlineText = user?.getDisplayedName(LocalContext.current) ?: "(Invalid user)",
-					supportingText = user?.userData?.schoolName
+					headlineContent = user?.getDisplayedName(LocalContext.current) ?: "(Invalid user)",
+					supportingContent = user?.userData?.schoolName
 				)
 
 

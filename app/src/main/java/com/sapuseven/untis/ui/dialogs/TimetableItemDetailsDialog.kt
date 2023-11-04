@@ -351,7 +351,7 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 							).forEach {
 								if (it.isNotBlank())
 									ListItem(
-										headlineText = { Text(it) },
+										headlineContent = { Text(it) },
 										leadingContent = {
 											Icon(
 												painter = painterResource(id = R.drawable.all_info),
@@ -368,12 +368,12 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 								val endDate = it.endDate.toLocalDate()
 
 								ListItem(
-									headlineText = {
+									headlineContent = {
 										ClickableUrlText(it.text) {
 											openUrl(it)
 										}
 									},
-									supportingText = {
+									supportingContent = {
 										Text(
 											stringResource(
 												id = R.string.homeworks_due_time,
@@ -407,10 +407,10 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 							// Lesson exam
 							periodData.element.exam?.also {
 								ListItem(
-									headlineText = {
+									headlineContent = {
 										Text(it.name ?: stringResource(id = R.string.all_exam))
 									},
-									supportingText = it.text?.let { { Text(it) } },
+									supportingContent = it.text?.let { { Text(it) } },
 									leadingContent = {
 										Icon(
 											painter = painterResource(id = R.drawable.infocenter_exam),
@@ -425,7 +425,7 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 							// Online lesson
 							if (periodData.element.isOnlinePeriod == true) {
 								ListItem(
-									headlineText = { Text(stringResource(R.string.all_lesson_online)) },
+									headlineContent = { Text(stringResource(R.string.all_lesson_online)) },
 									leadingContent = {
 										Icon(
 											painter = painterResource(id = R.drawable.all_lesson_online),
@@ -457,10 +457,10 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 									error = error,
 									errorMessage = errorMessage,
 									editPermission = CAN_WRITE_STUDENT_ABSENCE,
-									headlineText = {
+									headlineContent = {
 										Text(stringResource(id = R.string.all_absences))
 									},
-									supportingText = {
+									supportingContent = {
 										Text(
 											stringResource(
 												if (it.absenceChecked) R.string.all_dialog_absences_checked
@@ -500,10 +500,10 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 									error = error,
 									errorMessage = errorMessage,
 									editPermission = CAN_WRITE_LESSON_TOPIC,
-									headlineText = {
+									headlineContent = {
 										Text(stringResource(id = R.string.all_lessontopic))
 									},
-									supportingText = {
+									supportingContent = {
 										val topic = lessonTopicNew ?: it.topic?.text
 
 										Text(
@@ -645,10 +645,10 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 						untisPeriodData?.absences?.findLast { it.studentId == student.id }
 
 					ListItem(
-						headlineText = {
+						headlineContent = {
 							Text(text = student.fullName())
 						},
-						supportingText = absence?.let {
+						supportingContent = absence?.let {
 							{
 								it.text
 							}
@@ -781,7 +781,7 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 						modifier = Modifier.clickable {
 							showStartTimePicker = true
 						},
-						headlineText = {
+						headlineContent = {
 							Text(text = stringResource(id = R.string.all_start_time))
 						},
 						trailingContent = {
@@ -801,7 +801,7 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 						modifier = Modifier.clickable {
 							showEndTimePicker = true
 						},
-						headlineText = {
+						headlineContent = {
 							Text(text = stringResource(id = R.string.all_end_time))
 						},
 						trailingContent = {
@@ -830,7 +830,7 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 							}
 
 						},
-						headlineText = {
+						headlineContent = {
 							Text(text = "Absence reason")
 						},
 						trailingContent = {
@@ -914,8 +914,8 @@ private fun TimetableItemDetailsDialogWithPeriodData(
 	error: Throwable?,
 	errorMessage: String?,
 	editPermission: String? = null,
-	headlineText: @Composable () -> Unit,
-	supportingText: @Composable (UntisPeriodData) -> Unit,
+	headlineContent: @Composable () -> Unit,
+	supportingContent: @Composable (UntisPeriodData) -> Unit,
 	leadingContent: @Composable (UntisPeriodData?) -> Unit,
 	onClick: () -> Unit
 ) {
@@ -926,10 +926,10 @@ private fun TimetableItemDetailsDialogWithPeriodData(
 		) == true
 
 	ListItem(
-		headlineText = headlineText,
-		supportingText = {
+		headlineContent = headlineContent,
+		supportingContent = {
 			untisPeriodData?.let {
-				supportingText(it)
+				supportingContent(it)
 			} ?: error?.let {
 				Text(stringResource(R.string.all_error))
 			} ?: Text(stringResource(R.string.loading))
@@ -965,7 +965,7 @@ private fun TimetableDatabaseInterface.TimetableItemDetailsDialogElement(
 ) {
 	if (elements.isNotEmpty())
 		ListItem(
-			headlineText = {
+			headlineContent = {
 				Row(
 					modifier = Modifier.horizontalScroll(rememberScrollState()),
 					horizontalArrangement = Arrangement.spacedBy(8.dp)
