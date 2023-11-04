@@ -57,11 +57,13 @@ import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.ClickableUrlText
 import com.sapuseven.untis.ui.common.SmallCircularProgressIndicator
+import com.sapuseven.untis.ui.common.VerticalScrollColumn
 import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import kotlinx.coroutines.launch
 import org.joda.time.LocalDateTime
+import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormat
 
 
@@ -88,6 +90,13 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 		)
 	}
 
+	var detailedAbsenceCheck by rememberSaveable {
+		mutableStateOf<Pair<Pair<Int, UntisStudent>, Pair<UntisDateTime, UntisDateTime>>?>(
+			null
+		)
+	}
+	var studentName by rememberSaveable { mutableStateOf<String?>(null) }
+
 	var untisPeriodData by remember { mutableStateOf<UntisPeriodData?>(null) }
 	var untisStudents by rememberSaveable { mutableStateOf<List<UntisStudent>?>(null) }
 	var error by remember { mutableStateOf<Throwable?>(null) }
@@ -108,11 +117,13 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 	AppScaffold(
 		topBar = {
 			CenterAlignedTopAppBar(
-				title = { Text(stringResource(id = R.string.all_lesson_details)) },
+				title = { Text(studentName ?: stringResource(id = R.string.all_lesson_details)) },
 				navigationIcon = {
 					IconButton(onClick = {
-						if (absenceCheck != null)
+						if (absenceCheck != null && detailedAbsenceCheck == null)
 							absenceCheck = null
+						else if (detailedAbsenceCheck != null)
+							detailedAbsenceCheck = null
 						else
 							dismiss()
 					}) {
@@ -136,6 +147,30 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 					modifier = Modifier.bottomInsets(),
 					onClick = {
 						loading = true
+
+						if (detailedAbsenceCheck != null) {
+							scope.launch {
+								createAbsence(
+									user = user,
+									ttId = detailedAbsenceCheck?.first?.first ?: -1,
+									student = detailedAbsenceCheck?.first?.second!!,
+									startDateTime = detailedAbsenceCheck?.second?.first!!.toLocalDateTime(),
+									endDateTime = detailedAbsenceCheck?.second?.second!!.toLocalDateTime()
+								).fold({
+									untisPeriodData = untisPeriodData?.copy(
+										absences = untisPeriodData?.absences?.plus(it)
+									)
+								}, {
+									Toast
+										.makeText(context, it.message, Toast.LENGTH_LONG)
+										.show()
+								})
+								detailedAbsenceCheck = null
+								loading = false
+							}
+							return@FloatingActionButton
+						}
+
 
 						scope.launch {
 							submitAbsencesChecked(
@@ -316,7 +351,7 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 							).forEach {
 								if (it.isNotBlank())
 									ListItem(
-										headlineText = { Text(it) },
+										headlineContent = { Text(it) },
 										leadingContent = {
 											Icon(
 												painter = painterResource(id = R.drawable.all_info),
@@ -333,12 +368,12 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 								val endDate = it.endDate.toLocalDate()
 
 								ListItem(
-									headlineText = {
+									headlineContent = {
 										ClickableUrlText(it.text) {
 											openUrl(it)
 										}
 									},
-									supportingText = {
+									supportingContent = {
 										Text(
 											stringResource(
 												id = R.string.homeworks_due_time,
@@ -372,10 +407,10 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 							// Lesson exam
 							periodData.element.exam?.also {
 								ListItem(
-									headlineText = {
+									headlineContent = {
 										Text(it.name ?: stringResource(id = R.string.all_exam))
 									},
-									supportingText = it.text?.let { { Text(it) } },
+									supportingContent = it.text?.let { { Text(it) } },
 									leadingContent = {
 										Icon(
 											painter = painterResource(id = R.drawable.infocenter_exam),
@@ -390,7 +425,7 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 							// Online lesson
 							if (periodData.element.isOnlinePeriod == true) {
 								ListItem(
-									headlineText = { Text(stringResource(R.string.all_lesson_online)) },
+									headlineContent = { Text(stringResource(R.string.all_lesson_online)) },
 									leadingContent = {
 										Icon(
 											painter = painterResource(id = R.drawable.all_lesson_online),
@@ -422,10 +457,10 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 									error = error,
 									errorMessage = errorMessage,
 									editPermission = CAN_WRITE_STUDENT_ABSENCE,
-									headlineText = {
+									headlineContent = {
 										Text(stringResource(id = R.string.all_absences))
 									},
-									supportingText = {
+									supportingContent = {
 										Text(
 											stringResource(
 												if (it.absenceChecked) R.string.all_dialog_absences_checked
@@ -465,10 +500,10 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 									error = error,
 									errorMessage = errorMessage,
 									editPermission = CAN_WRITE_LESSON_TOPIC,
-									headlineText = {
+									headlineContent = {
 										Text(stringResource(id = R.string.all_lessontopic))
 									},
-									supportingText = {
+									supportingContent = {
 										val topic = lessonTopicNew ?: it.topic?.text
 
 										Text(
@@ -588,7 +623,7 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 			exit = fullscreenDialogAnimationExit()
 		) {
 			BackHandler(
-				enabled = absenceCheck != null,
+				enabled = absenceCheck != null && detailedAbsenceCheck == null,
 			) {
 				absenceCheck = null
 			}
@@ -610,10 +645,10 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 						untisPeriodData?.absences?.findLast { it.studentId == student.id }
 
 					ListItem(
-						headlineText = {
+						headlineContent = {
 							Text(text = student.fullName())
 						},
-						supportingText = absence?.let {
+						supportingContent = absence?.let {
 							{
 								it.text
 							}
@@ -632,67 +667,246 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 									contentDescription = "Present"
 								)
 						},
-						modifier = Modifier.clickable {
-							absence?.let {
-								loading = true
+						modifier = Modifier.conditional(
+							detailedAbsenceCheck == null,
+						) {
+							this.clickable {
+								absence?.let {
+									loading = true
 
-								scope.launch {
-									deleteAbsence(
-										user,
-										absence
-									).fold({
-										if (it)
-											untisPeriodData = untisPeriodData?.copy(
-												absences = untisPeriodData?.absences?.minus(
-													absence
+									scope.launch {
+										deleteAbsence(
+											user,
+											absence
+										).fold({
+											if (it)
+												untisPeriodData = untisPeriodData?.copy(
+													absences = untisPeriodData?.absences?.minus(
+														absence
+													)
 												)
-											)
-										else
+											else
+												Toast
+													.makeText(
+														context,
+														errorMessageGeneric,
+														Toast.LENGTH_LONG
+													)
+													.show()
+										}, {
 											Toast
-												.makeText(
-													context,
-													errorMessageGeneric,
-													Toast.LENGTH_LONG
-												)
+												.makeText(context, it.message, Toast.LENGTH_LONG)
 												.show()
-									}, {
-										Toast
-											.makeText(context, it.message, Toast.LENGTH_LONG)
-											.show()
-									})
-									loading = false
-								}
-							} ?: absenceCheck?.let { absenceCheckPeriod ->
-								loading = true
+										})
+										loading = false
+									}
+								} ?: absenceCheck?.let { absenceCheckPeriod ->
+									loading = true
 
-								scope.launch {
-									createAbsence(
-										user,
-										absenceCheckPeriod.first,
-										student,
-										absenceCheckPeriod.second.toLocalDateTime(),
-										absenceCheckPeriod.third.toLocalDateTime()
-									).fold({
-										untisPeriodData = untisPeriodData?.copy(
-											absences = untisPeriodData?.absences?.plus(it)
-										)
-									}, {
-										Toast
-											.makeText(context, it.message, Toast.LENGTH_LONG)
-											.show()
-									})
-									loading = false
+									scope.launch {
+										createAbsence(
+											user,
+											absenceCheckPeriod.first,
+											student,
+											absenceCheckPeriod.second.toLocalDateTime(),
+											absenceCheckPeriod.third.toLocalDateTime()
+										).fold({
+											untisPeriodData = untisPeriodData?.copy(
+												absences = untisPeriodData?.absences?.plus(it)
+											)
+										}, {
+											Toast
+												.makeText(context, it.message, Toast.LENGTH_LONG)
+												.show()
+										})
+										loading = false
+									}
 								}
+							}
+						},
+						trailingContent = {
+							IconButton(
+								onClick = {
+									detailedAbsenceCheck =
+										(absenceCheck!!.first to student) to (absenceCheck!!.second to absenceCheck!!.third)
+								}
+							) {
+								Icon(
+									painter = painterResource(id = R.drawable.notification_clock),
+									contentDescription = null
+								)
 							}
 						}
 					)
 				}
 			}
 		}
+
+		AnimatedVisibility(
+			visible = detailedAbsenceCheck != null,
+			enter = fullscreenDialogAnimationEnter(),
+			exit = fullscreenDialogAnimationExit()
+		) {
+			studentName = detailedAbsenceCheck?.first?.second?.fullName()
+
+			BackHandler(
+				enabled = detailedAbsenceCheck != null,
+			) {
+				detailedAbsenceCheck = null
+				studentName = null
+			}
+			Box(
+				modifier = Modifier
+					.padding(innerPadding)
+					.fillMaxSize()
+					.background(MaterialTheme.colorScheme.surface)
+			) {
+				VerticalScrollColumn {
+					var showStartTimePicker by remember { mutableStateOf(false) }
+					var showEndTimePicker by remember { mutableStateOf(false) }
+					/*
+					* See line 800 for explaination.
+					*
+					var isDropdownExpanded by remember { mutableStateOf(false) }
+					var menuOptions = listOf<AbsenceReason>()
+					var selectedOptionText by remember {
+						mutableStateOf(untisPeriodData?.absences?.findLast {
+							it.studentId == detailedAbsenceCheck?.first?.second?.id
+						}?.absenceReason ?: "Absence reason unknown")
+					}*/
+
+
+
+					ListItem(
+						modifier = Modifier.clickable {
+							showStartTimePicker = true
+						},
+						headlineContent = {
+							Text(text = stringResource(id = R.string.all_start_time))
+						},
+						trailingContent = {
+							Text(
+								text = detailedAbsenceCheck?.second?.first?.toLocalDateTime()
+									?.toString(
+										DateTimeFormat.forStyle("MS")
+											.withLocale(context.resources.configuration.locales[0])
+									)
+									?: "",
+								style = MaterialTheme.typography.labelLarge
+							)
+						}
+					)
+
+					ListItem(
+						modifier = Modifier.clickable {
+							showEndTimePicker = true
+						},
+						headlineContent = {
+							Text(text = stringResource(id = R.string.all_end_time))
+						},
+						trailingContent = {
+							Text(
+								text = detailedAbsenceCheck?.second?.second?.toLocalDateTime()
+									?.toString(
+										DateTimeFormat.forStyle("MS")
+											.withLocale(context.resources.configuration.locales[0])
+									)
+									?: "",
+								style = MaterialTheme.typography.labelLarge
+							)
+						}
+					)
+
+
+					/*
+					* This is experimental code we have to test with a real teacher account.
+					* The PR can be merged without this as this is only a little addition to the functionality
+					* The outcommented aims to get a dropdown working for the absence reasons
+					* ListItem(
+						modifier = Modifier.clickable {
+							scope.launch {
+								menuOptions =
+									userDatabase.userDao().getByIdWithData(user.id)?.absenceReasons ?: listOf()
+							}
+
+						},
+						headlineContent = {
+							Text(text = "Absence reason")
+						},
+						trailingContent = {
+							ExposedDropdownMenuBox(
+								expanded = isDropdownExpanded,
+								onExpandedChange = {
+									isDropdownExpanded = !isDropdownExpanded
+								})
+							{
+								TextField(
+									modifier = Modifier.menuAnchor(),
+									readOnly = true,
+									value = selectedOptionText,
+									onValueChange = {}
+								)
+								ExposedDropdownMenu(
+									expanded = isDropdownExpanded,
+									onDismissRequest = { isDropdownExpanded = false }
+								) {
+									menuOptions.forEach { selectionOption ->
+										DropdownMenuItem(
+											text = {
+												Text(text = selectionOption.longName)
+											},
+											onClick = {
+												selectedOptionText = selectionOption.longName
+												isDropdownExpanded = false
+											},
+											contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+										)
+									}
+								}
+							}
+						}
+					)*/
+
+					if (showStartTimePicker) {
+						val startTime = detailedAbsenceCheck?.let {
+							it.second.first.toLocalDateTime()
+						} ?: LocalDateTime()
+						TimePickerDialog(
+							initialSelection = startTime.toLocalTime(),
+							onDismiss = {
+								showStartTimePicker = false
+							}
+						) { time ->
+							detailedAbsenceCheck =
+								detailedAbsenceCheck!!.first to (UntisDateTime(
+									time.toDateTime(startTime.toDateTime()).toLocalDateTime()
+								) to detailedAbsenceCheck?.second?.second!!)
+							showStartTimePicker = false
+						}
+					}
+					if (showEndTimePicker) {
+						val endTime = detailedAbsenceCheck?.let {
+							it.second.second.toLocalDateTime()
+						} ?: LocalDateTime().plusHours(1)
+						TimePickerDialog(
+							initialSelection = endTime.toLocalTime(),
+							onDismiss = {
+								showEndTimePicker = false
+							}
+						) { time ->
+							detailedAbsenceCheck =
+								detailedAbsenceCheck!!.first to (detailedAbsenceCheck?.second?.first!! to UntisDateTime(
+									time.toDateTime(endTime.toDateTime()).toLocalDateTime()
+								))
+							showEndTimePicker = false
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TimetableItemDetailsDialogWithPeriodData(
 	periodData: PeriodData,
@@ -700,8 +914,8 @@ private fun TimetableItemDetailsDialogWithPeriodData(
 	error: Throwable?,
 	errorMessage: String?,
 	editPermission: String? = null,
-	headlineText: @Composable () -> Unit,
-	supportingText: @Composable (UntisPeriodData) -> Unit,
+	headlineContent: @Composable () -> Unit,
+	supportingContent: @Composable (UntisPeriodData) -> Unit,
 	leadingContent: @Composable (UntisPeriodData?) -> Unit,
 	onClick: () -> Unit
 ) {
@@ -712,10 +926,10 @@ private fun TimetableItemDetailsDialogWithPeriodData(
 		) == true
 
 	ListItem(
-		headlineText = headlineText,
-		supportingText = {
+		headlineContent = headlineContent,
+		supportingContent = {
 			untisPeriodData?.let {
-				supportingText(it)
+				supportingContent(it)
 			} ?: error?.let {
 				Text(stringResource(R.string.all_error))
 			} ?: Text(stringResource(R.string.loading))
@@ -751,7 +965,7 @@ private fun TimetableDatabaseInterface.TimetableItemDetailsDialogElement(
 ) {
 	if (elements.isNotEmpty())
 		ListItem(
-			headlineText = {
+			headlineContent = {
 				Row(
 					modifier = Modifier.horizontalScroll(rememberScrollState()),
 					horizontalArrangement = Arrangement.spacedBy(8.dp)

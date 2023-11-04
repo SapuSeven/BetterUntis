@@ -22,8 +22,8 @@ fun WidgetListViewHeader(
 	modifier: GlanceModifier = GlanceModifier,
 	dayColorScheme: ColorScheme,
 	nightColorScheme: ColorScheme,
-	headlineText: String,
-	supportingText: String? = null,
+	headlineContent: String,
+	supportingContent: String? = null,
 ) {
 	val primary = ColorProvider(
 		day = dayColorScheme.primary,
@@ -37,8 +37,8 @@ fun WidgetListViewHeader(
 
 	WidgetListItem(
 		modifier = modifier,
-		headlineText = headlineText,
-		supportingText = supportingText,
+		headlineContent = headlineContent,
+		supportingContent = supportingContent,
 		surfaceColor = primary,
 		textColor = onPrimary,
 		/*trailingContent = {
@@ -78,8 +78,8 @@ fun WidgetListView(
 				// TODO: Use actionStartActivity on timetable item click, otherwise show reload action
 				modifier = GlanceModifier.clickable(onClickAction),
 				leadingContent = it.leadingContent,
-				headlineText = it.headlineText,
-				supportingText = it.supportingText,
+				headlineContent = it.headlineContent,
+				supportingContent = it.supportingContent,
 				surfaceColor = surface,
 				textColor = onSurface
 			)
@@ -90,8 +90,8 @@ fun WidgetListView(
 @Composable
 private fun WidgetListItem(
 	modifier: GlanceModifier = GlanceModifier,
-	headlineText: String,
-	supportingText: String? = null,
+	headlineContent: String,
+	supportingContent: String? = null,
 	surfaceColor: ColorProvider,
 	textColor: ColorProvider,
 	typography: Typography = MaterialTheme.typography,
@@ -121,12 +121,12 @@ private fun WidgetListItem(
 				.padding(vertical = 8.dp)
 		) {
 			Text(
-				headlineText,
+				headlineContent,
 				style = typography.bodyLarge.toGlanceTextStyle(textColor)
 			)
-			supportingText?.let {
+			supportingContent?.let {
 				Text(
-					supportingText,
+					supportingContent,
 					style = typography.bodyMedium.toGlanceTextStyle(textColor)
 				)
 			}
@@ -137,7 +137,7 @@ private fun WidgetListItem(
 }
 
 data class WidgetListItemModel(
-	val headlineText: String,
-	val supportingText: String,
+	val headlineContent: String,
+	val supportingContent: String,
 	val leadingContent: @Composable ((surfaceColor: ColorProvider, textColor: ColorProvider) -> Unit)?
 )
