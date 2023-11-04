@@ -1,0 +1,5 @@
+- Fix database errors
+- Fix broken validation when login data is auto-filled
+- Fix other small bugs and crashes
+- Update QR code scanner to use ML Kit (if available)
+- Add support to login without a password

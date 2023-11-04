@@ -20,6 +20,7 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.activities.LoginActivity
 import com.sapuseven.untis.activities.LoginDataInputActivity
+import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.helpers.config.deleteProfile
 import com.sapuseven.untis.ui.common.AppScaffold
@@ -31,14 +32,14 @@ import kotlinx.coroutines.launch
 fun BaseComposeActivity.ProfileManagementDialog( // TODO: Remove inheritance of BaseComposeActivity
 	onDismiss: () -> Unit
 ) {
-	var dismissed by remember { mutableStateOf(false) }
-	var profiles by remember { mutableStateOf(this.userDatabase.userDao().getAll()) }
 	val context = LocalContext.current
 	val scope = rememberCoroutineScope()
+	var dismissed by remember { mutableStateOf(false) }
+	var profiles by remember { mutableStateOf(userDatabase.userDao().getAll()) }
 
 	val loginDataInputLauncher =
 		rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-			profiles = this.userDatabase.userDao().getAll()
+			profiles = userDatabase.userDao().getAll()
 		}
 
 	var deleteDialog by rememberSaveable { mutableStateOf<User?>(null) }
@@ -140,6 +141,7 @@ fun BaseComposeActivity.ProfileManagementDialog( // TODO: Remove inheritance of 
 								LoginActivity::class.java
 							).apply {
 								putBackgroundColorExtra(this)
+								putExtra(LoginActivity.EXTRA_BOOLEAN_SHOW_BACK_BUTTON, true)
 							}
 						)
 					}
@@ -170,8 +172,7 @@ fun BaseComposeActivity.ProfileManagementDialog( // TODO: Remove inheritance of 
 							scope.launch {
 								userDatabase.userDao().delete(user)
 								deleteProfile(user.id)
-								profiles =
-									this@ProfileManagementDialog.userDatabase.userDao().getAll()
+								profiles = userDatabase.userDao().getAll()
 								if (profiles.isEmpty())
 									recreate()
 								deleteDialog = null

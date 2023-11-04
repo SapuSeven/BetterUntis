@@ -15,14 +15,15 @@ import java.lang.ref.WeakReference
 class TimetableCache(val context: WeakReference<Context>) {
 	private var target: CacheTarget? = null
 
-	fun setTarget(startDate: UntisDate, endDate: UntisDate, id: Int, type: String) {
-		target = CacheTarget(startDate, endDate, id, type)
+	fun setTarget(startDate: UntisDate, endDate: UntisDate, id: Int, type: String, userId: Long) {
+		target = CacheTarget(startDate, endDate, id, type, userId)
 	}
 
 	fun exists(): Boolean {
 		return targetCacheFile(target)?.exists() ?: false
 	}
 
+	@OptIn(ExperimentalSerializationApi::class)
 	fun load(): CacheObject? {
 		return try {
 			Cbor.decodeFromByteArray<CacheObject>(targetCacheFile(target)?.readBytes() ?: ByteArray(0))
@@ -31,6 +32,7 @@ class TimetableCache(val context: WeakReference<Context>) {
 		}
 	}
 
+	@OptIn(ExperimentalSerializationApi::class)
 	fun save(items: CacheObject) {
 		targetCacheFile(target)?.writeBytes(Cbor.encodeToByteArray(items))
 	}
@@ -53,15 +55,15 @@ class TimetableCache(val context: WeakReference<Context>) {
 			val items: List<Period>
 	)
 
-	// TODO: May cause conflicts between multiple users. Include UserID
 	private inner class CacheTarget(
 			val startDate: UntisDate,
 			val endDate: UntisDate,
 			val id: Int,
-			val type: String
+			val type: String,
+			val userId: Long
 	) {
 		fun getName(): String {
-			return String.format("%s-%d-%s-%s", type, id, startDate, endDate)
+			return String.format("%d-%s-%d-%s-%s", userId, type, id, startDate, endDate)
 		}
 	}
 }

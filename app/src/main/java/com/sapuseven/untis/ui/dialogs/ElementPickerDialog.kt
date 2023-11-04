@@ -30,6 +30,7 @@ import androidx.compose.ui.window.Dialog
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import com.sapuseven.untis.ui.common.AbbreviatedText
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.NavigationBarInset
 import com.sapuseven.untis.ui.common.disabled
@@ -346,7 +347,7 @@ fun ElementPickerElements(
 						.size(96.dp)
 						.padding(bottom = 24.dp)
 				)
-				Text("Select a Timetable")
+				Text(stringResource(R.string.elementpicker_timetable_select))
 			}
 		}
 	}
@@ -369,7 +370,10 @@ fun ElementPickerTypeSelection(
 						contentDescription = null
 					)
 				},
-				label = { Text(stringResource(id = R.string.all_personal)) },
+				label = { AbbreviatedText(
+					text = stringResource(id = R.string.all_personal),
+					abbreviatedText = stringResource(id = R.string.all_personal_abbr)
+				) },
 				selected = false,
 				onClick = {
 					onSelect(null)

@@ -14,10 +14,10 @@ You can also download the latest automated build [from my website](https://sapus
 
 ## Screenshots
 
-| <img src="https://raw.githubusercontent.com/SapuSeven/BetterUntis/master/fastlane/metadata/android/en-US/images/phoneScreenshots/1.jpg" alt="Screenshot" /> | <img src="https://raw.githubusercontent.com/SapuSeven/BetterUntis/master/fastlane/metadata/android/en-US/images/phoneScreenshots/2.jpg" alt="Screenshot" /> | <img src="https://raw.githubusercontent.com/SapuSeven/BetterUntis/master/fastlane/metadata/android/en-US/images/phoneScreenshots/3.jpg" alt="Screenshot" /> | <img src="https://raw.githubusercontent.com/SapuSeven/BetterUntis/master/fastlane/metadata/android/en-US/images/phoneScreenshots/4.jpg" alt="Screenshot" /> |
-| --- | --- | --- | --- |
+| <img src="https://raw.githubusercontent.com/SapuSeven/BetterUntis/master/fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" alt="Screenshot 1" /> | <img src="https://raw.githubusercontent.com/SapuSeven/BetterUntis/master/fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" alt="Screenshot 2" /> | <img src="https://raw.githubusercontent.com/SapuSeven/BetterUntis/master/fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" alt="Screenshot 3" /> | <img src="https://raw.githubusercontent.com/SapuSeven/BetterUntis/master/fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" alt="Screenshot 4" /> |
+|---------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
 
-## Development notes
+## Development notes (v3.x.x)
 My [original version](https://github.com/SapuSeven/BetterUntis-Legacy) of BetterUntis had many design and performance flaws.
 As a result, development became increasingly more difficult.
 I came to the conclusion that it was best to scrap the project and start over from scratch.
@@ -34,7 +34,7 @@ Another major change is the use of a custom WeekView (based on [Till Hellmund](h
 - Improved overall design
 - Improved timetable selection dialog
 - Faster RoomFinder
-- Near instantaneous timetable loading
+- Faster timetable loading
 - Lag-free timetable scrolling
 - Flexible timegrid allows to display hours outside the regular timetable (like consultation times with teachers)
 - Support for multiple accounts/profiles
@@ -51,9 +51,11 @@ _Since v3.3.0:_
 - French
 - Norwegian Bokmål
 
+_This list may not be up-to-date. Please look at "Translating" below to check the current translation status._
+
 ## Project Git Structure
 I established a simple system to manage this Git repository.
-Basically, there are two main branches: **master** and **develop**. They both are permanent and can't be deleted.
+Basically, there are two main branches: **master** and **develop**. They both are permanent and cannot be deleted.
 
 ### Branch: master
 This branch always and only contains the latest release version. This includes alpha/beta releases.
@@ -70,16 +72,17 @@ These branches have a limited lifetime. After the last merge back into **develop
 
 ## Contributing
 
-### Translating into your language
+Your help is greatly appreciated, but first please read the following sections to prevent common mistakes:
 
-Translating BetterUntis is very easy.
-Just sign up for an account at [weblate.org](https://hosted.weblate.org/accounts/register/).
-After you are logged in, go to the [BetterUntis translation project](https://hosted.weblate.org/projects/betteruntis/translations/). 
+### Translating into another language
 
-There you can click the “Start new translation“ button if your language does not exist.
-If your language already exists, you can directly correct possible mistakes.
+If you haven't already, sign up for an account at [weblate.org](https://hosted.weblate.org/accounts/register/) .
+You can then navigate to the [BetterUntis translation project](https://hosted.weblate.org/projects/betteruntis/translations/). 
 
-Your translation will be included in the next release of BetterUntis.
+Select your desired language (or click the “Start new translation“ button at the bottom) and look at "Strings status".
+All categories marked in red are areas where translations are missing or potentially incorrect. Click on them to start translating.
+
+Your translation will then be automatically included in the next release of BetterUntis.
 
 ### Implementing new features / Fixing bugs
 

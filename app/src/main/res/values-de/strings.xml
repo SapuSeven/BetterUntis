@@ -6,6 +6,7 @@
     <string name="all_exit">Verlassen</string>
     <string name="all_failed">fehlgeschlagen</string>
     <string name="all_personal">Persönlich</string>
+    <string name="all_personal_abbr">Persönl.</string>
     <string name="all_subjects">Fächer</string>
     <string name="all_teachers">Lehrer</string>
     <string name="all_classes">Klassen</string>
@@ -39,7 +40,7 @@
     <string name="activity_title_settings">Einstellungen</string>
     <string name="errors_github_attach_file_message">Bitte füge die komprimierten Log-Dateien als Anhang hinzu.\nDiese wurden hier gespeichert: `%1$s`</string>
     <string name="nav_all_timetables">Stundenpläne</string>
-    <string name="menu_infocenter_messagesofday">Nachrichten</string>
+    <string name="menu_infocenter_messagesofday">Messages</string>
     <string name="menu_infocenter_officehours">Sprechstunden</string>
     <string name="menu_infocenter_events">Termine</string>
     <string name="menu_infocenter_absences">Abwesenheiten</string>
@@ -130,6 +131,7 @@
     <string name="elementpicker_hint_search_classes">Klassen durchsuchen…</string>
     <string name="elementpicker_hint_search_teachers">Lehrer durchsuchen…</string>
     <string name="elementpicker_hint_search_rooms">Räume durchsuchen…</string>
+    <string name="elementpicker_timetable_select">Wähle einen Stundenplan</string>
     <string name="preferences_connectivity">Verbindungseinstellungen</string>
     <string name="preferences_info">Informationen</string>
     <string name="preferences_notifications">Benachrichtigungen</string>
@@ -147,7 +149,7 @@
     <string name="preference_category_general_behaviour">Verhalten</string>
     <string name="preference_category_general_week_display">Wochenanzeige</string>
     <string name="preference_category_general_automute">Automatisches Stummschalten</string>
-    <string name="preference_automute_enable">Automatisches Stummschalten</string>
+    <string name="preference_automute_enable">Automatisches Stummschalten aktivieren</string>
     <string name="preference_automute_enable_summary">Aktiviert während jeder Stunde automatisch den „Bitte nicht stören“-Modus</string>
     <string name="preference_automute_cancelled_lessons">Auch in entfallenen Stunden stumm schalten</string>
     <string name="preference_automute_mute_priority">Ausnahmen für \"Bitte nicht Stören\" ignorieren</string>
@@ -269,7 +271,7 @@
     <string name="errors_crash_title">Es sieht aus als wäre BetterUntis abgestürzt.</string>
     <string name="errors_crash_message">Entschuldigung.</string>
     <string name="errors_report">Bitte hilf, die App zu verbessern, indem du die Fehler unten meldest:</string>
-    <string name="errors_button_dismiss">Schließen</string>
+    <string name="errors_button_dismiss">Alles schließen</string>
     <string name="errors_button_report">Senden</string>
     <string name="loading">Wird geladen</string>
     <string name="loading_failed">Ladevorgang fehlgeschlagen</string>
@@ -367,6 +369,8 @@
     <string name="infocenter_absences_list_ninety_days">Letzten 90 Tage anzeigen</string>
     <string name="infocenter_absences_list_schoolyear">Aktuelles Schuljahr</string>
     <string name="all_default_time_dialog_title">Zeit auswählen</string>
-	<string name="all_start_time">Start Zeit</string>
-	<string name="all_end_time">End Zeit</string>
+    <string name="all_start_time">Startzeit</string>
+	  <string name="all_end_time">Endzeit</string>
+    <string name="preference_app_language">App-Sprache</string>
+	  <string name="preference_category_app_language">App-Sprache</string>
 </resources>
