@@ -19,12 +19,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -57,6 +55,7 @@ import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.AppScaffold
+import com.sapuseven.untis.ui.common.ClickableUrlText
 import com.sapuseven.untis.ui.common.SmallCircularProgressIndicator
 import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.functional.bottomInsets
@@ -82,9 +81,12 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 	val pagerState = rememberPagerState(initialPage)
 	val scope = rememberCoroutineScope()
 	val context = LocalContext.current
-	val clipboardManager = LocalClipboardManager.current
 
-	var absenceCheck by rememberSaveable { mutableStateOf<Triple<Int, UntisDateTime, UntisDateTime>?>(null) }
+	var absenceCheck by rememberSaveable {
+		mutableStateOf<Triple<Int, UntisDateTime, UntisDateTime>?>(
+			null
+		)
+	}
 
 	var untisPeriodData by remember { mutableStateOf<UntisPeriodData?>(null) }
 	var untisStudents by rememberSaveable { mutableStateOf<List<UntisStudent>?>(null) }
@@ -331,7 +333,11 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 								val endDate = it.endDate.toLocalDate()
 
 								ListItem(
-									headlineText = { Text(it.text) },
+									headlineText = {
+										ClickableUrlText(it.text) {
+											openUrl(it)
+										}
+									},
 									supportingText = {
 										Text(
 											stringResource(
@@ -359,10 +365,7 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 												)
 											}
 										}
-									} else null,
-									modifier = Modifier.clickable {
-										clipboardManager.setText(AnnotatedString(it.text))
-									}
+									} else null
 								)
 							}
 
@@ -444,7 +447,13 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 										)
 									},
 									onClick = {
-										absenceCheck = periodData.element.let { Triple(it.id, it.startDateTime, it.endDateTime) }
+										absenceCheck = periodData.element.let {
+											Triple(
+												it.id,
+												it.startDateTime,
+												it.endDateTime
+											)
+										}
 									}
 								)
 
@@ -640,7 +649,11 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 											)
 										else
 											Toast
-												.makeText(context, errorMessageGeneric, Toast.LENGTH_LONG)
+												.makeText(
+													context,
+													errorMessageGeneric,
+													Toast.LENGTH_LONG
+												)
 												.show()
 									}, {
 										Toast
@@ -777,8 +790,8 @@ private fun TimetableDatabaseInterface.TimetableItemDetailsDialogElement(
 }
 
 private suspend fun loadPeriodData(
-    user: User,
-    period: Period
+	user: User,
+	period: Period
 ): Result<PeriodDataResult> {
 	val query = UntisRequest.UntisRequestQuery(user).apply {
 		data.method = UntisApiConstants.METHOD_GET_PERIOD_DATA
@@ -800,11 +813,11 @@ private suspend fun loadPeriodData(
 }
 
 private suspend fun createAbsence(
-    user: User,
-    ttId: Int,
-    student: UntisStudent,
-    startDateTime: LocalDateTime,
-    endDateTime: LocalDateTime
+	user: User,
+	ttId: Int,
+	student: UntisStudent,
+	startDateTime: LocalDateTime,
+	endDateTime: LocalDateTime
 ): Result<UntisAbsence> {
 	val query =
 		UntisRequest.UntisRequestQuery(user).apply {
@@ -830,8 +843,8 @@ private suspend fun createAbsence(
 }
 
 private suspend fun deleteAbsence(
-    user: User,
-    absence: UntisAbsence
+	user: User,
+	absence: UntisAbsence
 ): Result<Boolean> {
 	val query =
 		UntisRequest.UntisRequestQuery(user).apply {
@@ -854,8 +867,8 @@ private suspend fun deleteAbsence(
 }
 
 private suspend fun submitAbsencesChecked(
-    user: User,
-    ttId: Int
+	user: User,
+	ttId: Int
 ): Result<Boolean> {
 	val query =
 		UntisRequest.UntisRequestQuery(user).apply {
@@ -879,9 +892,9 @@ private suspend fun submitAbsencesChecked(
 }
 
 private suspend fun submitLessonTopic(
-    user: User,
-    ttId: Int,
-    lessonTopic: String
+	user: User,
+	ttId: Int,
+	lessonTopic: String
 ): Result<String> {
 	val query =
 		UntisRequest.UntisRequestQuery(user).apply {
