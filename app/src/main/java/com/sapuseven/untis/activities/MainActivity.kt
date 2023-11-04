@@ -542,7 +542,7 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 					},
 					actions = {
 						if (BuildConfig.DEBUG)
-							DebugInfoAction()
+							DebugDesclaimerAction()
 
 						ProfileSelectorAction(
 							users = state.userDatabase.userDao().getAll(),

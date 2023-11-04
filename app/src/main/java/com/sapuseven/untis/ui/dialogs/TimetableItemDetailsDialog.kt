@@ -30,6 +30,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
+import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
@@ -56,6 +57,7 @@ import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.ClickableUrlText
+import com.sapuseven.untis.ui.common.DebugTimetableItemDetailsAction
 import com.sapuseven.untis.ui.common.SmallCircularProgressIndicator
 import com.sapuseven.untis.ui.common.VerticalScrollColumn
 import com.sapuseven.untis.ui.common.conditional
@@ -63,7 +65,6 @@ import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import kotlinx.coroutines.launch
 import org.joda.time.LocalDateTime
-import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormat
 
 
@@ -132,6 +133,10 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 							contentDescription = stringResource(id = R.string.all_close)
 						)
 					}
+				},
+				actions = {
+					if (BuildConfig.DEBUG)
+						DebugTimetableItemDetailsAction(timegridItems)
 				}
 			)
 		},
