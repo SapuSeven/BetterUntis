@@ -105,7 +105,7 @@ fun DebugTimetableItemDetailsAction(timegridItems: List<PeriodData>) {
 						.background(MaterialTheme.colorScheme.background)
 						.padding(8.dp)
 				) {
-					RawText(item = it.element)
+					RawText(item = it)
 				}
 			}
 		}
