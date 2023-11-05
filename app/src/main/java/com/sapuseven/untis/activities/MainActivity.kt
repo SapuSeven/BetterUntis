@@ -496,7 +496,7 @@ fun MainApp(state: NewMainAppState) {
 					hourHeight = /*state.weekViewPreferences.hourHeight ?:*/ 72.dp,
 					hourList = state.weekViewPreferences.hourList.value,
 					dividerWidth = state.weekViewPreferences.dividerWidth,
-					dividerColor = state.weekViewPreferences.dividerColor,
+					colorScheme = state.weekViewPreferences.colorScheme,
 				)
 
 				val timeColumnWidth = with(LocalDensity.current) {
@@ -1134,7 +1134,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 	data class WeekViewPreferences(
 		var hourList: State<List<WeekViewHour>>,
-		var dividerColor: Color,
+		var colorScheme: WeekViewColorScheme,
 		var dividerWidth: Float,
 		var backgroundRegular: State<Int>,
 		var backgroundRegularPast: State<Int>,
@@ -2056,6 +2056,8 @@ fun rememberWeekViewPreferences(
 	}.collectAsState(initial = emptyList()),
 	dividerWidth: Float = Stroke.HairlineWidth,
 	dividerColor: Color = MaterialTheme.colorScheme.outline,
+	backgroundPast: State<Int> = preferences.backgroundPast.getState(),
+	backgroundFuture: State<Int> = preferences.backgroundFuture.getState(),
 	backgroundRegular: State<Int> = preferences.backgroundRegular.getState(),
 	backgroundRegularPast: State<Int> = preferences.backgroundRegularPast.getState(),
 	backgroundExam: State<Int> = preferences.backgroundExam.getState(),
@@ -2079,7 +2081,11 @@ fun rememberWeekViewPreferences(
 	NewMainAppState.WeekViewPreferences(
 		hourList = hourList,
 		dividerWidth = dividerWidth,
-		dividerColor = dividerColor,
+		colorScheme = WeekViewColorScheme(
+			dividerColor = dividerColor,
+			pastBackgroundColor = Color(backgroundPast.value),
+			futureBackgroundColor = Color(backgroundFuture.value)
+		),
 		backgroundRegular = backgroundRegular,
 		backgroundRegularPast = backgroundRegularPast,
 		backgroundExam = backgroundExam,

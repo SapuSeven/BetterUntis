@@ -18,8 +18,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -53,6 +55,7 @@ data class Event(
 	val top: String = "",
 	val bottom: String = "",
 	val color: Color,
+	val pastColor: Color,
 	val textColor: Color,
 	val start: LocalDateTime,
 	val end: LocalDateTime,
@@ -73,13 +76,24 @@ val eventTimeFormat = DateTimeFormat.forPattern("h:mm a")
 fun WeekViewEvent(
 	event: Event,
 	modifier: Modifier = Modifier,
+	currentTime: LocalDateTime = LocalDateTime.now(),
 	onClick: (() -> Unit)? = null,
 ) {
 	Box(
 		modifier = modifier
 			.fillMaxSize()
 			.padding(2.dp) // Outer padding
-			.background(event.color, shape = RoundedCornerShape(4.dp))
+			.clip(RoundedCornerShape(4.dp))
+			.drawBehind {
+				drawVerticalSplitRect(
+					event.pastColor,
+					event.color,
+					size = Size(size.width, size.height),
+					division = ((currentTime.toDateTime().millis - event.start.toDateTime().millis).toFloat()
+							/ (event.end.toDateTime().millis - event.start.toDateTime().millis).toFloat())
+						.coerceIn(0f, 1f)
+				)
+			}
 			.padding(horizontal = 2.dp) // Inner padding
 			.ifNotNull(onClick) {
 				clickable(onClick = it)
@@ -128,6 +142,7 @@ fun EventPreview() {
 		event = Event(
 			title = "Test",
 			color = Color(0xFFAFBBF2),
+			pastColor = Color(0xFFAFBBF2),
 			textColor = Color(0xFF000000),
 			start = LocalDateTime.parse("2021-05-18T09:00:00"),
 			end = LocalDateTime.parse("2021-05-18T11:00:00"),
@@ -352,18 +367,79 @@ fun DrawScope.WeekViewContentGrid(
 	)
 }
 
+fun DrawScope.WeekViewBackground(
+	numDays: Int = 5,
+	startDate: LocalDate,
+	startTime: LocalTime,
+	hourHeight: Dp,
+	pastBackgroundColor: Color,
+	futureBackgroundColor: Color,
+	currentTime: LocalDateTime = LocalDateTime.now(),
+) {
+	val dayWidth = size.width / numDays;
+
+	repeat(numDays) {
+		val fraction = Minutes
+			.minutesBetween(
+				startTime,
+				currentTime.toLocalTime()
+			).minutes / 60f * hourHeight.toPx()
+			.coerceIn(0f, size.height) / size.height
+
+		drawVerticalSplitRect(
+			topColor = pastBackgroundColor,
+			bottomColor = futureBackgroundColor,
+			topLeft = Offset(it * dayWidth, 0f),
+			size = Size(dayWidth, size.height),
+			division = when {
+				startDate.plusDays(it).isAfter(currentTime.toLocalDate()) -> 0f
+				startDate.plusDays(it).isEqual(currentTime.toLocalDate()) -> fraction
+				else -> 1f
+			}
+		)
+	}
+}
+
+fun DrawScope.drawVerticalSplitRect(
+	topColor: Color,
+	bottomColor: Color,
+	topLeft: Offset = Offset.Zero,
+	size: Size,
+	division: Float
+) {
+	when (division) {
+		0f -> drawRect(bottomColor, topLeft, size)
+		1f -> drawRect(topColor, topLeft, size)
+		else -> {
+			val topHeight = size.height * division
+			drawRect(
+				topColor,
+				topLeft,
+				size.copy(height = topHeight)
+			)
+			drawRect(
+				bottomColor,
+				topLeft.plus(Offset(0f, topHeight)),
+				size.copy(height = size.height - topHeight)
+			)
+		}
+	}
+}
+
 @Composable
 fun WeekViewContent(
 	events: List<Event>,
 	modifier: Modifier = Modifier,
-	startDate: LocalDate,
 	numDays: Int = 5,
+	startDate: LocalDate,
 	startTime: LocalTime,
 	endTime: LocalTime,
 	endTimeOffset: Float,
 	hourHeight: Dp,
 	hourList: List<WeekViewHour>,
 	dividerColor: Color = MaterialTheme.colorScheme.outline,
+	pastBackgroundColor: Color,
+	futureBackgroundColor: Color,
 	dividerWidth: Float = Stroke.HairlineWidth,
 	eventContent: @Composable (event: Event) -> Unit = { WeekViewEvent(event = it) }
 ) {
@@ -383,6 +459,15 @@ fun WeekViewContent(
 		},
 		modifier = modifier
 			.drawBehind {
+				WeekViewBackground(
+					numDays = numDays,
+					startDate = startDate,
+					startTime = startTime,
+					hourHeight = hourHeight,
+					pastBackgroundColor = pastBackgroundColor,
+					futureBackgroundColor = futureBackgroundColor,
+				)
+
 				WeekViewContentGrid(
 					numDays = numDays,
 					startTime = startTime,
@@ -450,7 +535,7 @@ fun WeekViewCompose(
 	startDate: LocalDate = LocalDate.now(),
 	hourHeight: Dp = 72.dp,
 	hourList: List<WeekViewHour> = emptyList(),
-	dividerColor: Color = MaterialTheme.colorScheme.outline,
+	colorScheme: WeekViewColorScheme = WeekViewColorScheme.default(),
 	dividerWidth: Float = Stroke.HairlineWidth,
 	startTime: LocalTime = hourList.firstOrNull()?.startTime ?: LocalTime.MIDNIGHT.plusHours(6),
 	endTime: LocalTime = hourList.lastOrNull()?.endTime ?: LocalTime.MIDNIGHT.plusHours(18),
@@ -571,7 +656,9 @@ fun WeekViewCompose(
 							hourHeight = hourHeight,
 							hourList = hourList,
 							dividerWidth = dividerWidth,
-							dividerColor = dividerColor,
+							dividerColor = colorScheme.dividerColor,
+							pastBackgroundColor = colorScheme.pastBackgroundColor,
+							futureBackgroundColor = colorScheme.futureBackgroundColor,
 							modifier = Modifier
 								.weight(1f)
 								.onGloballyPositioned { contentHeight = it.size.height }
@@ -591,6 +678,23 @@ fun WeekViewCompose(
 			datePickerDialog = false
 			jumpToDate = it
 		}
+}
+
+data class WeekViewColorScheme(
+	val dividerColor: Color,
+	val pastBackgroundColor: Color,
+	val futureBackgroundColor: Color,
+) {
+	companion object {
+		@Composable
+		fun default(): WeekViewColorScheme {
+			return WeekViewColorScheme(
+				dividerColor = MaterialTheme.colorScheme.outline,
+				pastBackgroundColor = Color(0x40808080),
+				futureBackgroundColor = Color.Transparent
+			)
+		}
+	}
 }
 
 /*@Preview(showBackground = true)
