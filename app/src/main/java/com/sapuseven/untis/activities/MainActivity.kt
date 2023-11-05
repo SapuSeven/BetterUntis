@@ -799,6 +799,10 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	}
 
 	fun setDisplayedElement(element: PeriodElement?, displayName: String? = null) {
+		weekViewEvents.clear()
+		scope.launch {
+			onPageChange(weekViewPage)
+		}
 		displayedElement.value = element
 		displayedName.value =
 			displayName ?: element?.let { timetableDatabaseInterface.getLongName(it) }
