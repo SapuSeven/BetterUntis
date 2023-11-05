@@ -2056,6 +2056,7 @@ fun rememberWeekViewPreferences(
 	}.collectAsState(initial = emptyList()),
 	dividerWidth: Float = Stroke.HairlineWidth,
 	dividerColor: Color = MaterialTheme.colorScheme.outline,
+	indicatorColor: State<Int> = preferences.marker.getState(),
 	backgroundPast: State<Int> = preferences.backgroundPast.getState(),
 	backgroundFuture: State<Int> = preferences.backgroundFuture.getState(),
 	backgroundRegular: State<Int> = preferences.backgroundRegular.getState(),
@@ -2084,7 +2085,8 @@ fun rememberWeekViewPreferences(
 		colorScheme = WeekViewColorScheme(
 			dividerColor = dividerColor,
 			pastBackgroundColor = Color(backgroundPast.value),
-			futureBackgroundColor = Color(backgroundFuture.value)
+			futureBackgroundColor = Color(backgroundFuture.value),
+			indicatorColor = Color(indicatorColor.value)
 		),
 		backgroundRegular = backgroundRegular,
 		backgroundRegularPast = backgroundRegularPast,

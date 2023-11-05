@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -426,6 +427,33 @@ fun DrawScope.drawVerticalSplitRect(
 	}
 }
 
+fun DrawScope.WeekViewIndicator(
+	numDays: Int = 5,
+	startDate: LocalDate,
+	startTime: LocalTime,
+	hourHeight: Dp,
+	indicatorColor: Color,
+	indicatorWidth: Float = 2.dp.toPx(),
+	currentTime: LocalDateTime = LocalDateTime.now(),
+) {
+	val dayWidth = size.width / numDays;
+
+	val yPos = Minutes
+		.minutesBetween( // TODO: Can this be negative?
+			startTime,
+			currentTime.toLocalTime()
+		).minutes / 60f * hourHeight.toPx()
+	val startDayIndex = Days.daysBetween(startDate, currentTime.toLocalDate()).days
+
+	if (startDayIndex in 0..numDays && yPos in 0f..size.height)
+		drawLine(
+			color = indicatorColor,
+			start = Offset(startDayIndex * dayWidth, yPos),
+			end = Offset((startDayIndex + 1) * dayWidth, yPos),
+			strokeWidth = indicatorWidth
+		)
+}
+
 @Composable
 fun WeekViewContent(
 	events: List<Event>,
@@ -437,7 +465,8 @@ fun WeekViewContent(
 	endTimeOffset: Float,
 	hourHeight: Dp,
 	hourList: List<WeekViewHour>,
-	dividerColor: Color = MaterialTheme.colorScheme.outline,
+	dividerColor: Color,
+	indicatorColor: Color,
 	pastBackgroundColor: Color,
 	futureBackgroundColor: Color,
 	dividerWidth: Float = Stroke.HairlineWidth,
@@ -458,14 +487,14 @@ fun WeekViewContent(
 			}
 		},
 		modifier = modifier
-			.drawBehind {
+			.drawWithContent {
 				WeekViewBackground(
 					numDays = numDays,
 					startDate = startDate,
 					startTime = startTime,
 					hourHeight = hourHeight,
 					pastBackgroundColor = pastBackgroundColor,
-					futureBackgroundColor = futureBackgroundColor,
+					futureBackgroundColor = futureBackgroundColor
 				)
 
 				WeekViewContentGrid(
@@ -475,6 +504,16 @@ fun WeekViewContent(
 					hourList = hourList,
 					dividerColor = dividerColor,
 					dividerWidth = dividerWidth
+				)
+
+				drawContent()
+
+				WeekViewIndicator(
+					numDays = numDays,
+					startDate = startDate,
+					startTime = startTime,
+					hourHeight = hourHeight,
+					indicatorColor = indicatorColor
 				)
 			}
 	) { measureables, constraints ->
@@ -657,6 +696,7 @@ fun WeekViewCompose(
 							hourList = hourList,
 							dividerWidth = dividerWidth,
 							dividerColor = colorScheme.dividerColor,
+							indicatorColor = colorScheme.indicatorColor,
 							pastBackgroundColor = colorScheme.pastBackgroundColor,
 							futureBackgroundColor = colorScheme.futureBackgroundColor,
 							modifier = Modifier
@@ -684,6 +724,7 @@ data class WeekViewColorScheme(
 	val dividerColor: Color,
 	val pastBackgroundColor: Color,
 	val futureBackgroundColor: Color,
+	val indicatorColor: Color
 ) {
 	companion object {
 		@Composable
@@ -691,7 +732,8 @@ data class WeekViewColorScheme(
 			return WeekViewColorScheme(
 				dividerColor = MaterialTheme.colorScheme.outline,
 				pastBackgroundColor = Color(0x40808080),
-				futureBackgroundColor = Color.Transparent
+				futureBackgroundColor = Color.Transparent,
+				indicatorColor = Color.White
 			)
 		}
 	}
