@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 fun ReportsInfoBottomSheet(reportsDataStore: DataStore<Preferences> = LocalContext.current.reportsDataStore) {
 	val scope = rememberCoroutineScope()
 	var bottomSheetVisible by rememberSaveable { mutableStateOf(false) }
-	val bottomSheetState = rememberSheetState(skipHalfExpanded = true)
+	val bottomSheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded)
 	var saveEnabled by rememberSaveable { mutableStateOf(true) }
 
 	LaunchedEffect(Unit) {

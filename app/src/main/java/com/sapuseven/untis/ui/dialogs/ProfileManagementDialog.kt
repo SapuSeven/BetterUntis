@@ -74,7 +74,7 @@ fun ProfileManagementDialog(
 		) {
 			item {
 				ListItem(
-					headlineText = { Text(stringResource(R.string.mainactivitydrawer_profile_edit_hint)) },
+					headlineContent = { Text(stringResource(R.string.mainactivitydrawer_profile_edit_hint)) },
 					leadingContent = {
 						Icon(
 							imageVector = Icons.Outlined.Info,
@@ -88,8 +88,8 @@ fun ProfileManagementDialog(
 
 			items(users) { user ->
 				ListItem(
-					headlineText = { Text(user.getDisplayedName()) },
-					supportingText = { Text(user.userData.schoolName) },
+					headlineContent = { Text(user.getDisplayedName()) },
+					supportingContent = { Text(user.userData.schoolName) },
 					leadingContent = {
 						Icon(
 							imageVector = Icons.Outlined.Person,
@@ -114,7 +114,7 @@ fun ProfileManagementDialog(
 
 			item {
 				ListItem(
-					headlineText = { Text(stringResource(id = R.string.mainactivitydrawer_profile_add)) },
+					headlineContent = { Text(stringResource(id = R.string.mainactivitydrawer_profile_add)) },
 					leadingContent = {
 						Icon(
 							imageVector = Icons.Outlined.Add,

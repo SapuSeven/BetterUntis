@@ -24,14 +24,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GoogleApiAvailability
-import com.google.mlkit.vision.barcode.common.Barcode
-import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
-import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
-import com.journeyapps.barcodescanner.ScanContract
-import com.journeyapps.barcodescanner.ScanIntentResult
-import com.journeyapps.barcodescanner.ScanOptions
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_DEMO_LOGIN
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
@@ -42,6 +34,8 @@ import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.models.UntisSchoolInfo
 import com.sapuseven.untis.models.untis.params.SchoolSearchParams
 import com.sapuseven.untis.models.untis.response.SchoolSearchResponse
+import com.sapuseven.untis.services.CodeScanService
+import com.sapuseven.untis.services.CodeScanServiceImpl
 import com.sapuseven.untis.ui.common.AppScaffold
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -52,7 +46,8 @@ import kotlinx.serialization.encodeToString
 
 class LoginActivity : BaseComposeActivity() {
 	companion object {
-		const val EXTRA_BOOLEAN_SHOW_BACK_BUTTON = "com.sapuseven.untis.activities.login.showBackButton"
+		const val EXTRA_BOOLEAN_SHOW_BACK_BUTTON =
+			"com.sapuseven.untis.activities.login.showBackButton"
 	}
 
 	private val loginLauncher =
@@ -63,53 +58,14 @@ class LoginActivity : BaseComposeActivity() {
 			}
 		}
 
-	private val scanCodeLauncher =
-		registerForActivityResult<ScanOptions, ScanIntentResult>(ScanContract()) {
-			it.contents?.let { url ->
-				loginLauncher.launch(Intent(this, LoginDataInputActivity::class.java).apply {
-					data = Uri.parse(url)
-				})
-			}
-		}
-
-	private fun scanCode() {
-		val googleApiAvailability = GoogleApiAvailability.getInstance()
-		val status = googleApiAvailability.isGooglePlayServicesAvailable(this)
-		if (status == ConnectionResult.SUCCESS)
-			scanCodeMlKit()
-		else
-			scanCodeFallback()
-	}
-
-	private fun scanCodeMlKit() {
-		val options = GmsBarcodeScannerOptions.Builder()
-			.setBarcodeFormats(Barcode.FORMAT_QR_CODE)
-			.build()
-
-		GmsBarcodeScanning.getClient(this, options).startScan()
-			.addOnSuccessListener { barcode ->
-				barcode.rawValue?.let { url ->
-					loginLauncher.launch(Intent(this, LoginDataInputActivity::class.java).apply {
-						data = Uri.parse(url)
-					})
-				}
-			}.addOnFailureListener {
-				scanCodeFallback()
-			}
-	}
-
-	private fun scanCodeFallback() {
-		val options = ScanOptions().apply {
-			setDesiredBarcodeFormats(ScanOptions.QR_CODE)
-			setBeepEnabled(false)
-			setPrompt(getString(R.string.login_scan_code))
-		}
-		this.scanCodeLauncher.launch(options)
-	}
+	private lateinit var codeScanService: CodeScanService
 
 	@OptIn(ExperimentalMaterial3Api::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+
+		codeScanService = CodeScanServiceImpl(this, activityResultRegistry)
+		lifecycle.addObserver(codeScanService as CodeScanServiceImpl)
 
 		setContent {
 			AppTheme {
@@ -118,7 +74,8 @@ class LoginActivity : BaseComposeActivity() {
 
 				val focusManager = LocalFocusManager.current
 
-				val showBackButton = searchMode || intent.getBooleanExtra(EXTRA_BOOLEAN_SHOW_BACK_BUTTON, false)
+				val showBackButton =
+					searchMode || intent.getBooleanExtra(EXTRA_BOOLEAN_SHOW_BACK_BUTTON, false)
 
 				BackHandler(
 					enabled = searchMode
@@ -131,7 +88,17 @@ class LoginActivity : BaseComposeActivity() {
 				AppScaffold(topBar = {
 					CenterAlignedTopAppBar(title = { Text(stringResource(id = R.string.app_name)) },
 						actions = {
-							IconButton(onClick = { scanCode() }) {
+							IconButton(onClick = {
+								codeScanService.scanCode {
+									loginLauncher.launch(
+										Intent(
+											this@LoginActivity,
+											LoginDataInputActivity::class.java
+										).apply {
+											data = it
+										})
+								}
+							}) {
 								Icon(
 									painter = painterResource(id = R.drawable.login_scan_code),
 									contentDescription = stringResource(id = R.string.login_scan_code)
@@ -303,8 +270,9 @@ class LoginActivity : BaseComposeActivity() {
 
 		if (items.isNotEmpty()) LazyColumn(modifier) {
 			items(items) {
-				ListItem(headlineText = { Text(it.displayName) },
-					supportingText = { Text(it.address) },
+				ListItem(
+					headlineContent = { Text(it.displayName) },
+					supportingContent = { Text(it.address) },
 					modifier = Modifier.clickable {
 						val builder = Uri.Builder()
 							.appendQueryParameter("schoolInfo", getJSON().encodeToString(it))
