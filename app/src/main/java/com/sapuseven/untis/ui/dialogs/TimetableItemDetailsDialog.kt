@@ -375,7 +375,7 @@ fun TimetableItemDetailsDialog(
 								ListItem(
 									headlineContent = {
 										ClickableUrlText(it.text) {
-											openUrl(it)
+											BaseComposeActivity.openUrl(context, it)
 										}
 									},
 									supportingContent = {

@@ -1,6 +1,7 @@
 package com.sapuseven.untis.activities
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -53,6 +54,18 @@ open class BaseComposeActivity : ComponentActivity() {
 			"com.sapuseven.untis.activities.backgroundcolor"
 
 		val DATASTORE_KEY_USER_ID = longPreferencesKey("userid")
+
+
+		fun openUrl(context: Context, url: String) {
+			val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+				addCategory(Intent.CATEGORY_BROWSABLE)
+				flags = Intent.FLAG_ACTIVITY_NEW_TASK
+			}
+
+			if (intent.resolveActivity(context.packageManager) != null) {
+				context.startActivity(intent)
+			}
+		}
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
