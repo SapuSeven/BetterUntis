@@ -163,6 +163,7 @@ jobs:
             git config user.name "CircleCI"
             
             git checkout -B release
+            git reset --hard HEAD~1
             git merge $CIRCLE_TAG
             
             versionCode=$(jq '.elements[0].versionCode' ./workspace/outputs/apk/gms/release/output-metadata.json)
@@ -171,7 +172,7 @@ jobs:
             git add ./app/build.gradle
             git commit -m "[skip ci] Update F-Droid release"
             git tag fdroid-$CIRCLE_TAG
-            git push --set-upstream origin release
+            git push --force --set-upstream origin release
             git push origin fdroid-$CIRCLE_TAG
 workflows:
   version: 2
