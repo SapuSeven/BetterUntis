@@ -23,6 +23,7 @@ fun Application.initSentry(enableDetailedInfo: Boolean = false) {
 			isEnableUserInteractionTracing = enableDetailedInfo
 			enableAllAutoBreadcrumbs(enableDetailedInfo)
 			setBeforeBreadcrumb { breadcrumb, _ -> if (enableDetailedInfo) breadcrumb else null }
+			environment = if (BuildConfig.DEBUG) "development" else "production"
 		}
 	}
 }

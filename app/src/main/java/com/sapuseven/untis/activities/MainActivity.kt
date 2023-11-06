@@ -66,6 +66,7 @@ import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.*
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
+import com.sapuseven.untis.ui.dialogs.FeedbackDialog
 import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
 import com.sapuseven.untis.ui.dialogs.TimetableItemDetailsDialog
 import com.sapuseven.untis.ui.functional.bottomInsets
@@ -513,6 +514,23 @@ fun MainApp(state: NewMainAppState) {
 						.disabled(state.isAnonymous)
 				)
 
+				IconButton(
+					modifier = Modifier
+						.align(Alignment.BottomEnd)
+						.padding(end = 8.dp)
+						.bottomInsets(),
+					onClick = {
+						state.showFeedback()
+					}
+				) {
+					Icon(painter = painterResource(R.drawable.all_feedback), contentDescription = "Give feedback")
+				}
+
+				if (state.feedbackDialog)
+					FeedbackDialog(
+						onDismiss = { state.feedbackDialog = false }
+					)
+
 				if (state.isAnonymous) {
 					Column(
 						verticalArrangement = Arrangement.Center,
@@ -737,6 +755,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 	var timetableItemDetailsDialog by mutableStateOf<Pair<List<PeriodData>, Int>?>(null)
 	var profileManagementDialog by mutableStateOf(false)
+	var feedbackDialog by mutableStateOf(false)
 
 	var weekViewPage by mutableStateOf<Int>(0)
 	var weekViewEvents = mutableStateMapOf<LocalDate, List<Event>>()
@@ -1077,6 +1096,10 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		else
 			stringResource(id = R.string.main_last_refreshed_never)
 	)
+
+	fun showFeedback() {
+		feedbackDialog = true
+	}
 
 	@OptIn(ExperimentalComposeUiApi::class)
 	@Composable
