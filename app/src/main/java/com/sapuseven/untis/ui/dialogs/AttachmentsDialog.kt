@@ -50,7 +50,7 @@ fun AttachmentsDialog(
 				) {
 					items(attachments) {
 						ListItem(
-							headlineText = { Text(it.name) },
+							headlineContent = { Text(it.name) },
 							leadingContent = {
 								Icon(
 									painter = painterResource(id = R.drawable.infocenter_attachment),

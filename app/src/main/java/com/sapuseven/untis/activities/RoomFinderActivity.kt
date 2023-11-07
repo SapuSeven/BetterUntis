@@ -245,7 +245,7 @@ fun RoomFinderListEmpty(modifier: Modifier = Modifier) {
 fun RoomFinderHourSelector(state: RoomFinderState) {
 	state.currentUnit?.let { unit ->
 		ListItem(
-			headlineText = {
+			headlineContent = {
 				Text(
 					text = stringResource(
 						id = R.string.roomfinder_current_hour,
@@ -256,7 +256,7 @@ fun RoomFinderHourSelector(state: RoomFinderState) {
 					modifier = Modifier.fillMaxWidth()
 				)
 			},
-			supportingText = {
+			supportingContent = {
 				Text(
 					text = stringResource(
 						id = R.string.roomfinder_current_hour_time,
@@ -312,8 +312,8 @@ fun RoomListItem(
 
 	// TODO: Show "Free for the rest of the day/week" (if applicable)
 	ListItem(
-		headlineText = { Text(item.name) },
-		supportingText = {
+		headlineContent = { Text(item.name) },
+		supportingContent = {
 			Text(
 				when {
 					isOccupied -> stringResource(R.string.roomfinder_item_desc_occupied)

@@ -48,6 +48,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_HIGHLIGHT
 import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_ROUTE
@@ -542,6 +543,9 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 						}
 					},
 					actions = {
+						if (BuildConfig.DEBUG)
+							DebugDesclaimerAction()
+
 						ProfileSelectorAction(
 							users = state.userDatabase.userDao().getAll(),
 							currentSelectionId = state.user.id,

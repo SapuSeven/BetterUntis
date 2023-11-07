@@ -389,6 +389,9 @@
     <string name="infocenter_absences_list_schoolyear">Current school year</string>
     <string name="maindrawer_hide_subjects">Subjects to hide</string>
     <string name="maindrawer_hide_subjects_dialogue_title">Subject selection</string>
+    <string name="all_timepicker_select">Select Time</string>
+    <string name="all_start_time">Start time</string>
+    <string name="all_end_time">End time</string>
     <string name="preference_category_app_language">App Language</string>
     <string name="preference_app_language">App language</string>
 </resources>

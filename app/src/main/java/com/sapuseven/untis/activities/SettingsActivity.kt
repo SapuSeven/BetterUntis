@@ -1120,7 +1120,7 @@ class SettingsActivity : BaseComposeActivity() {
 										}
 									} else {
 										ListItem(
-											headlineText = {
+											headlineContent = {
 												Text(loadingText)
 											},
 											leadingContent = {
@@ -1196,10 +1196,10 @@ class SettingsActivity : BaseComposeActivity() {
 	) {
 		ListItem(
 			modifier = Modifier.clickable(onClick = onClick),
-			headlineText = {
+			headlineContent = {
 				Text(githubUser.login)
 			},
-			supportingText = {
+			supportingContent = {
 				Text(
 					pluralStringResource(
 						id = R.plurals.preferences_contributors_contributions,
