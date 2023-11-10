@@ -49,6 +49,7 @@
 		<item>@string/preference_schoolcolors_exam</item>
 		<item>@string/preference_schoolcolors_irregular</item>
 		<item>@string/preference_schoolcolors_cancelled</item>
+		<item>@string/preference_schoolcolors_subjects</item>
 	</string-array>
 
 	<string-array name="preference_schoolcolors_values" translatable="false">
@@ -56,6 +57,7 @@
 		<item>exam</item>
 		<item>irregular</item>
 		<item>cancelled</item>
+		<item>subjects</item>
 	</string-array>
 	
 	<string-array name="infocenter_absences_list">
@@ -73,5 +75,5 @@
 		<item>ninety_days</item>
 		<item>current_schoolyear</item>
 	</string-array>
-	
+
 </resources>

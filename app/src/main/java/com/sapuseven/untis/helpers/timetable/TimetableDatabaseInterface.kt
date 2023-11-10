@@ -1,5 +1,6 @@
 package com.sapuseven.untis.helpers.timetable
 
+import android.graphics.Color
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.PeriodData.Companion.ELEMENT_NAME_UNKNOWN
 import com.sapuseven.untis.models.untis.masterdata.Klasse
@@ -73,6 +74,46 @@ class TimetableDatabaseInterface(val userDatabase: UserDatabase, val id: Long) {
 
 	fun getLongName(periodElement: PeriodElement): String {
 		return getLongName(periodElement.id, periodElement.type)
+	}
+
+	private fun getBackColor(id: Int, type: Type): Int? {
+		return when (type) {
+			Type.CLASS -> allClasses[id]?.backColor
+			Type.TEACHER -> allTeachers[id]?.backColor
+			Type.SUBJECT -> allSubjects[id]?.backColor
+			Type.ROOM ->  allRooms[id]?.backColor
+			else -> null
+		}?.let{Color.parseColor(it)}
+	}
+
+	private fun getBackColor(id: Int, type: String): Int? {
+		return getBackColor(id, Type.valueOf(type))
+	}
+
+	fun getBackColor(periodElement: PeriodElement?): Int? {
+		return periodElement?.let {
+			getBackColor(it.id , it.type)
+		}
+	}
+
+	private fun getForeColor(id: Int, type: Type): Int? {
+		return when (type) {
+			Type.CLASS -> allClasses[id]?.foreColor
+			Type.TEACHER -> allTeachers[id]?.foreColor
+			Type.SUBJECT -> allSubjects[id]?.foreColor
+			Type.ROOM ->  allRooms[id]?.foreColor
+			else -> null
+		}?.let{Color.parseColor(it)}
+	}
+
+	private fun getForeColor(id: Int, type: String): Int? {
+		return getForeColor(id, Type.valueOf(type))
+	}
+
+	fun getForeColor(periodElement: PeriodElement?): Int? {
+		return periodElement?.let {
+			getForeColor(it.id , it.type)
+		}
 	}
 
 	fun isAllowed(id: Int, type: Type?): Boolean {
