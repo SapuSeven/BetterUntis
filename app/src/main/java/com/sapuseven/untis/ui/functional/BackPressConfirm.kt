@@ -1,10 +1,8 @@
 package com.sapuseven.untis.ui.functional
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.stringResource
 import com.sapuseven.untis.R

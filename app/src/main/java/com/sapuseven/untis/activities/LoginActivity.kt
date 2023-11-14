@@ -41,7 +41,6 @@ import com.sapuseven.untis.models.untis.response.SchoolSearchResponse
 import com.sapuseven.untis.ui.common.AppScaffold
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
 class LoginActivity : BaseComposeActivity() {

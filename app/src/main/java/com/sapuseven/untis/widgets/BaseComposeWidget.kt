@@ -22,7 +22,6 @@ import androidx.glance.appwidget.unit.ColorProvider
 import androidx.glance.currentState
 import androidx.glance.layout.*
 import androidx.glance.text.Text
-import androidx.room.Room
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.config.intDataStore

@@ -5,7 +5,6 @@ import android.app.AlarmManager
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.*
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -19,7 +18,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -611,7 +610,7 @@ class SettingsActivity : BaseComposeActivity() {
 												dataStore = dataStorePreferences.timetableRange
 											)
 
-											SubjectElementPickerPreference(
+											ElementPickerPreference(
 												title = { Text(stringResource(id = R.string.maindrawer_hide_subjects))},
 												icon = {
 													Icon(
@@ -619,6 +618,9 @@ class SettingsActivity : BaseComposeActivity() {
 														contentDescription = null
 													)
 												},
+												type = TimetableDatabaseInterface.Type.SUBJECT,
+												multiSelect = true,
+												showSearch = true,
 												dataStore = dataStorePreferences.timetableHiddenElements,
 												timetableDatabaseInterface = timetableDatabaseInterface,
 											)

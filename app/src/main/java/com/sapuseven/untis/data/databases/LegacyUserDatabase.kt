@@ -1,6 +1,5 @@
 package com.sapuseven.untis.data.databases
 
-import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.Cursor.FIELD_TYPE_INTEGER
@@ -8,22 +7,9 @@ import android.database.Cursor.FIELD_TYPE_STRING
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
-import com.sapuseven.untis.R
-import com.sapuseven.untis.helpers.SerializationUtils.getJSON
-import com.sapuseven.untis.helpers.UserDatabaseQueryHelper.COLUMN_NAME_USER_ID
 import com.sapuseven.untis.helpers.UserDatabaseQueryHelper.generateCreateTable
 import com.sapuseven.untis.helpers.UserDatabaseQueryHelper.generateDropTable
-import com.sapuseven.untis.helpers.UserDatabaseQueryHelper.generateValues
-import com.sapuseven.untis.interfaces.TableModel
-import com.sapuseven.untis.models.TimetableBookmark
-import com.sapuseven.untis.models.untis.UntisMasterData
-import com.sapuseven.untis.models.untis.UntisSettings
-import com.sapuseven.untis.models.untis.UntisUserData
 import com.sapuseven.untis.models.untis.masterdata.*
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 
 private const val DATABASE_VERSION = 7
 private const val DATABASE_NAME = "userdata.db"
