@@ -814,30 +814,18 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	private suspend fun prepareItems(
 		items: List<TimegridItem>
 	): List<TimegridItem> {
+		val hiddenSubjects = decodeMultipleStoredTimetableValues(preferences.timetableHiddenElements.getValue()).orEmpty()
 		val newItems = mergeItems(items.mapNotNull { item ->
+			if (item.periodData.isCancelled() && preferences.timetableHideCancelled.getValue())
+				return@mapNotNull null
 			if (displayedElement.value?.type?.equals(TimetableDatabaseInterface.Type.SUBJECT.name) == false
 				&& item.periodData.subjects.isNotEmpty()
-				&& decodeMultipleStoredTimetableValues(preferences.timetableHiddenElements.getValue())?.contains(item.periodData.subjects.first()) == true
+				&& hiddenSubjects.containsAll(item.periodData.subjects)
 			) {
 				return@mapNotNull null
 			}
-			if (item.periodData.isCancelled() && preferences.timetableHideCancelled.getValue())
-				return@mapNotNull null
-
-			if (preferences.timetableSubstitutionsIrregular.getValue()) {
-				item.periodData.apply {
-					forceIrregular =
-						classes.find { it.id != it.orgId } != null
-								|| teachers.find { it.id != it.orgId } != null
-								|| subjects.find { it.id != it.orgId } != null
-								|| rooms.find { it.id != it.orgId } != null
-								|| preferences.timetableBackgroundIrregular.getValue()
-								&& item.periodData.element.backColor != UNTIS_DEFAULT_COLOR
-				}
-			}
 			item
 		})
-
 		colorItems(newItems)
 		return newItems
 	}

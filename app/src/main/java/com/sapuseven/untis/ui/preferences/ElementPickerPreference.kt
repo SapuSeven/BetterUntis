@@ -2,14 +2,11 @@ package com.sapuseven.untis.ui.preferences
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.text.style.TextOverflow
 import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialog
-import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
-import com.sapuseven.untis.ui.dialogs.SubjectsElementDialog
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -21,7 +18,10 @@ fun ElementPickerPreference(
 	dependency: UntisPreferenceDataStore<*>? = null,
 	dataStore: UntisPreferenceDataStore<String>,
 	timetableDatabaseInterface: TimetableDatabaseInterface,
-	highlight: Boolean = false
+	type: TimetableDatabaseInterface.Type? = null,
+	highlight: Boolean = false,
+	multiSelect: Boolean = false,
+	showSearch: Boolean = false
 ) {
 	val value = remember { mutableStateOf(dataStore.defaultValue) }
 	var showDialog by remember { mutableStateOf(false) }
@@ -33,11 +33,29 @@ fun ElementPickerPreference(
 		return timetableDatabaseInterface.getShortName(element)
 	}
 
+	@Composable
+	fun generateSummary(elements: List<PeriodElement>): String {
+		var subjects = ""
+		for (element in elements) {
+			subjects += "${timetableDatabaseInterface.getShortName(element)}, "
+		}
+		subjects = subjects.dropLast(2)
+		return subjects
+	}
+
+	@Composable
+	fun summary(value: String) {
+		Text(text = if (multiSelect) {
+			decodeMultipleStoredTimetableValues(value)?.let { generateSummary(elements = it) } ?: ""
+		} else {
+			decodeStoredTimetableValue(value)?.let { generateSummary(element = it) } ?: ""
+		}
+		)
+	}
+
 	Preference(
 		title = title,
-		summary = decodeStoredTimetableValue(value.value)?.let {
-			{ Text(generateSummary(it)) }
-		},
+		summary = { summary(value = value.value) },
 		icon = icon,
 		value = value,
 		dependency = dependency,
@@ -56,68 +74,25 @@ fun ElementPickerPreference(
 				showDialog = false
 			},
 			onSelect = { element ->
-				scope.launch { dataStore.saveValue(element?.let { encodeStoredTimetableValue(it) } ?: "") }
-				showDialog = false
-			},
-			initialType = decodeStoredTimetableValue(value.value)?.let { TimetableDatabaseInterface.Type.valueOf(it.type) }
-		)
-}
-
-@Composable
-fun SubjectElementPickerPreference(
-	title: (@Composable () -> Unit),
-	icon: (@Composable () -> Unit)? = null,
-	dependency: UntisPreferenceDataStore<*>? = null,
-	dataStore: UntisPreferenceDataStore<String>,
-	timetableDatabaseInterface: TimetableDatabaseInterface,
-	highlight: Boolean = false
-) {
-	val value = remember { mutableStateOf(dataStore.defaultValue) }
-	var showDialog by remember { mutableStateOf(false) }
-
-	val scope = rememberCoroutineScope()
-
-	@Composable
-	fun generateSummary(elements: List<PeriodElement>): String {
-		var subjects = ""
-		for (element in elements) {
-			subjects += "${timetableDatabaseInterface.getShortName(element)}, "
-		}
-		subjects = subjects.dropLast(2)
-		return subjects
-	}
-
-	Preference(
-		title = title,
-		summary = {
-			decodeMultipleStoredTimetableValues(value.value)?.let {
-				if (it.isNotEmpty()) {
-					 Text(generateSummary(it), overflow = TextOverflow.Ellipsis, maxLines = 1)
+				if (!multiSelect) {
+					scope.launch { dataStore.saveValue(element?.let { encodeStoredTimetableValue(it) } ?: "") }
+					showDialog = false
 				}
-			}
-		},
-		icon = icon,
-		value = value,
-		dependency = dependency,
-		dataStore = dataStore,
-		onClick = {
-			showDialog = true
-		},
-		highlight = highlight
-	)
-
-	if (showDialog)
-		SubjectsElementDialog(
-			title = title,
-			timetableDatabaseInterface = timetableDatabaseInterface,
-			onDismiss = {
-				showDialog = false
 			},
+			multiSelect = multiSelect,
 			onMultiSelect = { elements ->
-				scope.launch { dataStore.saveValue(encodeMultipleStoredTimeTableValues(elements)) }
-				showDialog = false
+				scope.launch {
+					dataStore.saveValue(encodeMultipleStoredTimeTableValues(elements))
+				}
 			},
-			selectedElements = decodeMultipleStoredTimetableValues(value.value)
+			selectedItems = if (multiSelect) {
+				decodeMultipleStoredTimetableValues(value.value)
+			} else {
+				null
+			},
+			showSearch = showSearch,
+			hideTypeSelection = type != null,
+			initialType = type ?: decodeStoredTimetableValue(value.value)?.let { TimetableDatabaseInterface.Type.valueOf(it.type) }
 		)
 }
 
@@ -133,7 +108,7 @@ fun decodeStoredTimetableValue(value: String): PeriodElement? = try {
 	null
 }
 
-fun decodeMultipleStoredTimetableValues(values: String) : List<PeriodElement>? = try {
+fun decodeMultipleStoredTimetableValues(values: String): List<PeriodElement>? = try {
 	SerializationUtils.getJSON().decodeFromString(values)
 } catch (e: Throwable) {
 	null

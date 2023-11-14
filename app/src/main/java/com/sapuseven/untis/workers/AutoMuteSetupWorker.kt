@@ -82,10 +82,13 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 					"preference_automute_minimum_break_length"
 				).getValue()
 
-				val hiddenSubjects = decodeMultipleStoredTimetableValues(applicationContext.stringDataStore(
-					user.id,
-					"timetable_hidden_elements"
-				).getValue()) ?: emptyList()
+				val hiddenSubjects = decodeMultipleStoredTimetableValues(
+					applicationContext.stringDataStore(
+						user.id,
+						"timetable_hidden_elements"
+					).getValue()
+				).orEmpty()
+
 
 				timetable.items.merged().sortedBy { it.startDateTime }.zipWithNext().withLast()
 					.forEach {

@@ -322,7 +322,7 @@
     <string name="mainactivitydrawer_profile_edit">Profile bearbeiten</string>
     <string name="maindrawer_bookmarks_add">Stundenplan hinzufügen</string>
 	<string name="maindrawer_hide_subjects">Zu verbergende Fächer</string>
-	<string name="maindrawer_hide_subjects_dialogue_title">Fächer auswahl</string>
+	<string name="maindrawer_hide_subjects_dialogue_title">Fachauswahl</string>
     <string name="all_favourites">Favoriten</string>
     <string name="preferences_theme_color">Designfarbe</string>
     <string name="preferences_theme_color_system">Designfarbe des Systems</string>

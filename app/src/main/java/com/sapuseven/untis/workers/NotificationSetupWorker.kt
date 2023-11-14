@@ -116,15 +116,21 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 					"preference_notifications_in_multiple"
 				).getValue()
 
-				val hiddenSubjects = applicationContext.stringDataStore(
-					user.id,
-					"timetable_hidden_elements"
-				).getValue()
+				val hiddenSubjects = decodeMultipleStoredTimetableValues(
+					applicationContext.stringDataStore(
+						user.id,
+						"timetable_hidden_elements"
+					).getValue()
+				).orEmpty()
 
-				val preparedItems = timetable.items.filter { !it.periodData.isCancelled() }.filter { item ->
-					!(item.periodData.subjects.isNotEmpty()
-						&& decodeMultipleStoredTimetableValues(hiddenSubjects)?.contains(item.periodData.subjects.first()) == true)
-				}.sortedBy { it.startDateTime }.merged().zipWithNext()
+				val preparedItems = timetable.items
+					.filterNot { it.periodData.isCancelled() }
+					.filterNot { item ->
+						item.periodData.subjects.isNotEmpty() && hiddenSubjects.containsAll(item.periodData.subjects)
+					}
+					.sortedBy { it.startDateTime }
+					.merged()
+					.zipWithNext()
 
 				if (preparedItems.isEmpty()) {
 					Log.d(LOG_TAG, "No notifications to schedule")

@@ -26,6 +26,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.flowlayout.MainAxisAlignment
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
@@ -192,29 +194,45 @@ fun ElementPickerDialogFullscreen(
 
 /**
  * A minimal dialog version of the element picker.
- * Missing features currently are: search, toolbar actions, multi select (due to missing confirm button), close button.
+ * Missing features currently are: toolbar actions, close button.
  */
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ElementPickerDialog(
 	title: (@Composable () -> Unit)?,
 	timetableDatabaseInterface: TimetableDatabaseInterface,
 	initialType: TimetableDatabaseInterface.Type? = null,
+	multiSelect: Boolean = false,
 	hideTypeSelection: Boolean = false,
 	hideTypeSelectionPersonal: Boolean = false,
 	onDismiss: (success: Boolean) -> Unit = {},
-	onSelect: (selectedItem: PeriodElement?) -> Unit = {}
+	onSelect: (selectedItem: PeriodElement?) -> Unit = {},
+	onMultiSelect: (selectedItems: List<PeriodElement>) -> Unit = {},
+	showSearch: Boolean = false,
+	selectedItems: List<PeriodElement>? = null
 ) {
 	var selectedType by remember { mutableStateOf(initialType) }
 
 	val items = remember(selectedType) {
 		mutableStateMapOf<PeriodElement, Boolean>().apply {
 			timetableDatabaseInterface.getElements(selectedType)
-				.associateWith { false }
+				.associateWith {
+					selectedItems?.contains(it) ?: false
+				}
 				.also {
 					putAll(it)
 				}
 		}
 	}
+
+	var allSelected by remember {
+		mutableStateOf(items.toMap().values.all { it })
+	}
+
+	var editSearch by remember {
+		mutableStateOf(false)
+	}
+	var search by remember { mutableStateOf("") }
 
 	Dialog(onDismissRequest = { onDismiss(false) }) {
 		Surface(
@@ -235,91 +253,12 @@ fun ElementPickerDialog(
 						}
 					}
 				}
-
-				ElementPickerElements(
-					timetableDatabaseInterface = timetableDatabaseInterface,
-					selectedType = selectedType,
-					onDismiss = onDismiss,
-					onSelect = onSelect,
-					items = items,
-					modifier = Modifier
-						.fillMaxWidth()
-						.weight(1f)
-						.padding(horizontal = 24.dp)
-				)
-
-				if (!hideTypeSelection)
-					ElementPickerTypeSelection(
-						selectedType = selectedType,
-						hideTypeSelectionPersonal = hideTypeSelectionPersonal,
-						onTypeChange = { selectedType = it },
-						onDismiss = onDismiss,
-						onSelect = onSelect
-					)
-			}
-		}
-	}
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SubjectsElementDialog(
-	title: (@Composable () -> Unit)?,
-	timetableDatabaseInterface: TimetableDatabaseInterface,
-	onDismiss: (success: Boolean) -> Unit = {},
-	onMultiSelect: (selectedItems: List<PeriodElement>) -> Unit = {},
-	selectedElements: List<PeriodElement>? = null
-) {
-	val items = remember(TimetableDatabaseInterface.Type.SUBJECT) {
-		mutableStateMapOf<PeriodElement, Boolean>().apply {
-			timetableDatabaseInterface.getElements(TimetableDatabaseInterface.Type.SUBJECT)
-				.associateWith { selectedElements?.contains(it) ?: false }
-				.also {
-					putAll(it)
-				}
-		}
-	}
-
-	var allSelected by remember {
-		mutableStateOf(items.toMap().values.all { it })
-	}
-
-	var showSearch by remember {
-		mutableStateOf(false)
-	}
-	var search by remember { mutableStateOf("") }
-
-	Dialog(onDismissRequest = { onDismiss(false) }) {
-		Surface(
-			modifier = Modifier.padding(vertical = 24.dp),
-			shape = AlertDialogDefaults.shape,
-			color = AlertDialogDefaults.containerColor,
-			tonalElevation = AlertDialogDefaults.TonalElevation
-		) {
-			Column {
-				Box(modifier = Modifier
-					.padding(top = 24.dp, bottom = 16.dp)
-					.padding(horizontal = 24.dp)
-				){
-					Row {
-						title?.let {
-							ProvideTextStyle(value = MaterialTheme.typography.headlineSmall) {
-								title()
-							}
-
-						}
-					}
-
-				}
-				Box(modifier = Modifier
-					.padding(top = 8.dp, bottom = 16.dp)
-					.padding(horizontal = 24.dp)
-				){
-					Row {
+				Row {
+					if (showSearch) {
 						IconButton(
 							onClick = {
-								showSearch = !showSearch
-								if (!showSearch) {
+								editSearch = !editSearch
+								if (!editSearch) {
 									search = ""
 								}
 							},
@@ -330,7 +269,7 @@ fun SubjectsElementDialog(
 								contentDescription = "TODO"
 							)
 						}
-						if (showSearch) {
+						if (editSearch) {
 							val focusRequester = remember { FocusRequester() }
 							BasicTextField(
 								value = search,
@@ -358,14 +297,15 @@ fun SubjectsElementDialog(
 								modifier = Modifier
 									.focusRequester(focusRequester)
 									.alignByBaseline()
-									//.padding(bottom = 6.dp)
+								//.padding(bottom = 6.dp)
 							)
 							LaunchedEffect(Unit) {
 								focusRequester.requestFocus()
 							}
 						}
-
-						Spacer(modifier = Modifier.weight(1f))
+					}
+					Spacer(modifier = Modifier.weight(1f))
+					if (multiSelect) {
 						IconButton(
 							onClick = {
 								for (key in items.keys){
@@ -381,44 +321,62 @@ fun SubjectsElementDialog(
 								Icon(painter = painterResource(id = R.drawable.all_checkbox_unchecked), contentDescription = null)
 							}
 						}
-						IconButton(
-							onClick = {
-								onMultiSelect(items.filter { it.value }.keys.toList())
-								onDismiss(true)
-							},
-							Modifier.alignByBaseline()
-						) {
-							Icon(
-								imageVector = Icons.Outlined.Check,
-								contentDescription = "TODO",
-							)
-						}
 					}
 				}
 
-
 				ElementPickerElements(
 					timetableDatabaseInterface = timetableDatabaseInterface,
-					selectedType = TimetableDatabaseInterface.Type.SUBJECT,
+					selectedType = selectedType,
+					multiSelect = multiSelect,
 					onDismiss = onDismiss,
-					multiSelect = true,
-					onSelect = {element ->
-						element?.let {
-							items[it] = items[it] == false
-						}
-						allSelected = items.toMap().values.all { it }
-					},
-					filter = search,
+					onSelect = onSelect,
 					items = items,
+					filter = search,
 					modifier = Modifier
 						.fillMaxWidth()
 						.weight(1f)
 						.padding(horizontal = 24.dp)
 				)
+				Spacer(modifier = Modifier.weight(1f))
+
+				if (!hideTypeSelection)
+					ElementPickerTypeSelection(
+						selectedType = selectedType,
+						hideTypeSelectionPersonal = hideTypeSelectionPersonal,
+						onTypeChange = { selectedType = it },
+						onDismiss = onDismiss,
+						onSelect = onSelect
+					)
+
+
+				FlowRow(
+					mainAxisAlignment = MainAxisAlignment.End,
+					mainAxisSpacing = 8.dp,
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(top = 16.dp, bottom = 24.dp)
+						.padding(horizontal = 24.dp),
+				) {
+					if (multiSelect) {
+						TextButton(onClick = {
+							onDismiss(false)
+						}) {
+							Text(text = stringResource(id = R.string.all_close))
+						}
+						TextButton(onClick = {
+							onMultiSelect(items.filter { it.value }.keys.toList())
+							onDismiss(true)
+						}) {
+							Text(text = "Confirm")
+						}
+					}
+				}
+
 			}
 		}
 	}
 }
+
 
 @Composable
 fun ElementPickerElements(
