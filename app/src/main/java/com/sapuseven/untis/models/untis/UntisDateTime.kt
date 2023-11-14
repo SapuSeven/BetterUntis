@@ -14,12 +14,11 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.LocalDateTime
 
-@Serializable
+@Serializable(UntisDateTime.Companion::class)
 class UntisDateTime(
 		val dateTime: String
 ) {
 	@OptIn(ExperimentalSerializationApi::class)
-	@Serializer(forClass = UntisDateTime::class)
 	companion object : KSerializer<UntisDateTime> {
 		override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("UntisDateTime", PrimitiveKind.STRING)
 

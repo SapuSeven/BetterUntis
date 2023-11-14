@@ -21,6 +21,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.*
@@ -47,6 +48,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_HIGHLIGHT
 import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_ROUTE
@@ -265,6 +267,8 @@ private fun Drawer(
 			ModalDrawerSheet(
 				modifier = Modifier
 					.width(320.dp) // default: 360.dp
+					.fillMaxHeight()
+					.verticalScroll(drawerScrollState)
 			) {
 				Spacer(modifier = Modifier.height(24.dp))
 
@@ -538,6 +542,9 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 						}
 					},
 					actions = {
+						if (BuildConfig.DEBUG)
+							DebugDesclaimerAction()
+
 						ProfileSelectorAction(
 							users = state.userDatabase.userDao().getAll(),
 							currentSelectionId = state.user.id,
@@ -1295,6 +1302,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 		if (!rangeIndexReset)
 			hourIndexOffset = (range?.first ?: 1) - 1
+
 		hourLines = lines.toIntArray()
 		hourLabels = labels.toTypedArray().let { hourLabelArray ->
 			if (hourLabelArray.joinToString("") == "") IntArray(
@@ -1303,8 +1311,12 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 				.toTypedArray()
 			else hourLabelArray
 		}
-		startTime = lines.first()
-		endTime = lines.last()
+
+		if (lines.isNotEmpty()) {
+			startTime = lines.first()
+			endTime = lines.last()
+		}
+
 		endTimeOffset = additionalSpaceBelow
 	}
 
@@ -1511,7 +1523,7 @@ fun rememberMainAppState(
 	),
 	defaultDisplayedName: String = stringResource(id = R.string.app_name),
 	drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
-	drawerGestures: MutableState<Boolean> = rememberSaveable { mutableStateOf(true) },
+	drawerGestures: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 	loading: MutableState<Int> = rememberSaveable { mutableStateOf(0) },
 	currentWeekIndex: MutableState<Int> = rememberSaveable { mutableStateOf(0) },
 	lastRefreshTimestamp: MutableState<Long> = rememberSaveable { mutableStateOf(0L) },

@@ -17,8 +17,19 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion '1.4.2'
+        kotlinCompilerExtensionVersion '1.4.7'
     }
+
+	compileOptions {
+		coreLibraryDesugaringEnabled true
+
+		sourceCompatibility JavaVersion.VERSION_17
+		targetCompatibility JavaVersion.VERSION_17
+	}
+
+	kotlinOptions {
+		jvmTarget = JavaVersion.VERSION_17.toString()
+	}
 }
 
 dependencies {

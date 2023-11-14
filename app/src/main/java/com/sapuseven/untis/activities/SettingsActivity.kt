@@ -5,6 +5,7 @@ import android.app.AlarmManager
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -17,12 +18,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringArrayResource
@@ -45,10 +48,7 @@ import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.github.GithubUser
-import com.sapuseven.untis.preferences.PreferenceCategory
-import com.sapuseven.untis.preferences.PreferenceScreen
-import com.sapuseven.untis.preferences.UntisPreferenceDataStore
-import com.sapuseven.untis.preferences.dataStorePreferences
+import com.sapuseven.untis.preferences.*
 import com.sapuseven.untis.receivers.AutoMuteReceiver
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_BOOLEAN_MUTE
 import com.sapuseven.untis.ui.common.AppScaffold
@@ -75,7 +75,7 @@ class SettingsActivity : BaseComposeActivity() {
 		private const val URL_WIKI_PROXY = "$URL_GITHUB_REPOSITORY/wiki/Proxy"
 	}
 
-	@OptIn(ExperimentalMaterial3Api::class)
+	@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
@@ -135,6 +135,9 @@ class SettingsActivity : BaseComposeActivity() {
 									enqueueNotificationSetup(user)
 								}
 						}
+
+					val languageSettingsLauncher =
+						rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
 
 					AppScaffold(
 						topBar = {
@@ -254,6 +257,25 @@ class SettingsActivity : BaseComposeActivity() {
 												title = { Text(stringResource(R.string.preference_flinging_enable)) },
 												dataStore = dataStorePreferences.flingEnable
 											)
+										}
+										if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+											PreferenceCategory(stringResource(id = R.string.preference_category_app_language)) {
+												val packageName = LocalContext.current.packageName
+												Preference(
+													title = { Text(text = stringResource(id = R.string.preference_app_language)) },
+													onClick = {
+
+														languageSettingsLauncher.launch(
+															Intent(
+																Settings.ACTION_APP_LOCALE_SETTINGS,
+																Uri.parse("package:$packageName")
+															)
+														)
+
+													},
+													dataStore = UntisPreferenceDataStore.emptyDataStore()
+												)
+											}
 										}
 
 										PreferenceCategory(stringResource(R.string.preference_category_general_week_display)) {
@@ -1102,7 +1124,7 @@ class SettingsActivity : BaseComposeActivity() {
 										}
 									} else {
 										ListItem(
-											headlineText = {
+											headlineContent = {
 												Text(loadingText)
 											},
 											leadingContent = {
@@ -1178,10 +1200,10 @@ class SettingsActivity : BaseComposeActivity() {
 	) {
 		ListItem(
 			modifier = Modifier.clickable(onClick = onClick),
-			headlineText = {
+			headlineContent = {
 				Text(githubUser.login)
 			},
-			supportingText = {
+			supportingContent = {
 				Text(
 					pluralStringResource(
 						id = R.plurals.preferences_contributors_contributions,

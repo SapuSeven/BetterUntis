@@ -68,12 +68,6 @@ open class BaseComposeActivity : ComponentActivity() {
 		WindowCompat.setDecorFitsSystemWindows(window, false)
 	}
 
-	override fun onDestroy() {
-		userDatabase.close()
-
-		super.onDestroy()
-	}
-
 	@Composable
 	fun withUser(
 		invalidContent: @Composable () -> Unit = { InvalidProfileDialog() },

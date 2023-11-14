@@ -278,8 +278,8 @@ private fun MessageItem(
 	val textColor = MaterialTheme.colorScheme.onSurfaceVariant
 
 	ListItem(
-		headlineText = { Text(item.subject) },
-		supportingText = {
+		headlineContent = { Text(item.subject) },
+		supportingContent = {
 			AndroidView(
 				factory = { context ->
 					TextView(context).apply {
@@ -315,7 +315,7 @@ private fun EventItem(item: EventListItem) {
 			TimetableDatabaseInterface.Type.SUBJECT
 		)
 		ListItem(
-			overlineText = {
+			overlineContent = {
 				Text(
 					formatExamTime(
 						item.exam.startDateTime.toLocalDateTime(),
@@ -323,7 +323,7 @@ private fun EventItem(item: EventListItem) {
 					)
 				)
 			},
-			headlineText = {
+			headlineContent = {
 				Text(
 					if (!item.exam.name.contains(subject)) stringResource(
 						R.string.infocenter_events_exam_name_long,
@@ -337,12 +337,12 @@ private fun EventItem(item: EventListItem) {
 
 	if (item.homework != null) {
 		ListItem(
-			overlineText = {
+			overlineContent = {
 				Text(
 					item.homework.endDate.toLocalDate().toString(DateTimeFormat.mediumDate())
 				)
 			},
-			headlineText = {
+			headlineContent = {
 				Text(
 					item.timetableDatabaseInterface.getLongName(
 						item.lessonsById?.get(item.homework.lessonId.toString())?.subjectId
@@ -350,7 +350,7 @@ private fun EventItem(item: EventListItem) {
 					)
 				)
 			},
-			supportingText = if (item.homework.text.isNotBlank()) {
+			supportingContent = if (item.homework.text.isNotBlank()) {
 				{ Text(item.homework.text) }
 			} else null
 		)
@@ -367,7 +367,7 @@ private fun OfficeHourItem(item: UntisOfficeHour) {
 	).filter { it?.isNotEmpty() == true }.joinToString("\n")
 
 	ListItem(
-		overlineText = {
+		overlineContent = {
 			Text(
 				formatOfficeHourTime(
 					item.startDateTime.toLocalDateTime(),
@@ -375,8 +375,8 @@ private fun OfficeHourItem(item: UntisOfficeHour) {
 				)
 			)
 		},
-		headlineText = { Text(item.displayNameTeacher) },
-		supportingText = if (body.isNotBlank()) {
+		headlineContent = { Text(item.displayNameTeacher) },
+		supportingContent = if (body.isNotBlank()) {
 			{ Text(body) }
 		} else null
 	)
@@ -386,7 +386,7 @@ private fun OfficeHourItem(item: UntisOfficeHour) {
 @Composable
 private fun AbsenceItem(item: UntisAbsence) {
 	ListItem(
-		overlineText = {
+		overlineContent = {
 			Text(
 				formatAbsenceTime(
 					item.startDateTime.toLocalDateTime(),
@@ -394,7 +394,7 @@ private fun AbsenceItem(item: UntisAbsence) {
 				)
 			)
 		},
-		headlineText = {
+		headlineContent = {
 			Text(
 				if (item.absenceReason.isNotEmpty())
 					item.absenceReason.substring(0, 1)
@@ -403,7 +403,7 @@ private fun AbsenceItem(item: UntisAbsence) {
 					stringResource(R.string.infocenter_absence_unknown_reason)
 			)
 		},
-		supportingText = if (item.text.isNotBlank()) {
+		supportingContent = if (item.text.isNotBlank()) {
 			{ Text(item.text) }
 		} else null,
 		leadingContent = {

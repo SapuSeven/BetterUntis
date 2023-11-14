@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
-  gh: circleci/github-cli@2.1.0
+  gh: circleci/github-cli@2.2.0
+  jq: circleci/jq@2.2.0
 filters: &release
   branches:
     ignore: /.*/
@@ -10,7 +11,7 @@ jobs:
   build:
     working_directory: ~/betteruntis
     docker:
-      - image: cimg/android:2022.09
+      - image: cimg/android:2023.06.1
     resource_class: large
     steps:
       - checkout
@@ -33,10 +34,9 @@ jobs:
             echo 'export KEY_RELEASE_PASSWORD=$(echo "$KEY_RELEASE_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
       - run:
           name: Initial build
-          command: ./gradlew --no-daemon assemble bundle $([ -z $SENTRY_PROJECT ] && echo "-x uploadSentryProguardMappingsRelease")
+          command: ./gradlew --no-daemon assemble bundle
           environment:
             GRADLE_OPTS: '
-              -Dorg.gradle.jvmargs="-Xmx3g -XX:+HeapDumpOnOutOfMemoryError -XX:MaxPermSize=512m"
               -Dorg.gradle.daemon=false
               -Dorg.gradle.parallel=true
               -Dorg.gradle.workers.max=3
@@ -83,7 +83,7 @@ jobs:
           command: |
             echo $SSH_DEPLOY_KEY_ENCODED | base64 --decode > id_rsa
             chmod 600 id_rsa
-            scp -r -P $SSH_DEPLOY_PORT -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null workspace/outputs/apk/debug "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/debug/$CIRCLE_BUILD_NUM"
+            scp -r -P $SSH_DEPLOY_PORT -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null workspace/outputs/apk/gms/debug "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/debug/$CIRCLE_BUILD_NUM"
   deploy_release:
     docker:
       - image: cimg/base:stable
@@ -102,8 +102,8 @@ jobs:
           command: |
             echo $SSH_DEPLOY_KEY_ENCODED | base64 --decode > id_rsa
             chmod 600 id_rsa
-            scp -r -P $SSH_DEPLOY_PORT -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null workspace/outputs/apk/release "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG"
-            scp -P $SSH_DEPLOY_PORT -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null workspace/outputs/mapping/release/* "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG/"
+            scp -r -P $SSH_DEPLOY_PORT -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null workspace/outputs/apk/gms/release "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG"
+            scp -P $SSH_DEPLOY_PORT -i id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null workspace/outputs/mapping/gmsRelease/* "$SSH_DEPLOY_USER@$SSH_DEPLOY_HOST:$SSH_DEPLOY_PATH/release/$CIRCLE_TAG/"
 
   deploy_fastlane:
     docker:
@@ -127,10 +127,11 @@ jobs:
       - attach_workspace:
           at: workspace
       - run:
-          name: Deploy to Play Store testing track
+          name: Deploy to Play Store
           command: |
             echo $GOOGLE_PLAY_KEY_ENCODED | base64 --decode > fastlane/key.json
-            bundle exec fastlane deploy aab:'workspace/outputs/bundle/release/app-release.aab' track:<<parameters.track>>
+            for f in fastlane/metadata/android/*/changelogs; do [[ -e "$f/$CIRCLE_TAG.txt" ]] && cp "$f/$CIRCLE_TAG.txt" "$f/default.txt"; done;
+            bundle exec fastlane deploy aab:'workspace/outputs/bundle/gmsRelease/app-gms-release.aab' track:<<parameters.track>>
 
   deploy_github:
     docker:
@@ -138,15 +139,41 @@ jobs:
     working_directory: ~/betteruntis
     steps:
       - gh/setup
-      - gh/clone
+      - checkout
       - attach_workspace:
           at: workspace
       - run:
           name: Deploy Release to GitHub
           command: |
-            VERSION=$(grep versionCode app/build.gradle | cut -d " " -f2-)
-            gh release create $CIRCLE_TAG --prerelease --title "BetterUntis ${CIRCLE_TAG}" --notes-file "./fastlane/metadata/android/en-US/changelogs/${VERSION}.txt" "./workspace/outputs/apk/debug/app-debug.apk#BetterUntis ${CIRCLE_TAG}.apk"
+            gh release create $CIRCLE_TAG --prerelease --title "BetterUntis $CIRCLE_TAG" --notes-file "./fastlane/metadata/android/en-US/changelogs/$CIRCLE_TAG.txt" "./workspace/outputs/apk/gms/release/app-gms-release.apk#BetterUntis $CIRCLE_TAG.apk"
 
+  deploy_fdroid:
+    docker:
+      - image: cimg/base:stable
+    working_directory: ~/betteruntis
+    steps:
+      - checkout
+      - jq/install
+      - attach_workspace:
+          at: workspace
+      - run:
+          name: Prepare release for F-Droid
+          command: |
+            git config user.email "ci@sapuseven.com"
+            git config user.name "CircleCI"
+            
+            git checkout -B release
+            git reset --hard HEAD~1
+            git merge $CIRCLE_TAG
+            
+            versionCode=$(jq '.elements[0].versionCode' ./workspace/outputs/apk/gms/release/output-metadata.json)
+            sed -i "s/versionCode generateVersionCode()/versionCode $versionCode/" ./app/build.gradle
+
+            git add ./app/build.gradle
+            git commit -m "[skip ci] Update F-Droid release"
+            git tag fdroid-$CIRCLE_TAG
+            git push --force --set-upstream origin release
+            git push origin fdroid-$CIRCLE_TAG
 workflows:
   version: 2
   build-and-deploy:
@@ -154,7 +181,7 @@ workflows:
       - build:
           filters:
             tags:
-              only: /.*/
+              ignore: /^fdroid-.*/
       - deploy_debug:
           requires:
             - build
@@ -179,6 +206,10 @@ workflows:
               ignore: /.*/ # Disables this job. Remove this line if you enable the branch above.
           track: 'material-3'
       - deploy_github:
+          requires:
+            - build
+          filters: *release
+      - deploy_fdroid:
           requires:
             - build
           filters: *release

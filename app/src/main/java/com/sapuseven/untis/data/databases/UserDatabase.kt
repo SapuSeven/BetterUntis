@@ -39,15 +39,23 @@ abstract class UserDatabase : RoomDatabase() {
 	abstract fun userDao(): UserDao
 
 	companion object {
+		@Volatile
+		private var instance: UserDatabase? = null
+
 		fun getInstance(context: Context): UserDatabase =
-			androidx.room.Room.databaseBuilder(
-				context,
-				UserDatabase::class.java, "userdata.db"
-			)
-				.allowMainThreadQueries() // TODO: Fix and delete this!
-				.enableMultiInstanceInvalidation()
-				.addMigrations(MIGRATION_7_8)
-				.build()
+			instance ?: synchronized(this) {
+				instance ?: androidx.room.Room.databaseBuilder(
+					context,
+					UserDatabase::class.java, "userdata.db"
+				)
+					.allowMainThreadQueries() // TODO: Fix and delete this!
+					.addMigrations(
+						*MIGRATIONS_LEGACY.toTypedArray(),
+						MIGRATION_7_8,
+					)
+					.build()
+					.also { instance = it }
+			}
 	}
 }
 

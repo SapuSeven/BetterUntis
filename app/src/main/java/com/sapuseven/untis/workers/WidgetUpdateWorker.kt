@@ -80,10 +80,10 @@ class WidgetUpdateWorker(context: Context, params: WorkerParameters) :
 									timetableItems.getOrNull(index + 1)?.startDateTime == item.startDateTime
 
 								WidgetListItemModel(
-									headlineText = item.periodData.getLong(
+									headlineContent = item.periodData.getLong(
 										TimetableDatabaseInterface.Type.SUBJECT
 									),
-									supportingText = arrayOf(item.top, item.bottom)
+									supportingContent = arrayOf(item.top, item.bottom)
 										.filter { s -> s.isNotBlank() }
 										.joinToString(" - "),
 									leadingContent = { surfaceColor, textColor ->

@@ -63,8 +63,7 @@ fun DatePickerDialog(
 					mainAxisSpacing = 8.dp,
 					modifier = Modifier
 						.fillMaxWidth()
-						.padding(top = 16.dp, bottom = 24.dp)
-						.padding(horizontal = 24.dp),
+						.padding(horizontal = 24.dp, vertical = 16.dp)
 				) {
 					TextButton(
 						onClick = { onDateSelected(LocalDate.now()) }

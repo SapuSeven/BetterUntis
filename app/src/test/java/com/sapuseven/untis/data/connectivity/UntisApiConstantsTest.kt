@@ -8,7 +8,6 @@ class UntisApiConstantsTest {
 	@Test
 	fun accessTest() {
 		assertThat(UntisApiConstants, notNullValue())
-		assertThat(UntisApiConstants.DEFAULT_WEBUNTIS_PROTOCOL, notNullValue())
 		assertThat(UntisApiConstants.DEFAULT_WEBUNTIS_PATH, notNullValue())
 		assertThat(UntisApiConstants.METHOD_GET_USER_DATA, notNullValue())
 		assertThat(UntisApiConstants.METHOD_GET_TIMETABLE, notNullValue())
