@@ -57,6 +57,7 @@
     <string name="elementpicker_hint_search_rooms">Search for rooms…</string>
     <string name="elementpicker_hint_search_teachers">Search for teachers…</string>
 	<string name="elementpicker_timetable_select">Select a Timetable</string>
+	<string name="elementpicker_select_all">Select all</string>
 	<string name="errormessagedictionary_generic">Unknown error</string>
     <string name="errormessagedictionary_invalid_credentials">Wrong username or key!</string>
     <string name="errormessagedictionary_invalid_school">The specified school doesn\'t exist!</string>

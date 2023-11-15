@@ -263,7 +263,7 @@ fun ElementPickerDialog(
 						)
 
 						Text(
-							text = "Select all",
+							text = stringResource(id = R.string.elementpicker_select_all),
 							style = MaterialTheme.typography.bodyLarge,
 							modifier = Modifier
 								.clickable(
@@ -303,7 +303,6 @@ fun ElementPickerDialog(
 						onSelect = onSelect
 					)
 
-
 				FlowRow(
 					mainAxisAlignment = MainAxisAlignment.End,
 					mainAxisSpacing = 8.dp,
@@ -316,17 +315,16 @@ fun ElementPickerDialog(
 						TextButton(onClick = {
 							onDismiss(false)
 						}) {
-							Text(text = stringResource(id = R.string.all_close))
+							Text(text = stringResource(id = R.string.all_cancel))
 						}
 						TextButton(onClick = {
 							onMultiSelect(items.filter { it.value }.keys.toList())
 							onDismiss(true)
 						}) {
-							Text(text = "Confirm")
+							Text(text = stringResource(id = R.string.all_ok))
 						}
 					}
 				}
-
 			}
 		}
 	}
