@@ -375,4 +375,6 @@
     <string name="main_dialog_reports_info_1">BetterUntis koristi Sentry za prikupljanje informacija o prekidima rada programa i o drugim greškama.</string>
     <string name="elementpicker_timetable_select">Odaberi raspored sati</string>
     <string name="all_personal_abbr">Osobno</string>
+    <string name="preference_category_app_language">Jezik aplikacije</string>
+    <string name="preference_app_language">Jezik aplikacije</string>
 </resources>
