@@ -77,7 +77,6 @@ import com.sapuseven.untis.ui.functional.BackPressConfirm
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.preferences.convertRangeToPair
-import com.sapuseven.untis.ui.preferences.decodeMultipleStoredTimetableValues
 import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import com.sapuseven.untis.views.WeekViewSwipeRefreshLayout
 import com.sapuseven.untis.views.weekview.HolidayChip
@@ -821,7 +820,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	private suspend fun prepareItems(
 		items: List<TimegridItem>
 	): List<TimegridItem> {
-		val hiddenSubjects = decodeMultipleStoredTimetableValues(preferences.timetableHiddenElements.getValue()).orEmpty()
+		val hiddenSubjects = decodeStoredTimetableValue(preferences.timetableHiddenElements.getValue()).orEmpty()
 		val newItems = mergeItems(items.mapNotNull { item ->
 			if (item.periodData.isCancelled() && preferences.timetableHideCancelled.getValue())
 				return@mapNotNull null
@@ -1077,7 +1076,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		scope.launch {
 			personalTimetableFlow.collect { customTimetable ->
 				if (user.anonymous || customTimetable != "") {
-					val element = decodeStoredTimetableValue(customTimetable)
+					val element = decodeStoredTimetableValue(customTimetable)?.firstOrNull()
 					val previousElement = personalTimetable?.first
 					personalTimetable =
 						element to element?.let { timetableDatabaseInterface.getLongName(it) }
@@ -1542,7 +1541,6 @@ fun rememberMainAppState(
 	},
 	showDatePicker: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 	profileManagementDialog: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
-	subjectsToHide: State<String> = preferences.timetableHiddenElements.getState(),
 ) = remember(user, customThemeColor, colorScheme) {
 	MainAppState(
 		user = user,

@@ -21,7 +21,7 @@ import com.sapuseven.untis.receivers.AutoMuteReceiver
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_BOOLEAN_MUTE
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_INT_ID
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_LONG_USER_ID
-import com.sapuseven.untis.ui.preferences.decodeMultipleStoredTimetableValues
+import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import com.sapuseven.untis.workers.DailyWorker.Companion.WORKER_DATA_USER_ID
 import org.joda.time.LocalDateTime
 
@@ -82,7 +82,7 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 					"preference_automute_minimum_break_length"
 				).getValue()
 
-				val hiddenSubjects = decodeMultipleStoredTimetableValues(
+				val hiddenSubjects = decodeStoredTimetableValue(
 					applicationContext.stringDataStore(
 						user.id,
 						"timetable_hidden_elements"

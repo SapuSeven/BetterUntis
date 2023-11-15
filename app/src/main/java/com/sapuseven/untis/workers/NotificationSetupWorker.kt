@@ -39,7 +39,7 @@ import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_NEXT_SUBJECT_LONG
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_NEXT_TEACHER
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_NEXT_TEACHER_LONG
-import com.sapuseven.untis.ui.preferences.decodeMultipleStoredTimetableValues
+import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import com.sapuseven.untis.workers.DailyWorker.Companion.WORKER_DATA_USER_ID
 import org.joda.time.DateTime
 import org.joda.time.LocalDateTime
@@ -116,7 +116,7 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 					"preference_notifications_in_multiple"
 				).getValue()
 
-				val hiddenSubjects = decodeMultipleStoredTimetableValues(
+				val hiddenSubjects = decodeStoredTimetableValue(
 					applicationContext.stringDataStore(
 						user.id,
 						"timetable_hidden_elements"

@@ -75,7 +75,7 @@ class SettingsActivity : BaseComposeActivity() {
 		private const val URL_WIKI_PROXY = "$URL_GITHUB_REPOSITORY/wiki/Proxy"
 	}
 
-	@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+	@OptIn(ExperimentalMaterial3Api::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
