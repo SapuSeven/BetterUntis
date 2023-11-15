@@ -4,7 +4,7 @@ import android.widget.TextView
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -34,9 +34,9 @@ import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_ABSENCES
 import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_EVENTS
 import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_MESSAGES
 import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_OFFICEHOURS
-import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
+import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.NavigationBarInset
 import com.sapuseven.untis.ui.common.VerticalScrollColumn
 import com.sapuseven.untis.ui.dialogs.AttachmentsDialog

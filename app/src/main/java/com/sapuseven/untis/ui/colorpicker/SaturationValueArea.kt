@@ -1,9 +1,9 @@
 package com.sapuseven.untis.ui.colorpicker
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.drag
-import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -23,12 +23,14 @@ import androidx.compose.ui.unit.toSize
 import com.github.ajalt.colormath.model.HSV
 
 /**
- * Saturation Value area Component that invokes onSaturationValueChanged when the saturation or value is mutated.
+ * Saturation Value area Component that invokes onSaturationValueChanged
+ * when the saturation or value is mutated.
  *
  * @param modifier modifiers to set on the Alpha Bar
  * @param currentColor the initial color to set on the alpha bar.
- * @param onSaturationValueChanged the callback that is invoked when saturation or value component of the changes.
- * saturation, value both between 0 - 1.
+ * @param onSaturationValueChanged the callback that is invoked when
+ *     saturation or value component of the changes. saturation, value both
+ *     between 0-1.
  */
 @Composable
 internal fun SaturationValueArea(
@@ -55,19 +57,17 @@ internal fun SaturationValueArea(
 		modifier = modifier
 			.fillMaxSize()
 			.pointerInput(Unit) {
-				forEachGesture {
-					awaitPointerEventScope {
-						val down = awaitFirstDown()
-						val (s, v) = getSaturationPoint(down.position, size)
-						onSaturationValueChanged(s, v)
-						drag(down.id) { change ->
-							if (change.positionChange() != Offset.Zero) change.consume()
-							val (newSaturation, newValue) = getSaturationPoint(
-								change.position,
-								size
-							)
-							onSaturationValueChanged(newSaturation, newValue)
-						}
+				awaitEachGesture {
+					val down = awaitFirstDown()
+					val (s, v) = getSaturationPoint(down.position, size)
+					onSaturationValueChanged(s, v)
+					drag(down.id) { change ->
+						if (change.positionChange() != Offset.Zero) change.consume()
+						val (newSaturation, newValue) = getSaturationPoint(
+							change.position,
+							size
+						)
+						onSaturationValueChanged(newSaturation, newValue)
 					}
 				}
 			}
@@ -110,10 +110,11 @@ private fun getSaturationPoint(
 }
 
 /**
- * Gets the X/Y offset for a color based on the input Size
- * (This is for the large inner area)
+ * Gets the X/Y offset for a color based on the input Size (This is for the
+ * large inner area)
  *
- * @return an Offset within the Size that represents the saturation and value of the supplied Color.
+ * @return an Offset within the Size that represents the saturation and
+ *     value of the supplied Color.
  */
 private fun getSaturationValuePoint(color: HsvColor, size: Size): Offset {
 	val height: Float = size.height
@@ -123,7 +124,8 @@ private fun getSaturationValuePoint(color: HsvColor, size: Size): Offset {
 }
 
 /**
- * Given an offset and size, this function calculates a saturation and value amount based on that.
+ * Given an offset and size, this function calculates a saturation and
+ * value amount based on that.
  *
  * @return new saturation and value
  */

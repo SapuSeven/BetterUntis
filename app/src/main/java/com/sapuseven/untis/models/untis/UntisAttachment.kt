@@ -1,6 +1,5 @@
 package com.sapuseven.untis.models.untis
 
-import com.sapuseven.untis.models.UnknownObject
 import kotlinx.serialization.Serializable
 
 @Serializable

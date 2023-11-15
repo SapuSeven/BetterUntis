@@ -6,6 +6,7 @@ buildscript {
 	ext.aboutlibraries_version = '10.5.2'
 	ext.room_version = '2.5.2'
 	ext.fuel_version = '2.3.1'
+	ext.sentry_version = "6.15.0"
 
 	repositories {
 		google()

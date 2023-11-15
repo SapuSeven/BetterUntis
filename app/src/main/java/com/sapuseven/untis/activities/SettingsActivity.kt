@@ -18,8 +18,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -45,6 +46,7 @@ import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
+import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.github.GithubUser
 import com.sapuseven.untis.preferences.*
 import com.sapuseven.untis.receivers.AutoMuteReceiver
@@ -628,6 +630,20 @@ class SettingsActivity : BaseComposeActivity() {
 													)
 												},
 												dataStore = dataStorePreferences.timetableRange
+											)
+
+											ElementPickerPreference(
+												title = { Text(stringResource(id = R.string.maindrawer_hide_subjects))},
+												icon = {
+													Icon(
+														painter = painterResource(id = R.drawable.all_hide_subjects),
+														contentDescription = null
+													)
+												},
+												type = TimetableDatabaseInterface.Type.SUBJECT,
+												multiSelect = true,
+												dataStore = dataStorePreferences.timetableHiddenElements,
+												timetableDatabaseInterface = timetableDatabaseInterface,
 											)
 
 											/*SwitchPreference(

@@ -1,9 +1,9 @@
 package com.sapuseven.untis.ui.colorpicker
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.drag
-import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -21,11 +21,13 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.ceil
 
 /**
- * Alpha side bar Component that invokes onAlphaChanged when the value is mutated.
+ * Alpha sidebar Component that invokes onAlphaChanged when the value is
+ * mutated.
  *
  * @param modifier modifiers to set on the Alpha Bar
  * @param currentColor the initial color to set on the alpha bar.
- * @param onAlphaChanged the callback that is invoked when alpha value changes. 0 - 1.
+ * @param onAlphaChanged the callback that is invoked when alpha value
+ *     changes. 0 - 1.
  */
 @Composable
 internal fun AlphaBar(
@@ -45,26 +47,25 @@ internal fun AlphaBar(
 		modifier = modifier
 			.fillMaxSize()
 			.pointerInput(Unit) {
-				forEachGesture {
-					awaitPointerEventScope {
-						val down = awaitFirstDown()
+				awaitEachGesture {
+					val down = awaitFirstDown()
+					onAlphaChanged(
+						getAlphaFromPosition(
+							down.position.x,
+							this.size.width.toFloat()
+						).coerceIn(0f, 1f)
+					)
+					drag(down.id) { change ->
+						if (change.positionChange() != Offset.Zero) change.consume()
 						onAlphaChanged(
 							getAlphaFromPosition(
-								down.position.x,
+								change.position.x,
 								this.size.width.toFloat()
 							).coerceIn(0f, 1f)
 						)
-						drag(down.id) { change ->
-							if (change.positionChange() != Offset.Zero) change.consume()
-							onAlphaChanged(
-								getAlphaFromPosition(
-									change.position.x,
-									this.size.width.toFloat()
-								).coerceIn(0f, 1f)
-							)
-						}
 					}
 				}
+
 			}
 	) {
 
@@ -110,9 +111,7 @@ private fun getPositionFromAlpha(color: HsvColor, maxWidth: Float): Float {
 	return maxWidth * alpha
 }
 
-/**
- * @return new alpha calculated from the maxWidth
- */
+/** @return new alpha calculated from the maxWidth */
 private fun getAlphaFromPosition(x: Float, maxWidth: Float): Float {
 	return 1 - x / maxWidth
 }

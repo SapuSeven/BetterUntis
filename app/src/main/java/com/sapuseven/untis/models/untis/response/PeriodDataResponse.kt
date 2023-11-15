@@ -1,6 +1,5 @@
 package com.sapuseven.untis.models.untis.response
 
-import android.os.Parcelable
 import com.sapuseven.untis.models.UnknownObject
 import com.sapuseven.untis.models.UntisAbsence
 import com.sapuseven.untis.models.UntisHomework

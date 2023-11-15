@@ -48,7 +48,7 @@ object Base32 {
 	)
 
 	fun encode(data: ByteArray): ByteArray {
-		val lower = encodeOriginal(data).toLowerCase(Locale.ROOT)
+		val lower = encodeOriginal(data).lowercase(Locale.ROOT)
 		return lower.toByteArray(StandardCharsets.US_ASCII)
 	}
 

@@ -20,13 +20,13 @@ class TimetableCache(val context: WeakReference<Context>) {
 	}
 
 	fun exists(): Boolean {
-		return targetCacheFile(target)?.exists() ?: false
+		return targetCacheFile(target).exists()
 	}
 
 	@OptIn(ExperimentalSerializationApi::class)
 	fun load(): CacheObject? {
 		return try {
-			Cbor.decodeFromByteArray<CacheObject>(targetCacheFile(target)?.readBytes() ?: ByteArray(0))
+			Cbor.decodeFromByteArray<CacheObject>(targetCacheFile(target).readBytes())
 		} catch (e: Exception) {
 			null
 		}
@@ -34,10 +34,10 @@ class TimetableCache(val context: WeakReference<Context>) {
 
 	@OptIn(ExperimentalSerializationApi::class)
 	fun save(items: CacheObject) {
-		targetCacheFile(target)?.writeBytes(Cbor.encodeToByteArray(items))
+		targetCacheFile(target).writeBytes(Cbor.encodeToByteArray(items))
 	}
 
-	private fun targetCacheFile(target: CacheTarget?): File? {
+	private fun targetCacheFile(target: CacheTarget?): File {
 		return File(context.get()?.cacheDir, target?.getName() ?: "default")
 	}
 
@@ -46,7 +46,7 @@ class TimetableCache(val context: WeakReference<Context>) {
 	}
 
 	fun delete() {
-		targetCacheFile(target)?.delete()
+		targetCacheFile(target).delete()
 	}
 
 	@Serializable

@@ -40,7 +40,7 @@ abstract class TimetableDependantWorker(
 					"preference_timetable_personal_timetable",
 					defaultValue = ""
 				).getValue()
-			)
+			)?.firstOrNull()
 
 			val elemId = customPersonalTimetable?.id ?: user.userData.elemId
 			val elemType = customPersonalTimetable?.type ?: user.userData.elemType ?: ""

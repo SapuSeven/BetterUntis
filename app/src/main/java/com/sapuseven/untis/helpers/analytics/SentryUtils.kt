@@ -1,18 +1,9 @@
 package com.sapuseven.untis.helpers.analytics
 
 import android.app.Application
-import android.util.Log
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import com.sapuseven.untis.BuildConfig
 import io.sentry.android.core.SentryAndroid
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 @OptIn(DelicateCoroutinesApi::class)
 fun Application.initSentry(enableDetailedInfo: Boolean = false) {

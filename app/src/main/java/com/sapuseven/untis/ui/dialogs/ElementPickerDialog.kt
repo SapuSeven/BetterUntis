@@ -2,7 +2,6 @@ package com.sapuseven.untis.ui.dialogs
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -27,6 +26,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.flowlayout.MainAxisAlignment
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
@@ -48,7 +49,8 @@ fun ElementPickerDialogFullscreen(
 	onDismiss: (success: Boolean) -> Unit = {},
 	onSelect: (selectedItem: PeriodElement?) -> Unit = {},
 	onMultiSelect: (selectedItems: List<PeriodElement>) -> Unit = {},
-	additionalActions: (@Composable () -> Unit) = {}
+	additionalActions: (@Composable () -> Unit) = {},
+	selectedElements: List<PeriodElement>? = null
 ) {
 	var selectedType by remember { mutableStateOf(initialType) }
 	var showSearch by remember { mutableStateOf(false) }
@@ -57,7 +59,9 @@ fun ElementPickerDialogFullscreen(
 	val items = remember(selectedType) {
 		mutableStateMapOf<PeriodElement, Boolean>().apply {
 			timetableDatabaseInterface.getElements(selectedType)
-				.associateWith { false }
+				.associateWith {
+					selectedElements?.contains(it) ?: false
+				}
 				.also {
 					putAll(it)
 				}
@@ -191,24 +195,30 @@ fun ElementPickerDialogFullscreen(
 
 /**
  * A minimal dialog version of the element picker.
- * Missing features currently are: search, toolbar actions, multi select (due to missing confirm button), close button.
+ * Missing features currently are: toolbar actions, close button.
  */
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ElementPickerDialog(
 	title: (@Composable () -> Unit)?,
 	timetableDatabaseInterface: TimetableDatabaseInterface,
 	initialType: TimetableDatabaseInterface.Type? = null,
+	multiSelect: Boolean = false,
 	hideTypeSelection: Boolean = false,
 	hideTypeSelectionPersonal: Boolean = false,
 	onDismiss: (success: Boolean) -> Unit = {},
-	onSelect: (selectedItem: PeriodElement?) -> Unit = {}
+	onSelect: (selectedItem: PeriodElement?) -> Unit = {},
+	onMultiSelect: (selectedItems: List<PeriodElement>) -> Unit = {},
+	selectedItems: List<PeriodElement>? = null
 ) {
 	var selectedType by remember { mutableStateOf(initialType) }
 
 	val items = remember(selectedType) {
 		mutableStateMapOf<PeriodElement, Boolean>().apply {
 			timetableDatabaseInterface.getElements(selectedType)
-				.associateWith { false }
+				.associateWith {
+					selectedItems?.contains(it) ?: false
+				}
 				.also {
 					putAll(it)
 				}
@@ -235,9 +245,45 @@ fun ElementPickerDialog(
 					}
 				}
 
+				if (multiSelect) {
+					val interactionSource = remember { MutableInteractionSource() }
+					val selectAll: ((Boolean) -> Unit) = { selectState ->
+						items.forEach { item, _ -> items[item] = selectState }
+					}
+
+					Row(
+						verticalAlignment = Alignment.CenterVertically,
+						modifier = Modifier
+							.padding(horizontal = 24.dp)
+					) {
+						Checkbox(
+							checked = !items.values.contains(false),
+							onCheckedChange = selectAll,
+							interactionSource = interactionSource
+						)
+
+						Text(
+							text = stringResource(id = R.string.elementpicker_select_all),
+							style = MaterialTheme.typography.bodyLarge,
+							modifier = Modifier
+								.clickable(
+									interactionSource = interactionSource,
+									indication = null,
+									role = Role.Checkbox
+								) {
+									selectAll(items.values.contains(false))
+								}
+								.weight(1f)
+						)
+					}
+
+					Divider()
+				}
+
 				ElementPickerElements(
 					timetableDatabaseInterface = timetableDatabaseInterface,
 					selectedType = selectedType,
+					multiSelect = multiSelect,
 					onDismiss = onDismiss,
 					onSelect = onSelect,
 					items = items,
@@ -246,6 +292,7 @@ fun ElementPickerDialog(
 						.weight(1f)
 						.padding(horizontal = 24.dp)
 				)
+				Spacer(modifier = Modifier.weight(1f))
 
 				if (!hideTypeSelection)
 					ElementPickerTypeSelection(
@@ -255,10 +302,34 @@ fun ElementPickerDialog(
 						onDismiss = onDismiss,
 						onSelect = onSelect
 					)
+
+				FlowRow(
+					mainAxisAlignment = MainAxisAlignment.End,
+					mainAxisSpacing = 8.dp,
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(top = 16.dp, bottom = 24.dp)
+						.padding(horizontal = 24.dp),
+				) {
+					if (multiSelect) {
+						TextButton(onClick = {
+							onDismiss(false)
+						}) {
+							Text(text = stringResource(id = R.string.all_cancel))
+						}
+						TextButton(onClick = {
+							onMultiSelect(items.filter { it.value }.keys.toList())
+							onDismiss(true)
+						}) {
+							Text(text = stringResource(id = R.string.all_ok))
+						}
+					}
+				}
 			}
 		}
 	}
 }
+
 
 @Composable
 fun ElementPickerElements(
@@ -276,7 +347,7 @@ fun ElementPickerElements(
 		contentAlignment = Alignment.Center,
 		modifier = modifier
 	) {
-		selectedType?.let {
+		selectedType?.let { type ->
 			LazyVerticalGrid(
 				columns = GridCells.Adaptive(if (multiSelect) 128.dp else 96.dp),
 				modifier = Modifier.fillMaxHeight(),
@@ -288,7 +359,11 @@ fun ElementPickerElements(
 							object {
 								val element = it
 								val name = timetableDatabaseInterface.getShortName(it)
-								val enabled = timetableDatabaseInterface.isAllowed(it)
+								val enabled = if (type != TimetableDatabaseInterface.Type.SUBJECT) {
+									timetableDatabaseInterface.isAllowed(it)
+								} else {
+									true
+								}
 							}
 						}
 						.filter { it.name.contains(filter, true) }
@@ -303,7 +378,10 @@ fun ElementPickerElements(
 						if (multiSelect)
 							Checkbox(
 								checked = items[item.element] ?: false,
-								onCheckedChange = { items[item.element] = it },
+								onCheckedChange = {
+									onSelect(item.element)
+									items[item.element] = it
+								},
 								interactionSource = interactionSource,
 								enabled = item.enabled
 							)
@@ -370,10 +448,12 @@ fun ElementPickerTypeSelection(
 						contentDescription = null
 					)
 				},
-				label = { AbbreviatedText(
-					text = stringResource(id = R.string.all_personal),
-					abbreviatedText = stringResource(id = R.string.all_personal_abbr)
-				) },
+				label = {
+					AbbreviatedText(
+						text = stringResource(id = R.string.all_personal),
+						abbreviatedText = stringResource(id = R.string.all_personal_abbr)
+					)
+				},
 				selected = false,
 				onClick = {
 					onSelect(null)

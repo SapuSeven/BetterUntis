@@ -2,8 +2,10 @@ package com.sapuseven.untis.workers
 
 import android.content.Context
 import android.util.Log
-import androidx.room.Room
-import androidx.work.*
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
+import androidx.work.WorkerParameters
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.config.booleanDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
