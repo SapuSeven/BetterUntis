@@ -1,0 +1,4 @@
+- Neue Einstellung für App-Sprache
+- Klickbare Links in Hausaufgaben
+- Anpassen der Fehlzeit bei der Anwesenheitskontrolle (für Lehrer)
+- Fehler beim Eingeben von ARGB-Werten in den Farbeinstellungen behoben

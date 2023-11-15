@@ -1,0 +1,4 @@
+- Add in-app language setting
+- Add clickable homework links
+- Add ability to edit absence start- and end-time (teachers only)
+- Fix being unable to use ARGB values for color preferences
