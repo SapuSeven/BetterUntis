@@ -209,7 +209,6 @@ fun ElementPickerDialog(
 	onDismiss: (success: Boolean) -> Unit = {},
 	onSelect: (selectedItem: PeriodElement?) -> Unit = {},
 	onMultiSelect: (selectedItems: List<PeriodElement>) -> Unit = {},
-	showSearch: Boolean = false,
 	selectedItems: List<PeriodElement>? = null
 ) {
 	var selectedType by remember { mutableStateOf(initialType) }
@@ -225,15 +224,6 @@ fun ElementPickerDialog(
 				}
 		}
 	}
-
-	var allSelected by remember {
-		mutableStateOf(items.toMap().values.all { it })
-	}
-
-	var editSearch by remember {
-		mutableStateOf(false)
-	}
-	var search by remember { mutableStateOf("") }
 
 	Dialog(onDismissRequest = { onDismiss(false) }) {
 		Surface(
@@ -254,75 +244,40 @@ fun ElementPickerDialog(
 						}
 					}
 				}
-				Row {
-					if (showSearch) {
-						IconButton(
-							onClick = {
-								editSearch = !editSearch
-								if (!editSearch) {
-									search = ""
-								}
-							},
-							Modifier.alignByBaseline()
-						) {
-							Icon(
-								imageVector = Icons.Outlined.Search,
-								contentDescription = "TODO"
-							)
-						}
-						if (editSearch) {
-							val focusRequester = remember { FocusRequester() }
-							BasicTextField(
-								value = search,
-								onValueChange = { search = it },
-								singleLine = true,
-								decorationBox = { innerTextField ->
-									TextFieldDecorationBox(
-										value = search,
-										innerTextField = innerTextField,
-										enabled = true,
-										singleLine = true,
-										visualTransformation = VisualTransformation.None,
-										interactionSource = remember { MutableInteractionSource() },
-										placeholder = { Text("Search") },
-										colors = TextFieldDefaults.textFieldColors(
-											containerColor = Color.Transparent,
-											focusedIndicatorColor = Color.Transparent,
-											unfocusedIndicatorColor = Color.Transparent,
-											disabledIndicatorColor = Color.Transparent
-										)
-									)
-								},
-								textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
-								cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
-								modifier = Modifier
-									.focusRequester(focusRequester)
-									.alignByBaseline()
-								//.padding(bottom = 6.dp)
-							)
-							LaunchedEffect(Unit) {
-								focusRequester.requestFocus()
-							}
-						}
+
+				if (multiSelect) {
+					val interactionSource = remember { MutableInteractionSource() }
+					val selectAll: ((Boolean) -> Unit) = { selectState ->
+						items.forEach { item, _ -> items[item] = selectState }
 					}
-					Spacer(modifier = Modifier.weight(1f))
-					if (multiSelect) {
-						IconButton(
-							onClick = {
-								for (key in items.keys){
-									items[key] = !allSelected
+
+					Row(
+						verticalAlignment = Alignment.CenterVertically,
+						modifier = Modifier
+							.padding(horizontal = 24.dp)
+					) {
+						Checkbox(
+							checked = !items.values.contains(false),
+							onCheckedChange = selectAll,
+							interactionSource = interactionSource
+						)
+
+						Text(
+							text = "Select all",
+							style = MaterialTheme.typography.bodyLarge,
+							modifier = Modifier
+								.clickable(
+									interactionSource = interactionSource,
+									indication = null,
+									role = Role.Checkbox
+								) {
+									selectAll(items.values.contains(false))
 								}
-								allSelected = !allSelected
-							},
-							Modifier.alignByBaseline()
-						) {
-							if (allSelected) {
-								Icon(painter = painterResource(id = R.drawable.all_checkbox_checked), contentDescription = null)
-							} else {
-								Icon(painter = painterResource(id = R.drawable.all_checkbox_unchecked), contentDescription = null)
-							}
-						}
+								.weight(1f)
+						)
 					}
+
+					Divider()
 				}
 
 				ElementPickerElements(
@@ -332,7 +287,6 @@ fun ElementPickerDialog(
 					onDismiss = onDismiss,
 					onSelect = onSelect,
 					items = items,
-					filter = search,
 					modifier = Modifier
 						.fillMaxWidth()
 						.weight(1f)
@@ -407,7 +361,11 @@ fun ElementPickerElements(
 							object {
 								val element = it
 								val name = timetableDatabaseInterface.getShortName(it)
-								val enabled = if (type != TimetableDatabaseInterface.Type.SUBJECT) { timetableDatabaseInterface.isAllowed(it) } else { true }
+								val enabled = if (type != TimetableDatabaseInterface.Type.SUBJECT) {
+									timetableDatabaseInterface.isAllowed(it)
+								} else {
+									true
+								}
 							}
 						}
 						.filter { it.name.contains(filter, true) }
@@ -492,10 +450,12 @@ fun ElementPickerTypeSelection(
 						contentDescription = null
 					)
 				},
-				label = { AbbreviatedText(
-					text = stringResource(id = R.string.all_personal),
-					abbreviatedText = stringResource(id = R.string.all_personal_abbr)
-				) },
+				label = {
+					AbbreviatedText(
+						text = stringResource(id = R.string.all_personal),
+						abbreviatedText = stringResource(id = R.string.all_personal_abbr)
+					)
+				},
 				selected = false,
 				onClick = {
 					onSelect(null)

@@ -25,7 +25,6 @@ fun ElementPickerPreference(
 	timetableDatabaseInterface: TimetableDatabaseInterface,
 	type: TimetableDatabaseInterface.Type? = null,
 	multiSelect: Boolean = false,
-	showSearch: Boolean = false,
 	highlight: Boolean = false,
 ) {
 	val value = remember { mutableStateOf(dataStore.defaultValue) }
@@ -82,7 +81,6 @@ fun ElementPickerPreference(
 				}
 			},
 			selectedItems = decodeStoredTimetableValue(value.value),
-			showSearch = showSearch,
 			hideTypeSelection = type != null,
 			initialType = type ?: decodeStoredTimetableValue(value.value)?.firstOrNull()
 				?.let { TimetableDatabaseInterface.Type.valueOf(it.type) }

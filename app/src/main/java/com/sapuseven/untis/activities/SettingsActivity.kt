@@ -642,7 +642,6 @@ class SettingsActivity : BaseComposeActivity() {
 												},
 												type = TimetableDatabaseInterface.Type.SUBJECT,
 												multiSelect = true,
-												showSearch = true,
 												dataStore = dataStorePreferences.timetableHiddenElements,
 												timetableDatabaseInterface = timetableDatabaseInterface,
 											)
