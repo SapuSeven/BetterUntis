@@ -2,6 +2,7 @@ version: 2.1
 orbs:
   gh: circleci/github-cli@2.2.0
   jq: circleci/jq@2.2.0
+  android: circleci/android@2.3.0
 filters: &release
   branches:
     ignore: /.*/
@@ -10,20 +11,16 @@ filters: &release
 jobs:
   build:
     working_directory: ~/betteruntis
-    docker:
-      - image: cimg/android:2023.06.1
-    resource_class: large
+    executor:
+      name: android/android-machine
+      resource-class: large
+      tag: 2023.10.1
     steps:
       - checkout
-      - restore_cache:
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - android/restore-gradle-cache
       - run:
           name: Download Dependencies
           command: ./gradlew androidDependencies
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
       - run:
           name: Prepare signing config
           command: |
@@ -34,7 +31,7 @@ jobs:
             echo 'export KEY_RELEASE_PASSWORD=$(echo "$KEY_RELEASE_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
       - run:
           name: Initial build
-          command: ./gradlew --no-daemon assemble bundle
+          command: ./gradlew --no-configuration-cache --no-daemon assemble bundle
           environment:
             GRADLE_OPTS: '
               -Dorg.gradle.daemon=false
@@ -42,6 +39,7 @@ jobs:
               -Dorg.gradle.workers.max=3
               -Dkotlin.incremental=false
             '
+      - android/save-gradle-cache
       - store_artifacts:
           name: Upload build artifacts
           path: app/build/outputs
@@ -163,6 +161,7 @@ jobs:
             git config user.name "CircleCI"
             
             git checkout -B release
+            git reset --hard HEAD~1
             git merge $CIRCLE_TAG
             
             versionCode=$(jq '.elements[0].versionCode' ./workspace/outputs/apk/gms/release/output-metadata.json)
@@ -171,7 +170,7 @@ jobs:
             git add ./app/build.gradle
             git commit -m "[skip ci] Update F-Droid release"
             git tag fdroid-$CIRCLE_TAG
-            git push --set-upstream origin release
+            git push --force --set-upstream origin release
             git push origin fdroid-$CIRCLE_TAG
 workflows:
   version: 2

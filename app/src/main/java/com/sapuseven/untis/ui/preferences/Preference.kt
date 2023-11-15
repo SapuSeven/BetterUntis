@@ -59,12 +59,12 @@ fun <T> Preference(
 	}
 
 	ListItem(
-		headlineText = {
+		headlineContent = {
 			Box(modifier = Modifier.disabled(!enabled)) {
 				title()
 			}
 		},
-		supportingText = summary?.let {
+		supportingContent = summary?.let {
 			{
 				Column {
 					Box(modifier = Modifier.disabled(!enabled)) {

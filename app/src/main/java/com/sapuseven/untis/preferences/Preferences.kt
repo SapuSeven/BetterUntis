@@ -86,7 +86,7 @@ fun PreferenceScreen(
 	navController: NavController
 ) {
 	ListItem(
-		headlineText = title,
+		headlineContent = title,
 		leadingContent = icon,
 		modifier = Modifier.clickable {
 			navController.navigate(key)

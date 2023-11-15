@@ -368,6 +368,9 @@
     <string name="infocenter_absences_list_thirty_days">Letzten 30 Tage anzeigen</string>
     <string name="infocenter_absences_list_ninety_days">Letzten 90 Tage anzeigen</string>
     <string name="infocenter_absences_list_schoolyear">Aktuelles Schuljahr</string>
-    <string name="preference_app_language">App Sprache</string>
-    <string name="preference_category_app_language">App-Sprache</string>
+    <string name="all_timepicker_select">Zeit auswählen</string>
+    <string name="all_start_time">Startzeit</string>
+	  <string name="all_end_time">Endzeit</string>
+    <string name="preference_app_language">App-Sprache</string>
+	  <string name="preference_category_app_language">App-Sprache</string>
 </resources>
