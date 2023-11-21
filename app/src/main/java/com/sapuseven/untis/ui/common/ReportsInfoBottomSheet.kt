@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 fun ReportsInfoBottomSheet(reportsDataStore: DataStore<Preferences> = LocalContext.current.reportsDataStore) {
 	val scope = rememberCoroutineScope()
 	var bottomSheetVisible by rememberSaveable { mutableStateOf(false) }
-	val bottomSheetState = rememberStandardBottomSheetState(initialValue = SheetValue.Expanded)
+	val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 	var saveEnabled by rememberSaveable { mutableStateOf(true) }
 
 	LaunchedEffect(Unit) {
@@ -38,7 +38,7 @@ fun ReportsInfoBottomSheet(reportsDataStore: DataStore<Preferences> = LocalConte
 				prefs[reportsDataStoreBreadcrumbsEnable.first]
 			}.first() == null) {
 			bottomSheetVisible = true
-			bottomSheetState.show()
+			sheetState.show()
 		}
 	}
 
@@ -47,8 +47,13 @@ fun ReportsInfoBottomSheet(reportsDataStore: DataStore<Preferences> = LocalConte
 			modifier = Modifier.fillMaxSize()
 		) {
 			ModalBottomSheet(
-				onDismissRequest = { bottomSheetVisible = false },
-				sheetState = bottomSheetState,
+				onDismissRequest = {
+					scope.launch {
+						sheetState.hide()
+						bottomSheetVisible = false
+					}
+				},
+				sheetState = sheetState,
 			) {
 				Row(
 					verticalAlignment = Alignment.CenterVertically,
@@ -125,9 +130,9 @@ fun ReportsInfoBottomSheet(reportsDataStore: DataStore<Preferences> = LocalConte
 											?: reportsDataStoreBreadcrumbsEnable.second
 								}
 
-								bottomSheetState.hide()
+								sheetState.hide()
 							}.invokeOnCompletion {
-								if (!bottomSheetState.isVisible) {
+								if (!sheetState.isVisible) {
 									bottomSheetVisible = false
 								}
 							}
