@@ -36,7 +36,9 @@ fun ElementPickerPreference(
 	@Composable
 	fun summary(value: String) {
 		decodeStoredTimetableValue(value)?.let {
-			Text(generateSummary(it), overflow = TextOverflow.Ellipsis, maxLines = 1)
+			if (it.isNotEmpty()) {
+				Text(generateSummary(it), overflow = TextOverflow.Ellipsis, maxLines = 1)
+			}
 		}
 
 	}
