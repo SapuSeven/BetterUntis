@@ -194,8 +194,8 @@ fun ElementPickerDialogFullscreen(
 }
 
 /**
- * A minimal dialog version of the element picker.
- * Missing features currently are: toolbar actions, close button.
+ * A minimal dialog version of the element picker. Missing features
+ * currently are: toolbar actions, close button.
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -209,7 +209,7 @@ fun ElementPickerDialog(
 	onDismiss: (success: Boolean) -> Unit = {},
 	onSelect: (selectedItem: PeriodElement?) -> Unit = {},
 	onMultiSelect: (selectedItems: List<PeriodElement>) -> Unit = {},
-	selectedItems: List<PeriodElement>? = null
+	initialSelection: List<PeriodElement>? = null
 ) {
 	var selectedType by remember { mutableStateOf(initialType) }
 
@@ -217,7 +217,7 @@ fun ElementPickerDialog(
 		mutableStateMapOf<PeriodElement, Boolean>().apply {
 			timetableDatabaseInterface.getElements(selectedType)
 				.associateWith {
-					selectedItems?.contains(it) ?: false
+					initialSelection?.contains(it) ?: false
 				}
 				.also {
 					putAll(it)
@@ -292,7 +292,7 @@ fun ElementPickerDialog(
 						.weight(1f)
 						.padding(horizontal = 24.dp)
 				)
-				Spacer(modifier = Modifier.weight(1f))
+				//Spacer(modifier = Modifier.weight(0.5f))
 
 				if (!hideTypeSelection)
 					ElementPickerTypeSelection(
@@ -303,15 +303,15 @@ fun ElementPickerDialog(
 						onSelect = onSelect
 					)
 
-				FlowRow(
-					mainAxisAlignment = MainAxisAlignment.End,
-					mainAxisSpacing = 8.dp,
-					modifier = Modifier
-						.fillMaxWidth()
-						.padding(top = 16.dp, bottom = 24.dp)
-						.padding(horizontal = 24.dp),
-				) {
-					if (multiSelect) {
+				if (multiSelect) {
+					FlowRow(
+						mainAxisAlignment = MainAxisAlignment.End,
+						mainAxisSpacing = 8.dp,
+						modifier = Modifier
+							.fillMaxWidth()
+							.padding(top = 16.dp, bottom = 24.dp)
+							.padding(horizontal = 24.dp),
+					) {
 						TextButton(onClick = {
 							onDismiss(false)
 						}) {

@@ -1,12 +1,8 @@
 package com.sapuseven.untis.ui.preferences
 
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
+import androidx.compose.ui.text.style.TextOverflow
 import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
@@ -39,7 +35,10 @@ fun ElementPickerPreference(
 
 	@Composable
 	fun summary(value: String) {
-		Text(decodeStoredTimetableValue(value)?.let { generateSummary(it) } ?: "")
+		decodeStoredTimetableValue(value)?.let {
+			Text(generateSummary(it), overflow = TextOverflow.Ellipsis, maxLines = 1)
+		}
+
 	}
 
 	Preference(
@@ -80,7 +79,7 @@ fun ElementPickerPreference(
 					dataStore.saveValue(encodeStoredTimetableValue(elements))
 				}
 			},
-			selectedItems = decodeStoredTimetableValue(value.value),
+			initialSelection = decodeStoredTimetableValue(value.value),
 			hideTypeSelection = type != null,
 			initialType = type ?: decodeStoredTimetableValue(value.value)?.firstOrNull()
 				?.let { TimetableDatabaseInterface.Type.valueOf(it.type) }

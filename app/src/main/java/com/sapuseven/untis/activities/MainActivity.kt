@@ -824,8 +824,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		val newItems = mergeItems(items.mapNotNull { item ->
 			if (item.periodData.isCancelled() && preferences.timetableHideCancelled.getValue())
 				return@mapNotNull null
-			if (displayedElement.value?.type?.equals(TimetableDatabaseInterface.Type.SUBJECT.name) == false
-				&& item.periodData.subjects.isNotEmpty()
+			if (item.periodData.subjects.isNotEmpty()
 				&& hiddenSubjects.containsAll(item.periodData.subjects)
 			) {
 				return@mapNotNull null

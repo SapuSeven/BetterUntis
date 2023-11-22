@@ -104,7 +104,7 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 								return@forEach // lesson is cancelled
 
 
-							if (hiddenSubjects.contains(item.periodData.subjects.first()))
+							if (item.periodData.subjects.isNotEmpty() && hiddenSubjects.containsAll(item.periodData.subjects))
 								return@forEach // lesson is hidden
 
 
