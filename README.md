@@ -62,8 +62,6 @@ The BetterUntis repository is managed with a clear and efficient branching strat
     address. Upon completion, they are merged back into the develop branch. Post-merge, these feature-specific branches are deleted if they 
     are no longer needed, keeping the repository clean and organized.
 
-## Contributing
-
 ### Translating into Another Language
 - Sign up at [weblate.org](https://hosted.weblate.org/accounts/register/).
 - Visit the [BetterUntis translation project](https://hosted.weblate.org/projects/betteruntis/translations/).
