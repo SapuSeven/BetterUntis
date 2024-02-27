@@ -44,12 +44,12 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.R
+import com.sapuseven.untis.api.model.SchoolInfo
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.helpers.api.LoginDataInfo
 import com.sapuseven.untis.helpers.api.LoginHelper
-import com.sapuseven.untis.models.UntisSchoolInfo
 import com.sapuseven.untis.models.untis.masterdata.TimeGrid
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.common.*
@@ -85,7 +85,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 
 	private var existingUserId: Long? = null
 
-	private var schoolInfoFromSearch: UntisSchoolInfo? = null
+	private var schoolInfoFromSearch: SchoolInfo? = null
 	private var existingUser: User? = null
 
 	@OptIn(
@@ -176,7 +176,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 						} else {
 							appLinkData.getQueryParameter("schoolInfo")?.let {
 								schoolInfoFromSearch =
-									getJSON().decodeFromString<UntisSchoolInfo>(it)
+									getJSON().decodeFromString<SchoolInfo>(it)
 								schoolId.value = schoolInfoFromSearch?.schoolId.toString()
 								schoolIdLocked = true
 							}
@@ -233,18 +233,18 @@ class LoginDataInputActivity : BaseComposeActivity() {
 							val schoolInfo = (
 									when {
 										schoolInfoFromSearch != null -> schoolInfoFromSearch
-										advanced && !apiUrl.value.isNullOrBlank() -> UntisSchoolInfo(
-											server = "",
-											useMobileServiceUrlAndroid = true,
-											useMobileServiceUrlIos = true,
-											address = "",
-											displayName = schoolId.value ?: "",
-											loginName = schoolId.value ?: "",
-											schoolId = schoolId.value?.toIntOrNull()
-												?: 0,
-											serverUrl = apiUrl.value ?: "",
-											mobileServiceUrl = apiUrl.value
-										)
+										advanced && !apiUrl.value.isNullOrBlank() -> SchoolInfo(
+                                            server = "",
+                                            useMobileServiceUrlAndroid = true,
+                                            useMobileServiceUrlIos = true,
+                                            address = "",
+                                            displayName = schoolId.value ?: "",
+                                            loginName = schoolId.value ?: "",
+                                            schoolId = schoolId.value?.toIntOrNull()
+                                                ?: 0,
+                                            serverUrl = apiUrl.value ?: "",
+                                            mobileServiceUrl = apiUrl.value
+                                        )
 
 										else -> loadSchoolInfo(
 											schoolId.value ?: ""

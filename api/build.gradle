@@ -4,6 +4,8 @@ plugins {
 	id 'org.openapi.generator' version '7.0.1'
 }
 
+apply plugin: 'kotlinx-serialization'
+
 java {
 	sourceCompatibility = JavaVersion.VERSION_17
 	targetCompatibility = JavaVersion.VERSION_17
@@ -15,7 +17,37 @@ dependencies {
 	implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization_version"
 	implementation "io.ktor:ktor-client-core:$ktor_version"
 	implementation "io.ktor:ktor-client-content-negotiation:$ktor_version"
+	implementation "io.ktor:ktor-serialization-kotlinx-json:$ktor_version"
 }
+
+/* Auto-generate api code from untis-extern spec - disabled for now, as not in use
+def apiSpecList = []
+def dir = new File("$projectDir/spec/untis-extern/".toString())
+dir.eachFileRecurse(groovy.io.FileType.FILES) { file ->
+	if (file.getName().endsWith(".yaml"))
+		apiSpecList << file
+}
+apiSpecList.each {
+	def fileName = it.getName().replace(".yaml", "");
+	def taskName = fileName.split('-').collect { it.capitalize() }.join();
+	def packageName = fileName.replace("-", "_");
+
+	tasks.register("openApiGenerate" + taskName, org.openapitools.generator.gradle.plugin.tasks.GenerateTask.class, {
+		generatorName = "kotlin"
+		inputSpec = "$projectDir/spec/untis-extern/".toString() + "${fileName}.yaml"
+		outputDir = "$buildDir/generated".toString()
+		apiPackage = "com.sapuseven.untis.api.".toString() + "${packageName}"
+		modelPackage = "com.sapuseven.untis.model.".toString() + "${packageName}"
+		//templateDir = "$rootDir/src/main/resources/api/templates".toString()
+		//    https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/jaxrs-spec.md
+		configOptions = [
+			library: 'jvm-ktor',
+			dateLibrary: 'java8',
+			serializationLibrary: 'kotlinx_serialization',
+		]
+	})
+	compileJava.dependsOn("openApiGenerate" + taskName)
+}*/
 
 openApiGenerate {
 	generatorName.set("kotlin")
@@ -24,9 +56,9 @@ openApiGenerate {
 	apiPackage.set("com.sapuseven.untis.api")
 	modelPackage.set("com.sapuseven.untis.model")
 	configOptions.set([
-			library: 'jvm-ktor',
-			dateLibrary: 'java8',
-			serializationLibrary: 'kotlinx_serialization'
+		library: 'jvm-ktor',
+		dateLibrary: 'java8',
+		serializationLibrary: 'kotlinx_serialization'
 	])
 }
 

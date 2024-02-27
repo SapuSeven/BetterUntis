@@ -1,6 +1,6 @@
-package com.sapuseven.untis.models.untis.response
+package com.sapuseven.untis.api.model.response
 
-import com.sapuseven.untis.models.UntisSchoolInfo
+import com.sapuseven.untis.api.model.SchoolInfo
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -11,5 +11,5 @@ data class SchoolSearchResponse(
 @Serializable
 data class SchoolSearchResult(
 		val size: Int,
-		val schools: List<UntisSchoolInfo>
+		val schools: List<SchoolInfo>
 )

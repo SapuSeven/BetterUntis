@@ -1,0 +1,121 @@
+openapi: 3.0.3
+info:
+  title: WebUntis API Error
+  version: "1.0.0"
+
+paths: {}
+
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      required:
+        - errorCode
+        - errorMessage
+        - requestId
+        - traceId
+      properties:
+        errorCode:
+          $ref: '#/components/schemas/ErrorCode'
+        errorMessage:
+          type: string
+        requestId:
+          type: string
+        traceId:
+          type: string
+
+    ErrorCode:
+      type: string
+      enum:
+        - INTERNAL_ERROR
+        - MASTER_DATA_NOT_FOUND
+        - VALIDATION_ERROR
+        - ENTITY_EXPIRED
+        - MESSAGING_GROUP_CALCULATION_ERROR
+        - MESSAGING_READ_CONFIRMATION_ALREADY_CONFIRMED
+        - NOT_FOUND
+        - FORBIDDEN
+        - TT_ONGOING_TIMETABLE_PUBLICATION
+        - TT_UNRESOLVED_CHANGESET
+        - TENANT_INSTALLATION_RECOVERABLE_ERROR
+        - BAD_REQUEST
+        - PW_CHANGE_RULE_VIOLATION
+
+    ValidationErrorResponse:
+      type: object
+      required:
+        - errorCode
+        - requestId
+        - traceId
+        - validationErrors
+      properties:
+        errorCode:
+          $ref: '#/components/schemas/ErrorCode'
+        requestId:
+          type: string
+        traceId:
+          type: string
+        validationErrors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'
+
+    ValidationError:
+      type: object
+      required:
+        - path
+        - errorMessage
+      properties:
+        errorKey:
+          type: string
+          enum:
+            - field.mustBeMin
+            - field.mustBeMax
+            - field.mustBeNull
+            - field.mustNotBeNull
+            - field.mustNotBeEmpty
+            - field.mustNotBeBlank
+            - field.sizeInvalid
+            - field.digitsMustMatch
+            - field.mustBeEmail
+            - field.mustBeFuture
+            - field.mustBeFutureOrPresent
+            - field.mustBePast
+            - field.mustBePastOrPresent
+            - field.mustBePositive
+            - field.mustBePositiveOrZero
+            - field.mustBeNegative
+            - field.mustBeNegativeOrZero
+            - field.mustMatchPattern
+            - value.mustHaveIdentity
+            - value.mustBeBefore
+            - value.mustBeAfter
+            - value.alreadyExists
+            - value.mustBeUnique
+            - value.other
+            - entity.notFound
+            - entity.duplicateFound
+            - entity.other
+        path:
+          type: string
+        constraintValue:
+          type: string
+        errorMessage:
+          type: string
+        index:
+          type: integer
+          description: Index of the dto which failed validation in a bulk operation. Count starts from 0.
+        errorData:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorData'
+
+    ErrorData:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        externKey:
+          type: string

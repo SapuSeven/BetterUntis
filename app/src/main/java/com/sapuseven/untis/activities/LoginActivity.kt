@@ -26,17 +26,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_DEMO_LOGIN
+import com.sapuseven.untis.api.client.SchoolSearchApi
+import com.sapuseven.untis.api.model.SchoolInfo
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
-import com.sapuseven.untis.data.connectivity.UntisApiConstants.SCHOOL_SEARCH_URL
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
-import com.sapuseven.untis.models.UntisSchoolInfo
-import com.sapuseven.untis.models.untis.params.SchoolSearchParams
-import com.sapuseven.untis.models.untis.response.SchoolSearchResponse
+import com.sapuseven.untis.api.model.request.SchoolSearchParams
+import com.sapuseven.untis.api.model.response.SchoolSearchResponse
 import com.sapuseven.untis.services.CodeScanService
 import com.sapuseven.untis.services.CodeScanServiceImpl
 import com.sapuseven.untis.ui.common.AppScaffold
+import io.ktor.client.call.body
+import io.ktor.client.engine.cio.CIO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -220,14 +222,12 @@ class LoginActivity : BaseComposeActivity() {
 		modifier: Modifier, searchText: String, debounceMillis: Long = 500
 	) {
 
-		var items by remember { mutableStateOf(emptyList<UntisSchoolInfo>()) }
+		var items by remember { mutableStateOf(emptyList<SchoolInfo>()) }
 		var loading by remember { mutableStateOf(false) }
 		var error by remember { mutableStateOf<String?>(null) }
-		val api: UntisRequest = remember { UntisRequest() }
-		val query: UntisRequest.UntisRequestQuery =
-			remember { UntisRequest.UntisRequestQuery(apiUrl = SCHOOL_SEARCH_URL) }
 		val composableScope = rememberCoroutineScope()
 		var searchJob by remember { mutableStateOf<Job?>(null) }
+		val schoolSearchApi = remember { SchoolSearchApi(CIO) }
 
 		DisposableEffect(searchText) {
 			error = null
@@ -238,29 +238,15 @@ class LoginActivity : BaseComposeActivity() {
 				if (searchText.isEmpty()) return@launch
 
 				loading = true
-
 				delay(debounceMillis)
-
-				var untisResponse = SchoolSearchResponse()
-
-				query.data.method = UntisApiConstants.METHOD_SEARCH_SCHOOLS
-				query.data.params = listOf(SchoolSearchParams(searchText))
-
-				api.request<SchoolSearchResponse>(query).fold({ data ->
-					untisResponse = data
-				}, { error ->
-					println("An error of type ${error.exception} happened: ${error.message}") // TODO: Implement proper error handling
-				})
-
+				val schoolSearchResult = schoolSearchApi.searchSchools(searchText)
 				loading = false
 
-				if (untisResponse.result != null) {
-					untisResponse.result?.let { items = it.schools }
-				} else {
-					error = ErrorMessageDictionary.getErrorMessage(
-						resources, untisResponse.error?.code, untisResponse.error?.message.orEmpty()
-					)
-				}
+				schoolSearchResult.fold({
+					items = it.schools
+				}, {
+					error = ErrorMessageDictionary.getErrorMessage(resources, it.code, it.message.orEmpty())
+				})
 			}
 
 			onDispose {

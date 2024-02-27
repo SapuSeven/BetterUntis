@@ -1,9 +1,10 @@
 package com.sapuseven.untis.models.untis
 
+import com.sapuseven.untis.api.model.request.SchoolSearchParams
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.models.untis.params.AppSharedSecretParams
-import com.sapuseven.untis.models.untis.params.SchoolSearchParams
 import com.sapuseven.untis.models.untis.params.UserDataParams
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import org.hamcrest.CoreMatchers.`is`
@@ -20,6 +21,7 @@ class ParamsTest {
 	}
 
 	@Test
+	@OptIn(ExperimentalSerializationApi::class)
 	fun schoolSearchParams_serialization() {
 		assertThat(getJSON().encodeToString<SchoolSearchParams>(SchoolSearchParams(
 				search = "school",
@@ -51,6 +53,7 @@ class ParamsTest {
 	}
 
 	@Test
+	@OptIn(ExperimentalSerializationApi::class)
 	fun schoolSearchParams_deserialization() {
 		val schoolSearchParams = getJSON().decodeFromString<SchoolSearchParams>("""{"search":"school","schoolid":123}""")
 		assertThat(schoolSearchParams.search, `is`("school"))

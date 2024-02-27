@@ -177,6 +177,7 @@ dependencies {
 	implementation 'io.coil-kt:coil-compose:2.2.2'
 	implementation "com.mikepenz:aboutlibraries-core:$aboutlibraries_version"
 	implementation "com.mikepenz:aboutlibraries-compose:$aboutlibraries_version"
+	implementation "io.ktor:ktor-client-cio:$ktor_version"
 	gmsImplementation 'com.google.android.gms:play-services-code-scanner:16.0.0'
 
 	coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
@@ -197,7 +198,7 @@ dependencies {
 	androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
 	debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
-
+	implementation project(':api')
 	implementation project(':weekview')
 	implementation project(':material-color-utils')
 }

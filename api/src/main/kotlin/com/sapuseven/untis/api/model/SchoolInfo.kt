@@ -1,9 +1,9 @@
-package com.sapuseven.untis.models
+package com.sapuseven.untis.api.model
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UntisSchoolInfo(
+data class SchoolInfo(
 	var server: String,
 	var useMobileServiceUrlAndroid: Boolean,
 	var useMobileServiceUrlIos: Boolean,

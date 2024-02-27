@@ -1,22 +1,20 @@
 package com.sapuseven.untis.helpers.api
 
 import com.sapuseven.untis.R
+import com.sapuseven.untis.api.client.SchoolSearchApi
+import com.sapuseven.untis.api.model.SchoolInfo
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisAuthentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
-import com.sapuseven.untis.helpers.SerializationUtils
-import com.sapuseven.untis.models.UntisSchoolInfo
 import com.sapuseven.untis.models.untis.params.AppSharedSecretParams
-import com.sapuseven.untis.models.untis.params.SchoolSearchParams
 import com.sapuseven.untis.models.untis.params.UserDataParams
 import com.sapuseven.untis.models.untis.response.AppSharedSecretResponse
-import com.sapuseven.untis.models.untis.response.SchoolSearchResponse
 import com.sapuseven.untis.models.untis.response.UserDataResponse
 import com.sapuseven.untis.models.untis.response.UserDataResult
+import io.ktor.client.engine.cio.CIO
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.decodeFromString
 import java.net.UnknownHostException
 
 class LoginHelper(
@@ -26,69 +24,65 @@ class LoginHelper(
 	val onError: (error: LoginErrorInfo) -> Unit
 ) {
 	private val api: UntisRequest = UntisRequest()
+	private val schoolSearchApi = SchoolSearchApi(CIO)
 
 	init {
 		onStatusUpdate(R.string.logindatainput_connecting)
 	}
 
 	@ExperimentalSerializationApi
-	suspend fun loadSchoolInfo(school: String): UntisSchoolInfo? {
+	suspend fun loadSchoolInfo(school: String): SchoolInfo? {
 		onStatusUpdate(R.string.logindatainput_aquiring_schoolid)
 
 		val schoolId = school.toIntOrNull()
-		val query = UntisRequest.UntisRequestQuery()
+		val schoolSearchResult = (
+			if (schoolId != null) schoolSearchApi.searchSchools(schoolid = schoolId)
+			else schoolSearchApi.searchSchools(search = school)
+		)
 
-		query.data.method = UntisApiConstants.METHOD_SEARCH_SCHOOLS
-		query.url = UntisApiConstants.SCHOOL_SEARCH_URL
-		query.proxyHost = proxyHost
-		query.data.params =
-			if (schoolId != null) listOf(SchoolSearchParams(schoolid = schoolId))
-			else listOf(SchoolSearchParams(search = school))
+		try {
+			schoolSearchResult.fold({
+				if (it.schools.isNotEmpty()) {
+					val schoolResult =
+						if (it.schools.size == 1)
+							it.schools.first()
+						else
+						// TODO: Show manual selection dialog when more than one results are returned
+							it.schools.find { schoolInfoResult ->
+								schoolInfoResult.schoolId == schoolId || schoolInfoResult.loginName.equals(
+									school,
+									true
+								)
+							}
 
-		api.request<SchoolSearchResponse>(query).fold({ untisResponse ->
-			try {
-				untisResponse.result?.let {
-					if (it.schools.isNotEmpty()) {
-						val schoolResult =
-							if (it.schools.size == 1)
-								it.schools.first()
-							else
-							// TODO: Show manual selection dialog when more than one results are returned
-								it.schools.find { schoolInfoResult ->
-									schoolInfoResult.schoolId == schoolId || schoolInfoResult.loginName.equals(
-										school,
-										true
-									)
-								}
-
-						if (schoolResult != null)
-							return schoolResult
-					}
-					onError(LoginErrorInfo(errorMessageStringRes = R.string.logindatainput_error_invalid_school))
-				} ?: run {
-					onError(
-						LoginErrorInfo(
-							errorCode = untisResponse.error?.code,
-							errorMessage = untisResponse.error?.message
-						)
-					)
+					if (schoolResult != null)
+						return schoolResult
 				}
-			} catch (e: SerializationException) {
+				onError(LoginErrorInfo(errorMessageStringRes = R.string.logindatainput_error_invalid_school))
+			}, {
 				onError(
 					LoginErrorInfo(
-						errorMessageStringRes = R.string.all_error_details,
-						errorMessage = e.message
+						errorCode = it.code,
+						errorMessage = it.message
 					)
 				)
-			}
-		}, { error ->
+			})
+		} catch (e: SerializationException) {
+			onError(
+				LoginErrorInfo(
+					errorMessageStringRes = R.string.all_error_details,
+					errorMessage = e.message
+				)
+			)
+		}
+		/*}, { error ->
 			onError(
 				LoginErrorInfo(
 					errorMessageStringRes = R.string.all_error_details,
 					errorMessage = error.message
 				)
 			)
-		})
+		})*/
 
 		return null
 	}
