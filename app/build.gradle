@@ -3,7 +3,8 @@ plugins {
 	id 'io.sentry.android.gradle' version '3.4.2'
 	id 'com.mikepenz.aboutlibraries.plugin'
 	id 'de.mannodermaus.android-junit5'
-	id 'com.google.devtools.ksp' version '1.8.21-1.0.11'
+	id 'com.google.devtools.ksp'
+	id 'com.google.dagger.hilt.android'
 }
 
 apply plugin: 'kotlin-android'
@@ -104,7 +105,7 @@ android {
 	}
 
 	composeOptions {
-		kotlinCompilerExtensionVersion '1.4.7'
+		kotlinCompilerExtensionVersion "$kotlin_compiler_ext_version"
 	}
 
 	lint {
@@ -178,11 +179,14 @@ dependencies {
 	implementation "com.mikepenz:aboutlibraries-core:$aboutlibraries_version"
 	implementation "com.mikepenz:aboutlibraries-compose:$aboutlibraries_version"
 	implementation "io.ktor:ktor-client-cio:$ktor_version"
+	implementation "com.google.dagger:hilt-android:$dagger_version"
 	gmsImplementation 'com.google.android.gms:play-services-code-scanner:16.0.0'
 
 	coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
 	ksp "androidx.room:room-compiler:$room_version"
+	ksp "com.google.dagger:dagger-compiler:$dagger_version"
+	ksp "com.google.dagger:hilt-compiler:$dagger_version"
 
 	testImplementation "org.junit.jupiter:junit-jupiter-api:$junit_version"
 	testImplementation "org.junit.jupiter:junit-jupiter-params:$junit_version"

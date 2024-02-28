@@ -13,6 +13,7 @@ import androidx.work.WorkManager
 import com.sapuseven.untis.helpers.analytics.initSentry
 import com.sapuseven.untis.workers.DailyWorker
 import com.sapuseven.untis.workers.DailyWorker.Companion.TAG_DAILY_WORK
+import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
@@ -22,6 +23,7 @@ import kotlinx.coroutines.launch
 val Context.reportsDataStore: DataStore<Preferences> by preferencesDataStore(name = "reports")
 val reportsDataStoreBreadcrumbsEnable = Pair(booleanPreferencesKey("reportBreadcrumbsEnable"), true)
 
+@HiltAndroidApp
 class App : Application(), Configuration.Provider {
 	override fun getWorkManagerConfiguration() =
 		Configuration.Builder()
