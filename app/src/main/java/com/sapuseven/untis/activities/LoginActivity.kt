@@ -1,5 +1,6 @@
 package com.sapuseven.untis.activities
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -16,7 +17,12 @@ class LoginActivity : BaseComposeActivity() {
 
 		setContent {
 			AppTheme {
-				Login(loginViewModel)
+				Login(loginViewModel) { result ->
+					if (result.resultCode == Activity.RESULT_OK) {
+						setResult(Activity.RESULT_OK, result.data)
+						finish()
+					}
+				}
 			}
 		}
 	}

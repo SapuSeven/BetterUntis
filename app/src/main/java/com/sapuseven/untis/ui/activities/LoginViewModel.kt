@@ -1,6 +1,11 @@
 package com.sapuseven.untis.ui.activities
 
+import android.app.Activity
+import android.app.Application
+import android.content.Context
 import android.net.Uri
+import android.os.Bundle
+import androidx.activity.result.ActivityResult
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,12 +14,14 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sapuseven.untis.activities.LoginActivity.Companion.EXTRA_BOOLEAN_SHOW_BACK_BUTTON
+import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_DEMO_LOGIN
 import com.sapuseven.untis.api.client.SchoolSearchApi
 import com.sapuseven.untis.api.model.SchoolInfo
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
+import com.sapuseven.untis.services.CodeScanService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -28,6 +35,7 @@ class LoginViewModel @Inject constructor(
 	savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 	val debounceMillis: Long = 500
+	lateinit var codeScanService: CodeScanService // TODO: Inject
 
 	var searchMode by mutableStateOf(false)
 		private set
@@ -54,7 +62,7 @@ class LoginViewModel @Inject constructor(
 	var schoolSearchJob by mutableStateOf<Job?>(null)
 		private set
 
-	val clearFocusEvent = MutableSharedFlow<Unit>()
+	val events = MutableSharedFlow<LoginEvents>()
 
 	fun onSchoolSearchFocusChanged(focused: Boolean) {
 		if (focused) searchMode = true
@@ -64,7 +72,7 @@ class LoginViewModel @Inject constructor(
 		searchMode = enabled
 		if (!enabled) {
 			viewModelScope.launch {
-				clearFocusEvent.emit(Unit)
+				events.emit(LoginEvents.ClearFocus)
 				schoolSearchText = ""
 			}
 		}
@@ -83,13 +91,13 @@ class LoginViewModel @Inject constructor(
 		schoolSearchText = text
 	}
 
-	fun startSchoolSearch(scope: CoroutineScope) {
+	fun startSchoolSearch() {
 		schoolSearchError = null
 		schoolSearchErrorRaw = null
 		schoolSearchItems = emptyList()
 
 		schoolSearchJob?.cancel()
-		schoolSearchJob = scope.launch {
+		schoolSearchJob = viewModelScope.launch {
 			if (schoolSearchText.isEmpty()) return@launch
 
 			schoolSearchLoading = true
@@ -115,44 +123,35 @@ class LoginViewModel @Inject constructor(
 		val builder = Uri.Builder()
 			.appendQueryParameter("schoolInfo", getJSON().encodeToString(school))
 
-		/*loginLauncher.launch(
-			Intent(
-			this@LoginActivity, LoginDataInputActivity::class.java
-		).apply {
-			data = builder.build()
-		})*/
+		viewModelScope.launch {
+			events.emit(LoginEvents.StartLoginActivity(data = builder.build()))
+		}
 	}
 
 	fun onCodeScanClick() {
-		/*codeScanService.scanCode {
-						loginLauncher.launch(
-							Intent(
-								this@LoginActivity,
-								LoginDataInputActivity::class.java
-							).apply {
-								data = it
-							})
-					}*/
+		codeScanService.scanCode {
+			viewModelScope.launch {
+				events.emit(LoginEvents.StartLoginActivity(data = it))
+			}
+		}
 	}
 
 	fun onDemoClick() {
-		/*loginLauncher.launch(
-							Intent(
-							this@LoginActivity,
-							LoginDataInputActivity::class.java
-						).apply {
-							putBackgroundColorExtra(this)
-							putExtra(EXTRA_BOOLEAN_DEMO_LOGIN, true)
-						})*/
+		viewModelScope.launch {
+			val bundle = Bundle().apply {
+				//TODO add putBackgroundColorExtra(this)
+				putBoolean(EXTRA_BOOLEAN_DEMO_LOGIN, true)
+			}
+			events.emit(LoginEvents.StartLoginActivity(extras = bundle))
+		}
 	}
 
 	fun onManualDataInputClick() {
-		/*loginLauncher.launch(
-							Intent(
-							this@LoginActivity,
-							LoginDataInputActivity::class.java
-						).apply {
-							putBackgroundColorExtra(this)
-						})*/
+		viewModelScope.launch {
+			val bundle = Bundle().apply {
+				//TODO add putBackgroundColorExtra(this)
+			}
+			events.emit(LoginEvents.StartLoginActivity(extras = bundle))
+		}
 	}
 }

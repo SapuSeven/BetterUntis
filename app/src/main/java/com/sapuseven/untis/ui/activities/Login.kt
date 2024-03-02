@@ -1,7 +1,11 @@
 package com.sapuseven.untis.ui.activities
 
+import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,10 +32,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -39,29 +43,41 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sapuseven.untis.R
+import com.sapuseven.untis.activities.LoginDataInputActivity
 import com.sapuseven.untis.ui.common.AppScaffold
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.serialization.ExperimentalSerializationApi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Login(loginViewModel: LoginViewModel = viewModel()) {
-	/*val loginLauncher =
-		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-			if (it.resultCode == Activity.RESULT_OK) {
-				setResult(Activity.RESULT_OK, it.data)
-				finish()
-			}
-		}
-
-	lateinit var codeScanService: CodeScanService*/
-
+fun Login(
+	loginViewModel: LoginViewModel = viewModel(),
+	onLogin: (ActivityResult) -> Unit
+) {
+	val context = LocalContext.current
 	val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
 	val focusManager = LocalFocusManager.current
+
+	val loginLauncher = rememberLauncherForActivityResult(
+		contract = ActivityResultContracts.StartActivityForResult(),
+		onResult = onLogin
+	)
+
 	LaunchedEffect(Unit) {
-		loginViewModel.clearFocusEvent.collectLatest {
-			focusManager.clearFocus()
+		loginViewModel.events.collectLatest { event ->
+			when (event) {
+				LoginEvents.ClearFocus -> {
+					focusManager.clearFocus()
+				}
+
+				is LoginEvents.StartLoginActivity -> {
+					loginLauncher.launch(
+						Intent(context, LoginDataInputActivity::class.java).apply {
+							setData(event.data)
+							replaceExtras(event.extras)
+						})
+				}
+			}
 		}
 	}
 
@@ -176,10 +192,8 @@ fun SchoolSearch(
 	modifier: Modifier,
 	viewModel: LoginViewModel
 ) {
-	val composableScope = rememberCoroutineScope()
-
 	DisposableEffect(viewModel.schoolSearchText) {
-		viewModel.startSchoolSearch(composableScope)
+		viewModel.startSchoolSearch()
 
 		onDispose {
 			viewModel.stopSchoolSearch()
