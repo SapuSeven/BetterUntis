@@ -22,6 +22,7 @@ import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.services.CodeScanService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.scopes.ActivityRetainedScoped
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -32,10 +33,10 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
 	val schoolSearchApi: SchoolSearchApi,
+	val codeScanService: CodeScanService,
 	savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 	val debounceMillis: Long = 500
-	lateinit var codeScanService: CodeScanService // TODO: Inject
 
 	var searchMode by mutableStateOf(false)
 		private set

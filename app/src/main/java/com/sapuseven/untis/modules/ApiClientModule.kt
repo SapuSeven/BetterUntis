@@ -11,7 +11,5 @@ import io.ktor.client.engine.cio.CIO
 @InstallIn(SingletonComponent::class)
 object ApiClientModule {
 	@Provides
-	fun provideSchoolSearchApi(): SchoolSearchApi {
-		return SchoolSearchApi(CIO)
-	}
+	fun provideSchoolSearchApi(): SchoolSearchApi = SchoolSearchApi(CIO)
 }
