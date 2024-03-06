@@ -3,7 +3,7 @@ package com.sapuseven.untis.helpers.timetable
 import android.content.Context
 import android.util.Log
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
-import com.sapuseven.untis.data.connectivity.UntisAuthentication
+import com.sapuseven.untis.data.connectivity.Authentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.timetable.PeriodData
@@ -16,10 +16,7 @@ import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.cancel
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.takeWhile
-import kotlinx.coroutines.flow.transformWhile
 import org.joda.time.Instant
 import java.lang.ref.WeakReference
 import kotlin.coroutines.resume
@@ -212,7 +209,7 @@ class TimetableLoader(
 			user.masterDataTimestamp,
 			0, // TODO: Figure out how timetableTimestamp works
 			emptyList(),
-			if (user.anonymous) UntisAuthentication.createAuthObject() else UntisAuthentication.createAuthObject(
+			if (user.anonymous) Authentication.createAuthObject() else Authentication.createAuthObject(
 				user.user,
 				user.key
 			)
@@ -301,7 +298,7 @@ class TimetableLoader(
 			user.masterDataTimestamp,
 			0, // TODO: Figure out how timetableTimestamp works
 			emptyList(),
-			if (user.anonymous) UntisAuthentication.createAuthObject() else UntisAuthentication.createAuthObject(
+			if (user.anonymous) Authentication.createAuthObject() else Authentication.createAuthObject(
 				user.user,
 				user.key
 			)

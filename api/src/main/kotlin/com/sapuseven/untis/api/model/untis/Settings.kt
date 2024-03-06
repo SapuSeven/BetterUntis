@@ -1,9 +1,9 @@
-package com.sapuseven.untis.models.untis
+package com.sapuseven.untis.api.model.untis
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UntisSettings(
+data class Settings(
 		val showAbsenceReason: Boolean,
 		val showAbsenceText: Boolean,
 		val absenceCheckRequired: Boolean,

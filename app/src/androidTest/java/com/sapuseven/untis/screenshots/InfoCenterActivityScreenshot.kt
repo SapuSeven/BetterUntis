@@ -16,7 +16,7 @@ import com.sapuseven.untis.models.UntisAbsence
 import com.sapuseven.untis.models.UntisMessage
 import com.sapuseven.untis.models.UntisOfficeHour
 import com.sapuseven.untis.models.untis.UntisMasterData
-import com.sapuseven.untis.models.untis.masterdata.Room
+import com.sapuseven.untis.api.model.untis.masterdata.Room
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.activities.EventListItem
 import com.sapuseven.untis.ui.activities.InfoCenter

@@ -11,13 +11,14 @@ java {
 	targetCompatibility = JavaVersion.VERSION_17
 }
 
-compileKotlin.dependsOn tasks.openApiGenerate
+//compileKotlin.dependsOn tasks.openApiGenerate
 
 dependencies {
 	implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization_version"
 	implementation "io.ktor:ktor-client-core:$ktor_version"
 	implementation "io.ktor:ktor-client-content-negotiation:$ktor_version"
 	implementation "io.ktor:ktor-serialization-kotlinx-json:$ktor_version"
+	implementation "androidx.room:room-common:$room_version"
 }
 
 /* Auto-generate api code from untis-extern spec - disabled for now, as not in use

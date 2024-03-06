@@ -1,14 +1,13 @@
 package com.sapuseven.untis.api.client
 
 import com.sapuseven.untis.api.model.request.SchoolSearchParams
-import com.sapuseven.untis.api.model.request.UntisRequestData
+import com.sapuseven.untis.api.model.request.RequestData
 import com.sapuseven.untis.api.model.response.SchoolSearchResponse
 import com.sapuseven.untis.api.model.response.SchoolSearchResult
 import com.sapuseven.untis.api.model.response.UntisResult
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngineFactory
-import io.ktor.client.utils.EmptyContent.headers
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -30,10 +29,9 @@ open class SchoolSearchApi(
 	): UntisResult<SchoolSearchResult> {
 		val config = RequestConfig<Any?>(
 			HttpMethod.Post,
-			DEFAULT_SCHOOLSEARCH_URL,
-			requiresAuthentication = false
+			DEFAULT_SCHOOLSEARCH_URL
 		)
-		val body = UntisRequestData(
+		val body = RequestData(
 			method = ApiClient.METHOD_SEARCH_SCHOOLS,
 			params = listOf(SchoolSearchParams(search, schoolid, schoolname))
 		)

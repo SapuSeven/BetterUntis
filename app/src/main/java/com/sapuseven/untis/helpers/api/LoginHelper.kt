@@ -2,16 +2,16 @@ package com.sapuseven.untis.helpers.api
 
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.client.SchoolSearchApi
-import com.sapuseven.untis.api.model.SchoolInfo
+import com.sapuseven.untis.api.model.response.UserDataResponse
+import com.sapuseven.untis.api.model.response.UserDataResult
+import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
-import com.sapuseven.untis.data.connectivity.UntisAuthentication
+import com.sapuseven.untis.data.connectivity.Authentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.models.untis.params.AppSharedSecretParams
 import com.sapuseven.untis.models.untis.params.UserDataParams
 import com.sapuseven.untis.models.untis.response.AppSharedSecretResponse
-import com.sapuseven.untis.models.untis.response.UserDataResponse
-import com.sapuseven.untis.models.untis.response.UserDataResult
 import io.ktor.client.engine.cio.CIO
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
@@ -133,7 +133,7 @@ class LoginHelper(
 		return null
 	}
 
-	suspend fun loadUserData(apiUrl: String, key: String?): UserDataResult? {
+	/*suspend fun loadUserData(apiUrl: String, key: String?): UserDataResult? {
 		onStatusUpdate(R.string.logindatainput_loading_user_data)
 
 		val query = UntisRequest.UntisRequestQuery()
@@ -144,12 +144,12 @@ class LoginHelper(
 
 		if (loginData.anonymous)
 			query.data.params =
-				listOf(UserDataParams(auth = UntisAuthentication.createAuthObject()))
+				listOf(UserDataParams(auth = Authentication.createAuthObject()))
 		else {
 			if (key == null) return null
 			query.data.params = listOf(
 				UserDataParams(
-					auth = UntisAuthentication.createAuthObject(
+					auth = Authentication.createAuthObject(
 						loginData.user,
 						key
 					)
@@ -187,5 +187,5 @@ class LoginHelper(
 		})
 
 		return null
-	}
+	}*/
 }

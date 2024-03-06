@@ -1,6 +1,6 @@
 package com.sapuseven.untis.api.model.response
 
-import com.sapuseven.untis.api.model.SchoolInfo
+import com.sapuseven.untis.api.model.untis.SchoolInfo
 import kotlinx.serialization.Serializable
 
 @Serializable

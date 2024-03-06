@@ -1,7 +1,7 @@
 package com.sapuseven.untis.models
 
+import com.sapuseven.untis.api.model.untis.Time
 import com.sapuseven.untis.models.untis.UntisDateTime
-import com.sapuseven.untis.models.untis.UntisTime
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -23,6 +23,6 @@ data class UntisExam(
 @Serializable
 data class UntisInvigilator(
 		val id: Int,
-		val startTime: UntisTime,
-		val endTime: UntisTime
+		val startTime: Time,
+		val endTime: Time
 )

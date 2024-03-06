@@ -51,7 +51,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Login(
-	loginViewModel: LoginViewModel = viewModel(),
+	viewModel: LoginViewModel = viewModel(),
 	onLogin: (ActivityResult) -> Unit
 ) {
 	val context = LocalContext.current
@@ -64,7 +64,7 @@ fun Login(
 	)
 
 	LaunchedEffect(Unit) {
-		loginViewModel.events.collectLatest { event ->
+		viewModel.events.collectLatest { event ->
 			when (event) {
 				LoginEvents.ClearFocus -> {
 					focusManager.clearFocus()
@@ -82,15 +82,15 @@ fun Login(
 	}
 
 	BackHandler(
-		enabled = loginViewModel.searchMode
+		enabled = viewModel.searchMode
 	) {
-		loginViewModel.goBack()
+		viewModel.goBack()
 	}
 
 	AppScaffold(topBar = {
 		CenterAlignedTopAppBar(title = { Text(stringResource(id = R.string.app_name)) },
 			actions = {
-				IconButton(onClick = { loginViewModel.onCodeScanClick() }) {
+				IconButton(onClick = { viewModel.onCodeScanClick() }) {
 					Icon(
 						painter = painterResource(id = R.drawable.login_scan_code),
 						contentDescription = stringResource(id = R.string.login_scan_code)
@@ -98,8 +98,8 @@ fun Login(
 				}
 			},
 			navigationIcon = {
-				if (loginViewModel.shouldShowBackButton.value) IconButton(onClick = {
-					if (loginViewModel.goBack()) {
+				if (viewModel.shouldShowBackButton.value) IconButton(onClick = {
+					if (viewModel.goBack()) {
 						onBackPressedDispatcher?.onBackPressed()
 					}
 				}) {
@@ -115,7 +115,7 @@ fun Login(
 				.padding(innerPadding)
 				.fillMaxSize()
 		) {
-			if (!loginViewModel.searchMode) Column(
+			if (!viewModel.searchMode) Column(
 				verticalArrangement = Arrangement.Center,
 				modifier = Modifier
 					.fillMaxWidth()
@@ -142,20 +142,20 @@ fun Login(
 				modifier = Modifier
 					.fillMaxWidth()
 					.weight(1f),
-				viewModel = loginViewModel
+				viewModel = viewModel
 			)
 			Column(
 				modifier = Modifier.fillMaxWidth()
 			) {
-				OutlinedTextField(value = loginViewModel.schoolSearchText,
-					onValueChange = { loginViewModel.updateSchoolSearchText(it) },
+				OutlinedTextField(value = viewModel.schoolSearchText,
+					onValueChange = { viewModel.updateSchoolSearchText(it) },
 					singleLine = true,
 					modifier = Modifier
 						.fillMaxWidth()
 						.padding(horizontal = dimensionResource(id = R.dimen.margin_login_input_horizontal))
-						.onFocusChanged { loginViewModel.onSchoolSearchFocusChanged(it.isFocused) }
+						.onFocusChanged { viewModel.onSchoolSearchFocusChanged(it.isFocused) }
 						.then(
-							if (loginViewModel.searchMode) Modifier.padding(
+							if (viewModel.searchMode) Modifier.padding(
 								bottom = dimensionResource(
 									id = R.dimen.margin_login_input_horizontal
 								)
@@ -165,7 +165,7 @@ fun Login(
 					label = {
 						Text(stringResource(id = R.string.login_search_by_school_name_or_address))
 					})
-				if (!loginViewModel.searchMode) Row(
+				if (!viewModel.searchMode) Row(
 					modifier = Modifier
 						.fillMaxWidth()
 						.padding(
@@ -173,11 +173,11 @@ fun Login(
 							vertical = dimensionResource(id = R.dimen.margin_login_input_vertical)
 						), horizontalArrangement = Arrangement.SpaceBetween
 				) {
-					TextButton(onClick = { loginViewModel.onDemoClick() }) {
+					TextButton(onClick = { viewModel.onDemoClick() }) {
 						Text(text = stringResource(id = R.string.login_demo))
 					}
 
-					TextButton(onClick = { loginViewModel.onManualDataInputClick() }) {
+					TextButton(onClick = { viewModel.onManualDataInputClick() }) {
 						Text(text = stringResource(id = R.string.login_manual_data_input))
 					}
 				}

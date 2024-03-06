@@ -34,6 +34,7 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.MainActivity.Companion.EXTRA_STRING_PERIOD_ELEMENT
 import com.sapuseven.untis.activities.RoomFinderState.Companion.ROOM_STATE_FREE
 import com.sapuseven.untis.activities.RoomFinderState.Companion.ROOM_STATE_OCCUPIED
+import com.sapuseven.untis.api.model.untis.masterdata.timegrid.Day
 import com.sapuseven.untis.data.databases.RoomFinderDatabase
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
@@ -41,7 +42,6 @@ import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.models.RoomFinderItem
 import com.sapuseven.untis.models.untis.UntisDate
-import com.sapuseven.untis.models.untis.masterdata.timegrid.Day
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
@@ -55,6 +55,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
+import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
 import java.util.*
@@ -260,9 +261,9 @@ fun RoomFinderHourSelector(state: RoomFinderState) {
 				Text(
 					text = stringResource(
 						id = R.string.roomfinder_current_hour_time,
-						unit.third.startTime.toLocalTime()
+						LocalTime(unit.third.startTime.toLocalTime())
 							.toString(DateTimeFormat.shortTime()),
-						unit.third.endTime.toLocalTime()
+						LocalTime(unit.third.endTime.toLocalTime())
 							.toString(DateTimeFormat.shortTime())
 					),
 					textAlign = TextAlign.Center,
@@ -393,7 +394,7 @@ class RoomFinderState constructor(
 	val currentDeleteItem: RoomStatusData?
 		get() = roomList.find { it.periodElement.id == deleteItem }
 
-	val currentUnit: Triple<Day, Int, com.sapuseven.untis.models.untis.masterdata.timegrid.Unit>?
+	val currentUnit: Triple<Day, Int, com.sapuseven.untis.api.model.untis.masterdata.timegrid.Unit>?
 		get() = getUnitFromIndex(user, currentHourIndex)
 
 	val currentHourIndex: Int
@@ -490,8 +491,8 @@ class RoomFinderState constructor(
 
 					timetableItems.items.forEach allItems@{ item ->
 						if (item.startDateTime.dayOfWeek == dayDateTime.dayOfWeek)
-							if (item.startDateTime.millisOfDay <= unitEndDateTime.millisOfDay
-								&& item.endDateTime.millisOfDay >= unitStartDateTime.millisOfDay
+							if (item.startDateTime.millisOfDay <= LocalTime(unitEndDateTime).millisOfDay
+								&& item.endDateTime.millisOfDay >= LocalTime(unitStartDateTime).millisOfDay
 							) {
 								occupied = true
 								return@allItems
@@ -538,7 +539,7 @@ class RoomFinderState constructor(
 	private fun getUnitFromIndex(
 		user: User,
 		index: Int
-	): Triple<Day, Int, com.sapuseven.untis.models.untis.masterdata.timegrid.Unit>? {
+	): Triple<Day, Int, com.sapuseven.untis.api.model.untis.masterdata.timegrid.Unit>? {
 		var indexCounter = index
 		user.timeGrid.days.forEach { day ->
 			if (indexCounter >= day.units.size)
@@ -659,7 +660,7 @@ private fun calculateCurrentHourIndex(user: User): Int {
 			DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseLocalDate(day.day)
 		if (dayDate.dayOfWeek == now.dayOfWeek) {
 			day.units.forEach { unit ->
-				if (unit.endTime.toLocalTime().millisOfDay > now.millisOfDay)
+				if (LocalTime(unit.endTime.toLocalTime()).millisOfDay > now.millisOfDay)
 					return index
 				index++
 			}

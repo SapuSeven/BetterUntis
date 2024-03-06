@@ -1,9 +1,9 @@
-package com.sapuseven.untis.models.untis
+package com.sapuseven.untis.api.model.untis
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UntisMessengerSettings(
+data class MessengerSettings(
 		val serverUrl: String,
 		val organizationId: String
 )

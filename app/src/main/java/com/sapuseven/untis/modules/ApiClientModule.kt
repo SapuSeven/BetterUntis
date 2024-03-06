@@ -1,6 +1,7 @@
 package com.sapuseven.untis.modules
 
 import com.sapuseven.untis.api.client.SchoolSearchApi
+import com.sapuseven.untis.api.client.UserDataApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,4 +13,6 @@ import io.ktor.client.engine.cio.CIO
 object ApiClientModule {
 	@Provides
 	fun provideSchoolSearchApi(): SchoolSearchApi = SchoolSearchApi(CIO)
+	@Provides
+	fun provideUserDataApi(): UserDataApi = UserDataApi(CIO)
 }

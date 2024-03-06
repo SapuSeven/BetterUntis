@@ -5,20 +5,18 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
-import com.sapuseven.untis.data.connectivity.UntisAuthentication
+import com.sapuseven.untis.data.connectivity.Authentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.databases.entities.User
-import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.*
 import com.sapuseven.untis.models.untis.UntisDate
-import com.sapuseven.untis.models.untis.masterdata.SchoolYear
+import com.sapuseven.untis.api.model.untis.masterdata.SchoolYear
 import com.sapuseven.untis.models.untis.params.*
 import com.sapuseven.untis.models.untis.response.*
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_MESSAGES
-import kotlinx.serialization.decodeFromString
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
 
@@ -103,7 +101,7 @@ class InfoCenterState(
 		query.data.params = listOf(
 			MessageParams(
 				UntisDate.fromLocalDate(LocalDate.now()),
-				auth = UntisAuthentication.createAuthObject(user)
+				auth = Authentication.createAuthObject(user)
 			)
 		)
 
@@ -143,7 +141,7 @@ class InfoCenterState(
 					user.userData.elemType ?: "",
 					UntisDate.fromLocalDate(LocalDate.now()),
 					UntisDate(currentSchoolYearEndDate),
-					auth = UntisAuthentication.createAuthObject(user)
+					auth = Authentication.createAuthObject(user)
 				)
 			)
 
@@ -173,7 +171,7 @@ class InfoCenterState(
 					user.userData.elemType ?: "",
 					UntisDate.fromLocalDate(LocalDate.now()),
 					UntisDate(currentSchoolYearEndDate),
-					auth = UntisAuthentication.createAuthObject(user)
+					auth = Authentication.createAuthObject(user)
 				)
 			)
 
@@ -204,7 +202,7 @@ class InfoCenterState(
 				UntisDate.fromLocalDate(LocalDate.now().plusMonths(1)),
 				includeExcused = true,
 				includeUnExcused = true,
-				auth = UntisAuthentication.createAuthObject(user)
+				auth = Authentication.createAuthObject(user)
 			)
 		)
 
@@ -228,7 +226,7 @@ class InfoCenterState(
 			OfficeHoursParams(
 				-1,
 				UntisDate.fromLocalDate(LocalDate.now()),
-				auth = UntisAuthentication.createAuthObject(user)
+				auth = Authentication.createAuthObject(user)
 			)
 		)
 

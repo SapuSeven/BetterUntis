@@ -1,4 +1,4 @@
-package com.sapuseven.untis.api.model
+package com.sapuseven.untis.api.model.untis
 
 import kotlinx.serialization.Serializable
 

@@ -59,7 +59,6 @@ import io.sentry.Sentry
 import io.sentry.compose.withSentryObservableEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
 
 class SettingsActivity : BaseComposeActivity() {
 	companion object {

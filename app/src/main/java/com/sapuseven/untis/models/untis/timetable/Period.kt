@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Period(
 	val id: Int,
+	@Transient val userId: Long = -1,
 	val lessonId: Int,
 	var startDateTime: UntisDateTime,
 	var endDateTime: UntisDateTime,

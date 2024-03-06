@@ -1,6 +1,6 @@
 package com.sapuseven.untis.models.untis.response
 
-import com.sapuseven.untis.models.untis.UntisMasterData
+import com.sapuseven.untis.api.model.untis.MasterData
 import com.sapuseven.untis.models.untis.UntisTimetable
 import kotlinx.serialization.Serializable
 
@@ -12,5 +12,5 @@ data class TimetableResponse(
 @Serializable
 data class TimetableResult(
 		val timetable: UntisTimetable,
-		val masterData: UntisMasterData
+		val masterData: MasterData
 )

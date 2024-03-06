@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PeriodExam(
 	val id: Int,
+	@Transient val userId: Long = -1,
 	val examtype: String?,
 	val name: String?,
 	val text: String?

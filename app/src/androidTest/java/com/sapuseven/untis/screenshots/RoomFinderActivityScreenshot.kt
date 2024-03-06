@@ -17,7 +17,7 @@ import com.sapuseven.untis.mocks.timeGrid
 import com.sapuseven.untis.mocks.userMock
 import com.sapuseven.untis.models.RoomFinderItem
 import com.sapuseven.untis.models.untis.UntisMasterData
-import com.sapuseven.untis.models.untis.masterdata.Room
+import com.sapuseven.untis.api.model.untis.masterdata.Room
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.utils.WithScreenshot
 import com.sapuseven.untis.utils.preferenceWithTheme

@@ -79,7 +79,6 @@ import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.serialization.*
 import kotlinx.serialization.json.Json
 import org.joda.time.*
 import org.joda.time.format.DateTimeFormat
@@ -2053,8 +2052,8 @@ fun buildHourList(
 
 		hourList.add(
 			WeekViewHour(
-				startTime,
-				endTime,
+				LocalTime(startTime),
+				LocalTime(endTime),
 				label
 			)
 		)

@@ -2,10 +2,10 @@ package com.sapuseven.untis.helpers.timetable
 
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.timetable.PeriodData.Companion.ELEMENT_NAME_UNKNOWN
-import com.sapuseven.untis.models.untis.masterdata.Klasse
-import com.sapuseven.untis.models.untis.masterdata.Room
-import com.sapuseven.untis.models.untis.masterdata.Subject
-import com.sapuseven.untis.models.untis.masterdata.Teacher
+import com.sapuseven.untis.api.model.untis.masterdata.Klasse
+import com.sapuseven.untis.api.model.untis.masterdata.Room
+import com.sapuseven.untis.api.model.untis.masterdata.Subject
+import com.sapuseven.untis.api.model.untis.masterdata.Teacher
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 
 class TimetableDatabaseInterface(val userDatabase: UserDatabase, val id: Long) {

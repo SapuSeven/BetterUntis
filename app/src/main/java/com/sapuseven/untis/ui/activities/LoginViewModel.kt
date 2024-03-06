@@ -1,11 +1,7 @@
 package com.sapuseven.untis.ui.activities
 
-import android.app.Activity
-import android.app.Application
-import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import androidx.activity.result.ActivityResult
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,13 +12,11 @@ import androidx.lifecycle.viewModelScope
 import com.sapuseven.untis.activities.LoginActivity.Companion.EXTRA_BOOLEAN_SHOW_BACK_BUTTON
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_DEMO_LOGIN
 import com.sapuseven.untis.api.client.SchoolSearchApi
-import com.sapuseven.untis.api.model.SchoolInfo
+import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.services.CodeScanService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.android.scopes.ActivityRetainedScoped
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow

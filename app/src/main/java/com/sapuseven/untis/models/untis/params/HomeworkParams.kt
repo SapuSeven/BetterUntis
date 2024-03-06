@@ -1,6 +1,6 @@
 package com.sapuseven.untis.models.untis.params
 
-import com.sapuseven.untis.models.untis.UntisAuth
+import com.sapuseven.untis.api.model.untis.Auth
 import com.sapuseven.untis.models.untis.UntisDate
 import kotlinx.serialization.Serializable
 
@@ -10,5 +10,5 @@ data class HomeworkParams(
 		val type: String,
 		val startDate: UntisDate,
 		val endDate: UntisDate,
-		val auth: UntisAuth
+		val auth: Auth
 ) : BaseParams()

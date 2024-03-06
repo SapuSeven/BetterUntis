@@ -1,23 +1,19 @@
 package com.sapuseven.untis.api.client
 
+import com.sapuseven.untis.api.model.request.RequestData
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.HttpClientEngineFactory
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.header
-import io.ktor.client.request.parameter
 import io.ktor.client.request.request
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.utils.EmptyContent.contentType
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.URLBuilder
 import io.ktor.http.contentType
-import io.ktor.http.encodeURLQueryComponent
-import io.ktor.http.encodedPath
 import io.ktor.http.takeFrom
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
@@ -45,53 +41,35 @@ open class ApiClient() {
 		httpClientConfig: ((HttpClientConfig<*>) -> Unit)? = null,
 		jsonBlock: Json,
 	) : this(
-		httpClientEngineFactory?.create(),
-		httpClientConfig,
-		jsonBlock
+		httpClientEngineFactory?.create(), httpClientConfig, jsonBlock
 	)
 
 	constructor(
 		httpClient: HttpClient
-	): this() {
+	) : this() {
 		this.client = httpClient
 	}
 
 	protected suspend fun <T : Any?> request(
-		requestConfig: RequestConfig<T>,
-		body: Any? = null
+		requestConfig: RequestConfig<T>, body: RequestData? = null
 	): HttpResponse {
-		val headers = requestConfig.headers
+		requestConfig.auth?.let {
+			body?.params?.forEachIndexed { index, _ -> body.params[index].auth = it }
+		}
 
 		return client.request {
-			this.url {
-				this.takeFrom(URLBuilder(requestConfig.path))
-				//appendPath(requestConfig.path.trimStart('/').split('/'))
-				requestConfig.query.forEach { query ->
-					query.value.forEach { value ->
-						parameter(query.key, value)
-					}
+			requestConfig.path?.let {
+				this.url {
+					this.takeFrom(URLBuilder(it))
 				}
 			}
 			this.method = requestConfig.method
-			headers.filter { header -> !UNSAFE_HEADERS.contains(header.key) }
-				.forEach { header -> this.header(header.key, header.value) }
 			if (requestConfig.method in listOf(HttpMethod.Put, HttpMethod.Post, HttpMethod.Patch)) {
-				val contentType =
-					(requestConfig.headers[HttpHeaders.ContentType]?.let { ContentType.parse(it) }
-						?: ContentType.Application.Json)
-				contentType(contentType)
+				contentType(ContentType.Application.Json)
 				setBody(body)
 			}
 		}
 	}
-
-	private fun URLBuilder.appendPath(components: kotlin.collections.List<String>): URLBuilder =
-		apply {
-			encodedPath = encodedPath.trimEnd('/') + components.joinToString(
-				"/",
-				prefix = "/"
-			) { it.encodeURLQueryComponent() }
-		}
 
 	companion object {
 		const val DEFAULT_WEBUNTIS_HOST = "mobile.webuntis.com"

@@ -1,8 +1,8 @@
 package com.sapuseven.untis.data.connectivity
 
 import com.sapuseven.untis.data.databases.entities.User
-import com.sapuseven.untis.helpers.Base32.decode
-import com.sapuseven.untis.models.untis.UntisAuth
+import com.sapuseven.untis.api.util.Base32.decode
+import com.sapuseven.untis.api.model.untis.Auth
 import org.joda.time.DateTime
 import java.security.InvalidKeyException
 import java.security.NoSuchAlgorithmException
@@ -10,7 +10,7 @@ import java.util.*
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
-object UntisAuthentication {
+object Authentication {
 	private const val DEFAULT_USER = "#anonymous#"
 
 	@Throws(InvalidKeyException::class, NoSuchAlgorithmException::class)
@@ -53,13 +53,13 @@ object UntisAuthentication {
 		}
 	}
 
-	fun createAuthObject(user: String? = null, key: String? = null): UntisAuth {
+	fun createAuthObject(user: String? = null, key: String? = null): Auth {
 		DateTime().millis.let { time ->
-			return UntisAuth(user ?: DEFAULT_USER, createTimeBasedCode(time, key), time)
+			return Auth(user ?: DEFAULT_USER, createTimeBasedCode(time, key), time)
 		}
 	}
 
-	fun createAuthObject(user: User): UntisAuth {
+	fun createAuthObject(user: User): Auth {
 		return if (user.anonymous)
 			createAuthObject()
 		else

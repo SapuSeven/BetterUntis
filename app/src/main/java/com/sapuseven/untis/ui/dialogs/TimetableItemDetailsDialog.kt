@@ -38,7 +38,7 @@ import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_LESSON_T
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_READ_STUDENT_ABSENCE
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_WRITE_LESSON_TOPIC
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.CAN_WRITE_STUDENT_ABSENCE
-import com.sapuseven.untis.data.connectivity.UntisAuthentication
+import com.sapuseven.untis.data.connectivity.Authentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.timetable.PeriodData
@@ -48,7 +48,7 @@ import com.sapuseven.untis.models.UntisAbsence
 import com.sapuseven.untis.models.untis.UntisAttachment
 import com.sapuseven.untis.models.untis.UntisDateTime
 import com.sapuseven.untis.models.untis.UntisError
-import com.sapuseven.untis.models.untis.UntisTime
+import com.sapuseven.untis.api.model.untis.Time
 import com.sapuseven.untis.models.untis.params.*
 import com.sapuseven.untis.models.untis.response.*
 import com.sapuseven.untis.models.untis.timetable.Period
@@ -1017,7 +1017,7 @@ private suspend fun loadPeriodData(
 		data.params = listOf(
 			PeriodDataParams(
 				listOf(period.id),
-				UntisAuthentication.createAuthObject(user)
+				Authentication.createAuthObject(user)
 			)
 		)
 	}
@@ -1045,9 +1045,9 @@ private suspend fun createAbsence(
 				CreateImmediateAbsenceParams(
 					ttId,
 					student.id,
-					UntisTime(startDateTime.toString(DateTimeUtils.tTimeNoSeconds())),
-					UntisTime(endDateTime.toString(DateTimeUtils.tTimeNoSeconds())),
-					UntisAuthentication.createAuthObject(user)
+					Time(startDateTime.toString(DateTimeUtils.tTimeNoSeconds())),
+					Time(endDateTime.toString(DateTimeUtils.tTimeNoSeconds())),
+					Authentication.createAuthObject(user)
 				)
 			)
 		}
@@ -1071,7 +1071,7 @@ private suspend fun deleteAbsence(
 			data.params = listOf(
 				DeleteAbsenceParams(
 					absence.id,
-					UntisAuthentication.createAuthObject(user)
+					Authentication.createAuthObject(user)
 				)
 			)
 		}
@@ -1095,7 +1095,7 @@ private suspend fun submitAbsencesChecked(
 			data.params = listOf(
 				AbsencesCheckedParams(
 					listOf(ttId),
-					UntisAuthentication.createAuthObject(user)
+					Authentication.createAuthObject(user)
 				)
 			)
 		}
@@ -1122,7 +1122,7 @@ private suspend fun submitLessonTopic(
 				SubmitLessonTopicParams(
 					lessonTopic,
 					ttId,
-					UntisAuthentication.createAuthObject(user)
+					Authentication.createAuthObject(user)
 				)
 			)
 		}
