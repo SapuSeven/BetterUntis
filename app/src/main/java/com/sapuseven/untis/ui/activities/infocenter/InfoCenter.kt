@@ -1,4 +1,4 @@
-package com.sapuseven.untis.ui.activities
+package com.sapuseven.untis.ui.activities.infocenter
 
 import android.widget.TextView
 import androidx.activity.compose.BackHandler

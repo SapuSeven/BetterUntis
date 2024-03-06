@@ -1,4 +1,4 @@
-package com.sapuseven.untis.ui.activities
+package com.sapuseven.untis.ui.activities.login
 
 import android.content.Intent
 import androidx.activity.compose.BackHandler

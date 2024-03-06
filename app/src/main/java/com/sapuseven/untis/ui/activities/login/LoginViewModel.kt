@@ -1,4 +1,4 @@
-package com.sapuseven.untis.ui.activities
+package com.sapuseven.untis.ui.activities.login
 
 import android.os.Bundle
 import android.util.Log

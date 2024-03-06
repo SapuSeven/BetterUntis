@@ -1,4 +1,4 @@
-package com.sapuseven.untis.ui.activities
+package com.sapuseven.untis.ui.activities.logindatainput
 
 import android.net.Uri
 import android.util.Patterns
