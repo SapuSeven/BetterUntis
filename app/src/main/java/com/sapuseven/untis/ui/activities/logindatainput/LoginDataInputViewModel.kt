@@ -1,5 +1,6 @@
 package com.sapuseven.untis.ui.activities.logindatainput
 
+import android.app.Activity.RESULT_OK
 import android.net.Uri
 import android.util.Patterns
 import androidx.compose.runtime.derivedStateOf
@@ -7,7 +8,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.DEMO_API_URL
@@ -15,20 +15,32 @@ import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOO
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_PROFILE_UPDATE
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_STRING_SCHOOL_INFO
 import com.sapuseven.untis.activities.SAVED_STATE_INTENT_DATA
+import com.sapuseven.untis.api.client.SchoolSearchApi
 import com.sapuseven.untis.api.client.UserDataApi
+import com.sapuseven.untis.api.exceptions.UntisApiException
+import com.sapuseven.untis.api.model.response.UserDataResult
 import com.sapuseven.untis.api.model.untis.SchoolInfo
+import com.sapuseven.untis.api.model.untis.masterdata.TimeGrid
+import com.sapuseven.untis.data.databases.entities.User
+import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
+import com.sapuseven.untis.ui.activities.ActivityEvents
+import com.sapuseven.untis.ui.activities.ActivityViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+// TODO: Things to check:
+//       - anonymous login
+//       - app secret resolution
+//       - lock school id
 @HiltViewModel
 class LoginDataInputViewModel @Inject constructor(
+	val schoolSearchApi: SchoolSearchApi,
 	val userDataApi: UserDataApi,
 	savedStateHandle: SavedStateHandle
-) : ViewModel() {
+) : ActivityViewModel() {
 	val loginData = LoginData()
 	val events = MutableSharedFlow<LoginDataInputEvents>()
 
@@ -75,6 +87,10 @@ class LoginDataInputViewModel @Inject constructor(
 		} ?: true
 	}
 
+	val schoolInfoFromSearch = savedStateHandle.get<String>(EXTRA_STRING_SCHOOL_INFO)?.let {
+		getJSON().decodeFromString<SchoolInfo>(it)
+	}
+
 	init {
 		if (savedStateHandle.get<Boolean>(EXTRA_BOOLEAN_DEMO_LOGIN) == true) {
 			loginData.anonymous.value = true
@@ -85,9 +101,8 @@ class LoginDataInputViewModel @Inject constructor(
 			loadData()
 		}
 
-		savedStateHandle.get<String>(EXTRA_STRING_SCHOOL_INFO)?.let {
-			loginData.schoolId.value =
-				getJSON().decodeFromString<SchoolInfo>(it).schoolId.toString()
+		schoolInfoFromSearch?.let {
+			loginData.schoolId.value = schoolInfoFromSearch.schoolId.toString()
 			//schoolIdLocked = true
 		}
 
@@ -147,16 +162,36 @@ class LoginDataInputViewModel @Inject constructor(
 		}
 	}
 
-	private fun loadData() {
+	private fun loadData() = viewModelScope.launch {
 		loading = true
 
-		viewModelScope.launch {
-			delay(2000)
+		try {
+			val schoolInfo = loadSchoolInfo() ?: run {
+				events.emit(LoginDataInputEvents.DisplaySnackbar(R.string.logindatainput_error_invalid_school))
+				return@launch
+			}
+
+			val untisApiUrl = buildUntisApiUrl(schoolInfo)
+
+			val appSharedSecret = loadAppSharedSecret(untisApiUrl) ?: run {
+				// TODO properly handle this error
+				//events.emit(LoginDataInputEvents.DisplaySnackbar(R.string.logindatainput_error_invalid_school))
+				return@launch
+			}
+
+			val userData = loadUserData(untisApiUrl, appSharedSecret)
+
+			val user = buildUser(untisApiUrl, appSharedSecret, schoolInfo, userData)
+
+			saveUser(user)
+
+			activityEvents.send(ActivityEvents.Finish(RESULT_OK))
+		} catch (e: UntisApiException) {
+			events.emit(LoginDataInputEvents.DisplaySnackbar(ErrorMessageDictionary.getErrorMessageResource(e.error?.code)))
+		} finally {
 			loading = false
-			events.emit(LoginDataInputEvents.DisplaySnackbar(R.string.all_error))
 		}
 
-		// TODO: Implement loading user data
 		/*viewModelScope.launch {
 			LoginHelper(
 				loginData = LoginDataInfo(
@@ -272,6 +307,101 @@ class LoginDataInputViewModel @Inject constructor(
 				finish()
 			}
 		}*/
+	}
+
+	private fun buildUser(
+		untisApiUrl: String,
+		appSharedSecret: String,
+		schoolInfo: SchoolInfo,
+		userData: UserDataResult
+	): User {
+		//var userId = existingUserId ?: 0
+		val user = User(
+			0,//userId,
+			loginData.profileName.value ?: "",
+			untisApiUrl,
+			schoolInfo.schoolId.toString(),
+			if (loginData.anonymous.value != true) loginData.username.value else null,
+			if (loginData.anonymous.value != true) appSharedSecret else null,
+			loginData.anonymous.value == true,
+			userData.masterData.timeGrid
+				?: TimeGrid.generateDefault(),
+			userData.masterData.timeStamp,
+			userData.userData,
+			userData.settings,
+			bookmarks = emptySet()//bookmarks
+		)
+		return user
+	}
+
+	private fun saveUser(user: User) {
+		// TODO: Inject user database
+		/*userDatabase.userDao().let { dao ->
+			if (existingUserId == null)
+				userId = dao.insert(user)
+			else
+				dao.update(user)
+
+			dao.deleteUserData(userId)
+			dao.insertUserData(
+				userId,
+				userDataResponse.masterData
+			)
+		}*/
+	}
+
+	private fun buildUntisApiUrl(schoolInfo: SchoolInfo): String {
+		return if (advanced && !loginData.apiUrl.value.isNullOrBlank())
+			loginData.apiUrl.value ?: ""
+		else if (schoolInfo.useMobileServiceUrlAndroid && !schoolInfo.mobileServiceUrl.isNullOrBlank()) schoolInfo.mobileServiceUrl!!
+		else Uri.parse(schoolInfo.serverUrl).buildUpon()
+			.appendEncodedPath("jsonrpc_intern.do")
+			.build().toString()
+	}
+
+	private suspend fun loadSchoolInfo(): SchoolInfo? {
+		return schoolInfoFromSearch ?: run {
+			if (advanced && !loginData.apiUrl.value.isNullOrBlank())
+				SchoolInfo(
+					server = "",
+					useMobileServiceUrlAndroid = true,
+					useMobileServiceUrlIos = true,
+					address = "",
+					displayName = loginData.schoolId.value ?: "",
+					loginName = loginData.schoolId.value ?: "",
+					schoolId = loginData.schoolId.value?.toIntOrNull() ?: 0,
+					serverUrl = loginData.apiUrl.value ?: "",
+					mobileServiceUrl = loginData.apiUrl.value
+				)
+			else {
+				val school = loginData.schoolId.value ?: ""
+				val schoolId = school.toIntOrNull()
+				val schoolSearchResult = schoolSearchApi.searchSchools(school)
+				if (schoolSearchResult.size == 1)
+					schoolSearchResult.schools.first()
+				else
+				// TODO: Show manual selection dialog when more than one results are returned.
+				//       This workaround tries to find a matching school regardless.
+					schoolSearchResult.schools.find { schoolInfoResult ->
+						schoolInfoResult.schoolId == schoolId
+							|| schoolInfoResult.loginName.equals(school, true)
+					}
+			}
+		}
+	}
+
+	private suspend fun loadAppSharedSecret(untisApiUrl: String): String? = when {
+		loginData.anonymous.value == true -> ""
+		loginData.skipAppSecret.value == true -> loginData.password.value
+		else -> userDataApi.loadAppSharedSecret(
+			untisApiUrl,
+			loginData.username.value ?: "",
+			loginData.password.value ?: ""
+		)
+	}
+
+	private suspend fun loadUserData(untisApiUrl: String, appSharedSecret: String): UserDataResult {
+		return userDataApi.loadUserData(untisApiUrl, loginData.username.value, appSharedSecret)
 	}
 
 	fun onQrCodeErrorDialogDismiss() {

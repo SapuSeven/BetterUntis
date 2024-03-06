@@ -1,14 +1,18 @@
 package com.sapuseven.untis.ui.activities.logindatainput
 
-import android.app.Activity
-import android.content.Intent
 import android.content.res.Configuration
 import android.util.Log
-import android.util.Patterns
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
@@ -57,17 +61,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.MutableCreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.LoginDataInputActivity
-import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_PROFILE_UPDATE
-import com.sapuseven.untis.api.model.untis.SchoolInfo
-import com.sapuseven.untis.helpers.ErrorMessageDictionary
-import com.sapuseven.untis.helpers.SerializationUtils.getJSON
-import com.sapuseven.untis.helpers.api.LoginDataInfo
-import com.sapuseven.untis.helpers.api.LoginHelper
-import com.sapuseven.untis.api.model.untis.masterdata.TimeGrid
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.LabeledCheckbox
 import com.sapuseven.untis.ui.common.LabeledSwitch
@@ -132,7 +127,7 @@ fun LoginDataInput(
 		}
 	else
 		AppScaffold(
-			snackbarHost = { SnackbarHost(snackbarHostState) },
+			snackbarHost = { SnackbarHost(snackbarHostState) }, // TODO: The snackbar looks bad, implement an alternative error notification
 			floatingActionButtonPosition = FabPosition.End,
 			floatingActionButton = {
 				ExtendedFloatingActionButton(
@@ -172,9 +167,9 @@ fun LoginDataInput(
 		) { innerPadding ->
 			Column(
 				modifier = Modifier
-					.padding(innerPadding)
-					.fillMaxSize()
-					.verticalScroll(rememberScrollState())
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
 			) {
 				if (LocalConfiguration.current.orientation != Configuration.ORIENTATION_LANDSCAPE)
 					Icon(
@@ -182,10 +177,10 @@ fun LoginDataInput(
 						contentDescription = null,
 						tint = MaterialTheme.colorScheme.primary,
 						modifier = Modifier
-							.width(dimensionResource(id = R.dimen.size_login_icon))
-							.height(dimensionResource(id = R.dimen.size_login_icon))
-							.align(Alignment.CenterHorizontally)
-							.padding(bottom = dimensionResource(id = R.dimen.margin_login_pleaselogin_top))
+                            .width(dimensionResource(id = R.dimen.size_login_icon))
+                            .height(dimensionResource(id = R.dimen.size_login_icon))
+                            .align(Alignment.CenterHorizontally)
+                            .padding(bottom = dimensionResource(id = R.dimen.margin_login_pleaselogin_top))
 					)
 				InputField(
 					state = viewModel.loginData.profileName,
@@ -272,8 +267,8 @@ fun LoginDataInput(
 				}
 				Spacer(
 					modifier = Modifier
-						.bottomInsets()
-						.height(80.dp)
+                        .bottomInsets()
+                        .height(80.dp)
 				)
 
 				if (viewModel.showQrCodeErrorDialog) {
@@ -320,9 +315,9 @@ private fun InputField(
 
 	Column(
 		modifier = Modifier
-			.fillMaxWidth()
-			.padding(horizontal = 16.dp, vertical = 8.dp)
-			.bringIntoViewRequester(bringIntoViewRequester)
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .bringIntoViewRequester(bringIntoViewRequester)
 	) {
 		OutlinedTextField(
 			value = state.value ?: "",
@@ -334,21 +329,19 @@ private fun InputField(
 			enabled = enabled,
 			isError = !valid,
 			modifier = Modifier
-				.fillMaxWidth()
-				.onFocusEvent { focusState ->
-					Log.d("LoginDataInput", "onFocus event")
-					if (focusState.isFocused) {
-						Log.d("LoginDataInput", "onFocus isFocused")
-						coroutineScope.launch {
-							bringIntoViewRequester.bringIntoView()
-						}
-					}
-				}
-				.ifNotNull(autofillType) {
-					autofill(listOf(it)) {
-						state.value = it
-					}
-				}
+                .fillMaxWidth()
+                .onFocusEvent { focusState ->
+                    if (focusState.isFocused) {
+                        coroutineScope.launch {
+                            bringIntoViewRequester.bringIntoView()
+                        }
+                    }
+                }
+                .ifNotNull(autofillType) {
+                    autofill(listOf(it)) {
+                        state.value = it
+                    }
+                }
 		)
 
 		AnimatedVisibility(visible = !valid) {

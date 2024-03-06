@@ -16,7 +16,7 @@ import com.sapuseven.untis.api.model.untis.masterdata.SchoolYear
 import com.sapuseven.untis.models.untis.params.*
 import com.sapuseven.untis.models.untis.response.*
 import com.sapuseven.untis.preferences.DataStorePreferences
-import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_MESSAGES
+import com.sapuseven.untis.ui.activities.infocenter.InfoCenterState.Companion.ID_MESSAGES
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
 

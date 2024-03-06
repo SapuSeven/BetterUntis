@@ -30,10 +30,10 @@ import com.sapuseven.untis.models.UntisMessage
 import com.sapuseven.untis.models.UntisOfficeHour
 import com.sapuseven.untis.models.untis.UntisAttachment
 import com.sapuseven.untis.preferences.DataStorePreferences
-import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_ABSENCES
-import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_EVENTS
-import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_MESSAGES
-import com.sapuseven.untis.ui.activities.InfoCenterState.Companion.ID_OFFICEHOURS
+import com.sapuseven.untis.ui.activities.infocenter.InfoCenterState.Companion.ID_ABSENCES
+import com.sapuseven.untis.ui.activities.infocenter.InfoCenterState.Companion.ID_EVENTS
+import com.sapuseven.untis.ui.activities.infocenter.InfoCenterState.Companion.ID_MESSAGES
+import com.sapuseven.untis.ui.activities.infocenter.InfoCenterState.Companion.ID_OFFICEHOURS
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit

@@ -1,8 +1,10 @@
 package com.sapuseven.untis.api.client
 
 import com.sapuseven.untis.api.exceptions.UntisApiException
+import com.sapuseven.untis.api.model.request.AppSharedSecretParams
 import com.sapuseven.untis.api.model.request.RequestData
 import com.sapuseven.untis.api.model.request.UserDataParams
+import com.sapuseven.untis.api.model.response.AppSharedSecretResponse
 import com.sapuseven.untis.api.model.response.UserDataResponse
 import com.sapuseven.untis.api.model.response.UserDataResult
 import com.sapuseven.untis.api.model.untis.Auth
@@ -20,6 +22,22 @@ open class UserDataApi(
 	httpClientConfig = config,
 	jsonBlock = jsonBlock
 ) {
+	open suspend fun loadAppSharedSecret(
+		apiUrl: String,
+		user: String,
+		password: String
+	): String {
+		val config = RequestConfig(apiUrl)
+		val body = RequestData(
+			method = ApiClient.METHOD_GET_APP_SHARED_SECRET,
+			params = listOf(AppSharedSecretParams(user, password))
+		)
+
+		val response: AppSharedSecretResponse = request(config, body).body()
+
+		return response.result ?: throw UntisApiException(response.error)
+	}
+
 	open suspend fun loadUserData(
 		apiUrl: String,
 		user: String?,

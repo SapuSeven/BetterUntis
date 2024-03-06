@@ -2,15 +2,10 @@ package com.sapuseven.untis.activities
 
 import android.content.Context
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.annotation.MainThread
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.core.view.WindowCompat
 import androidx.datastore.core.DataStore
@@ -18,24 +13,19 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.lifecycle.DEFAULT_ARGS_KEY
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider.Factory
-import androidx.lifecycle.viewmodel.MutableCreationExtras
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.data.databases.entities.User
-import com.sapuseven.untis.ui.activities.LoginDataInput
-import com.sapuseven.untis.ui.activities.LoginDataInputViewModel
+import com.sapuseven.untis.ui.activities.logindatainput.LoginDataInput
+import com.sapuseven.untis.ui.activities.logindatainput.LoginDataInputViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.serialization.ExperimentalSerializationApi
 
 
 val Context.backupDataStore: DataStore<Preferences> by preferencesDataStore(name = LoginDataInputActivity.BACKUP_PREF_NAME)
 
 @AndroidEntryPoint
-class LoginDataInputActivity : BaseComposeActivity() {
-	private val loginDataInputViewModel: LoginDataInputViewModel by viewModelsWithData()
+class LoginDataInputActivity : BaseComposeActivityNew<LoginDataInputViewModel>() {
+	override val viewModel: LoginDataInputViewModel by viewModelsWithData()
 
 	companion object {
 		const val BACKUP_PREF_NAME = "loginDataInputBackup"
@@ -66,7 +56,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 		super.onCreate(savedInstanceState)
 		setContent {
 			AppTheme {
-				LoginDataInput(loginDataInputViewModel)
+				LoginDataInput(viewModel)
 			}
 		}
 	}
@@ -104,27 +94,3 @@ class LoginDataInputActivity : BaseComposeActivity() {
 		}
 	}
 }
-
-const val SAVED_STATE_INTENT_DATA = "data"
-
-/**
- * A replacement for `viewModels()` that adds the data from the intent to the extras.
- */
-@MainThread
-public inline fun <reified VM : ViewModel> ComponentActivity.viewModelsWithData(
-	noinline factoryProducer: (() -> Factory)? = null
-): Lazy<VM> = viewModels(
-	factoryProducer = factoryProducer,
-	extrasProducer = {
-		MutableCreationExtras(defaultViewModelCreationExtras).apply {
-			set(DEFAULT_ARGS_KEY,
-				(get(DEFAULT_ARGS_KEY) ?: Bundle()).apply {
-					putString(
-						SAVED_STATE_INTENT_DATA,
-						intent.dataString
-					)
-				}
-			)
-		}
-	}
-)

@@ -1,7 +1,9 @@
 package com.sapuseven.untis.ui.activities.login
 
+import android.app.Activity
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.result.ActivityResult
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,10 +16,13 @@ import com.sapuseven.untis.activities.LoginActivity.Companion.EXTRA_BOOLEAN_SHOW
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_DEMO_LOGIN
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_STRING_SCHOOL_INFO
 import com.sapuseven.untis.api.client.SchoolSearchApi
+import com.sapuseven.untis.api.exceptions.UntisApiException
 import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.services.CodeScanService
+import com.sapuseven.untis.ui.activities.ActivityEvents
+import com.sapuseven.untis.ui.activities.ActivityViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -31,8 +36,8 @@ class LoginViewModel @Inject constructor(
 	val schoolSearchApi: SchoolSearchApi,
 	val codeScanService: CodeScanService,
 	savedStateHandle: SavedStateHandle
-) : ViewModel() {
-	val debounceMillis: Long = 500
+) : ActivityViewModel() {
+	val debounceMillis: Long = 300
 
 	var searchMode by mutableStateOf(false)
 		private set
@@ -100,25 +105,29 @@ class LoginViewModel @Inject constructor(
 			schoolSearchLoading = true
 			delay(debounceMillis)
 			try {
-				val schoolSearchResult = schoolSearchApi.searchSchools(schoolSearchText)
-
-				schoolSearchLoading = false
-
-				schoolSearchResult.fold({
-					schoolSearchItems = it.schools
-				}, {
-					schoolSearchError =
-						ErrorMessageDictionary.getErrorMessageResource(it.code, false)
-					schoolSearchErrorRaw = it.message.orEmpty()
-				})
+				schoolSearchItems = schoolSearchApi.searchSchools(schoolSearchText).schools
+			} catch (e: UntisApiException) {
+				schoolSearchError = ErrorMessageDictionary.getErrorMessageResource(e.error?.code, false)
+				schoolSearchErrorRaw = e.message.orEmpty()
 			} catch (e: Exception) {
-				Log.e("LoginViewModel", "schoolSearch error", e)
+				schoolSearchError = null
+				schoolSearchErrorRaw = e.message.orEmpty()
+			} finally {
+				schoolSearchLoading = false
 			}
 		}
 	}
 
 	fun stopSchoolSearch() {
 		schoolSearchJob?.cancel()
+	}
+
+	fun onLoginResult(result: ActivityResult) {
+		if (result.resultCode == Activity.RESULT_OK) {
+			viewModelScope.launch {
+				activityEvents.send(ActivityEvents.Finish(Activity.RESULT_OK, result.data))
+			}
+		}
 	}
 
 	// onClick listeners

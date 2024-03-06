@@ -31,7 +31,7 @@ class LoginHelper(
 	}
 
 	@ExperimentalSerializationApi
-	suspend fun loadSchoolInfo(school: String): SchoolInfo? {
+	/*suspend fun loadSchoolInfo(school: String): SchoolInfo? {
 		onStatusUpdate(R.string.logindatainput_aquiring_schoolid)
 
 		val schoolId = school.toIntOrNull()
@@ -85,7 +85,7 @@ class LoginHelper(
 		})*/
 
 		return null
-	}
+	}*/
 
 	suspend fun loadAppSharedSecret(apiUrl: String): String? {
 		onStatusUpdate(R.string.logindatainput_aquiring_app_secret)

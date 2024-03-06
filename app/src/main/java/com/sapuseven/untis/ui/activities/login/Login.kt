@@ -1,5 +1,6 @@
 package com.sapuseven.untis.ui.activities.login
 
+import android.app.Activity
 import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -51,8 +52,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Login(
-	viewModel: LoginViewModel = viewModel(),
-	onLogin: (ActivityResult) -> Unit
+	viewModel: LoginViewModel = viewModel()
 ) {
 	val context = LocalContext.current
 	val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -60,7 +60,7 @@ fun Login(
 
 	val loginLauncher = rememberLauncherForActivityResult(
 		contract = ActivityResultContracts.StartActivityForResult(),
-		onResult = onLogin
+		onResult = { viewModel.onLoginResult(it) }
 	)
 
 	LaunchedEffect(Unit) {

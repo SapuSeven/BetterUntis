@@ -1,11 +1,12 @@
 package com.sapuseven.untis.activities
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.viewModels
+import androidx.annotation.MainThread
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -21,6 +22,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.lifecycle.DEFAULT_ARGS_KEY
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.MutableCreationExtras
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.R
@@ -29,6 +34,8 @@ import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.helpers.config.globalDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.preferences.dataStorePreferences
+import com.sapuseven.untis.ui.activities.ActivityEvents
+import com.sapuseven.untis.ui.activities.ActivityViewModel
 import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.material.scheme.Scheme
@@ -36,8 +43,7 @@ import com.sapuseven.untis.ui.theme.generateColorScheme
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
-@SuppressLint("Registered") // This activity is not intended to be used directly
-open class BaseComposeActivity : ComponentActivity() {
+abstract class BaseComposeActivity : ComponentActivity() {
 	internal var user by mutableStateOf<User?>(null)
 	internal var customThemeColor by mutableStateOf<Color?>(null) // Workaround to allow legacy views to respond to theme color changes
 	internal var colorScheme by mutableStateOf<ColorScheme?>(null)
@@ -315,3 +321,48 @@ open class BaseComposeActivity : ComponentActivity() {
 		}
 	}
 }
+
+// TODO: Rename and merge with old one once all activities are migrated
+abstract class BaseComposeActivityNew<VM : ActivityViewModel> : BaseComposeActivity() {
+	protected abstract val viewModel: VM
+
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+
+		viewModel.activityEvents().observe(this) { eventData ->
+			when (eventData) {
+				is ActivityEvents.Finish -> {
+					if (eventData.data != null && eventData.resultCode != null)
+						setResult(eventData.resultCode, eventData.data)
+					else if (eventData.resultCode != null)
+						setResult(eventData.resultCode)
+					finish()
+				}
+			}
+		}
+	}
+}
+
+const val SAVED_STATE_INTENT_DATA = "data"
+
+/**
+ * A replacement for `viewModels()` that adds the data from the intent to the extras.
+ */
+@MainThread
+public inline fun <reified VM : ViewModel> ComponentActivity.viewModelsWithData(
+	noinline factoryProducer: (() -> ViewModelProvider.Factory)? = null
+): Lazy<VM> = viewModels(
+	factoryProducer = factoryProducer,
+	extrasProducer = {
+		MutableCreationExtras(defaultViewModelCreationExtras).apply {
+			set(DEFAULT_ARGS_KEY,
+				(get(DEFAULT_ARGS_KEY) ?: Bundle()).apply {
+					putString(
+						SAVED_STATE_INTENT_DATA,
+						intent.dataString
+					)
+				}
+			)
+		}
+	}
+)

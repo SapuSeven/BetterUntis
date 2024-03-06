@@ -1138,4 +1138,4 @@ private suspend fun submitLessonTopic(
 	})
 }
 
-class UntisApiException(error: UntisError?) : Throwable(error?.message)
+private class UntisApiException(error: UntisError?) : Throwable(error?.message)
