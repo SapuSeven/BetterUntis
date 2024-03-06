@@ -1,7 +1,6 @@
 package com.sapuseven.untis.api.client
 
 import com.sapuseven.untis.api.model.untis.Auth
-import io.ktor.http.HttpMethod
 
 /**
  * Defines a config object for a given request.

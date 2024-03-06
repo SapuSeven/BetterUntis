@@ -1,6 +1,5 @@
 package com.sapuseven.untis.api.model.response
 
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
 @Serializable

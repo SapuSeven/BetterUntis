@@ -1,6 +1,5 @@
 package com.sapuseven.untis.api.model.request
 
-import com.sapuseven.untis.api.model.untis.Auth
 import kotlinx.serialization.Serializable
 
 @Serializable
