@@ -2,11 +2,15 @@ package com.sapuseven.untis.activities
 
 import android.content.Context
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.MainThread
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.core.view.WindowCompat
 import androidx.datastore.core.DataStore
@@ -14,8 +18,11 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.DEFAULT_ARGS_KEY
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider.Factory
+import androidx.lifecycle.viewmodel.MutableCreationExtras
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.ui.activities.LoginDataInput
 import com.sapuseven.untis.ui.activities.LoginDataInputViewModel
@@ -28,7 +35,7 @@ val Context.backupDataStore: DataStore<Preferences> by preferencesDataStore(name
 
 @AndroidEntryPoint
 class LoginDataInputActivity : BaseComposeActivity() {
-	private val loginDataInputViewModel: LoginDataInputViewModel by viewModels()
+	private val loginDataInputViewModel: LoginDataInputViewModel by viewModelsWithData()
 
 	companion object {
 		const val BACKUP_PREF_NAME = "loginDataInputBackup"
@@ -37,6 +44,7 @@ class LoginDataInputActivity : BaseComposeActivity() {
 
 		const val EXTRA_BOOLEAN_PROFILE_UPDATE = "com.sapuseven.untis.activities.profileupdate"
 		const val EXTRA_BOOLEAN_DEMO_LOGIN = "com.sapuseven.untis.activities.demoLogin"
+		const val EXTRA_STRING_SCHOOL_INFO = "com.sapuseven.untis.activities.schoolInfo"
 
 		const val DEMO_API_URL = "https://api.sapuseven.com/untis/testing"
 
@@ -52,7 +60,6 @@ class LoginDataInputActivity : BaseComposeActivity() {
 
 	private var existingUserId: Long? = null
 
-	private var schoolInfoFromSearch: SchoolInfo? = null
 	private var existingUser: User? = null
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -96,38 +103,28 @@ class LoginDataInputActivity : BaseComposeActivity() {
 			}
 		}
 	}
-
-	@OptIn(DelicateCoroutinesApi::class)
-	@Composable
-	fun <T> PersistentState(
-		state: MutableState<T?>,
-		prefKey: Preferences.Key<T>? = null
-	) {
-		/*prefKey?.let {
-			val coroutineScope = rememberCoroutineScope()
-
-			DisposableEffect(Unit) {
-				if (state.value == null)
-					coroutineScope.launch {
-						backupDataStore.data
-							.map { prefs -> prefs[prefKey] }
-							.first()
-							?.let {
-								state.value = it
-							}
-					}
-
-				onDispose {
-					state.value?.let {
-						// Not the cleanest, but this needs to run after the local coroutineScope has been cancelled
-						GlobalScope.launch(Dispatchers.IO) {
-							backupDataStore.edit { prefs ->
-								prefs[prefKey] = it
-							}
-						}
-					}
-				}
-			}
-		}*/
-	}
 }
+
+const val SAVED_STATE_INTENT_DATA = "data"
+
+/**
+ * A replacement for `viewModels()` that adds the data from the intent to the extras.
+ */
+@MainThread
+public inline fun <reified VM : ViewModel> ComponentActivity.viewModelsWithData(
+	noinline factoryProducer: (() -> Factory)? = null
+): Lazy<VM> = viewModels(
+	factoryProducer = factoryProducer,
+	extrasProducer = {
+		MutableCreationExtras(defaultViewModelCreationExtras).apply {
+			set(DEFAULT_ARGS_KEY,
+				(get(DEFAULT_ARGS_KEY) ?: Bundle()).apply {
+					putString(
+						SAVED_STATE_INTENT_DATA,
+						intent.dataString
+					)
+				}
+			)
+		}
+	}
+)

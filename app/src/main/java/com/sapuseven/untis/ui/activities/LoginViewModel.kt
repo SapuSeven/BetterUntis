@@ -1,17 +1,18 @@
 package com.sapuseven.untis.ui.activities
 
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.os.bundleOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sapuseven.untis.activities.LoginActivity.Companion.EXTRA_BOOLEAN_SHOW_BACK_BUTTON
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_DEMO_LOGIN
+import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_STRING_SCHOOL_INFO
 import com.sapuseven.untis.api.client.SchoolSearchApi
 import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
@@ -23,7 +24,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
-import java.lang.Exception
 import javax.inject.Inject
 
 @HiltViewModel
@@ -107,7 +107,8 @@ class LoginViewModel @Inject constructor(
 				schoolSearchResult.fold({
 					schoolSearchItems = it.schools
 				}, {
-					schoolSearchError = ErrorMessageDictionary.getErrorMessageResource(it.code, false)
+					schoolSearchError =
+						ErrorMessageDictionary.getErrorMessageResource(it.code, false)
 					schoolSearchErrorRaw = it.message.orEmpty()
 				})
 			} catch (e: Exception) {
@@ -122,11 +123,16 @@ class LoginViewModel @Inject constructor(
 
 	// onClick listeners
 	fun onSchoolSelected(school: SchoolInfo) {
-		val builder = Uri.Builder()
-			.appendQueryParameter("schoolInfo", getJSON().encodeToString(school))
-
 		viewModelScope.launch {
-			events.emit(LoginEvents.StartLoginActivity(data = builder.build()))
+			events.emit(
+				LoginEvents.StartLoginActivity(
+					extras = bundleOf(
+						EXTRA_STRING_SCHOOL_INFO to getJSON().encodeToString(
+							school
+						)
+					)
+				)
+			)
 		}
 	}
 

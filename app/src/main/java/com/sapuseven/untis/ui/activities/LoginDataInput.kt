@@ -53,6 +53,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.MutableCreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.LoginDataInputActivity
@@ -79,8 +80,6 @@ fun LoginDataInput(
 ) {
 	val snackbarHostState = remember { SnackbarHostState() }
 
-	var qrCodeErrorDialog by rememberSaveable { mutableStateOf(false) }
-
 	var schoolIdLocked by rememberSaveable { mutableStateOf(false) }
 
 	/*val proxyHostPref = dataStorePreferences.proxyHost
@@ -88,164 +87,9 @@ fun LoginDataInput(
 		existingUser?.let {
 			proxyUrl.value = proxyHostPref.getValue()
 		}
+	}*/
 
-		val appLinkData = intent.data
-
-		if (appLinkData?.isHierarchical == true) {
-			if (appLinkData.scheme == "untis") {
-				if (appLinkData.host == "setschool") {
-					// Untis-supported values
-					schoolId.value = appLinkData.getQueryParameter("school")
-					username.value = appLinkData.getQueryParameter("user")
-					password.value = appLinkData.getQueryParameter("key")
-
-					// Custom values
-					anonymous.value =
-						appLinkData.getBooleanQueryParameter("anonymous", false)
-					proxyUrl.value = appLinkData.getQueryParameter("proxyUrl") ?: ""
-					apiUrl.value = appLinkData.getQueryParameter("apiUrl")
-					skipAppSecret.value =
-						appLinkData.getBooleanQueryParameter("skipAppSecret", false)
-
-					advanced =
-						proxyUrl.value?.isNotEmpty() == true || apiUrl.value?.isNotEmpty() == true
-				} else {
-					qrCodeErrorDialog = true
-				}
-			} else {
-				appLinkData.getQueryParameter("schoolInfo")?.let {
-					schoolInfoFromSearch =
-						getJSON().decodeFromString<SchoolInfo>(it)
-					schoolId.value = schoolInfoFromSearch?.schoolId.toString()
-					schoolIdLocked = true
-				}
-			}
-		}
-	}
-
-	fun loadData() {
-		loading = true
-		coroutineScope.launch {
-			LoginHelper(
-				loginData = LoginDataInfo(
-					username.value ?: "",
-					password.value ?: existingUser?.key ?: "",
-					anonymous.value ?: false
-				),
-				proxyHost = proxyUrl.value,
-				onStatusUpdate = { status ->
-					Log.d(
-						LoginDataInputActivity::class.java.simpleName,
-						getString(status)
-					)
-				},
-				onError = { error ->
-					val errorMessage = when {
-						error.errorCode != null -> ErrorMessageDictionary.getErrorMessage(
-							resources,
-							error.errorCode,
-							error.errorMessage
-						)
-
-						error.errorMessageStringRes != null -> getString(
-							error.errorMessageStringRes,
-							error.errorMessage
-						)
-
-						else -> error.errorMessage
-							?: getString(R.string.all_error)
-					}
-
-					loading = false
-					coroutineScope.launch {
-						snackbarHostState.showSnackbar(
-							errorMessage,
-							duration = SnackbarDuration.Long
-						)
-					}
-				}).run {
-				val schoolInfo = (
-					when {
-						schoolInfoFromSearch != null -> schoolInfoFromSearch
-						advanced && !apiUrl.value.isNullOrBlank() -> SchoolInfo(
-							server = "",
-							useMobileServiceUrlAndroid = true,
-							useMobileServiceUrlIos = true,
-							address = "",
-							displayName = schoolId.value ?: "",
-							loginName = schoolId.value ?: "",
-							schoolId = schoolId.value?.toIntOrNull()
-								?: 0,
-							serverUrl = apiUrl.value ?: "",
-							mobileServiceUrl = apiUrl.value
-						)
-
-						else -> loadSchoolInfo(
-							schoolId.value ?: ""
-						)
-					}) ?: return@run
-				val untisApiUrl =
-					if (advanced && !apiUrl.value.isNullOrBlank())
-						apiUrl.value ?: ""
-					else if (schoolInfo.useMobileServiceUrlAndroid && !schoolInfo.mobileServiceUrl.isNullOrBlank()) schoolInfo.mobileServiceUrl!!
-					else Uri.parse(schoolInfo.serverUrl).buildUpon()
-						.appendEncodedPath("jsonrpc_intern.do")
-						.build().toString()
-				val appSharedSecret =
-					when {
-						loginData.anonymous -> ""
-						skipAppSecret.value == true -> loginData.password
-						else -> loadAppSharedSecret(untisApiUrl)
-							?: return@run
-					}
-				val userDataResponse =
-					loadUserData(untisApiUrl, appSharedSecret)
-						?: return@run
-				val bookmarks =
-					existingUserId?.let { user ->
-						userDatabase.userDao().getById(user)?.bookmarks?.toSet()
-					}
-						?: emptySet()
-				var userId = existingUserId ?: 0
-				val user = User(
-					userId,
-					profileName.value ?: "",
-					untisApiUrl,
-					schoolInfo.schoolId.toString(),
-					if (anonymous.value != true) loginData.user else null,
-					if (anonymous.value != true) appSharedSecret else null,
-					anonymous.value == true,
-					userDataResponse.masterData.timeGrid
-						?: TimeGrid.generateDefault(),
-					userDataResponse.masterData.timeStamp,
-					userDataResponse.userData,
-					userDataResponse.settings,
-					bookmarks = bookmarks
-				)
-
-				userDatabase.userDao().let { dao ->
-					if (existingUserId == null)
-						userId = dao.insert(user)
-					else
-						dao.update(user)
-
-					dao.deleteUserData(userId)
-					dao.insertUserData(
-						userId,
-						userDataResponse.masterData
-					)
-				}
-
-				if (advanced && !proxyUrl.value.isNullOrEmpty())
-					proxyHostPref.saveValue(proxyUrl.value)
-
-				setResult(Activity.RESULT_OK)
-				finish()
-			}
-		}
-	}
-
-	if (intent.getBooleanExtra(EXTRA_BOOLEAN_PROFILE_UPDATE, false))
+	if (viewModel.showProfileUpdate)
 		Surface {
 			Column(
 				verticalArrangement = Arrangement.Center,
@@ -268,10 +112,8 @@ fun LoginDataInput(
 					modifier = Modifier.padding(top = 16.dp)
 				)
 			}
-
-			loadData()
 		}
-	else*/
+	else
 		AppScaffold(
 			snackbarHost = { SnackbarHost(snackbarHostState) },
 			floatingActionButtonPosition = FabPosition.End,
@@ -292,10 +134,10 @@ fun LoginDataInput(
 				CenterAlignedTopAppBar(
 					title = {
 						Text(
-							//if (existingUserId == null)
+							if (viewModel.isExistingUser)
+								stringResource(id = R.string.logindatainput_title_edit)
+							else
 								stringResource(id = R.string.logindatainput_title_add)
-							//else
-								//stringResource(id = R.string.logindatainput_title_edit)
 						)
 					},
 					navigationIcon = {
@@ -337,8 +179,7 @@ fun LoginDataInput(
 					state = viewModel.loginData.schoolId,
 					label = { Text(stringResource(id = R.string.logindatainput_school)) },
 					enabled = !viewModel.loading && !schoolIdLocked,
-					valid = viewModel.schoolIdValid.value,
-					//validator = !it.isNullOrEmpty()
+					valid = !viewModel.validate || viewModel.schoolIdValid.value,
 					errorText = stringResource(id = R.string.logindatainput_error_field_empty)
 				)
 				Spacer(
@@ -355,8 +196,7 @@ fun LoginDataInput(
 							state = viewModel.loginData.username,
 							label = { Text(stringResource(id = R.string.logindatainput_username)) },
 							enabled = !viewModel.loading,
-							valid = viewModel.usernameValid.value,
-							//validator = viewModel.loginData.anonymous.value == true || !it.isNullOrEmpty()
+							valid = !viewModel.validate || viewModel.usernameValid.value,
 							errorText = stringResource(id = R.string.logindatainput_error_field_empty),
 							autofillType = AutofillType.Username
 						)
@@ -365,10 +205,10 @@ fun LoginDataInput(
 							type = KeyboardType.Password,
 							label = {
 								Text(
-									//if (existingUser?.key == null || password.value != null)
+									if (viewModel.isExistingUser && !viewModel.loginData.password.value.isNullOrEmpty())
+										stringResource(id = R.string.logindatainput_key_saved)
+									else
 										stringResource(id = R.string.logindatainput_key)
-									//else
-										//stringResource(id = R.string.logindatainput_key_saved)
 								)
 							},
 							enabled = !viewModel.loading,
@@ -395,8 +235,7 @@ fun LoginDataInput(
 							type = KeyboardType.Uri,
 							label = { Text(stringResource(id = R.string.logindatainput_proxy_host)) },
 							enabled = !viewModel.loading,
-							valid = viewModel.proxyUrlValid.value,
-							// validator = it.isNullOrEmpty() || Patterns.WEB_URL.matcher(it).matches()
+							valid = !viewModel.validate || viewModel.proxyUrlValid.value,
 							errorText = stringResource(id = R.string.logindatainput_error_invalid_url)
 						)
 						InputField(
@@ -404,8 +243,7 @@ fun LoginDataInput(
 							type = KeyboardType.Uri,
 							label = { Text(stringResource(id = R.string.logindatainput_api_url)) },
 							enabled = !viewModel.loading,
-							valid = viewModel.apiUrlValid.value,
-							//validator = it.isNullOrEmpty() || Patterns.WEB_URL.matcher(it).matches()
+							valid = !viewModel.validate || viewModel.apiUrlValid.value,
 							errorText = stringResource(id = R.string.logindatainput_error_invalid_url)
 						)
 						InputCheckbox(
@@ -421,10 +259,10 @@ fun LoginDataInput(
 						.height(80.dp)
 				)
 
-				if (qrCodeErrorDialog) {
+				if (viewModel.showQrCodeErrorDialog) {
 					AlertDialog(
 						onDismissRequest = {
-							qrCodeErrorDialog = false
+							viewModel.onQrCodeErrorDialogDismiss()
 						},
 						title = {
 							Text(stringResource(id = R.string.logindatainput_dialog_qrcodeinvalid_title))
@@ -435,7 +273,7 @@ fun LoginDataInput(
 						confirmButton = {
 							TextButton(
 								onClick = {
-									qrCodeErrorDialog = false
+									viewModel.onQrCodeErrorDialogDismiss()
 								}) {
 								Text(stringResource(id = R.string.all_ok))
 							}
@@ -444,15 +282,6 @@ fun LoginDataInput(
 				}
 			}
 		}
-
-	/*if (intent.getBooleanExtra(EXTRA_BOOLEAN_DEMO_LOGIN, false)) {
-		anonymous.value = true
-		schoolId.value = "demo"
-		advanced = true
-		apiUrl.value = DEMO_API_URL
-
-		loadData()
-	}*/
 }
 
 @OptIn(
