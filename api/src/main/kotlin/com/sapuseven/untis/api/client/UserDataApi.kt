@@ -27,11 +27,7 @@ open class UserDataApi(
 		user: String?,
 		key: String?
 	): UntisResult<UserDataResult> {
-		val config = RequestConfig<Any?>(
-			HttpMethod.Post,
-			apiUrl,
-			Auth(user, key)
-		)
+		val config = RequestConfig(apiUrl, Auth(user, key))
 		val body = RequestData(
 			method = ApiClient.METHOD_GET_USER_DATA,
 			params = listOf(UserDataParams())

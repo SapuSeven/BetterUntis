@@ -5,10 +5,14 @@ import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.HttpClientEngineFactory
+import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.post
 import io.ktor.client.request.request
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.utils.EmptyContent.contentType
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
@@ -29,6 +33,11 @@ open class ApiClient() {
 		val clientConfig: (HttpClientConfig<*>) -> Unit by lazy {
 			{
 				it.install(ContentNegotiation) { json(jsonBlock) }
+				it.install(HttpRequestRetry) {
+					retryOnServerErrors(maxRetries = 3)
+					retryOnException(maxRetries = 3)
+					exponentialDelay()
+				}
 				httpClientConfig?.invoke(it)
 			}
 		}
@@ -50,24 +59,16 @@ open class ApiClient() {
 		this.client = httpClient
 	}
 
-	protected suspend fun <T : Any?> request(
-		requestConfig: RequestConfig<T>, body: RequestData? = null
+	protected suspend fun request(
+		requestConfig: RequestConfig, body: RequestData? = null
 	): HttpResponse {
 		requestConfig.auth?.let {
 			body?.params?.forEachIndexed { index, _ -> body.params[index].auth = it }
 		}
 
-		return client.request {
-			requestConfig.path?.let {
-				this.url {
-					this.takeFrom(URLBuilder(it))
-				}
-			}
-			this.method = requestConfig.method
-			if (requestConfig.method in listOf(HttpMethod.Put, HttpMethod.Post, HttpMethod.Patch)) {
-				contentType(ContentType.Application.Json)
-				setBody(body)
-			}
+		return client.post(requestConfig.path) {
+			contentType(ContentType.Application.Json)
+			setBody(body)
 		}
 	}
 

@@ -27,10 +27,7 @@ open class SchoolSearchApi(
 		schoolid: Int = 0,
 		schoolname: String = ""
 	): UntisResult<SchoolSearchResult> {
-		val config = RequestConfig<Any?>(
-			HttpMethod.Post,
-			DEFAULT_SCHOOLSEARCH_URL
-		)
+		val config = RequestConfig(DEFAULT_SCHOOLSEARCH_URL)
 		val body = RequestData(
 			method = ApiClient.METHOD_SEARCH_SCHOOLS,
 			params = listOf(SchoolSearchParams(search, schoolid, schoolname))

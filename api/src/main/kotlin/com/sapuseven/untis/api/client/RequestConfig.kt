@@ -9,8 +9,7 @@ import io.ktor.http.HttpMethod
  *       allows for caching of the constructed object
  *       for many request definitions.
  */
-data class RequestConfig<T>(
-	val method: HttpMethod,
-	val path: String? = null,
+data class RequestConfig(
+	val path: String,
 	val auth: Auth? = null
 )

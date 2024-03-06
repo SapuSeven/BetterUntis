@@ -2,6 +2,7 @@ package com.sapuseven.untis.ui.activities
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +23,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
+import java.lang.Exception
 import javax.inject.Inject
 
 @HiltViewModel
@@ -97,15 +99,20 @@ class LoginViewModel @Inject constructor(
 
 			schoolSearchLoading = true
 			delay(debounceMillis)
-			val schoolSearchResult = schoolSearchApi.searchSchools(schoolSearchText)
-			schoolSearchLoading = false
+			try {
+				val schoolSearchResult = schoolSearchApi.searchSchools(schoolSearchText)
 
-			schoolSearchResult.fold({
-				schoolSearchItems = it.schools
-			}, {
-				schoolSearchError = ErrorMessageDictionary.getErrorMessageResource(it.code, false)
-				schoolSearchErrorRaw = it.message.orEmpty()
-			})
+				schoolSearchLoading = false
+
+				schoolSearchResult.fold({
+					schoolSearchItems = it.schools
+				}, {
+					schoolSearchError = ErrorMessageDictionary.getErrorMessageResource(it.code, false)
+					schoolSearchErrorRaw = it.message.orEmpty()
+				})
+			} catch (e: Exception) {
+				Log.e("LoginViewModel", "schoolSearch error", e)
+			}
 		}
 	}
 
