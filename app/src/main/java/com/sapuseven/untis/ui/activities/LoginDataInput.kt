@@ -1,9 +1,11 @@
 package com.sapuseven.untis.ui.activities
 
 import android.app.Activity
+import android.content.Intent
 import android.content.res.Configuration
 import android.util.Log
 import android.util.Patterns
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
@@ -25,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -45,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.AutofillType
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -71,6 +75,7 @@ import com.sapuseven.untis.ui.common.SmallCircularProgressIndicator
 import com.sapuseven.untis.ui.common.autofill
 import com.sapuseven.untis.ui.common.ifNotNull
 import com.sapuseven.untis.ui.functional.bottomInsets
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
@@ -78,16 +83,28 @@ import kotlinx.coroutines.launch
 fun LoginDataInput(
 	viewModel: LoginDataInputViewModel = viewModel()
 ) {
+	val context = LocalContext.current
 	val snackbarHostState = remember { SnackbarHostState() }
+	val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
 	var schoolIdLocked by rememberSaveable { mutableStateOf(false) }
 
-	/*val proxyHostPref = dataStorePreferences.proxyHost
 	LaunchedEffect(Unit) {
-		existingUser?.let {
-			proxyUrl.value = proxyHostPref.getValue()
+		viewModel.events.collectLatest { event ->
+			when (event) {
+				is LoginDataInputEvents.DisplaySnackbar -> {
+					event.textRes?.let {
+						snackbarHostState.showSnackbar(
+							context.getString(it),
+							duration = SnackbarDuration.Long
+						)
+					} ?: {
+						snackbarHostState.currentSnackbarData?.dismiss()
+					}
+				}
+			}
 		}
-	}*/
+	}
 
 	if (viewModel.showProfileUpdate)
 		Surface {
@@ -142,7 +159,7 @@ fun LoginDataInput(
 					},
 					navigationIcon = {
 						IconButton(onClick = {
-							//finish()
+							onBackPressedDispatcher?.onBackPressed()
 						}) {
 							Icon(
 								imageVector = Icons.Outlined.ArrowBack,
@@ -165,10 +182,10 @@ fun LoginDataInput(
 						contentDescription = null,
 						tint = MaterialTheme.colorScheme.primary,
 						modifier = Modifier
-                            .width(dimensionResource(id = R.dimen.size_login_icon))
-                            .height(dimensionResource(id = R.dimen.size_login_icon))
-                            .align(Alignment.CenterHorizontally)
-                            .padding(bottom = dimensionResource(id = R.dimen.margin_login_pleaselogin_top))
+							.width(dimensionResource(id = R.dimen.size_login_icon))
+							.height(dimensionResource(id = R.dimen.size_login_icon))
+							.align(Alignment.CenterHorizontally)
+							.padding(bottom = dimensionResource(id = R.dimen.margin_login_pleaselogin_top))
 					)
 				InputField(
 					state = viewModel.loginData.profileName,

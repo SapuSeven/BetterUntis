@@ -8,6 +8,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.DEMO_API_URL
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_DEMO_LOGIN
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_PROFILE_UPDATE
@@ -17,6 +19,9 @@ import com.sapuseven.untis.api.client.UserDataApi
 import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,6 +30,7 @@ class LoginDataInputViewModel @Inject constructor(
 	savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 	val loginData = LoginData()
+	val events = MutableSharedFlow<LoginDataInputEvents>()
 
 	var advanced by mutableStateOf(
 		loginData.proxyUrl.value?.isNotEmpty() == true ||
@@ -95,12 +101,22 @@ class LoginDataInputViewModel @Inject constructor(
 			// TODO handle correctly
 			showQrCodeErrorDialog = true
 		}
+
+		// TODO: load data from existing user
+		/*val proxyHostPref = dataStorePreferences.proxyHost
+		LaunchedEffect(Unit) {
+			existingUser?.let {
+				proxyUrl.value = proxyHostPref.getValue()
+			}
+		}*/
 	}
 
 	fun onLoginClick() {
 		validate = true
 		if (schoolIdValid.value && usernameValid.value && proxyUrlValid.value && apiUrlValid.value) {
-			//snackbarHostState.currentSnackbarData?.dismiss()
+			viewModelScope.launch {
+				events.emit(LoginDataInputEvents.DisplaySnackbar(null))
+			}
 			loadData()
 		}
 	}
@@ -134,6 +150,13 @@ class LoginDataInputViewModel @Inject constructor(
 	private fun loadData() {
 		loading = true
 
+		viewModelScope.launch {
+			delay(2000)
+			loading = false
+			events.emit(LoginDataInputEvents.DisplaySnackbar(R.string.all_error))
+		}
+
+		// TODO: Implement loading user data
 		/*viewModelScope.launch {
 			LoginHelper(
 				loginData = LoginDataInfo(
@@ -166,11 +189,8 @@ class LoginDataInputViewModel @Inject constructor(
 					}
 
 					loading = false
-					coroutineScope.launch {
-						snackbarHostState.showSnackbar(
-							errorMessage,
-							duration = SnackbarDuration.Long
-						)
+					viewModelScope.launch {
+						events.emit(LoginDataInputEvents.DisplaySnackbar(errorMessage))
 					}
 				}).run {
 				val schoolInfo = (
@@ -257,22 +277,22 @@ class LoginDataInputViewModel @Inject constructor(
 	fun onQrCodeErrorDialogDismiss() {
 		showQrCodeErrorDialog = false
 	}
-}
 
-// Using `null` as the default values allows for partial data updates
-class LoginData(
-	initialProfileName: String? = null,
-	initialSchoolId: String? = null,
-	initialAnonymous: Boolean? = null,
-	initialUsername: String? = null,
-	initialApiUrl: String? = null,
-) {
-	val profileName = mutableStateOf(initialProfileName)
-	val schoolId = mutableStateOf(initialSchoolId)
-	val anonymous = mutableStateOf(initialAnonymous)
-	val username = mutableStateOf(initialUsername)
-	val password = mutableStateOf<String?>(null)
-	val proxyUrl = mutableStateOf<String?>(null)
-	val apiUrl = mutableStateOf(initialApiUrl)
-	val skipAppSecret = mutableStateOf<Boolean?>(null)
+	// Using `null` as the default values allows for partial data updates
+	class LoginData(
+		initialProfileName: String? = null,
+		initialSchoolId: String? = null,
+		initialAnonymous: Boolean? = null,
+		initialUsername: String? = null,
+		initialApiUrl: String? = null,
+	) {
+		val profileName = mutableStateOf(initialProfileName)
+		val schoolId = mutableStateOf(initialSchoolId)
+		val anonymous = mutableStateOf(initialAnonymous)
+		val username = mutableStateOf(initialUsername)
+		val password = mutableStateOf<String?>(null)
+		val proxyUrl = mutableStateOf<String?>(null)
+		val apiUrl = mutableStateOf(initialApiUrl)
+		val skipAppSecret = mutableStateOf<Boolean?>(null)
+	}
 }
