@@ -97,7 +97,6 @@ data class UserWithData(
 	@Relation(parentColumn = "id", entityColumn = "userId") val schoolYears: List<SchoolYear>,
 )
 
-// TODO: Verify the new data model with entities from the api module is backwards-compatible
 @Dao
 interface UserDao {
 	@Query("SELECT * FROM user")

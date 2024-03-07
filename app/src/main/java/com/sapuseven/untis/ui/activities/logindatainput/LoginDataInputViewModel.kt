@@ -20,16 +20,20 @@ import com.sapuseven.untis.api.client.SchoolSearchApi
 import com.sapuseven.untis.api.client.UserDataApi
 import com.sapuseven.untis.api.exceptions.UntisApiException
 import com.sapuseven.untis.api.model.response.UserDataResult
+import com.sapuseven.untis.api.model.untis.MasterData
 import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.api.model.untis.masterdata.TimeGrid
 import com.sapuseven.untis.data.databases.entities.User
+import com.sapuseven.untis.data.databases.entities.UserDao
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.ui.activities.ActivityEvents
 import com.sapuseven.untis.ui.activities.ActivityViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 // TODO: Things to check:
@@ -40,6 +44,7 @@ import javax.inject.Inject
 class LoginDataInputViewModel @Inject constructor(
 	val schoolSearchApi: SchoolSearchApi,
 	val userDataApi: UserDataApi,
+	val userDao: UserDao,
 	savedStateHandle: SavedStateHandle
 ) : ActivityViewModel() {
 	val loginData = LoginData()
@@ -181,12 +186,12 @@ class LoginDataInputViewModel @Inject constructor(
 			}
 
 			val userData = loadUserData(untisApiUrl, appSharedSecret)
-
 			val user = buildUser(untisApiUrl, appSharedSecret, schoolInfo, userData)
 
-			saveUser(user)
-
-			activityEvents.send(ActivityEvents.Finish(RESULT_OK))
+			withContext(Dispatchers.IO) {
+				saveUser(user, userData.masterData)
+				activityEvents.send(ActivityEvents.Finish(RESULT_OK))
+			}
 		} catch (e: UntisApiException) {
 			Log.e(LoginDataInputViewModel::class.simpleName, "loadData error", e)
 			events.emit(LoginDataInputEvents.DisplaySnackbar(ErrorMessageDictionary.getErrorMessageResource(e.error?.code)))
@@ -336,20 +341,17 @@ class LoginDataInputViewModel @Inject constructor(
 		return user
 	}
 
-	private fun saveUser(user: User) {
-		// TODO: Inject user database
-		/*userDatabase.userDao().let { dao ->
-			if (existingUserId == null)
-				userId = dao.insert(user)
-			else
-				dao.update(user)
+	private suspend fun saveUser(user: User, masterData: MasterData) {
+		//if (existingUserId == null)
+			val userId = userDao.insert(user)
+		//else
+			//userDao.update(user)
 
-			dao.deleteUserData(userId)
-			dao.insertUserData(
-				userId,
-				userDataResponse.masterData
-			)
-		}*/
+		userDao.deleteUserData(userId)
+		userDao.insertUserData(
+			userId,
+			masterData
+		)
 	}
 
 	private fun buildUntisApiUrl(schoolInfo: SchoolInfo): String {

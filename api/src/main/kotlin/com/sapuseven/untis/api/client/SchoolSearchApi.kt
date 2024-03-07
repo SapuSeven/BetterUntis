@@ -10,7 +10,6 @@ import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngineFactory
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import org.openapitools.client.infrastructure.RequestConfig
 
 open class SchoolSearchApi(
 	engineFactory: HttpClientEngineFactory<*>,

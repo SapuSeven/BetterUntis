@@ -2052,8 +2052,8 @@ fun buildHourList(
 
 		hourList.add(
 			WeekViewHour(
-				LocalTime(startTime),
-				LocalTime(endTime),
+				LocalTime(startTime.hour, startTime.minute),
+				LocalTime(endTime.hour, endTime.minute),
 				label
 			)
 		)

@@ -15,6 +15,8 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 
 open class ApiClient() {
@@ -59,8 +61,8 @@ open class ApiClient() {
 
 	protected suspend fun request(
 		path: String, body: RequestData? = null
-	): HttpResponse {
-		return client.post(path) {
+	): HttpResponse = withContext(Dispatchers.IO) {
+		return@withContext client.post(path) {
 			contentType(ContentType.Application.Json)
 			setBody(body)
 		}

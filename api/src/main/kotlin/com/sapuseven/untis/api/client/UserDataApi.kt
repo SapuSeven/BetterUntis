@@ -12,7 +12,6 @@ import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngineFactory
 import kotlinx.serialization.json.Json
-import org.openapitools.client.infrastructure.RequestConfig
 
 open class UserDataApi(
 	engineFactory: HttpClientEngineFactory<*>,
