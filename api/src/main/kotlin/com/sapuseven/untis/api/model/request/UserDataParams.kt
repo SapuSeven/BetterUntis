@@ -8,5 +8,5 @@ data class UserDataParams(
 	val elementId: Int = 0,
 	val deviceOs: String = "AND",
 	val deviceOsVersion: String = "",
-	override var auth: Auth?
+	val auth: Auth?
 ) : BaseParams()

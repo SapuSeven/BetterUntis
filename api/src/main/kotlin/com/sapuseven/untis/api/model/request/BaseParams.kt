@@ -6,9 +6,7 @@ import kotlinx.serialization.json.JsonContentPolymorphicSerializer
 import kotlinx.serialization.json.JsonElement
 
 @Serializable(with = BaseParamsSerializer::class)
-abstract class BaseParams {
-	open var auth: Auth? = null
-}
+abstract class BaseParams
 
 object BaseParamsSerializer : JsonContentPolymorphicSerializer<BaseParams>(BaseParams::class) {
 	override fun selectDeserializer(element: JsonElement) = throw Error("Not supported")
