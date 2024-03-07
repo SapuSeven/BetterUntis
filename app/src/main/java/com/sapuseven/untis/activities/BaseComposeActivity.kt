@@ -53,7 +53,7 @@ abstract class BaseComposeActivity : ComponentActivity() {
 	private var dialogOpenUrl: MutableState<String?>? = null
 
 	companion object {
-		private const val EXTRA_LONG_USER_ID = "com.sapuseven.untis.activities.profileid"
+		const val EXTRA_LONG_USER_ID = "com.sapuseven.untis.activities.profileid"
 		private const val EXTRA_INT_BACKGROUND_COLOR =
 			"com.sapuseven.untis.activities.backgroundcolor"
 

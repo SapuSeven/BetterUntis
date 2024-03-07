@@ -11,6 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.sapuseven.untis.R
+import com.sapuseven.untis.activities.BaseComposeActivity.Companion.EXTRA_LONG_USER_ID
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.DEMO_API_URL
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_DEMO_LOGIN
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_PROFILE_UPDATE
@@ -37,7 +38,6 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 // TODO: Things to check:
-//       - anonymous login
 //       - app secret resolution
 //       - lock school id
 @HiltViewModel
@@ -47,12 +47,14 @@ class LoginDataInputViewModel @Inject constructor(
 	val userDao: UserDao,
 	savedStateHandle: SavedStateHandle
 ) : ActivityViewModel() {
-	val loginData = LoginData()
 	val events = MutableSharedFlow<LoginDataInputEvents>()
 
+	val existingUserId = savedStateHandle.get<Long>(EXTRA_LONG_USER_ID)
+
+	val loginData = LoginData()
+
 	var advanced by mutableStateOf(
-		loginData.proxyUrl.value?.isNotEmpty() == true ||
-			loginData.apiUrl.value?.isNotEmpty() == true
+		loginData.proxyUrl.value?.isNotEmpty() == true || loginData.apiUrl.value?.isNotEmpty() == true
 	)
 
 	var validate by mutableStateOf(false)
@@ -68,6 +70,8 @@ class LoginDataInputViewModel @Inject constructor(
 		private set
 
 	val showProfileUpdate = savedStateHandle.get<Boolean>(EXTRA_BOOLEAN_PROFILE_UPDATE) == true
+
+	var schoolIdLocked by mutableStateOf(false)
 
 	val schoolIdValid = derivedStateOf {
 		loginData.schoolId.value?.let {
@@ -98,6 +102,10 @@ class LoginDataInputViewModel @Inject constructor(
 	}
 
 	init {
+		viewModelScope.launch(Dispatchers.IO) {
+			existingUserId?.let { userDao.getById(it) }?.let { loginData.loadFromUser(it) }
+		}
+
 		if (savedStateHandle.get<Boolean>(EXTRA_BOOLEAN_DEMO_LOGIN) == true) {
 			loginData.anonymous.value = true
 			loginData.schoolId.value = "demo"
@@ -109,7 +117,7 @@ class LoginDataInputViewModel @Inject constructor(
 
 		schoolInfoFromSearch?.let {
 			loginData.schoolId.value = schoolInfoFromSearch.schoolId.toString()
-			//schoolIdLocked = true
+			schoolIdLocked = true
 		}
 
 		if (showProfileUpdate) {
@@ -122,14 +130,6 @@ class LoginDataInputViewModel @Inject constructor(
 			// TODO handle correctly
 			showQrCodeErrorDialog = true
 		}
-
-		// TODO: load data from existing user
-		/*val proxyHostPref = dataStorePreferences.proxyHost
-		LaunchedEffect(Unit) {
-			existingUser?.let {
-				proxyUrl.value = proxyHostPref.getValue()
-			}
-		}*/
 	}
 
 	fun onLoginClick() {
@@ -143,8 +143,7 @@ class LoginDataInputViewModel @Inject constructor(
 	}
 
 	private fun loadFromAppLinkData(appLinkDataString: String?) {
-		if (appLinkDataString == null)
-			return;
+		if (appLinkDataString == null) return;
 
 		val appLinkData = Uri.parse(appLinkDataString)
 
@@ -194,7 +193,13 @@ class LoginDataInputViewModel @Inject constructor(
 			}
 		} catch (e: UntisApiException) {
 			Log.e(LoginDataInputViewModel::class.simpleName, "loadData error", e)
-			events.emit(LoginDataInputEvents.DisplaySnackbar(ErrorMessageDictionary.getErrorMessageResource(e.error?.code)))
+			events.emit(
+				LoginDataInputEvents.DisplaySnackbar(
+					ErrorMessageDictionary.getErrorMessageResource(
+						e.error?.code
+					)
+				)
+			)
 		} finally {
 			loading = false
 		}
@@ -322,17 +327,15 @@ class LoginDataInputViewModel @Inject constructor(
 		schoolInfo: SchoolInfo,
 		userData: UserDataResult
 	): User {
-		//var userId = existingUserId ?: 0
 		val user = User(
-			0,//userId,
+			existingUserId ?: 0,
 			loginData.profileName.value ?: "",
 			untisApiUrl,
 			schoolInfo.schoolId.toString(),
 			if (loginData.anonymous.value != true) loginData.username.value else null,
 			if (loginData.anonymous.value != true) appSharedSecret else null,
 			loginData.anonymous.value == true,
-			userData.masterData.timeGrid
-				?: TimeGrid.generateDefault(),
+			userData.masterData.timeGrid ?: TimeGrid.generateDefault(),
 			userData.masterData.timeStamp,
 			userData.userData,
 			userData.settings,
@@ -342,53 +345,49 @@ class LoginDataInputViewModel @Inject constructor(
 	}
 
 	private suspend fun saveUser(user: User, masterData: MasterData) {
-		//if (existingUserId == null)
-			val userId = userDao.insert(user)
-		//else
-			//userDao.update(user)
+		val userId = existingUserId?.also {
+			userDao.update(user)
+		} ?: run {
+			userDao.insert(user)
+		}
 
 		userDao.deleteUserData(userId)
-		userDao.insertUserData(
-			userId,
-			masterData
-		)
+		userDao.insertUserData(userId, masterData)
 	}
 
 	private fun buildUntisApiUrl(schoolInfo: SchoolInfo): String {
-		return if (advanced && !loginData.apiUrl.value.isNullOrBlank())
-			loginData.apiUrl.value ?: ""
+		return if (advanced && !loginData.apiUrl.value.isNullOrBlank()) loginData.apiUrl.value ?: ""
 		else if (schoolInfo.useMobileServiceUrlAndroid && !schoolInfo.mobileServiceUrl.isNullOrBlank()) schoolInfo.mobileServiceUrl!!
-		else Uri.parse(schoolInfo.serverUrl).buildUpon()
-			.appendEncodedPath("jsonrpc_intern.do")
+		else Uri.parse(schoolInfo.serverUrl).buildUpon().appendEncodedPath("jsonrpc_intern.do")
 			.build().toString()
 	}
 
 	private suspend fun loadSchoolInfo(): SchoolInfo? {
 		return schoolInfoFromSearch ?: run {
-			if (advanced && !loginData.apiUrl.value.isNullOrBlank())
-				SchoolInfo(
-					server = "",
-					useMobileServiceUrlAndroid = true,
-					useMobileServiceUrlIos = true,
-					address = "",
-					displayName = loginData.schoolId.value ?: "",
-					loginName = loginData.schoolId.value ?: "",
-					schoolId = loginData.schoolId.value?.toIntOrNull() ?: 0,
-					serverUrl = loginData.apiUrl.value ?: "",
-					mobileServiceUrl = loginData.apiUrl.value
-				)
+			if (advanced && !loginData.apiUrl.value.isNullOrBlank()) SchoolInfo(
+				server = "",
+				useMobileServiceUrlAndroid = true,
+				useMobileServiceUrlIos = true,
+				address = "",
+				displayName = loginData.schoolId.value ?: "",
+				loginName = loginData.schoolId.value ?: "",
+				schoolId = loginData.schoolId.value?.toIntOrNull() ?: 0,
+				serverUrl = loginData.apiUrl.value ?: "",
+				mobileServiceUrl = loginData.apiUrl.value
+			)
 			else {
 				val school = loginData.schoolId.value ?: ""
 				val schoolId = school.toIntOrNull()
 				val schoolSearchResult = schoolSearchApi.searchSchools(school)
-				if (schoolSearchResult.size == 1)
-					schoolSearchResult.schools.first()
+				if (schoolSearchResult.size == 1) schoolSearchResult.schools.first()
 				else
 				// TODO: Show manual selection dialog when more than one results are returned.
 				//       This workaround tries to find a matching school regardless.
 					schoolSearchResult.schools.find { schoolInfoResult ->
-						schoolInfoResult.schoolId == schoolId
-							|| schoolInfoResult.loginName.equals(school, true)
+						schoolInfoResult.schoolId == schoolId || schoolInfoResult.loginName.equals(
+							school,
+							true
+						)
 					}
 			}
 		}
@@ -398,9 +397,7 @@ class LoginDataInputViewModel @Inject constructor(
 		loginData.anonymous.value == true -> ""
 		loginData.skipAppSecret.value == true -> loginData.password.value
 		else -> userDataApi.loadAppSharedSecret(
-			untisApiUrl,
-			loginData.username.value ?: "",
-			loginData.password.value ?: ""
+			untisApiUrl, loginData.username.value ?: "", loginData.password.value ?: ""
 		)
 	}
 
@@ -413,7 +410,6 @@ class LoginDataInputViewModel @Inject constructor(
 		showQrCodeErrorDialog = false
 	}
 
-	// Using `null` as the default values allows for partial data updates
 	class LoginData(
 		initialProfileName: String? = null,
 		initialSchoolId: String? = null,
@@ -429,5 +425,13 @@ class LoginDataInputViewModel @Inject constructor(
 		val proxyUrl = mutableStateOf<String?>(null)
 		val apiUrl = mutableStateOf(initialApiUrl)
 		val skipAppSecret = mutableStateOf<Boolean?>(null)
+
+		fun loadFromUser(user: User) {
+			profileName.value = user.profileName
+			schoolId.value = user.schoolId
+			anonymous.value = user.anonymous
+			username.value = user.user
+			apiUrl.value = user.apiUrl
+		}
 	}
 }

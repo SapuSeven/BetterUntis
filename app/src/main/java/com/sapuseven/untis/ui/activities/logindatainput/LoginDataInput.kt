@@ -82,8 +82,6 @@ fun LoginDataInput(
 	val snackbarHostState = remember { SnackbarHostState() }
 	val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
-	var schoolIdLocked by rememberSaveable { mutableStateOf(false) }
-
 	LaunchedEffect(Unit) {
 		viewModel.events.collectLatest { event ->
 			when (event) {
@@ -190,7 +188,7 @@ fun LoginDataInput(
 				InputField(
 					state = viewModel.loginData.schoolId,
 					label = { Text(stringResource(id = R.string.logindatainput_school)) },
-					enabled = !viewModel.loading && !schoolIdLocked,
+					enabled = !viewModel.loading && !viewModel.schoolIdLocked,
 					valid = !viewModel.validate || viewModel.schoolIdValid.value,
 					errorText = stringResource(id = R.string.logindatainput_error_field_empty)
 				)
