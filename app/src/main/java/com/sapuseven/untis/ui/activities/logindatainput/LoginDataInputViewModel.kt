@@ -2,6 +2,7 @@ package com.sapuseven.untis.ui.activities.logindatainput
 
 import android.app.Activity.RESULT_OK
 import android.net.Uri
+import android.util.Log
 import android.util.Patterns
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -187,6 +188,7 @@ class LoginDataInputViewModel @Inject constructor(
 
 			activityEvents.send(ActivityEvents.Finish(RESULT_OK))
 		} catch (e: UntisApiException) {
+			Log.e(LoginDataInputViewModel::class.simpleName, "loadData error", e)
 			events.emit(LoginDataInputEvents.DisplaySnackbar(ErrorMessageDictionary.getErrorMessageResource(e.error?.code)))
 		} finally {
 			loading = false
@@ -401,7 +403,8 @@ class LoginDataInputViewModel @Inject constructor(
 	}
 
 	private suspend fun loadUserData(untisApiUrl: String, appSharedSecret: String): UserDataResult {
-		return userDataApi.loadUserData(untisApiUrl, loginData.username.value, appSharedSecret)
+		val user = if (loginData.anonymous.value == true) null else loginData.username.value
+		return userDataApi.loadUserData(untisApiUrl, user, appSharedSecret)
 	}
 
 	fun onQrCodeErrorDialogDismiss() {

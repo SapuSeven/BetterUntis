@@ -12,6 +12,7 @@ import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngineFactory
 import kotlinx.serialization.json.Json
+import org.openapitools.client.infrastructure.RequestConfig
 
 open class UserDataApi(
 	engineFactory: HttpClientEngineFactory<*>,
@@ -27,13 +28,12 @@ open class UserDataApi(
 		user: String,
 		password: String
 	): String {
-		val config = RequestConfig(apiUrl)
 		val body = RequestData(
 			method = ApiClient.METHOD_GET_APP_SHARED_SECRET,
 			params = listOf(AppSharedSecretParams(user, password))
 		)
 
-		val response: AppSharedSecretResponse = request(config, body).body()
+		val response: AppSharedSecretResponse = request(apiUrl, body).body()
 
 		return response.result ?: throw UntisApiException(response.error)
 	}
@@ -43,13 +43,12 @@ open class UserDataApi(
 		user: String?,
 		key: String?
 	): UserDataResult {
-		val config = RequestConfig(apiUrl, Auth(user, key))
 		val body = RequestData(
 			method = ApiClient.METHOD_GET_USER_DATA,
-			params = listOf(UserDataParams())
+			params = listOf(UserDataParams(auth = Auth(user, key)))
 		)
 
-		val response: UserDataResponse = request(config, body).body()
+		val response: UserDataResponse = request(apiUrl, body).body()
 
 		return response.result ?: throw UntisApiException(response.error)
 	}

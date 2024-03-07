@@ -6,8 +6,8 @@ import kotlinx.serialization.json.JsonContentPolymorphicSerializer
 import kotlinx.serialization.json.JsonElement
 
 @Serializable(with = BaseParamsSerializer::class)
-open class BaseParams {
-	var auth: Auth? = null;
+abstract class BaseParams {
+	open var auth: Auth? = null
 }
 
 object BaseParamsSerializer : JsonContentPolymorphicSerializer<BaseParams>(BaseParams::class) {

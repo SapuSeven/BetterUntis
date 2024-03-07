@@ -10,6 +10,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.utils.EmptyContent.contentType
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
@@ -26,7 +27,10 @@ open class ApiClient() {
 	) : this() {
 		val clientConfig: (HttpClientConfig<*>) -> Unit by lazy {
 			{
-				it.install(ContentNegotiation) { json(jsonBlock) }
+				it.install(ContentNegotiation) {
+					json(jsonBlock, contentType = ContentType.Application.Json)
+					json(jsonBlock, contentType = ContentType.Application.JsonRpc)
+				}
 				it.install(HttpRequestRetry) {
 					retryOnServerErrors(maxRetries = 3)
 					retryOnException(maxRetries = 3)
@@ -54,17 +58,16 @@ open class ApiClient() {
 	}
 
 	protected suspend fun request(
-		requestConfig: RequestConfig, body: RequestData? = null
+		path: String, body: RequestData? = null
 	): HttpResponse {
-		requestConfig.auth?.let {
-			body?.params?.forEachIndexed { index, _ -> body.params[index].auth = it }
-		}
-
-		return client.post(requestConfig.path) {
+		return client.post(path) {
 			contentType(ContentType.Application.Json)
 			setBody(body)
 		}
 	}
+
+	private val ContentType.Application.JsonRpc: ContentType
+		get() = ContentType("application", "json-rpc")
 
 	companion object {
 		const val DEFAULT_WEBUNTIS_HOST = "mobile.webuntis.com"
@@ -72,8 +75,9 @@ open class ApiClient() {
 		const val DEFAULT_SCHOOLSEARCH_URL = "https://schoolsearch.webuntis.com/schoolquery2"
 		val DEFAULT_JSON = Json {
 			ignoreUnknownKeys = true
-			prettyPrint = true
 			isLenient = true
+			encodeDefaults = true
+			prettyPrint = true // TODO only for DEV
 		}
 
 		protected val UNSAFE_HEADERS = listOf(HttpHeaders.ContentType)
