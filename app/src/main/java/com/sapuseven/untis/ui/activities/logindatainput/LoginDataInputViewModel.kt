@@ -27,6 +27,7 @@ import com.sapuseven.untis.api.model.untis.masterdata.TimeGrid
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.databases.entities.UserDao
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
+import com.sapuseven.untis.helpers.ErrorMessageDictionary.ERROR_CODE_TOO_MANY_RESULTS
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.ui.activities.ActivityEvents
 import com.sapuseven.untis.ui.activities.ActivityViewModel
@@ -47,8 +48,6 @@ class LoginDataInputViewModel @Inject constructor(
 	val userDao: UserDao,
 	savedStateHandle: SavedStateHandle
 ) : ActivityViewModel() {
-	val events = MutableSharedFlow<LoginDataInputEvents>()
-
 	val existingUserId = savedStateHandle.get<Long>(EXTRA_LONG_USER_ID)
 
 	val loginData = LoginData()
@@ -61,6 +60,12 @@ class LoginDataInputViewModel @Inject constructor(
 		private set
 
 	var loading by mutableStateOf(false)
+		private set
+
+	var errorText: Int? by mutableStateOf(null)
+		private set
+
+	var errorTextRaw: String? by mutableStateOf(null)
 		private set
 
 	var isExistingUser by mutableStateOf(false)
@@ -135,9 +140,8 @@ class LoginDataInputViewModel @Inject constructor(
 	fun onLoginClick() {
 		validate = true
 		if (schoolIdValid.value && usernameValid.value && proxyUrlValid.value && apiUrlValid.value) {
-			viewModelScope.launch {
-				events.emit(LoginDataInputEvents.DisplaySnackbar(null))
-			}
+			errorText = null
+			errorTextRaw = null
 			loadData()
 		}
 	}
@@ -172,7 +176,7 @@ class LoginDataInputViewModel @Inject constructor(
 
 		try {
 			val schoolInfo = loadSchoolInfo() ?: run {
-				events.emit(LoginDataInputEvents.DisplaySnackbar(R.string.logindatainput_error_invalid_school))
+				errorText = R.string.logindatainput_error_invalid_school
 				return@launch
 			}
 
@@ -193,13 +197,12 @@ class LoginDataInputViewModel @Inject constructor(
 			}
 		} catch (e: UntisApiException) {
 			Log.e(LoginDataInputViewModel::class.simpleName, "loadData error", e)
-			events.emit(
-				LoginDataInputEvents.DisplaySnackbar(
-					ErrorMessageDictionary.getErrorMessageResource(
-						e.error?.code
-					)
-				)
-			)
+			val errorTextRes = ErrorMessageDictionary.getErrorMessageResource(e.error?.code, false)
+			errorText = errorTextRes ?: R.string.errormessagedictionary_generic
+			errorTextRaw = when(e.error?.code) {
+				ERROR_CODE_TOO_MANY_RESULTS -> "Check the school id" // TODO: This is an exampe. Add detailed descriptions to errormessagedictionary
+				else -> if (errorTextRes == null) e.error?.message else null
+			}
 		} finally {
 			loading = false
 		}

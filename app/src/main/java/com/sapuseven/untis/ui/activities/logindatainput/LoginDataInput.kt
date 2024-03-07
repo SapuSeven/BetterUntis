@@ -1,7 +1,6 @@
 package com.sapuseven.untis.ui.activities.logindatainput
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -31,28 +30,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.AutofillType
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -66,11 +56,11 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.LabeledCheckbox
 import com.sapuseven.untis.ui.common.LabeledSwitch
+import com.sapuseven.untis.ui.common.MessageBubble
 import com.sapuseven.untis.ui.common.SmallCircularProgressIndicator
 import com.sapuseven.untis.ui.common.autofill
 import com.sapuseven.untis.ui.common.ifNotNull
 import com.sapuseven.untis.ui.functional.bottomInsets
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
@@ -78,26 +68,7 @@ import kotlinx.coroutines.launch
 fun LoginDataInput(
 	viewModel: LoginDataInputViewModel = viewModel()
 ) {
-	val context = LocalContext.current
-	val snackbarHostState = remember { SnackbarHostState() }
 	val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
-	LaunchedEffect(Unit) {
-		viewModel.events.collectLatest { event ->
-			when (event) {
-				is LoginDataInputEvents.DisplaySnackbar -> {
-					event.textRes?.let {
-						snackbarHostState.showSnackbar(
-							context.getString(it),
-							duration = SnackbarDuration.Long
-						)
-					} ?: {
-						snackbarHostState.currentSnackbarData?.dismiss()
-					}
-				}
-			}
-		}
-	}
 
 	if (viewModel.showProfileUpdate)
 		Surface {
@@ -125,7 +96,6 @@ fun LoginDataInput(
 		}
 	else
 		AppScaffold(
-			snackbarHost = { SnackbarHost(snackbarHostState) }, // TODO: The snackbar looks bad, implement an alternative error notification
 			floatingActionButtonPosition = FabPosition.End,
 			floatingActionButton = {
 				ExtendedFloatingActionButton(
@@ -180,6 +150,21 @@ fun LoginDataInput(
                             .align(Alignment.CenterHorizontally)
                             .padding(bottom = dimensionResource(id = R.dimen.margin_login_pleaselogin_top))
 					)
+
+				MessageBubble(
+					modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+					icon = {
+						Icon(
+							painter = painterResource(id = R.drawable.all_error),
+							contentDescription = stringResource(id = R.string.all_error)
+						)
+					},
+					messageText = viewModel.errorText,
+					messageTextRaw = viewModel.errorTextRaw
+				)
+
 				InputField(
 					state = viewModel.loginData.profileName,
 					label = { Text(stringResource(id = R.string.logindatainput_profilename)) },
