@@ -1,22 +1,28 @@
 package com.sapuseven.untis.activities
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.annotation.MainThread
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material3.*
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
@@ -26,6 +32,7 @@ import androidx.lifecycle.DEFAULT_ARGS_KEY
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.MutableCreationExtras
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.R
@@ -33,13 +40,16 @@ import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.helpers.config.globalDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import com.sapuseven.untis.modules.ThemeViewModel
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.activities.ActivityEvents
 import com.sapuseven.untis.ui.activities.ActivityViewModel
 import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.material.scheme.Scheme
+import com.sapuseven.untis.ui.theme.animated
 import com.sapuseven.untis.ui.theme.generateColorScheme
+import com.sapuseven.untis.ui.theme.toColorScheme
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -155,6 +165,63 @@ abstract class BaseComposeActivity : ComponentActivity() {
 	}
 
 	fun currentUserId() = user?.id ?: -1
+
+	@Composable
+	fun AppThemeNew(
+		//initialDarkTheme: Boolean = isSystemInDarkTheme(),
+		navBarInset: Boolean = true,
+		systemUiController: SystemUiController? = rememberSystemUiController(),
+		dynamicColor: Boolean = true,
+		themeViewModel: ThemeViewModel = viewModel(),
+		content: @Composable () -> Unit
+	) {
+		val themeState by themeViewModel.themeState.collectAsState()
+
+		val colorScheme = when {
+			dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+				val context = LocalContext.current
+				if (themeState.isDarkMode) dynamicDarkColorScheme(context) else dynamicLightColorScheme(
+					context
+				)
+			}
+
+			themeState.isDarkMode -> Scheme.dark(Color.Red.toArgb()).toColorScheme()
+			else -> Scheme.light(Color.Red.toArgb()).toColorScheme()
+		}
+		val view = LocalView.current
+
+		if (!view.isInEditMode) {
+			SideEffect {
+				val window = (view.context as Activity).window
+				window.statusBarColor = Color.Transparent.toArgb()
+
+//            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
+			}
+		}
+
+		MaterialTheme(
+			colorScheme = colorScheme.animated()
+		) {
+			val darkIcons = MaterialTheme.colorScheme.background.luminance() > .5f
+
+			Surface(
+				modifier = Modifier
+					.fillMaxSize()
+					.background(MaterialTheme.colorScheme.background)
+					.conditional(navBarInset) {
+						bottomInsets()
+					}
+					.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)),
+				content = content
+			)
+
+			SideEffect {
+				systemUiController?.let {
+					setSystemUiColor(it, Color.Transparent, darkIcons)
+				}
+			}
+		}
+	}
 
 	@Composable
 	fun AppTheme(

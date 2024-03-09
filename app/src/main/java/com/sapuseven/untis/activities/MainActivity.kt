@@ -15,6 +15,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
@@ -40,6 +41,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat.recreate
 import androidx.core.graphics.ColorUtils
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -62,6 +64,9 @@ import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
+import com.sapuseven.untis.ui.activities.login.LoginViewModel
+import com.sapuseven.untis.ui.activities.main.Main
+import com.sapuseven.untis.ui.activities.main.MainViewModel
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.*
@@ -74,6 +79,7 @@ import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.models.NavItemShortcut
 import com.sapuseven.untis.ui.preferences.convertRangeToPair
 import com.sapuseven.untis.ui.weekview.*
+import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -85,7 +91,10 @@ import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
 import java.util.*
 
-class MainActivity : BaseComposeActivity() {
+@AndroidEntryPoint
+class MainActivity : BaseComposeActivityNew<MainViewModel>() {
+	override val viewModel: MainViewModel by viewModels()
+
 	companion object {
 		const val MESSENGER_PACKAGE_NAME = "com.untis.chat"
 
@@ -115,54 +124,55 @@ class MainActivity : BaseComposeActivity() {
 		super.onCreate(savedInstanceState)
 
 		setContent {
-			AppTheme(navBarInset = false) {
-				withUser(
-					invalidContent = { login() }
-				) { user ->
-					/*val state =
-						rememberMainAppState(
-							user = user,
-							contextActivity = this,
-							//customThemeColor = customThemeColor,
-							preferences = dataStorePreferences,
-							globalPreferences = globalDataStore,
-							//colorScheme = MaterialTheme.colorScheme//!! // Can't be null, AppTheme content isn't rendered if colorScheme is null
-						)
+			AppThemeNew(/*navBarInset = false*/) {
+				Main(viewModel)
+				/*withUser(
+								invalidContent = { login() }
+							) { user ->
+								/*val state =
+									rememberMainAppState(
+										user = user,
+										contextActivity = this,
+										//customThemeColor = customThemeColor,
+										preferences = dataStorePreferences,
+										globalPreferences = globalDataStore,
+										//colorScheme = MaterialTheme.colorScheme//!! // Can't be null, AppTheme content isn't rendered if colorScheme is null
+									)
 
-					val prefs = dataStorePreferences
-					LaunchedEffect(Unit) {
-						val personalTimetableFlow = prefs.timetablePersonalTimetable.getValueFlow()
+								val prefs = dataStorePreferences
+								LaunchedEffect(Unit) {
+									val personalTimetableFlow = prefs.timetablePersonalTimetable.getValueFlow()
 
-						state.scope.launch {
-							personalTimetableFlow.collect { customTimetable ->
-								if (user.anonymous || customTimetable != "") {
-									val element = decodeStoredTimetableValue(customTimetable)
-									val previousElement = state.personalTimetable?.first
-									state.personalTimetable =
-										element to element?.let { timetableDatabaseInterface.getLongName(it) }
+									state.scope.launch {
+										personalTimetableFlow.collect { customTimetable ->
+											if (user.anonymous || customTimetable != "") {
+												val element = decodeStoredTimetableValue(customTimetable)
+												val previousElement = state.personalTimetable?.first
+												state.personalTimetable =
+													element to element?.let { timetableDatabaseInterface.getLongName(it) }
 
-									if (element != previousElement)
-										state.displayElement(state.personalTimetable?.first, state.personalTimetable?.second)
-								}
-							}
-						}
-					}*/
+												if (element != previousElement)
+													state.displayElement(state.personalTimetable?.first, state.personalTimetable?.second)
+											}
+										}
+									}
+								}*/
 
-					/*LaunchedEffect(user) {
-						state.displayElement(
-							state.personalTimetable?.first,
-							state.personalTimetable?.second
-						)
-					}*/
+								/*LaunchedEffect(user) {
+									state.displayElement(
+										state.personalTimetable?.first,
+										state.personalTimetable?.second
+									)
+								}*/
 
-					val state = rememberNewMainAppState(
-						user = user,
-						contextActivity = this,
-						preferences = dataStorePreferences
-					)
+								val state = rememberNewMainAppState(
+									user = user,
+									contextActivity = this,
+									preferences = dataStorePreferences
+								)
 
-					MainApp(state)
-				}
+								//MainApp(state)
+							}*/
 			}
 		}
 	}

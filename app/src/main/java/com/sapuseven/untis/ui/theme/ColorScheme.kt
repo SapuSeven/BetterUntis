@@ -2,9 +2,12 @@ package com.sapuseven.untis.ui.theme
 
 import android.content.Context
 import android.os.Build
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.sapuseven.untis.ui.material.scheme.Scheme
@@ -19,6 +22,7 @@ fun generateColorScheme(
 	dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
 		if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
 	}
+
 	darkTheme -> Scheme.dark(themeColor.toArgb()).toColorScheme()
 	else -> Scheme.light(themeColor.toArgb()).toColorScheme()
 }.run {
@@ -60,3 +64,43 @@ fun Scheme.toColorScheme(): ColorScheme =
 		outlineVariant = Color(outlineVariant),
 		scrim = Color(scrim),
 	)
+
+@Composable
+private fun animateColor(targetValue: Color) = animateColorAsState(
+	targetValue = targetValue,
+	animationSpec = tween(),
+	label = "themeColor"
+).value
+
+@Composable
+fun ColorScheme.animated(): ColorScheme = copy(
+	primary = animateColor(primary),
+	onPrimary = animateColor(onPrimary),
+	primaryContainer = animateColor(primaryContainer),
+	onPrimaryContainer = animateColor(onPrimaryContainer),
+	inversePrimary = animateColor(inversePrimary),
+	secondary = animateColor(secondary),
+	onSecondary = animateColor(onSecondary),
+	secondaryContainer = animateColor(secondaryContainer),
+	onSecondaryContainer = animateColor(onSecondaryContainer),
+	tertiary = animateColor(tertiary),
+	onTertiary = animateColor(onTertiary),
+	tertiaryContainer = animateColor(tertiaryContainer),
+	onTertiaryContainer = animateColor(onTertiaryContainer),
+	background = animateColor(background),
+	onBackground = animateColor(onBackground),
+	surface = animateColor(surface),
+	onSurface = animateColor(onSurface),
+	surfaceVariant = animateColor(surfaceVariant),
+	onSurfaceVariant = animateColor(onSurfaceVariant),
+	surfaceTint = animateColor(surfaceTint),
+	inverseSurface = animateColor(inverseSurface),
+	inverseOnSurface = animateColor(inverseOnSurface),
+	error = animateColor(error),
+	onError = animateColor(onError),
+	errorContainer = animateColor(errorContainer),
+	onErrorContainer = animateColor(onErrorContainer),
+	outline = animateColor(outline),
+	outlineVariant = animateColor(outlineVariant),
+	scrim = animateColor(scrim),
+)
