@@ -40,7 +40,6 @@ import javax.inject.Inject
 
 // TODO: Things to check:
 //       - app secret resolution
-//       - lock school id
 @HiltViewModel
 class LoginDataInputViewModel @Inject constructor(
 	val schoolSearchApi: SchoolSearchApi,
