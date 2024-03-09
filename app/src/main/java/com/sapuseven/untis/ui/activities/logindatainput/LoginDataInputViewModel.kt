@@ -40,6 +40,8 @@ import javax.inject.Inject
 
 // TODO: Things to check:
 //       - app secret resolution
+//       - respect proxy host
+//       - bookmarks
 @HiltViewModel
 class LoginDataInputViewModel @Inject constructor(
 	val schoolSearchApi: SchoolSearchApi,
@@ -205,122 +207,6 @@ class LoginDataInputViewModel @Inject constructor(
 		} finally {
 			loading = false
 		}
-
-		/*viewModelScope.launch {
-			LoginHelper(
-				loginData = LoginDataInfo(
-					username.value ?: "",
-					password.value ?: existingUser?.key ?: "",
-					anonymous.value ?: false
-				),
-				proxyHost = proxyUrl.value,
-				onStatusUpdate = { status ->
-					Log.d(
-						LoginDataInputActivity::class.java.simpleName,
-						getString(status)
-					)
-				},
-				onError = { error ->
-					val errorMessage = when {
-						error.errorCode != null -> ErrorMessageDictionary.getErrorMessage(
-							resources,
-							error.errorCode,
-							error.errorMessage
-						)
-
-						error.errorMessageStringRes != null -> getString(
-							error.errorMessageStringRes,
-							error.errorMessage
-						)
-
-						else -> error.errorMessage
-							?: getString(R.string.all_error)
-					}
-
-					loading = false
-					viewModelScope.launch {
-						events.emit(LoginDataInputEvents.DisplaySnackbar(errorMessage))
-					}
-				}).run {
-				val schoolInfo = (
-					when {
-						schoolInfoFromSearch != null -> schoolInfoFromSearch
-						advanced && !apiUrl.value.isNullOrBlank() -> SchoolInfo(
-							server = "",
-							useMobileServiceUrlAndroid = true,
-							useMobileServiceUrlIos = true,
-							address = "",
-							displayName = schoolId.value ?: "",
-							loginName = schoolId.value ?: "",
-							schoolId = schoolId.value?.toIntOrNull()
-								?: 0,
-							serverUrl = apiUrl.value ?: "",
-							mobileServiceUrl = apiUrl.value
-						)
-
-						else -> loadSchoolInfo(
-							schoolId.value ?: ""
-						)
-					}) ?: return@run
-				val untisApiUrl =
-					if (advanced && !apiUrl.value.isNullOrBlank())
-						apiUrl.value ?: ""
-					else if (schoolInfo.useMobileServiceUrlAndroid && !schoolInfo.mobileServiceUrl.isNullOrBlank()) schoolInfo.mobileServiceUrl!!
-					else Uri.parse(schoolInfo.serverUrl).buildUpon()
-						.appendEncodedPath("jsonrpc_intern.do")
-						.build().toString()
-				val appSharedSecret =
-					when {
-						loginData.anonymous -> ""
-						skipAppSecret.value == true -> loginData.password
-						else -> loadAppSharedSecret(untisApiUrl)
-							?: return@run
-					}
-				val userDataResponse =
-					loadUserData(untisApiUrl, appSharedSecret)
-						?: return@run
-				val bookmarks =
-					existingUserId?.let { user ->
-						userDatabase.userDao().getById(user)?.bookmarks?.toSet()
-					}
-						?: emptySet()
-				var userId = existingUserId ?: 0
-				val user = User(
-					userId,
-					profileName.value ?: "",
-					untisApiUrl,
-					schoolInfo.schoolId.toString(),
-					if (anonymous.value != true) loginData.user else null,
-					if (anonymous.value != true) appSharedSecret else null,
-					anonymous.value == true,
-					userDataResponse.masterData.timeGrid
-						?: TimeGrid.generateDefault(),
-					userDataResponse.masterData.timeStamp,
-					userDataResponse.userData,
-					userDataResponse.settings,
-					bookmarks = bookmarks
-				)
-
-				userDatabase.userDao().let { dao ->
-					if (existingUserId == null)
-						userId = dao.insert(user)
-					else
-						dao.update(user)
-
-					dao.deleteUserData(userId)
-					dao.insertUserData(
-						userId,
-						userDataResponse.masterData
-					)
-				}
-
-				if (advanced && !proxyUrl.value.isNullOrEmpty())
-					proxyHostPref.saveValue(proxyUrl.value)
-
-				setResult(Activity.RESULT_OK)
-				finish()
-			}
-		}*/
 	}
 
 	private fun buildUser(
