@@ -82,7 +82,7 @@ fun Main(
 			}
 		}
 	) {*/
-	val activeUserId = viewModel.activeUserId.collectAsState()
+	val activeUser = viewModel.activeUser.collectAsState()
 
 		AppScaffold(
 			topBar = {
@@ -104,7 +104,7 @@ fun Main(
 
 						ProfileSelectorAction(
 							users = viewModel.userList,
-							currentSelectionId = activeUserId.value,
+							currentSelection = activeUser.value,
 							showProfileActions = true,
 							onSelectionChange = {
 								viewModel.switchUser(it)
@@ -130,9 +130,11 @@ fun Main(
 					}
 				}
 
-				Text("Current user: ${activeUserId.value}")
-				Button(onClick = { viewModel.toggleTheme() }) {
-					Text(text = "Toggle theme")
+				Column {
+					Text("Current user: ${activeUser.value?.id}")
+					Button(onClick = { viewModel.toggleTheme() }) {
+						Text(text = "Toggle theme")
+					}
 				}
 
 				/*WeekViewCompose(

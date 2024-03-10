@@ -40,7 +40,7 @@ class MainViewModel @Inject constructor(
 	var displayedName by mutableStateOf("")
 		private set
 
-	var activeUserId = userManager.activeUser
+	var activeUser = userManager.activeUser
 
 	init {
 	    viewModelScope.launch {
@@ -92,6 +92,8 @@ class MainViewModel @Inject constructor(
 	}
 
 	fun toggleTheme() {
-		themeManager.toggleTheme(activeUserId.value ?: -1)
+		activeUser.value?.id?.let {
+			themeManager.toggleTheme(it)
+		}
 	}
 }

@@ -2,6 +2,7 @@ package com.sapuseven.untis.modules
 
 import androidx.datastore.preferences.core.edit
 import com.sapuseven.untis.data.databases.entities.User
+import com.sapuseven.untis.data.databases.entities.UserDao
 import com.sapuseven.untis.modules.DataStoreUtil.Companion.USER_ID_KEY
 import dagger.Module
 import dagger.Provides
@@ -20,21 +21,19 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object UserModule {
 	@Provides
-	fun provideUserId(): Int {
-		// TODO: Get the user ID from storage mechanism
-		return -1
-	}
-
-	@Provides
-	fun provideUserManager(dataStoreUtil: DataStoreUtil): UserManager = UserManager(dataStoreUtil)
+	fun provideUserManager(
+		dataStoreUtil: DataStoreUtil,
+		userDao: UserDao
+	): UserManager = UserManager(dataStoreUtil, userDao)
 }
 
 @Singleton
 class UserManager @Inject constructor(
-	private val dataStoreUtil: DataStoreUtil
+	private val dataStoreUtil: DataStoreUtil,
+	private val userDao: UserDao
 ) {
-	private val _userState = MutableStateFlow<Long?>(null)
-	val activeUser: StateFlow<Long?> = _userState
+	private val _userState = MutableStateFlow<User?>(null)
+	val activeUser: StateFlow<User?> = _userState
 
 	private val scope = CoroutineScope(Dispatchers.IO)
 
@@ -42,8 +41,8 @@ class UserManager @Inject constructor(
 		scope.launch(Dispatchers.IO) {
 			dataStoreUtil.globalDataStore.data.map { preferences ->
 				preferences[USER_ID_KEY]
-			}.collect {
-				_userState.value = it
+			}.collect { storedActiveUserId ->
+				_userState.value = storedActiveUserId?.let { userDao.getById(it) }
 			}
 		}
 
