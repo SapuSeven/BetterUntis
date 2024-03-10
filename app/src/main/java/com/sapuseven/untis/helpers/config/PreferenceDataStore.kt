@@ -7,10 +7,10 @@ import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
 
 val Context.preferenceDataStore: DataStore<Preferences> by androidx.datastore.preferences.preferencesDataStore(
-	name = "preferences"
+	name = "preferences_old"
 )
 val Context.globalDataStore: DataStore<Preferences> by androidx.datastore.preferences.preferencesDataStore(
-	name = "global"
+	name = "global_old"
 )
 
 fun Context.intDataStore(

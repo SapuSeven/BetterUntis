@@ -426,6 +426,10 @@ abstract class BaseComposeActivityNew<VM : ActivityViewModel> : BaseComposeActiv
 						setResult(eventData.resultCode)
 					finish()
 				}
+
+				is ActivityEvents.Launch -> {
+					startActivity(Intent(this, eventData.clazz), eventData.data)
+				}
 			}
 		}
 	}

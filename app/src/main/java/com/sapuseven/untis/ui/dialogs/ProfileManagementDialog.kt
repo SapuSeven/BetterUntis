@@ -18,23 +18,21 @@ import androidx.compose.ui.res.stringResource
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.NewMainAppState
 import com.sapuseven.untis.data.databases.entities.User
+import com.sapuseven.untis.ui.activities.main.MainViewModel
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileManagementDialog(
-	state: NewMainAppState,
+	viewModel: MainViewModel,
 	onDismiss: () -> Unit
 ) {
 	var dismissed by remember { mutableStateOf(false) }
-	var users = state.listUsers()
+	var users = viewModel.userList
 	val context = LocalContext.current
-
-	val loginLauncher =
-		rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-			users = state.listUsers() // TODO: Doesn't work, user database is probably read before it's updated
-		}
+	val scope = rememberCoroutineScope()
 
 	var deleteDialog by rememberSaveable { mutableStateOf<User?>(null) }
 
@@ -107,7 +105,7 @@ fun ProfileManagementDialog(
 						}
 					},
 					modifier = Modifier.clickable {
-						state.editUser(user, loginLauncher)
+						viewModel.editUser(user)
 					}
 				)
 			}
@@ -122,7 +120,7 @@ fun ProfileManagementDialog(
 						)
 					},
 					modifier = Modifier.clickable {
-						state.editUser(null, loginLauncher)
+						viewModel.editUser(null)
 					}
 				)
 			}
@@ -147,10 +145,10 @@ fun ProfileManagementDialog(
 				},
 				confirmButton = {
 					TextButton(
-						onClick = {
-							state.deleteUser(user)
+						onClick = { scope.launch {
+							viewModel.deleteUser(user)
 							deleteDialog = null
-						}) {
+						}}) {
 						Text(stringResource(id = R.string.all_delete))
 					}
 				},

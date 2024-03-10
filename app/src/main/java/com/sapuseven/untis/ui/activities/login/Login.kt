@@ -30,12 +30,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
@@ -45,6 +47,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.LoginDataInputActivity
+import com.sapuseven.untis.modules.ThemeManager
 import com.sapuseven.untis.ui.common.AppScaffold
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -88,7 +91,8 @@ fun Login(
 	}
 
 	AppScaffold(topBar = {
-		CenterAlignedTopAppBar(title = { Text(stringResource(id = R.string.app_name)) },
+		CenterAlignedTopAppBar(
+			title = { Text(stringResource(id = R.string.app_name)) },
 			actions = {
 				IconButton(onClick = { viewModel.onCodeScanClick() }) {
 					Icon(
@@ -108,7 +112,12 @@ fun Login(
 						contentDescription = stringResource(id = R.string.all_back)
 					)
 				}
-			})
+			},
+			// TODO: Maybe use this in preferences where the theme can be changed
+			colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+				containerColor = Color.Transparent,
+				scrolledContainerColor = Color.Transparent
+			))
 	}) { innerPadding ->
 		Column(
 			modifier = Modifier

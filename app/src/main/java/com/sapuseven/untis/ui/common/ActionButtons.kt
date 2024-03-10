@@ -26,7 +26,7 @@ import com.sapuseven.untis.data.databases.entities.User
 @Composable
 fun ProfileSelectorAction(
 	users: List<User>,
-	currentSelectionId: Long, // TODO: Better to use a UserDatabase.User reference?
+	currentSelectionId: Long?, // TODO: Better to use a UserDatabase.User reference?
 	showProfileActions: Boolean = false,
 	hideIfSingleProfile: Boolean = false,
 	onSelectionChange: (User) -> Unit,

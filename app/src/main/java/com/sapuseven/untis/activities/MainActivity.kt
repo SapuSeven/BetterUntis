@@ -124,8 +124,8 @@ class MainActivity : BaseComposeActivityNew<MainViewModel>() {
 		super.onCreate(savedInstanceState)
 
 		setContent {
-			AppThemeNew(/*navBarInset = false*/) {
-				Main(viewModel)
+			AppThemeNew(navBarInset = false) {
+				Main()
 				/*withUser(
 								invalidContent = { login() }
 							) { user ->
@@ -600,18 +600,17 @@ fun MainApp(state: NewMainAppState) {
 		)
 	}
 
-	AnimatedVisibility(
+	/*AnimatedVisibility(
 		visible = state.profileManagementDialog,
 		enter = fullscreenDialogAnimationEnter(),
 		exit = fullscreenDialogAnimationExit()
 	) {
 		ProfileManagementDialog(
-			state = state,
 			onDismiss = {
 				state.profileManagementDialog = false
 			}
 		)
-	}
+	}*/
 }
 
 class MainDrawerState constructor(
