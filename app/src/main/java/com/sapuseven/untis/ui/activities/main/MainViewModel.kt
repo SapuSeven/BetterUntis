@@ -3,6 +3,7 @@ package com.sapuseven.untis.ui.activities.main
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.compose.material3.DrawerState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -12,6 +13,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sapuseven.untis.activities.LoginActivity
 import com.sapuseven.untis.activities.LoginDataInputActivity
 import com.sapuseven.untis.data.databases.entities.User
@@ -28,8 +30,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-	val userManager: UserManager,
-	val themeManager: ThemeManager,
+	private val userManager: UserManager,
+	private val themeManager: ThemeManager,
 	private val userDao: UserDao
 ) : ActivityViewModel() {
 	var profileManagementDialog by mutableStateOf(false)

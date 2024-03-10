@@ -8,6 +8,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,10 +16,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,6 +32,8 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -34,6 +41,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -67,31 +75,37 @@ import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNull.content
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Main(
 	viewModel: MainViewModel = viewModel()
 ) {
-	/*Drawer(
-		state = state.mainDrawerState,
-		onShowTimetable = {
+	val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+	val scope = rememberCoroutineScope()
+
+	Drawer(
+		drawerState = drawerState
+		/*onShowTimetable = {
 			it.let { element ->
 				state.setDisplayedElement(element?.first, element?.second)
 			}
-		}
-	) {*/
-	val activeUser = viewModel.activeUser.collectAsState()
+		}*/
+	) {
+		val activeUser = viewModel.activeUser.collectAsState()
 
 		AppScaffold(
 			topBar = {
 				CenterAlignedTopAppBar(
 					title = { Text(viewModel.displayedName) },
 					navigationIcon = {
-						IconButton(onClick = {
-							//viewModel.openDrawer()
-						}) {
+						IconButton(onClick = { scope.launch {
+							drawerState.open()
+						}}) {
 							Icon(
 								imageVector = Icons.Outlined.Menu,
 								contentDescription = stringResource(id = R.string.main_drawer_open)
@@ -223,7 +237,7 @@ fun Main(
 
 			ReportsInfoBottomSheet()
 		}
-	//}
+	}
 
 	AnimatedVisibility(
 		visible = viewModel.profileManagementDialog,
@@ -239,13 +253,15 @@ fun Main(
 	}
 }
 
-/*@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Drawer(
-	state: MainDrawerState,
-	onShowTimetable: (Pair<PeriodElement?, String?>?) -> Unit,
+	viewModel: MainDrawerViewModel = viewModel(),
+	drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
+//onShowTimetable: (Pair<PeriodElement?, String?>?) -> Unit,
 	content: @Composable () -> Unit
 ) {
+	val user by viewModel.user.collectAsState()
 	val scope = rememberCoroutineScope()
 	val drawerScrollState = rememberScrollState()
 
@@ -271,11 +287,11 @@ private fun Drawer(
 			}
 
 			periodElement?.let {
-				onShowTimetable(it to state.timetableDatabaseInterface.getLongName(it))
+				//onShowTimetable(it to state.timetableDatabaseInterface.getLongName(it))
 			}
 		}
 
-	LaunchedEffect(state.drawerState) {
+	/*LaunchedEffect(state.drawerState) {
 		snapshotFlow { state.drawerState.isOpen }
 			.distinctUntilChanged()
 			.drop(1)
@@ -288,17 +304,17 @@ private fun Drawer(
 					Sentry.addBreadcrumb(this)
 				}
 			}
-	}
+	}*/
 
-	BackHandler(enabled = state.drawerState.isOpen) {
+	BackHandler(enabled = drawerState.isOpen) {
 		scope.launch {
-			state.drawerState.close()
+			drawerState.close()
 		}
 	}
 
 	ModalNavigationDrawer(
-		gesturesEnabled = state.drawerGesturesEnabled,
-		drawerState = state.drawerState,
+		gesturesEnabled = viewModel.enableDrawerGestures,
+		drawerState = drawerState,
 		drawerContent = {
 			ModalDrawerSheet(
 				modifier = Modifier
@@ -318,19 +334,19 @@ private fun Drawer(
 						)
 					},
 					label = { Text(stringResource(id = R.string.all_personal_timetable)) },
-					selected = state.isPersonalTimetableDisplayed(),
-					onClick = {
-						state.closeDrawer()
-						onShowTimetable(state.personalTimetable)
-					},
+					selected = viewModel.isPersonalTimetableDisplayed(),
+					onClick = { scope.launch {
+						drawerState.close()
+						//todo onShowTimetable(state.personalTimetable)
+					}},
 					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 				)
 
 				var isBookmarkSelected = false
-				state.getBookmarks().forEach { bookmark ->
-					val isDisplayed = state.displayedElement.value?.let {
+				user?.bookmarks?.forEach { bookmark ->
+					val isDisplayed = false/*state.displayedElement.value?.let {
 						it.id == bookmark.elementId && it.type == bookmark.elementType
-					} == true
+					} == true*/
 					isBookmarkSelected = isBookmarkSelected || isDisplayed
 
 					NavigationDrawerItem(
@@ -352,7 +368,7 @@ private fun Drawer(
 						},
 						badge = {
 							IconButton(
-								onClick = { state.bookmarkDeleteDialog.value = bookmark }
+								onClick = { viewModel.showBookmarkDeleteDialog(bookmark) }
 							) {
 								Icon(
 									painter = painterResource(id = R.drawable.all_bookmark_remove),
@@ -362,9 +378,9 @@ private fun Drawer(
 						},
 						label = { Text(text = bookmark.displayName) },
 						selected = isDisplayed,
-						onClick = {
-							state.closeDrawer()
-							val items = state.timetableDatabaseInterface.getElements(
+						onClick = { scope.launch {
+							drawerState.close()
+							/*todoval items = state.timetableDatabaseInterface.getElements(
 								TimetableDatabaseInterface.Type.valueOf(bookmark.elementType)
 							)
 							val item = items.find {
@@ -372,8 +388,8 @@ private fun Drawer(
 							}
 							onShowTimetable(
 								item to state.timetableDatabaseInterface.getLongName(item!!)
-							)
-						},
+							)*/
+						}},
 						modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 					)
 				}
@@ -387,33 +403,34 @@ private fun Drawer(
 					},
 					label = { Text(stringResource(id = R.string.maindrawer_bookmarks_add)) },
 					selected = false,
-					onClick = {
-						state.closeDrawer()
+					onClick = { scope.launch {
+						drawerState.close()
 						bookmarksElementPicker = TimetableDatabaseInterface.Type.CLASS
-					},
+					}},
 					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 				)
 
 				DrawerText(stringResource(id = R.string.nav_all_timetables))
 
 				DrawerItems(
-					isMessengerAvailable = state.isMessengerAvailable(),
-					disableTypeSelection = state.isPersonalTimetableDisplayed() || isBookmarkSelected,
-					displayedElement = state.displayedElement.value,
-					onTimetableClick = { item ->
-						state.closeDrawer()
+					isMessengerAvailable = false,//todo state.isMessengerAvailable(),
+					disableTypeSelection = false,//todo state.isPersonalTimetableDisplayed() || isBookmarkSelected,
+					displayedElement = null,//todo state.displayedElement.value,
+					onTimetableClick = { item -> scope.launch {
+						drawerState.close()
 						showElementPicker = item.elementType
-					},
-					onShortcutClick = { item ->
-						state.onShortcutItemClick(item, shortcutLauncher)
-					}
+					}},
+					onShortcutClick = { item -> scope.launch {
+						drawerState.close()
+						viewModel.onShortcutItemClick(item, shortcutLauncher)
+					}}
 				)
 			}
 		},
 		content = content
 	)
 
-	AnimatedVisibility(
+	/*AnimatedVisibility(
 		visible = showElementPicker != null,
 		enter = fullscreenDialogAnimationEnter(),
 		exit = fullscreenDialogAnimationExit()
@@ -453,26 +470,26 @@ private fun Drawer(
 			},
 			initialType = bookmarksElementPicker
 		)
-	}
+	}*/
 
-	state.bookmarkDeleteDialog.value?.let { bookmark ->
+	viewModel.bookmarkDeleteDialog?.let { bookmark ->
 		AlertDialog(
 			text = { Text(stringResource(id = R.string.main_dialog_delete_bookmark)) },
-			onDismissRequest = { state.bookmarkDeleteDialog.value = null },
+			onDismissRequest = { viewModel.dismissBookmarkDeleteDialog() },
 			confirmButton = {
 				TextButton(
 					onClick = {
-						state.removeBookmark(bookmark)
+						viewModel.deleteBookmark(bookmark)
 					}) {
 					Text(stringResource(id = R.string.all_delete))
 				}
 			},
 			dismissButton = {
 				TextButton(
-					onClick = { state.bookmarkDeleteDialog.value = null }) {
+					onClick = { viewModel.dismissBookmarkDeleteDialog() }) {
 					Text(stringResource(id = R.string.all_cancel))
 				}
 			}
 		)
 	}
-}*/
+}
