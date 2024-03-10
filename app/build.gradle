@@ -16,7 +16,7 @@ static def generateVersionCode() {
 }
 
 android {
-	compileSdkVersion 33
+	compileSdkVersion 34
 	namespace 'com.sapuseven.untis'
 
 	androidResources {

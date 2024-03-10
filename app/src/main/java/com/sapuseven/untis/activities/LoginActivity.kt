@@ -20,7 +20,7 @@ class LoginActivity : BaseComposeActivityNew<LoginViewModel>() {
 		lifecycle.addObserver(viewModel.codeScanService as CodeScanServiceImpl)
 
 		setContent {
-			AppTheme {
+			AppThemeNew {
 				Login(viewModel)
 			}
 		}

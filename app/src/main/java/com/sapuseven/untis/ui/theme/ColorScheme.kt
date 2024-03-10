@@ -3,6 +3,8 @@ package com.sapuseven.untis.ui.theme
 import android.content.Context
 import android.os.Build
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -68,7 +70,7 @@ fun Scheme.toColorScheme(): ColorScheme =
 @Composable
 private fun animateColor(targetValue: Color) = animateColorAsState(
 	targetValue = targetValue,
-	animationSpec = tween(),
+	animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
 	label = "themeColor"
 ).value
 

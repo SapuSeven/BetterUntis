@@ -11,22 +11,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.sapuseven.untis.modules.ThemeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Main(
-	viewModel: MainViewModel = viewModel(),
-	themeViewModel: ThemeViewModel = viewModel()
+	viewModel: MainViewModel = viewModel()
 ) {
-	val themeState by themeViewModel.themeState.collectAsState()
-
-	Column(
-		modifier = Modifier.padding(top = 48.dp)
-	) {
-		Text(text = "Dark mode: ${themeState.isDarkMode}")
-		Button(onClick = { themeViewModel.toggleTheme() }) {
-			Text(text = "Toggle")
-		}
-	}
 }
