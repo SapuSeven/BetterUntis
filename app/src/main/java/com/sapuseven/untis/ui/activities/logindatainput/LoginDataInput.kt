@@ -51,7 +51,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.sapuseven.untis.R
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.LabeledCheckbox
@@ -66,7 +68,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun LoginDataInput(
-	viewModel: LoginDataInputViewModel = viewModel()
+	navController: NavHostController,
+	viewModel: LoginDataInputViewModel = hiltViewModel()
 ) {
 	val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 

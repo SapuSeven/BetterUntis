@@ -57,6 +57,7 @@
 
 		<activity
 			android:name=".activities.MainActivity"
+			android:windowSoftInputMode="adjustResize"
 			android:launchMode="singleTop"
 			android:exported="true">
 

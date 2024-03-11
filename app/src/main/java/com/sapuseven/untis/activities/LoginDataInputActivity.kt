@@ -42,10 +42,5 @@ class LoginDataInputActivity : BaseComposeActivityNew<LoginDataInputViewModel>()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		setContent {
-			AppThemeNew {
-				LoginDataInput(viewModel)
-			}
-		}
 	}
 }

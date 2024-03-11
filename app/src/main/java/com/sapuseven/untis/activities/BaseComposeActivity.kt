@@ -89,9 +89,6 @@ abstract class BaseComposeActivity : ComponentActivity() {
 
 	private var dialogOpenUrl: MutableState<String?>? = null
 
-	@Inject
-	internal lateinit var themeManager: ThemeManager
-
 	companion object {
 		const val EXTRA_LONG_USER_ID = "com.sapuseven.untis.activities.profileid"
 		private const val EXTRA_INT_BACKGROUND_COLOR =
@@ -196,53 +193,6 @@ abstract class BaseComposeActivity : ComponentActivity() {
 
 	fun currentUserId() = user?.id ?: -1
 
-	@Composable
-	fun AppThemeNew(
-		//initialDarkTheme: Boolean = isSystemInDarkTheme(),
-		navBarInset: Boolean = true,
-		systemUiController: SystemUiController? = rememberSystemUiController(),
-		dynamicColor: Boolean = true,
-		content: @Composable () -> Unit
-	) {
-		val themeState by themeManager.themeState.collectAsState()
-
-		val colorScheme = when {
-			dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-				val context = LocalContext.current
-				if (themeState.isDarkMode) dynamicDarkColorScheme(context) else dynamicLightColorScheme(
-					context
-				)
-			}
-
-			themeState.isDarkMode -> Scheme.dark(Color.Red.toArgb()).toColorScheme()
-			else -> Scheme.light(Color.Red.toArgb()).toColorScheme()
-		}
-
-		Log.d("AppTheme", "dark mode: ${themeState.isDarkMode}")
-
-		MaterialTheme(
-			colorScheme = colorScheme.animated()
-		) {
-			val darkIcons = MaterialTheme.colorScheme.background.luminance() > .5f
-
-			Surface(
-				modifier = Modifier
-					.fillMaxSize()
-					.background(MaterialTheme.colorScheme.background)
-					.conditional(navBarInset) {
-						bottomInsets()
-					}
-					.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)),
-				content = content
-			)
-
-			SideEffect {
-				systemUiController?.let {
-					setSystemUiColor(it, Color.Transparent, darkIcons)
-				}
-			}
-		}
-	}
 
 	@Composable
 	fun AppTheme(

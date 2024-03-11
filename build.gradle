@@ -10,6 +10,7 @@ buildscript {
 	ext.junit_version = '5.9.3'
 	ext.ktor_version = '2.3.5'
 	ext.dagger_version = '2.51'
+	ext.nav_version = '2.7.7'
 
 	repositories {
 		google()

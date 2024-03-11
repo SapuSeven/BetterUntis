@@ -4,15 +4,18 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -20,6 +23,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -34,7 +38,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -43,9 +49,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat.recreate
 import androidx.core.graphics.ColorUtils
+import androidx.core.view.WindowCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.systemuicontroller.SystemUiController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_HIGHLIGHT
@@ -62,6 +74,7 @@ import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.models.TimetableBookmark
 import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import com.sapuseven.untis.modules.ThemeManager
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.activities.login.LoginViewModel
@@ -76,8 +89,12 @@ import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
 import com.sapuseven.untis.ui.dialogs.TimetableItemDetailsDialog
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
+import com.sapuseven.untis.ui.material.scheme.Scheme
 import com.sapuseven.untis.ui.models.NavItemShortcut
+import com.sapuseven.untis.ui.navigation.AppNavHost
 import com.sapuseven.untis.ui.preferences.convertRangeToPair
+import com.sapuseven.untis.ui.theme.animated
+import com.sapuseven.untis.ui.theme.toColorScheme
 import com.sapuseven.untis.ui.weekview.*
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Breadcrumb
@@ -86,15 +103,15 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNull.content
 import org.joda.time.*
 import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
 import java.util.*
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : BaseComposeActivityNew<MainViewModel>() {
-	override val viewModel: MainViewModel by viewModels()
-
+class MainActivity : ComponentActivity() {
 	companion object {
 		const val MESSENGER_PACKAGE_NAME = "com.untis.chat"
 
@@ -102,6 +119,9 @@ class MainActivity : BaseComposeActivityNew<MainViewModel>() {
 	}
 
 	private val weekViewRefreshHandler = Handler(Looper.getMainLooper())
+
+	@Inject
+	internal lateinit var themeManager: ThemeManager
 
 	// TODO
 	/*private val weekViewUpdate = object : Runnable {
@@ -121,11 +141,21 @@ class MainActivity : BaseComposeActivityNew<MainViewModel>() {
 
 	@OptIn(ExperimentalMaterial3Api::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
+		enableEdgeToEdge()
 		super.onCreate(savedInstanceState)
 
 		setContent {
-			AppThemeNew(navBarInset = false) {
-				Main()
+			AppTheme {
+				Surface(
+					modifier = Modifier
+						.fillMaxSize()
+						//.bottomInsets() // todo when the content should be below the bottom bars, remove this
+						//.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top))
+						//.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top))
+				) {
+					AppNavHost(navController = rememberNavController())
+				}
+
 				/*withUser(
 								invalidContent = { login() }
 							) { user ->
@@ -179,11 +209,69 @@ class MainActivity : BaseComposeActivityNew<MainViewModel>() {
 
 	private fun login() {
 		loginLauncher.launch(Intent(this, LoginActivity::class.java).apply {
-			putUserIdExtra(this)
-			putBackgroundColorExtra(this)
+			//putUserIdExtra(this)
+			//putBackgroundColorExtra(this)
 		})
 	}
 
+	fun setSystemUiColor(
+		systemUiController: SystemUiController,
+		color: Color = Color.Transparent,
+		darkIcons: Boolean = color.luminance() > 0.5f
+	) {
+		systemUiController.run {
+			setSystemBarsColor(
+				color = color,
+				darkIcons = darkIcons
+			)
+
+			setNavigationBarColor(
+				color = color,
+				darkIcons = darkIcons
+			)
+		}
+	}
+
+	@Composable
+	fun AppTheme(
+		//initialDarkTheme: Boolean = isSystemInDarkTheme(),
+		systemUiController: SystemUiController? = rememberSystemUiController(),
+		dynamicColor: Boolean = true,
+		content: @Composable () -> Unit
+	) {
+		val themeState by themeManager.themeState.collectAsState()
+
+		val colorScheme = when {
+			dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+				val context = LocalContext.current
+				if (themeState.isDarkMode) dynamicDarkColorScheme(context) else dynamicLightColorScheme(
+					context
+				)
+			}
+
+			themeState.isDarkMode -> Scheme.dark(Color.Red.toArgb()).toColorScheme()
+			else -> Scheme.light(Color.Red.toArgb()).toColorScheme()
+		}
+
+		SideEffect {
+			systemUiController?.let {
+				setSystemUiColor(it, Color.Transparent)
+			}
+		}
+
+		MaterialTheme(
+			colorScheme = colorScheme,//.animated(),
+			content = content
+		) /*{
+			val darkIcons = MaterialTheme.colorScheme.background.luminance() > .5f
+
+			SideEffect {
+				systemUiController?.let {
+					setSystemUiColor(it, Color.Transparent, darkIcons)
+				}
+			}
+		}*/
+	}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

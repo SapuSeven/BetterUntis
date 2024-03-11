@@ -1,11 +1,9 @@
 package com.sapuseven.untis.ui.activities.login
 
-import android.app.Activity
 import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -44,18 +43,20 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.LoginDataInputActivity
-import com.sapuseven.untis.modules.ThemeManager
 import com.sapuseven.untis.ui.common.AppScaffold
+import com.sapuseven.untis.ui.navigation.NavigationItem
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.serialization.ExperimentalSerializationApi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Login(
-	viewModel: LoginViewModel = viewModel()
+	navController: NavHostController,
+	viewModel: LoginViewModel = hiltViewModel()
 ) {
 	val context = LocalContext.current
 	val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -74,11 +75,7 @@ fun Login(
 				}
 
 				is LoginEvents.StartLoginActivity -> {
-					loginLauncher.launch(
-						Intent(context, LoginDataInputActivity::class.java).apply {
-							setData(event.data)
-							replaceExtras(event.extras)
-						})
+					navController.navigate(NavigationItem.LoginDataInput.route)
 				}
 			}
 		}
@@ -90,35 +87,40 @@ fun Login(
 		viewModel.goBack()
 	}
 
-	AppScaffold(topBar = {
-		CenterAlignedTopAppBar(
-			title = { Text(stringResource(id = R.string.app_name)) },
-			actions = {
-				IconButton(onClick = { viewModel.onCodeScanClick() }) {
-					Icon(
-						painter = painterResource(id = R.drawable.login_scan_code),
-						contentDescription = stringResource(id = R.string.login_scan_code)
-					)
-				}
-			},
-			navigationIcon = {
-				if (viewModel.shouldShowBackButton.value) IconButton(onClick = {
-					if (viewModel.goBack()) {
-						onBackPressedDispatcher?.onBackPressed()
+	AppScaffold(
+		topBar = {
+			CenterAlignedTopAppBar(
+				title = { Text(stringResource(id = R.string.app_name)) },
+				actions = {
+					IconButton(onClick = { viewModel.onCodeScanClick() }) {
+						Icon(
+							painter = painterResource(id = R.drawable.login_scan_code),
+							contentDescription = stringResource(id = R.string.login_scan_code)
+						)
 					}
-				}) {
-					Icon(
-						imageVector = Icons.Outlined.ArrowBack,
-						contentDescription = stringResource(id = R.string.all_back)
-					)
-				}
-			},
-			// TODO: Maybe use this in preferences where the theme can be changed
-			colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-				containerColor = Color.Transparent,
-				scrolledContainerColor = Color.Transparent
-			))
-	}) { innerPadding ->
+				},
+				navigationIcon = {
+					if (viewModel.shouldShowBackButton.value) IconButton(onClick = {
+						if (viewModel.goBack()) {
+							onBackPressedDispatcher?.onBackPressed()
+						}
+					}) {
+						Icon(
+							imageVector = Icons.Outlined.ArrowBack,
+							contentDescription = stringResource(id = R.string.all_back)
+						)
+					}
+				},
+				// TODO: Maybe use this in preferences where the theme can be changed
+				colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+					containerColor = Color.Transparent,
+					scrolledContainerColor = Color.Transparent
+				)
+			)
+		},
+		modifier = Modifier
+			.safeDrawingPadding()
+	) { innerPadding ->
 		Column(
 			modifier = Modifier
 				.padding(innerPadding)

@@ -18,12 +18,6 @@ class LoginActivity : BaseComposeActivityNew<LoginViewModel>() {
 		super.onCreate(savedInstanceState)
 		viewModel.codeScanService.setResultRegistry(activityResultRegistry) // Ugly, but I can't for the life of me make this work with Dagger/Hilt without assigning it manually.
 		lifecycle.addObserver(viewModel.codeScanService as CodeScanServiceImpl)
-
-		setContent {
-			AppThemeNew {
-				Login(viewModel)
-			}
-		}
 	}
 
 	override fun onDestroy() {
