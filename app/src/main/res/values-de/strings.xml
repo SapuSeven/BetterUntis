@@ -157,6 +157,8 @@
     <string name="preference_automute_minimum_break_length">Mindestpausendauer</string>
     <string name="preference_background_cancelled">Entfallene Stunden</string>
     <string name="preference_background_cancelled_past">Vergangene entfallene Stunden</string>
+    <string name="preference_background_homework">Stunden mit Hausaufgaben</string>
+    <string name="preference_background_homework_past">Vergangene Stunden mit Hausaufgaben</string>
     <string name="preference_background_exam">Stunden mit Tests</string>
     <string name="preference_background_exam_past">Vergangene Stunden mit Tests</string>
     <string name="preference_background_future">Hintergrundfarbe zukünftiger Tage</string>

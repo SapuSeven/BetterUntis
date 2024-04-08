@@ -30,6 +30,8 @@
 	<integer name="preference_background_irregular_past_default">0xFF388E3C</integer>
 	<integer name="preference_background_cancelled_default">0xFF9E9E9E</integer>
 	<integer name="preference_background_cancelled_past_default">0xFF616161</integer>
+	<integer name="preference_background_homework_default">0xFFCD9E</integer>
+	<integer name="preference_background_homework_past_default">0xFFB661</integer>
 	<integer name="preference_background_future_default">0x00000000</integer>
 	<integer name="preference_background_past_default">0x40808080</integer>
 	<integer name="preference_marker_default">0xFFFFFFFF</integer>

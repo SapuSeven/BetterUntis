@@ -458,6 +458,26 @@ class SettingsActivity : BaseComposeActivity() {
 											)
 
 											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_homework)) },
+												dependency = dataStorePreferences.schoolBackground.with(
+													dependencyValue = { !it.contains("homework") }
+												),
+												dataStore = dataStorePreferences.backgroundHomework,
+												showAlphaSlider = true,
+												defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+											)
+
+											ColorPreference(
+												title = { Text(stringResource(R.string.preference_background_homework_past)) },
+												dependency = dataStorePreferences.schoolBackground.with(
+													dependencyValue = { !it.contains("homework") }
+												),
+												dataStore = dataStorePreferences.backgroundHomeworkPast,
+												showAlphaSlider = true,
+												defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+											)
+
+											ColorPreference(
 												title = { Text(stringResource(R.string.preference_background_irregular)) },
 												dependency = dataStorePreferences.schoolBackground.with(
 													dependencyValue = { !it.contains("irregular") }

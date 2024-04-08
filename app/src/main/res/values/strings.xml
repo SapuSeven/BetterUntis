@@ -198,6 +198,8 @@
     <string name="preference_automute_mute_priority">Don\'t allow priority events to ignore aute-mute</string>
     <string name="preference_background_cancelled">Cancelled lessons</string>
     <string name="preference_background_cancelled_past">Past cancelled lessons</string>
+    <string name="preference_background_homework">Lessons with homework</string>
+    <string name="preference_background_homework_past">Past lessons with homework</string>
     <string name="preference_background_exam">Lessons with tests</string>
     <string name="preference_background_exam_past">Past lessons with tests</string>
     <string name="preference_background_future">Future day background</string>
