@@ -27,6 +27,7 @@
     <string name="activity_title_errors">Ошибки</string>
     <string name="all_dialog_datepicker_button_today">Сегодня</string>
     <string name="logindatainput_connecting">Соединение…</string>
+    <string name="preference_background_homework">Уроки с домашним заданием</string>
     <string name="preference_background_exam">Уроки с тестами</string>
     <string name="all_classes">Классы</string>
     <string name="all_no">Нет</string>

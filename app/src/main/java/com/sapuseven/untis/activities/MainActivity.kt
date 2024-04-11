@@ -916,6 +916,8 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		val examPastColor = weekViewPreferences.backgroundExamPast.value
 		val cancelledColor = weekViewPreferences.backgroundCancelled.value
 		val cancelledPastColor = weekViewPreferences.backgroundCancelledPast.value
+		val homeworkColor = weekViewPreferences.backgroundHomework.value
+		val homeworkPastColor = weekViewPreferences.backgroundHomeworkPast.value
 		val irregularColor = weekViewPreferences.backgroundIrregular.value
 		val irregularPastColor = weekViewPreferences.backgroundIrregularPast.value
 
@@ -930,6 +932,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor else examColor
 				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else cancelledColor
 				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else irregularColor
+				item.periodData.element.homeWorks?.isNotEmpty() == true -> homeworkColor
 				else -> if (useDefault.contains("regular")) defaultColor else regularColor
 			}
 
@@ -945,6 +948,8 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(
 					0.25f
 				) else irregularPastColor
+
+				item.periodData.element.homeWorks?.isNotEmpty() == true -> homeworkPastColor
 
 				else -> if (useDefault.contains("regular")) defaultColor.darken(0.25f) else regularPastColor
 			}
@@ -1165,6 +1170,8 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		var backgroundExamPast: State<Int>,
 		var backgroundCancelled: State<Int>,
 		var backgroundCancelledPast: State<Int>,
+		var backgroundHomework: State<Int>,
+		var backgroundHomeworkPast: State<Int>,
 		var backgroundIrregular: State<Int>,
 		var backgroundIrregularPast: State<Int>,
 		var weekLength: State<Int>,
@@ -2088,6 +2095,8 @@ fun rememberWeekViewPreferences(
 	backgroundExamPast: State<Int> = preferences.backgroundExamPast.getState(),
 	backgroundCancelled: State<Int> = preferences.backgroundCancelled.getState(),
 	backgroundCancelledPast: State<Int> = preferences.backgroundCancelledPast.getState(),
+	backgroundHomework: State<Int> = preferences.backgroundHomework.getState(),
+	backgroundHomeworkPast: State<Int> = preferences.backgroundHomeworkPast.getState(),
 	backgroundIrregular: State<Int> = preferences.backgroundIrregular.getState(),
 	backgroundIrregularPast: State<Int> = preferences.backgroundIrregularPast.getState(),
 	weekLength: State<Int> = preferences.weekCustomRange.getValueFlow()
@@ -2117,6 +2126,8 @@ fun rememberWeekViewPreferences(
 		backgroundExamPast = backgroundExamPast,
 		backgroundCancelled = backgroundCancelled,
 		backgroundCancelledPast = backgroundCancelledPast,
+		backgroundHomework = backgroundHomework,
+		backgroundHomeworkPast = backgroundHomeworkPast,
 		backgroundIrregular = backgroundIrregular,
 		backgroundIrregularPast = backgroundIrregularPast,
 		weekLength = weekLength,

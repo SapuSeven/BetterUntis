@@ -44,6 +44,7 @@
     <string name="preference_background_irregular_past">Geçmiş düzensiz dersler</string>
     <string name="preference_background_irregular">Düzensiz dersler</string>
     <string name="preference_background_exam_past">Geçmiş testi bulunan dersler</string>
+    <string name="preference_background_homework">Ev ödevli dersler</string>
     <string name="preference_background_exam">Testi bulunan dersler</string>
     <string name="preference_background_cancelled_past">Geçmiş iptal edilen dersler</string>
     <string name="preference_background_cancelled">İptal edilen dersler</string>

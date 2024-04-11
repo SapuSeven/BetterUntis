@@ -244,6 +244,7 @@
     <string name="preference_background_irregular">Ezohiko eskolak</string>
     <string name="preference_background_cancelled_past">Iraganean bertan behera utzi diren eskolak</string>
     <string name="preference_background_exam_past">Iraganean azterketak izan dituzten eskolak</string>
+    <string name="preference_background_homework">Ikasgaiak etxeko lanekin</string>
     <string name="preference_background_exam">Azterketak dituzten eskolak</string>
     <string name="preference_background_cancelled">Bertan behera utzitako eskolak</string>
     <string name="preference_automute_enable_summary">Ez molestatu modua automatikoki aktibatzen du eskola orduetan</string>

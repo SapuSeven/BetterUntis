@@ -1,16 +1,20 @@
 package com.sapuseven.untis.preferences
 
+import android.graphics.Color
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.toColor
 import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.helpers.config.*
 import com.sapuseven.untis.ui.preferences.materialColors
 
 val BaseComposeActivity.dataStorePreferences: DataStorePreferences
-	@Composable
+	@RequiresApi(Build.VERSION_CODES.O) @Composable
 	get() = LocalContext.current.run {
 		DataStorePreferences(
 			doubleTapToExit = this.booleanDataStore(
@@ -106,6 +110,16 @@ val BaseComposeActivity.dataStorePreferences: DataStorePreferences
 				currentUserId(),
 				"preference_background_cancelled_past",
 				defaultValue = MaterialTheme.colorScheme.secondary.copy(alpha = .7f).toArgb()
+			),
+			backgroundHomework = this.intDataStore(
+				currentUserId(),
+				"preference_background_homework",
+				defaultValue = ColorUtils.blendARGB(MaterialTheme.colorScheme.primary.toArgb(), MaterialTheme.colorScheme.error.toArgb(), .7f).toColor().toArgb()
+			),
+			backgroundHomeworkPast = this.intDataStore(
+				currentUserId(),
+				"preference_background_homework_past",
+				defaultValue = ColorUtils.setAlphaComponent(ColorUtils.blendARGB(MaterialTheme.colorScheme.primary.toArgb(), MaterialTheme.colorScheme.error.toArgb(), .7f).toColor().toArgb(), 178)
 			),
 			themeColor = this.intDataStore(
 				currentUserId(),
@@ -270,6 +284,8 @@ class DataStorePreferences(
 	val backgroundIrregularPast: UntisPreferenceDataStore<Int>,
 	val backgroundCancelled: UntisPreferenceDataStore<Int>,
 	val backgroundCancelledPast: UntisPreferenceDataStore<Int>,
+	val backgroundHomework: UntisPreferenceDataStore<Int>,
+	val backgroundHomeworkPast: UntisPreferenceDataStore<Int>,
 	val themeColor: UntisPreferenceDataStore<Int>,
 	val darkTheme: UntisPreferenceDataStore<String>,
 	val darkThemeOled: UntisPreferenceDataStore<Boolean>,

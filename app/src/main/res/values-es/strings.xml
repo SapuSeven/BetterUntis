@@ -116,4 +116,5 @@
     <string name="infocenter_absence_unknown_reason">Causa desconocida</string>
     <string name="infocenter_timeformat_sameday">%2$s - %4$s, %1$s</string>
     <string name="infocenter_absences_filter_oldest_first">Primero el más antiguo</string>
+    <string name="preference_background_homework">Lecciones con deberes</string>
 </resources>

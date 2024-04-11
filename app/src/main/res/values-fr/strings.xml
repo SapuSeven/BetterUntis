@@ -122,6 +122,7 @@
     <string name="preference_background_irregular">Cours irréguliers</string>
     <string name="preference_background_future">Arrière-plan pour journée à venir</string>
     <string name="preference_background_exam_past">Anciens cours avec un examen</string>
+    <string name="preference_background_homework">Cours avec devoirs</string>
     <string name="preference_background_exam">Cours avec un examen</string>
     <string name="preference_background_cancelled_past">Anciens cours annulés</string>
     <string name="preference_background_cancelled">Cours annulés</string>
