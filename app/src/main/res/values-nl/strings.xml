@@ -76,4 +76,5 @@
     <string name="all_absences">Afwezigheden</string>
     <string name="all_homework">Huiswerk</string>
     <string name="errormessagedictionary_invalid_server_url">Ongeldige server URL!</string>
+    <string name="preference_background_homework">Cursussen met huiswerk</string>
 </resources>

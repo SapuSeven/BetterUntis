@@ -255,6 +255,7 @@
     <string name="preference_background_exam_past">考试课程（过期）</string>
     <string name="preference_background_irregular_past">不定期课程（过期）</string>
     <string name="preference_background_future">未来日期背景</string>
+    <string name="preference_background_homework">有家庭作业的课程</string>
     <string name="preference_background_exam">考试课程</string>
     <string name="preference_background_irregular">不定期课程</string>
     <string name="notifications_text_message_separator">"/ "</string>

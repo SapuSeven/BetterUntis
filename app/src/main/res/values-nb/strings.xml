@@ -130,6 +130,7 @@
     <string name="preference_automute_cancelled_lessons">Forstum kansellerte skoletimer også</string>
     <string name="preference_background_cancelled">Kansellerte leksjoner</string>
     <string name="preference_background_cancelled_past">Tidligere kansellerte leksjoner</string>
+    <string name="preference_background_homework">Leksjoner med lekser</string>
     <string name="preference_background_exam">Leksjoner med prøver</string>
     <string name="preference_background_exam_past">Tidligere leksjoner med prøver</string>
     <string name="preference_background_future">Bakgrunn for fremtidig dager</string>
