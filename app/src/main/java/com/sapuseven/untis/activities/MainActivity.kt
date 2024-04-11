@@ -929,16 +929,14 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 				android.graphics.Color.parseColor(item.periodData.element.foreColor)
 
 			item.color = when {
-				item.periodData.element.homeWorks?.isNotEmpty() == true -> homeworkColor
 				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor else examColor
 				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else cancelledColor
 				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else irregularColor
+				item.periodData.element.homeWorks?.isNotEmpty() == true -> homeworkColor
 				else -> if (useDefault.contains("regular")) defaultColor else regularColor
 			}
 
 			item.pastColor = when {
-				item.periodData.element.homeWorks?.isNotEmpty() == true -> homeworkPastColor
-
 				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor.darken(
 					0.25f
 				) else examPastColor
@@ -950,6 +948,8 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(
 					0.25f
 				) else irregularPastColor
+
+				item.periodData.element.homeWorks?.isNotEmpty() == true -> homeworkPastColor
 
 				else -> if (useDefault.contains("regular")) defaultColor.darken(0.25f) else regularPastColor
 			}
