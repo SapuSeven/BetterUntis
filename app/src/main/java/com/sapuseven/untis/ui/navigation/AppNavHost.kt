@@ -1,5 +1,7 @@
 package com.sapuseven.untis.ui.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -44,9 +46,39 @@ fun AppNavHost(
 	NavHost(
 		modifier = modifier,
 		navController = navController,
-		startDestination = startDestination
+		startDestination = startDestination,
+		enterTransition = {
+			slideIntoContainer(
+				AnimatedContentTransitionScope.SlideDirection.Left,
+				animationSpec = tween(500)
+			)
+		},
+		exitTransition = {
+			slideOutOfContainer(
+				AnimatedContentTransitionScope.SlideDirection.Left,
+				animationSpec = tween(500)
+			)
+		},
+		popEnterTransition = {
+			slideIntoContainer(
+				AnimatedContentTransitionScope.SlideDirection.Right,
+				animationSpec = tween(500)
+			)
+		},
+		popExitTransition = {
+			slideOutOfContainer(
+				AnimatedContentTransitionScope.SlideDirection.Right,
+				animationSpec = tween(500)
+			)
+		}
 	) {
-		composable(NavigationItem.Splash.route) { Splash() }
+		composable(
+			NavigationItem.Splash.route,
+			enterTransition = null,
+			exitTransition = null,
+			popEnterTransition = null,
+			popExitTransition = null,
+		) { Splash() }
 		composable(NavigationItem.Login.route) { Login() }
 		composable(
 			NavigationItem.LoginDataInput.route,
