@@ -1,6 +1,5 @@
 package com.sapuseven.untis.ui.activities.login
 
-import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -46,7 +45,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.LoginDataInputActivity
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.navigation.NavigationItem
 import kotlinx.coroutines.flow.collectLatest
@@ -72,10 +70,6 @@ fun Login(
 			when (event) {
 				LoginEvents.ClearFocus -> {
 					focusManager.clearFocus()
-				}
-
-				is LoginEvents.StartLoginActivity -> {
-					navController.navigate(NavigationItem.LoginDataInput.route)
 				}
 			}
 		}

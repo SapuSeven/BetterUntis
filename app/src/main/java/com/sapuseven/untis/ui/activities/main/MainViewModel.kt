@@ -1,7 +1,9 @@
 package com.sapuseven.untis.ui.activities.main
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.compose.material3.DrawerState
 import androidx.compose.runtime.MutableState
@@ -18,10 +20,12 @@ import com.sapuseven.untis.activities.LoginActivity
 import com.sapuseven.untis.activities.LoginDataInputActivity
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.databases.entities.UserDao
+import com.sapuseven.untis.modules.DataStoreUtil
 import com.sapuseven.untis.modules.ThemeManager
 import com.sapuseven.untis.modules.UserManager
 import com.sapuseven.untis.ui.activities.ActivityEvents
 import com.sapuseven.untis.ui.activities.ActivityViewModel
+import com.sapuseven.untis.ui.navigation.AppNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,6 +34,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
+	val navigator: AppNavigator,
 	private val userManager: UserManager,
 	private val themeManager: ThemeManager,
 	private val userDao: UserDao
@@ -45,7 +50,7 @@ class MainViewModel @Inject constructor(
 	var activeUser = userManager.activeUser
 
 	init {
-	    viewModelScope.launch {
+		viewModelScope.launch {
 			userList.addAll(getUserList())
 		}
 	}
@@ -79,7 +84,7 @@ class MainViewModel @Inject constructor(
 		userDao.delete(user)
 		//contextActivity.deleteProfile(user.id)
 		//if (userDatabase.userDao().getAll().isEmpty())
-			//contextActivity.recreate()
+		//contextActivity.recreate()
 	}
 
 	fun switchUser(user: User) {

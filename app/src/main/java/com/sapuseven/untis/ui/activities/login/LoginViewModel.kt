@@ -12,6 +12,7 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.Navigator
 import com.sapuseven.untis.activities.LoginActivity.Companion.EXTRA_BOOLEAN_SHOW_BACK_BUTTON
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_DEMO_LOGIN
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_STRING_SCHOOL_INFO
@@ -23,6 +24,8 @@ import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.services.CodeScanService
 import com.sapuseven.untis.ui.activities.ActivityEvents
 import com.sapuseven.untis.ui.activities.ActivityViewModel
+import com.sapuseven.untis.ui.navigation.AppNavigator
+import com.sapuseven.untis.ui.navigation.NavigationActions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -35,6 +38,7 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
 	val schoolSearchApi: SchoolSearchApi,
 	val codeScanService: CodeScanService,
+	private val navigator: AppNavigator,
 	savedStateHandle: SavedStateHandle
 ) : ActivityViewModel() {
 	val debounceMillis: Long = 300
@@ -132,43 +136,22 @@ class LoginViewModel @Inject constructor(
 
 	// onClick listeners
 	fun onSchoolSelected(school: SchoolInfo) {
-		viewModelScope.launch {
-			events.emit(
-				LoginEvents.StartLoginActivity(
-					extras = bundleOf(
-						EXTRA_STRING_SCHOOL_INFO to getJSON().encodeToString(
-							school
-						)
-					)
-				)
-			)
-		}
+		navigator.navigate(NavigationActions.Login.toDataInput(schoolInfo = school))
 	}
 
 	fun onCodeScanClick() {
-		codeScanService.scanCode {
+		/* TODO codeScanService.scanCode {
 			viewModelScope.launch {
 				events.emit(LoginEvents.StartLoginActivity(data = it))
 			}
-		}
+		}*/
 	}
 
 	fun onDemoClick() {
-		viewModelScope.launch {
-			val bundle = Bundle().apply {
-				//TODO add putBackgroundColorExtra(this)
-				putBoolean(EXTRA_BOOLEAN_DEMO_LOGIN, true)
-			}
-			events.emit(LoginEvents.StartLoginActivity(extras = bundle))
-		}
+		navigator.navigate(NavigationActions.Login.toDataInput(demoLogin = true))
 	}
 
 	fun onManualDataInputClick() {
-		viewModelScope.launch {
-			val bundle = Bundle().apply {
-				//TODO add putBackgroundColorExtra(this)
-			}
-			events.emit(LoginEvents.StartLoginActivity(extras = bundle))
-		}
+		navigator.navigate(NavigationActions.Login.toDataInput())
 	}
 }

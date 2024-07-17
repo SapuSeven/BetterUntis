@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.BaseComposeActivity.Companion.EXTRA_LONG_USER_ID
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.DEMO_API_URL
@@ -31,6 +32,7 @@ import com.sapuseven.untis.helpers.ErrorMessageDictionary.ERROR_CODE_TOO_MANY_RE
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.ui.activities.ActivityEvents
 import com.sapuseven.untis.ui.activities.ActivityViewModel
+import com.sapuseven.untis.ui.navigation.AppNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -47,6 +49,7 @@ class LoginDataInputViewModel @Inject constructor(
 	val schoolSearchApi: SchoolSearchApi,
 	val userDataApi: UserDataApi,
 	val userDao: UserDao,
+	val navController: AppNavigator,
 	savedStateHandle: SavedStateHandle
 ) : ActivityViewModel() {
 	val existingUserId = savedStateHandle.get<Long>(EXTRA_LONG_USER_ID)

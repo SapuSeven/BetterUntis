@@ -23,15 +23,57 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.absolutePadding
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -47,15 +89,13 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat.recreate
 import androidx.core.graphics.ColorUtils
-import androidx.core.view.WindowCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.navOptions
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.BuildConfig
@@ -77,41 +117,66 @@ import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.modules.ThemeManager
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
-import com.sapuseven.untis.ui.activities.login.LoginViewModel
-import com.sapuseven.untis.ui.activities.main.Main
 import com.sapuseven.untis.ui.activities.main.MainViewModel
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
-import com.sapuseven.untis.ui.common.*
+import com.sapuseven.untis.ui.common.AppScaffold
+import com.sapuseven.untis.ui.common.DebugDesclaimerAction
+import com.sapuseven.untis.ui.common.ProfileSelectorAction
+import com.sapuseven.untis.ui.common.ReportsInfoBottomSheet
+import com.sapuseven.untis.ui.common.Weekday
+import com.sapuseven.untis.ui.common.disabled
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.dialogs.FeedbackDialog
-import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
 import com.sapuseven.untis.ui.dialogs.TimetableItemDetailsDialog
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.material.scheme.Scheme
 import com.sapuseven.untis.ui.models.NavItemShortcut
 import com.sapuseven.untis.ui.navigation.AppNavHost
+import com.sapuseven.untis.ui.navigation.NavigationActions
+import com.sapuseven.untis.ui.navigation.NavigationItem
 import com.sapuseven.untis.ui.preferences.convertRangeToPair
-import com.sapuseven.untis.ui.theme.animated
 import com.sapuseven.untis.ui.theme.toColorScheme
-import com.sapuseven.untis.ui.weekview.*
+import com.sapuseven.untis.ui.weekview.Event
+import com.sapuseven.untis.ui.weekview.WeekViewColorScheme
+import com.sapuseven.untis.ui.weekview.WeekViewCompose
+import com.sapuseven.untis.ui.weekview.WeekViewHour
+import com.sapuseven.untis.ui.weekview.pageIndexForDate
+import com.sapuseven.untis.ui.weekview.startDateForPageIndex
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonNull.content
-import org.joda.time.*
+import org.joda.time.DateTimeConstants
+import org.joda.time.Instant
+import org.joda.time.LocalDate
+import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
-import java.util.*
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+	val viewModel: MainViewModel by viewModels()
+
 	companion object {
 		const val MESSENGER_PACKAGE_NAME = "com.untis.chat"
 
@@ -133,10 +198,8 @@ class MainActivity : ComponentActivity() {
 
 	private val loginLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-			if (it.resultCode == Activity.RESULT_OK)
-				recreate() // TODO: Look at it.data for potential actions (e.g. show a specific timetable)
-			else
-				finish()
+			if (it.resultCode == Activity.RESULT_OK) recreate() // TODO: Look at it.data for potential actions (e.g. show a specific timetable)
+			else finish()
 		}
 
 	@OptIn(ExperimentalMaterial3Api::class)
@@ -147,13 +210,21 @@ class MainActivity : ComponentActivity() {
 		setContent {
 			AppTheme {
 				Surface(
-					modifier = Modifier
-						.fillMaxSize()
-						//.bottomInsets() // todo when the content should be below the bottom bars, remove this
-						//.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top))
-						//.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top))
+					modifier = Modifier.fillMaxSize()
+					//.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top))
+					//.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top))
 				) {
-					AppNavHost(navController = rememberNavController())
+					LaunchedEffect(Unit) {
+						viewModel.activeUser.collect { user ->
+							user?.let {
+								viewModel.navigator.navigate(NavigationActions.Splash.toTimetable(it.id))
+							} ?: run {
+								viewModel.navigator.navigate(NavigationActions.Splash.toLogin())
+							}
+						}
+					}
+
+					AppNavHost(viewModel.navigator)
 				}
 
 				/*withUser(
@@ -221,13 +292,11 @@ class MainActivity : ComponentActivity() {
 	) {
 		systemUiController.run {
 			setSystemBarsColor(
-				color = color,
-				darkIcons = darkIcons
+				color = color, darkIcons = darkIcons
 			)
 
 			setNavigationBarColor(
-				color = color,
-				darkIcons = darkIcons
+				color = color, darkIcons = darkIcons
 			)
 		}
 	}
@@ -311,18 +380,15 @@ private fun Drawer(
 		}
 
 	LaunchedEffect(state.drawerState) {
-		snapshotFlow { state.drawerState.isOpen }
-			.distinctUntilChanged()
-			.drop(1)
-			.collect {
-				Log.i("Sentry", "Drawer isOpen: ${state.drawerState.isOpen}")
-				Breadcrumb().apply {
-					category = "ui.drawer"
-					level = SentryLevel.INFO
-					setData("isOpen", state.drawerState.isOpen)
-					Sentry.addBreadcrumb(this)
-				}
+		snapshotFlow { state.drawerState.isOpen }.distinctUntilChanged().drop(1).collect {
+			Log.i("Sentry", "Drawer isOpen: ${state.drawerState.isOpen}")
+			Breadcrumb().apply {
+				category = "ui.drawer"
+				level = SentryLevel.INFO
+				setData("isOpen", state.drawerState.isOpen)
+				Sentry.addBreadcrumb(this)
 			}
+		}
 	}
 
 	BackHandler(enabled = state.drawerState.isOpen) {
@@ -337,9 +403,9 @@ private fun Drawer(
 		drawerContent = {
 			ModalDrawerSheet(
 				modifier = Modifier
-					.width(320.dp) // default: 360.dp
-					.fillMaxHeight()
-					.verticalScroll(drawerScrollState)
+                    .width(320.dp) // default: 360.dp
+                    .fillMaxHeight()
+                    .verticalScroll(drawerScrollState)
 			) {
 				Spacer(modifier = Modifier.height(24.dp))
 
@@ -381,14 +447,11 @@ private fun Drawer(
 										TimetableDatabaseInterface.Type.ROOM -> R.drawable.all_rooms
 										else -> R.drawable.all_prefs_personal
 									}
-								),
-								contentDescription = null
+								), contentDescription = null
 							)
 						},
 						badge = {
-							IconButton(
-								onClick = { state.bookmarkDeleteDialog.value = bookmark }
-							) {
+							IconButton(onClick = { state.bookmarkDeleteDialog.value = bookmark }) {
 								Icon(
 									painter = painterResource(id = R.drawable.all_bookmark_remove),
 									contentDescription = "Remove Bookmark"
@@ -416,8 +479,7 @@ private fun Drawer(
 				NavigationDrawerItem(
 					icon = {
 						Icon(
-							painterResource(id = R.drawable.all_add),
-							contentDescription = null
+							painterResource(id = R.drawable.all_add), contentDescription = null
 						)
 					},
 					label = { Text(stringResource(id = R.string.maindrawer_bookmarks_add)) },
@@ -431,8 +493,7 @@ private fun Drawer(
 
 				DrawerText(stringResource(id = R.string.nav_all_timetables))
 
-				DrawerItems(
-					isMessengerAvailable = state.isMessengerAvailable(),
+				DrawerItems(isMessengerAvailable = state.isMessengerAvailable(),
 					disableTypeSelection = state.isPersonalTimetableDisplayed() || isBookmarkSelected,
 					displayedElement = state.displayedElement.value,
 					onTimetableClick = { item ->
@@ -441,8 +502,7 @@ private fun Drawer(
 					},
 					onShortcutClick = { item ->
 						state.onShortcutItemClick(item, shortcutLauncher)
-					}
-				)
+					})
 			}
 		},
 		content = content
@@ -482,8 +542,11 @@ private fun Drawer(
 			onDismiss = { bookmarksElementPicker = null },
 			onSelect = { item ->
 				item?.let {
-					if (state.createBookmark(item))
-						onShowTimetable(item to state.timetableDatabaseInterface.getLongName(it))
+					if (state.createBookmark(item)) onShowTimetable(
+						item to state.timetableDatabaseInterface.getLongName(
+							it
+						)
+					)
 				}
 			},
 			initialType = bookmarksElementPicker
@@ -491,24 +554,20 @@ private fun Drawer(
 	}
 
 	state.bookmarkDeleteDialog.value?.let { bookmark ->
-		AlertDialog(
-			text = { Text(stringResource(id = R.string.main_dialog_delete_bookmark)) },
+		AlertDialog(text = { Text(stringResource(id = R.string.main_dialog_delete_bookmark)) },
 			onDismissRequest = { state.bookmarkDeleteDialog.value = null },
 			confirmButton = {
-				TextButton(
-					onClick = {
-						state.removeBookmark(bookmark)
-					}) {
+				TextButton(onClick = {
+					state.removeBookmark(bookmark)
+				}) {
 					Text(stringResource(id = R.string.all_delete))
 				}
 			},
 			dismissButton = {
-				TextButton(
-					onClick = { state.bookmarkDeleteDialog.value = null }) {
+				TextButton(onClick = { state.bookmarkDeleteDialog.value = null }) {
 					Text(stringResource(id = R.string.all_cancel))
 				}
-			}
-		)
+			})
 	}
 }
 
@@ -521,20 +580,15 @@ fun MainApp(state: NewMainAppState) {
 	)
 	val snackbarHostState = remember { SnackbarHostState() }
 
-	Drawer(
-		state = state.mainDrawerState,
-		onShowTimetable = {
-			it.let { element ->
-				state.setDisplayedElement(element?.first, element?.second)
-			}
+	Drawer(state = state.mainDrawerState, onShowTimetable = {
+		it.let { element ->
+			state.setDisplayedElement(element?.first, element?.second)
 		}
-	) {
-		AppScaffold(
-			containerColor = containerColor,
+	}) {
+		AppScaffold(containerColor = containerColor,
 			snackbarHost = { SnackbarHost(snackbarHostState) },
 			topBar = {
-				CenterAlignedTopAppBar(
-					title = { Text(state.getDisplayedName()) },
+				CenterAlignedTopAppBar(title = { Text(state.getDisplayedName()) },
 					navigationIcon = {
 						IconButton(onClick = {
 							state.openDrawer()
@@ -546,11 +600,9 @@ fun MainApp(state: NewMainAppState) {
 						}
 					},
 					actions = {
-						if (BuildConfig.DEBUG)
-							DebugDesclaimerAction()
+						if (BuildConfig.DEBUG) DebugDesclaimerAction()
 
-						ProfileSelectorAction(
-							users = state.listUsers(),
+						ProfileSelectorAction(users = state.listUsers(),
 							currentSelectionId = state.getCurrentUserId(),
 							showProfileActions = true,
 							onSelectionChange = {
@@ -558,16 +610,13 @@ fun MainApp(state: NewMainAppState) {
 							},
 							onActionEdit = {
 								state.editUsers()
-							}
-						)
-					}
-				)
-			}
-		) { innerPadding ->
+							})
+					})
+			}) { innerPadding ->
 			Box(
 				modifier = Modifier
-					.padding(innerPadding)
-					.fillMaxSize()
+                    .padding(innerPadding)
+                    .fillMaxSize()
 			) {
 				val density = LocalDensity.current
 				val insets = insetsPaddingValues()
@@ -605,60 +654,56 @@ fun MainApp(state: NewMainAppState) {
 				Text(
 					text = state.lastRefreshText(),
 					modifier = Modifier
-						.align(Alignment.BottomStart)
-						.padding(start = timeColumnWidth + 8.dp, bottom = 8.dp)
-						.bottomInsets()
-						.disabled(state.isAnonymous)
+                        .align(Alignment.BottomStart)
+                        .padding(start = timeColumnWidth + 8.dp, bottom = 8.dp)
+                        .bottomInsets()
+                        .disabled(state.isAnonymous)
 				)
 
-				IconButton(
-					modifier = Modifier
-						.align(Alignment.BottomEnd)
-						.padding(end = 8.dp)
-						.bottomInsets(),
-					onClick = {
-						state.showFeedback()
-					}
-				) {
-					Icon(painter = painterResource(R.drawable.all_feedback), contentDescription = "Give feedback")
+				IconButton(modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 8.dp)
+                    .bottomInsets(), onClick = {
+					state.showFeedback()
+				}) {
+					Icon(
+						painter = painterResource(R.drawable.all_feedback),
+						contentDescription = "Give feedback"
+					)
 				}
 
-				if (state.feedbackDialog)
-					FeedbackDialog(
-						onDismiss = { state.feedbackDialog = false }
-					)
+				if (state.feedbackDialog) FeedbackDialog(onDismiss = {
+					state.feedbackDialog = false
+				})
 
 				if (state.isAnonymous) {
 					Column(
 						verticalArrangement = Arrangement.Center,
 						horizontalAlignment = Alignment.CenterHorizontally,
 						modifier = Modifier
-							.fillMaxSize()
-							.absolutePadding(left = 16.dp)
+                            .fillMaxSize()
+                            .absolutePadding(left = 16.dp)
 					) {
 						Text(
 							text = stringResource(id = R.string.main_anonymous_login_info_text),
 							textAlign = TextAlign.Center,
-							modifier = Modifier
-								.padding(horizontal = 32.dp)
+							modifier = Modifier.padding(horizontal = 32.dp)
 						)
 
 						Button(
 							onClick = state.onAnonymousSettingsClick,
-							modifier = Modifier
-								.padding(top = 16.dp)
+							modifier = Modifier.padding(top = 16.dp)
 						) {
 							Text(text = stringResource(id = R.string.main_go_to_settings))
 						}
 					}
 				}
 
-				if (state.isLoading)
-					CircularProgressIndicator(
-						modifier = Modifier
-							.align(Alignment.BottomEnd)
-							.padding(8.dp)
-					)
+				if (state.isLoading) CircularProgressIndicator(
+					modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(8.dp)
+				)
 			}
 
 			ReportsInfoBottomSheet()
@@ -672,10 +717,9 @@ fun MainApp(state: NewMainAppState) {
 		exit = fullscreenDialogAnimationExit()
 	) {
 		// TODO: Incorrect insets
-		TimetableItemDetailsDialog(
-			timegridItems = remember {
-				state.timetableItemDetailsDialog?.first ?: emptyList()
-			},
+		TimetableItemDetailsDialog(timegridItems = remember {
+			state.timetableItemDetailsDialog?.first ?: emptyList()
+		},
 			initialPage = remember {
 				state.timetableItemDetailsDialog?.second ?: 0
 			},
@@ -684,8 +728,7 @@ fun MainApp(state: NewMainAppState) {
 			onDismiss = {
 				state.timetableItemDetailsDialog = null
 				it?.let { state.setDisplayedElement(it) }
-			}
-		)
+			})
 	}
 
 	/*AnimatedVisibility(
@@ -701,7 +744,7 @@ fun MainApp(state: NewMainAppState) {
 	}*/
 }
 
-class MainDrawerState constructor(
+class MainDrawerState(
 	private val user: User,
 	private val contextActivity: BaseComposeActivity,
 	private val scope: CoroutineScope,
@@ -769,15 +812,12 @@ class MainDrawerState constructor(
 				}
 			}
 		} else {
-			shortcutLauncher.launch(
-				Intent(
-					contextActivity,
-					item.target
-				).apply {
-					contextActivity.putUserIdExtra(this, user.id)
-					contextActivity.putBackgroundColorExtra(this)
-				}
-			)
+			shortcutLauncher.launch(Intent(
+				contextActivity, item.target
+			).apply {
+				contextActivity.putUserIdExtra(this, user.id)
+				contextActivity.putBackgroundColorExtra(this)
+			})
 		}
 	}
 
@@ -788,14 +828,10 @@ class MainDrawerState constructor(
 			displayName = timetableDatabaseInterface.getLongName(item)
 		)
 
-		if (user.bookmarks.contains(newBookmark))
-			Toast
-				.makeText(
-					contextActivity,
-					"Bookmark already exists",
-					Toast.LENGTH_LONG
-				) // TODO: Extract string resource
-				.show()
+		if (user.bookmarks.contains(newBookmark)) Toast.makeText(
+			contextActivity, "Bookmark already exists", Toast.LENGTH_LONG
+		) // TODO: Extract string resource
+			.show()
 		else {
 			user.bookmarks = user.bookmarks.plus(newBookmark)
 			userDatabase.userDao().update(user)
@@ -877,18 +913,14 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	}
 
 	fun editUser(
-		user: User?,
-		loginLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
+		user: User?, loginLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
 	) {
-		loginLauncher.launch(
-			Intent(
-				contextActivity,
-				user?.let { LoginDataInputActivity::class.java } ?: LoginActivity::class.java
-			).apply {
-				user?.id?.let { contextActivity.putUserIdExtra(this, it) }
-				contextActivity.putBackgroundColorExtra(this)
-				putExtra(LoginActivity.EXTRA_BOOLEAN_SHOW_BACK_BUTTON, true)
-			})
+		loginLauncher.launch(Intent(contextActivity,
+			user?.let { LoginDataInputActivity::class.java } ?: LoginActivity::class.java).apply {
+			user?.id?.let { contextActivity.putUserIdExtra(this, it) }
+			contextActivity.putBackgroundColorExtra(this)
+			putExtra(LoginActivity.EXTRA_BOOLEAN_SHOW_BACK_BUTTON, true)
+		})
 	}
 
 	fun deleteUser(
@@ -897,8 +929,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		scope.launch {
 			userDatabase.userDao().delete(user)
 			contextActivity.deleteProfile(user.id)
-			if (userDatabase.userDao().getAll().isEmpty())
-				contextActivity.recreate()
+			if (userDatabase.userDao().getAll().isEmpty()) contextActivity.recreate()
 		}
 	}
 
@@ -921,7 +952,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		displayedElement.value = element
 		displayedName.value =
 			displayName ?: element?.let { timetableDatabaseInterface.getLongName(it) }
-					?: defaultDisplayedName
+				?: defaultDisplayedName
 	}
 
 	// WeekView
@@ -935,18 +966,12 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		items: List<TimegridItem>
 	): List<TimegridItem> {
 		val newItems = mergeItems(items.mapNotNull { item ->
-			if (item.periodData.isCancelled() && preferences.timetableHideCancelled.getValue())
-				return@mapNotNull null
+			if (item.periodData.isCancelled() && preferences.timetableHideCancelled.getValue()) return@mapNotNull null
 
 			if (preferences.timetableSubstitutionsIrregular.getValue()) {
 				item.periodData.apply {
 					forceIrregular =
-						classes.find { it.id != it.orgId } != null
-								|| teachers.find { it.id != it.orgId } != null
-								|| subjects.find { it.id != it.orgId } != null
-								|| rooms.find { it.id != it.orgId } != null
-								|| preferences.timetableBackgroundIrregular.getValue()
-								&& item.periodData.element.backColor != UNTIS_DEFAULT_COLOR
+						classes.find { it.id != it.orgId } != null || teachers.find { it.id != it.orgId } != null || subjects.find { it.id != it.orgId } != null || rooms.find { it.id != it.orgId } != null || preferences.timetableBackgroundIrregular.getValue() && item.periodData.element.backColor != UNTIS_DEFAULT_COLOR
 				}
 			}
 			item
@@ -982,10 +1007,10 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 				it.endTime.time == endDateTime.toString(DateTimeUtils.tTimeNoSeconds())
 			}
 
-			if (thisUnitStartIndex != -1 && thisUnitEndIndex != -1)
-				itemGrid[day][thisUnitStartIndex].add(item)
-			else
-				leftover.add(item)
+			if (thisUnitStartIndex != -1 && thisUnitEndIndex != -1) itemGrid[day][thisUnitStartIndex].add(
+				item
+			)
+			else leftover.add(item)
 		}
 
 		val newItems = mutableListOf<TimegridItem>()
@@ -1104,23 +1129,18 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 	@OptIn(ExperimentalCoroutinesApi::class)
 	suspend fun loadEventsFlow(
-		startDate: LocalDate,
-		endDate: LocalDate
+		startDate: LocalDate, endDate: LocalDate
 	): Flow<Pair<Long, List<Event>>> {
-		val dateRange =
-			UntisDate.fromLocalDate(LocalDate(startDate)) to
-					UntisDate.fromLocalDate(LocalDate(endDate))
+		val dateRange = UntisDate.fromLocalDate(LocalDate(startDate)) to UntisDate.fromLocalDate(
+			LocalDate(endDate)
+		)
 
 		return displayedElement.value?.let { element ->
 			loadTimetableFlow(
-				timetableLoader,
-				TimetableLoader.TimetableLoaderTarget(
-					dateRange.first,
-					dateRange.second,
-					element.id, // TODO: Handle nullability
+				timetableLoader, TimetableLoader.TimetableLoaderTarget(
+					dateRange.first, dateRange.second, element.id, // TODO: Handle nullability
 					element.type
-				),
-				false
+				), false
 			).map {
 				it.timestamp to prepareItems(it.items).map { item -> item.toEvent() }
 			}
@@ -1148,23 +1168,20 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	}
 
 	suspend fun loadEvents(startDate: LocalDate = startDateForPageIndex(weekViewPage)) = loadEvents(
-		startDate,
-		startDate.plusDays(weekViewPreferences.weekLength.value)
+		startDate, startDate.plusDays(weekViewPreferences.weekLength.value)
 	)
 
 	suspend fun loadEvents(startDate: LocalDate, endDate: LocalDate) {
 		Log.d("WeekView", "Loading items for $startDate")
 		loading++
-		loadEventsFlow(startDate, endDate)
-			.onCompletion {
-				loading--
-				Log.d("WeekView", "All items received for $startDate")
-			}
-			.collect {
-				Log.d("WeekView", "New items received for $startDate")
-				weekViewRefreshTimestamps[pageIndexForDate(startDate)] = it.first
-				weekViewEvents[startDate] = it.second
-			}
+		loadEventsFlow(startDate, endDate).onCompletion {
+			loading--
+			Log.d("WeekView", "All items received for $startDate")
+		}.collect {
+			Log.d("WeekView", "New items received for $startDate")
+			weekViewRefreshTimestamps[pageIndexForDate(startDate)] = it.first
+			weekViewEvents[startDate] = it.second
+		}
 	}
 
 	suspend fun loadAllEvents(pageOffset: Int = weekViewPage) {
@@ -1176,8 +1193,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 						"WeekView",
 						"Items available for $startDate: ${weekViewEvents.contains(startDate)}"
 					)
-					if (!weekViewEvents.contains(startDate))
-						loadEvents(startDate)
+					if (!weekViewEvents.contains(startDate)) loadEvents(startDate)
 				}
 			}.awaitAll()
 		}
@@ -1187,10 +1203,8 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	@Composable
 	fun lastRefreshText() = stringResource(
 		id = R.string.main_last_refreshed,
-		if (weekViewRefreshTimestamps[weekViewPage] ?: 0L > 0L)
-			formatTimeDiff(Instant.now().millis - weekViewRefreshTimestamps[weekViewPage]!!)
-		else
-			stringResource(id = R.string.main_last_refreshed_never)
+		if (weekViewRefreshTimestamps[weekViewPage] ?: 0L > 0L) formatTimeDiff(Instant.now().millis - weekViewRefreshTimestamps[weekViewPage]!!)
+		else stringResource(id = R.string.main_last_refreshed_never)
 	)
 
 	fun showFeedback() {
@@ -1209,15 +1223,11 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			)
 
 			diff < DAY_MILLIS -> pluralStringResource(
-				R.plurals.main_time_diff_hours,
-				((diff / HOUR_MILLIS).toInt()),
-				diff / HOUR_MILLIS
+				R.plurals.main_time_diff_hours, ((diff / HOUR_MILLIS).toInt()), diff / HOUR_MILLIS
 			)
 
 			else -> pluralStringResource(
-				R.plurals.main_time_diff_days,
-				((diff / DAY_MILLIS).toInt()),
-				diff / DAY_MILLIS
+				R.plurals.main_time_diff_days, ((diff / DAY_MILLIS).toInt()), diff / DAY_MILLIS
 			)
 		}
 	}
@@ -1226,23 +1236,18 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 	// Event listeners
 	val onAnonymousSettingsClick: () -> Unit = {
-		contextActivity.startActivity(
-			Intent(
-				contextActivity,
-				SettingsActivity::class.java
-			).apply {
-				contextActivity.putUserIdExtra(this, user.id)
-				putExtra(
-					EXTRA_STRING_PREFERENCE_ROUTE,
-					"preferences_timetable"
-				)
-				putExtra(
-					EXTRA_STRING_PREFERENCE_HIGHLIGHT,
-					"preference_timetable_personal_timetable"
-				)
-				contextActivity.putBackgroundColorExtra(this)
-			}
-		)
+		contextActivity.startActivity(Intent(
+			contextActivity, SettingsActivity::class.java
+		).apply {
+			contextActivity.putUserIdExtra(this, user.id)
+			putExtra(
+				EXTRA_STRING_PREFERENCE_ROUTE, "preferences_timetable"
+			)
+			putExtra(
+				EXTRA_STRING_PREFERENCE_HIGHLIGHT, "preference_timetable_personal_timetable"
+			)
+			contextActivity.putBackgroundColorExtra(this)
+		})
 	}
 
 	val onPageChange: suspend (Int) -> Unit = { pageOffset ->
@@ -1440,8 +1445,7 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 */
 class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	val user: User,
-	val contextActivity: BaseComposeActivity,
-	/*val weekViewSwipeRefresh: MutableState<WeekViewSwipeRefreshLayout?>,
+	val contextActivity: BaseComposeActivity,    /*val weekViewSwipeRefresh: MutableState<WeekViewSwipeRefreshLayout?>,
 	val weekView: MutableState<WeekView<TimegridItem>?>,
 	val context: Context,*/
 	val scope: CoroutineScope,
@@ -1452,8 +1456,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	var personalTimetable: Pair<PeriodElement?, String?>?,
 	val defaultDisplayedName: String,
 	val drawerState: DrawerState,
-	var drawerGestureState: MutableState<Boolean>,
-	/*val loading: MutableState<Int>,
+	var drawerGestureState: MutableState<Boolean>,    /*val loading: MutableState<Int>,
 	val currentWeekIndex: MutableState<Int>,*/
 	val lastRefreshTimestamp: MutableState<Long>,
 	//val weeklyTimetableItems: SnapshotStateMap<Int, WeeklyTimetableItems?>,
@@ -1503,8 +1506,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	private var shouldUpdateWeekView = true*/
 
 	val isMessengerAvailable: Boolean
-		get() {
-			/*for (item in this.weeklyTimetableItems.values) {
+		get() {            /*for (item in this.weeklyTimetableItems.values) {
 				if (item != null) {
 					for (it in item.items) {
 						if (it.data?.periodData?.element?.messengerChannel != null) {
@@ -1530,7 +1532,7 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	fun displayElement(element: PeriodElement?, name: String? = null) {
 		displayedElement.value = element
 		displayedName.value = name ?: element?.let { timetableDatabaseInterface.getLongName(it) }
-				?: defaultDisplayedName
+			?: defaultDisplayedName
 
 		weekViewEvents.clear()
 		scope.launch {
@@ -2041,8 +2043,7 @@ fun rememberNewMainAppState(
 	coroutineScope: CoroutineScope = rememberCoroutineScope(),
 	mainDrawerState: MainDrawerState = rememberMainDrawerState(user, contextActivity),
 	weekViewPreferences: NewMainAppState.WeekViewPreferences = rememberWeekViewPreferences(
-		contextActivity.dataStorePreferences,
-		user
+		contextActivity.dataStorePreferences, user
 	),
 	colorScheme: ColorScheme = MaterialTheme.colorScheme,
 ) = remember(user) {
@@ -2071,8 +2072,7 @@ fun rememberMainAppState(
 	colorScheme: ColorScheme = MaterialTheme.colorScheme,
 	//currentDensity: Density = LocalDensity.current,
 	personalTimetable: Pair<PeriodElement?, String?>? = getPersonalTimetableElement(
-		user,
-		contextActivity
+		user, contextActivity
 	),
 	defaultDisplayedName: String = user.getDisplayedName(),// stringResource(id = R.string.app_name),
 	drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
@@ -2091,8 +2091,7 @@ fun rememberMainAppState(
 	profileManagementDialog: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 	bookmarkDeleteDialog: MutableState<TimetableBookmark?> = rememberSaveable { mutableStateOf(null) },
 	weekViewPreferences: NewMainAppState.WeekViewPreferences = rememberWeekViewPreferences(
-		contextActivity.dataStorePreferences,
-		user
+		contextActivity.dataStorePreferences, user
 	),
 	weekViewEvents: SnapshotStateMap<LocalDate, List<Event>> = mutableStateMapOf<LocalDate, List<Event>>(),
 	weekViewPage: MutableState<Int> = rememberSaveable { mutableStateOf(0) },
@@ -2126,9 +2125,7 @@ fun rememberMainAppState(
 }
 
 fun buildHourList(
-	user: User,
-	range: Pair<Int, Int>?,
-	rangeIndexReset: Boolean
+	user: User, range: Pair<Int, Int>?, rangeIndexReset: Boolean
 ): List<WeekViewHour> {
 	val hourList = mutableListOf<WeekViewHour>()
 
@@ -2141,10 +2138,8 @@ fun buildHourList(
 
 		// If label is empty, fill it according to preferences
 		val label = hour.label.ifEmpty {
-			if (rangeIndexReset)
-				(index + 1).toString()
-			else
-				((range?.first ?: 1) + index).toString()
+			if (rangeIndexReset) (index + 1).toString()
+			else ((range?.first ?: 1) + index).toString()
 		}
 
 		hourList.add(
@@ -2168,9 +2163,7 @@ fun rememberWeekViewPreferences(
 		preferences.timetableRangeIndexReset.getValueFlow()
 	) { range, rangeIndexReset ->
 		buildHourList(
-			user,
-			range.convertRangeToPair(),
-			rangeIndexReset
+			user, range.convertRangeToPair(), rangeIndexReset
 		)
 	}.collectAsState(initial = emptyList()),
 	dividerWidth: Float = Stroke.HairlineWidth,
@@ -2221,8 +2214,7 @@ fun rememberWeekViewPreferences(
 }
 
 private fun getPersonalTimetableElement(
-	user: User,
-	context: Context
+	user: User, context: Context
 ): Pair<PeriodElement?, String?>? {
 	return user.userData.elemType?.let { type ->
 		PeriodElement(
