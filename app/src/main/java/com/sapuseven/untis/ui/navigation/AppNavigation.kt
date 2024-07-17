@@ -4,8 +4,6 @@ import android.os.Bundle
 import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
 import androidx.navigation.NavOptionsBuilder
-import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_DEMO_LOGIN
-import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_STRING_SCHOOL_INFO
 import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.helpers.SerializationUtils
 import dagger.hilt.android.scopes.ActivityRetainedScoped
@@ -22,7 +20,7 @@ enum class Screen(val path: String) {
 	SPLASH("/"),
 	TIMETABLE("/timetable/{userId}"),
 	LOGIN("/login"),
-	LOGIN_DATA_INPUT("/logindata"),
+	LOGIN_DATA_INPUT("/logindata?demoLogin={demoLogin}&profileUpdate={profileUpdate}&schoolInfo={schoolInfo}"),
 	SETTINGS("/settings/{userId}"),
 }
 
@@ -36,8 +34,6 @@ sealed class NavigationItem(val route: String) {
 
 interface NavigationAction {
 	val destination: String
-	val arguments: Bundle?
-		get() = null
 	val navOptions: NavOptions
 		get() = NavOptions.Builder().build()
 }
@@ -61,20 +57,18 @@ object NavigationActions {
 	object Login {
 		fun toDataInput(
 			schoolInfo: SchoolInfo? = null,
-			demoLogin: Boolean? = null
+			demoLogin: Boolean? = null,
+			profileUpdate: Boolean? = null
 		) = object : NavigationAction {
-			override val destination = NavigationItem.LoginDataInput.route
-			override val arguments: Bundle
-				get() = Bundle().apply {
-					schoolInfo?.let {
-						putString(
-							EXTRA_STRING_SCHOOL_INFO,
-							SerializationUtils.getJSON().encodeToString(it)
-						)
-					}
-					demoLogin?.let {
-						putBoolean(EXTRA_BOOLEAN_DEMO_LOGIN, it)
-					}
+			override val destination = run {
+					if (demoLogin == true)
+						"/logindata?demoLogin=true"
+					else if (profileUpdate == true)
+						"/logindata?profileUpdate=true"
+					else if (schoolInfo != null)
+						"/logindata?schoolInfo=${SerializationUtils.getJSON().encodeToString(schoolInfo)}"
+					else
+						"/logindata"
 				}
 		}
 	}

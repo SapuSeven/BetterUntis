@@ -53,17 +53,10 @@ import kotlinx.serialization.ExperimentalSerializationApi
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Login(
-	navController: NavHostController,
 	viewModel: LoginViewModel = hiltViewModel()
 ) {
-	val context = LocalContext.current
 	val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 	val focusManager = LocalFocusManager.current
-
-	val loginLauncher = rememberLauncherForActivityResult(
-		contract = ActivityResultContracts.StartActivityForResult(),
-		onResult = { viewModel.onLoginResult(it) }
-	)
 
 	LaunchedEffect(Unit) {
 		viewModel.events.collectLatest { event ->

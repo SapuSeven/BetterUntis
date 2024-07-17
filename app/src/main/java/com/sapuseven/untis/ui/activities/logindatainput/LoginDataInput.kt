@@ -1,6 +1,7 @@
 package com.sapuseven.untis.ui.activities.logindatainput
 
 import android.content.res.Configuration
+import android.os.Bundle
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -53,6 +54,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavArgs
 import androidx.navigation.NavHostController
 import com.sapuseven.untis.R
 import com.sapuseven.untis.ui.common.AppScaffold
@@ -68,7 +70,6 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun LoginDataInput(
-	navController: NavHostController,
 	viewModel: LoginDataInputViewModel = hiltViewModel()
 ) {
 	val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher

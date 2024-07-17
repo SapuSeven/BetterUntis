@@ -37,7 +37,6 @@ fun AppNavHost(
 	)
 	LaunchedEffect(navigatorState) {
 		navigatorState?.let {
-			it.arguments?.let { navController.currentBackStackEntry?.arguments?.putAll(it) }
 			navController.navigate(it.destination, it.navOptions)
 		}
 	}
@@ -48,14 +47,30 @@ fun AppNavHost(
 		startDestination = startDestination
 	) {
 		composable(NavigationItem.Splash.route) { Splash() }
-		composable(NavigationItem.Login.route) { Login(navController) }
-		composable(NavigationItem.LoginDataInput.route) { LoginDataInput(navController) }
+		composable(NavigationItem.Login.route) { Login() }
+		composable(
+			NavigationItem.LoginDataInput.route,
+			arguments = listOf(
+				navArgument("demoLogin") {
+					type = NavType.BoolType
+					defaultValue = false
+				},
+				navArgument("profileUpdate") {
+					type = NavType.BoolType
+					defaultValue = false
+				},
+				navArgument("schoolInfo") {
+					type = NavType.StringType
+					nullable = true
+				}
+			)
+		) { LoginDataInput() }
 		composable(
 			NavigationItem.Timetable.route,
 			arguments = listOf(navArgument("userId") {
 				type = NavType.LongType
 			})
-		) { Timetable(navController) }
+		) { Timetable() }
 	}
 }
 

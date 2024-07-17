@@ -14,9 +14,6 @@ import androidx.navigation.NavController
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.BaseComposeActivity.Companion.EXTRA_LONG_USER_ID
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.DEMO_API_URL
-import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_DEMO_LOGIN
-import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_BOOLEAN_PROFILE_UPDATE
-import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.EXTRA_STRING_SCHOOL_INFO
 import com.sapuseven.untis.activities.SAVED_STATE_INTENT_DATA
 import com.sapuseven.untis.api.client.SchoolSearchApi
 import com.sapuseven.untis.api.client.UserDataApi
@@ -78,7 +75,7 @@ class LoginDataInputViewModel @Inject constructor(
 	var showQrCodeErrorDialog by mutableStateOf(false)
 		private set
 
-	val showProfileUpdate = savedStateHandle.get<Boolean>(EXTRA_BOOLEAN_PROFILE_UPDATE) == true
+	val showProfileUpdate = savedStateHandle.get<Boolean>("profileUpdate") == true
 
 	var schoolIdLocked by mutableStateOf(false)
 
@@ -106,7 +103,7 @@ class LoginDataInputViewModel @Inject constructor(
 		} ?: true
 	}
 
-	val schoolInfoFromSearch = savedStateHandle.get<String>(EXTRA_STRING_SCHOOL_INFO)?.let {
+	val schoolInfoFromSearch = savedStateHandle.get<String>("schoolInfo")?.let {
 		getJSON().decodeFromString<SchoolInfo>(it)
 	}
 
@@ -115,7 +112,7 @@ class LoginDataInputViewModel @Inject constructor(
 			existingUserId?.let { userDao.getById(it) }?.let { loginData.loadFromUser(it) }
 		}
 
-		if (savedStateHandle.get<Boolean>(EXTRA_BOOLEAN_DEMO_LOGIN) == true) {
+		if (savedStateHandle.get<Boolean>("demoLogin") == true) {
 			loginData.anonymous.value = true
 			loginData.schoolId.value = "demo"
 			advanced = true

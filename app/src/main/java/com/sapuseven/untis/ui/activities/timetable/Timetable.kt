@@ -58,7 +58,6 @@ import kotlinx.serialization.ExperimentalSerializationApi
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Timetable(
-	navController: NavHostController,
 	viewModel: TimetableViewModel = hiltViewModel()
 ) {
 	Text(text = "${viewModel.userId}")

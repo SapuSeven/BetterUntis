@@ -27,12 +27,6 @@ class LoginDataInputActivity : BaseComposeActivityNew<LoginDataInputViewModel>()
 	companion object {
 		const val BACKUP_PREF_NAME = "loginDataInputBackup"
 
-		//private const val FRAGMENT_TAG_PROFILE_UPDATE = "profileUpdate"
-
-		const val EXTRA_BOOLEAN_PROFILE_UPDATE = "com.sapuseven.untis.activities.profileupdate"
-		const val EXTRA_BOOLEAN_DEMO_LOGIN = "com.sapuseven.untis.activities.demoLogin"
-		const val EXTRA_STRING_SCHOOL_INFO = "com.sapuseven.untis.activities.schoolInfo"
-
 		const val DEMO_API_URL = "https://api.sapuseven.com/untis/testing"
 	}
 
