@@ -2,6 +2,8 @@ package com.sapuseven.untis.ui.navigation
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -22,6 +24,7 @@ import com.sapuseven.untis.ui.activities.logindatainput.LoginDataInput
 import com.sapuseven.untis.ui.activities.splash.Splash
 import com.sapuseven.untis.ui.activities.timetable.Timetable
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 
 @Composable
 fun AppNavHost(
@@ -30,14 +33,11 @@ fun AppNavHost(
 	navController: NavHostController = rememberNavController(),
 	startDestination: Any = AppRoutes.Splash,
 ) {
-	val lifecycleOwner = LocalLifecycleOwner.current
-	val navigatorState by navigator.navActions.asLifecycleAwareState(
-		lifecycleOwner = lifecycleOwner,
-		initialState = null
-	)
-	LaunchedEffect(navigatorState) {
-		navigatorState?.let {
-			navController.navigate(it.destination, it.navOptions)
+	LaunchedEffect(navigator) {
+		navigator.navActions.collect { action ->
+			action?.let {
+				navController.navigate(it.destination, it.navOptions)
+			} ?: navController.popBackStack()
 		}
 	}
 
@@ -45,40 +45,71 @@ fun AppNavHost(
 		modifier = modifier,
 		navController = navController,
 		startDestination = startDestination,
-		enterTransition = {
-			slideIntoContainer(
-				AnimatedContentTransitionScope.SlideDirection.Left,
-				animationSpec = tween(500)
-			)
-		},
-		exitTransition = {
-			slideOutOfContainer(
-				AnimatedContentTransitionScope.SlideDirection.Left,
-				animationSpec = tween(500)
-			)
-		},
-		popEnterTransition = {
-			slideIntoContainer(
-				AnimatedContentTransitionScope.SlideDirection.Right,
-				animationSpec = tween(500)
-			)
-		},
-		popExitTransition = {
-			slideOutOfContainer(
-				AnimatedContentTransitionScope.SlideDirection.Right,
-				animationSpec = tween(500)
-			)
-		}
 	) {
-		composable<AppRoutes.Splash>(
-			enterTransition = null,
-			exitTransition = null,
-			popEnterTransition = null,
-			popExitTransition = null,
-		) { Splash() }
-		composable<AppRoutes.Login> { Login() }
-		composable<AppRoutes.LoginDataInput> { LoginDataInput() }
-		composable<AppRoutes.Timetable> { Timetable() }
+		composable<AppRoutes.Splash> { Splash() }
+		composable<AppRoutes.Login>(
+			enterTransition = {
+				fadeIn(animationSpec = tween(500))
+			},
+			exitTransition = {
+				slideOutOfContainer(
+					AnimatedContentTransitionScope.SlideDirection.Left,
+					animationSpec = tween(500)
+				)
+			},
+			popEnterTransition = {
+				slideIntoContainer(
+					AnimatedContentTransitionScope.SlideDirection.Right,
+					animationSpec = tween(500)
+				)
+			},
+			popExitTransition = {
+				slideOutOfContainer(
+					AnimatedContentTransitionScope.SlideDirection.Right,
+					animationSpec = tween(500)
+				)
+			},
+		) { Login() }
+		composable<AppRoutes.LoginDataInput>(
+			enterTransition = {
+				slideIntoContainer(
+					AnimatedContentTransitionScope.SlideDirection.Left,
+					animationSpec = tween(500)
+				)
+			},
+			exitTransition = {
+				slideOutOfContainer(
+					AnimatedContentTransitionScope.SlideDirection.Down,
+					animationSpec = tween(500)
+				) + fadeOut(animationSpec = tween(500))
+			},
+			popEnterTransition = {
+				slideIntoContainer(
+					AnimatedContentTransitionScope.SlideDirection.Right,
+					animationSpec = tween(500)
+				)
+			},
+			popExitTransition = {
+				slideOutOfContainer(
+					AnimatedContentTransitionScope.SlideDirection.Right,
+					animationSpec = tween(500)
+				)
+			},
+		) { LoginDataInput() }
+		composable<AppRoutes.Timetable>(
+			enterTransition = {
+				fadeIn(animationSpec = tween(500))
+			},
+			exitTransition = {
+				fadeOut(animationSpec = tween(500))
+			},
+			popEnterTransition = {
+				fadeIn(animationSpec = tween(500))
+			},
+			popExitTransition = {
+				fadeOut(animationSpec = tween(500))
+			},
+		) { Timetable() }
 	}
 }
 

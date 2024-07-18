@@ -50,7 +50,6 @@ import kotlinx.serialization.ExperimentalSerializationApi
 fun Login(
 	viewModel: LoginViewModel = hiltViewModel()
 ) {
-	val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 	val focusManager = LocalFocusManager.current
 
 	LaunchedEffect(Unit) {
@@ -83,9 +82,7 @@ fun Login(
 				},
 				navigationIcon = {
 					if (viewModel.shouldShowBackButton.value) IconButton(onClick = {
-						if (viewModel.goBack()) {
-							onBackPressedDispatcher?.onBackPressed()
-						}
+						viewModel.goBack()
 					}) {
 						Icon(
 							imageVector = Icons.Outlined.ArrowBack,

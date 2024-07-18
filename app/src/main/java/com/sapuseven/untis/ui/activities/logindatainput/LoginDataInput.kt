@@ -72,8 +72,6 @@ import kotlinx.coroutines.launch
 fun LoginDataInput(
 	viewModel: LoginDataInputViewModel = hiltViewModel()
 ) {
-	val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
 	if (viewModel.showProfileUpdate)
 		Surface {
 			Column(
@@ -126,7 +124,7 @@ fun LoginDataInput(
 					},
 					navigationIcon = {
 						IconButton(onClick = {
-							onBackPressedDispatcher?.onBackPressed()
+							viewModel.goBack()
 						}) {
 							Icon(
 								imageVector = Icons.Outlined.ArrowBack,

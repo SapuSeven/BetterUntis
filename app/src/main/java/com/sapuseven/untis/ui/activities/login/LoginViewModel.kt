@@ -77,12 +77,11 @@ class LoginViewModel @Inject constructor(
 		}
 	}
 
-	fun goBack(): Boolean {
+	fun goBack() {
 		if (searchMode) {
 			updateSearchMode(false)
-			return false
 		} else {
-			return true
+			navigator.popBackStack()
 		}
 	}
 

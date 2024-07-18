@@ -297,6 +297,10 @@ class LoginDataInputViewModel @Inject constructor(
 		return userDataApi.loadUserData(untisApiUrl, user, appSharedSecret)
 	}
 
+	fun goBack() {
+		navigator.popBackStack()
+	}
+
 	fun onQrCodeErrorDialogDismiss() {
 		showQrCodeErrorDialog = false
 	}

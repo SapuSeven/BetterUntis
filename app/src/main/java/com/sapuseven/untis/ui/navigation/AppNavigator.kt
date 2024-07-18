@@ -14,7 +14,7 @@ data class NavigationAction <T: Any> (
 
 @ActivityRetainedScoped
 class AppNavigator @Inject constructor() {
-	private val _navActions = Channel<NavigationAction<*>>(Channel.UNLIMITED)
+	private val _navActions = Channel<NavigationAction<*>?>(Channel.UNLIMITED)
 	val navActions = _navActions.receiveAsFlow()
 
 	fun <T: Any> navigate(action: NavigationAction<T>) {
@@ -23,5 +23,9 @@ class AppNavigator @Inject constructor() {
 
 	fun <T: Any> navigate(route: T, builder: NavOptionsBuilder.() -> Unit = {}) {
 		_navActions.trySend(NavigationAction(route, builder))
+	}
+
+	fun popBackStack() {
+		_navActions.trySend(null)
 	}
 }
