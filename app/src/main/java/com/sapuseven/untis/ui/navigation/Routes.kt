@@ -1,17 +1,8 @@
 package com.sapuseven.untis.ui.navigation
 
-import android.net.Uri
-import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
-import android.os.Parcelable
 import androidx.navigation.NavType
-import com.sapuseven.untis.api.model.untis.SchoolInfo
-import com.sapuseven.untis.helpers.SerializationUtils.getJSON
-import kotlinx.parcelize.Parcelize
-import kotlinx.parcelize.RawValue
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 object Routes {
 	@Serializable
@@ -25,10 +16,10 @@ object Routes {
 
 	@Serializable
 	data class LoginDataInput(
-		var demoLogin: Boolean = false,
-		var profileUpdate: Boolean = false,
-		var schoolInfoSerialized: String? = null,
-		var userId: Long = -1
+		val demoLogin: Boolean = false,
+		val profileUpdate: Boolean = false,
+		val schoolInfoSerialized: String? = null,
+		val userId: Long = -1
 	)
 
 	@Serializable

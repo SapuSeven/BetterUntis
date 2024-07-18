@@ -50,7 +50,7 @@ class LoginDataInputViewModel @Inject constructor(
 ) : ActivityViewModel() {
 	val args: Routes.LoginDataInput = savedStateHandle.toRoute<Routes.LoginDataInput>()
 
-	val existingUserId = args.userId
+	val existingUserId = if (args.userId == -1L) null else args.userId
 
 	val loginData = LoginData()
 
