@@ -131,7 +131,7 @@ import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.material.scheme.Scheme
 import com.sapuseven.untis.ui.models.NavItemShortcut
 import com.sapuseven.untis.ui.navigation.AppNavHost
-import com.sapuseven.untis.ui.navigation.Routes
+import com.sapuseven.untis.ui.navigation.AppRoutes
 import com.sapuseven.untis.ui.preferences.convertRangeToPair
 import com.sapuseven.untis.ui.theme.toColorScheme
 import com.sapuseven.untis.ui.weekview.Event
@@ -212,9 +212,13 @@ class MainActivity : ComponentActivity() {
 					LaunchedEffect(Unit) {
 						viewModel.activeUser.collect { user ->
 							user?.let {
-								viewModel.navigator.navigate(Routes.Timetable(it.id))
+								viewModel.navigator.navigate(AppRoutes.Timetable(it.id)) {
+									popUpTo(AppRoutes.Splash) { inclusive = true }
+								}
 							} ?: run {
-								viewModel.navigator.navigate(Routes.Login)
+								viewModel.navigator.navigate(AppRoutes.Login) {
+									popUpTo(AppRoutes.Splash) { inclusive = true }
+								}
 							}
 						}
 					}

@@ -17,20 +17,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.ui.activities.login.Login
 import com.sapuseven.untis.ui.activities.logindatainput.LoginDataInput
 import com.sapuseven.untis.ui.activities.splash.Splash
 import com.sapuseven.untis.ui.activities.timetable.Timetable
 import kotlinx.coroutines.flow.Flow
-import kotlin.reflect.typeOf
 
 @Composable
 fun AppNavHost(
 	navigator: AppNavigator,
 	modifier: Modifier = Modifier,
 	navController: NavHostController = rememberNavController(),
-	startDestination: Any = Routes.Splash,
+	startDestination: Any = AppRoutes.Splash,
 ) {
 	val lifecycleOwner = LocalLifecycleOwner.current
 	val navigatorState by navigator.navActions.asLifecycleAwareState(
@@ -39,7 +37,7 @@ fun AppNavHost(
 	)
 	LaunchedEffect(navigatorState) {
 		navigatorState?.let {
-			navController.navigate(it.destination)
+			navController.navigate(it.destination, it.navOptions)
 		}
 	}
 
@@ -72,15 +70,15 @@ fun AppNavHost(
 			)
 		}
 	) {
-		composable<Routes.Splash>(
+		composable<AppRoutes.Splash>(
 			enterTransition = null,
 			exitTransition = null,
 			popEnterTransition = null,
 			popExitTransition = null,
 		) { Splash() }
-		composable<Routes.Login> { Login() }
-		composable<Routes.LoginDataInput> { LoginDataInput() }
-		composable<Routes.Timetable> { Timetable() }
+		composable<AppRoutes.Login> { Login() }
+		composable<AppRoutes.LoginDataInput> { LoginDataInput() }
+		composable<AppRoutes.Timetable> { Timetable() }
 	}
 }
 

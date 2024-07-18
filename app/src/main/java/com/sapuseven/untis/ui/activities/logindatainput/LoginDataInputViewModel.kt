@@ -1,6 +1,5 @@
 package com.sapuseven.untis.ui.activities.logindatainput
 
-import android.app.Activity.RESULT_OK
 import android.net.Uri
 import android.util.Log
 import android.util.Patterns
@@ -10,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.toRoute
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.DEMO_API_URL
@@ -26,10 +26,9 @@ import com.sapuseven.untis.data.databases.entities.UserDao
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.ErrorMessageDictionary.ERROR_CODE_TOO_MANY_RESULTS
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
-import com.sapuseven.untis.ui.activities.ActivityEvents
 import com.sapuseven.untis.ui.activities.ActivityViewModel
 import com.sapuseven.untis.ui.navigation.AppNavigator
-import com.sapuseven.untis.ui.navigation.Routes
+import com.sapuseven.untis.ui.navigation.AppRoutes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,10 +44,10 @@ class LoginDataInputViewModel @Inject constructor(
 	val schoolSearchApi: SchoolSearchApi,
 	val userDataApi: UserDataApi,
 	val userDao: UserDao,
-	val navController: AppNavigator,
+	private val navigator: AppNavigator,
 	savedStateHandle: SavedStateHandle
 ) : ActivityViewModel() {
-	val args: Routes.LoginDataInput = savedStateHandle.toRoute<Routes.LoginDataInput>()
+	val args: AppRoutes.LoginDataInput = savedStateHandle.toRoute<AppRoutes.LoginDataInput>()
 
 	val existingUserId = if (args.userId == -1L) null else args.userId
 
@@ -194,8 +193,10 @@ class LoginDataInputViewModel @Inject constructor(
 			val user = buildUser(untisApiUrl, appSharedSecret, schoolInfo, userData)
 
 			withContext(Dispatchers.IO) {
-				saveUser(user, userData.masterData)
-				activityEvents.send(ActivityEvents.Finish(RESULT_OK))
+				val userId = saveUser(user, userData.masterData)
+				navigator.navigate(AppRoutes.Timetable(userId)) {
+					popUpTo(0) // Pop all previous routes
+				}
 			}
 		} catch (e: UntisApiException) {
 			Log.e(LoginDataInputViewModel::class.simpleName, "loadData error", e)
@@ -233,7 +234,7 @@ class LoginDataInputViewModel @Inject constructor(
 		return user
 	}
 
-	private suspend fun saveUser(user: User, masterData: MasterData) {
+	private suspend fun saveUser(user: User, masterData: MasterData): Long {
 		val userId = existingUserId?.also {
 			userDao.update(user)
 		} ?: run {
@@ -242,6 +243,7 @@ class LoginDataInputViewModel @Inject constructor(
 
 		userDao.deleteUserData(userId)
 		userDao.insertUserData(userId, masterData)
+		return userId
 	}
 
 	private fun buildUntisApiUrl(schoolInfo: SchoolInfo): String {

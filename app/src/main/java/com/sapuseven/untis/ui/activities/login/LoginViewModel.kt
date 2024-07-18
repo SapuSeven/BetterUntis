@@ -18,7 +18,7 @@ import com.sapuseven.untis.services.CodeScanService
 import com.sapuseven.untis.ui.activities.ActivityEvents
 import com.sapuseven.untis.ui.activities.ActivityViewModel
 import com.sapuseven.untis.ui.navigation.AppNavigator
-import com.sapuseven.untis.ui.navigation.Routes
+import com.sapuseven.untis.ui.navigation.AppRoutes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -131,7 +131,7 @@ class LoginViewModel @Inject constructor(
 	// onClick listeners
 	fun onSchoolSelected(school: SchoolInfo) {
 		navigator.navigate(
-			Routes.LoginDataInput(schoolInfoSerialized = getJSON().encodeToString<SchoolInfo>(school))
+			AppRoutes.LoginDataInput(schoolInfoSerialized = getJSON().encodeToString<SchoolInfo>(school))
 		)
 	}
 
@@ -144,10 +144,10 @@ class LoginViewModel @Inject constructor(
 	}
 
 	fun onDemoClick() {
-		navigator.navigate(Routes.LoginDataInput(demoLogin = true))
+		navigator.navigate(AppRoutes.LoginDataInput(demoLogin = true))
 	}
 
 	fun onManualDataInputClick() {
-		navigator.navigate(Routes.LoginDataInput())
+		navigator.navigate(AppRoutes.LoginDataInput())
 	}
 }

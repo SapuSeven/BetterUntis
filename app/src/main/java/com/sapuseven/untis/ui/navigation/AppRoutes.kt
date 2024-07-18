@@ -1,15 +1,16 @@
 package com.sapuseven.untis.ui.navigation
 
-import android.os.Bundle
-import androidx.navigation.NavType
 import kotlinx.serialization.Serializable
 
-object Routes {
+object AppRoutes {
 	@Serializable
 	object Splash
 
 	@Serializable
-	data class Timetable(val userId: Long)
+	data class Timetable(val userId: Long) {
+		@Serializable
+		companion object
+	}
 
 	@Serializable
 	object Login
