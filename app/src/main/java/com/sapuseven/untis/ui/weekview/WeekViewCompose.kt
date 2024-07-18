@@ -650,7 +650,7 @@ fun WeekViewCompose(
 			pageSpacing = with(LocalDensity.current) { dividerWidth.toDp() },
 			flingBehavior = PagerDefaults.flingBehavior(
 				state = pagerState,
-				lowVelocityAnimationSpec = tween(
+				snapAnimationSpec = tween(
 					easing = CubicBezierEasing(0.17f, 0.84f, 0.44f, 1f),
 					durationMillis = 500
 				)

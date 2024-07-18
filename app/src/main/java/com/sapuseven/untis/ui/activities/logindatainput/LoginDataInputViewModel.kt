@@ -10,9 +10,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
+import androidx.navigation.toRoute
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.BaseComposeActivity.Companion.EXTRA_LONG_USER_ID
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.DEMO_API_URL
 import com.sapuseven.untis.activities.SAVED_STATE_INTENT_DATA
 import com.sapuseven.untis.api.client.SchoolSearchApi
@@ -30,9 +29,9 @@ import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.ui.activities.ActivityEvents
 import com.sapuseven.untis.ui.activities.ActivityViewModel
 import com.sapuseven.untis.ui.navigation.AppNavigator
+import com.sapuseven.untis.ui.navigation.Routes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -49,7 +48,9 @@ class LoginDataInputViewModel @Inject constructor(
 	val navController: AppNavigator,
 	savedStateHandle: SavedStateHandle
 ) : ActivityViewModel() {
-	val existingUserId = savedStateHandle.get<Long>(EXTRA_LONG_USER_ID)
+	val args: Routes.LoginDataInput = savedStateHandle.toRoute<Routes.LoginDataInput>()
+
+	val existingUserId = args.userId
 
 	val loginData = LoginData()
 
@@ -75,7 +76,7 @@ class LoginDataInputViewModel @Inject constructor(
 	var showQrCodeErrorDialog by mutableStateOf(false)
 		private set
 
-	val showProfileUpdate = savedStateHandle.get<Boolean>("profileUpdate") == true
+	val showProfileUpdate = args.profileUpdate == true
 
 	var schoolIdLocked by mutableStateOf(false)
 
@@ -103,7 +104,7 @@ class LoginDataInputViewModel @Inject constructor(
 		} ?: true
 	}
 
-	val schoolInfoFromSearch = savedStateHandle.get<String>("schoolInfo")?.let {
+	val schoolInfoFromSearch = args.schoolInfoSerialized?.let {
 		getJSON().decodeFromString<SchoolInfo>(it)
 	}
 
@@ -112,7 +113,7 @@ class LoginDataInputViewModel @Inject constructor(
 			existingUserId?.let { userDao.getById(it) }?.let { loginData.loadFromUser(it) }
 		}
 
-		if (savedStateHandle.get<Boolean>("demoLogin") == true) {
+		if (args.demoLogin == true) {
 			loginData.anonymous.value = true
 			loginData.schoolId.value = "demo"
 			advanced = true
@@ -200,7 +201,7 @@ class LoginDataInputViewModel @Inject constructor(
 			Log.e(LoginDataInputViewModel::class.simpleName, "loadData error", e)
 			val errorTextRes = ErrorMessageDictionary.getErrorMessageResource(e.error?.code, false)
 			errorText = errorTextRes ?: R.string.errormessagedictionary_generic
-			errorTextRaw = when(e.error?.code) {
+			errorTextRaw = when (e.error?.code) {
 				ERROR_CODE_TOO_MANY_RESULTS -> "Check the school id" // TODO: This is an exampe. Add detailed descriptions to errormessagedictionary
 				else -> if (errorTextRes == null) e.error?.message else null
 			}

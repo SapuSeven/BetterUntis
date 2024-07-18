@@ -93,9 +93,6 @@ import androidx.core.graphics.ColorUtils
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import androidx.navigation.navOptions
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.BuildConfig
@@ -134,8 +131,7 @@ import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.material.scheme.Scheme
 import com.sapuseven.untis.ui.models.NavItemShortcut
 import com.sapuseven.untis.ui.navigation.AppNavHost
-import com.sapuseven.untis.ui.navigation.NavigationActions
-import com.sapuseven.untis.ui.navigation.NavigationItem
+import com.sapuseven.untis.ui.navigation.Routes
 import com.sapuseven.untis.ui.preferences.convertRangeToPair
 import com.sapuseven.untis.ui.theme.toColorScheme
 import com.sapuseven.untis.ui.weekview.Event
@@ -158,7 +154,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transform
@@ -217,9 +212,9 @@ class MainActivity : ComponentActivity() {
 					LaunchedEffect(Unit) {
 						viewModel.activeUser.collect { user ->
 							user?.let {
-								viewModel.navigator.navigate(NavigationActions.Splash.toTimetable(it.id))
+								viewModel.navigator.navigate(Routes.Timetable(it.id))
 							} ?: run {
-								viewModel.navigator.navigate(NavigationActions.Splash.toLogin())
+								viewModel.navigator.navigate(Routes.Login)
 							}
 						}
 					}

@@ -1,18 +1,13 @@
 package com.sapuseven.untis.ui.activities.login
 
 import android.app.Activity
-import android.os.Bundle
-import android.util.Log
 import androidx.activity.result.ActivityResult
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.core.os.bundleOf
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.Navigator
 import com.sapuseven.untis.activities.LoginActivity.Companion.EXTRA_BOOLEAN_SHOW_BACK_BUTTON
 import com.sapuseven.untis.api.client.SchoolSearchApi
 import com.sapuseven.untis.api.exceptions.UntisApiException
@@ -23,7 +18,7 @@ import com.sapuseven.untis.services.CodeScanService
 import com.sapuseven.untis.ui.activities.ActivityEvents
 import com.sapuseven.untis.ui.activities.ActivityViewModel
 import com.sapuseven.untis.ui.navigation.AppNavigator
-import com.sapuseven.untis.ui.navigation.NavigationActions
+import com.sapuseven.untis.ui.navigation.Routes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -109,7 +104,8 @@ class LoginViewModel @Inject constructor(
 			try {
 				schoolSearchItems = schoolSearchApi.searchSchools(schoolSearchText).schools
 			} catch (e: UntisApiException) {
-				schoolSearchError = ErrorMessageDictionary.getErrorMessageResource(e.error?.code, false)
+				schoolSearchError =
+					ErrorMessageDictionary.getErrorMessageResource(e.error?.code, false)
 				schoolSearchErrorRaw = e.message.orEmpty()
 			} catch (e: Exception) {
 				schoolSearchError = null
@@ -134,7 +130,9 @@ class LoginViewModel @Inject constructor(
 
 	// onClick listeners
 	fun onSchoolSelected(school: SchoolInfo) {
-		navigator.navigate(NavigationActions.Login.toDataInput(schoolInfo = school))
+		navigator.navigate(
+			Routes.LoginDataInput(schoolInfoSerialized = getJSON().encodeToString<SchoolInfo>(school))
+		)
 	}
 
 	fun onCodeScanClick() {
@@ -146,10 +144,10 @@ class LoginViewModel @Inject constructor(
 	}
 
 	fun onDemoClick() {
-		navigator.navigate(NavigationActions.Login.toDataInput(demoLogin = true))
+		navigator.navigate(Routes.LoginDataInput(demoLogin = true))
 	}
 
 	fun onManualDataInputClick() {
-		navigator.navigate(NavigationActions.Login.toDataInput())
+		navigator.navigate(Routes.LoginDataInput())
 	}
 }

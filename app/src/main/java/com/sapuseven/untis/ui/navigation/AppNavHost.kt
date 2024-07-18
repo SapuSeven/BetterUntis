@@ -9,28 +9,28 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.ui.activities.login.Login
 import com.sapuseven.untis.ui.activities.logindatainput.LoginDataInput
 import com.sapuseven.untis.ui.activities.splash.Splash
 import com.sapuseven.untis.ui.activities.timetable.Timetable
 import kotlinx.coroutines.flow.Flow
+import kotlin.reflect.typeOf
 
 @Composable
 fun AppNavHost(
 	navigator: AppNavigator,
 	modifier: Modifier = Modifier,
 	navController: NavHostController = rememberNavController(),
-	startDestination: String = NavigationItem.Splash.route,
+	startDestination: Any = Routes.Splash,
 ) {
 	val lifecycleOwner = LocalLifecycleOwner.current
 	val navigatorState by navigator.navActions.asLifecycleAwareState(
@@ -39,7 +39,7 @@ fun AppNavHost(
 	)
 	LaunchedEffect(navigatorState) {
 		navigatorState?.let {
-			navController.navigate(it.destination, it.navOptions)
+			navController.navigate(it.destination)
 		}
 	}
 
@@ -72,37 +72,15 @@ fun AppNavHost(
 			)
 		}
 	) {
-		composable(
-			NavigationItem.Splash.route,
+		composable<Routes.Splash>(
 			enterTransition = null,
 			exitTransition = null,
 			popEnterTransition = null,
 			popExitTransition = null,
 		) { Splash() }
-		composable(NavigationItem.Login.route) { Login() }
-		composable(
-			NavigationItem.LoginDataInput.route,
-			arguments = listOf(
-				navArgument("demoLogin") {
-					type = NavType.BoolType
-					defaultValue = false
-				},
-				navArgument("profileUpdate") {
-					type = NavType.BoolType
-					defaultValue = false
-				},
-				navArgument("schoolInfo") {
-					type = NavType.StringType
-					nullable = true
-				}
-			)
-		) { LoginDataInput() }
-		composable(
-			NavigationItem.Timetable.route,
-			arguments = listOf(navArgument("userId") {
-				type = NavType.LongType
-			})
-		) { Timetable() }
+		composable<Routes.Login> { Login() }
+		composable<Routes.LoginDataInput> { LoginDataInput() }
+		composable<Routes.Timetable> { Timetable() }
 	}
 }
 
