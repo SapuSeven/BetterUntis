@@ -7,10 +7,7 @@ object AppRoutes {
 	object Splash
 
 	@Serializable
-	data class Timetable(val userId: Long) {
-		@Serializable
-		companion object
-	}
+	data class Timetable(val userId: Long)
 
 	@Serializable
 	object Login

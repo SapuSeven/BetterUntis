@@ -88,7 +88,8 @@ fun Main(
 	val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 	val scope = rememberCoroutineScope()
 
-	Drawer(
+	Text(text = "Hello :)")
+	/*Drawer(
 		drawerState = drawerState
 		/*onShowTimetable = {
 			it.let { element ->
@@ -244,16 +245,16 @@ fun Main(
 		enter = fullscreenDialogAnimationEnter(),
 		exit = fullscreenDialogAnimationExit()
 	) {
-		ProfileManagementDialog(
+		/*ProfileManagementDialog(
 			viewModel = viewModel,
 			onDismiss = {
 				viewModel.profileManagementDialog = false
 			}
-		)
-	}
+		)*/
+	}*/
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+/*@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Drawer(
 	viewModel: MainDrawerViewModel = viewModel(),
@@ -492,4 +493,4 @@ private fun Drawer(
 			}
 		)
 	}
-}
+}*/

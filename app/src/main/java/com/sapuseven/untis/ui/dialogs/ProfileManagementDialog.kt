@@ -19,6 +19,7 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.NewMainAppState
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.ui.activities.main.MainViewModel
+import com.sapuseven.untis.ui.activities.timetable.TimetableViewModel
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import kotlinx.coroutines.launch
@@ -26,11 +27,11 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileManagementDialog(
-	viewModel: MainViewModel,
+	viewModel: TimetableViewModel,
 	onDismiss: () -> Unit
 ) {
 	var dismissed by remember { mutableStateOf(false) }
-	var users = viewModel.userList
+	var users = viewModel.allUsers
 	val context = LocalContext.current
 	val scope = rememberCoroutineScope()
 

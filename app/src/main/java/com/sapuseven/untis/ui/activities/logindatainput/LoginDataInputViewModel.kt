@@ -26,6 +26,7 @@ import com.sapuseven.untis.data.databases.entities.UserDao
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.ErrorMessageDictionary.ERROR_CODE_TOO_MANY_RESULTS
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
+import com.sapuseven.untis.modules.UserManager
 import com.sapuseven.untis.ui.activities.ActivityViewModel
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
@@ -45,6 +46,7 @@ class LoginDataInputViewModel @Inject constructor(
 	val userDataApi: UserDataApi,
 	val userDao: UserDao,
 	private val navigator: AppNavigator,
+	private val userManager: UserManager,
 	savedStateHandle: SavedStateHandle
 ) : ActivityViewModel() {
 	val args: AppRoutes.LoginDataInput = savedStateHandle.toRoute<AppRoutes.LoginDataInput>()
@@ -243,6 +245,7 @@ class LoginDataInputViewModel @Inject constructor(
 
 		userDao.deleteUserData(userId)
 		userDao.insertUserData(userId, masterData)
+		userManager.setActiveUser(userId)
 		return userId
 	}
 

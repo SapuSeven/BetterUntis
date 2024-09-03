@@ -28,6 +28,7 @@ object UserModule {
 }
 
 @Singleton
+@Deprecated("User selection should be handled via nav routes")
 class UserManager @Inject constructor(
 	private val dataStoreUtil: DataStoreUtil,
 	private val userDao: UserDao
@@ -45,13 +46,14 @@ class UserManager @Inject constructor(
 				_userState.value = storedActiveUserId?.let { userDao.getById(it) }
 			}
 		}
-
 	}
 
-	fun setActiveUser(user: User) {
+	fun setActiveUser(user: User) = setActiveUser(user.id)
+
+	fun setActiveUser(userId: Long) {
 		scope.launch(Dispatchers.IO) {
 			dataStoreUtil.globalDataStore.edit { preferences ->
-				preferences[USER_ID_KEY] = user.id
+				preferences[USER_ID_KEY] = userId
 			}
 		}
 	}

@@ -1,33 +1,22 @@
-package com.sapuseven.untis.ui.activities.main
+package com.sapuseven.untis.ui.activities.timetable
 
 import android.content.Intent
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.ActivityResult
-import androidx.compose.material3.DrawerState
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
-import com.sapuseven.untis.activities.MainActivity
 import com.sapuseven.untis.data.databases.entities.UserDao
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.TimetableBookmark
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.modules.UserManager
 import com.sapuseven.untis.ui.models.NavItemShortcut
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.sentry.Breadcrumb
-import io.sentry.Sentry
-import io.sentry.SentryLevel
 import javax.inject.Inject
 
 @HiltViewModel
-class MainDrawerViewModel @Inject constructor(
-	private val userManager: UserManager,
+class TimetableDrawerViewModel @Inject constructor(
 	private val userDao: UserDao
 ) : ViewModel() {
 	var displayedElement by mutableStateOf<PeriodElement?>(null)
@@ -38,7 +27,7 @@ class MainDrawerViewModel @Inject constructor(
 	var bookmarkDeleteDialog by mutableStateOf<TimetableBookmark?>(null)
 		private set
 
-	val user = userManager.activeUser
+	//val user = userManager.activeUser
 	fun onShortcutItemClick(
 		item: NavItemShortcut,
 		shortcutLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
@@ -114,10 +103,10 @@ class MainDrawerViewModel @Inject constructor(
 	}
 
 	fun deleteBookmark(bookmark: TimetableBookmark) {
-		user.value?.let { user ->
+		/*user.value?.let { user ->
 			user.bookmarks = user.bookmarks.minus(bookmark)
 			userDao.update(user)
-		}
+		}*/
 		dismissBookmarkDeleteDialog()
 	}
 
