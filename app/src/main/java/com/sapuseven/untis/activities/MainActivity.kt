@@ -210,6 +210,9 @@ class MainActivity : ComponentActivity() {
 					//.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top))
 				) {
 					LaunchedEffect(Unit) {
+						// TODO Remove references to viewModel.
+						//   Currently there's no mechanism to fallback to other users if the selected user is deleted.
+						//   Maybe load the user inside Splash?
 						viewModel.activeUser.collect { user ->
 							user?.let {
 								viewModel.navigator.navigate(AppRoutes.Timetable(it.id)) {

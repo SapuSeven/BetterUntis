@@ -54,7 +54,7 @@ class TimetableViewModel @Inject constructor(
 						navigator.navigate(AppRoutes.Login)
 					} else if (currentUser.value?.id?.let { currentUserId -> users.find { it.id == currentUserId } == null } == true) {
 						// Potential improvement: With this approach, the user gets kicked out of the profile management dialog when the current user is deleted.
-						navigator.navigate(AppRoutes.Timetable(users.get(0).id))
+						switchUser(users.get(0))
 					}
 				}
 			}
@@ -62,7 +62,9 @@ class TimetableViewModel @Inject constructor(
 	}
 
 	fun switchUser(user: User) {
-		navigator.navigate(AppRoutes.Timetable(user.id))
+		navigator.navigate(AppRoutes.Timetable(user.id)){
+			popUpTo(0) // Pop all previous routes
+		}
 	}
 
 	fun editUsers() {

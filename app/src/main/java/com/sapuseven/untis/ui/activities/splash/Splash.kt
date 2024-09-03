@@ -6,5 +6,5 @@ import androidx.navigation.NavHostController
 
 @Composable
 fun Splash() {
-	Text(text = "Splish splash splush")
+	Text(text = "Splish splash splush") // TODO
 }
