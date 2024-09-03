@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
@@ -47,12 +47,18 @@ class TimetableViewModel @Inject constructor(
 
 	init {
 		viewModelScope.launch {
-			loadUserDetails()
+			withContext(Dispatchers.IO) {
+				currentUser.value = userDao.getById(args.userId)
+				allUsersLiveData.asFlow().collect { users ->
+					if (users.isEmpty()) {
+						navigator.navigate(AppRoutes.Login)
+					} else if (currentUser.value?.id?.let { currentUserId -> users.find { it.id == currentUserId } == null } == true) {
+						// Potential improvement: With this approach, the user gets kicked out of the profile management dialog when the current user is deleted.
+						navigator.navigate(AppRoutes.Timetable(users.get(0).id))
+					}
+				}
+			}
 		}
-	}
-
-	private suspend fun loadUserDetails() = withContext(Dispatchers.IO) {
-		currentUser.value = userDao.getById(args.userId)
 	}
 
 	fun switchUser(user: User) {
@@ -74,9 +80,6 @@ class TimetableViewModel @Inject constructor(
 	override suspend fun deleteUser(user: User) {
 		withContext(Dispatchers.IO) {
 			userDao.delete(user)
-			//contextActivity.deleteProfile(user.id)
-			//if (userDatabase.userDao().getAll().isEmpty())
-			//contextActivity.recreate()
 		}
 	}
 
