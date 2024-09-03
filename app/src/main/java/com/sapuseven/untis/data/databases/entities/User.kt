@@ -3,6 +3,7 @@ package com.sapuseven.untis.data.databases.entities
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Embedded
@@ -99,6 +100,10 @@ data class UserWithData(
 
 @Dao
 interface UserDao {
+	@Query("SELECT * FROM user")
+	fun getAllLive(): LiveData<List<User>>
+
+	@Deprecated("Will be changed to getAllLive()")
 	@Query("SELECT * FROM user")
 	fun getAll(): List<User>
 

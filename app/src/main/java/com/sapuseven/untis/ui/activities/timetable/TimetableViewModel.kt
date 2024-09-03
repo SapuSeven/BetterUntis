@@ -1,20 +1,20 @@
 package com.sapuseven.untis.ui.activities.timetable
 
-import android.os.Bundle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.sapuseven.untis.activities.LoginActivity
-import com.sapuseven.untis.activities.LoginDataInputActivity
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.databases.entities.UserDao
 import com.sapuseven.untis.modules.ThemeManager
-import com.sapuseven.untis.ui.activities.ActivityEvents
 import com.sapuseven.untis.ui.activities.ActivityViewModel
+import com.sapuseven.untis.ui.dialogs.ProfileManagementDialogViewModel
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,13 +29,15 @@ class TimetableViewModel @Inject constructor(
 	private val navigator: AppNavigator,
 	private val themeManager: ThemeManager,
 	private val userDao: UserDao,
-) : ActivityViewModel() {
+) :
+	ProfileManagementDialogViewModel,
+	ActivityViewModel() {
 	private val args: AppRoutes.Timetable = savedStateHandle.toRoute<AppRoutes.Timetable>()
 
 	var currentUser = mutableStateOf<User?>(null)
 		private set
 
-	var allUsers = mutableStateListOf<User>()
+	var allUsersLiveData = userDao.getAllLive().distinctUntilChanged()
 		private set
 
 	var displayedName by mutableStateOf("")
@@ -51,8 +53,6 @@ class TimetableViewModel @Inject constructor(
 
 	private suspend fun loadUserDetails() = withContext(Dispatchers.IO) {
 		currentUser.value = userDao.getById(args.userId)
-		allUsers.clear()
-		allUsers.addAll(userDao.getAll())
 	}
 
 	fun switchUser(user: User) {
@@ -63,17 +63,25 @@ class TimetableViewModel @Inject constructor(
 		profileManagementDialog = true
 	}
 
-	fun editUser(
+	override fun editUser(
 		user: User?
-	) = viewModelScope.launch {
-		navigator.navigate(AppRoutes.LoginDataInput(userId = user?.id ?: -1))
+	) {
+		viewModelScope.launch {
+			navigator.navigate(AppRoutes.LoginDataInput(userId = user?.id ?: -1))
+		}
 	}
 
-	suspend fun deleteUser(user: User) = withContext(Dispatchers.IO) {
-		userDao.delete(user)
-		//contextActivity.deleteProfile(user.id)
-		//if (userDatabase.userDao().getAll().isEmpty())
-		//contextActivity.recreate()
+	override suspend fun deleteUser(user: User) {
+		withContext(Dispatchers.IO) {
+			userDao.delete(user)
+			//contextActivity.deleteProfile(user.id)
+			//if (userDatabase.userDao().getAll().isEmpty())
+			//contextActivity.recreate()
+		}
+	}
+
+	override fun getAllUsers(): LiveData<List<User>> {
+		return allUsersLiveData
 	}
 
 	fun toggleTheme() {

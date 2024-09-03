@@ -32,6 +32,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+@Deprecated(
+	message = " There is no \"Main\" anymore.",
+	replaceWith = ReplaceWith("TimetableViewModel()", "com.sapuseven.untis.ui.activities.timetable"),
+	level = DeprecationLevel.ERROR
+)
 @HiltViewModel
 class MainViewModel @Inject constructor(
 	val navigator: AppNavigator,

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -18,7 +19,6 @@ import androidx.compose.ui.res.stringResource
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.NewMainAppState
 import com.sapuseven.untis.data.databases.entities.User
-import com.sapuseven.untis.ui.activities.main.MainViewModel
 import com.sapuseven.untis.ui.activities.timetable.TimetableViewModel
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
@@ -27,11 +27,11 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileManagementDialog(
-	viewModel: TimetableViewModel,
+	viewModel: ProfileManagementDialogViewModel,
 	onDismiss: () -> Unit
 ) {
 	var dismissed by remember { mutableStateOf(false) }
-	var users = viewModel.allUsers
+	var users = viewModel.getAllUsers().observeAsState(listOf())
 	val context = LocalContext.current
 	val scope = rememberCoroutineScope()
 
@@ -85,7 +85,7 @@ fun ProfileManagementDialog(
 				Divider(color = MaterialTheme.colorScheme.outline)
 			}
 
-			items(users) { user ->
+			items(users.value) { user ->
 				ListItem(
 					headlineContent = { Text(user.getDisplayedName()) },
 					supportingContent = { Text(user.userData.schoolName) },

@@ -69,6 +69,7 @@ import com.sapuseven.untis.ui.dialogs.FeedbackDialog
 import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
+import com.sapuseven.untis.ui.navigation.AppRoutes
 import com.sapuseven.untis.ui.weekview.WeekViewCompose
 import com.sapuseven.untis.ui.weekview.startDateForPageIndex
 import io.sentry.Breadcrumb
@@ -80,15 +81,18 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNull.content
 
+@Deprecated(
+	message = " There is no \"Main\" anymore.",
+	replaceWith = ReplaceWith("Timetable()", "com.sapuseven.untis.ui.activities.timetable"),
+	level = DeprecationLevel.ERROR
+)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Main(
-	viewModel: MainViewModel = viewModel()
 ) {
 	val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 	val scope = rememberCoroutineScope()
 
-	Text(text = "Hello :)")
 	/*Drawer(
 		drawerState = drawerState
 		/*onShowTimetable = {

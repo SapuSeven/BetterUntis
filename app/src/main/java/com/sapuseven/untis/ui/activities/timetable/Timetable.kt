@@ -34,6 +34,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -70,6 +71,7 @@ fun Timetable(
 ) {
 	val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 	val scope = rememberCoroutineScope()
+	val users = viewModel.allUsersLiveData.observeAsState(listOf())
 
 	Drawer(
 		drawerState = drawerState
@@ -100,7 +102,7 @@ fun Timetable(
 							DebugDesclaimerAction()
 
 						ProfileSelectorAction(
-							users = viewModel.allUsers,
+							users = users.value,
 							currentSelection = viewModel.currentUser.value,
 							showProfileActions = true,
 							onSelectionChange = {
@@ -116,8 +118,8 @@ fun Timetable(
 		) { innerPadding ->
 			Box(
 				modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
+					.padding(innerPadding)
+					.fillMaxSize()
 			) {
 				val density = LocalDensity.current
 				val insets = insetsPaddingValues()
