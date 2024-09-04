@@ -1,5 +1,6 @@
 package com.sapuseven.untis.ui.activities.timetable
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -35,12 +36,8 @@ class TimetableViewModel @Inject constructor(
 	ElementPickerDelegate by elementPickerDelegate,
 	UserManagerDelegate by userManagerDelegate
 {
-	var displayedName by mutableStateOf("")
-		private set
-
 	var profileManagementDialog by mutableStateOf(false)
 
-	//fun getTimetableDatabaseInterface() = TimetableDatabaseInterface(userDatabase, currentUser.value!!.id)
 	private val args: AppRoutes.Timetable = savedStateHandle.toRoute<AppRoutes.Timetable>()
 
 	init {

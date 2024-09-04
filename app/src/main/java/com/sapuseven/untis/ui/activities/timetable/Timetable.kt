@@ -49,7 +49,6 @@ fun Timetable(
 
 	TimetableDrawer(
 		drawerState = drawerState,
-		//timetableDatabaseInterface = viewModel.getTimetableDatabaseInterface(),
 		elementPickerDelegate = viewModel.elementPickerDelegate,
 		onShowTimetable = {
 			//it.let { element ->
@@ -60,7 +59,7 @@ fun Timetable(
 		AppScaffold(
 			topBar = {
 				CenterAlignedTopAppBar(
-					title = { Text(viewModel.displayedName) },
+					title = { Text(user.value?.getDisplayedName() ?: "") },
 					navigationIcon = {
 						IconButton(onClick = {
 							scope.launch {
