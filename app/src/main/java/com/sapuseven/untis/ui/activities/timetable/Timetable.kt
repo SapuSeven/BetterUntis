@@ -1,14 +1,17 @@
 package com.sapuseven.untis.ui.activities.timetable
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -20,11 +23,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
@@ -33,7 +40,10 @@ import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.DebugDesclaimerAction
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
 import com.sapuseven.untis.ui.common.ReportsInfoBottomSheet
+import com.sapuseven.untis.ui.common.disabled
+import com.sapuseven.untis.ui.dialogs.FeedbackDialog
 import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
+import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import kotlinx.coroutines.launch
 
@@ -44,8 +54,8 @@ fun Timetable(
 ) {
 	val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 	val scope = rememberCoroutineScope()
-	val user = viewModel.user.collectAsState()
-	val users = viewModel.allUsers.collectAsState()
+	val user = viewModel.user.collectAsStateWithLifecycle()
+	val users = viewModel.allUsers.collectAsStateWithLifecycle()
 
 	TimetableDrawer(
 		drawerState = drawerState,
@@ -59,7 +69,7 @@ fun Timetable(
 		AppScaffold(
 			topBar = {
 				CenterAlignedTopAppBar(
-					title = { Text(user.value?.getDisplayedName() ?: "") },
+					title = { Text((user.value?.getDisplayedName() ?: "") + (if (BuildConfig.DEBUG) " (${user.value?.id})" else "")) },
 					navigationIcon = {
 						IconButton(onClick = {
 							scope.launch {
@@ -103,22 +113,69 @@ fun Timetable(
 						(insets.calculateBottomPadding() + 48.dp).toPx()
 					}
 				}
-
-				Column {
-					Text("Current user: ${user.value?.id}")
-					Button(onClick = { viewModel.toggleTheme() }) {
-						Text(text = "Toggle theme")
-					}
-
-					var rooms = viewModel.elementPickerDelegate.allRooms.observeAsState()
-					var classes = viewModel.elementPickerDelegate.allClasses.observeAsState()
-
-					Text(text = "${rooms.value?.size ?: "?"} rooms")
-					Text(text = "${classes.value?.size ?: "?"} classes")
-					Text(text = "${viewModel.elementPickerDelegate.allSubjects.value?.size ?: "?"} subjects")
-					Text(text = "${viewModel.elementPickerDelegate.allTeachers.value?.size ?: "?"} teachers")
+				val timeColumnWidth = with(LocalDensity.current) {
+					/*state.weekView.value?.config?.timeColumnWidth?.toDp()
+						?: */48.dp
 				}
 
+				Text(
+					text = viewModel.lastRefreshText(),
+					modifier = Modifier
+						.align(Alignment.BottomStart)
+						.padding(start = timeColumnWidth + 8.dp, bottom = 8.dp)
+						.bottomInsets()
+						.disabled(user.value?.anonymous == true)
+				)
+
+				IconButton(
+					modifier = Modifier
+						.align(Alignment.BottomEnd)
+						.padding(end = 8.dp)
+						.bottomInsets(),
+					onClick = {
+						viewModel.showFeedback()
+					}
+				) {
+					Icon(painter = painterResource(R.drawable.all_feedback), contentDescription = "Give feedback")
+				}
+
+				if (viewModel.feedbackDialog)
+					FeedbackDialog(
+						onDismiss = { viewModel.feedbackDialog = false }
+					)
+
+				if (user.value?.anonymous == true) {
+					Column(
+						verticalArrangement = Arrangement.Center,
+						horizontalAlignment = Alignment.CenterHorizontally,
+						modifier = Modifier
+							.fillMaxSize()
+							.absolutePadding(left = 16.dp)
+					) {
+						Text(
+							text = stringResource(id = R.string.main_anonymous_login_info_text),
+							textAlign = TextAlign.Center,
+							modifier = Modifier
+								.padding(horizontal = 32.dp)
+						)
+
+						Button(
+							onClick = {},// viewModel.onAnonymousSettingsClick,
+							modifier = Modifier
+								.padding(top = 16.dp)
+						) {
+							Text(text = stringResource(id = R.string.main_go_to_settings))
+						}
+					}
+				}
+
+				if (viewModel.loading)
+					CircularProgressIndicator(
+						modifier = Modifier
+							.align(Alignment.BottomEnd)
+							.padding(8.dp)
+							.bottomInsets()
+					)
 				/*WeekViewCompose(
 					events = state.weekViewEvents,
 					onPageChange = { pageOffset ->
@@ -137,70 +194,7 @@ fun Timetable(
 					hourList = state.weekViewPreferences.hourList.value,
 					dividerWidth = state.weekViewPreferences.dividerWidth,
 					colorScheme = state.weekViewPreferences.colorScheme,
-				)
-
-				val timeColumnWidth = with(LocalDensity.current) {
-					/*state.weekView.value?.config?.timeColumnWidth?.toDp()
-						?: */48.dp
-				}
-
-				Text(
-					text = state.lastRefreshText(),
-					modifier = Modifier
-						.align(Alignment.BottomStart)
-						.padding(start = timeColumnWidth + 8.dp, bottom = 8.dp)
-						.bottomInsets()
-						.disabled(state.isAnonymous)
-				)
-
-				IconButton(
-					modifier = Modifier
-						.align(Alignment.BottomEnd)
-						.padding(end = 8.dp)
-						.bottomInsets(),
-					onClick = {
-						state.showFeedback()
-					}
-				) {
-					Icon(painter = painterResource(R.drawable.all_feedback), contentDescription = "Give feedback")
-				}
-
-				if (state.feedbackDialog)
-					FeedbackDialog(
-						onDismiss = { state.feedbackDialog = false }
-					)
-
-				if (state.isAnonymous) {
-					Column(
-						verticalArrangement = Arrangement.Center,
-						horizontalAlignment = Alignment.CenterHorizontally,
-						modifier = Modifier
-							.fillMaxSize()
-							.absolutePadding(left = 16.dp)
-					) {
-						Text(
-							text = stringResource(id = R.string.main_anonymous_login_info_text),
-							textAlign = TextAlign.Center,
-							modifier = Modifier
-								.padding(horizontal = 32.dp)
-						)
-
-						Button(
-							onClick = state.onAnonymousSettingsClick,
-							modifier = Modifier
-								.padding(top = 16.dp)
-						) {
-							Text(text = stringResource(id = R.string.main_go_to_settings))
-						}
-					}
-				}
-
-				if (state.isLoading)
-					CircularProgressIndicator(
-						modifier = Modifier
-							.align(Alignment.BottomEnd)
-							.padding(8.dp)
-					)*/
+				)*/
 			}
 
 			ReportsInfoBottomSheet()

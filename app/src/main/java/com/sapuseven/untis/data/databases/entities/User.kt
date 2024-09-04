@@ -102,14 +102,15 @@ data class UserWithData(
 @Dao
 interface UserDao {
 	@Query("SELECT * FROM user")
-	fun getAllLive(): LiveData<List<User>>
-
-	@Query("SELECT * FROM user")
 	fun getAllFlow(): Flow<List<User>>
 
-	@Deprecated("Will be changed to getAllLive() or getAllFlow()")
+	@Deprecated("Will be changed to getAllFlow()")
 	@Query("SELECT * FROM user")
 	fun getAll(): List<User>
+
+	@Deprecated("Will be changed to getAllFlow()")
+	@Query("SELECT * FROM user")
+	suspend fun getAllAsync(): List<User>
 
 	@Query("SELECT * FROM user WHERE id LIKE :userId")
 	fun getById(userId: Long): User?

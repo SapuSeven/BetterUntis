@@ -4,10 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.databases.entities.UserDao
 import com.sapuseven.untis.modules.ThemeManager
@@ -20,8 +22,10 @@ import com.sapuseven.untis.viewmodels.ViewModelDelegateFactory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.joda.time.Instant
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,6 +41,9 @@ class TimetableViewModel @Inject constructor(
 	UserManagerDelegate by userManagerDelegate
 {
 	var profileManagementDialog by mutableStateOf(false)
+	var feedbackDialog by mutableStateOf(false)
+
+	var loading by mutableStateOf(true)
 
 	private val args: AppRoutes.Timetable = savedStateHandle.toRoute<AppRoutes.Timetable>()
 
@@ -45,7 +52,8 @@ class TimetableViewModel @Inject constructor(
 		userManagerDelegate.init(viewModelScope, args.userId)
 
 		viewModelScope.launch {
-			allUsers.collect { users ->
+			// TODO for some reason this is not properly closed when the app is closed, which leads to the database being kept open and causes crashes on subsequent launches.
+			/*userManagerDelegate.allUsers.collect { users ->
 				users?.let {
 					if (users.isEmpty() == true) {
 						navigator.navigate(AppRoutes.Login)
@@ -54,7 +62,7 @@ class TimetableViewModel @Inject constructor(
 						switchUser(users.get(0))
 					}
 				}
-			}
+			}*/
 		}
 	}
 
@@ -72,5 +80,17 @@ class TimetableViewModel @Inject constructor(
 		user.value?.id?.let {
 			themeManager.toggleTheme(it)
 		}
+	}
+
+	// TODO
+	@Composable
+	fun lastRefreshText() = stringResource(
+		id = R.string.main_last_refreshed,
+		/*if (weekViewRefreshTimestamps[weekViewPage] ?: 0L > 0L) formatTimeDiff(Instant.now().millis - weekViewRefreshTimestamps[weekViewPage]!!)
+		else*/ stringResource(id = R.string.main_last_refreshed_never)
+	)
+
+	fun showFeedback() {
+		feedbackDialog = true
 	}
 }

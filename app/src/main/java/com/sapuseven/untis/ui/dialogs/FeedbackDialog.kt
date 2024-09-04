@@ -114,7 +114,7 @@ fun FeedbackDialog(
 		Text(
 			text = "You shouldn't notice any differences - if you do, please use this dialog to report your issues.",
 			modifier = Modifier
-				.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp)
+				.padding(start = 16.dp, end = 16.dp, top = 8.dp)
 		)
 
 		OutlinedTextField(
@@ -124,7 +124,7 @@ fun FeedbackDialog(
 			minLines = 4,
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(horizontal = 16.dp)
+				.padding(horizontal = 16.dp, vertical = 16.dp)
 		)
 
 		LabeledCheckbox(

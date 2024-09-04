@@ -15,6 +15,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -52,7 +54,7 @@ class UserManagerDelegateImpl @Inject constructor(
 
 		allUsers = userDao.getAllFlow().stateIn(
 			scope = delegateScope,
-			started = WhileSubscribed(2000),
+			started = WhileSubscribed(5000),
 			initialValue = null
 		)
 	}

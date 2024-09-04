@@ -16,6 +16,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.NewMainAppState
 import com.sapuseven.untis.data.databases.entities.User
@@ -32,7 +33,7 @@ fun ProfileManagementDialog(
 	onDismiss: () -> Unit
 ) {
 	var dismissed by remember { mutableStateOf(false) }
-	var users = userManager.allUsers.collectAsState()
+	var users = userManager.allUsers.collectAsStateWithLifecycle()
 	val context = LocalContext.current
 	val scope = rememberCoroutineScope()
 

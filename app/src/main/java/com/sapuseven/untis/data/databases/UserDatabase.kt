@@ -60,7 +60,6 @@ abstract class UserDatabase : RoomDatabase() {
 					context,
 					UserDatabase::class.java, "userdata.db"
 				)
-					.allowMainThreadQueries() // TODO: Fix and delete this!
 					.addMigrations(
 						*MIGRATIONS_LEGACY.toTypedArray(),
 						MIGRATION_7_8,
