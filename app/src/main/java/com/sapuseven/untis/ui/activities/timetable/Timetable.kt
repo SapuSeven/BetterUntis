@@ -1,60 +1,32 @@
 package com.sapuseven.untis.ui.activities.timetable
 
-import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.MainActivity
-import com.sapuseven.untis.activities.main.DrawerItems
-import com.sapuseven.untis.activities.main.DrawerText
-import com.sapuseven.untis.api.model.untis.masterdata.Klasse
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.AppScaffold
@@ -64,7 +36,6 @@ import com.sapuseven.untis.ui.common.ReportsInfoBottomSheet
 import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,8 +44,8 @@ fun Timetable(
 ) {
 	val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 	val scope = rememberCoroutineScope()
-	val users = viewModel.allUsersLiveData.observeAsState(listOf())
-	val timetableElements = viewModel.elementPickerDelegate.getAllPeriodElements()
+	val user = viewModel.user.collectAsState()
+	val users = viewModel.allUsers.collectAsState()
 
 	TimetableDrawer(
 		drawerState = drawerState,
@@ -107,8 +78,8 @@ fun Timetable(
 							DebugDesclaimerAction()
 
 						ProfileSelectorAction(
-							users = users.value,
-							currentSelection = viewModel.currentUser.value,
+							users = users.value ?: emptyList(),
+							currentSelection = user.value,
 							showProfileActions = true,
 							onSelectionChange = {
 								viewModel.switchUser(it)
@@ -135,7 +106,7 @@ fun Timetable(
 				}
 
 				Column {
-					Text("Current user: ${viewModel.currentUser.value?.id}")
+					Text("Current user: ${user.value?.id}")
 					Button(onClick = { viewModel.toggleTheme() }) {
 						Text(text = "Toggle theme")
 					}
@@ -243,7 +214,7 @@ fun Timetable(
 		exit = fullscreenDialogAnimationExit()
 	) {
 		ProfileManagementDialog(
-			viewModel = viewModel,
+			userManager = viewModel.userManagerDelegate,
 			onDismiss = {
 				viewModel.profileManagementDialog = false
 			}

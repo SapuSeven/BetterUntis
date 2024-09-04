@@ -22,16 +22,17 @@ import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.ui.activities.timetable.TimetableViewModel
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
+import com.sapuseven.untis.viewmodels.UserManagerDelegate
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileManagementDialog(
-	viewModel: ProfileManagementDialogViewModel,
+	userManager: UserManagerDelegate,
 	onDismiss: () -> Unit
 ) {
 	var dismissed by remember { mutableStateOf(false) }
-	var users = viewModel.getAllUsers().observeAsState(listOf())
+	var users = userManager.allUsers.collectAsState()
 	val context = LocalContext.current
 	val scope = rememberCoroutineScope()
 
@@ -85,7 +86,7 @@ fun ProfileManagementDialog(
 				Divider(color = MaterialTheme.colorScheme.outline)
 			}
 
-			items(users.value) { user ->
+			items(users.value ?: emptyList()) { user ->
 				ListItem(
 					headlineContent = { Text(user.getDisplayedName()) },
 					supportingContent = { Text(user.userData.schoolName) },
@@ -106,7 +107,7 @@ fun ProfileManagementDialog(
 						}
 					},
 					modifier = Modifier.clickable {
-						viewModel.editUser(user)
+						userManager.editUser(user)
 					}
 				)
 			}
@@ -121,7 +122,7 @@ fun ProfileManagementDialog(
 						)
 					},
 					modifier = Modifier.clickable {
-						viewModel.editUser(null)
+						userManager.editUser(null)
 					}
 				)
 			}
@@ -147,7 +148,7 @@ fun ProfileManagementDialog(
 				confirmButton = {
 					TextButton(
 						onClick = { scope.launch {
-							viewModel.deleteUser(user)
+							userManager.deleteUser(user)
 							deleteDialog = null
 						}}) {
 						Text(stringResource(id = R.string.all_delete))

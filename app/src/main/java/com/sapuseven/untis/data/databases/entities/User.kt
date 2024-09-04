@@ -33,6 +33,7 @@ import com.sapuseven.untis.api.model.untis.masterdata.Teacher
 import com.sapuseven.untis.api.model.untis.masterdata.TeachingMethod
 import com.sapuseven.untis.api.model.untis.masterdata.TimeGrid
 import com.sapuseven.untis.models.TimetableBookmark
+import kotlinx.coroutines.flow.Flow
 
 @Entity
 data class User(
@@ -103,12 +104,18 @@ interface UserDao {
 	@Query("SELECT * FROM user")
 	fun getAllLive(): LiveData<List<User>>
 
-	@Deprecated("Will be changed to getAllLive()")
+	@Query("SELECT * FROM user")
+	fun getAllFlow(): Flow<List<User>>
+
+	@Deprecated("Will be changed to getAllLive() or getAllFlow()")
 	@Query("SELECT * FROM user")
 	fun getAll(): List<User>
 
 	@Query("SELECT * FROM user WHERE id LIKE :userId")
 	fun getById(userId: Long): User?
+
+	@Query("SELECT * FROM user WHERE id LIKE :userId")
+	suspend fun getByIdAsync(userId: Long): User?
 
 	@Transaction
 	@Query("SELECT * FROM user")

@@ -2,7 +2,9 @@ package com.sapuseven.untis.viewmodels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.map
+import androidx.navigation.toRoute
 import com.sapuseven.untis.api.model.untis.masterdata.Klasse
 import com.sapuseven.untis.api.model.untis.masterdata.Room
 import com.sapuseven.untis.api.model.untis.masterdata.Subject
@@ -12,19 +14,21 @@ import com.sapuseven.untis.data.timetable.PeriodData.Companion.ELEMENT_NAME_UNKN
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface.Type
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import com.sapuseven.untis.ui.navigation.AppRoutes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-interface ElementPickerDelegate : ViewModelDelegate {
+interface ElementPickerDelegate {
 	val allClasses: LiveData<Map<Int, Klasse>>
 	val allTeachers: LiveData<Map<Int, Teacher>>
 	val allSubjects: LiveData<Map<Int, Subject>>
 	val allRooms: LiveData<Map<Int, Room>>
 
-	fun loadAllElements(userId: Long)
+	fun init(delegateScope: CoroutineScope)
+
 	fun getAllPeriodElements(): Map<TimetableDatabaseInterface.Type, LiveData<List<PeriodElement>>?>
 
 	fun getShortName(periodElement: PeriodElement): String
@@ -32,17 +36,18 @@ interface ElementPickerDelegate : ViewModelDelegate {
 }
 
 class ElementPickerDelegateImpl @Inject constructor(
-	override val delegateScope: CoroutineScope,
+	savedStateHandle: SavedStateHandle,
 	private val userDao: UserDao,
-) : ElementPickerDelegate {
+) : ViewModelDelegate(), ElementPickerDelegate {
+	private val userId = savedStateHandle.get<Long>("userId")!!
+
 	override val allClasses = MutableLiveData<Map<Int, Klasse>>()
 	override val allTeachers = MutableLiveData<Map<Int, Teacher>>()
 	override val allSubjects = MutableLiveData<Map<Int, Subject>>()
 	override val allRooms = MutableLiveData<Map<Int, Room>>()
 
-	override fun loadAllElements(userId: Long) {
+	override fun init() {
 		delegateScope.launch(Dispatchers.IO) {
-			delay(5000)
 			userDao.getByIdWithData(userId)?.let {
 				allClasses.postValue(it.klassen.toList().filter { it.active }
 					.sortedBy { it.name }.associateBy { it.id })

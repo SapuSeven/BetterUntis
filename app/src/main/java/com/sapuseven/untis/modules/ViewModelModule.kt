@@ -3,6 +3,9 @@ package com.sapuseven.untis.modules
 import com.sapuseven.untis.viewmodels.CloseableCoroutineScope
 import com.sapuseven.untis.viewmodels.ElementPickerDelegate
 import com.sapuseven.untis.viewmodels.ElementPickerDelegateImpl
+import com.sapuseven.untis.viewmodels.UserManagerDelegate
+import com.sapuseven.untis.viewmodels.UserManagerDelegateImpl
+import com.sapuseven.untis.viewmodels.ViewModelDelegateFactory
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -23,6 +26,11 @@ interface ViewModelDelegateModule {
 	fun bindElementPickerDelegate(
 		impl: ElementPickerDelegateImpl
 	): ElementPickerDelegate
+
+	@Binds
+	fun bindUserManagerDelegate(
+		impl: UserManagerDelegateImpl
+	): UserManagerDelegate
 
 	companion object {
 		@ViewModelScoped
