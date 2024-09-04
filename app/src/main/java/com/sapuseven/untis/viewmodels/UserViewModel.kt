@@ -1,4 +1,4 @@
-package com.sapuseven.untis.ui.viewmodels
+package com.sapuseven.untis.viewmodels
 
 import androidx.lifecycle.LiveData
 import com.sapuseven.untis.data.databases.entities.User

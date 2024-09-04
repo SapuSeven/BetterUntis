@@ -1,6 +1,6 @@
 package com.sapuseven.untis.ui.dialogs
 
-import com.sapuseven.untis.ui.viewmodels.UserViewModel
+import com.sapuseven.untis.viewmodels.UserViewModel
 
 interface ProfileManagementDialogViewModel : UserViewModel {
 }
