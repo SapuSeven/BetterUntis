@@ -1,5 +1,6 @@
 package com.sapuseven.untis.ui.activities.timetable
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,15 +18,9 @@ import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
 import com.sapuseven.untis.viewmodels.ElementPickerDelegate
 import com.sapuseven.untis.viewmodels.UserManagerDelegate
-import com.sapuseven.untis.viewmodels.UserManagerDelegateImpl
-import com.sapuseven.untis.viewmodels.ViewModelDelegateFactory
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.joda.time.Instant
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,8 +33,7 @@ class TimetableViewModel @Inject constructor(
 	private val userDao: UserDao,
 ) : ViewModel(),
 	ElementPickerDelegate by elementPickerDelegate,
-	UserManagerDelegate by userManagerDelegate
-{
+	UserManagerDelegate by userManagerDelegate {
 	var profileManagementDialog by mutableStateOf(false)
 	var feedbackDialog by mutableStateOf(false)
 
@@ -51,9 +45,8 @@ class TimetableViewModel @Inject constructor(
 		elementPickerDelegate.init(viewModelScope)
 		userManagerDelegate.init(viewModelScope, args.userId)
 
-		viewModelScope.launch {
-			// TODO for some reason this is not properly closed when the app is closed, which leads to the database being kept open and causes crashes on subsequent launches.
-			/*userManagerDelegate.allUsers.collect { users ->
+		viewModelScope.launch(Dispatchers.IO) {
+			userManagerDelegate.allUsers.collect { users ->
 				users?.let {
 					if (users.isEmpty() == true) {
 						navigator.navigate(AppRoutes.Login)
@@ -62,7 +55,7 @@ class TimetableViewModel @Inject constructor(
 						switchUser(users.get(0))
 					}
 				}
-			}*/
+			}
 		}
 	}
 
