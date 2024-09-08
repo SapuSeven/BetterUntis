@@ -333,7 +333,6 @@
     <string name="widget_disclaimer_title">Beta funkcija</string>
     <string name="login_demo">Isprobaj!</string>
     <string name="all_favourites">Favoriti</string>
-    <string name="preference_range_to">do</string>
     <string name="preference_dialog_permission_alarms_title">Potrebna je dozvola</string>
     <string name="all_dialog_open_settings">Otvori postavke</string>
     <string name="preference_dialog_permission_alarms_text">Ova funkcija zahtijeva dodatne dozvole. Dozvoli BetterUntis pristup za određivanje točnih alarma.</string>
@@ -352,7 +351,6 @@
     <string name="settings_recommend_title">Preporuči BetterUntis</string>
     <string name="all_datepicker_select">Odaberi datum</string>
     <string name="all_open_link">Otvori poveznicu</string>
-    <string name="preference_range_from">od</string>
     <string name="preference_category_reports">Izvještavanje grešaka</string>
     <string name="preference_reports_info">O izvještavanju grešaka</string>
     <string name="all_lesson_online">Održava se online</string>

@@ -5,4 +5,6 @@
 	<string name="dialog_reset">Réinitialiser</string>
 	<string name="preference_week_custom_range_summary_short">%1$s</string>
 	<string name="preference_week_custom_range_summary">%1$s à %2$s</string>
+	<string name="preference_range_from">de</string>
+	<string name="preference_range_to">à</string>
 </resources>

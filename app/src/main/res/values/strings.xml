@@ -366,8 +366,6 @@
     <string name="mainactivitydrawer_profile_edit_hint">Tap on a profile to edit</string>
     <string name="all_lesson_online">Taking place online</string>
     <string name="all_open_link">Open link</string>
-    <string name="preference_range_from">from</string>
-    <string name="preference_range_to">to</string>
     <string name="preference_dialog_permission_alarms_title">Permission needed</string>
     <string name="preference_dialog_permission_alarms_text">This feature requires additional permissions. Please allow BetterUntis access to schedule exact alarms.</string>
     <string name="all_dialog_open_settings">Open settings</string>

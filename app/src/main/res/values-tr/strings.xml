@@ -269,7 +269,6 @@
     <string name="preference_timetable_bold_lesson_name">Kalın ders adı</string>
     <string name="preference_timetable_range">Gösterilecek dersler</string>
     <string name="preference_timetable_item_text_light">Beyaz ders yazısı</string>
-    <string name="preference_week_custom_range_summary_short">%1$s</string>
     <string name="preference_timetable_item_padding_overlap">Üst üste olan dersler arası mesafe</string>
     <string name="errors_report">Uygulamayı düzeltmeye yardım etmek için lütfen aşağıdaki hataları bildir:</string>
     <plurals name="main_time_diff_minutes">

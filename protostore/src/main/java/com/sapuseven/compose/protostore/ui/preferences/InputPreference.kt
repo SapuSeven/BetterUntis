@@ -4,46 +4,72 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.sapuseven.untis.R
-import com.sapuseven.untis.preferences.UntisPreferenceDataStore
+import com.google.protobuf.MessageLite
+import com.sapuseven.compose.protostore.R
+import com.sapuseven.compose.protostore.data.SettingsRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InputPreference(
+fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> InputPreference(
 	title: (@Composable () -> Unit),
-	icon: (@Composable () -> Unit)? = null,
-	onChange: ((value: String) -> Unit)? = null,
-	dependency: UntisPreferenceDataStore<*>? = null,
-	dataStore: UntisPreferenceDataStore<String>
+	summary: (@Composable () -> Unit)? = null,
+	supportingContent: @Composable ((value: String, enabled: Boolean) -> Unit)? = null,
+	leadingContent: (@Composable () -> Unit)? = null,
+	trailingContent: (@Composable (value: String, enabled: Boolean) -> Unit)? = null,
+	settingsRepository: SettingsRepository<Model, ModelBuilder>,
+	value: (Model) -> String,
+	scope: CoroutineScope = rememberCoroutineScope(),
+	enabledCondition: (Model) -> Boolean = { true },
+	highlight: Boolean = false,
+	onValueChange: (ModelBuilder.(checked: String) -> Unit)? = null,
 ) {
-	val value = remember { mutableStateOf(dataStore.defaultValue) }
+	var dialogValue by remember { mutableStateOf("") }
 	var showDialog by remember { mutableStateOf(false) }
-
-	val scope = rememberCoroutineScope()
 
 	Preference(
 		title = title,
-		summary = if (value.value.isNotBlank()) {
-			{ Text(value.value) }
-		} else null,
-		icon = icon,
-		dependency = dependency,
-		dataStore = dataStore,
+		summary = summary,
+		supportingContent = { currentValue, enabled ->
+			if (currentValue.isNotEmpty()) {
+				supportingContent?.invoke(currentValue, enabled)
+			}
+		},
+		leadingContent = leadingContent,
+		trailingContent = trailingContent,
+		settingsRepository = settingsRepository,
 		value = value,
-		onClick = { showDialog = true }
+		scope = scope,
+		enabledCondition = enabledCondition,
+		highlight = highlight,
+		onClick = {
+			dialogValue = it
+			showDialog = true
+		}
 	)
 
 	if (showDialog) {
-		var input by remember { mutableStateOf(value.value) }
+		var input by remember { mutableStateOf(dialogValue) }
 
 		AlertDialog(
 			onDismissRequest = { showDialog = false },
@@ -55,8 +81,11 @@ fun InputPreference(
 					onValueChange = { input = it },
 					singleLine = true,
 					keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-					colors = TextFieldDefaults.textFieldColors(
-						containerColor = Color.Transparent
+					colors = TextFieldDefaults.colors(
+						focusedContainerColor = Color.Transparent,
+						unfocusedContainerColor = Color.Transparent,
+						disabledContainerColor = Color.Transparent,
+						errorContainerColor = Color.Transparent,
 					),
 					modifier = Modifier.fillMaxWidth()
 				)
@@ -66,16 +95,17 @@ fun InputPreference(
 					onClick = {
 						showDialog = false
 						scope.launch {
-							dataStore.saveValue(input)
-							onChange?.invoke(input)
+							settingsRepository.updateUserSettings {
+								onValueChange?.invoke(this, input)
+							}
 						}
 					}) {
-					Text(stringResource(id = R.string.all_ok))
+					Text(stringResource(id = R.string.dialog_ok))
 				}
 			},
 			dismissButton = {
 				TextButton(onClick = { showDialog = false }) {
-					Text(stringResource(id = R.string.all_cancel))
+					Text(stringResource(id = R.string.dialog_cancel))
 				}
 			}
 		)
@@ -84,31 +114,45 @@ fun InputPreference(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NumericInputPreference(
+fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> NumericInputPreference(
 	title: (@Composable () -> Unit),
-	icon: (@Composable () -> Unit)? = null,
+	summary: (@Composable () -> Unit)? = null,
+	supportingContent: @Composable ((value: String, enabled: Boolean) -> Unit)? = null,
+	leadingContent: (@Composable () -> Unit)? = null,
+	trailingContent: (@Composable (value: Int, enabled: Boolean) -> Unit)? = null,
+	settingsRepository: SettingsRepository<Model, ModelBuilder>,
+	value: (Model) -> Int,
 	unit: String? = null,
-	onChange: ((value: Int) -> Unit)? = null,
-	dependency: UntisPreferenceDataStore<*>? = null,
-	dataStore: UntisPreferenceDataStore<Int>
+	scope: CoroutineScope = rememberCoroutineScope(),
+	enabledCondition: (Model) -> Boolean = { true },
+	highlight: Boolean = false,
+	onValueChange: (ModelBuilder.(checked: Int) -> Unit)? = null,
 ) {
-	val value = remember { mutableStateOf(dataStore.defaultValue) }
+	var dialogValue by remember { mutableIntStateOf(0) }
 	var showDialog by remember { mutableStateOf(false) }
-
-	val scope = rememberCoroutineScope()
 
 	Preference(
 		title = title,
-		summary = { Text(unit?.let { "${value.value} $unit" } ?: value.value.toString()) },
-		icon = icon,
-		dependency = dependency,
-		dataStore = dataStore,
+		summary = summary,
+		supportingContent = { currentValue, enabled ->
+			supportingContent?.invoke(unit?.let { "$currentValue $unit" }
+				?: currentValue.toString(), enabled)
+		},
+		leadingContent = leadingContent,
+		trailingContent = trailingContent,
+		settingsRepository = settingsRepository,
 		value = value,
-		onClick = { showDialog = true }
+		scope = scope,
+		enabledCondition = enabledCondition,
+		highlight = highlight,
+		onClick = {
+			dialogValue = it
+			showDialog = true
+		}
 	)
 
 	if (showDialog) {
-		var input by remember { mutableStateOf(value.value.toString()) }
+		var input by remember { mutableStateOf(dialogValue.toString()) }
 
 		AlertDialog(
 			onDismissRequest = { showDialog = false },
@@ -124,8 +168,11 @@ fun NumericInputPreference(
 						onValueChange = { input = it },
 						singleLine = true,
 						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-						colors = TextFieldDefaults.textFieldColors(
-							containerColor = Color.Transparent
+						colors = TextFieldDefaults.colors(
+							focusedContainerColor = Color.Transparent,
+							unfocusedContainerColor = Color.Transparent,
+							disabledContainerColor = Color.Transparent,
+							errorContainerColor = Color.Transparent,
 						),
 						modifier = Modifier.weight(1f)
 					)
@@ -143,17 +190,17 @@ fun NumericInputPreference(
 					onClick = {
 						showDialog = false
 						scope.launch {
-							val inputInt = input.toIntOrNull() ?: 0
-							dataStore.saveValue(inputInt)
-							onChange?.invoke(inputInt)
+							settingsRepository.updateUserSettings {
+								onValueChange?.invoke(this, input.toIntOrNull() ?: 0)
+							}
 						}
 					}) {
-					Text(stringResource(id = R.string.all_ok))
+					Text(stringResource(id = R.string.dialog_ok))
 				}
 			},
 			dismissButton = {
 				TextButton(onClick = { showDialog = false }) {
-					Text(stringResource(id = R.string.all_cancel))
+					Text(stringResource(id = R.string.dialog_cancel))
 				}
 			}
 		)
@@ -162,33 +209,43 @@ fun NumericInputPreference(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RangeInputPreference(
+fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> RangeInputPreference(
 	title: (@Composable () -> Unit),
-	icon: (@Composable () -> Unit)? = null,
-	dependency: UntisPreferenceDataStore<*>? = null,
-	dataStore: UntisPreferenceDataStore<String>
+	summary: (@Composable () -> Unit)? = null,
+	supportingContent: @Composable ((value: String, enabled: Boolean) -> Unit)? = null,
+	leadingContent: (@Composable () -> Unit)? = null,
+	trailingContent: (@Composable (value: String, enabled: Boolean) -> Unit)? = null,
+	settingsRepository: SettingsRepository<Model, ModelBuilder>,
+	value: (Model) -> String,
+	scope: CoroutineScope = rememberCoroutineScope(),
+	enabledCondition: (Model) -> Boolean = { true },
+	highlight: Boolean = false,
+	onValueChange: (ModelBuilder.(checked: String) -> Unit)? = null,
 ) {
-	val value = remember { mutableStateOf(dataStore.defaultValue) }
+	var dialogValue by remember { mutableStateOf<Pair<Int, Int>?>(null) }
 	var showDialog by remember { mutableStateOf(false) }
-
-	val scope = rememberCoroutineScope()
 
 	Preference(
 		title = title,
-		summary = value.value.convertRangeToPair()?.let {
-			{
-				Text(stringResource(R.string.preference_timetable_range_desc, it.first, it.second))
-			}
+		summary = summary,
+		supportingContent = { currentValue, enabled ->
+			supportingContent?.invoke(currentValue, enabled)
 		},
-		icon = icon,
-		dependency = dependency,
-		dataStore = dataStore,
+		leadingContent = leadingContent,
+		trailingContent = trailingContent,
+		settingsRepository = settingsRepository,
 		value = value,
-		onClick = { showDialog = true }
+		scope = scope,
+		enabledCondition = enabledCondition,
+		highlight = highlight,
+		onClick = {
+			dialogValue = it.convertRangeToPair()
+			showDialog = true
+		}
 	)
 
 	if (showDialog) {
-		val input = value.value.convertRangeToPair()
+		val input = dialogValue
 		var first by remember { mutableStateOf(input?.first?.toString() ?: "") }
 		var second by remember { mutableStateOf(input?.second?.toString() ?: "") }
 
@@ -205,8 +262,11 @@ fun RangeInputPreference(
 						onValueChange = { first = it },
 						singleLine = true,
 						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-						colors = TextFieldDefaults.textFieldColors(
-							containerColor = Color.Transparent
+						colors = TextFieldDefaults.colors(
+							focusedContainerColor = Color.Transparent,
+							unfocusedContainerColor = Color.Transparent,
+							disabledContainerColor = Color.Transparent,
+							errorContainerColor = Color.Transparent,
 						),
 						label = { Text(text = stringResource(R.string.preference_range_from)) },
 						modifier = Modifier
@@ -219,8 +279,11 @@ fun RangeInputPreference(
 						onValueChange = { second = it },
 						singleLine = true,
 						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-						colors = TextFieldDefaults.textFieldColors(
-							containerColor = Color.Transparent
+						colors = TextFieldDefaults.colors(
+							focusedContainerColor = Color.Transparent,
+							unfocusedContainerColor = Color.Transparent,
+							disabledContainerColor = Color.Transparent,
+							errorContainerColor = Color.Transparent,
 						),
 						label = { Text(text = stringResource(R.string.preference_range_to)) },
 						modifier = Modifier
@@ -233,14 +296,21 @@ fun RangeInputPreference(
 				TextButton(
 					onClick = {
 						showDialog = false
-						scope.launch { dataStore.saveValue(if (first.isNotBlank() && second.isNotBlank()) "$first-$second" else "") }
+						scope.launch {
+							settingsRepository.updateUserSettings {
+								onValueChange?.invoke(
+									this,
+									if (first.isNotBlank() && second.isNotBlank()) "$first-$second" else ""
+								)
+							}
+						}
 					}) {
-					Text(stringResource(id = R.string.all_ok))
+					Text(stringResource(id = R.string.dialog_ok))
 				}
 			},
 			dismissButton = {
 				TextButton(onClick = { showDialog = false }) {
-					Text(stringResource(id = R.string.all_cancel))
+					Text(stringResource(id = R.string.dialog_cancel))
 				}
 			}
 		)

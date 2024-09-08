@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-	<string name="dialog_ok">Ados</string>
-	<string name="dialog_cancel">Utzi</string>
-	<string name="dialog_reset">Berrezarri</string>
-	<string name="preference_week_custom_range_summary">%1$s - %2$s</string>
-	<string name="preference_week_custom_range_summary_short">%1$s</string>
-</resources>

@@ -14,8 +14,10 @@ import androidx.navigation.compose.composable
 import com.sapuseven.compose.protostore.ui.preferences.ColorPreference
 import com.sapuseven.compose.protostore.ui.preferences.ListPreference
 import com.sapuseven.compose.protostore.ui.preferences.MultiSelectListPreference
+import com.sapuseven.compose.protostore.ui.preferences.NumericInputPreference
 import com.sapuseven.compose.protostore.ui.preferences.Preference
 import com.sapuseven.compose.protostore.ui.preferences.PreferenceGroup
+import com.sapuseven.compose.protostore.ui.preferences.RangeInputPreference
 import com.sapuseven.compose.protostore.ui.preferences.SliderPreference
 import com.sapuseven.compose.protostore.ui.preferences.SwitchPreference
 import com.sapuseven.compose.protostore.ui.preferences.WeekRangePreference
@@ -480,98 +482,96 @@ fun NavGraphBuilder.SettingsNav(
 		SettingsScreen(
 			navController = navController,
 			title = stringResource(id = R.string.preferences_timetable)
-		) {}
-
-		/*VerticalScrollColumn {
-			ElementPickerPreference(
+		) { viewModel ->
+			/* TODO ElementPickerPreference(
 				title = { Text(stringResource(R.string.preference_timetable_personal_timetable)) },
-				icon = {
+				leadingContent = {
 					Icon(
 						painter = painterResource(id = R.drawable.settings_account_personal),
 						contentDescription = null
 					)
 				},
 				settingsRepository = viewModel,
-value = { it.timetablePersonalTimetable, },
-onValueChange = { timetablePersonalTimetable, = it }
-				timetableDatabaseInterface = timetableDatabaseInterface,
+				value = { it.timetablePersonalTimetable, },
+				onValueChange = { timetablePersonalTimetable, = it }
+					timetableDatabaseInterface = timetableDatabaseInterface,
 				highlight = preferenceHighlight == "preference_timetable_personal_timetable"
-			)
+			)*/
 
 			SwitchPreference(
 				title = { Text(stringResource(R.string.preference_timetable_hide_timestamps)) },
 				summary = { Text(stringResource(R.string.preference_timetable_hide_timestamps_desc)) },
-				icon = {
+				leadingContent = {
 					Icon(
 						painter = painterResource(id = R.drawable.settings_hide_timestamps),
 						contentDescription = null
 					)
 				},
 				settingsRepository = viewModel,
-value = { it.timetableHideTimeStamps },
-onValueChange = { timetableHideTimeStamps = it }
+				value = { it.timetableHideTimeStamps },
+				onValueChange = { timetableHideTimeStamps = it }
 			)
 
 			SwitchPreference(
 				title = { Text(stringResource(R.string.preference_timetable_hide_cancelled)) },
 				summary = { Text(stringResource(R.string.preference_timetable_hide_cancelled_desc)) },
-				icon = {
+				leadingContent = {
 					Icon(
 						painter = painterResource(id = R.drawable.settings_hide_cancelled),
 						contentDescription = null
 					)
 				},
 				settingsRepository = viewModel,
-value = { it.timetableHideCancelled },
-onValueChange = { timetableHideCancelled = it }
+				value = { it.timetableHideCancelled },
+				onValueChange = { timetableHideCancelled = it }
 			)
 
 			SwitchPreference(
 				title = { Text(stringResource(R.string.preference_timetable_substitutions_irregular)) },
 				summary = { Text(stringResource(R.string.preference_timetable_substitutions_irregular_desc)) },
-				icon = {
+				leadingContent = {
 					Icon(
 						painter = painterResource(id = R.drawable.settings_detect_irregular),
 						contentDescription = null
 					)
 				},
 				settingsRepository = viewModel,
-value = { it.timetableSubstitutionsIrregular },
-onValueChange = { timetableSubstitutionsIrregular = it }
+				value = { it.timetableSubstitutionsIrregular },
+				onValueChange = { timetableSubstitutionsIrregular = it }
 			)
 
 			SwitchPreference(
 				title = { Text(stringResource(R.string.preference_timetable_background_irregular)) },
 				summary = { Text(stringResource(R.string.preference_timetable_background_irregular_desc)) },
-				icon = {
+				leadingContent = {
 					Icon(
 						painter = painterResource(id = R.drawable.settings_background_irregular),
 						contentDescription = null
 					)
 				},
-				dependency = dataStorePreferences.timetableSubstitutionsIrregular,
+				enabledCondition = { it.timetableSubstitutionsIrregular },
 				settingsRepository = viewModel,
-value = { it.timetableBackgroundIrregular },
-onValueChange = { timetableBackgroundIrregular = it }
+				value = { it.timetableBackgroundIrregular },
+				onValueChange = { timetableBackgroundIrregular = it }
 			)
 
 			PreferenceGroup(stringResource(id = R.string.preference_category_display_options)) {
 				RangeInputPreference(
 					title = { Text(stringResource(R.string.preference_timetable_range)) },
-					icon = {
+					leadingContent = {
 						Icon(
 							painter = painterResource(id = R.drawable.settings_timetable_range),
 							contentDescription = null
 						)
 					},
 					settingsRepository = viewModel,
-value = { it.timetableRange },
-onValueChange = { timetableRange = it }
+					value = { it.timetableRange },
+					onValueChange = { timetableRange = it }
 				)
 
 				/*SwitchPreference(
 					title = { Text(stringResource(R.string.preference_timetable_range_index_reset)) },
-					dependency = dataStorePreferences.timetableRange,
+					enabledCondition = { it.timetableRange },
 					settingsRepository = viewModel,
 value = { it.timetableRangeIndexReset },
 onValueChange = { timetableRangeIndexReset = it }
@@ -587,7 +587,7 @@ onValueChange = { timetableRangeIndexReset = it }
 			PreferenceGroup(stringResource(id = R.string.preference_category_timetable_item_appearance)) {
 				NumericInputPreference(
 					title = { Text(stringResource(R.string.preference_timetable_item_padding_overlap)) },
-					icon = {
+					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.settings_timetable_padding),
 							contentDescription = null
@@ -595,13 +595,13 @@ onValueChange = { timetableRangeIndexReset = it }
 					},
 					unit = "dp",
 					settingsRepository = viewModel,
-value = { it.timetableItemPaddingOverlap },
-onValueChange = { timetableItemPaddingOverlap = it }
+					value = { it.timetableItemPaddingOverlap },
+					onValueChange = { timetableItemPaddingOverlap = it }
 				)
 
 				NumericInputPreference(
 					title = { Text(stringResource(R.string.preference_timetable_item_padding)) },
-					icon = {
+					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.settings_timetable_padding),
 							contentDescription = null
@@ -609,13 +609,13 @@ onValueChange = { timetableItemPaddingOverlap = it }
 					},
 					unit = "dp",
 					settingsRepository = viewModel,
-value = { it.timetableItemPadding },
-onValueChange = { timetableItemPadding = it }
+					value = { it.timetableItemPadding },
+					onValueChange = { timetableItemPadding = it }
 				)
 
 				NumericInputPreference(
 					title = { Text(stringResource(R.string.preference_timetable_item_corner_radius)) },
-					icon = {
+					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.settings_timetable_rounded_corner),
 							contentDescription = null
@@ -623,41 +623,41 @@ onValueChange = { timetableItemPadding = it }
 					},
 					unit = "dp",
 					settingsRepository = viewModel,
-value = { it.timetableItemCornerRadius },
-onValueChange = { timetableItemCornerRadius = it }
+					value = { it.timetableItemCornerRadius },
+					onValueChange = { timetableItemCornerRadius = it }
 				)
 			}
 
 			PreferenceGroup(stringResource(id = R.string.preference_category_timetable_lesson_text)) {
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_timetable_centered_lesson_info)) },
-					icon = {
+					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.settings_timetable_align_center),
 							contentDescription = null
 						)
 					},
 					settingsRepository = viewModel,
-value = { it.timetableCenteredLessonInfo },
-onValueChange = { timetableCenteredLessonInfo = it }
+					value = { it.timetableCenteredLessonInfo },
+					onValueChange = { timetableCenteredLessonInfo = it }
 				)
 
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_timetable_bold_lesson_name)) },
-					icon = {
+					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.settings_timetable_format_bold),
 							contentDescription = null
 						)
 					},
 					settingsRepository = viewModel,
-value = { it.timetableBoldLessonName },
-onValueChange = { timetableBoldLessonName = it }
+					value = { it.timetableBoldLessonName },
+					onValueChange = { timetableBoldLessonName = it }
 				)
 
 				NumericInputPreference(
 					title = { Text(stringResource(R.string.preference_timetable_lesson_name_font_size)) },
-					icon = {
+					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.settings_timetable_font_size),
 							contentDescription = null
@@ -665,13 +665,13 @@ onValueChange = { timetableBoldLessonName = it }
 					},
 					unit = "sp",
 					settingsRepository = viewModel,
-value = { it.timetableLessonNameFontSize },
-onValueChange = { timetableLessonNameFontSize = it }
+					value = { it.timetableLessonNameFontSize },
+					onValueChange = { timetableLessonNameFontSize = it }
 				)
 
 				NumericInputPreference(
 					title = { Text(stringResource(R.string.preference_timetable_lesson_info_font_size)) },
-					icon = {
+					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.settings_timetable_font_size),
 							contentDescription = null
@@ -679,11 +679,12 @@ onValueChange = { timetableLessonNameFontSize = it }
 					},
 					unit = "sp",
 					settingsRepository = viewModel,
-value = { it.timetableLessonInfoFontSize },
-onValueChange = { timetableLessonInfoFontSize = it }
+					value = { it.timetableLessonInfoFontSize },
+					onValueChange = { timetableLessonInfoFontSize = it }
 				)
 			}
-		}*/
+
+		}
 	}
 	composable<AppRoutes.Settings.Notifications> {
 		SettingsScreen(
@@ -695,7 +696,7 @@ onValueChange = { timetableLessonInfoFontSize = it }
 			SwitchPreference(
 				title = { Text(stringResource(R.string.preference_notifications_enable)) },
 				summary = { Text(stringResource(R.string.preference_notifications_enable_desc)) },
-				/*icon = {
+				/*leadingContent = {
 					Icon(
 						painter = painterResource(R.drawable.settings_notifications_active),
 						contentDescription = null
@@ -729,7 +730,7 @@ onValueChange = { notificationsEnable = it }
 			SwitchPreference(
 				title = { Text(stringResource(R.string.preference_notifications_multiple)) },
 				summary = { Text(stringResource(R.string.preference_notifications_multiple_desc)) },
-				dependency = dataStorePreferences.notificationsEnable,
+				enabledCondition = { it.notificationsEnable },
 				onCheckedChange = {
 					enqueueNotificationSetup(user)
 					it
@@ -742,7 +743,7 @@ onValueChange = { notificationsInMultiple = it }
 			SwitchPreference(
 				title = { Text(stringResource(R.string.preference_notifications_first_lesson)) },
 				summary = { Text(stringResource(R.string.preference_notifications_first_lesson_desc)) },
-				dependency = dataStorePreferences.notificationsEnable,
+				enabledCondition = { it.notificationsEnable },
 				onCheckedChange = {
 					enqueueNotificationSetup(user)
 					it
@@ -755,7 +756,7 @@ onValueChange = { notificationsBeforeFirst = it }
 			NumericInputPreference(
 				title = { Text(stringResource(R.string.preference_notifications_first_lesson_time)) },
 				unit = stringResource(R.string.preference_notifications_first_lesson_time_unit),
-				dependency = dataStorePreferences.notificationsBeforeFirst,
+				enabledCondition = { it.notificationsBeforeFirst },
 				onChange = {
 					enqueueNotificationSetup(user)
 				},
@@ -767,7 +768,7 @@ onValueChange = { notificationsBeforeFirstTime = it }
 			Preference(
 				title = { Text(stringResource(R.string.preference_notifications_clear)) },
 				onClick = { clearNotifications() },
-				icon = {
+				leadingContent = {
 					Icon(
 						painter = painterResource(R.drawable.settings_notifications_clear_all),
 						contentDescription = null
@@ -780,7 +781,7 @@ onValueChange = { notificationsBeforeFirstTime = it }
 				ListPreference(
 					title = { Text(stringResource(R.string.all_subjects)) },
 					summary = { Text(it.second) },
-					icon = {
+					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.all_subject),
 							contentDescription = null
@@ -788,7 +789,7 @@ onValueChange = { notificationsBeforeFirstTime = it }
 					},
 					entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
 					entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
-					dependency = dataStorePreferences.notificationsEnable,
+					enabledCondition = { it.notificationsEnable },
 					settingsRepository = viewModel,
 value = { it.notificationsVisibilitySubjects },
 onValueChange = { notificationsVisibilitySubjects = it }
@@ -797,7 +798,7 @@ onValueChange = { notificationsVisibilitySubjects = it }
 				ListPreference(
 					title = { Text(stringResource(R.string.all_rooms)) },
 					summary = { Text(it.second) },
-					icon = {
+					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.all_rooms),
 							contentDescription = null
@@ -805,7 +806,7 @@ onValueChange = { notificationsVisibilitySubjects = it }
 					},
 					entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
 					entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
-					dependency = dataStorePreferences.notificationsEnable,
+					enabledCondition = { it.notificationsEnable },
 					settingsRepository = viewModel,
 value = { it.notificationsVisibilityRooms },
 onValueChange = { notificationsVisibilityRooms = it }
@@ -814,7 +815,7 @@ onValueChange = { notificationsVisibilityRooms = it }
 				ListPreference(
 					title = { Text(stringResource(R.string.all_teachers)) },
 					summary = { Text(it.second) },
-					icon = {
+					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.all_teachers),
 							contentDescription = null
@@ -822,7 +823,7 @@ onValueChange = { notificationsVisibilityRooms = it }
 					},
 					entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
 					entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
-					dependency = dataStorePreferences.notificationsEnable,
+					enabledCondition = { it.notificationsEnable },
 					settingsRepository = viewModel,
 value = { it.notificationsVisibilityTeachers },
 onValueChange = { notificationsVisibilityTeachers = it }
@@ -831,7 +832,7 @@ onValueChange = { notificationsVisibilityTeachers = it }
 				ListPreference(
 					title = { Text(stringResource(R.string.all_classes)) },
 					summary = { Text(it.second) },
-					icon = {
+					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.all_classes),
 							contentDescription = null
@@ -839,7 +840,7 @@ onValueChange = { notificationsVisibilityTeachers = it }
 					},
 					entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
 					entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
-					dependency = dataStorePreferences.notificationsEnable,
+					enabledCondition = { it.notificationsEnable },
 					settingsRepository = viewModel,
 value = { it.notificationsVisibilityClasses },
 onValueChange = { notificationsVisibilityClasses = it }
@@ -865,7 +866,7 @@ onValueChange = { connectivityRefreshInBackground = it }
 			PreferenceGroup(stringResource(id = R.string.preference_category_connectivity_proxy)) {
 				InputPreference(
 					title = { Text(stringResource(R.string.preference_connectivity_proxy_host)) },
-					icon = {
+					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.settings_connectivity_proxy),
 							contentDescription = null
@@ -881,7 +882,7 @@ onValueChange = { proxyHost = it }
 					onClick = {
 						openUrl(URL_WIKI_PROXY)
 					},
-					icon = {
+					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.settings_info),
 							contentDescription = null
@@ -911,7 +912,7 @@ onValueChange = { proxyHost = it }
 				onClick = {
 					openUrl("$URL_GITHUB_REPOSITORY/releases")
 				},
-				icon = {
+				leadingContent = {
 					Icon(
 						painter = painterResource(R.drawable.settings_about_app_icon),
 						contentDescription = null
@@ -929,7 +930,7 @@ onValueChange = { proxyHost = it }
 					onClick = {
 						openUrl(URL_GITHUB_REPOSITORY)
 					},
-					icon = {
+					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.settings_info_github),
 							contentDescription = null
@@ -944,7 +945,7 @@ onValueChange = { proxyHost = it }
 					onClick = {
 						openUrl("$URL_GITHUB_REPOSITORY/blob/master/LICENSE")
 					},
-					icon = {
+					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.settings_info_github),
 							contentDescription = null
@@ -959,7 +960,7 @@ onValueChange = { proxyHost = it }
 				onClick = {
 					//openDialog.value = true
 				},
-				icon = {
+				leadingContent = {
 					Icon(
 						painter = painterResource(R.drawable.settings_about_contributor),
 						contentDescription = null
@@ -1017,7 +1018,7 @@ onValueChange = { proxyHost = it }
 				title = { Text(stringResource(R.string.preference_info_libraries)) },
 				summary = { Text(stringResource(R.string.preference_info_libraries_desc)) },
 				onClick = { navController.navigate(AppRoutes.Settings.About.Libraries) },
-				icon = {
+				leadingContent = {
 					Icon(
 						painter = painterResource(R.drawable.settings_about_library),
 						contentDescription = null

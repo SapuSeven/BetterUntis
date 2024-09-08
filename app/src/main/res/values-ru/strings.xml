@@ -44,7 +44,6 @@
     <string name="all_edit">Изменить</string>
     <string name="logindatainput_error_invalid_school">Неверный ID школы!</string>
     <string name="logindatainput_loading_user_data">Загрузка данных пользователя…</string>
-    <string name="preference_range_from">от</string>
     <string name="all_dialog_error_title">Информация об ошибке</string>
     <string name="errors_button_report">Пожаловаться на все</string>
     <string name="elementpicker_hint_search">Поиск…</string>
@@ -73,7 +72,6 @@
     <string name="all_personal_timetable">Личное время</string>
     <string name="errormessagedictionary_no_right">Нет права на расписание</string>
     <string name="errormessagedictionary_too_many_results">Слишком много результатов</string>
-    <string name="preference_timetable_range_desc">Часы %1$d - %2$d</string>
     <string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
     <string name="main_go_to_settings">Перейти к настройкам</string>
     <string name="logindatainput_key_saved">Ключ или пароль (сохраненный)</string>
@@ -104,7 +102,6 @@
     <string name="loading">Загрузка</string>
     <string name="logindatainput_show_advanced">Показать расширенные настройки</string>
     <string name="all_exam">Экзамен</string>
-    <string name="preference_range_to">в</string>
     <string name="errormessagedictionary_user_locked">Пользователь заблокирован!</string>
     <string name="login_welcome">Добро пожаловать в BetterUntis!</string>
     <string name="notifications_text_message_subjects">Следующий урок: %1$s</string>

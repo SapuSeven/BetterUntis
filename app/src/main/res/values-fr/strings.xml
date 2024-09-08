@@ -345,8 +345,6 @@
     <string name="login_demo">Essayez-le !</string>
     <string name="all_lesson_online">Se déroulant en ligne</string>
     <string name="all_open_link">Ouvrir le lien</string>
-    <string name="preference_range_from">de</string>
-    <string name="preference_range_to">à</string>
     <string name="preference_dialog_permission_alarms_text">Cette fonction nécessite des autorisations supplémentaires. Veuillez autoriser BetterUntis à programmer des alarmes exactes.</string>
     <string name="preference_reports_info_desc">Ces paramètres permettent d\'améliorer l\'application.
 \nAucune information personnelle n\'est jamais collectée.
