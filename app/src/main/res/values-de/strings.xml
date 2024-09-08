@@ -242,8 +242,6 @@
     <string name="preference_use_theme_background">Designfarben verwenden</string>
     <string name="preference_use_theme_background_desc">Dies gilt nur für normale Stunden</string>
     <string name="preference_week_custom_range">Wochenlänge</string>
-    <string name="preference_week_custom_range_summary">%1$s bis %2$s</string>
-    <string name="preference_week_custom_range_summary_short">%1$s</string>
     <string name="preference_week_display_length">Anzuzeigende Tage</string>
     <string name="preference_week_display_length_summary">Auf 0 setzen, um die Wochenlänge zu verwenden</string>
     <string name="preference_week_snap_to_days">Tageweise scrollen</string>

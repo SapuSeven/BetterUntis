@@ -151,8 +151,6 @@
     <string name="preference_week_snap_to_days">Egokitu egunetara</string>
     <string name="preference_week_display_length_summary">Ezarri 0 astearen luzera erabiltzeko</string>
     <string name="preference_week_display_length">Bistaratzeko egunak</string>
-    <string name="preference_week_custom_range_summary_short">%1$s</string>
-    <string name="preference_week_custom_range_summary">%1$s - %2$s</string>
     <string name="preference_week_custom_range">Aste-tarte pertsonalizatua</string>
     <string name="preference_timetable_substitutions_irregular">Aurkitu ezohiko eskolak</string>
     <string name="preference_timetable_range">Bistaratzeko orduak</string>

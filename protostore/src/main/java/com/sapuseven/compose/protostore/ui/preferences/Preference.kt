@@ -1,10 +1,11 @@
-package com.sapuseven.compose.protostore.ui
+package com.sapuseven.compose.protostore.ui.preferences
 
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
 import androidx.compose.runtime.Composable
@@ -16,23 +17,42 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import com.google.protobuf.MessageLite
-import com.sapuseven.compose.protostore.data.MultiUserSettingsRepository
-import com.sapuseven.compose.protostore.utils.conditional
-import com.sapuseven.compose.protostore.utils.disabled
-import com.sapuseven.compose.protostore.utils.ifNotNull
+import com.sapuseven.compose.protostore.data.SettingsRepository
+import com.sapuseven.compose.protostore.ui.utils.conditional
+import com.sapuseven.compose.protostore.ui.utils.disabled
+import com.sapuseven.compose.protostore.ui.utils.ifNotNull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
+/**
+ * @param title A composable to show as the preference title
+ * @param summary A composable to show as the preference summary.
+ *  It should be a description of the preference and independent of the current value.
+ * @param supportingContent A composable to show below the preference summary.
+ * 	This is usually implemented by other types of preferences that show their own input method.
+ * @param leadingContent A composable to show in front of the preference. Usually an icon.
+ * @param trailingContent A composable to show after the preference. Usually a switch or button.
+ * @param settingsRepository The repository that contains the user settings.
+ * @param value A function that returns the current value of the preference.
+ *  If your preference doesn't have an associated value, you can just return `Unit`.
+ * @param enabledCondition A function that returns a boolean indicating whether the preference should be enabled or not.
+ * @param highlight A boolean indicating whether the preference should be highlighted or not.
+ * 	Highlighting is a one-time effect that is triggered when the preference is first shown.
+ * 	It can be used to highlight a specific preference to the user.
+ * @param scope A coroutine scope to launch coroutines in.
+ * @param onClick A function that is called when the preference is clicked.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <Model : MessageLite, Value> Preference(
 	title: (@Composable () -> Unit),
+	summary: (@Composable () -> Unit)? = null,
 	supportingContent: @Composable ((value: Value, enabled: Boolean) -> Unit)? = null,
 	leadingContent: (@Composable () -> Unit)? = null,
 	trailingContent: @Composable ((value: Value, enabled: Boolean) -> Unit)? = null,
-	settingsRepository: MultiUserSettingsRepository<*, *, Model, *>,
+	settingsRepository: SettingsRepository<Model, *>,
 	value: (Model) -> Value,
 	enabledCondition: (Model) -> Boolean = { true },
 	highlight: Boolean = false,
@@ -42,7 +62,8 @@ fun <Model : MessageLite, Value> Preference(
 	val data by settingsRepository.getUserSettings().collectAsState(null)
 	val interactionSource = remember { MutableInteractionSource() }
 
-	val isEnabled = settingsRepository.getUserSettings().map { enabledCondition(it) }.collectAsState(initial = true)
+	val isEnabled = settingsRepository.getUserSettings().map { enabledCondition(it) }
+		.collectAsState(initial = true)
 
 	if (highlight)
 		LaunchedEffect(Unit) {
@@ -61,8 +82,16 @@ fun <Model : MessageLite, Value> Preference(
 				title()
 			}
 		},
-		supportingContent = supportingContent?.let {
-			{ data?.let { supportingContent(value(it), isEnabled.value) } }
+		supportingContent = {
+			Column {
+				data?.let {
+					Box(modifier = Modifier.disabled(!isEnabled.value)) {
+						summary?.invoke()
+					}
+
+					supportingContent?.invoke(value(it), isEnabled.value)
+				}
+			}
 		},
 		leadingContent = leadingContent?.let {
 			{

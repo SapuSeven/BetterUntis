@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="dialog_ok">OK</string>
+	<string name="dialog_cancel">Abbrechen</string>
+	<string name="dialog_reset">Zurücksetzen</string>
+	<string name="preference_week_custom_range_summary">%1$s bis %2$s</string>
+	<string name="preference_week_custom_range_summary_short">%1$s</string>
+</resources>

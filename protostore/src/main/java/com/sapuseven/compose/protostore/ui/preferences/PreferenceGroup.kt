@@ -1,4 +1,4 @@
-package com.sapuseven.compose.protostore.ui
+package com.sapuseven.compose.protostore.ui.preferences
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding

@@ -134,7 +134,7 @@ class SettingsScreenViewModel @Inject constructor(
 
 ## Building a settings screen
 
-Once your model is defined, you can use the composables from the `com.sapuseven.protostore.ui` package
+Once your model is defined, you can use the composables from the `com.sapuseven.protostore.ui.preferences` package
 to build your settings screen:
 
 ```kotlin
@@ -150,3 +150,17 @@ fun Settings() {
     }
 }
 ```
+
+## About
+
+### A note on naming
+
+In this library, the term "Settings" is used to refer to data-related objects and configurations,
+in line with modern practices and components like Proto DataStore.
+
+However, for consistency and familiarity, the term "Preferences" is still used to describe user interface elements,
+such as `Preference` and `PreferenceGroup`.
+
+In summary, a "Preference" is a UI element, while "Settings" pertains to the stored data.
+
+This approach ensures familiarity with traditional terminology while incorporating updated standards for data management.

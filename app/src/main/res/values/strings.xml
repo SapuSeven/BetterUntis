@@ -297,8 +297,6 @@
     <string name="preference_use_theme_background">Use theme colors</string>
     <string name="preference_use_theme_background_desc">This only applies to regular lessons</string>
     <string name="preference_week_custom_range">Custom week range</string>
-    <string name="preference_week_custom_range_summary">%1$s to %2$s</string>
-    <string name="preference_week_custom_range_summary_short">%1$s</string>
     <string name="preference_week_display_length">Days to display</string>
     <string name="preference_week_display_length_summary">Set to 0 to use week length</string>
     <string name="preference_week_snap_to_days">Snap to days</string>

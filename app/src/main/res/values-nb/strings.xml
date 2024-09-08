@@ -199,8 +199,6 @@
     <string name="preference_use_theme_background">Bruk temafarger</string>
     <string name="preference_use_theme_background_desc">Dette gjelder bare for vanlige leksjoner</string>
     <string name="preference_week_custom_range">Egendefinert ukeanpassning</string>
-    <string name="preference_week_custom_range_summary">%1$s til %2$s</string>
-    <string name="preference_week_custom_range_summary_short">%1$s</string>
     <string name="preference_week_display_length">Dager å vise</string>
     <string name="preference_week_display_length_summary">Sett til 0 for å bruke ukelengde</string>
     <string name="preference_week_snap_to_days">Sett visning på linje med dagene</string>

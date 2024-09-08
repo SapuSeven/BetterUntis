@@ -146,7 +146,6 @@
     <string name="notifications_channel_breakinfo">信息中断</string>
     <string name="preference_week_snap_to_days">切换到每天</string>
     <string name="preference_week_snap_to_days_summary">替换每周</string>
-    <string name="preference_week_custom_range_summary">%1$s 至 %2$s</string>
     <string name="preference_timetable_substitutions_irregular_desc">将替换课程视为不定期课程</string>
     <string name="preference_timetable_range_desc">%1$d 到 %2$d小时</string>
     <string name="preference_timetable_range">显示时间</string>
@@ -258,7 +257,6 @@
     <string name="preference_background_exam">考试课程</string>
     <string name="preference_background_irregular">不定期课程</string>
     <string name="notifications_text_message_separator">"/ "</string>
-    <string name="preference_week_custom_range_summary_short">%1$s</string>
     <string name="preference_flinging_enable">允许翻页</string>
     <string name="all_absences">缺失</string>
     <plurals name="preferences_contributors_contributions">

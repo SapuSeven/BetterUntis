@@ -64,8 +64,6 @@
     <string name="preference_week_snap_to_days">Listaj po danima</string>
     <string name="preference_week_display_length_summary">Postavi na 0 za prikaz tjedna</string>
     <string name="preference_week_display_length">Dani za prikaz</string>
-    <string name="preference_week_custom_range_summary_short">%1$s</string>
-    <string name="preference_week_custom_range_summary">%1$s do %2$s</string>
     <string name="preference_week_custom_range">Prilagođen raspon tjedna</string>
     <string name="preference_use_theme_background_desc">Ovo vrijedi samo za redovnu nastavu</string>
     <string name="preference_use_theme_background">Koristi boju teme</string>

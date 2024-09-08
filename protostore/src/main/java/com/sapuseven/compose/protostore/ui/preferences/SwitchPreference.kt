@@ -1,27 +1,29 @@
-package com.sapuseven.compose.protostore.ui
+package com.sapuseven.compose.protostore.ui.preferences
 
 import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import com.google.protobuf.MessageLite
-import com.sapuseven.compose.protostore.data.MultiUserSettingsRepository
+import com.sapuseven.compose.protostore.data.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
 fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> SwitchPreference(
 	title: (@Composable () -> Unit),
+	summary: (@Composable () -> Unit)? = null,
 	supportingContent: @Composable ((value: Boolean, enabled: Boolean) -> Unit)? = null,
 	leadingContent: (@Composable () -> Unit)? = null,
-	settingsRepository: MultiUserSettingsRepository<*, *, Model, ModelBuilder>,
+	settingsRepository: SettingsRepository<Model, ModelBuilder>,
 	value: (Model) -> Boolean,
 	scope: CoroutineScope = rememberCoroutineScope(),
 	enabledCondition: (Model) -> Boolean = { true },
 	highlight: Boolean = false,
-	onCheckedChange: (ModelBuilder.(checked: Boolean) -> Unit)? = null,
+	onValueChange: (ModelBuilder.(checked: Boolean) -> Unit)? = null,
 ) {
 	Preference(
 		title = title,
+		summary = summary,
 		supportingContent = supportingContent,
 		leadingContent = leadingContent,
 		trailingContent = { currentValue, enabled ->
@@ -30,7 +32,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> SwitchPreference(
 				onCheckedChange = {
 					scope.launch {
 						settingsRepository.updateUserSettings {
-							onCheckedChange?.invoke(this, it)
+							onValueChange?.invoke(this, it)
 						}
 					}
 				},
@@ -45,7 +47,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> SwitchPreference(
 		onClick = { currentValue ->
 			scope.launch {
 				settingsRepository.updateUserSettings {
-					onCheckedChange?.invoke(this, !currentValue)
+					onValueChange?.invoke(this, !currentValue)
 				}
 			}
 		}

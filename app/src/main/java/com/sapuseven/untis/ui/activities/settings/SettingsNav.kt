@@ -1,19 +1,25 @@
 package com.sapuseven.untis.ui.activities.settings
 
+import android.os.Build
+import android.widget.Toast
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.sapuseven.compose.protostore.ui.Preference
-import com.sapuseven.compose.protostore.ui.PreferenceGroup
-import com.sapuseven.compose.protostore.ui.SwitchPreference
+import com.sapuseven.compose.protostore.ui.preferences.Preference
+import com.sapuseven.compose.protostore.ui.preferences.PreferenceGroup
+import com.sapuseven.compose.protostore.ui.preferences.SliderPreference
+import com.sapuseven.compose.protostore.ui.preferences.SwitchPreference
+import com.sapuseven.compose.protostore.ui.preferences.WeekRangePickerPreference
+import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.settings.model.UserSettings
 import com.sapuseven.untis.preferences.PreferenceScreen
 import com.sapuseven.untis.ui.navigation.AppRoutes
+import io.sentry.Sentry
 
 fun NavGraphBuilder.SettingsNav(
 	navController: NavHostController
@@ -102,70 +108,79 @@ fun NavGraphBuilder.SettingsNav(
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_double_tap_to_exit)) },
 					settingsRepository = viewModel,
-					transform = { it.exitConfirmation },
-					onCheckedChange = { exitConfirmation = it }
+					value = { it.exitConfirmation },
+					onValueChange = { exitConfirmation = it }
 				)
 
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_flinging_enable)) },
 					settingsRepository = viewModel,
-					transform = { it.flingEnable },
-					onCheckedChange = { flingEnable = it }
+					value = { it.flingEnable },
+					onValueChange = { flingEnable = it }
 				)
 			}
-		}
-
-		/*VerticalScrollColumn {
 
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-				PreferenceCategory(stringResource(id = R.string.preference_category_app_language)) {
+				PreferenceGroup(stringResource(id = R.string.preference_category_app_language)) {
 					val packageName = LocalContext.current.packageName
 					Preference(
 						title = { Text(text = stringResource(id = R.string.preference_app_language)) },
 						onClick = {
-
-							languageSettingsLauncher.launch(
+							/*TODO languageSettingsLauncher.launch(
 								Intent(
 									android.provider.Settings.ACTION_APP_LOCALE_SETTINGS,
 									Uri.parse("package:$packageName")
 								)
-							)
-
+							)*/
 						},
-						dataStore = UntisPreferenceDataStore.emptyDataStore()
+						value = { Unit },
+						settingsRepository = viewModel,
 					)
 				}
 			}
 
-			PreferenceCategory(stringResource(R.string.preference_category_general_week_display)) {
+			PreferenceGroup(stringResource(R.string.preference_category_general_week_display)) {
 				WeekRangePickerPreference(
 					title = { Text(stringResource(R.string.preference_week_custom_range)) },
-					dataStore = dataStorePreferences.weekCustomRange
+					settingsRepository = viewModel,
+					value = { it.weekCustomRangeList },
+					onValueChange = {
+						weekCustomRangeList.apply {
+							clear()
+							addAll(it)
+						}
+					}
 				)
 
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_week_snap_to_days)) },
 					summary = { Text(stringResource(R.string.preference_week_snap_to_days_summary)) },
-					dataStore = dataStorePreferences.weekSnapToDays
+					settingsRepository = viewModel,
+					value = { it.weekSnapToDays },
+					onValueChange = { weekSnapToDays = it }
 				)
 
 				SliderPreference(
-					valueRange = 0f..7f,
-					steps = 6,
 					title = { Text(stringResource(R.string.preference_week_display_length)) },
 					summary = { Text(stringResource(R.string.preference_week_display_length_summary)) },
-					dependency = dataStorePreferences.weekSnapToDays,
+					valueRange = 0f..7f,
+					steps = 6,
+					enabledCondition = { it.weekSnapToDays },
 					showSeekBarValue = true,
-					dataStore = dataStorePreferences.weekCustomLength
+					settingsRepository = viewModel,
+					value = { it.weekCustomLength },
+					onValueChange = { weekCustomLength = it }
 				)
 			}
 
-			PreferenceCategory(stringResource(id = R.string.preference_category_general_automute)) {
+			PreferenceGroup(stringResource(id = R.string.preference_category_general_automute)) {
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_automute_enable)) },
 					summary = { Text(stringResource(R.string.preference_automute_enable_summary)) },
-					onCheckedChange = {
-						if (it) {
+					settingsRepository = viewModel,
+					value = { it.automuteEnable },
+					onValueChange = {
+						/*TODO if (it) {
 							if (requestAutoMutePermission(
 									autoMuteSettingsLauncher
 								)
@@ -179,19 +194,22 @@ fun NavGraphBuilder.SettingsNav(
 						} else {
 							disableAutoMute()
 							false
-						}
-					},
-					dataStore = dataStorePreferences.automuteEnable
+						}*/
+					}
 				)
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_automute_cancelled_lessons)) },
-					dependency = dataStorePreferences.automuteEnable,
-					dataStore = dataStorePreferences.automuteCancelledLessons
+					enabledCondition = { it.automuteEnable },
+					settingsRepository = viewModel,
+					value = { it.automuteCancelledLessons },
+					onValueChange = { automuteCancelledLessons = it }
 				)
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_automute_mute_priority)) },
-					dependency = dataStorePreferences.automuteEnable,
-					dataStore = dataStorePreferences.automuteMutePriority
+					enabledCondition = { it.automuteEnable },
+					settingsRepository = viewModel,
+					value = { it.automuteMutePriority },
+					onValueChange = { automuteMutePriority = it }
 				)
 
 				SliderPreference(
@@ -200,50 +218,57 @@ fun NavGraphBuilder.SettingsNav(
 					title = { Text(stringResource(R.string.preference_automute_minimum_break_length)) },
 					summary = { Text(stringResource(R.string.preference_automute_minimum_break_length_summary)) },
 					showSeekBarValue = true,
-					dependency = dataStorePreferences.automuteEnable,
-					dataStore = dataStorePreferences.automuteMinimumBreakLength
+					enabledCondition = { it.automuteEnable },
+					settingsRepository = viewModel,
+					value = { it.automuteMinimumBreakLength },
+					onValueChange = { automuteMinimumBreakLength = it }
 				)
 			}
 
-			PreferenceCategory(stringResource(R.string.preference_category_reports)) {
+			PreferenceGroup(stringResource(R.string.preference_category_reports)) {
 				Preference(
 					title = { Text(stringResource(R.string.preference_reports_info)) },
 					summary = { Text(stringResource(R.string.preference_reports_info_desc)) },
-					icon = {
+					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.settings_info),
 							contentDescription = null
 						)
 					},
-					dataStore = UntisPreferenceDataStore.emptyDataStore()
+					settingsRepository = viewModel,
+					value = { Unit }
 				)
 
-				SwitchPreference(
+				/*TODO SwitchPreference(
 					title = { Text(stringResource(R.string.preference_reports_breadcrumbs)) },
 					summary = { Text(stringResource(R.string.preference_reports_breadcrumbs_desc)) },
+					settingsRepository = viewModel,
 					dataStore = UntisPreferenceDataStore(
 						reportsDataStore,
 						reportsDataStoreBreadcrumbsEnable.first,
 						reportsDataStoreBreadcrumbsEnable.second
 					)
-				)
+				)*/
 
-				if (BuildConfig.DEBUG)
+				if (BuildConfig.DEBUG) {
+					val context = LocalContext.current
 					Preference(
 						title = { Text("Send test report") },
 						summary = { Text("Sends a report to Sentry to test error reporting") },
 						onClick = {
-							Sentry.captureException(java.lang.Exception("Test report"))
+							Sentry.captureException(Exception("Test report"))
 							Toast.makeText(
-								this@SettingsActivity,
+								context,
 								"Report has been sent",
 								Toast.LENGTH_SHORT
 							).show()
 						},
-						dataStore = UntisPreferenceDataStore.emptyDataStore()
+						settingsRepository = viewModel,
+						value = { Unit }
 					)
+				}
 			}
-		}*/
+		}
 	}
 	composable<AppRoutes.Settings.Styling> {
 		SettingsScreen(
@@ -252,32 +277,40 @@ fun NavGraphBuilder.SettingsNav(
 		) {}
 
 		/*VerticalScrollColumn {
-			PreferenceCategory(stringResource(id = R.string.preference_category_styling_colors)) {
+			PreferenceGroup(stringResource(id = R.string.preference_category_styling_colors)) {
 				ColorPreference(
 					title = { Text(stringResource(R.string.preference_background_future)) },
 					showAlphaSlider = true,
-					dataStore = dataStorePreferences.backgroundFuture
+					settingsRepository = viewModel,
+value = { it.backgroundFuture },
+onValueChange = { backgroundFuture = it }
 				)
 
 				ColorPreference(
 					title = { Text(stringResource(R.string.preference_background_past)) },
 					showAlphaSlider = true,
-					dataStore = dataStorePreferences.backgroundPast
+					settingsRepository = viewModel,
+value = { it.backgroundPast },
+onValueChange = { backgroundPast = it }
 				)
 
 				ColorPreference(
 					title = { Text(stringResource(R.string.preference_marker)) },
-					dataStore = dataStorePreferences.marker
+					settingsRepository = viewModel,
+value = { it.marker },
+onValueChange = { marker = it }
 				)
 			}
 
-			PreferenceCategory(stringResource(id = R.string.preference_category_styling_backgrounds)) {
+			PreferenceGroup(stringResource(id = R.string.preference_category_styling_backgrounds)) {
 				MultiSelectListPreference(
 					title = { Text(stringResource(R.string.preference_school_background)) },
 					summary = { Text(stringResource(R.string.preference_school_background_desc)) },
 					entries = stringArrayResource(id = R.array.preference_schoolcolors_values),
 					entryLabels = stringArrayResource(id = R.array.preference_schoolcolors),
-					dataStore = dataStorePreferences.schoolBackground
+					settingsRepository = viewModel,
+value = { it.schoolBackground },
+onValueChange = { schoolBackground = it }
 				)
 
 				ColorPreference(
@@ -285,7 +318,9 @@ fun NavGraphBuilder.SettingsNav(
 					dependency = dataStorePreferences.schoolBackground.with(
 						dependencyValue = { !it.contains("regular") }
 					),
-					dataStore = dataStorePreferences.backgroundRegular,
+					settingsRepository = viewModel,
+value = { it.backgroundRegular, },
+onValueChange = { backgroundRegular, = it }
 					showAlphaSlider = true,
 					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
@@ -295,7 +330,9 @@ fun NavGraphBuilder.SettingsNav(
 					dependency = dataStorePreferences.schoolBackground.with(
 						dependencyValue = { !it.contains("regular") }
 					),
-					dataStore = dataStorePreferences.backgroundRegularPast,
+					settingsRepository = viewModel,
+value = { it.backgroundRegularPast, },
+onValueChange = { backgroundRegularPast, = it }
 					showAlphaSlider = true,
 					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
@@ -305,7 +342,9 @@ fun NavGraphBuilder.SettingsNav(
 					dependency = dataStorePreferences.schoolBackground.with(
 						dependencyValue = { !it.contains("exam") }
 					),
-					dataStore = dataStorePreferences.backgroundExam,
+					settingsRepository = viewModel,
+value = { it.backgroundExam, },
+onValueChange = { backgroundExam, = it }
 					showAlphaSlider = true,
 					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
@@ -315,7 +354,9 @@ fun NavGraphBuilder.SettingsNav(
 					dependency = dataStorePreferences.schoolBackground.with(
 						dependencyValue = { !it.contains("exam") }
 					),
-					dataStore = dataStorePreferences.backgroundExamPast,
+					settingsRepository = viewModel,
+value = { it.backgroundExamPast, },
+onValueChange = { backgroundExamPast, = it }
 					showAlphaSlider = true,
 					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
@@ -325,7 +366,9 @@ fun NavGraphBuilder.SettingsNav(
 					dependency = dataStorePreferences.schoolBackground.with(
 						dependencyValue = { !it.contains("irregular") }
 					),
-					dataStore = dataStorePreferences.backgroundIrregular,
+					settingsRepository = viewModel,
+value = { it.backgroundIrregular, },
+onValueChange = { backgroundIrregular, = it }
 					showAlphaSlider = true,
 					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
@@ -335,7 +378,9 @@ fun NavGraphBuilder.SettingsNav(
 					dependency = dataStorePreferences.schoolBackground.with(
 						dependencyValue = { !it.contains("irregular") }
 					),
-					dataStore = dataStorePreferences.backgroundIrregularPast,
+					settingsRepository = viewModel,
+value = { it.backgroundIrregularPast, },
+onValueChange = { backgroundIrregularPast, = it }
 					showAlphaSlider = true,
 					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
@@ -345,7 +390,9 @@ fun NavGraphBuilder.SettingsNav(
 					dependency = dataStorePreferences.schoolBackground.with(
 						dependencyValue = { !it.contains("cancelled") }
 					),
-					dataStore = dataStorePreferences.backgroundCancelled,
+					settingsRepository = viewModel,
+value = { it.backgroundCancelled, },
+onValueChange = { backgroundCancelled, = it }
 					showAlphaSlider = true,
 					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
@@ -355,7 +402,9 @@ fun NavGraphBuilder.SettingsNav(
 					dependency = dataStorePreferences.schoolBackground.with(
 						dependencyValue = { !it.contains("cancelled") }
 					),
-					dataStore = dataStorePreferences.backgroundCancelledPast,
+					settingsRepository = viewModel,
+value = { it.backgroundCancelledPast, },
+onValueChange = { backgroundCancelledPast, = it }
 					showAlphaSlider = true,
 					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
@@ -369,7 +418,7 @@ fun NavGraphBuilder.SettingsNav(
 				)*/
 			}
 
-			PreferenceCategory(stringResource(id = R.string.preference_category_styling_themes)) {
+			PreferenceGroup(stringResource(id = R.string.preference_category_styling_themes)) {
 				ColorPreference(
 					title = { Text(stringResource(R.string.preferences_theme_color)) },
 					icon = {
@@ -378,7 +427,9 @@ fun NavGraphBuilder.SettingsNav(
 							contentDescription = null
 						)
 					},
-					dataStore = dataStorePreferences.themeColor,
+					settingsRepository = viewModel,
+value = { it.themeColor, },
+onValueChange = { themeColor, = it }
 					defaultValueLabel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
 						stringResource(id = R.string.preferences_theme_color_system)
 					else
@@ -396,7 +447,9 @@ fun NavGraphBuilder.SettingsNav(
 					},
 					entries = stringArrayResource(id = R.array.preference_dark_theme_values),
 					entryLabels = stringArrayResource(id = R.array.preference_dark_theme),
-					dataStore = dataStorePreferences.darkTheme
+					settingsRepository = viewModel,
+value = { it.darkTheme },
+onValueChange = { darkTheme = it }
 				)
 
 				SwitchPreference(
@@ -409,7 +462,9 @@ fun NavGraphBuilder.SettingsNav(
 						)
 					},
 					dependency = dataStorePreferences.darkTheme,
-					dataStore = dataStorePreferences.darkThemeOled
+					settingsRepository = viewModel,
+value = { it.darkThemeOled },
+onValueChange = { darkThemeOled = it }
 				)
 			}
 		}*/
@@ -429,7 +484,9 @@ fun NavGraphBuilder.SettingsNav(
 						contentDescription = null
 					)
 				},
-				dataStore = dataStorePreferences.timetablePersonalTimetable,
+				settingsRepository = viewModel,
+value = { it.timetablePersonalTimetable, },
+onValueChange = { timetablePersonalTimetable, = it }
 				timetableDatabaseInterface = timetableDatabaseInterface,
 				highlight = preferenceHighlight == "preference_timetable_personal_timetable"
 			)
@@ -443,7 +500,9 @@ fun NavGraphBuilder.SettingsNav(
 						contentDescription = null
 					)
 				},
-				dataStore = dataStorePreferences.timetableHideTimeStamps
+				settingsRepository = viewModel,
+value = { it.timetableHideTimeStamps },
+onValueChange = { timetableHideTimeStamps = it }
 			)
 
 			SwitchPreference(
@@ -455,7 +514,9 @@ fun NavGraphBuilder.SettingsNav(
 						contentDescription = null
 					)
 				},
-				dataStore = dataStorePreferences.timetableHideCancelled
+				settingsRepository = viewModel,
+value = { it.timetableHideCancelled },
+onValueChange = { timetableHideCancelled = it }
 			)
 
 			SwitchPreference(
@@ -467,7 +528,9 @@ fun NavGraphBuilder.SettingsNav(
 						contentDescription = null
 					)
 				},
-				dataStore = dataStorePreferences.timetableSubstitutionsIrregular
+				settingsRepository = viewModel,
+value = { it.timetableSubstitutionsIrregular },
+onValueChange = { timetableSubstitutionsIrregular = it }
 			)
 
 			SwitchPreference(
@@ -480,10 +543,12 @@ fun NavGraphBuilder.SettingsNav(
 					)
 				},
 				dependency = dataStorePreferences.timetableSubstitutionsIrregular,
-				dataStore = dataStorePreferences.timetableBackgroundIrregular
+				settingsRepository = viewModel,
+value = { it.timetableBackgroundIrregular },
+onValueChange = { timetableBackgroundIrregular = it }
 			)
 
-			PreferenceCategory(stringResource(id = R.string.preference_category_display_options)) {
+			PreferenceGroup(stringResource(id = R.string.preference_category_display_options)) {
 				RangeInputPreference(
 					title = { Text(stringResource(R.string.preference_timetable_range)) },
 					icon = {
@@ -492,13 +557,17 @@ fun NavGraphBuilder.SettingsNav(
 							contentDescription = null
 						)
 					},
-					dataStore = dataStorePreferences.timetableRange
+					settingsRepository = viewModel,
+value = { it.timetableRange },
+onValueChange = { timetableRange = it }
 				)
 
 				/*SwitchPreference(
 					title = { Text(stringResource(R.string.preference_timetable_range_index_reset)) },
 					dependency = dataStorePreferences.timetableRange,
-					dataStore = dataStorePreferences.timetableRangeIndexReset
+					settingsRepository = viewModel,
+value = { it.timetableRangeIndexReset },
+onValueChange = { timetableRangeIndexReset = it }
 				)*/
 
 				/*SwitchPreference
@@ -508,7 +577,7 @@ fun NavGraphBuilder.SettingsNav(
 				title = Hide lessons outside specified range" */
 			}
 
-			PreferenceCategory(stringResource(id = R.string.preference_category_timetable_item_appearance)) {
+			PreferenceGroup(stringResource(id = R.string.preference_category_timetable_item_appearance)) {
 				NumericInputPreference(
 					title = { Text(stringResource(R.string.preference_timetable_item_padding_overlap)) },
 					icon = {
@@ -518,7 +587,9 @@ fun NavGraphBuilder.SettingsNav(
 						)
 					},
 					unit = "dp",
-					dataStore = dataStorePreferences.timetableItemPaddingOverlap
+					settingsRepository = viewModel,
+value = { it.timetableItemPaddingOverlap },
+onValueChange = { timetableItemPaddingOverlap = it }
 				)
 
 				NumericInputPreference(
@@ -530,7 +601,9 @@ fun NavGraphBuilder.SettingsNav(
 						)
 					},
 					unit = "dp",
-					dataStore = dataStorePreferences.timetableItemPadding
+					settingsRepository = viewModel,
+value = { it.timetableItemPadding },
+onValueChange = { timetableItemPadding = it }
 				)
 
 				NumericInputPreference(
@@ -542,11 +615,13 @@ fun NavGraphBuilder.SettingsNav(
 						)
 					},
 					unit = "dp",
-					dataStore = dataStorePreferences.timetableItemCornerRadius
+					settingsRepository = viewModel,
+value = { it.timetableItemCornerRadius },
+onValueChange = { timetableItemCornerRadius = it }
 				)
 			}
 
-			PreferenceCategory(stringResource(id = R.string.preference_category_timetable_lesson_text)) {
+			PreferenceGroup(stringResource(id = R.string.preference_category_timetable_lesson_text)) {
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_timetable_centered_lesson_info)) },
 					icon = {
@@ -555,7 +630,9 @@ fun NavGraphBuilder.SettingsNav(
 							contentDescription = null
 						)
 					},
-					dataStore = dataStorePreferences.timetableCenteredLessonInfo
+					settingsRepository = viewModel,
+value = { it.timetableCenteredLessonInfo },
+onValueChange = { timetableCenteredLessonInfo = it }
 				)
 
 				SwitchPreference(
@@ -566,7 +643,9 @@ fun NavGraphBuilder.SettingsNav(
 							contentDescription = null
 						)
 					},
-					dataStore = dataStorePreferences.timetableBoldLessonName
+					settingsRepository = viewModel,
+value = { it.timetableBoldLessonName },
+onValueChange = { timetableBoldLessonName = it }
 				)
 
 				NumericInputPreference(
@@ -578,7 +657,9 @@ fun NavGraphBuilder.SettingsNav(
 						)
 					},
 					unit = "sp",
-					dataStore = dataStorePreferences.timetableLessonNameFontSize
+					settingsRepository = viewModel,
+value = { it.timetableLessonNameFontSize },
+onValueChange = { timetableLessonNameFontSize = it }
 				)
 
 				NumericInputPreference(
@@ -590,7 +671,9 @@ fun NavGraphBuilder.SettingsNav(
 						)
 					},
 					unit = "sp",
-					dataStore = dataStorePreferences.timetableLessonInfoFontSize
+					settingsRepository = viewModel,
+value = { it.timetableLessonInfoFontSize },
+onValueChange = { timetableLessonInfoFontSize = it }
 				)
 			}
 		}*/
@@ -631,7 +714,9 @@ fun NavGraphBuilder.SettingsNav(
 						false
 					}
 				},
-				dataStore = dataStorePreferences.notificationsEnable
+				settingsRepository = viewModel,
+value = { it.notificationsEnable },
+onValueChange = { notificationsEnable = it }
 			)
 
 			SwitchPreference(
@@ -642,7 +727,9 @@ fun NavGraphBuilder.SettingsNav(
 					enqueueNotificationSetup(user)
 					it
 				},
-				dataStore = dataStorePreferences.notificationsInMultiple
+				settingsRepository = viewModel,
+value = { it.notificationsInMultiple },
+onValueChange = { notificationsInMultiple = it }
 			)
 
 			SwitchPreference(
@@ -653,7 +740,9 @@ fun NavGraphBuilder.SettingsNav(
 					enqueueNotificationSetup(user)
 					it
 				},
-				dataStore = dataStorePreferences.notificationsBeforeFirst
+				settingsRepository = viewModel,
+value = { it.notificationsBeforeFirst },
+onValueChange = { notificationsBeforeFirst = it }
 			)
 
 			NumericInputPreference(
@@ -663,7 +752,9 @@ fun NavGraphBuilder.SettingsNav(
 				onChange = {
 					enqueueNotificationSetup(user)
 				},
-				dataStore = dataStorePreferences.notificationsBeforeFirstTime
+				settingsRepository = viewModel,
+value = { it.notificationsBeforeFirstTime },
+onValueChange = { notificationsBeforeFirstTime = it }
 			)
 
 			Preference(
@@ -678,7 +769,7 @@ fun NavGraphBuilder.SettingsNav(
 				dataStore = UntisPreferenceDataStore.emptyDataStore()
 			)
 
-			PreferenceCategory(stringResource(id = R.string.preference_category_notifications_visible_fields)) {
+			PreferenceGroup(stringResource(id = R.string.preference_category_notifications_visible_fields)) {
 				ListPreference(
 					title = { Text(stringResource(R.string.all_subjects)) },
 					summary = { Text(it.second) },
@@ -691,7 +782,9 @@ fun NavGraphBuilder.SettingsNav(
 					entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
 					entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
 					dependency = dataStorePreferences.notificationsEnable,
-					dataStore = dataStorePreferences.notificationsVisibilitySubjects
+					settingsRepository = viewModel,
+value = { it.notificationsVisibilitySubjects },
+onValueChange = { notificationsVisibilitySubjects = it }
 				)
 
 				ListPreference(
@@ -706,7 +799,9 @@ fun NavGraphBuilder.SettingsNav(
 					entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
 					entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
 					dependency = dataStorePreferences.notificationsEnable,
-					dataStore = dataStorePreferences.notificationsVisibilityRooms
+					settingsRepository = viewModel,
+value = { it.notificationsVisibilityRooms },
+onValueChange = { notificationsVisibilityRooms = it }
 				)
 
 				ListPreference(
@@ -721,7 +816,9 @@ fun NavGraphBuilder.SettingsNav(
 					entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
 					entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
 					dependency = dataStorePreferences.notificationsEnable,
-					dataStore = dataStorePreferences.notificationsVisibilityTeachers
+					settingsRepository = viewModel,
+value = { it.notificationsVisibilityTeachers },
+onValueChange = { notificationsVisibilityTeachers = it }
 				)
 
 				ListPreference(
@@ -736,7 +833,9 @@ fun NavGraphBuilder.SettingsNav(
 					entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
 					entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
 					dependency = dataStorePreferences.notificationsEnable,
-					dataStore = dataStorePreferences.notificationsVisibilityClasses
+					settingsRepository = viewModel,
+value = { it.notificationsVisibilityClasses },
+onValueChange = { notificationsVisibilityClasses = it }
 				)
 			}
 		}*/
@@ -751,10 +850,12 @@ fun NavGraphBuilder.SettingsNav(
 			SwitchPreference(
 				title = { Text(stringResource(R.string.preference_connectivity_refresh_in_background)) },
 				summary = { Text(stringResource(R.string.preference_connectivity_refresh_in_background_desc)) },
-				dataStore = dataStorePreferences.connectivityRefreshInBackground
+				settingsRepository = viewModel,
+value = { it.connectivityRefreshInBackground },
+onValueChange = { connectivityRefreshInBackground = it }
 			)
 
-			PreferenceCategory(stringResource(id = R.string.preference_category_connectivity_proxy)) {
+			PreferenceGroup(stringResource(id = R.string.preference_category_connectivity_proxy)) {
 				InputPreference(
 					title = { Text(stringResource(R.string.preference_connectivity_proxy_host)) },
 					icon = {
@@ -763,7 +864,9 @@ fun NavGraphBuilder.SettingsNav(
 							contentDescription = null
 						)
 					},
-					dataStore = dataStorePreferences.proxyHost
+					settingsRepository = viewModel,
+value = { it.proxyHost },
+onValueChange = { proxyHost = it }
 				)
 
 				Preference(
@@ -810,7 +913,7 @@ fun NavGraphBuilder.SettingsNav(
 				dataStore = UntisPreferenceDataStore.emptyDataStore()
 			)
 
-			PreferenceCategory(stringResource(id = R.string.preference_info_general)) {
+			PreferenceGroup(stringResource(id = R.string.preference_info_general)) {
 				val openDialog = remember { mutableStateOf(false) }
 
 				Preference(

@@ -42,8 +42,6 @@
     <string name="preference_week_snap_to_days">Défilement journalier</string>
     <string name="preference_week_display_length_summary">Définir à 0 pour utiliser la longueur de la semaine</string>
     <string name="preference_week_display_length">Jours à afficher</string>
-    <string name="preference_week_custom_range_summary_short">%1$s</string>
-    <string name="preference_week_custom_range_summary">%1$s à %2$s</string>
     <string name="preference_week_custom_range">Personnaliser la semaine</string>
     <string name="preference_use_theme_background_desc">Ceci s’applique uniquement aux cours réguliers</string>
     <string name="preference_use_theme_background">Utiliser les couleurs du thème</string>
