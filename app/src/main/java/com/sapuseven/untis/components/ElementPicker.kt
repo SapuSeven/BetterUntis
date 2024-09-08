@@ -1,54 +1,39 @@
-package com.sapuseven.untis.viewmodels
+package com.sapuseven.untis.components
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.map
-import androidx.navigation.toRoute
 import com.sapuseven.untis.api.model.untis.masterdata.Klasse
 import com.sapuseven.untis.api.model.untis.masterdata.Room
 import com.sapuseven.untis.api.model.untis.masterdata.Subject
 import com.sapuseven.untis.api.model.untis.masterdata.Teacher
+import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.databases.entities.UserDao
 import com.sapuseven.untis.data.timetable.PeriodData.Companion.ELEMENT_NAME_UNKNOWN
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface.Type
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import com.sapuseven.untis.ui.navigation.AppRoutes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-interface ElementPickerDelegate {
-	val allClasses: LiveData<Map<Int, Klasse>>
-	val allTeachers: LiveData<Map<Int, Teacher>>
-	val allSubjects: LiveData<Map<Int, Subject>>
-	val allRooms: LiveData<Map<Int, Room>>
-
-	fun init(delegateScope: CoroutineScope)
-
-	fun getAllPeriodElements(): Map<TimetableDatabaseInterface.Type, LiveData<List<PeriodElement>>?>
-
-	fun getShortName(periodElement: PeriodElement): String
-	fun isAllowed(periodElement: PeriodElement): Boolean
-}
-
-class ElementPickerDelegateImpl @Inject constructor(
-	savedStateHandle: SavedStateHandle,
+class ElementPicker(
+	private val user: User,
 	private val userDao: UserDao,
-) : ViewModelDelegate(), ElementPickerDelegate {
-	private val userId = savedStateHandle.get<Long>("userId")!!
+) {
+	val allClasses = MutableLiveData<Map<Int, Klasse>>()
+	val allTeachers = MutableLiveData<Map<Int, Teacher>>()
+	val allSubjects = MutableLiveData<Map<Int, Subject>>()
+	val allRooms = MutableLiveData<Map<Int, Room>>()
 
-	override val allClasses = MutableLiveData<Map<Int, Klasse>>()
-	override val allTeachers = MutableLiveData<Map<Int, Teacher>>()
-	override val allSubjects = MutableLiveData<Map<Int, Subject>>()
-	override val allRooms = MutableLiveData<Map<Int, Room>>()
+	init {
+		loadElements()
+	}
 
-	override fun init() {
-		delegateScope.launch(Dispatchers.IO) {
-			userDao.getByIdWithData(userId)?.let {
+	fun loadElements() {
+		Log.d("ElementPicker", "loading elements")
+		CoroutineScope(Dispatchers.IO).launch {
+			userDao.getByIdWithData(user.id)?.let {
 				allClasses.postValue(it.klassen.toList().filter { it.active }
 					.sortedBy { it.name }.associateBy { it.id })
 				allTeachers.postValue(it.teachers.toList().filter { it.active }
@@ -61,7 +46,7 @@ class ElementPickerDelegateImpl @Inject constructor(
 		}
 	}
 
-	override fun getAllPeriodElements(): Map<Type, LiveData<List<PeriodElement>>?> = listOf(
+	fun getAllPeriodElements(): Map<Type, LiveData<List<PeriodElement>>?> = listOf(
 		Type.CLASS,
 		Type.TEACHER,
 		Type.SUBJECT,
@@ -82,7 +67,7 @@ class ElementPickerDelegateImpl @Inject constructor(
 		return getShortName(id, type?.let { Type.valueOf(it) })
 	}
 
-	override fun getShortName(periodElement: PeriodElement): String {
+	fun getShortName(periodElement: PeriodElement): String {
 		return getShortName(periodElement.id, periodElement.type)
 	}
 
@@ -118,7 +103,7 @@ class ElementPickerDelegateImpl @Inject constructor(
 		return isAllowed(id, Type.valueOf(type))
 	}
 
-	override fun isAllowed(periodElement: PeriodElement): Boolean {
+	fun isAllowed(periodElement: PeriodElement): Boolean {
 		return isAllowed(periodElement.id, periodElement.type)
 	}
 

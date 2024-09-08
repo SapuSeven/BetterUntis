@@ -1,39 +1,54 @@
 package com.sapuseven.untis.ui.dialogs
 
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.NewMainAppState
+import com.sapuseven.untis.components.UserManager
 import com.sapuseven.untis.data.databases.entities.User
-import com.sapuseven.untis.ui.activities.timetable.TimetableViewModel
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
-import com.sapuseven.untis.viewmodels.UserManagerDelegate
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileManagementDialog(
-	userManager: UserManagerDelegate,
+	userManager: UserManager,
+	onEdit: (user: User?) -> Unit,
 	onDismiss: () -> Unit
 ) {
 	var dismissed by remember { mutableStateOf(false) }
-	var users = userManager.allUsers.collectAsStateWithLifecycle()
+	val users by userManager.allUsersState.collectAsStateWithLifecycle()
 	val context = LocalContext.current
 	val scope = rememberCoroutineScope()
 
@@ -87,7 +102,7 @@ fun ProfileManagementDialog(
 				Divider(color = MaterialTheme.colorScheme.outline)
 			}
 
-			items(users.value ?: emptyList()) { user ->
+			items(users) { user ->
 				ListItem(
 					headlineContent = { Text(user.getDisplayedName()) },
 					supportingContent = { Text(user.userData.schoolName) },
@@ -108,7 +123,7 @@ fun ProfileManagementDialog(
 						}
 					},
 					modifier = Modifier.clickable {
-						userManager.editUser(user)
+						onEdit(user)
 					}
 				)
 			}
@@ -123,7 +138,7 @@ fun ProfileManagementDialog(
 						)
 					},
 					modifier = Modifier.clickable {
-						userManager.editUser(null)
+						onEdit(null)
 					}
 				)
 			}
@@ -148,10 +163,12 @@ fun ProfileManagementDialog(
 				},
 				confirmButton = {
 					TextButton(
-						onClick = { scope.launch {
-							userManager.deleteUser(user)
-							deleteDialog = null
-						}}) {
+						onClick = {
+							scope.launch {
+								userManager.deleteUser(user)
+								deleteDialog = null
+							}
+						}) {
 						Text(stringResource(id = R.string.all_delete))
 					}
 				},

@@ -34,22 +34,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.LiveData
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.MainActivity
 import com.sapuseven.untis.activities.main.DrawerItems
 import com.sapuseven.untis.activities.main.DrawerText
-import com.sapuseven.untis.api.model.untis.masterdata.Klasse
-import com.sapuseven.untis.api.model.untis.masterdata.Room
-import com.sapuseven.untis.api.model.untis.masterdata.Subject
-import com.sapuseven.untis.api.model.untis.masterdata.Teacher
+import com.sapuseven.untis.components.ElementPicker
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
-import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreenNew
-import com.sapuseven.untis.viewmodels.ElementPickerDelegate
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
@@ -59,7 +53,7 @@ fun TimetableDrawer(
 	viewModel: TimetableDrawerViewModel = hiltViewModel(),
 	drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
 	//timetableDatabaseInterface: TimetableDatabaseInterface,
-	elementPickerDelegate: ElementPickerDelegate,
+	elementPicker: ElementPicker,
 	onShowTimetable: (PeriodElement?) -> Unit,
 	content: @Composable () -> Unit
 ) {
@@ -235,6 +229,12 @@ fun TimetableDrawer(
 							drawerState.close()
 							viewModel.onShortcutItemClick(item, shortcutLauncher)
 						}
+					},
+					onNavigationClick = { item ->
+						scope.launch {
+							drawerState.close()
+							viewModel.onNavigationItemClick(item)
+						}
 					}
 				)
 			}
@@ -249,7 +249,7 @@ fun TimetableDrawer(
 	) {
 		ElementPickerDialogFullscreenNew(
 			title = { /*TODO*/ },
-			elementPickerDelegate = elementPickerDelegate,
+			elementPicker = elementPicker,
 			onDismiss = { showElementPicker = null },
 			onSelect = { item ->
 				item?.let {

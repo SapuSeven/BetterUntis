@@ -9,7 +9,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.toRoute
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.DEMO_API_URL
@@ -21,12 +20,12 @@ import com.sapuseven.untis.api.model.response.UserDataResult
 import com.sapuseven.untis.api.model.untis.MasterData
 import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.api.model.untis.masterdata.TimeGrid
+import com.sapuseven.untis.components.UserManager
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.databases.entities.UserDao
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.ErrorMessageDictionary.ERROR_CODE_TOO_MANY_RESULTS
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
-import com.sapuseven.untis.modules.UserManager
 import com.sapuseven.untis.ui.activities.ActivityViewModel
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
@@ -196,7 +195,8 @@ class LoginDataInputViewModel @Inject constructor(
 
 			withContext(Dispatchers.IO) {
 				val userId = saveUser(user, userData.masterData)
-				navigator.navigate(AppRoutes.Timetable(userId)) {
+				userManager.switchUser(userId)
+				navigator.navigate(AppRoutes.Timetable) {
 					popUpTo(0) // Pop all previous routes
 				}
 			}
@@ -245,7 +245,6 @@ class LoginDataInputViewModel @Inject constructor(
 
 		userDao.deleteUserData(userId)
 		userDao.insertUserData(userId, masterData)
-		userManager.setActiveUser(userId)
 		return userId
 	}
 

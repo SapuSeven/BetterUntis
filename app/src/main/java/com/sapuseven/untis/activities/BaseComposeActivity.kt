@@ -3,9 +3,7 @@ package com.sapuseven.untis.activities
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.annotation.MainThread
@@ -26,13 +24,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,16 +54,13 @@ import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.helpers.config.globalDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.modules.ThemeManager
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.activities.ActivityEvents
 import com.sapuseven.untis.ui.activities.ActivityViewModel
 import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.material.scheme.Scheme
-import com.sapuseven.untis.ui.theme.animated
 import com.sapuseven.untis.ui.theme.generateColorScheme
-import com.sapuseven.untis.ui.theme.toColorScheme
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -78,7 +70,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import javax.inject.Inject
 
 abstract class BaseComposeActivity : ComponentActivity() {
 	internal var user by mutableStateOf<User?>(null)

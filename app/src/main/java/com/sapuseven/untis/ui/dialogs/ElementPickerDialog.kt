@@ -1,21 +1,48 @@
 package com.sapuseven.untis.ui.dialogs
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TextFieldDefaults.TextFieldDecorationBox
-import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -28,10 +55,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.asFlow
-import androidx.lifecycle.distinctUntilChanged
 import com.sapuseven.untis.R
+import com.sapuseven.untis.components.ElementPicker
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.ui.common.AbbreviatedText
@@ -39,12 +65,11 @@ import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.NavigationBarInset
 import com.sapuseven.untis.ui.common.disabled
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
-import com.sapuseven.untis.viewmodels.ElementPickerDelegate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ElementPickerDialogFullscreenNew(
-	elementPickerDelegate: ElementPickerDelegate,
+	elementPicker: ElementPicker,
 	title: @Composable () -> Unit,
 	initialType: TimetableDatabaseInterface.Type? = null,
 	multiSelect: Boolean = false,
@@ -62,7 +87,7 @@ fun ElementPickerDialogFullscreenNew(
 	val items = remember { mutableStateMapOf<PeriodElement, Boolean>() }
 	LaunchedEffect(selectedType) {
 		items.clear()
-		elementPickerDelegate.getAllPeriodElements()[selectedType]?.asFlow()?.collect { periodElements ->
+		elementPicker.getAllPeriodElements()[selectedType]?.asFlow()?.collect { periodElements ->
 			periodElements.associateWith { false }.let { items.putAll(it) }
 		}
 	}
@@ -168,7 +193,7 @@ fun ElementPickerDialogFullscreenNew(
 		) {
 			//Text(text = "${elements.get(TimetableDatabaseInterface.Type.ROOM)?.size ?: "?"} rooms")
 			ElementPickerElementsNew(
-				elementPickerDelegate = elementPickerDelegate,
+				elementPicker = elementPicker,
 				selectedType = selectedType,
 				multiSelect = multiSelect,
 				onDismiss = onDismiss,
@@ -259,9 +284,9 @@ fun ElementPickerDialogFullscreen(
 							textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
 							cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
 							modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(20.dp)
-                                .focusRequester(focusRequester)
+								.fillMaxWidth()
+								.padding(20.dp)
+								.focusRequester(focusRequester)
 						)
 
 						LaunchedEffect(Unit) {
@@ -317,8 +342,8 @@ fun ElementPickerDialogFullscreen(
 	) { innerPadding ->
 		Column(
 			modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
+				.padding(innerPadding)
+				.fillMaxSize()
 		) {
 			ElementPickerElements(
 				timetableDatabaseInterface = timetableDatabaseInterface,
@@ -329,8 +354,8 @@ fun ElementPickerDialogFullscreen(
 				items = items,
 				filter = search,
 				modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
+					.fillMaxWidth()
+					.weight(1f),
 				contentPadding = if (hideTypeSelection) insetsPaddingValues() else PaddingValues(0.dp)
 			)
 
@@ -383,9 +408,9 @@ fun ElementPickerDialog(
 				title?.let {
 					ProvideTextStyle(value = MaterialTheme.typography.headlineSmall) {
 						Box(
-                            Modifier
-                                .padding(top = 24.dp, bottom = 16.dp)
-                                .padding(horizontal = 24.dp)
+							Modifier
+								.padding(top = 24.dp, bottom = 16.dp)
+								.padding(horizontal = 24.dp)
 						) {
 							title()
 						}
@@ -399,9 +424,9 @@ fun ElementPickerDialog(
 					onSelect = onSelect,
 					items = items,
 					modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .padding(horizontal = 24.dp)
+						.fillMaxWidth()
+						.weight(1f)
+						.padding(horizontal = 24.dp)
 				)
 
 				if (!hideTypeSelection)
@@ -469,24 +494,24 @@ fun ElementPickerElements(
 							text = item.name,
 							style = MaterialTheme.typography.bodyLarge,
 							modifier = Modifier
-                                .clickable(
-                                    interactionSource = interactionSource,
-                                    indication = if (!multiSelect) LocalIndication.current else null,
-                                    role = Role.Checkbox,
-                                    enabled = item.enabled
-                                ) {
-                                    onSelect(item.element)
-                                    if (multiSelect)
-                                        items[item.element] = items[item.element] == false
-                                    else
-                                        onDismiss(true)
-                                }
-                                .weight(1f)
-                                .padding(
-                                    vertical = 16.dp,
-                                    horizontal = if (!multiSelect) 16.dp else 0.dp
-                                )
-                                .disabled(!item.enabled)
+								.clickable(
+									interactionSource = interactionSource,
+									indication = if (!multiSelect) LocalIndication.current else null,
+									role = Role.Checkbox,
+									enabled = item.enabled
+								) {
+									onSelect(item.element)
+									if (multiSelect)
+										items[item.element] = items[item.element] == false
+									else
+										onDismiss(true)
+								}
+								.weight(1f)
+								.padding(
+									vertical = 16.dp,
+									horizontal = if (!multiSelect) 16.dp else 0.dp
+								)
+								.disabled(!item.enabled)
 						)
 					}
 				}
@@ -501,8 +526,8 @@ fun ElementPickerElements(
 					imageVector = Icons.Outlined.Info,
 					contentDescription = null,
 					modifier = Modifier
-                        .size(96.dp)
-                        .padding(bottom = 24.dp)
+						.size(96.dp)
+						.padding(bottom = 24.dp)
 				)
 				Text(stringResource(R.string.elementpicker_timetable_select))
 			}
@@ -512,7 +537,7 @@ fun ElementPickerElements(
 
 @Composable
 fun ElementPickerElementsNew(
-	elementPickerDelegate: ElementPickerDelegate,
+	elementPicker: ElementPicker,
 	selectedType: TimetableDatabaseInterface.Type?,
 	multiSelect: Boolean = false,
 	modifier: Modifier,
@@ -537,8 +562,8 @@ fun ElementPickerElementsNew(
 						.map {
 							object {
 								val element = it
-								val name = elementPickerDelegate.getShortName(it)
-								val enabled = elementPickerDelegate.isAllowed(it)
+								val name = elementPicker.getShortName(it)
+								val enabled = elementPicker.isAllowed(it)
 							}
 						}
 						.filter { it.name.contains(filter, true) }
@@ -562,24 +587,24 @@ fun ElementPickerElementsNew(
 							text = item.name,
 							style = MaterialTheme.typography.bodyLarge,
 							modifier = Modifier
-                                .clickable(
-                                    interactionSource = interactionSource,
-                                    indication = if (!multiSelect) LocalIndication.current else null,
-                                    role = Role.Checkbox,
-                                    enabled = item.enabled
-                                ) {
-                                    onSelect(item.element)
-                                    if (multiSelect)
-                                        items[item.element] = items[item.element] == false
-                                    else
-                                        onDismiss(true)
-                                }
-                                .weight(1f)
-                                .padding(
-                                    vertical = 16.dp,
-                                    horizontal = if (!multiSelect) 16.dp else 0.dp
-                                )
-                                .disabled(!item.enabled)
+								.clickable(
+									interactionSource = interactionSource,
+									indication = if (!multiSelect) LocalIndication.current else null,
+									role = Role.Checkbox,
+									enabled = item.enabled
+								) {
+									onSelect(item.element)
+									if (multiSelect)
+										items[item.element] = items[item.element] == false
+									else
+										onDismiss(true)
+								}
+								.weight(1f)
+								.padding(
+									vertical = 16.dp,
+									horizontal = if (!multiSelect) 16.dp else 0.dp
+								)
+								.disabled(!item.enabled)
 						)
 					}
 				}
@@ -594,8 +619,8 @@ fun ElementPickerElementsNew(
 					imageVector = Icons.Outlined.Info,
 					contentDescription = null,
 					modifier = Modifier
-                        .size(96.dp)
-                        .padding(bottom = 24.dp)
+						.size(96.dp)
+						.padding(bottom = 24.dp)
 				)
 				Text(stringResource(R.string.elementpicker_timetable_select))
 			}

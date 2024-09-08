@@ -19,8 +19,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -54,22 +53,27 @@ fun Timetable(
 ) {
 	val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 	val scope = rememberCoroutineScope()
-	val user = viewModel.user.collectAsStateWithLifecycle()
-	val users = viewModel.allUsers.collectAsStateWithLifecycle()
+	val user = viewModel.currentUser
+	val users by viewModel.allUsersState.collectAsStateWithLifecycle()
 
 	TimetableDrawer(
 		drawerState = drawerState,
-		elementPickerDelegate = viewModel.elementPickerDelegate,
+		elementPicker = viewModel.elementPicker,
 		onShowTimetable = {
 			//it.let { element ->
-				//state.setDisplayedElement(element?.first, element?.second)
+			//state.setDisplayedElement(element?.first, element?.second)
 			//}
 		}
 	) {
 		AppScaffold(
 			topBar = {
 				CenterAlignedTopAppBar(
-					title = { Text((user.value?.getDisplayedName() ?: "") + (if (BuildConfig.DEBUG) " (${user.value?.id})" else "")) },
+					title = {
+						Text(
+							(user.getDisplayedName()
+								?: "") + (if (BuildConfig.DEBUG) " (${user.id})" else "")
+						)
+					},
 					navigationIcon = {
 						IconButton(onClick = {
 							scope.launch {
@@ -87,8 +91,8 @@ fun Timetable(
 							DebugDesclaimerAction()
 
 						ProfileSelectorAction(
-							users = users.value ?: emptyList(),
-							currentSelection = user.value,
+							users = users,
+							currentSelection = user,
 							showProfileActions = true,
 							onSelectionChange = {
 								viewModel.switchUser(it)
@@ -124,7 +128,7 @@ fun Timetable(
 						.align(Alignment.BottomStart)
 						.padding(start = timeColumnWidth + 8.dp, bottom = 8.dp)
 						.bottomInsets()
-						.disabled(user.value?.anonymous == true)
+						.disabled(user.anonymous == true)
 				)
 
 				IconButton(
@@ -136,7 +140,10 @@ fun Timetable(
 						viewModel.showFeedback()
 					}
 				) {
-					Icon(painter = painterResource(R.drawable.all_feedback), contentDescription = "Give feedback")
+					Icon(
+						painter = painterResource(R.drawable.all_feedback),
+						contentDescription = "Give feedback"
+					)
 				}
 
 				if (viewModel.feedbackDialog)
@@ -144,7 +151,7 @@ fun Timetable(
 						onDismiss = { viewModel.feedbackDialog = false }
 					)
 
-				if (user.value?.anonymous == true) {
+				if (user.anonymous == true) {
 					Column(
 						verticalArrangement = Arrangement.Center,
 						horizontalAlignment = Alignment.CenterHorizontally,
@@ -207,7 +214,10 @@ fun Timetable(
 		exit = fullscreenDialogAnimationExit()
 	) {
 		ProfileManagementDialog(
-			userManager = viewModel.userManagerDelegate,
+			userManager = viewModel.userManager,
+			onEdit = {
+				viewModel.editUser(it)
+			},
 			onDismiss = {
 				viewModel.profileManagementDialog = false
 			}

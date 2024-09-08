@@ -1,8 +1,14 @@
 package com.sapuseven.untis.activities.main
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -10,11 +16,12 @@ import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.InfoCenterActivity
 import com.sapuseven.untis.activities.RoomFinderActivity
-import com.sapuseven.untis.activities.SettingsActivity
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import com.sapuseven.untis.ui.models.NavItemNavigation
 import com.sapuseven.untis.ui.models.NavItemShortcut
 import com.sapuseven.untis.ui.models.NavItemTimetable
+import com.sapuseven.untis.ui.navigation.AppRoutes
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,6 +32,7 @@ fun DrawerItems(
 	displayedElement: PeriodElement? = null,
 	onTimetableClick: (item: NavItemTimetable) -> Unit,
 	onShortcutClick: (item: NavItemShortcut) -> Unit,
+	onNavigationClick: (item: NavItemNavigation) -> Unit,
 ) {
 	val navItemsElementTypes = listOf(
 		NavItemTimetable(
@@ -60,12 +68,6 @@ fun DrawerItems(
 			label = stringResource(id = R.string.activity_title_free_rooms),
 			RoomFinderActivity::class.java
 		),
-		NavItemShortcut(
-			id = 4,
-			icon = painterResource(id = R.drawable.all_settings),
-			label = stringResource(id = R.string.activity_title_settings),
-			SettingsActivity::class.java
-		)
 	)
 	if (isMessengerAvailable) {
 		navItemsShortcuts = navItemsShortcuts.plus(
@@ -79,6 +81,15 @@ fun DrawerItems(
 			it.id
 		}
 	}
+
+	var navItemsNavigation = listOf(
+		NavItemNavigation(
+			id = 4,
+			icon = painterResource(id = R.drawable.all_settings),
+			label = stringResource(id = R.string.activity_title_settings),
+			route = AppRoutes.Settings
+		)
+	)
 
 	navItemsElementTypes.forEach { item ->
 		NavigationDrawerItem(
@@ -98,6 +109,15 @@ fun DrawerItems(
 			label = { Text(item.label) },
 			selected = false,
 			onClick = { onShortcutClick(item) },
+			modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+		)
+	}
+	navItemsNavigation.forEach { item ->
+		NavigationDrawerItem(
+			icon = { Icon(item.icon, contentDescription = null) },
+			label = { Text(item.label) },
+			selected = false,
+			onClick = { onNavigationClick(item) },
 			modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 		)
 	}

@@ -16,9 +16,17 @@ data class NavItemTimetable(
 	val elementType: TimetableDatabaseInterface.Type
 ) : NavItem(id, icon, label)
 
+@Deprecated("Shortcuts are not supported with compose-navigation. Use NavItemNavigation instead")
 data class NavItemShortcut(
 	override val id: Int,
 	override val icon: Painter,
 	override val label: String,
 	val target: Class<*>? //TODO("Maybe not the best option to make this nullable")
+) : NavItem(id, icon, label)
+
+data class NavItemNavigation(
+	override val id: Int,
+	override val icon: Painter,
+	override val label: String,
+	val route: Any
 ) : NavItem(id, icon, label)

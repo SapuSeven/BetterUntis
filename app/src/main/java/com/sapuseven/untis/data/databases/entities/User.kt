@@ -3,7 +3,6 @@ package com.sapuseven.untis.data.databases.entities
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Embedded
@@ -80,7 +79,10 @@ data class UserWithData(
 
 	@Relation(parentColumn = "id", entityColumn = "userId") val eventReasons: List<EventReason>,
 
-	@Relation(parentColumn = "id", entityColumn = "userId") val eventReasonGroups: List<EventReasonGroup>,
+	@Relation(
+		parentColumn = "id",
+		entityColumn = "userId"
+	) val eventReasonGroups: List<EventReasonGroup>,
 
 	@Relation(parentColumn = "id", entityColumn = "userId") val excuseStatuses: List<ExcuseStatus>,
 
@@ -94,7 +96,10 @@ data class UserWithData(
 
 	@Relation(parentColumn = "id", entityColumn = "userId") val teachers: List<Teacher>,
 
-	@Relation(parentColumn = "id", entityColumn = "userId") val teachingMethods: List<TeachingMethod>,
+	@Relation(
+		parentColumn = "id",
+		entityColumn = "userId"
+	) val teachingMethods: List<TeachingMethod>,
 
 	@Relation(parentColumn = "id", entityColumn = "userId") val schoolYears: List<SchoolYear>,
 )
@@ -170,18 +175,23 @@ interface UserDao {
 
 	@Transaction
 	fun insertUserData(userId: Long, masterData: MasterData) {
-		insertAbsenceReasons((masterData.absenceReasons ?: emptyList()).map { it.copy(userId = userId) })
+		insertAbsenceReasons(
+			(masterData.absenceReasons ?: emptyList()).map { it.copy(userId = userId) })
 		insertDepartments((masterData.departments ?: emptyList()).map { it.copy(userId = userId) })
 		insertDuties((masterData.duties ?: emptyList()).map { it.copy(userId = userId) })
-		insertEventReasons((masterData.eventReasons ?: emptyList()).map { it.copy(userId = userId) })
-		insertEventReasonGroups((masterData.eventReasonGroups ?: emptyList()).map { it.copy(userId = userId) })
-		insertExcuseStatuses((masterData.excuseStatuses ?: emptyList()).map { it.copy(userId = userId) })
+		insertEventReasons(
+			(masterData.eventReasons ?: emptyList()).map { it.copy(userId = userId) })
+		insertEventReasonGroups(
+			(masterData.eventReasonGroups ?: emptyList()).map { it.copy(userId = userId) })
+		insertExcuseStatuses(
+			(masterData.excuseStatuses ?: emptyList()).map { it.copy(userId = userId) })
 		insertHolidays((masterData.holidays ?: emptyList()).map { it.copy(userId = userId) })
 		insertKlassen((masterData.klassen).map { it.copy(userId = userId) })
 		insertRooms((masterData.rooms).map { it.copy(userId = userId) })
 		insertSubjects((masterData.subjects).map { it.copy(userId = userId) })
 		insertTeachers((masterData.teachers).map { it.copy(userId = userId) })
-		insertTeachingMethods((masterData.teachingMethods ?: emptyList()).map { it.copy(userId = userId) })
+		insertTeachingMethods(
+			(masterData.teachingMethods ?: emptyList()).map { it.copy(userId = userId) })
 		insertSchoolYears((masterData.schoolyears ?: emptyList()).map { it.copy(userId = userId) })
 	}
 

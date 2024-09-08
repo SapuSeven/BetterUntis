@@ -10,14 +10,16 @@ import androidx.lifecycle.ViewModel
 import com.sapuseven.untis.data.databases.entities.UserDao
 import com.sapuseven.untis.models.TimetableBookmark
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import com.sapuseven.untis.modules.UserManager
+import com.sapuseven.untis.ui.models.NavItemNavigation
 import com.sapuseven.untis.ui.models.NavItemShortcut
+import com.sapuseven.untis.ui.navigation.AppNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class TimetableDrawerViewModel @Inject constructor(
-	private val userDao: UserDao
+	private val userDao: UserDao,
+	private val navigator: AppNavigator,
 ) : ViewModel() {
 	var displayedElement by mutableStateOf<PeriodElement?>(null)
 
@@ -26,6 +28,10 @@ class TimetableDrawerViewModel @Inject constructor(
 
 	var bookmarkDeleteDialog by mutableStateOf<TimetableBookmark?>(null)
 		private set
+
+	fun onNavigationItemClick(item: NavItemNavigation) {
+		navigator.navigate(item.route)
+	}
 
 	//val user = userManager.activeUser
 	fun onShortcutItemClick(
@@ -39,9 +45,9 @@ class TimetableDrawerViewModel @Inject constructor(
 			setData("id", item.id)
 			setData("label", item.label)
 			Sentry.addBreadcrumb(this)
-		}
+		}*/
 
-		if (item.target == null) {
+		/*if (item.target == null) {
 			try {
 				contextActivity.startActivity(
 					contextActivity.packageManager.getLaunchIntentForPackage(

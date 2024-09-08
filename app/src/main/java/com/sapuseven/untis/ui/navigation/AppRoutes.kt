@@ -4,13 +4,13 @@ import kotlinx.serialization.Serializable
 
 object AppRoutes {
 	@Serializable
-	object Splash
+	data object Splash
 
 	@Serializable
-	data class Timetable(val userId: Long)
+	data object Timetable
 
 	@Serializable
-	object Login
+	data object Login
 
 	@Serializable
 	data class LoginDataInput(
@@ -21,5 +21,5 @@ object AppRoutes {
 	)
 
 	@Serializable
-	data class Settings(val userId: Long)
+	data object Settings
 }
