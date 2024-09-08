@@ -20,7 +20,7 @@ class UserScopeManager @Inject constructor(
 	/**
 	 * Get or create the UserComponent for the given user.
 	 */
-	fun getUserComponent(user: User) {
+	private fun getUserComponent(user: User) {
 		userComponentBuilder
 			.user(user)
 			.build()
@@ -33,7 +33,7 @@ class UserScopeManager @Inject constructor(
 	/**
 	 * Clear the current user component.
 	 */
-	fun clearUserComponent() {
+	private fun clearUserComponent() {
 		component = null
 		entryPoint = null
 	}

@@ -15,6 +15,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.*
 
+@Deprecated("Will not be neded anymore")
 class UntisPreferenceDataStore<T>(
 	val dataStore: DataStore<Preferences>?,
 	val prefKey: Preferences.Key<T>,
@@ -77,6 +78,7 @@ class UntisPreferenceDataStore<T>(
 	)
 }
 
+@Deprecated("Will be implemented in ProtoStore")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T: Any> PreferenceScreen(
@@ -94,6 +96,7 @@ fun <T: Any> PreferenceScreen(
 	)
 }
 
+@Deprecated("Will be implemented in ProtoStore")
 @Composable
 fun PreferenceCategory(
 	title: String,

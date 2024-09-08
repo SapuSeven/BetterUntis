@@ -12,10 +12,6 @@ import dagger.hilt.InstallIn
 @Module
 @InstallIn(UserComponent::class)
 class UserModule {
-	@Provides
-	fun provideElementPicker(user: User, userDao: UserDao): ElementPicker {
-		return ElementPicker(user, userDao)
-	}
 }
 
 @InstallIn(UserComponent::class)

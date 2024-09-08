@@ -9,6 +9,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.sapuseven.compose.protostore.ui.Preference
+import com.sapuseven.compose.protostore.ui.PreferenceGroup
+import com.sapuseven.compose.protostore.ui.SwitchPreference
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.settings.model.Settings
 import com.sapuseven.untis.data.settings.model.UserSettings
@@ -102,29 +104,29 @@ fun NavGraphBuilder.SettingsNav(
 			navController = navController,
 			title = stringResource(id = R.string.preferences_general)
 		) { viewModel ->
-			Preference(
-				title = { Text(viewModel.getUserId()) },
-				dataSource = viewModel.getUserSettings(),
-				transform = { it.exampleCounter },
-				supportingContent = { vaule, _ -> Text(text = vaule.toString()) },
-				onClick = {
-					viewModel.updateUserSettings { it.exampleCounter = it.exampleCounter + 1 }
-				}
-			)
-		}
-
-		/*VerticalScrollColumn {
-			PreferenceCategory(stringResource(id = R.string.preference_category_general_behaviour)) {
+			PreferenceGroup(stringResource(id = R.string.preference_category_general_behaviour)) {
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_double_tap_to_exit)) },
-					dataStore = dataStorePreferences.doubleTapToExit
+					dataSource = viewModel.getUserSettings(),
+					transform = { it.exitConfirmation },
+					onCheckedChange = {
+						viewModel.updateUserSettings { exitConfirmation = it }
+					}
 				)
 
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_flinging_enable)) },
-					dataStore = dataStorePreferences.flingEnable
+					dataSource = viewModel.getUserSettings(),
+					transform = { it.flingEnable },
+					onCheckedChange = {
+						viewModel.updateUserSettings { flingEnable = it }
+					}
 				)
 			}
+		}
+
+		/*VerticalScrollColumn {
+
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 				PreferenceCategory(stringResource(id = R.string.preference_category_app_language)) {
 					val packageName = LocalContext.current.packageName
