@@ -1,2 +1,3 @@
 include ':app', ':weekview', ':material-color-utils'
 include ':api'
+include ':protostore'
