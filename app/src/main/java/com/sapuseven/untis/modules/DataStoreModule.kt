@@ -2,6 +2,10 @@ package com.sapuseven.untis.modules
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.DataStoreFactory
+import androidx.datastore.dataStoreFile
+import androidx.datastore.migrations.SharedPreferencesMigration
+import androidx.datastore.preferences.SharedPreferencesMigration
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -9,6 +13,8 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sapuseven.untis.data.settings.UserSettingsSerializer
+import com.sapuseven.untis.data.settings.model.UserSettings
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,6 +23,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -26,9 +33,29 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Module
+private const val USER_PREFERENCES_NAME = "settings"
+private const val DATA_STORE_FILE_NAME = "settings.pb"
+
 @InstallIn(SingletonComponent::class)
+@Module
 object DataStoreModule {
+	@Singleton
+	@Provides
+	fun provideProtoDataStore(@ApplicationContext appContext: Context): DataStore<UserSettings> {
+		return DataStoreFactory.create(
+			serializer = UserSettingsSerializer,
+			produceFile = { appContext.dataStoreFile(DATA_STORE_FILE_NAME) },
+			corruptionHandler = null,
+			/*migrations = listOf(
+				SharedPreferencesMigration(
+					appContext,
+					USER_PREFERENCES_NAME
+				)
+			),*/
+			scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+		)
+	}
+
 	@Provides
 	fun provideDataStoreUtil(@ApplicationContext context: Context): DataStoreUtil = DataStoreUtil(context)
 

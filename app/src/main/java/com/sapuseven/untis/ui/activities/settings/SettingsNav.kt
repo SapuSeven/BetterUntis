@@ -2,17 +2,22 @@ package com.sapuseven.untis.ui.activities.settings
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.sapuseven.compose.protostore.ui.Preference
 import com.sapuseven.untis.R
+import com.sapuseven.untis.data.settings.model.Settings
+import com.sapuseven.untis.data.settings.model.UserSettings
+import com.sapuseven.untis.data.settings.settingsDataStore
 import com.sapuseven.untis.preferences.PreferenceScreen
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
 import com.sapuseven.untis.ui.common.VerticalScrollColumn
 import com.sapuseven.untis.ui.navigation.AppRoutes
-import com.sapuseven.untis.ui.preferences.Preference
+import kotlinx.coroutines.flow.map
 
 fun NavGraphBuilder.SettingsNav(
 	navController: NavHostController
@@ -96,7 +101,17 @@ fun NavGraphBuilder.SettingsNav(
 		SettingsScreen(
 			navController = navController,
 			title = stringResource(id = R.string.preferences_general)
-		) {}
+		) { viewModel ->
+			Preference(
+				title = { Text(viewModel.getUserId()) },
+				dataSource = viewModel.getUserSettings(),
+				transform = { it.exampleCounter },
+				supportingContent = { vaule, _ -> Text(text = vaule.toString()) },
+				onClick = {
+					viewModel.updateUserSettings { it.exampleCounter = it.exampleCounter + 1 }
+				}
+			)
+		}
 
 		/*VerticalScrollColumn {
 			PreferenceCategory(stringResource(id = R.string.preference_category_general_behaviour)) {
@@ -834,7 +849,7 @@ fun NavGraphBuilder.SettingsNav(
 						)
 					},
 					dataStore = UntisPreferenceDataStore.emptyDataStore()
-				)*/
+				)
 
 			Preference(
 				title = { Text(stringResource(R.string.preference_info_contributors)) },
@@ -851,7 +866,7 @@ fun NavGraphBuilder.SettingsNav(
 				dataStore = UntisPreferenceDataStore.emptyDataStore()
 			)
 
-			/*if (openDialog.value) {
+			if (openDialog.value) {
 				AlertDialog(
 					onDismissRequest = {
 						openDialog.value = false
@@ -894,7 +909,7 @@ fun NavGraphBuilder.SettingsNav(
 						Text(stringResource(id = R.string.preference_info_privacy_desc))
 					}
 				)
-			}*/
+			}
 
 			Preference(
 				title = { Text(stringResource(R.string.preference_info_libraries)) },
@@ -908,7 +923,7 @@ fun NavGraphBuilder.SettingsNav(
 				},
 				dataStore = UntisPreferenceDataStore.emptyDataStore()
 			)
-			//}
+			}*/
 		}
 	}
 	composable<AppRoutes.Settings.About.Libraries> {

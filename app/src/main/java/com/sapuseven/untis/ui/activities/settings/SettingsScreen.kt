@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -36,7 +37,8 @@ import com.sapuseven.untis.ui.preferences.Preference
 fun SettingsScreen(
 	navController: NavHostController,
 	title: String?,
-	content: @Composable (NavController) -> Unit
+	viewModel: SettingsScreenViewModel = hiltViewModel(),
+	content: @Composable (SettingsScreenViewModel) -> Unit
 ) {
 	/*val autoMutePref = dataStorePreferences.automuteEnable
 	val scope = rememberCoroutineScope()
@@ -109,11 +111,11 @@ fun SettingsScreen(
 	) { innerPadding ->
 		Box(
 			modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
+				.padding(innerPadding)
+				.fillMaxSize()
 		) {
 			VerticalScrollColumn {
-				content(navController)
+				content(viewModel)
 			}
 		}
 	}

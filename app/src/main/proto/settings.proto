@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option java_package = "com.sapuseven.untis.data.settings.model";
+option java_multiple_files = true;
+
+message Settings {
+  int32 example_counter = 3;
+}
+
+message UserSettings {
+  int64 activeUser = 1;
+  map<int64, Settings> users = 2;
+}
