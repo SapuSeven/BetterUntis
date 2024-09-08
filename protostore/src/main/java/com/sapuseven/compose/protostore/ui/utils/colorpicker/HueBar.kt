@@ -1,4 +1,4 @@
-package com.sapuseven.untis.ui.colorpicker
+package com.sapuseven.compose.protostore.ui.utils.colorpicker
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -25,9 +25,9 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 internal fun HueBar(
-	modifier: Modifier = Modifier,
-	currentColor: HsvColor,
-	onHueChanged: (Float) -> Unit
+    modifier: Modifier = Modifier,
+    currentColor: HsvColor,
+    onHueChanged: (Float) -> Unit
 ) {
 	val rainbowBrush = remember {
 		Brush.verticalGradient(getRainbowColors())

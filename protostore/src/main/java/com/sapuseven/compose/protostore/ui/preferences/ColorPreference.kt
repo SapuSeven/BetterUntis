@@ -3,13 +3,34 @@ package com.sapuseven.compose.protostore.ui.preferences
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,13 +40,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
-import com.sapuseven.untis.R
-import com.sapuseven.untis.preferences.UntisPreferenceDataStore
-import com.sapuseven.untis.ui.colorpicker.ColorPicker
-import com.sapuseven.untis.ui.common.disabled
+import com.google.protobuf.MessageLite
+import com.sapuseven.compose.protostore.R
+import com.sapuseven.compose.protostore.data.SettingsRepository
+import com.sapuseven.compose.protostore.ui.utils.colorpicker.ColorPicker
+import com.sapuseven.compose.protostore.ui.utils.disabled
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-val materialColors = arrayOf(
+private val materialColors = arrayOf(
 	Color(0xFFF44336), // RED 500
 	Color(0xFFE91E63), // PINK 500
 	Color(0xFFFF2C93), // LIGHT PINK 500
@@ -48,52 +71,65 @@ val materialColors = arrayOf(
 )
 
 @Composable
-fun ColorPreference(
+fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ColorPreference(
 	title: (@Composable () -> Unit),
-	icon: (@Composable () -> Unit)? = null,
+	summary: (@Composable () -> Unit)? = null,
+	//supportingContent: @Composable ((value: Float, enabled: Boolean) -> Unit)? = null,
+	leadingContent: (@Composable () -> Unit)? = null,
+	//trailingContent: @Composable ((value: Float, enabled: Boolean) -> Unit)? = null,
+	settingsRepository: SettingsRepository<Model, ModelBuilder>,
+	value: (Model) -> Int,
+	scope: CoroutineScope = rememberCoroutineScope(),
+	enabledCondition: (Model) -> Boolean = { true },
+	highlight: Boolean = false,
 	showAlphaSlider: Boolean = false,
-	defaultValueLabel: String? = null,
-	dependency: UntisPreferenceDataStore<*>? = null,
-	dataStore: UntisPreferenceDataStore<Int>
+	//defaultValueLabel: String? = null,
+	onValueChange: (ModelBuilder.(value: Int) -> Unit)? = null,
 ) {
-	val value = remember { mutableStateOf(dataStore.defaultValue) }
+	var dialogValue by remember { mutableIntStateOf(0) }
 	var showDialog by remember { mutableStateOf(false) }
-
-	val scope = rememberCoroutineScope()
 
 	Preference(
 		title = title,
-		icon = icon,
-		trailingContent = { saved, enabled ->
+		summary = summary,
+		leadingContent = leadingContent,
+		trailingContent = { currentValue, enabled ->
 			Box(
 				modifier = Modifier
 					.disabled(!enabled)
 					.size(24.dp)
 					.clip(CircleShape)
 					.background(MaterialTheme.colorScheme.surface)
-					.background(Color(saved))
+					.background(Color(currentValue))
 					.border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
 			)
 		},
-		dependency = dependency,
-		dataStore = dataStore,
+		settingsRepository = settingsRepository,
 		value = value,
-		onClick = { showDialog = true }
+		scope = scope,
+		enabledCondition = enabledCondition,
+		highlight = highlight,
+		onClick = {
+			dialogValue = it
+			showDialog = true
+		}
 	)
 
 	if (showDialog) {
-		val presetColors = remember { materialColors.plus(
-			if (defaultValueLabel == null)
-				Color(dataStore.defaultValue)
-			else
+		val color = Color(dialogValue);
+		val presetColors = remember {
+			materialColors.plus(
+				/*if (defaultValueLabel == null)
+					Color(dataStore.defaultValue)
+				else*/
 				Color.Black
-		) }
+			)
+		}
 
-		var color by remember { mutableStateOf(Color(value.value)) }
-		var selectedPreset by remember { mutableStateOf(presetColors.indexOf(color)) }
+		var selectedPreset by remember { mutableIntStateOf(presetColors.indexOf(color)) }
 		var advanced by remember { mutableStateOf(false) }
 
-		val defaultColor = Color(dataStore.defaultValue)
+		//TODO val defaultColor = Color(dataStore.defaultValue)
 
 		key(advanced) {
 			AlertDialog(
@@ -107,7 +143,7 @@ fun ColorPreference(
 							showAlphaBar = showAlphaSlider,
 							initialColor = color,
 							onColorChanged = { newColor ->
-								color = newColor
+								dialogValue = newColor.toArgb()
 							}
 						)
 					} else {
@@ -124,14 +160,14 @@ fun ColorPreference(
 											selected = selectedPreset == index,
 											onSelect = {
 												selectedPreset = index
-												color = it
+												dialogValue = it.toArgb()
 											}
 										)
 									}
 								}
 							)
 
-							defaultValueLabel?.let {
+							/*defaultValueLabel?.let {
 								Row(
 									verticalAlignment = Alignment.CenterVertically,
 									modifier = Modifier
@@ -157,13 +193,13 @@ fun ColorPreference(
 										text = defaultValueLabel
 									)
 								}
-							}
+							}*/
 
 							if (showAlphaSlider) {
 								Slider(
 									value = color.alpha,
 									onValueChange = {
-										color = color.copy(alpha = it)
+										dialogValue = color.copy(alpha = it).toArgb()
 									},
 									modifier = Modifier.fillMaxWidth()
 								)
@@ -188,7 +224,7 @@ fun ColorPreference(
 						Spacer(modifier = Modifier.weight(1f))
 
 						TextButton(onClick = { showDialog = false }) {
-							Text(stringResource(id = R.string.all_cancel))
+							Text(stringResource(id = R.string.dialog_cancel))
 						}
 
 						Spacer(modifier = Modifier.width(8.dp))
@@ -197,13 +233,16 @@ fun ColorPreference(
 							onClick = {
 								showDialog = false
 								scope.launch {
-									if (color == defaultColor)
+									/*if (color == defaultColor)
 										dataStore.clearValue()
 									else
-										dataStore.saveValue(color.toArgb())
+										dataStore.saveValue(color.toArgb())*/
+									settingsRepository.updateUserSettings {
+										onValueChange?.invoke(this, color.toArgb())
+									}
 								}
 							}) {
-							Text(stringResource(id = R.string.all_ok))
+							Text(stringResource(id = R.string.dialog_ok))
 						}
 					}
 				}
@@ -243,7 +282,7 @@ fun ColorBox(
 	) {
 		if (selected)
 			Icon(
-				painter = painterResource(id = R.drawable.all_check),
+				painter = painterResource(id = R.drawable.colorpicker_check),
 				contentDescription = null, // TODO: create stringResource(id = R.string.all_selected)
 				tint = if (ColorUtils.calculateLuminance(color.toArgb()) < 0.5)
 					Color.White

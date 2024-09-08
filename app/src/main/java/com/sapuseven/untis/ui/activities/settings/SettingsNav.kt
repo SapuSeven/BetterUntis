@@ -10,6 +10,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.sapuseven.compose.protostore.ui.preferences.ColorPreference
 import com.sapuseven.compose.protostore.ui.preferences.Preference
 import com.sapuseven.compose.protostore.ui.preferences.PreferenceGroup
 import com.sapuseven.compose.protostore.ui.preferences.SliderPreference
@@ -274,31 +275,29 @@ fun NavGraphBuilder.SettingsNav(
 		SettingsScreen(
 			navController = navController,
 			title = stringResource(id = R.string.preferences_styling)
-		) {}
-
-		/*VerticalScrollColumn {
+		) { viewModel ->
 			PreferenceGroup(stringResource(id = R.string.preference_category_styling_colors)) {
 				ColorPreference(
 					title = { Text(stringResource(R.string.preference_background_future)) },
 					showAlphaSlider = true,
 					settingsRepository = viewModel,
-value = { it.backgroundFuture },
-onValueChange = { backgroundFuture = it }
+					value = { it.backgroundFuture },
+					onValueChange = { backgroundFuture = it }
 				)
 
 				ColorPreference(
 					title = { Text(stringResource(R.string.preference_background_past)) },
 					showAlphaSlider = true,
 					settingsRepository = viewModel,
-value = { it.backgroundPast },
-onValueChange = { backgroundPast = it }
+					value = { it.backgroundPast },
+					onValueChange = { backgroundPast = it }
 				)
 
 				ColorPreference(
 					title = { Text(stringResource(R.string.preference_marker)) },
 					settingsRepository = viewModel,
-value = { it.marker },
-onValueChange = { marker = it }
+					value = { it.marker },
+					onValueChange = { marker = it }
 				)
 			}
 
@@ -309,104 +308,104 @@ onValueChange = { marker = it }
 					entries = stringArrayResource(id = R.array.preference_schoolcolors_values),
 					entryLabels = stringArrayResource(id = R.array.preference_schoolcolors),
 					settingsRepository = viewModel,
-value = { it.schoolBackground },
-onValueChange = { schoolBackground = it }
+					value = { it.schoolBackground },
+					onValueChange = { schoolBackground = it }
 				)
 
 				ColorPreference(
 					title = { Text(stringResource(R.string.preference_background_regular)) },
-					dependency = dataStorePreferences.schoolBackground.with(
-						dependencyValue = { !it.contains("regular") }
-					),
+					enabledCondition = {
+						!it.schoolBackgroundList.contains("regular")
+					},
 					settingsRepository = viewModel,
-value = { it.backgroundRegular, },
-onValueChange = { backgroundRegular, = it }
+					value = { it.backgroundRegular },
+					onValueChange = { backgroundRegular = it },
 					showAlphaSlider = true,
-					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+					//defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
 
 				ColorPreference(
 					title = { Text(stringResource(R.string.preference_background_regular_past)) },
-					dependency = dataStorePreferences.schoolBackground.with(
-						dependencyValue = { !it.contains("regular") }
-					),
+					enabledCondition = {
+						!it.schoolBackgroundList.contains("regular")
+					},
 					settingsRepository = viewModel,
-value = { it.backgroundRegularPast, },
-onValueChange = { backgroundRegularPast, = it }
+					value = { it.backgroundRegularPast },
+					onValueChange = { backgroundRegularPast = it },
 					showAlphaSlider = true,
-					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+					//defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
 
 				ColorPreference(
 					title = { Text(stringResource(R.string.preference_background_exam)) },
-					dependency = dataStorePreferences.schoolBackground.with(
-						dependencyValue = { !it.contains("exam") }
-					),
+					enabledCondition = {
+						!it.schoolBackgroundList.contains("exam")
+					},
 					settingsRepository = viewModel,
-value = { it.backgroundExam, },
-onValueChange = { backgroundExam, = it }
+					value = { it.backgroundExam },
+					onValueChange = { backgroundExam = it },
 					showAlphaSlider = true,
-					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+					//defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
 
 				ColorPreference(
 					title = { Text(stringResource(R.string.preference_background_exam_past)) },
-					dependency = dataStorePreferences.schoolBackground.with(
-						dependencyValue = { !it.contains("exam") }
-					),
+					enabledCondition = {
+						!it.schoolBackgroundList.contains("exam")
+					},
 					settingsRepository = viewModel,
-value = { it.backgroundExamPast, },
-onValueChange = { backgroundExamPast, = it }
+					value = { it.backgroundExamPast },
+					onValueChange = { backgroundExamPast = it },
 					showAlphaSlider = true,
-					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+					//defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
 
 				ColorPreference(
 					title = { Text(stringResource(R.string.preference_background_irregular)) },
-					dependency = dataStorePreferences.schoolBackground.with(
-						dependencyValue = { !it.contains("irregular") }
-					),
+					enabledCondition = {
+						!it.schoolBackgroundList.contains("irregular")
+					},
 					settingsRepository = viewModel,
-value = { it.backgroundIrregular, },
-onValueChange = { backgroundIrregular, = it }
+					value = { it.backgroundIrregular },
+					onValueChange = { backgroundIrregular = it },
 					showAlphaSlider = true,
-					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+					//defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
 
 				ColorPreference(
 					title = { Text(stringResource(R.string.preference_background_irregular_past)) },
-					dependency = dataStorePreferences.schoolBackground.with(
-						dependencyValue = { !it.contains("irregular") }
-					),
+					enabledCondition = {
+						!it.schoolBackgroundList.contains("irregular")
+					},
 					settingsRepository = viewModel,
-value = { it.backgroundIrregularPast, },
-onValueChange = { backgroundIrregularPast, = it }
+					value = { it.backgroundIrregularPast },
+					onValueChange = { backgroundIrregularPast = it },
 					showAlphaSlider = true,
-					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+					//defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
 
 				ColorPreference(
 					title = { Text(stringResource(R.string.preference_background_cancelled)) },
-					dependency = dataStorePreferences.schoolBackground.with(
-						dependencyValue = { !it.contains("cancelled") }
-					),
+					enabledCondition = {
+						!it.schoolBackgroundList.contains("cancelled")
+					},
 					settingsRepository = viewModel,
-value = { it.backgroundCancelled, },
-onValueChange = { backgroundCancelled, = it }
+					value = { it.backgroundCancelled },
+					onValueChange = { backgroundCancelled = it },
 					showAlphaSlider = true,
-					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+					//defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
 
 				ColorPreference(
 					title = { Text(stringResource(R.string.preference_background_cancelled_past)) },
-					dependency = dataStorePreferences.schoolBackground.with(
-						dependencyValue = { !it.contains("cancelled") }
-					),
+					enabledCondition = {
+						!it.schoolBackgroundList.contains("cancelled")
+					},
 					settingsRepository = viewModel,
-value = { it.backgroundCancelledPast, },
-onValueChange = { backgroundCancelledPast, = it }
+					value = { it.backgroundCancelledPast },
+					onValueChange = { backgroundCancelledPast = it },
 					showAlphaSlider = true,
-					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+					//defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
 
 				/*ConfirmDialogPreference(
@@ -421,19 +420,19 @@ onValueChange = { backgroundCancelledPast, = it }
 			PreferenceGroup(stringResource(id = R.string.preference_category_styling_themes)) {
 				ColorPreference(
 					title = { Text(stringResource(R.string.preferences_theme_color)) },
-					icon = {
+					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.settings_timetable_format_paint),
 							contentDescription = null
 						)
 					},
 					settingsRepository = viewModel,
-value = { it.themeColor, },
-onValueChange = { themeColor, = it }
-					defaultValueLabel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+					value = { it.themeColor },
+					onValueChange = { themeColor = it },
+					/*defaultValueLabel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
 						stringResource(id = R.string.preferences_theme_color_system)
 					else
-						null
+						null*/
 				)
 
 				ListPreference(
@@ -448,26 +447,26 @@ onValueChange = { themeColor, = it }
 					entries = stringArrayResource(id = R.array.preference_dark_theme_values),
 					entryLabels = stringArrayResource(id = R.array.preference_dark_theme),
 					settingsRepository = viewModel,
-value = { it.darkTheme },
-onValueChange = { darkTheme = it }
+					value = { it.darkTheme },
+					onValueChange = { darkTheme = it }
 				)
 
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_dark_theme_oled)) },
 					summary = { Text(stringResource(R.string.preference_dark_theme_oled_desc)) },
-					icon = {
+					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.settings_timetable_format_oled),
 							contentDescription = null
 						)
 					},
-					dependency = dataStorePreferences.darkTheme,
+					enabledCondition = { it.darkTheme != "light" },
 					settingsRepository = viewModel,
-value = { it.darkThemeOled },
-onValueChange = { darkThemeOled = it }
+					value = { it.darkThemeOled },
+					onValueChange = { darkThemeOled = it }
 				)
 			}
-		}*/
+		}
 	}
 	composable<AppRoutes.Settings.Timetable> {
 		SettingsScreen(

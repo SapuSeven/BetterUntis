@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import com.sapuseven.untis.R
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
-import com.sapuseven.untis.ui.colorpicker.ColorPicker
+import com.sapuseven.compose.protostore.ui.utils.colorpicker.ColorPicker
 import com.sapuseven.untis.ui.common.disabled
 import kotlinx.coroutines.launch
 

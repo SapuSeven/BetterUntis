@@ -1,4 +1,4 @@
-package com.sapuseven.untis.ui.colorpicker
+package com.sapuseven.compose.protostore.ui.utils.colorpicker
 
 /**
  * A representation of Color in Hue, Saturation and Value form.

@@ -1,4 +1,4 @@
-package com.sapuseven.untis.ui.colorpicker
+package com.sapuseven.compose.protostore.ui.utils.colorpicker
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -29,9 +29,9 @@ import kotlin.math.ceil
  */
 @Composable
 internal fun AlphaBar(
-	modifier: Modifier = Modifier,
-	currentColor: HsvColor,
-	onAlphaChanged: (Float) -> Unit
+    modifier: Modifier = Modifier,
+    currentColor: HsvColor,
+    onAlphaChanged: (Float) -> Unit
 ) {
 
 	val currentColorToAlphaBrush = remember(currentColor) {

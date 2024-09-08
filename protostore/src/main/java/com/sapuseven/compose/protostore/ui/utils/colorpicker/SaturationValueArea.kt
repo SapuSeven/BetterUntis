@@ -1,4 +1,4 @@
-package com.sapuseven.untis.ui.colorpicker
+package com.sapuseven.compose.protostore.ui.utils.colorpicker
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -32,9 +32,9 @@ import com.github.ajalt.colormath.model.HSV
  */
 @Composable
 internal fun SaturationValueArea(
-	modifier: Modifier = Modifier,
-	currentColor: HsvColor,
-	onSaturationValueChanged: (saturation: Float, value: Float) -> Unit
+    modifier: Modifier = Modifier,
+    currentColor: HsvColor,
+    onSaturationValueChanged: (saturation: Float, value: Float) -> Unit
 ) {
 	val blackGradientBrush = remember {
 		Brush.verticalGradient(listOf(Color(0xffffffff), Color(0xff000000)))

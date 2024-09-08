@@ -1,4 +1,4 @@
-package com.sapuseven.untis.ui.colorpicker
+package com.sapuseven.compose.protostore.ui.utils.colorpicker
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
