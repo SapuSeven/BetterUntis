@@ -1,5 +1,6 @@
 package com.sapuseven.untis.ui.activities.timetable
 
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -7,6 +8,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import com.sapuseven.untis.R
+import com.sapuseven.untis.activities.SettingsActivity
+import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_HIGHLIGHT
+import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_ROUTE
 import com.sapuseven.untis.components.ElementPicker
 import com.sapuseven.untis.components.UserManager
 import com.sapuseven.untis.data.databases.entities.User
@@ -58,6 +62,11 @@ class TimetableViewModel @Inject constructor(
 		/*user.value?.id?.let {
 			themeManager.toggleTheme(it)
 		}*/
+	}
+
+	val onAnonymousSettingsClick = {
+		navigator.navigate(AppRoutes.Settings.Timetable)
+		//EXTRA_STRING_PREFERENCE_HIGHLIGHT = "preference_timetable_personal_timetable"
 	}
 
 	// TODO

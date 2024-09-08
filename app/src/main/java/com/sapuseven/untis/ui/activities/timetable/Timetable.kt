@@ -167,7 +167,7 @@ fun Timetable(
 						)
 
 						Button(
-							onClick = {},// viewModel.onAnonymousSettingsClick,
+							onClick = viewModel.onAnonymousSettingsClick,
 							modifier = Modifier
 								.padding(top = 16.dp)
 						) {
