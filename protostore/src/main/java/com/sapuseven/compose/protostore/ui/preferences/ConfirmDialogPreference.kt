@@ -1,6 +1,7 @@
 package com.sapuseven.compose.protostore.ui.preferences
 
-import androidx.compose.material3.AlertDialog
+// TODO Implement
+/*import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
@@ -49,4 +50,4 @@ fun ConfirmDialogPreference(
 			}
 		)
 	}
-}
+}*/

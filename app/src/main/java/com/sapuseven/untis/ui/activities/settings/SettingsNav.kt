@@ -2,16 +2,25 @@ package com.sapuseven.untis.ui.activities.settings
 
 import android.os.Build
 import android.widget.Toast
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.google.accompanist.flowlayout.MainAxisAlignment
 import com.sapuseven.compose.protostore.ui.preferences.ColorPreference
+import com.sapuseven.compose.protostore.ui.preferences.InputPreference
 import com.sapuseven.compose.protostore.ui.preferences.ListPreference
 import com.sapuseven.compose.protostore.ui.preferences.MultiSelectListPreference
 import com.sapuseven.compose.protostore.ui.preferences.NumericInputPreference
@@ -690,9 +699,7 @@ onValueChange = { timetableRangeIndexReset = it }
 		SettingsScreen(
 			navController = navController,
 			title = stringResource(id = R.string.preferences_notifications)
-		) {}
-
-		/*VerticalScrollColumn {
+		) { viewModel ->
 			SwitchPreference(
 				title = { Text(stringResource(R.string.preference_notifications_enable)) },
 				summary = { Text(stringResource(R.string.preference_notifications_enable_desc)) },
@@ -702,8 +709,10 @@ onValueChange = { timetableRangeIndexReset = it }
 						contentDescription = null
 					)
 				},*/
-				onCheckedChange = { enable ->
-					if (enable) {
+				settingsRepository = viewModel,
+				value = { it.notificationsEnable },
+				onValueChange = {
+					/*TODO if (it) {
 						if (!canScheduleExactAlarms()) {
 							dialogScheduleExactAlarms = true
 							false
@@ -720,67 +729,66 @@ onValueChange = { timetableRangeIndexReset = it }
 					} else {
 						clearNotifications()
 						false
-					}
-				},
-				settingsRepository = viewModel,
-value = { it.notificationsEnable },
-onValueChange = { notificationsEnable = it }
+					}*/
+					notificationsEnable = it
+				}
 			)
 
 			SwitchPreference(
 				title = { Text(stringResource(R.string.preference_notifications_multiple)) },
 				summary = { Text(stringResource(R.string.preference_notifications_multiple_desc)) },
 				enabledCondition = { it.notificationsEnable },
-				onCheckedChange = {
-					enqueueNotificationSetup(user)
-					it
-				},
 				settingsRepository = viewModel,
-value = { it.notificationsInMultiple },
-onValueChange = { notificationsInMultiple = it }
+				value = { it.notificationsInMultiple },
+				onValueChange = {
+					//enqueueNotificationSetup(user)
+					notificationsInMultiple = it
+				}
 			)
 
 			SwitchPreference(
 				title = { Text(stringResource(R.string.preference_notifications_first_lesson)) },
 				summary = { Text(stringResource(R.string.preference_notifications_first_lesson_desc)) },
 				enabledCondition = { it.notificationsEnable },
-				onCheckedChange = {
-					enqueueNotificationSetup(user)
-					it
-				},
 				settingsRepository = viewModel,
-value = { it.notificationsBeforeFirst },
-onValueChange = { notificationsBeforeFirst = it }
+				value = { it.notificationsBeforeFirst },
+				onValueChange = {
+					//enqueueNotificationSetup(user)
+					notificationsBeforeFirst = it
+				}
 			)
 
 			NumericInputPreference(
 				title = { Text(stringResource(R.string.preference_notifications_first_lesson_time)) },
 				unit = stringResource(R.string.preference_notifications_first_lesson_time_unit),
 				enabledCondition = { it.notificationsBeforeFirst },
-				onChange = {
-					enqueueNotificationSetup(user)
-				},
 				settingsRepository = viewModel,
-value = { it.notificationsBeforeFirstTime },
-onValueChange = { notificationsBeforeFirstTime = it }
+				value = { it.notificationsBeforeFirstTime },
+				onValueChange = {
+					//enqueueNotificationSetup(user)
+					notificationsBeforeFirstTime = it
+				}
 			)
 
 			Preference(
 				title = { Text(stringResource(R.string.preference_notifications_clear)) },
-				onClick = { clearNotifications() },
+				onClick = {
+					//clearNotifications()
+				},
 				leadingContent = {
 					Icon(
 						painter = painterResource(R.drawable.settings_notifications_clear_all),
 						contentDescription = null
 					)
 				},
-				dataStore = UntisPreferenceDataStore.emptyDataStore()
+				settingsRepository = viewModel,
+				value = { Unit }
 			)
 
 			PreferenceGroup(stringResource(id = R.string.preference_category_notifications_visible_fields)) {
 				ListPreference(
 					title = { Text(stringResource(R.string.all_subjects)) },
-					summary = { Text(it.second) },
+					supportingContent = { value, _ -> Text(value.second) },
 					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.all_subject),
@@ -791,13 +799,13 @@ onValueChange = { notificationsBeforeFirstTime = it }
 					entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
 					enabledCondition = { it.notificationsEnable },
 					settingsRepository = viewModel,
-value = { it.notificationsVisibilitySubjects },
-onValueChange = { notificationsVisibilitySubjects = it }
+					value = { it.notificationsVisibilitySubjects },
+					onValueChange = { notificationsVisibilitySubjects = it }
 				)
 
 				ListPreference(
 					title = { Text(stringResource(R.string.all_rooms)) },
-					summary = { Text(it.second) },
+					supportingContent = { value, _ -> Text(value.second) },
 					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.all_rooms),
@@ -808,13 +816,13 @@ onValueChange = { notificationsVisibilitySubjects = it }
 					entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
 					enabledCondition = { it.notificationsEnable },
 					settingsRepository = viewModel,
-value = { it.notificationsVisibilityRooms },
-onValueChange = { notificationsVisibilityRooms = it }
+					value = { it.notificationsVisibilityRooms },
+					onValueChange = { notificationsVisibilityRooms = it }
 				)
 
 				ListPreference(
 					title = { Text(stringResource(R.string.all_teachers)) },
-					summary = { Text(it.second) },
+					supportingContent = { value, _ -> Text(value.second) },
 					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.all_teachers),
@@ -825,13 +833,13 @@ onValueChange = { notificationsVisibilityRooms = it }
 					entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
 					enabledCondition = { it.notificationsEnable },
 					settingsRepository = viewModel,
-value = { it.notificationsVisibilityTeachers },
-onValueChange = { notificationsVisibilityTeachers = it }
+					value = { it.notificationsVisibilityTeachers },
+					onValueChange = { notificationsVisibilityTeachers = it }
 				)
 
 				ListPreference(
 					title = { Text(stringResource(R.string.all_classes)) },
-					summary = { Text(it.second) },
+					supportingContent = { value, _ -> Text(value.second) },
 					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.all_classes),
@@ -842,25 +850,23 @@ onValueChange = { notificationsVisibilityTeachers = it }
 					entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
 					enabledCondition = { it.notificationsEnable },
 					settingsRepository = viewModel,
-value = { it.notificationsVisibilityClasses },
-onValueChange = { notificationsVisibilityClasses = it }
+					value = { it.notificationsVisibilityClasses },
+					onValueChange = { notificationsVisibilityClasses = it }
 				)
 			}
-		}*/
+		}
 	}
 	composable<AppRoutes.Settings.Connectivity> {
 		SettingsScreen(
 			navController = navController,
 			title = stringResource(id = R.string.preferences_connectivity)
-		) {}
-
-		/*VerticalScrollColumn {
+		) { viewModel ->
 			SwitchPreference(
 				title = { Text(stringResource(R.string.preference_connectivity_refresh_in_background)) },
 				summary = { Text(stringResource(R.string.preference_connectivity_refresh_in_background_desc)) },
 				settingsRepository = viewModel,
-value = { it.connectivityRefreshInBackground },
-onValueChange = { connectivityRefreshInBackground = it }
+				value = { it.connectivityRefreshInBackground },
+				onValueChange = { connectivityRefreshInBackground = it }
 			)
 
 			PreferenceGroup(stringResource(id = R.string.preference_category_connectivity_proxy)) {
@@ -873,14 +879,14 @@ onValueChange = { connectivityRefreshInBackground = it }
 						)
 					},
 					settingsRepository = viewModel,
-value = { it.proxyHost },
-onValueChange = { proxyHost = it }
+					value = { it.proxyHost },
+					onValueChange = { proxyHost = it }
 				)
 
 				Preference(
 					title = { Text(stringResource(R.string.preference_connectivity_proxy_about)) },
 					onClick = {
-						openUrl(URL_WIKI_PROXY)
+						//openUrl(URL_WIKI_PROXY)
 					},
 					leadingContent = {
 						Icon(
@@ -888,17 +894,20 @@ onValueChange = { proxyHost = it }
 							contentDescription = null
 						)
 					},
-					dataStore = UntisPreferenceDataStore.emptyDataStore()
+					settingsRepository = viewModel,
+					value = { Unit }
 				)
 			}
-		}*/
+
+		}
 	}
+
 	composable<AppRoutes.Settings.About> {
 		SettingsScreen(
 			navController = navController,
 			title = stringResource(id = R.string.preferences_info)
-		) {
-			/*Preference(
+		) { viewModel ->
+			Preference(
 				title = { Text(stringResource(R.string.app_name)) },
 				summary = {
 					Text(
@@ -910,7 +919,7 @@ onValueChange = { proxyHost = it }
 					)
 				},
 				onClick = {
-					openUrl("$URL_GITHUB_REPOSITORY/releases")
+					//openUrl("$URL_GITHUB_REPOSITORY/releases")
 				},
 				leadingContent = {
 					Icon(
@@ -918,7 +927,8 @@ onValueChange = { proxyHost = it }
 						contentDescription = null
 					)
 				},
-				dataStore = UntisPreferenceDataStore.emptyDataStore()
+				settingsRepository = viewModel,
+				value = { Unit }
 			)
 
 			PreferenceGroup(stringResource(id = R.string.preference_info_general)) {
@@ -926,9 +936,11 @@ onValueChange = { proxyHost = it }
 
 				Preference(
 					title = { Text(stringResource(R.string.preference_info_github)) },
-					summary = { Text(URL_GITHUB_REPOSITORY) },
+					summary = {
+						//Text(URL_GITHUB_REPOSITORY)
+					},
 					onClick = {
-						openUrl(URL_GITHUB_REPOSITORY)
+						//openUrl(URL_GITHUB_REPOSITORY)
 					},
 					leadingContent = {
 						Icon(
@@ -936,14 +948,15 @@ onValueChange = { proxyHost = it }
 							contentDescription = null
 						)
 					},
-					dataStore = UntisPreferenceDataStore.emptyDataStore()
+					settingsRepository = viewModel,
+					value = { Unit }
 				)
 
 				Preference(
 					title = { Text(stringResource(R.string.preference_info_license)) },
 					summary = { Text(stringResource(R.string.preference_info_license_desc)) },
 					onClick = {
-						openUrl("$URL_GITHUB_REPOSITORY/blob/master/LICENSE")
+						//openUrl("$URL_GITHUB_REPOSITORY/blob/master/LICENSE")
 					},
 					leadingContent = {
 						Icon(
@@ -951,82 +964,86 @@ onValueChange = { proxyHost = it }
 							contentDescription = null
 						)
 					},
-					dataStore = UntisPreferenceDataStore.emptyDataStore()
+					settingsRepository = viewModel,
+					value = { Unit }
 				)
 
-			Preference(
-				title = { Text(stringResource(R.string.preference_info_contributors)) },
-				summary = { Text(stringResource(R.string.preference_info_contributors_desc)) },
-				onClick = {
-					//openDialog.value = true
-				},
-				leadingContent = {
-					Icon(
-						painter = painterResource(R.drawable.settings_about_contributor),
-						contentDescription = null
-					)
-				},
-				dataStore = UntisPreferenceDataStore.emptyDataStore()
-			)
+				Preference(
+					title = { Text(stringResource(R.string.preference_info_contributors)) },
+					summary = { Text(stringResource(R.string.preference_info_contributors_desc)) },
+					onClick = {
+						//openDialog.value = true
+					},
+					leadingContent = {
+						Icon(
+							painter = painterResource(R.drawable.settings_about_contributor),
+							contentDescription = null
+						)
+					},
+					settingsRepository = viewModel,
+					value = { Unit }
+				)
 
-			if (openDialog.value) {
-				AlertDialog(
-					onDismissRequest = {
-						openDialog.value = false
-					},
-					confirmButton = {
-						FlowRow(
-							modifier = Modifier.padding(all = 8.dp),
-							mainAxisAlignment = MainAxisAlignment.End,
-							mainAxisSpacing = 8.dp
-						) {
-							TextButton(
-								onClick = {
-									openDialog.value = false
-									openUrl("https://docs.github.com/en/github/site-policy/github-privacy-statement")
-								}
+				if (openDialog.value) {
+					AlertDialog(
+						onDismissRequest = {
+							openDialog.value = false
+						},
+						confirmButton = {
+							// TODO Migrate to Material FlowRow?
+							com.google.accompanist.flowlayout.FlowRow(
+								modifier = Modifier.padding(all = 8.dp),
+								mainAxisAlignment = MainAxisAlignment.End,
+								mainAxisSpacing = 8.dp
 							) {
-								Text(text = stringResource(id = R.string.preference_info_privacy_policy))
-							}
-							TextButton(
-								onClick = {
-									openDialog.value = false
+								TextButton(
+									onClick = {
+										openDialog.value = false
+										//openUrl("https://docs.github.com/en/github/site-policy/github-privacy-statement")
+									}
+								) {
+									Text(text = stringResource(id = R.string.preference_info_privacy_policy))
 								}
-							) {
-								Text(text = stringResource(id = R.string.all_cancel))
-							}
-							TextButton(
-								onClick = {
-									openDialog.value = false
-									navController.navigate("contributors")
+								TextButton(
+									onClick = {
+										openDialog.value = false
+									}
+								) {
+									Text(text = stringResource(id = R.string.all_cancel))
 								}
-							) {
-								Text(text = stringResource(id = R.string.all_ok))
+								TextButton(
+									onClick = {
+										openDialog.value = false
+										navController.navigate("contributors")
+									}
+								) {
+									Text(text = stringResource(id = R.string.all_ok))
+								}
 							}
+						},
+						title = {
+							Text(text = stringResource(id = R.string.preference_info_privacy))
+						},
+						text = {
+							Text(stringResource(id = R.string.preference_info_privacy_desc))
 						}
+					)
+				}
+
+				Preference(
+					title = { Text(stringResource(R.string.preference_info_libraries)) },
+					summary = { Text(stringResource(R.string.preference_info_libraries_desc)) },
+					onClick = { navController.navigate(AppRoutes.Settings.About.Libraries) },
+					leadingContent = {
+						Icon(
+							painter = painterResource(R.drawable.settings_about_library),
+							contentDescription = null
+						)
 					},
-					title = {
-						Text(text = stringResource(id = R.string.preference_info_privacy))
-					},
-					text = {
-						Text(stringResource(id = R.string.preference_info_privacy_desc))
-					}
+					settingsRepository = viewModel,
+					value = { Unit }
 				)
 			}
-
-			Preference(
-				title = { Text(stringResource(R.string.preference_info_libraries)) },
-				summary = { Text(stringResource(R.string.preference_info_libraries_desc)) },
-				onClick = { navController.navigate(AppRoutes.Settings.About.Libraries) },
-				leadingContent = {
-					Icon(
-						painter = painterResource(R.drawable.settings_about_library),
-						contentDescription = null
-					)
-				},
-				dataStore = UntisPreferenceDataStore.emptyDataStore()
-			)
-			}*/
 		}
 	}
 	composable<AppRoutes.Settings.About.Libraries> {

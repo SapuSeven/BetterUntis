@@ -1,14 +1,14 @@
-package com.sapuseven.compose.protostore.ui.preferences
+package com.sapuseven.untis.ui.preferences
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import com.sapuseven.compose.protostore.ui.preferences.Preference
 import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialog
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
 @Composable
@@ -30,12 +30,12 @@ fun ElementPickerPreference(
 		return timetableDatabaseInterface.getShortName(element)
 	}
 
-	Preference(
+	/*TODO Implement Preference(
 		title = title,
 		summary = decodeStoredTimetableValue(value.value)?.let {
 			{ Text(generateSummary(it)) }
 		},
-		icon = icon,
+		leadingContent = icon,
 		value = value,
 		dependency = dependency,
 		dataStore = dataStore,
@@ -43,7 +43,7 @@ fun ElementPickerPreference(
 			showDialog = true
 		},
 		highlight = highlight
-	)
+	)*/
 
 	if (showDialog)
 		ElementPickerDialog(
