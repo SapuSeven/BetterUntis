@@ -5,28 +5,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import com.google.protobuf.MessageLite
 import com.sapuseven.compose.protostore.data.MultiUserSettingsRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
 fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> SwitchPreference(
 	title: (@Composable () -> Unit),
-	supportingContent: @Composable ((checked: Boolean, enabled: Boolean) -> Unit)? = null,
+	supportingContent: @Composable ((value: Boolean, enabled: Boolean) -> Unit)? = null,
 	leadingContent: (@Composable () -> Unit)? = null,
-	onCheckedChange: (ModelBuilder.(checked: Boolean) -> Unit)? = null,
 	settingsRepository: MultiUserSettingsRepository<*, *, Model, ModelBuilder>,
-	transform: (Model) -> Boolean,
-	//dependency: UntisPreferenceDataStore<*>? = null,
-	//dataStore: UntisPreferenceDataStore<Boolean>
+	value: (Model) -> Boolean,
+	scope: CoroutineScope = rememberCoroutineScope(),
+	enabledCondition: (Model) -> Boolean = { true },
+	highlight: Boolean = false,
+	onCheckedChange: (ModelBuilder.(checked: Boolean) -> Unit)? = null,
 ) {
-	val scope = rememberCoroutineScope()
-
-	Preference<Model, Boolean>(
+	Preference(
 		title = title,
 		supportingContent = supportingContent,
 		leadingContent = leadingContent,
-		trailingContent = { value, enabled ->
+		trailingContent = { currentValue, enabled ->
 			Switch(
-				checked = value,
+				checked = currentValue,
 				onCheckedChange = {
 					scope.launch {
 						settingsRepository.updateUserSettings {
@@ -37,14 +37,15 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> SwitchPreference(
 				enabled = enabled
 			)
 		},
-		//dependency = dependency,
-		//dataStore = dataStore,
 		settingsRepository = settingsRepository,
-		transform = transform,
-		onClick = { value ->
+		value = value,
+		scope = scope,
+		enabledCondition = enabledCondition,
+		highlight = highlight,
+		onClick = { currentValue ->
 			scope.launch {
 				settingsRepository.updateUserSettings {
-					onCheckedChange?.invoke(this, !value)
+					onCheckedChange?.invoke(this, !currentValue)
 				}
 			}
 		}

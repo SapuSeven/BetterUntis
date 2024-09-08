@@ -144,7 +144,7 @@ fun Settings() {
         SwitchPreference(
             title = { Text("Example switch") },
             settingsRepository = viewModel,
-            transform = { it.exampleValue },
+            value = { it.exampleValue },
             onCheckedChange = { exampleValue = it }
         )
     }
