@@ -28,13 +28,13 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> WeekRangePickerPre
 	summary: (@Composable () -> Unit)? = null,
 	//supportingContent: @Composable ((value: Float, enabled: Boolean) -> Unit)? = null,
 	leadingContent: (@Composable () -> Unit)? = null,
-	trailingContent: @Composable ((value: List<String>, enabled: Boolean) -> Unit)? = null,
+	trailingContent: @Composable ((value: Set<String>, enabled: Boolean) -> Unit)? = null,
 	settingsRepository: SettingsRepository<Model, ModelBuilder>,
-	value: (Model) -> List<String>,
+	value: (Model) -> Set<String>,
 	scope: CoroutineScope = rememberCoroutineScope(),
 	enabledCondition: (Model) -> Boolean = { true },
 	highlight: Boolean = false,
-	onValueChange: (ModelBuilder.(value: List<String>) -> Unit)? = null,
+	onValueChange: (ModelBuilder.(value: Set<String>) -> Unit)? = null,
 ) {
 	var dialogValue by remember { mutableStateOf(emptySet<String>()) }
 	var showDialog by remember { mutableStateOf(false) }
@@ -110,7 +110,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> WeekRangePickerPre
 						showDialog = false
 						scope.launch {
 							settingsRepository.updateUserSettings {
-								onValueChange?.invoke(this, dialogValue.toList())
+								onValueChange?.invoke(this, dialogValue)
 							}
 						}
 					}) {

@@ -6,11 +6,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.sapuseven.compose.protostore.ui.preferences.ColorPreference
+import com.sapuseven.compose.protostore.ui.preferences.ListPreference
+import com.sapuseven.compose.protostore.ui.preferences.MultiSelectListPreference
 import com.sapuseven.compose.protostore.ui.preferences.Preference
 import com.sapuseven.compose.protostore.ui.preferences.PreferenceGroup
 import com.sapuseven.compose.protostore.ui.preferences.SliderPreference
@@ -144,7 +147,7 @@ fun NavGraphBuilder.SettingsNav(
 				WeekRangePickerPreference(
 					title = { Text(stringResource(R.string.preference_week_custom_range)) },
 					settingsRepository = viewModel,
-					value = { it.weekCustomRangeList },
+					value = { it.weekCustomRangeList.toSet() },
 					onValueChange = {
 						weekCustomRangeList.apply {
 							clear()
@@ -308,8 +311,13 @@ fun NavGraphBuilder.SettingsNav(
 					entries = stringArrayResource(id = R.array.preference_schoolcolors_values),
 					entryLabels = stringArrayResource(id = R.array.preference_schoolcolors),
 					settingsRepository = viewModel,
-					value = { it.schoolBackground },
-					onValueChange = { schoolBackground = it }
+					value = { it.schoolBackgroundList.toSet() },
+					onValueChange = {
+						schoolBackgroundList.apply {
+							clear()
+							addAll(it)
+						}
+					}
 				)
 
 				ColorPreference(
@@ -437,8 +445,8 @@ fun NavGraphBuilder.SettingsNav(
 
 				ListPreference(
 					title = { Text(stringResource(R.string.preference_dark_theme)) },
-					summary = { Text(it.second) },
-					icon = {
+					supportingContent = { value, _ -> Text(value.second) },
+					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.settings_timetable_brightness_medium),
 							contentDescription = null

@@ -12,39 +12,54 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import com.sapuseven.untis.R
-import com.sapuseven.untis.preferences.UntisPreferenceDataStore
+import com.google.protobuf.MessageLite
+import com.sapuseven.compose.protostore.R
+import com.sapuseven.compose.protostore.data.SettingsRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun ListPreference(
-	title: @Composable () -> Unit,
-	summary: @Composable ((selected: Pair<String, String>) -> Unit)? = null,
-	icon: @Composable (() -> Unit)? = null,
-	dependency: UntisPreferenceDataStore<*>? = null,
-	dataStore: UntisPreferenceDataStore<String>,
+fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ListPreference(
+	title: (@Composable () -> Unit),
+	summary: (@Composable () -> Unit)? = null,
+	//summary: @Composable ((selected: Pair<String, String>) -> Unit)? = null,
+	supportingContent: @Composable ((value: Pair<String, String>, enabled: Boolean) -> Unit)? = null,
+	leadingContent: (@Composable () -> Unit)? = null,
+	trailingContent: (@Composable (value: String, enabled: Boolean) -> Unit)? = null,
+	settingsRepository: SettingsRepository<Model, ModelBuilder>,
+	value: (Model) -> String,
+	scope: CoroutineScope = rememberCoroutineScope(),
+	enabledCondition: (Model) -> Boolean = { true },
+	highlight: Boolean = false,
 	entries: Array<String>, // Compatibility with legacy array resources
-	entryLabels: Array<String> // Compatibility with legacy array resources
+	entryLabels: Array<String>, // Compatibility with legacy array resources
+	onValueChange: (ModelBuilder.(value: String) -> Unit)? = null,
 ) {
-	val value = remember { mutableStateOf(dataStore.defaultValue) }
+	var dialogValue by remember { mutableStateOf("") }
 	var showDialog by remember { mutableStateOf(false) }
-	val entryLabelMap = remember { mapOf(pairs = entries.zip(entryLabels).toTypedArray()) }
 
-	val scope = rememberCoroutineScope()
+	val entryLabelMap = remember { mapOf(pairs = entries.zip(entryLabels).toTypedArray()) }
 
 	Preference(
 		title = title,
-		summary = if (summary != null) {
-			{
-				val selected = value.value to entryLabelMap.getOrDefault(value.value, value.value)
-				summary(selected)
+		summary = summary,
+		supportingContent = { currentValue, enabled ->
+			if (currentValue.isNotEmpty()) {
+				val selected = dialogValue to entryLabelMap.getOrElse(dialogValue) { dialogValue }
+				supportingContent?.invoke(selected, enabled)
 			}
-		} else null,
-		icon = icon,
-		dependency = dependency,
-		dataStore = dataStore,
+		},
+		leadingContent = leadingContent,
+		trailingContent = trailingContent,
+		settingsRepository = settingsRepository,
 		value = value,
-		onClick = { showDialog = true }
+		scope = scope,
+		enabledCondition = enabledCondition,
+		highlight = highlight,
+		onClick = {
+			dialogValue = it
+			showDialog = true
+		}
 	)
 
 	if (showDialog)
@@ -62,21 +77,29 @@ fun ListPreference(
 									role = Role.RadioButton
 								) {
 									showDialog = false
-									scope.launch { dataStore.saveValue(it) }
+									scope.launch {
+										settingsRepository.updateUserSettings {
+											onValueChange?.invoke(this, it)
+										}
+									}
 								},
 							verticalAlignment = Alignment.CenterVertically
 						) {
 							RadioButton(
-								selected = value.value == it,
+								selected = dialogValue == it,
 								onClick = {
 									showDialog = false
-									scope.launch { dataStore.saveValue(it) }
+									scope.launch {
+										settingsRepository.updateUserSettings {
+											onValueChange?.invoke(this, it)
+										}
+									}
 								}
 							)
 
 							Text(
 								modifier = Modifier.weight(1f),
-								text = entryLabelMap.getOrDefault(it, it)
+								text = entryLabelMap.getOrElse(it) { it }
 							)
 						}
 					}
@@ -87,40 +110,49 @@ fun ListPreference(
 					onClick = {
 						showDialog = false
 					}) {
-					Text(stringResource(id = R.string.all_cancel))
+					Text(stringResource(id = R.string.dialog_cancel))
 				}
 			}
 		)
 }
 
 @Composable
-fun MultiSelectListPreference(
-	title: @Composable () -> Unit,
-	summary: @Composable (() -> Unit)? = null,
-	icon: @Composable (() -> Unit)? = null,
-	dependency: UntisPreferenceDataStore<*>? = null,
-	dataStore: UntisPreferenceDataStore<Set<String>>,
+fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> MultiSelectListPreference(
+	title: (@Composable () -> Unit),
+	summary: (@Composable () -> Unit)? = null,
+	//summary: @Composable ((selected: Pair<String, String>) -> Unit)? = null,
+	supportingContent: @Composable ((value: Set<String>, enabled: Boolean) -> Unit)? = null,
+	leadingContent: (@Composable () -> Unit)? = null,
+	trailingContent: (@Composable (value: Set<String>, enabled: Boolean) -> Unit)? = null,
+	settingsRepository: SettingsRepository<Model, ModelBuilder>,
+	value: (Model) -> Set<String>,
+	scope: CoroutineScope = rememberCoroutineScope(),
+	enabledCondition: (Model) -> Boolean = { true },
+	highlight: Boolean = false,
 	entries: Array<String>, // Compatibility with legacy array resources
-	entryLabels: Array<String> // Compatibility with legacy array resources
+	entryLabels: Array<String>, // Compatibility with legacy array resources
+	onValueChange: (ModelBuilder.(value: Set<String>) -> Unit)? = null,
 ) {
-	val value = remember { mutableStateOf(dataStore.defaultValue) }
 	var showDialog by remember { mutableStateOf(false) }
-	val dialogItems = remember { mutableStateMapOf<String, Boolean>() }
-	val entryLabelMap = remember { mapOf(pairs = entries.zip(entryLabels).toTypedArray()) }
+	val dialogValues = remember { mutableStateMapOf<String, Boolean>() }
 
-	val scope = rememberCoroutineScope()
+	val entryLabelMap = remember { mapOf(pairs = entries.zip(entryLabels).toTypedArray()) }
 
 	Preference(
 		title = title,
 		summary = summary,
-		icon = icon,
-		dependency = dependency,
-		dataStore = dataStore,
+		supportingContent = supportingContent,
+		leadingContent = leadingContent,
+		trailingContent = trailingContent,
+		settingsRepository = settingsRepository,
 		value = value,
+		scope = scope,
+		enabledCondition = enabledCondition,
+		highlight = highlight,
 		onClick = {
-			dialogItems.apply {
+			dialogValues.apply {
 				entries.forEach { entry ->
-					this[entry] = value.value.contains(entry)
+					this[entry] = it.contains(entry)
 				}
 			}
 			showDialog = true
@@ -133,27 +165,27 @@ fun MultiSelectListPreference(
 			title = title,
 			text = {
 				LazyColumn(modifier = Modifier.fillMaxWidth()) {
-					items(dialogItems.keys.toList()) {
+					items(dialogValues.keys.toList()) {
 						Row(
 							modifier = Modifier
 								.fillMaxWidth()
 								.clickable(
 									role = Role.Checkbox
 								) {
-									dialogItems[it] = !dialogItems.getOrDefault(it, false)
+									dialogValues[it] = !dialogValues.getOrElse(it) { false }
 								},
 							verticalAlignment = Alignment.CenterVertically
 						) {
 							Checkbox(
-								checked = dialogItems.getOrDefault(it, false),
+								checked = dialogValues.getOrElse(it) { false },
 								onCheckedChange = { newValue ->
-									dialogItems[it] = newValue
+									dialogValues[it] = newValue
 								}
 							)
 
 							Text(
 								modifier = Modifier.weight(1f),
-								text = entryLabelMap.getOrDefault(it, it)
+								text = entryLabelMap.getOrElse(it) { it }
 							)
 						}
 					}
@@ -163,14 +195,18 @@ fun MultiSelectListPreference(
 				TextButton(
 					onClick = {
 						showDialog = false
-						scope.launch { dataStore.saveValue(dialogItems.filter { it.value }.keys) }
+						scope.launch {
+							settingsRepository.updateUserSettings {
+								onValueChange?.invoke(this, dialogValues.filter { it.value }.keys)
+							}
+						}
 					}) {
-					Text(stringResource(id = R.string.all_ok))
+					Text(stringResource(id = R.string.dialog_ok))
 				}
 			},
 			dismissButton = {
 				TextButton(onClick = { showDialog = false }) {
-					Text(stringResource(id = R.string.all_cancel))
+					Text(stringResource(id = R.string.dialog_cancel))
 				}
 			}
 		)
