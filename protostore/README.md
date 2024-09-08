@@ -56,16 +56,7 @@ Proto DataStore requires a predefined schema in a proto file in the `app/src/mai
 This schema defines the type for the objects that you persist in your Proto DataStore.
 To learn more about defining a proto schema, see the [protobuf language guide](https://developers.google.com/protocol-buffers/docs/proto3).
 
-```protobuf
-syntax = "proto3";
-
-option java_package = "com.example.application";
-option java_multiple_files = true;
-
-message Settings {
-  int32 example_counter = 1;
-}
-```
+For an example implementation, see below.
 
 ### Create a Proto DataStore
 
@@ -92,13 +83,70 @@ val Context.settingsDataStore: DataStore<Settings> by dataStore(
 )
 ```
 
-## Building a preference screen
+### Define a settings model and repository
+
+#### Single-user settings
+
+TODO
+
+#### Multi-user settings
+
+For multi-user preferences, you need a schema that consists of two objects:
+1. A holder for settings per use
+2. A global object with a map to the user-specific settings
+
+```protobuf
+syntax = "proto3";
+
+option java_package = "com.example.application";
+option java_multiple_files = true;
+
+message UserSettings {
+  bool exampleValue = 1;
+}
+
+message Settings {
+  int64 activeUser = 1;
+  map<int64, UserSettings> users = 2;
+}
+```
+
+Then you can define a ViewModel extending `MultiUserSettingsRepository` with your defined types:
+
+```kotlin
+@HiltViewModel
+class SettingsScreenViewModel @Inject constructor(
+	dataStore: DataStore<Settings>
+) : MultiUserSettingsRepository<Settings, Settings.Builder, UserSettings, UserSettings.Builder>(dataStore) {
+	private val userId = -1;// get your active user id here
+
+	override fun getUserSettings(dataStore: Settings) : UserSettings {
+		return dataStore.usersMap.getOrDefault(userId, UserSettings.getDefaultInstance())
+	}
+
+	override fun updateUserSettings(currentData : Settings, userSettings: UserSettings) : Settings {
+		return currentData.toBuilder()
+			.putUsers(userId, userSettings)
+			.build()
+	}
+}
+```
+
+## Building a settings screen
+
+Once your model is defined, you can use the composables from the `com.sapuseven.protostore.ui` package
+to build your settings screen:
 
 ```kotlin
 @Composable
 fun Settings() {
     VerticalScrollColumn {
-        Preference()
+        SwitchPreference(
+            title = { Text("Example switch") },
+            settingsRepository = viewModel,
+            transform = { it.exampleValue },
+            onCheckedChange = { exampleValue = it }
+        )
     }
 }
 ```
