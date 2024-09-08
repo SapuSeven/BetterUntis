@@ -4,21 +4,16 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.dataStoreFile
-import androidx.datastore.migrations.SharedPreferencesMigration
-import androidx.datastore.preferences.SharedPreferencesMigration
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.sapuseven.untis.data.settings.UserSettingsSerializer
-import com.sapuseven.untis.data.settings.model.UserSettings
+import com.sapuseven.untis.data.settings.model.Settings
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
@@ -27,7 +22,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -41,7 +35,7 @@ private const val DATA_STORE_FILE_NAME = "settings.pb"
 object DataStoreModule {
 	@Singleton
 	@Provides
-	fun provideProtoDataStore(@ApplicationContext appContext: Context): DataStore<UserSettings> {
+	fun provideProtoDataStore(@ApplicationContext appContext: Context): DataStore<Settings> {
 		return DataStoreFactory.create(
 			serializer = UserSettingsSerializer,
 			produceFile = { appContext.dataStoreFile(DATA_STORE_FILE_NAME) },

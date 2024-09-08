@@ -3,7 +3,7 @@ package com.sapuseven.untis.components
 import androidx.datastore.core.DataStore
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.databases.entities.UserDao
-import com.sapuseven.untis.data.settings.model.UserSettings
+import com.sapuseven.untis.data.settings.model.Settings
 import com.sapuseven.untis.scope.UserScopeManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +20,7 @@ import javax.inject.Singleton
 class UserManager @Inject constructor(
 	private val userScopeManager: UserScopeManager,
 	private val userDao: UserDao,
-	private val userSettings: DataStore<UserSettings>,
+	private val userSettings: DataStore<Settings>,
 ) {
 	private val _userState = MutableStateFlow<UserState>(UserState.Loading)
 	val userState: StateFlow<UserState> = _userState

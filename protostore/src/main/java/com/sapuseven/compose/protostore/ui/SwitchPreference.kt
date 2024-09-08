@@ -3,23 +3,23 @@ package com.sapuseven.compose.protostore.ui
 import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import com.google.protobuf.GeneratedMessageLite
 import com.google.protobuf.MessageLite
-import kotlinx.coroutines.flow.Flow
+import com.sapuseven.compose.protostore.data.MultiUserSettingsRepository
 import kotlinx.coroutines.launch
-import kotlin.reflect.KMutableProperty0
 
 @Composable
-fun <Model : MessageLite> SwitchPreference(
+fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> SwitchPreference(
 	title: (@Composable () -> Unit),
 	supportingContent: @Composable ((checked: Boolean, enabled: Boolean) -> Unit)? = null,
 	leadingContent: (@Composable () -> Unit)? = null,
-	onCheckedChange: ((checked: Boolean) -> Unit)? = null,
-	dataSource: Flow<Model>,
+	onCheckedChange: (ModelBuilder.(checked: Boolean) -> Unit)? = null,
+	settingsRepository: MultiUserSettingsRepository<*, *, Model, ModelBuilder>,
 	transform: (Model) -> Boolean,
 	//dependency: UntisPreferenceDataStore<*>? = null,
 	//dataStore: UntisPreferenceDataStore<Boolean>
 ) {
+	val scope = rememberCoroutineScope()
+
 	Preference<Model, Boolean>(
 		title = title,
 		supportingContent = supportingContent,
@@ -27,14 +27,26 @@ fun <Model : MessageLite> SwitchPreference(
 		trailingContent = { value, enabled ->
 			Switch(
 				checked = value,
-				onCheckedChange = onCheckedChange,
+				onCheckedChange = {
+					scope.launch {
+						settingsRepository.updateUserSettings {
+							onCheckedChange?.invoke(this, it)
+						}
+					}
+				},
 				enabled = enabled
 			)
 		},
 		//dependency = dependency,
 		//dataStore = dataStore,
-		dataSource = dataSource,
+		settingsRepository = settingsRepository,
 		transform = transform,
-		onClick = { value -> onCheckedChange?.invoke(!value)}
+		onClick = { value ->
+			scope.launch {
+				settingsRepository.updateUserSettings {
+					onCheckedChange?.invoke(this, !value)
+				}
+			}
+		}
 	)
 }

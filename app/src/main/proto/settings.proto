@@ -3,7 +3,7 @@ syntax = "proto3";
 option java_package = "com.sapuseven.untis.data.settings.model";
 option java_multiple_files = true;
 
-message Settings {
+message UserSettings {
   bool exitConfirmation = 1;
   bool flingEnable = 2;
   bool weekSnapToDays = 3;
@@ -58,7 +58,7 @@ message Settings {
   string infocenterAbsencesTimeRange = 52;
 }
 
-message UserSettings {
+message Settings {
   int64 activeUser = 1;
-  map<int64, Settings> users = 2;
+  map<int64, UserSettings> users = 2;
 }

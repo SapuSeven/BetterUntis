@@ -2,7 +2,6 @@ package com.sapuseven.untis.ui.activities.settings
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraphBuilder
@@ -12,14 +11,9 @@ import com.sapuseven.compose.protostore.ui.Preference
 import com.sapuseven.compose.protostore.ui.PreferenceGroup
 import com.sapuseven.compose.protostore.ui.SwitchPreference
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.settings.model.Settings
 import com.sapuseven.untis.data.settings.model.UserSettings
-import com.sapuseven.untis.data.settings.settingsDataStore
 import com.sapuseven.untis.preferences.PreferenceScreen
-import com.sapuseven.untis.preferences.UntisPreferenceDataStore
-import com.sapuseven.untis.ui.common.VerticalScrollColumn
 import com.sapuseven.untis.ui.navigation.AppRoutes
-import kotlinx.coroutines.flow.map
 
 fun NavGraphBuilder.SettingsNav(
 	navController: NavHostController
@@ -107,20 +101,16 @@ fun NavGraphBuilder.SettingsNav(
 			PreferenceGroup(stringResource(id = R.string.preference_category_general_behaviour)) {
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_double_tap_to_exit)) },
-					dataSource = viewModel.getUserSettings(),
+					settingsRepository = viewModel,
 					transform = { it.exitConfirmation },
-					onCheckedChange = {
-						viewModel.updateUserSettings { exitConfirmation = it }
-					}
+					onCheckedChange = { exitConfirmation = it }
 				)
 
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_flinging_enable)) },
-					dataSource = viewModel.getUserSettings(),
+					settingsRepository = viewModel,
 					transform = { it.flingEnable },
-					onCheckedChange = {
-						viewModel.updateUserSettings { flingEnable = it }
-					}
+					onCheckedChange = { flingEnable = it }
 				)
 			}
 		}
