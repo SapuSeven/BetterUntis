@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 @Composable
-fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> WeekRangePickerPreference(
+fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> WeekRangePreference(
 	title: (@Composable () -> Unit),
 	summary: (@Composable () -> Unit)? = null,
 	//supportingContent: @Composable ((value: Float, enabled: Boolean) -> Unit)? = null,

@@ -18,7 +18,7 @@ import com.sapuseven.compose.protostore.ui.preferences.Preference
 import com.sapuseven.compose.protostore.ui.preferences.PreferenceGroup
 import com.sapuseven.compose.protostore.ui.preferences.SliderPreference
 import com.sapuseven.compose.protostore.ui.preferences.SwitchPreference
-import com.sapuseven.compose.protostore.ui.preferences.WeekRangePickerPreference
+import com.sapuseven.compose.protostore.ui.preferences.WeekRangePreference
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.preferences.PreferenceScreen
@@ -144,7 +144,7 @@ fun NavGraphBuilder.SettingsNav(
 			}
 
 			PreferenceGroup(stringResource(R.string.preference_category_general_week_display)) {
-				WeekRangePickerPreference(
+				WeekRangePreference(
 					title = { Text(stringResource(R.string.preference_week_custom_range)) },
 					settingsRepository = viewModel,
 					value = { it.weekCustomRangeList.toSet() },
