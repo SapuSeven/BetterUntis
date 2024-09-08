@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.google.protobuf.MessageLite
 import com.sapuseven.compose.protostore.R
 import com.sapuseven.compose.protostore.data.SettingsRepository
+import com.sapuseven.compose.protostore.ui.utils.disabled
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -34,7 +35,12 @@ import kotlinx.coroutines.launch
 fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> InputPreference(
 	title: (@Composable () -> Unit),
 	summary: (@Composable () -> Unit)? = null,
-	supportingContent: @Composable ((value: String, enabled: Boolean) -> Unit)? = null,
+	supportingContent: @Composable ((value: String, enabled: Boolean) -> Unit)? = { currentValue, enabled ->
+		DefaultSupportingContent(
+			currentValue = currentValue,
+			enabled = enabled
+		)
+	},
 	leadingContent: (@Composable () -> Unit)? = null,
 	trailingContent: (@Composable (value: String, enabled: Boolean) -> Unit)? = null,
 	settingsRepository: SettingsRepository<Model, ModelBuilder>,
@@ -117,7 +123,12 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> InputPreference(
 fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> NumericInputPreference(
 	title: (@Composable () -> Unit),
 	summary: (@Composable () -> Unit)? = null,
-	supportingContent: @Composable ((value: String, enabled: Boolean) -> Unit)? = null,
+	supportingContent: @Composable ((value: String, enabled: Boolean) -> Unit)? = { currentValue, enabled ->
+		DefaultSupportingContent(
+			currentValue = currentValue,
+			enabled = enabled
+		)
+	},
 	leadingContent: (@Composable () -> Unit)? = null,
 	trailingContent: (@Composable (value: Int, enabled: Boolean) -> Unit)? = null,
 	settingsRepository: SettingsRepository<Model, ModelBuilder>,
@@ -212,7 +223,12 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> NumericInputPrefer
 fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> RangeInputPreference(
 	title: (@Composable () -> Unit),
 	summary: (@Composable () -> Unit)? = null,
-	supportingContent: @Composable ((value: String, enabled: Boolean) -> Unit)? = null,
+	supportingContent: @Composable ((value: String, enabled: Boolean) -> Unit)? = { currentValue, enabled ->
+		DefaultSupportingContent(
+			currentValue = currentValue,
+			enabled = enabled
+		)
+	},
 	leadingContent: (@Composable () -> Unit)? = null,
 	trailingContent: (@Composable (value: String, enabled: Boolean) -> Unit)? = null,
 	settingsRepository: SettingsRepository<Model, ModelBuilder>,
@@ -229,7 +245,9 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> RangeInputPreferen
 		title = title,
 		summary = summary,
 		supportingContent = { currentValue, enabled ->
-			supportingContent?.invoke(currentValue, enabled)
+			if (currentValue.isNotEmpty()) {
+				supportingContent?.invoke(currentValue, enabled)
+			}
 		},
 		leadingContent = leadingContent,
 		trailingContent = trailingContent,
@@ -270,8 +288,8 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> RangeInputPreferen
 						),
 						label = { Text(text = stringResource(R.string.preference_range_from)) },
 						modifier = Modifier
-							.padding(end = 12.dp)
-							.weight(1f)
+                            .padding(end = 12.dp)
+                            .weight(1f)
 					)
 
 					TextField(
@@ -287,8 +305,8 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> RangeInputPreferen
 						),
 						label = { Text(text = stringResource(R.string.preference_range_to)) },
 						modifier = Modifier
-							.padding(start = 12.dp)
-							.weight(1f)
+                            .padding(start = 12.dp)
+                            .weight(1f)
 					)
 				}
 			},
@@ -315,6 +333,14 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> RangeInputPreferen
 			}
 		)
 	}
+}
+
+@Composable
+fun DefaultSupportingContent(
+	currentValue: String,
+	enabled: Boolean
+) {
+	Text(text = currentValue, modifier = Modifier.disabled(!enabled))
 }
 
 private fun <E> List<E>.toPair(): Pair<E, E>? =

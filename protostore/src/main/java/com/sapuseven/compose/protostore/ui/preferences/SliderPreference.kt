@@ -73,7 +73,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> SliderPreference(
 						).run {
 							maximumFractionDigits = 2
 							isGroupingUsed = false
-							format(value)
+							format(currentValue.toDouble())
 						}
 					)
 			}

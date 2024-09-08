@@ -158,10 +158,8 @@ fun NavGraphBuilder.SettingsNav(
 					settingsRepository = viewModel,
 					value = { it.weekCustomRangeList.toSet() },
 					onValueChange = {
-						weekCustomRangeList.apply {
-							clear()
-							addAll(it)
-						}
+						clearWeekCustomRange()
+						addAllWeekCustomRange(it)
 					}
 				)
 
@@ -193,6 +191,7 @@ fun NavGraphBuilder.SettingsNav(
 					settingsRepository = viewModel,
 					value = { it.automuteEnable },
 					onValueChange = {
+						automuteEnable = it
 						/*TODO if (it) {
 							if (requestAutoMutePermission(
 									autoMuteSettingsLauncher
@@ -318,10 +317,8 @@ fun NavGraphBuilder.SettingsNav(
 					settingsRepository = viewModel,
 					value = { it.schoolBackgroundList.toSet() },
 					onValueChange = {
-						schoolBackgroundList.apply {
-							clear()
-							addAll(it)
-						}
+						clearSchoolBackground()
+						addAllSchoolBackground(it)
 					}
 				)
 

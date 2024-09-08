@@ -45,7 +45,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ListPreference(
 		summary = summary,
 		supportingContent = { currentValue, enabled ->
 			if (currentValue.isNotEmpty()) {
-				val selected = dialogValue to entryLabelMap.getOrElse(dialogValue) { dialogValue }
+				val selected = currentValue to entryLabelMap.getOrElse(currentValue) { currentValue }
 				supportingContent?.invoke(selected, enabled)
 			}
 		},
