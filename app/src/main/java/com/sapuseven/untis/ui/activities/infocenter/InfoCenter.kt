@@ -40,8 +40,6 @@ import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.NavigationBarInset
 import com.sapuseven.untis.ui.common.VerticalScrollColumn
 import com.sapuseven.untis.ui.dialogs.AttachmentsDialog
-import com.sapuseven.untis.ui.preferences.ListPreference
-import com.sapuseven.untis.ui.preferences.SwitchPreference
 import kotlinx.coroutines.launch
 import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
@@ -506,7 +504,8 @@ private fun AbsenceFilterDialog(
 	) { padding ->
 		Box(modifier = Modifier.padding(padding)){
 			VerticalScrollColumn {
-				val sortReversed by preferences.infocenterAbsencesSortReverse.getState()
+				// TODO implement protostore
+				/*val sortReversed by preferences.infocenterAbsencesSortReverse.getState()
 				SwitchPreference(
 					title = { Text(text = stringResource(id = R.string.infocenter_absences_filter_only_unexcused)) },
 					dataStore = preferences.infocenterAbsencesOnlyUnexcused
@@ -526,7 +525,7 @@ private fun AbsenceFilterDialog(
 					dataStore = preferences.infocenterAbsencesTimeRange,
 					entries = stringArrayResource(id = R.array.infocenter_absences_list_values),
 					entryLabels = stringArrayResource(id = R.array.infocenter_absences_list)
-				)
+				)*/
 			}
 		}
 	}

@@ -5,9 +5,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import com.sapuseven.compose.protostore.ui.preferences.materialColors
 import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.helpers.config.*
-import com.sapuseven.untis.ui.preferences.materialColors
 
 val BaseComposeActivity.dataStorePreferences: DataStorePreferences
 	@Composable

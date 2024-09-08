@@ -30,7 +30,6 @@ import com.sapuseven.untis.preferences.UntisPreferenceDataStore
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.VerticalScrollColumn
 import com.sapuseven.untis.ui.navigation.AppRoutes
-import com.sapuseven.untis.ui.preferences.Preference
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

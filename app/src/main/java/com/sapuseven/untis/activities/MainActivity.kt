@@ -64,6 +64,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.sapuseven.compose.protostore.ui.preferences.convertRangeToPair
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_HIGHLIGHT
 import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_ROUTE
@@ -92,7 +93,6 @@ import com.sapuseven.untis.ui.models.NavItemShortcut
 import com.sapuseven.untis.ui.navigation.AppNavHost
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
-import com.sapuseven.untis.ui.preferences.convertRangeToPair
 import com.sapuseven.untis.ui.theme.toColorScheme
 import com.sapuseven.untis.ui.weekview.Event
 import com.sapuseven.untis.ui.weekview.WeekViewColorScheme

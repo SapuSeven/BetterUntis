@@ -473,7 +473,7 @@ fun NavGraphBuilder.SettingsNav(
 							contentDescription = null
 						)
 					},
-					enabledCondition = { it.darkTheme != "light" },
+					enabledCondition = { it.darkTheme != "off" },
 					settingsRepository = viewModel,
 					value = { it.darkThemeOled },
 					onValueChange = { darkThemeOled = it }

@@ -48,7 +48,7 @@ import com.sapuseven.compose.protostore.ui.utils.disabled
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-private val materialColors = arrayOf(
+val materialColors = arrayOf(
 	Color(0xFFF44336), // RED 500
 	Color(0xFFE91E63), // PINK 500
 	Color(0xFFFF2C93), // LIGHT PINK 500

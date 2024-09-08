@@ -5,6 +5,7 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
@@ -23,10 +24,10 @@ import androidx.glance.currentState
 import androidx.glance.layout.*
 import androidx.glance.text.Text
 import androidx.room.Room
+import com.sapuseven.compose.protostore.ui.preferences.materialColors
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.UserDatabase
 import com.sapuseven.untis.helpers.config.intDataStore
-import com.sapuseven.untis.ui.preferences.materialColors
 import com.sapuseven.untis.ui.theme.generateColorScheme
 import com.sapuseven.untis.ui.widgets.WidgetListItemModel
 import com.sapuseven.untis.ui.widgets.WidgetListView
@@ -42,7 +43,7 @@ open class BaseComposeWidget : GlanceAppWidget() {
 
 	private var items by mutableStateOf<List<WidgetListItemModel>?>(null)
 
-	private var elementId by mutableStateOf<Int>(-1)
+	private var elementId by mutableIntStateOf(-1)
 
 	@Composable
 	fun AppWidgetTheme(

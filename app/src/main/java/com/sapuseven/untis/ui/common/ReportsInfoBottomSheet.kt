@@ -14,12 +14,12 @@ import androidx.compose.ui.unit.dp
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import com.sapuseven.compose.protostore.ui.preferences.SwitchPreference
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.reportsDataStore
 import com.sapuseven.untis.activities.reportsDataStoreBreadcrumbsEnable
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
-import com.sapuseven.untis.ui.preferences.SwitchPreference
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -94,7 +94,8 @@ fun ReportsInfoBottomSheet(reportsDataStore: DataStore<Preferences> = LocalConte
 				) {
 					Divider()
 
-					SwitchPreference(
+					// TODO integrate protostore
+					/*SwitchPreference(
 						title = { Text(stringResource(R.string.preference_reports_breadcrumbs)) },
 						summary = { Text(stringResource(R.string.preference_reports_breadcrumbs_desc)) },
 						dataStore = UntisPreferenceDataStore(
@@ -102,7 +103,7 @@ fun ReportsInfoBottomSheet(reportsDataStore: DataStore<Preferences> = LocalConte
 							reportsDataStoreBreadcrumbsEnable.first,
 							reportsDataStoreBreadcrumbsEnable.second
 						)
-					)
+					)*/
 
 					Divider()
 				}
