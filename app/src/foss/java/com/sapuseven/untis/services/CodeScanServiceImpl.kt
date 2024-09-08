@@ -15,8 +15,8 @@ import javax.inject.Inject
 
 class CodeScanServiceImpl @Inject constructor(
 	@ActivityContext val context: Context,
-	val registry: ActivityResultRegistry
 ) : CodeScanService, DefaultLifecycleObserver {
+	lateinit var registry: ActivityResultRegistry
 	lateinit var scanCodeLauncher: ActivityResultLauncher<ScanOptions>
 	lateinit var onSuccess: (Uri) -> Unit
 
@@ -26,6 +26,10 @@ class CodeScanServiceImpl @Inject constructor(
 				if (this::onSuccess.isInitialized) onSuccess(Uri.parse(url))
 			}
 		}
+	}
+
+	override fun setResultRegistry(registry: ActivityResultRegistry) {
+		this.registry = registry
 	}
 
 	override fun scanCode(onSuccess: (Uri) -> Unit) {
