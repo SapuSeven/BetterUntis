@@ -30,7 +30,6 @@ import com.sapuseven.compose.protostore.ui.utils.disabled
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> InputPreference(
 	title: (@Composable () -> Unit),
@@ -77,48 +76,29 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> InputPreference(
 	if (showDialog) {
 		var input by remember { mutableStateOf(dialogValue) }
 
-		AlertDialog(
-			onDismissRequest = { showDialog = false },
+		PreferenceDialog(
 			title = title,
-			text = {
-				// TODO: Find a way to reduce the TextField padding
-				TextField(
-					value = input,
-					onValueChange = { input = it },
-					singleLine = true,
-					keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-					colors = TextFieldDefaults.colors(
-						focusedContainerColor = Color.Transparent,
-						unfocusedContainerColor = Color.Transparent,
-						disabledContainerColor = Color.Transparent,
-						errorContainerColor = Color.Transparent,
-					),
-					modifier = Modifier.fillMaxWidth()
-				)
-			},
-			confirmButton = {
-				TextButton(
-					onClick = {
-						showDialog = false
-						scope.launch {
-							settingsRepository.updateUserSettings {
-								onValueChange?.invoke(this, input)
-							}
-						}
-					}) {
-					Text(stringResource(id = R.string.dialog_ok))
+			onConfirm = {
+				showDialog = false
+				scope.launch {
+					settingsRepository.updateUserSettings {
+						onValueChange?.invoke(this, input)
+					}
 				}
 			},
-			dismissButton = {
-				TextButton(onClick = { showDialog = false }) {
-					Text(stringResource(id = R.string.dialog_cancel))
-				}
+			onDismiss = {
+				showDialog = false
 			}
-		)
+		) {
+			PreferenceDialogTextField(
+				value = input,
+				onValueChange = { input = it },
+				modifier = Modifier.fillMaxWidth()
+			)
+		}
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> NumericInputPreference(
 	title: (@Composable () -> Unit),
@@ -165,60 +145,42 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> NumericInputPrefer
 	if (showDialog) {
 		var input by remember { mutableStateOf(dialogValue.toString()) }
 
-		AlertDialog(
-			onDismissRequest = { showDialog = false },
+		PreferenceDialog(
 			title = title,
-			text = {
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
-					modifier = Modifier.fillMaxWidth()
-				) {
-					// TODO: Find a way to reduce the TextField padding
-					TextField(
-						value = input,
-						onValueChange = { input = it },
-						singleLine = true,
-						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-						colors = TextFieldDefaults.colors(
-							focusedContainerColor = Color.Transparent,
-							unfocusedContainerColor = Color.Transparent,
-							disabledContainerColor = Color.Transparent,
-							errorContainerColor = Color.Transparent,
-						),
-						modifier = Modifier.weight(1f)
-					)
-
-					unit?.let {
-						Text(
-							modifier = Modifier.padding(start = 8.dp),
-							text = unit
-						)
+			onConfirm = {
+				showDialog = false
+				scope.launch {
+					settingsRepository.updateUserSettings {
+						onValueChange?.invoke(this, input.toIntOrNull() ?: 0)
 					}
 				}
 			},
-			confirmButton = {
-				TextButton(
-					onClick = {
-						showDialog = false
-						scope.launch {
-							settingsRepository.updateUserSettings {
-								onValueChange?.invoke(this, input.toIntOrNull() ?: 0)
-							}
-						}
-					}) {
-					Text(stringResource(id = R.string.dialog_ok))
-				}
-			},
-			dismissButton = {
-				TextButton(onClick = { showDialog = false }) {
-					Text(stringResource(id = R.string.dialog_cancel))
+			onDismiss = {
+				showDialog = false
+			}
+		) {
+			Row(
+				verticalAlignment = Alignment.CenterVertically,
+				modifier = Modifier.fillMaxWidth()
+			) {
+				PreferenceDialogTextField(
+					value = input,
+					onValueChange = { input = it },
+					modifier = Modifier.weight(1f),
+					keyboardType = KeyboardType.Number
+				)
+
+				unit?.let {
+					Text(
+						modifier = Modifier.padding(start = 8.dp),
+						text = unit
+					)
 				}
 			}
-		)
+		}
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> RangeInputPreference(
 	title: (@Composable () -> Unit),
@@ -267,72 +229,100 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> RangeInputPreferen
 		var first by remember { mutableStateOf(input?.first?.toString() ?: "") }
 		var second by remember { mutableStateOf(input?.second?.toString() ?: "") }
 
-		AlertDialog(
-			onDismissRequest = { showDialog = false },
+		PreferenceDialog(
 			title = title,
-			text = {
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
-					modifier = Modifier.fillMaxWidth()
-				) {
-					TextField(
-						value = first,
-						onValueChange = { first = it },
-						singleLine = true,
-						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-						colors = TextFieldDefaults.colors(
-							focusedContainerColor = Color.Transparent,
-							unfocusedContainerColor = Color.Transparent,
-							disabledContainerColor = Color.Transparent,
-							errorContainerColor = Color.Transparent,
-						),
-						label = { Text(text = stringResource(R.string.preference_range_from)) },
-						modifier = Modifier
-                            .padding(end = 12.dp)
-                            .weight(1f)
-					)
-
-					TextField(
-						value = second,
-						onValueChange = { second = it },
-						singleLine = true,
-						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-						colors = TextFieldDefaults.colors(
-							focusedContainerColor = Color.Transparent,
-							unfocusedContainerColor = Color.Transparent,
-							disabledContainerColor = Color.Transparent,
-							errorContainerColor = Color.Transparent,
-						),
-						label = { Text(text = stringResource(R.string.preference_range_to)) },
-						modifier = Modifier
-                            .padding(start = 12.dp)
-                            .weight(1f)
-					)
+			onConfirm = {
+				showDialog = false
+				scope.launch {
+					settingsRepository.updateUserSettings {
+						onValueChange?.invoke(
+							this,
+							if (first.isNotBlank() && second.isNotBlank()) "$first-$second" else ""
+						)
+					}
 				}
 			},
-			confirmButton = {
-				TextButton(
-					onClick = {
-						showDialog = false
-						scope.launch {
-							settingsRepository.updateUserSettings {
-								onValueChange?.invoke(
-									this,
-									if (first.isNotBlank() && second.isNotBlank()) "$first-$second" else ""
-								)
-							}
-						}
-					}) {
-					Text(stringResource(id = R.string.dialog_ok))
-				}
-			},
-			dismissButton = {
-				TextButton(onClick = { showDialog = false }) {
-					Text(stringResource(id = R.string.dialog_cancel))
-				}
+			onDismiss = {
+				showDialog = false
 			}
-		)
+		) {
+			Row(
+				verticalAlignment = Alignment.CenterVertically,
+				modifier = Modifier.fillMaxWidth()
+			) {
+				PreferenceDialogTextField(
+					value = first,
+					onValueChange = { first = it },
+					modifier = Modifier
+						.padding(end = 12.dp)
+						.weight(1f),
+					label = stringResource(R.string.preference_range_from),
+					keyboardType = KeyboardType.Number
+				)
+
+				PreferenceDialogTextField(
+					value = second,
+					onValueChange = { second = it },
+					modifier = Modifier
+						.padding(start = 12.dp)
+						.weight(1f),
+					label = stringResource(R.string.preference_range_to),
+					keyboardType = KeyboardType.Number
+				)
+			}
+		}
 	}
+}
+
+@Composable
+private fun PreferenceDialog(
+	title: @Composable () -> Unit,
+	confirmButtonText: String = stringResource(id = R.string.dialog_ok),
+	dismissButtonText: String = stringResource(id = R.string.dialog_cancel),
+	onConfirm: () -> Unit,
+	onDismiss: () -> Unit,
+	content: @Composable () -> Unit
+) {
+	AlertDialog(
+		onDismissRequest = { onDismiss() },
+		title = title,
+		text = content,
+		confirmButton = {
+			TextButton(onClick = onConfirm) {
+				Text(confirmButtonText)
+			}
+		},
+		dismissButton = {
+			TextButton(onClick = onDismiss) {
+				Text(dismissButtonText)
+			}
+		}
+	)
+}
+
+@Composable
+private fun PreferenceDialogTextField(
+	value: String,
+	onValueChange: (String) -> Unit,
+	modifier: Modifier = Modifier,
+	label: String? = null,
+	keyboardType: KeyboardType = KeyboardType.Text
+) {
+	// TODO: Find a way to reduce the TextField padding
+	TextField(
+		value = value,
+		onValueChange = onValueChange,
+		singleLine = true,
+		keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+		colors = TextFieldDefaults.colors(
+			focusedContainerColor = Color.Transparent,
+			unfocusedContainerColor = Color.Transparent,
+			disabledContainerColor = Color.Transparent,
+			errorContainerColor = Color.Transparent,
+		),
+		label = label?.let { { Text(text = it) } },
+		modifier = modifier
+	)
 }
 
 @Composable
@@ -347,4 +337,4 @@ private fun <E> List<E>.toPair(): Pair<E, E>? =
 	if (this.size != 2) null else this.zipWithNext().first()
 
 fun String.convertRangeToPair(): Pair<Int, Int>? =
-	this.split("-").map { it.toIntOrNull() ?: return null }.toPair()
+	this.split("-").mapNotNull { it.toIntOrNull() }.toPair()
