@@ -147,9 +147,7 @@ fun NavGraphBuilder.SettingsNav(
 									Uri.parse("package:$packageName")
 								)
 							)*/
-						},
-						value = { Unit },
-						settingsRepository = viewModel,
+						}
 					)
 				}
 			}
@@ -249,9 +247,7 @@ fun NavGraphBuilder.SettingsNav(
 							painter = painterResource(R.drawable.settings_info),
 							contentDescription = null
 						)
-					},
-					settingsRepository = viewModel,
-					value = { Unit }
+					}
 				)
 
 				/*TODO SwitchPreference(
@@ -277,9 +273,7 @@ fun NavGraphBuilder.SettingsNav(
 								"Report has been sent",
 								Toast.LENGTH_SHORT
 							).show()
-						},
-						settingsRepository = viewModel,
-						value = { Unit }
+						}
 					)
 				}
 			}
@@ -780,9 +774,7 @@ onValueChange = { timetableRangeIndexReset = it }
 						painter = painterResource(R.drawable.settings_notifications_clear_all),
 						contentDescription = null
 					)
-				},
-				settingsRepository = viewModel,
-				value = { Unit }
+				}
 			)
 
 			PreferenceGroup(stringResource(id = R.string.preference_category_notifications_visible_fields)) {
@@ -893,9 +885,7 @@ onValueChange = { timetableRangeIndexReset = it }
 							painter = painterResource(R.drawable.settings_info),
 							contentDescription = null
 						)
-					},
-					settingsRepository = viewModel,
-					value = { Unit }
+					}
 				)
 			}
 
@@ -926,9 +916,7 @@ onValueChange = { timetableRangeIndexReset = it }
 						painter = painterResource(R.drawable.settings_about_app_icon),
 						contentDescription = null
 					)
-				},
-				settingsRepository = viewModel,
-				value = { Unit }
+				}
 			)
 
 			PreferenceGroup(stringResource(id = R.string.preference_info_general)) {
@@ -947,9 +935,7 @@ onValueChange = { timetableRangeIndexReset = it }
 							painter = painterResource(R.drawable.settings_info_github),
 							contentDescription = null
 						)
-					},
-					settingsRepository = viewModel,
-					value = { Unit }
+					}
 				)
 
 				Preference(
@@ -963,9 +949,7 @@ onValueChange = { timetableRangeIndexReset = it }
 							painter = painterResource(R.drawable.settings_info_github),
 							contentDescription = null
 						)
-					},
-					settingsRepository = viewModel,
-					value = { Unit }
+					}
 				)
 
 				Preference(
@@ -979,9 +963,7 @@ onValueChange = { timetableRangeIndexReset = it }
 							painter = painterResource(R.drawable.settings_about_contributor),
 							contentDescription = null
 						)
-					},
-					settingsRepository = viewModel,
-					value = { Unit }
+					}
 				)
 
 				if (openDialog.value) {
@@ -1039,9 +1021,7 @@ onValueChange = { timetableRangeIndexReset = it }
 							painter = painterResource(R.drawable.settings_about_library),
 							contentDescription = null
 						)
-					},
-					settingsRepository = viewModel,
-					value = { Unit }
+					}
 				)
 			}
 		}
