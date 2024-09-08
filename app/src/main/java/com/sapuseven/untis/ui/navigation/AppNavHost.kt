@@ -21,9 +21,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.sapuseven.untis.ui.activities.login.Login
 import com.sapuseven.untis.ui.activities.logindatainput.LoginDataInput
+import com.sapuseven.untis.ui.activities.settings.SettingsNav
 import com.sapuseven.untis.ui.activities.splash.Splash
 import com.sapuseven.untis.ui.activities.timetable.Timetable
 import kotlinx.coroutines.flow.Flow
@@ -64,6 +66,7 @@ fun AppNavHost(
 		startDestination = startDestination,
 	) {
 		composable<AppRoutes.Splash> { Splash() }
+
 		composable<AppRoutes.Login>(
 			enterTransition = {
 				fadeIn(animationSpec = tween(500))
@@ -87,6 +90,7 @@ fun AppNavHost(
 				)
 			},
 		) { Login() }
+
 		composable<AppRoutes.LoginDataInput>(
 			enterTransition = {
 				slideIntoContainer(
@@ -113,6 +117,7 @@ fun AppNavHost(
 				)
 			},
 		) { LoginDataInput() }
+
 		composable<AppRoutes.Timetable>(
 			enterTransition = {
 				fadeIn(animationSpec = tween(500))
@@ -127,6 +132,10 @@ fun AppNavHost(
 				fadeOut(animationSpec = tween(500))
 			},
 		) { Timetable() }
+
+		navigation<AppRoutes.Settings>(startDestination = AppRoutes.Settings.Categories) {
+			SettingsNav(navController = navController)
+		}
 	}
 }
 

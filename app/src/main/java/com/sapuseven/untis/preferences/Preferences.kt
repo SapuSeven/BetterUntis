@@ -79,8 +79,8 @@ class UntisPreferenceDataStore<T>(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PreferenceScreen(
-	key: String,
+fun <T: Any> PreferenceScreen(
+	key: T,
 	title: (@Composable () -> Unit),
 	icon: (@Composable () -> Unit) = {},
 	navController: NavController

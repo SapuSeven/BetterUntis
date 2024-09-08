@@ -21,5 +21,34 @@ object AppRoutes {
 	)
 
 	@Serializable
-	data object Settings
+	data object Settings {
+
+		@Serializable
+		data object Categories
+
+		@Serializable
+		data object General
+
+		@Serializable
+		data object Styling
+
+		@Serializable
+		data object Timetable
+
+		@Serializable
+		data object Notifications
+
+		@Serializable
+		data object Connectivity
+
+		@Serializable
+		data object About {
+
+			@Serializable
+			data object Libraries
+
+			@Serializable
+			data object Contributors
+		}
+	}
 }
