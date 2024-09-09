@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -83,7 +84,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ColorPreference(
 	enabledCondition: (Model) -> Boolean = { true },
 	highlight: Boolean = false,
 	showAlphaSlider: Boolean = false,
-	//defaultValueLabel: String? = null,
+	defaultValueLabel: String? = null,
 	onValueChange: (ModelBuilder.(value: Int) -> Unit)? = null,
 ) {
 	var dialogValue by remember { mutableIntStateOf(0) }
@@ -116,20 +117,20 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ColorPreference(
 	)
 
 	if (showDialog) {
+		val defaultColor = Color(value(settingsRepository.getSettingsDefaults()))
+
 		val color = Color(dialogValue);
 		val presetColors = remember {
 			materialColors.plus(
-				/*if (defaultValueLabel == null)
-					Color(dataStore.defaultValue)
-				else*/
-				Color.Black
+				if (defaultValueLabel == null)
+					defaultColor
+				else
+					Color.Black
 			)
 		}
 
 		var selectedPreset by remember { mutableIntStateOf(presetColors.indexOf(color)) }
 		var advanced by remember { mutableStateOf(false) }
-
-		//TODO val defaultColor = Color(dataStore.defaultValue)
 
 		key(advanced) {
 			AlertDialog(
@@ -167,7 +168,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ColorPreference(
 								}
 							)
 
-							/*defaultValueLabel?.let {
+							defaultValueLabel?.let {
 								Row(
 									verticalAlignment = Alignment.CenterVertically,
 									modifier = Modifier
@@ -175,7 +176,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ColorPreference(
 										.clip(RoundedCornerShape(50))
 										.clickable {
 											selectedPreset = -1
-											color = defaultColor
+											dialogValue = defaultColor.toArgb()
 										}
 								) {
 									ColorBox(
@@ -183,7 +184,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ColorPreference(
 										selected = color == defaultColor,
 										onSelect = {
 											selectedPreset = -1
-											color = it
+											dialogValue = it.toArgb()
 										}
 									)
 
@@ -193,7 +194,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ColorPreference(
 										text = defaultValueLabel
 									)
 								}
-							}*/
+							}
 
 							if (showAlphaSlider) {
 								Slider(
@@ -237,7 +238,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ColorPreference(
 										dataStore.clearValue()
 									else
 										dataStore.saveValue(color.toArgb())*/
-									settingsRepository.updateUserSettings {
+									settingsRepository.updateSettings {
 										onValueChange?.invoke(this, color.toArgb())
 									}
 								}
@@ -283,7 +284,7 @@ fun ColorBox(
 		if (selected)
 			Icon(
 				painter = painterResource(id = R.drawable.colorpicker_check),
-				contentDescription = null, // TODO: create stringResource(id = R.string.all_selected)
+				contentDescription = null, // TODO: localize stringResource(id = R.string.all_selected)
 				tint = if (ColorUtils.calculateLuminance(color.toArgb()) < 0.5)
 					Color.White
 				else

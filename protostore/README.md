@@ -87,13 +87,38 @@ val Context.settingsDataStore: DataStore<Settings> by dataStore(
 
 #### Single-user settings
 
-TODO
+For single-user preferences, you just need a schema that consists of an object:
+
+```protobuf
+syntax = "proto3";
+
+option java_package = "com.example.application";
+option java_multiple_files = true;
+
+message Settings {
+  bool exampleValue = 1;
+}
+
+```
+
+Then you can define a ViewModel extending `SingleUserSettingsRepository` with your defined type:
+
+```kotlin
+@HiltViewModel
+class SettingsScreenViewModel @Inject constructor(
+	dataStore: DataStore<Settings>
+) : SingleUserSettingsRepository<Settings, Settings.Builder>(dataStore) {
+    override fun getSettingsDefaults() = UserSettings.newBuilder().apply {
+        // assign default values here
+    }
+}
+```
 
 #### Multi-user settings
 
 For multi-user preferences, you need a schema that consists of two objects:
-1. A holder for settings per use
-2. A global object with a map to the user-specific settings
+1. A holder for settings per user
+2. A 'global' object with a map to the user-specific settings
 
 ```protobuf
 syntax = "proto3";
@@ -118,13 +143,17 @@ Then you can define a ViewModel extending `MultiUserSettingsRepository` with you
 class SettingsScreenViewModel @Inject constructor(
 	dataStore: DataStore<Settings>
 ) : MultiUserSettingsRepository<Settings, Settings.Builder, UserSettings, UserSettings.Builder>(dataStore) {
-	private val userId = -1;// get your active user id here
+	private val userId = -1;// set your active user id here
 
-	override fun getUserSettings(dataStore: Settings) : UserSettings {
-		return dataStore.usersMap.getOrDefault(userId, UserSettings.getDefaultInstance())
+	override fun getSettings(dataStore: Settings) : UserSettings {
+        return dataStore.usersMap.getOrDefault(userId, getSettingsDefaults())
 	}
 
-	override fun updateUserSettings(currentData : Settings, userSettings: UserSettings) : Settings {
+    override fun getSettingsDefaults() = UserSettings.newBuilder().apply {
+        // assign default values here
+    }
+    
+	override fun updateSettings(currentData : Settings, userSettings: UserSettings) : Settings {
 		return currentData.toBuilder()
 			.putUsers(userId, userSettings)
 			.build()

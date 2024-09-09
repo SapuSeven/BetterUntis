@@ -4,7 +4,9 @@ import com.google.protobuf.MessageLite
 import kotlinx.coroutines.flow.Flow
 
 interface SettingsRepository<SettingsType : MessageLite, SettingsBuilderType : MessageLite.Builder> {
-	fun getUserSettings(): Flow<SettingsType>
+	fun getSettings(): Flow<SettingsType>
 
-	suspend fun updateUserSettings(update: SettingsBuilderType.() -> Unit)
+	fun getSettingsDefaults(): SettingsType
+
+	suspend fun updateSettings(update: SettingsBuilderType.() -> Unit)
 }

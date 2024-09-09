@@ -331,7 +331,7 @@ fun NavGraphBuilder.SettingsNav(
 					value = { it.backgroundRegular },
 					onValueChange = { backgroundRegular = it },
 					showAlphaSlider = true,
-					//defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
 
 				ColorPreference(
@@ -343,7 +343,7 @@ fun NavGraphBuilder.SettingsNav(
 					value = { it.backgroundRegularPast },
 					onValueChange = { backgroundRegularPast = it },
 					showAlphaSlider = true,
-					//defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
 
 				ColorPreference(
@@ -355,7 +355,7 @@ fun NavGraphBuilder.SettingsNav(
 					value = { it.backgroundExam },
 					onValueChange = { backgroundExam = it },
 					showAlphaSlider = true,
-					//defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
 
 				ColorPreference(
@@ -367,7 +367,7 @@ fun NavGraphBuilder.SettingsNav(
 					value = { it.backgroundExamPast },
 					onValueChange = { backgroundExamPast = it },
 					showAlphaSlider = true,
-					//defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
 
 				ColorPreference(
@@ -379,7 +379,7 @@ fun NavGraphBuilder.SettingsNav(
 					value = { it.backgroundIrregular },
 					onValueChange = { backgroundIrregular = it },
 					showAlphaSlider = true,
-					//defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
 
 				ColorPreference(
@@ -391,7 +391,7 @@ fun NavGraphBuilder.SettingsNav(
 					value = { it.backgroundIrregularPast },
 					onValueChange = { backgroundIrregularPast = it },
 					showAlphaSlider = true,
-					//defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
 
 				ColorPreference(
@@ -403,7 +403,7 @@ fun NavGraphBuilder.SettingsNav(
 					value = { it.backgroundCancelled },
 					onValueChange = { backgroundCancelled = it },
 					showAlphaSlider = true,
-					//defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
 
 				ColorPreference(
@@ -415,7 +415,7 @@ fun NavGraphBuilder.SettingsNav(
 					value = { it.backgroundCancelledPast },
 					onValueChange = { backgroundCancelledPast = it },
 					showAlphaSlider = true,
-					//defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
+					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
 
 				/*ConfirmDialogPreference(

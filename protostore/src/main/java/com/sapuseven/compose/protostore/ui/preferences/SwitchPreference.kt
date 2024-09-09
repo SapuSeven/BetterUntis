@@ -31,7 +31,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> SwitchPreference(
 				checked = currentValue,
 				onCheckedChange = {
 					scope.launch {
-						settingsRepository.updateUserSettings {
+						settingsRepository.updateSettings {
 							onValueChange?.invoke(this, it)
 						}
 					}
@@ -46,7 +46,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> SwitchPreference(
 		highlight = highlight,
 		onClick = { currentValue ->
 			scope.launch {
-				settingsRepository.updateUserSettings {
+				settingsRepository.updateSettings {
 					onValueChange?.invoke(this, !currentValue)
 				}
 			}

@@ -118,7 +118,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> WeekRangePreferenc
 					onClick = {
 						showDialog = false
 						scope.launch {
-							settingsRepository.updateUserSettings {
+							settingsRepository.updateSettings {
 								onValueChange?.invoke(this, dialogValue)
 							}
 						}

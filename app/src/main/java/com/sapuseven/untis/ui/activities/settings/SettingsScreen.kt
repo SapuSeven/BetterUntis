@@ -9,27 +9,17 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import com.sapuseven.untis.R
-import com.sapuseven.untis.preferences.PreferenceScreen
-import com.sapuseven.untis.preferences.UntisPreferenceDataStore
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.VerticalScrollColumn
-import com.sapuseven.untis.ui.navigation.AppRoutes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,6 +29,11 @@ fun SettingsScreen(
 	viewModel: SettingsScreenViewModel = hiltViewModel(),
 	content: @Composable (SettingsScreenViewModel) -> Unit
 ) {
+	val colorScheme = MaterialTheme.colorScheme
+	LaunchedEffect(Unit) {
+		viewModel.setColorScheme(colorScheme)
+	}
+
 	/*val autoMutePref = dataStorePreferences.automuteEnable
 	val scope = rememberCoroutineScope()
 	val autoMuteSettingsLauncher =
@@ -110,8 +105,8 @@ fun SettingsScreen(
 	) { innerPadding ->
 		Box(
 			modifier = Modifier
-				.padding(innerPadding)
-				.fillMaxSize()
+                .padding(innerPadding)
+                .fillMaxSize()
 		) {
 			VerticalScrollColumn {
 				content(viewModel)

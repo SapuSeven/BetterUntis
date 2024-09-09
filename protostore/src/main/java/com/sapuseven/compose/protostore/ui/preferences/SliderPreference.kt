@@ -52,7 +52,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> SliderPreference(
 					value = currentValue,
 					onValueChange = {
 						scope.launch {
-							settingsRepository.updateUserSettings {
+							settingsRepository.updateSettings {
 								onValueChange?.invoke(this, it)
 							}
 						}

@@ -18,12 +18,12 @@ abstract class MultiUserSettingsRepository <
 
 	abstract fun updateUserSettings(currentData : SettingsType, userSettings: UserSettingsType) : SettingsType
 
-	override fun getUserSettings(): Flow<UserSettingsType> {
+	override fun getSettings(): Flow<UserSettingsType> {
 		return _dataStore.data.map { userSettings -> getUserSettings(userSettings) }
 	}
 
 	@Suppress("UNCHECKED_CAST")
-	override suspend fun updateUserSettings(update: UserSettingsBuilderType.() -> Unit) {
+	override suspend fun updateSettings(update: UserSettingsBuilderType.() -> Unit) {
 		_dataStore.updateData { currentData ->
 			val settingsBuilder = getUserSettings(currentData).toBuilder() as UserSettingsBuilderType
 			settingsBuilder.apply(update)

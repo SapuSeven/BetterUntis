@@ -23,7 +23,6 @@ import com.sapuseven.compose.protostore.ui.utils.disabled
 import com.sapuseven.compose.protostore.ui.utils.ifNotNull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -59,10 +58,10 @@ fun <Model : MessageLite, Value> Preference(
 	scope: CoroutineScope = rememberCoroutineScope(),
 	onClick: ((value: Value) -> Unit)? = null,
 ) {
-	val data by settingsRepository.getUserSettings().collectAsState(null)
+	val data by settingsRepository.getSettings().collectAsState(null)
 	val interactionSource = remember { MutableInteractionSource() }
 
-	val isEnabled = settingsRepository.getUserSettings().map { enabledCondition(it) }
+	val isEnabled = settingsRepository.getSettings().map { enabledCondition(it) }
 		.collectAsState(initial = true)
 
 	if (highlight)

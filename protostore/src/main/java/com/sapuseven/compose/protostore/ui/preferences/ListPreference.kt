@@ -78,7 +78,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ListPreference(
 								) {
 									showDialog = false
 									scope.launch {
-										settingsRepository.updateUserSettings {
+										settingsRepository.updateSettings {
 											onValueChange?.invoke(this, it)
 										}
 									}
@@ -90,7 +90,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ListPreference(
 								onClick = {
 									showDialog = false
 									scope.launch {
-										settingsRepository.updateUserSettings {
+										settingsRepository.updateSettings {
 											onValueChange?.invoke(this, it)
 										}
 									}
@@ -196,7 +196,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> MultiSelectListPre
 					onClick = {
 						showDialog = false
 						scope.launch {
-							settingsRepository.updateUserSettings {
+							settingsRepository.updateSettings {
 								onValueChange?.invoke(this, dialogValues.filter { it.value }.keys)
 							}
 						}
