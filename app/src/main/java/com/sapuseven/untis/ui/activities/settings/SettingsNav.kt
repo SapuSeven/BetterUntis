@@ -34,6 +34,7 @@ import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.preferences.PreferenceScreen
 import com.sapuseven.untis.ui.navigation.AppRoutes
+import com.sapuseven.untis.ui.preferences.ElementPickerPreference
 import io.sentry.Sentry
 
 fun NavGraphBuilder.SettingsNav(
@@ -483,7 +484,7 @@ fun NavGraphBuilder.SettingsNav(
 			navController = navController,
 			title = stringResource(id = R.string.preferences_timetable)
 		) { viewModel ->
-			/* TODO ElementPickerPreference(
+			ElementPickerPreference(
 				title = { Text(stringResource(R.string.preference_timetable_personal_timetable)) },
 				leadingContent = {
 					Icon(
@@ -492,11 +493,11 @@ fun NavGraphBuilder.SettingsNav(
 					)
 				},
 				settingsRepository = viewModel,
-				value = { it.timetablePersonalTimetable, },
-				onValueChange = { timetablePersonalTimetable, = it }
-					timetableDatabaseInterface = timetableDatabaseInterface,
-				highlight = preferenceHighlight == "preference_timetable_personal_timetable"
-			)*/
+				value = { it.timetablePersonalTimetable },
+				onValueChange = { timetablePersonalTimetable = it },
+				elementPicker = viewModel.elementPicker,
+				//highlight = preferenceHighlight == "preference_timetable_personal_timetable",
+			)
 
 			SwitchPreference(
 				title = { Text(stringResource(R.string.preference_timetable_hide_timestamps)) },

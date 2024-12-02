@@ -21,10 +21,17 @@ class ElementPicker(
 	private val user: User,
 	private val userDao: UserDao,
 ) {
-	val allClasses = MutableLiveData<Map<Int, Klasse>>()
-	val allTeachers = MutableLiveData<Map<Int, Teacher>>()
-	val allSubjects = MutableLiveData<Map<Int, Subject>>()
-	val allRooms = MutableLiveData<Map<Int, Room>>()
+	private val _allClasses = MutableLiveData<Map<Int, Klasse>>()
+	val allClasses: LiveData<Map<Int, Klasse>> by this::_allClasses
+
+	private val _allTeachers = MutableLiveData<Map<Int, Teacher>>()
+	val allTeachers: LiveData<Map<Int, Teacher>> by this::_allTeachers
+
+	private val _allSubjects = MutableLiveData<Map<Int, Subject>>()
+	val allSubjects: LiveData<Map<Int, Subject>> by this::_allSubjects
+
+	private val _allRooms = MutableLiveData<Map<Int, Room>>()
+	val allRooms: LiveData<Map<Int, Room>> by this::_allRooms
 
 	init {
 		loadElements()
@@ -34,13 +41,13 @@ class ElementPicker(
 		Log.d("ElementPicker", "loading elements")
 		CoroutineScope(Dispatchers.IO).launch {
 			userDao.getByIdWithData(user.id)?.let {
-				allClasses.postValue(it.klassen.toList().filter { it.active }
+				_allClasses.postValue(it.klassen.toList().filter { it.active }
 					.sortedBy { it.name }.associateBy { it.id })
-				allTeachers.postValue(it.teachers.toList().filter { it.active }
+				_allTeachers.postValue(it.teachers.toList().filter { it.active }
 					.sortedBy { it.name }.associateBy { it.id })
-				allSubjects.postValue(it.subjects.toList().filter { it.active }
+				_allSubjects.postValue(it.subjects.toList().filter { it.active }
 					.sortedBy { it.name }.associateBy { it.id })
-				allRooms.postValue(it.rooms.toList().filter { it.active }
+				_allRooms.postValue(it.rooms.toList().filter { it.active }
 					.sortedBy { it.name }.associateBy { it.id })
 			}
 		}
@@ -55,10 +62,10 @@ class ElementPicker(
 
 	fun getShortName(id: Int, type: Type?): String {
 		return when (type) {
-			Type.CLASS -> allClasses.value?.get(id)?.name
-			Type.TEACHER -> allTeachers.value?.get(id)?.name
-			Type.SUBJECT -> allSubjects.value?.get(id)?.name
-			Type.ROOM -> allRooms.value?.get(id)?.name
+			Type.CLASS -> _allClasses.value?.get(id)?.name
+			Type.TEACHER -> _allTeachers.value?.get(id)?.name
+			Type.SUBJECT -> _allSubjects.value?.get(id)?.name
+			Type.ROOM -> _allRooms.value?.get(id)?.name
 			else -> null
 		} ?: ELEMENT_NAME_UNKNOWN
 	}
@@ -73,10 +80,10 @@ class ElementPicker(
 
 	fun getLongName(id: Int, type: Type): String {
 		return when (type) {
-			Type.CLASS -> allClasses.value?.get(id)?.longName
-			Type.TEACHER -> allTeachers.value?.get(id)?.run { "$firstName $lastName" }
-			Type.SUBJECT -> allSubjects.value?.get(id)?.longName
-			Type.ROOM -> allRooms.value?.get(id)?.longName
+			Type.CLASS -> _allClasses.value?.get(id)?.longName
+			Type.TEACHER -> _allTeachers.value?.get(id)?.run { "$firstName $lastName" }
+			Type.SUBJECT -> _allSubjects.value?.get(id)?.longName
+			Type.ROOM -> _allRooms.value?.get(id)?.longName
 			else -> null
 		} ?: ELEMENT_NAME_UNKNOWN
 	}
@@ -91,10 +98,10 @@ class ElementPicker(
 
 	fun isAllowed(id: Int, type: Type?): Boolean {
 		return when (type) {
-			Type.CLASS -> allClasses.value?.get(id)?.displayable
-			Type.TEACHER -> allTeachers.value?.get(id)?.displayAllowed
-			Type.SUBJECT -> allSubjects.value?.get(id)?.displayAllowed
-			Type.ROOM -> allRooms.value?.get(id)?.displayAllowed
+			Type.CLASS -> _allClasses.value?.get(id)?.displayable
+			Type.TEACHER -> _allTeachers.value?.get(id)?.displayAllowed
+			Type.SUBJECT -> _allSubjects.value?.get(id)?.displayAllowed
+			Type.ROOM -> _allRooms.value?.get(id)?.displayAllowed
 			else -> null
 		} ?: false
 	}
@@ -108,10 +115,10 @@ class ElementPicker(
 	}
 
 	private fun getPeriodElements(type: Type): LiveData<List<PeriodElement>>? = when (type) {
-		Type.CLASS -> allClasses.map { data -> data.values.mapToPeriodElements() }
-		Type.TEACHER -> allTeachers.map { data -> data.values.mapToPeriodElements() }
-		Type.SUBJECT -> allSubjects.map { data -> data.values.mapToPeriodElements() }
-		Type.ROOM -> allRooms.map { data -> data.values.mapToPeriodElements() }
+		Type.CLASS -> _allClasses.map { data -> data.values.mapToPeriodElements() }
+		Type.TEACHER -> _allTeachers.map { data -> data.values.mapToPeriodElements() }
+		Type.SUBJECT -> _allSubjects.map { data -> data.values.mapToPeriodElements() }
+		Type.ROOM -> _allRooms.map { data -> data.values.mapToPeriodElements() }
 		else -> null
 	}
 

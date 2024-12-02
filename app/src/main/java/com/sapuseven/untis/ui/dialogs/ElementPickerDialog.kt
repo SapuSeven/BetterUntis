@@ -218,6 +218,7 @@ fun ElementPickerDialogFullscreenNew(
 	}
 }
 
+@Deprecated("To be replaced with ElementPickerDialogFullscreenNew")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ElementPickerDialogFullscreen(
@@ -371,10 +372,76 @@ fun ElementPickerDialogFullscreen(
 	}
 }
 
+@Composable
+fun ElementPickerDialogNew(
+	elementPicker: ElementPicker,
+	title: (@Composable () -> Unit)?,
+	initialType: TimetableDatabaseInterface.Type? = null,
+	hideTypeSelection: Boolean = false,
+	hideTypeSelectionPersonal: Boolean = false,
+	onDismiss: (success: Boolean) -> Unit = {},
+	onSelect: (selectedItem: PeriodElement?) -> Unit = {}
+) {
+	var selectedType by remember { mutableStateOf(initialType) }
+
+	val items = remember { mutableStateMapOf<PeriodElement, Boolean>() }
+	LaunchedEffect(selectedType) {
+		items.clear()
+		elementPicker.getAllPeriodElements()[selectedType]?.asFlow()?.collect { periodElements ->
+			periodElements.associateWith { false }.let { items.putAll(it) }
+		}
+	}
+
+	Dialog(onDismissRequest = { onDismiss(false) }) {
+		Surface(
+			modifier = Modifier.padding(vertical = 24.dp),
+			shape = AlertDialogDefaults.shape,
+			color = AlertDialogDefaults.containerColor,
+			tonalElevation = AlertDialogDefaults.TonalElevation
+		) {
+			Column {
+				title?.let {
+					ProvideTextStyle(value = MaterialTheme.typography.headlineSmall) {
+						Box(
+							Modifier
+								.padding(top = 24.dp, bottom = 16.dp)
+								.padding(horizontal = 24.dp)
+						) {
+							title()
+						}
+					}
+				}
+
+				ElementPickerElementsNew(
+					elementPicker = elementPicker,
+					selectedType = selectedType,
+					onDismiss = onDismiss,
+					onSelect = onSelect,
+					items = items,
+					modifier = Modifier
+						.fillMaxWidth()
+						.weight(1f)
+						.padding(horizontal = 24.dp)
+				)
+
+				if (!hideTypeSelection)
+					ElementPickerTypeSelection(
+						selectedType = selectedType,
+						hideTypeSelectionPersonal = hideTypeSelectionPersonal,
+						onTypeChange = { selectedType = it },
+						onDismiss = onDismiss,
+						onSelect = onSelect
+					)
+			}
+		}
+	}
+}
+
 /**
  * A minimal dialog version of the element picker.
  * Missing features currently are: search, toolbar actions, multi select (due to missing confirm button), close button.
  */
+@Deprecated("To be replaced with ElementPickerDialogNew")
 @Composable
 fun ElementPickerDialog(
 	title: (@Composable () -> Unit)?,
@@ -442,6 +509,7 @@ fun ElementPickerDialog(
 	}
 }
 
+@Deprecated("To be replaced with ElementPickerElementsNew")
 @Composable
 fun ElementPickerElements(
 	timetableDatabaseInterface: TimetableDatabaseInterface,

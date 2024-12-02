@@ -1,62 +1,86 @@
 package com.sapuseven.untis.ui.preferences
 
+import ElementItem
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import com.google.protobuf.MessageLite
+import com.sapuseven.compose.protostore.data.SettingsRepository
 import com.sapuseven.compose.protostore.ui.preferences.Preference
+import com.sapuseven.untis.components.ElementPicker
 import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import com.sapuseven.untis.preferences.UntisPreferenceDataStore
-import com.sapuseven.untis.ui.dialogs.ElementPickerDialog
+import com.sapuseven.untis.ui.dialogs.ElementPickerDialogNew
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 
 @Composable
-fun ElementPickerPreference(
+fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ElementPickerPreference(
 	title: (@Composable () -> Unit),
-	icon: (@Composable () -> Unit)? = null,
-	dependency: UntisPreferenceDataStore<*>? = null,
-	dataStore: UntisPreferenceDataStore<String>,
-	timetableDatabaseInterface: TimetableDatabaseInterface,
-	highlight: Boolean = false
+	summary: (@Composable () -> Unit)? = null,
+	leadingContent: (@Composable () -> Unit)? = null,
+	settingsRepository: SettingsRepository<Model, ModelBuilder>,
+	value: (Model) -> String,
+	scope: CoroutineScope = rememberCoroutineScope(),
+	enabledCondition: (Model) -> Boolean = { true },
+	highlight: Boolean = false,
+	onValueChange: (ModelBuilder.(value: String) -> Unit)? = null,
+	elementPicker: ElementPicker
 ) {
-	val value = remember { mutableStateOf(dataStore.defaultValue) }
+	var selectedType: TimetableDatabaseInterface.Type? by remember { mutableStateOf(null) }
 	var showDialog by remember { mutableStateOf(false) }
 
-	val scope = rememberCoroutineScope()
-
-	@Composable
-	fun generateSummary(element: PeriodElement): String {
-		return timetableDatabaseInterface.getShortName(element)
-	}
-
-	/*TODO Implement Preference(
+	Preference(
 		title = title,
-		summary = decodeStoredTimetableValue(value.value)?.let {
-			{ Text(generateSummary(it)) }
+		summary = summary,
+		supportingContent = { currentValue, _ ->
+			if (currentValue.isNotEmpty()) {
+				decodeStoredTimetableValue(currentValue)?.let {
+					ElementItem(it, elementPicker) { shortName, _, _ ->
+						Text(shortName)
+					}
+				}
+			}
 		},
-		leadingContent = icon,
+		leadingContent = leadingContent,
+		settingsRepository = settingsRepository,
 		value = value,
-		dependency = dependency,
-		dataStore = dataStore,
+		scope = scope,
+		enabledCondition = enabledCondition,
+		highlight = highlight,
 		onClick = {
-			showDialog = true
-		},
-		highlight = highlight
-	)*/
+			selectedType =
+				decodeStoredTimetableValue(value(settingsRepository.getSettingsDefaults()))?.let {
+					TimetableDatabaseInterface.Type.valueOf(it.type)
+				};
+			showDialog = true;
+		}
+	)
 
 	if (showDialog)
-		ElementPickerDialog(
+		ElementPickerDialogNew(
+			elementPicker = elementPicker,
 			title = title,
-			timetableDatabaseInterface = timetableDatabaseInterface,
 			onDismiss = {
 				showDialog = false
 			},
 			onSelect = { element ->
-				scope.launch { dataStore.saveValue(element?.let { encodeStoredTimetableValue(it) } ?: "") }
 				showDialog = false
+				scope.launch {
+					settingsRepository.updateSettings {
+						onValueChange?.invoke(
+							this,
+							element?.let { encodeStoredTimetableValue(it) } ?: "")
+					}
+				}
 			},
-			initialType = decodeStoredTimetableValue(value.value)?.let { TimetableDatabaseInterface.Type.valueOf(it.type) }
+			initialType = selectedType
 		)
 }
 

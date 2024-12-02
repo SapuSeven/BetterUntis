@@ -6,6 +6,8 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.datastore.core.DataStore
 import com.sapuseven.compose.protostore.data.MultiUserSettingsRepository
 import com.sapuseven.compose.protostore.ui.preferences.materialColors
+import com.sapuseven.untis.components.ElementPicker
+import com.sapuseven.untis.data.databases.entities.UserDao
 import com.sapuseven.untis.data.settings.model.Settings
 import com.sapuseven.untis.data.settings.model.UserSettings
 import com.sapuseven.untis.scope.UserScopeManager
@@ -15,12 +17,16 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsScreenViewModel @Inject constructor(
 	private val userScopeManager: UserScopeManager,
+	private val userDao: UserDao,
 	dataStore: DataStore<Settings>
 ) : MultiUserSettingsRepository<Settings, Settings.Builder, UserSettings, UserSettings.Builder>(
 	dataStore
 ) {
 	private val userId = userScopeManager.user.id
 	private lateinit var colorScheme: ColorScheme
+
+	val elementPicker: ElementPicker
+		get() = ElementPicker(userScopeManager.user, userDao)
 
 	fun setColorScheme(colorScheme: ColorScheme) {
 		this.colorScheme = colorScheme
