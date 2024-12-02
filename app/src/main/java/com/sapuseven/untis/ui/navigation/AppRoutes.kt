@@ -1,5 +1,6 @@
 package com.sapuseven.untis.ui.navigation
 
+import androidx.annotation.StringRes
 import kotlinx.serialization.Serializable
 
 object AppRoutes {
@@ -33,7 +34,7 @@ object AppRoutes {
 		data object Styling
 
 		@Serializable
-		data object Timetable
+		data class Timetable(@StringRes val highlightTitle: Int)
 
 		@Serializable
 		data object Notifications

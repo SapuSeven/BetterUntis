@@ -15,9 +15,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.google.accompanist.flowlayout.MainAxisAlignment
 import com.sapuseven.compose.protostore.ui.preferences.ColorPreference
 import com.sapuseven.compose.protostore.ui.preferences.InputPreference
@@ -484,6 +486,8 @@ fun NavGraphBuilder.SettingsNav(
 			navController = navController,
 			title = stringResource(id = R.string.preferences_timetable)
 		) { viewModel ->
+			val args = viewModel.savedStateHandle.toRoute<AppRoutes.Settings.Timetable>()
+
 			ElementPickerPreference(
 				title = { Text(stringResource(R.string.preference_timetable_personal_timetable)) },
 				leadingContent = {
@@ -496,7 +500,7 @@ fun NavGraphBuilder.SettingsNav(
 				value = { it.timetablePersonalTimetable },
 				onValueChange = { timetablePersonalTimetable = it },
 				elementPicker = viewModel.elementPicker,
-				//highlight = preferenceHighlight == "preference_timetable_personal_timetable",
+				highlight = args.highlightTitle == R.string.preference_timetable_personal_timetable,
 			)
 
 			SwitchPreference(

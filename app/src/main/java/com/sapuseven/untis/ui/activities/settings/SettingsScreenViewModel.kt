@@ -4,6 +4,7 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.datastore.core.DataStore
+import androidx.lifecycle.SavedStateHandle
 import com.sapuseven.compose.protostore.data.MultiUserSettingsRepository
 import com.sapuseven.compose.protostore.ui.preferences.materialColors
 import com.sapuseven.untis.components.ElementPicker
@@ -18,7 +19,8 @@ import javax.inject.Inject
 class SettingsScreenViewModel @Inject constructor(
 	private val userScopeManager: UserScopeManager,
 	private val userDao: UserDao,
-	dataStore: DataStore<Settings>
+	val savedStateHandle: SavedStateHandle,
+	dataStore: DataStore<Settings>,
 ) : MultiUserSettingsRepository<Settings, Settings.Builder, UserSettings, UserSettings.Builder>(
 	dataStore
 ) {

@@ -48,7 +48,7 @@ class LoginDataInputViewModel @Inject constructor(
 	private val userManager: UserManager,
 	savedStateHandle: SavedStateHandle
 ) : ActivityViewModel() {
-	val args: AppRoutes.LoginDataInput = savedStateHandle.toRoute<AppRoutes.LoginDataInput>()
+	val args = savedStateHandle.toRoute<AppRoutes.LoginDataInput>()
 
 	val existingUserId = if (args.userId == -1L) null else args.userId
 

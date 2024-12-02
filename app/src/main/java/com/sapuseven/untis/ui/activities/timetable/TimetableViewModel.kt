@@ -65,8 +65,7 @@ class TimetableViewModel @Inject constructor(
 	}
 
 	val onAnonymousSettingsClick = {
-		navigator.navigate(AppRoutes.Settings.Timetable)
-		//EXTRA_STRING_PREFERENCE_HIGHLIGHT = "preference_timetable_personal_timetable"
+		navigator.navigate(AppRoutes.Settings.Timetable(highlightTitle = R.string.preference_timetable_personal_timetable))
 	}
 
 	// TODO
