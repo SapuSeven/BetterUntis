@@ -34,7 +34,7 @@ object AppRoutes {
 		data object Styling
 
 		@Serializable
-		data class Timetable(@StringRes val highlightTitle: Int)
+		data class Timetable(@StringRes val highlightTitle: Int = -1)
 
 		@Serializable
 		data object Notifications

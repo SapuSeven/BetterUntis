@@ -1,10 +1,12 @@
 package com.sapuseven.compose.protostore.data
 
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
 import com.google.protobuf.MessageLite
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 
 abstract class MultiUserSettingsRepository <
 	SettingsType : MessageLite,
@@ -19,6 +21,7 @@ abstract class MultiUserSettingsRepository <
 	abstract fun updateUserSettings(currentData : SettingsType, userSettings: UserSettingsType) : SettingsType
 
 	override fun getSettings(): Flow<UserSettingsType> {
+		Log.d("SettingsRepository", "DataStore getSettings")
 		return _dataStore.data.map { userSettings -> getUserSettings(userSettings) }
 	}
 

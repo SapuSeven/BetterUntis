@@ -69,7 +69,7 @@ fun NavGraphBuilder.SettingsNav(
 			)
 
 			PreferenceScreen(
-				key = AppRoutes.Settings.Timetable,
+				key = AppRoutes.Settings.Timetable(),
 				title = { Text(stringResource(id = R.string.preferences_timetable)) },
 				icon = {
 					Icon(
@@ -125,14 +125,14 @@ fun NavGraphBuilder.SettingsNav(
 			PreferenceGroup(stringResource(id = R.string.preference_category_general_behaviour)) {
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_double_tap_to_exit)) },
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.exitConfirmation },
 					onValueChange = { exitConfirmation = it }
 				)
 
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_flinging_enable)) },
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.flingEnable },
 					onValueChange = { flingEnable = it }
 				)
@@ -158,7 +158,7 @@ fun NavGraphBuilder.SettingsNav(
 			PreferenceGroup(stringResource(R.string.preference_category_general_week_display)) {
 				WeekRangePreference(
 					title = { Text(stringResource(R.string.preference_week_custom_range)) },
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.weekCustomRangeList.toSet() },
 					onValueChange = {
 						clearWeekCustomRange()
@@ -169,7 +169,7 @@ fun NavGraphBuilder.SettingsNav(
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_week_snap_to_days)) },
 					summary = { Text(stringResource(R.string.preference_week_snap_to_days_summary)) },
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.weekSnapToDays },
 					onValueChange = { weekSnapToDays = it }
 				)
@@ -181,7 +181,7 @@ fun NavGraphBuilder.SettingsNav(
 					steps = 6,
 					enabledCondition = { it.weekSnapToDays },
 					showSeekBarValue = true,
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.weekCustomLength },
 					onValueChange = { weekCustomLength = it }
 				)
@@ -191,7 +191,7 @@ fun NavGraphBuilder.SettingsNav(
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_automute_enable)) },
 					summary = { Text(stringResource(R.string.preference_automute_enable_summary)) },
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.automuteEnable },
 					onValueChange = {
 						automuteEnable = it
@@ -215,14 +215,14 @@ fun NavGraphBuilder.SettingsNav(
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_automute_cancelled_lessons)) },
 					enabledCondition = { it.automuteEnable },
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.automuteCancelledLessons },
 					onValueChange = { automuteCancelledLessons = it }
 				)
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_automute_mute_priority)) },
 					enabledCondition = { it.automuteEnable },
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.automuteMutePriority },
 					onValueChange = { automuteMutePriority = it }
 				)
@@ -234,7 +234,7 @@ fun NavGraphBuilder.SettingsNav(
 					summary = { Text(stringResource(R.string.preference_automute_minimum_break_length_summary)) },
 					showSeekBarValue = true,
 					enabledCondition = { it.automuteEnable },
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.automuteMinimumBreakLength },
 					onValueChange = { automuteMinimumBreakLength = it }
 				)
@@ -255,7 +255,7 @@ fun NavGraphBuilder.SettingsNav(
 				/*TODO SwitchPreference(
 					title = { Text(stringResource(R.string.preference_reports_breadcrumbs)) },
 					summary = { Text(stringResource(R.string.preference_reports_breadcrumbs_desc)) },
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					dataStore = UntisPreferenceDataStore(
 						reportsDataStore,
 						reportsDataStoreBreadcrumbsEnable.first,
@@ -290,7 +290,7 @@ fun NavGraphBuilder.SettingsNav(
 				ColorPreference(
 					title = { Text(stringResource(R.string.preference_background_future)) },
 					showAlphaSlider = true,
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.backgroundFuture },
 					onValueChange = { backgroundFuture = it }
 				)
@@ -298,14 +298,14 @@ fun NavGraphBuilder.SettingsNav(
 				ColorPreference(
 					title = { Text(stringResource(R.string.preference_background_past)) },
 					showAlphaSlider = true,
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.backgroundPast },
 					onValueChange = { backgroundPast = it }
 				)
 
 				ColorPreference(
 					title = { Text(stringResource(R.string.preference_marker)) },
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.marker },
 					onValueChange = { marker = it }
 				)
@@ -317,7 +317,7 @@ fun NavGraphBuilder.SettingsNav(
 					summary = { Text(stringResource(R.string.preference_school_background_desc)) },
 					entries = stringArrayResource(id = R.array.preference_schoolcolors_values),
 					entryLabels = stringArrayResource(id = R.array.preference_schoolcolors),
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.schoolBackgroundList.toSet() },
 					onValueChange = {
 						clearSchoolBackground()
@@ -330,7 +330,7 @@ fun NavGraphBuilder.SettingsNav(
 					enabledCondition = {
 						!it.schoolBackgroundList.contains("regular")
 					},
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.backgroundRegular },
 					onValueChange = { backgroundRegular = it },
 					showAlphaSlider = true,
@@ -342,7 +342,7 @@ fun NavGraphBuilder.SettingsNav(
 					enabledCondition = {
 						!it.schoolBackgroundList.contains("regular")
 					},
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.backgroundRegularPast },
 					onValueChange = { backgroundRegularPast = it },
 					showAlphaSlider = true,
@@ -354,7 +354,7 @@ fun NavGraphBuilder.SettingsNav(
 					enabledCondition = {
 						!it.schoolBackgroundList.contains("exam")
 					},
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.backgroundExam },
 					onValueChange = { backgroundExam = it },
 					showAlphaSlider = true,
@@ -366,7 +366,7 @@ fun NavGraphBuilder.SettingsNav(
 					enabledCondition = {
 						!it.schoolBackgroundList.contains("exam")
 					},
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.backgroundExamPast },
 					onValueChange = { backgroundExamPast = it },
 					showAlphaSlider = true,
@@ -378,7 +378,7 @@ fun NavGraphBuilder.SettingsNav(
 					enabledCondition = {
 						!it.schoolBackgroundList.contains("irregular")
 					},
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.backgroundIrregular },
 					onValueChange = { backgroundIrregular = it },
 					showAlphaSlider = true,
@@ -390,7 +390,7 @@ fun NavGraphBuilder.SettingsNav(
 					enabledCondition = {
 						!it.schoolBackgroundList.contains("irregular")
 					},
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.backgroundIrregularPast },
 					onValueChange = { backgroundIrregularPast = it },
 					showAlphaSlider = true,
@@ -402,7 +402,7 @@ fun NavGraphBuilder.SettingsNav(
 					enabledCondition = {
 						!it.schoolBackgroundList.contains("cancelled")
 					},
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.backgroundCancelled },
 					onValueChange = { backgroundCancelled = it },
 					showAlphaSlider = true,
@@ -414,7 +414,7 @@ fun NavGraphBuilder.SettingsNav(
 					enabledCondition = {
 						!it.schoolBackgroundList.contains("cancelled")
 					},
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.backgroundCancelledPast },
 					onValueChange = { backgroundCancelledPast = it },
 					showAlphaSlider = true,
@@ -439,7 +439,7 @@ fun NavGraphBuilder.SettingsNav(
 							contentDescription = null
 						)
 					},
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.themeColor },
 					onValueChange = { themeColor = it },
 					/*defaultValueLabel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
@@ -459,7 +459,7 @@ fun NavGraphBuilder.SettingsNav(
 					},
 					entries = stringArrayResource(id = R.array.preference_dark_theme_values),
 					entryLabels = stringArrayResource(id = R.array.preference_dark_theme),
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.darkTheme },
 					onValueChange = { darkTheme = it }
 				)
@@ -474,7 +474,7 @@ fun NavGraphBuilder.SettingsNav(
 						)
 					},
 					enabledCondition = { it.darkTheme != "off" },
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.darkThemeOled },
 					onValueChange = { darkThemeOled = it }
 				)
@@ -496,7 +496,7 @@ fun NavGraphBuilder.SettingsNav(
 						contentDescription = null
 					)
 				},
-				settingsRepository = viewModel,
+				settingsRepository = viewModel.repository,
 				value = { it.timetablePersonalTimetable },
 				onValueChange = { timetablePersonalTimetable = it },
 				elementPicker = viewModel.elementPicker,
@@ -512,7 +512,7 @@ fun NavGraphBuilder.SettingsNav(
 						contentDescription = null
 					)
 				},
-				settingsRepository = viewModel,
+				settingsRepository = viewModel.repository,
 				value = { it.timetableHideTimeStamps },
 				onValueChange = { timetableHideTimeStamps = it }
 			)
@@ -526,7 +526,7 @@ fun NavGraphBuilder.SettingsNav(
 						contentDescription = null
 					)
 				},
-				settingsRepository = viewModel,
+				settingsRepository = viewModel.repository,
 				value = { it.timetableHideCancelled },
 				onValueChange = { timetableHideCancelled = it }
 			)
@@ -540,7 +540,7 @@ fun NavGraphBuilder.SettingsNav(
 						contentDescription = null
 					)
 				},
-				settingsRepository = viewModel,
+				settingsRepository = viewModel.repository,
 				value = { it.timetableSubstitutionsIrregular },
 				onValueChange = { timetableSubstitutionsIrregular = it }
 			)
@@ -555,7 +555,7 @@ fun NavGraphBuilder.SettingsNav(
 					)
 				},
 				enabledCondition = { it.timetableSubstitutionsIrregular },
-				settingsRepository = viewModel,
+				settingsRepository = viewModel.repository,
 				value = { it.timetableBackgroundIrregular },
 				onValueChange = { timetableBackgroundIrregular = it }
 			)
@@ -569,7 +569,7 @@ fun NavGraphBuilder.SettingsNav(
 							contentDescription = null
 						)
 					},
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.timetableRange },
 					onValueChange = { timetableRange = it }
 				)
@@ -577,7 +577,7 @@ fun NavGraphBuilder.SettingsNav(
 				/*SwitchPreference(
 					title = { Text(stringResource(R.string.preference_timetable_range_index_reset)) },
 					enabledCondition = { it.timetableRange },
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 value = { it.timetableRangeIndexReset },
 onValueChange = { timetableRangeIndexReset = it }
 				)*/
@@ -599,7 +599,7 @@ onValueChange = { timetableRangeIndexReset = it }
 						)
 					},
 					unit = "dp",
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.timetableItemPaddingOverlap },
 					onValueChange = { timetableItemPaddingOverlap = it }
 				)
@@ -613,7 +613,7 @@ onValueChange = { timetableRangeIndexReset = it }
 						)
 					},
 					unit = "dp",
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.timetableItemPadding },
 					onValueChange = { timetableItemPadding = it }
 				)
@@ -627,7 +627,7 @@ onValueChange = { timetableRangeIndexReset = it }
 						)
 					},
 					unit = "dp",
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.timetableItemCornerRadius },
 					onValueChange = { timetableItemCornerRadius = it }
 				)
@@ -642,7 +642,7 @@ onValueChange = { timetableRangeIndexReset = it }
 							contentDescription = null
 						)
 					},
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.timetableCenteredLessonInfo },
 					onValueChange = { timetableCenteredLessonInfo = it }
 				)
@@ -655,7 +655,7 @@ onValueChange = { timetableRangeIndexReset = it }
 							contentDescription = null
 						)
 					},
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.timetableBoldLessonName },
 					onValueChange = { timetableBoldLessonName = it }
 				)
@@ -669,7 +669,7 @@ onValueChange = { timetableRangeIndexReset = it }
 						)
 					},
 					unit = "sp",
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.timetableLessonNameFontSize },
 					onValueChange = { timetableLessonNameFontSize = it }
 				)
@@ -683,7 +683,7 @@ onValueChange = { timetableRangeIndexReset = it }
 						)
 					},
 					unit = "sp",
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.timetableLessonInfoFontSize },
 					onValueChange = { timetableLessonInfoFontSize = it }
 				)
@@ -705,7 +705,7 @@ onValueChange = { timetableRangeIndexReset = it }
 						contentDescription = null
 					)
 				},*/
-				settingsRepository = viewModel,
+				settingsRepository = viewModel.repository,
 				value = { it.notificationsEnable },
 				onValueChange = {
 					/*TODO if (it) {
@@ -734,7 +734,7 @@ onValueChange = { timetableRangeIndexReset = it }
 				title = { Text(stringResource(R.string.preference_notifications_multiple)) },
 				summary = { Text(stringResource(R.string.preference_notifications_multiple_desc)) },
 				enabledCondition = { it.notificationsEnable },
-				settingsRepository = viewModel,
+				settingsRepository = viewModel.repository,
 				value = { it.notificationsInMultiple },
 				onValueChange = {
 					//enqueueNotificationSetup(user)
@@ -746,7 +746,7 @@ onValueChange = { timetableRangeIndexReset = it }
 				title = { Text(stringResource(R.string.preference_notifications_first_lesson)) },
 				summary = { Text(stringResource(R.string.preference_notifications_first_lesson_desc)) },
 				enabledCondition = { it.notificationsEnable },
-				settingsRepository = viewModel,
+				settingsRepository = viewModel.repository,
 				value = { it.notificationsBeforeFirst },
 				onValueChange = {
 					//enqueueNotificationSetup(user)
@@ -758,7 +758,7 @@ onValueChange = { timetableRangeIndexReset = it }
 				title = { Text(stringResource(R.string.preference_notifications_first_lesson_time)) },
 				unit = stringResource(R.string.preference_notifications_first_lesson_time_unit),
 				enabledCondition = { it.notificationsBeforeFirst },
-				settingsRepository = viewModel,
+				settingsRepository = viewModel.repository,
 				value = { it.notificationsBeforeFirstTime },
 				onValueChange = {
 					//enqueueNotificationSetup(user)
@@ -792,7 +792,7 @@ onValueChange = { timetableRangeIndexReset = it }
 					entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
 					entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
 					enabledCondition = { it.notificationsEnable },
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.notificationsVisibilitySubjects },
 					onValueChange = { notificationsVisibilitySubjects = it }
 				)
@@ -809,7 +809,7 @@ onValueChange = { timetableRangeIndexReset = it }
 					entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
 					entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
 					enabledCondition = { it.notificationsEnable },
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.notificationsVisibilityRooms },
 					onValueChange = { notificationsVisibilityRooms = it }
 				)
@@ -826,7 +826,7 @@ onValueChange = { timetableRangeIndexReset = it }
 					entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
 					entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
 					enabledCondition = { it.notificationsEnable },
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.notificationsVisibilityTeachers },
 					onValueChange = { notificationsVisibilityTeachers = it }
 				)
@@ -843,7 +843,7 @@ onValueChange = { timetableRangeIndexReset = it }
 					entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
 					entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
 					enabledCondition = { it.notificationsEnable },
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.notificationsVisibilityClasses },
 					onValueChange = { notificationsVisibilityClasses = it }
 				)
@@ -858,7 +858,7 @@ onValueChange = { timetableRangeIndexReset = it }
 			SwitchPreference(
 				title = { Text(stringResource(R.string.preference_connectivity_refresh_in_background)) },
 				summary = { Text(stringResource(R.string.preference_connectivity_refresh_in_background_desc)) },
-				settingsRepository = viewModel,
+				settingsRepository = viewModel.repository,
 				value = { it.connectivityRefreshInBackground },
 				onValueChange = { connectivityRefreshInBackground = it }
 			)
@@ -872,7 +872,7 @@ onValueChange = { timetableRangeIndexReset = it }
 							contentDescription = null
 						)
 					},
-					settingsRepository = viewModel,
+					settingsRepository = viewModel.repository,
 					value = { it.proxyHost },
 					onValueChange = { proxyHost = it }
 				)

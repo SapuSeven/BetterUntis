@@ -16,9 +16,12 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -56,6 +59,8 @@ fun Timetable(
 	val user = viewModel.currentUser
 	val users by viewModel.allUsersState.collectAsStateWithLifecycle()
 
+	val needsPersonalTimetable by viewModel.needsPersonalTimetable.collectAsState()
+
 	TimetableDrawer(
 		drawerState = drawerState,
 		elementPicker = viewModel.elementPicker,
@@ -70,8 +75,7 @@ fun Timetable(
 				CenterAlignedTopAppBar(
 					title = {
 						Text(
-							(user.getDisplayedName()
-								?: "") + (if (BuildConfig.DEBUG) " (${user.id})" else "")
+							user.getDisplayedName() + (if (BuildConfig.DEBUG) " (${user.id})" else "")
 						)
 					},
 					navigationIcon = {
@@ -151,7 +155,7 @@ fun Timetable(
 						onDismiss = { viewModel.feedbackDialog = false }
 					)
 
-				if (user.anonymous == true) {
+				if (needsPersonalTimetable) {
 					Column(
 						verticalArrangement = Arrangement.Center,
 						horizontalAlignment = Alignment.CenterHorizontally,
