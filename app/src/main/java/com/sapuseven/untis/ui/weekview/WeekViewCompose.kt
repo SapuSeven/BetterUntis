@@ -1,13 +1,11 @@
 package com.sapuseven.untis.ui.weekview
 
 import android.text.format.DateFormat
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -110,23 +108,23 @@ fun WeekViewEvent(
 ) {
 	Box(
 		modifier = modifier
-			.fillMaxSize()
-			.padding(2.dp) // Outer padding
-			.clip(RoundedCornerShape(4.dp))
-			.drawBehind {
-				drawVerticalSplitRect(
-					event.pastColor,
-					event.color,
-					size = Size(size.width, size.height),
-					division = ((currentTime.toDateTime().millis - event.start.toDateTime().millis).toFloat()
-						/ (event.end.toDateTime().millis - event.start.toDateTime().millis).toFloat())
-						.coerceIn(0f, 1f)
-				)
-			}
-			.padding(horizontal = 2.dp) // Inner padding
-			.ifNotNull(onClick) {
-				clickable(onClick = it)
-			}
+            .fillMaxSize()
+            .padding(2.dp) // Outer padding
+            .clip(RoundedCornerShape(4.dp))
+            .drawBehind {
+                drawVerticalSplitRect(
+                    event.pastColor,
+                    event.color,
+                    size = Size(size.width, size.height),
+                    division = ((currentTime.toDateTime().millis - event.start.toDateTime().millis).toFloat()
+                            / (event.end.toDateTime().millis - event.start.toDateTime().millis).toFloat())
+                        .coerceIn(0f, 1f)
+                )
+            }
+            .padding(horizontal = 2.dp) // Inner padding
+            .ifNotNull(onClick) {
+                clickable(onClick = it)
+            }
 	) {
 		Text(
 			text = event.top,
@@ -270,16 +268,16 @@ fun WeekViewSidebarLabel(
 
 	Box(
 		modifier = modifier
-			.padding(horizontal = 4.dp)
-			.fillMaxSize()
+            .padding(horizontal = 4.dp)
+            .fillMaxSize()
 	) {
 		Text(
 			text = timeFormat.print(hour.startTime),
 			fontSize = 12.sp,
 			color = MaterialTheme.colorScheme.onSurfaceVariant,
 			modifier = Modifier
-				.align(Alignment.TopStart)
-				.padding(end = 4.dp)
+                .align(Alignment.TopStart)
+                .padding(end = 4.dp)
 		)
 		Text(
 			text = hour.label,
@@ -294,8 +292,8 @@ fun WeekViewSidebarLabel(
 			fontSize = 12.sp,
 			color = MaterialTheme.colorScheme.onSurfaceVariant,
 			modifier = Modifier
-				.align(Alignment.BottomEnd)
-				.padding(start = 4.dp)
+                .align(Alignment.BottomEnd)
+                .padding(start = 4.dp)
 		)
 	}
 }
@@ -337,8 +335,8 @@ fun WeekViewSidebar(
 	// TODO: This implementation is prone to alignment issues due to rounding errors. Maybe use a Box with absolute padding instead (like the hour lines).
 	Column(
 		modifier = modifier
-			.width(IntrinsicSize.Max)
-			.padding(bottom = bottomPadding)
+            .width(IntrinsicSize.Max)
+            .padding(bottom = bottomPadding)
 	) {
 		var lastEndTime: LocalTime? = null
 		hourList.forEach { hour ->
@@ -352,9 +350,9 @@ fun WeekViewSidebar(
 
 			Box(
 				modifier = Modifier
-					.padding(top = topPadding)
-					.height(totalHourHeight)
-					.fillMaxWidth()
+                    .padding(top = topPadding)
+                    .height(totalHourHeight)
+                    .fillMaxWidth()
 			) {
 				label(hour)
 			}
@@ -569,8 +567,13 @@ fun WeekViewContent(
 				)
 			}
 	) { measureables, constraints ->
-		val height = (Minutes.minutesBetween(startTime, endTime).minutes / 60f * hourHeight.toPx()
-			+ endTimeOffset).roundToInt()
+		val height = Math.max(
+			constraints.minHeight,
+			(Minutes.minutesBetween(
+				startTime,
+				endTime
+			).minutes / 60f * hourHeight.toPx() + endTimeOffset).roundToInt()
+		)
 		val width = constraints.maxWidth
 		val dayWidth = width / numDays;
 		val placeablesWithEvents = measureables.map { measurable ->
@@ -631,6 +634,7 @@ fun WeekViewCompose(
 	startTime: LocalTime = hourList.firstOrNull()?.startTime ?: LocalTime.MIDNIGHT.plusHours(6),
 	endTime: LocalTime = hourList.lastOrNull()?.endTime ?: LocalTime.MIDNIGHT.plusHours(18),
 	endTimeOffset: Float = 0f,
+	overlayContent: @Composable ((startPadding: Int) -> Unit)? = null
 ) {
 	val verticalScrollState = rememberScrollState()
 	var sidebarWidth by remember { mutableIntStateOf(0) }
@@ -664,8 +668,8 @@ fun WeekViewCompose(
 			Box(
 				contentAlignment = Alignment.Center,
 				modifier = Modifier
-					.width(with(LocalDensity.current) { sidebarWidth.toDp() })
-					.height(with(LocalDensity.current) { headerHeight.toDp() })
+                    .width(with(LocalDensity.current) { sidebarWidth.toDp() })
+                    .height(with(LocalDensity.current) { headerHeight.toDp() })
 			) {
 				IconButton(
 					onClick = {
@@ -684,9 +688,8 @@ fun WeekViewCompose(
 				bottomPadding = with(LocalDensity.current) { endTimeOffset.toDp() },
 				hourList = hourList,
 				modifier = Modifier
-					.onGloballyPositioned { sidebarWidth = it.size.width }
-					.verticalScroll(verticalScrollState)
-					.animateContentSize()
+                    .onGloballyPositioned { sidebarWidth = it.size.width }
+                    .verticalScroll(verticalScrollState)
 			)
 
 		}
@@ -734,6 +737,8 @@ fun WeekViewCompose(
 								isRefreshing = false
 							}
 						},
+						modifier = Modifier
+							.weight(1f)
 					) {
 						WeekViewContent(
 							events = events.getOrDefault(visibleStartDate, emptyList()),
@@ -751,15 +756,17 @@ fun WeekViewCompose(
 							pastBackgroundColor = colorScheme.pastBackgroundColor,
 							futureBackgroundColor = colorScheme.futureBackgroundColor,
 							modifier = Modifier
-								.weight(1f)
-								.onGloballyPositioned { contentHeight = it.size.height }
-								.verticalScroll(verticalScrollState)
+                                .fillMaxHeight()
+                                .onGloballyPositioned { contentHeight = it.size.height }
+                                .verticalScroll(verticalScrollState)
 						)
 					}
 				}
 			}
 		}
 	}
+
+	overlayContent?.invoke(sidebarWidth)
 
 	if (datePickerDialog)
 		DatePickerDialog(
@@ -805,8 +812,8 @@ fun WeekViewTest(
 ) {
 	Box(
 		modifier = Modifier
-			.fillMaxSize()
-			.background(bg)
+            .fillMaxSize()
+            .background(bg)
 	)
 }
 

@@ -1,43 +1,33 @@
 package com.sapuseven.untis.ui.activities.timetable
 
-import android.content.Intent
-import android.util.Log
 import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
-import androidx.datastore.core.DataStore
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.sapuseven.compose.protostore.ui.preferences.convertRangeToPair
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.SettingsActivity
-import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_HIGHLIGHT
-import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_ROUTE
 import com.sapuseven.untis.components.ElementPicker
 import com.sapuseven.untis.components.UserManager
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.databases.entities.UserDao
-import com.sapuseven.untis.data.settings.model.Settings
 import com.sapuseven.untis.data.settings.model.UserSettings
 import com.sapuseven.untis.modules.ThemeManager
 import com.sapuseven.untis.scope.UserScopeManager
 import com.sapuseven.untis.ui.activities.settings.SettingsRepository
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
+import com.sapuseven.untis.ui.weekview.WeekViewHour
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.joda.time.LocalTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -52,7 +42,8 @@ class TimetableViewModel @Inject constructor(
 ) : ViewModel() {
 	val args = savedStateHandle.toRoute<AppRoutes.Timetable>()
 
-	private val _currentUserSettings = MutableStateFlow<UserSettings>(repository.getSettingsDefaults())
+	private val _currentUserSettings =
+		MutableStateFlow<UserSettings>(repository.getSettingsDefaults())
 	val currentUserSettings: StateFlow<UserSettings> = _currentUserSettings
 
 	var profileManagementDialog by mutableStateOf(false)
@@ -62,6 +53,9 @@ class TimetableViewModel @Inject constructor(
 
 	private val _needsPersonalTimetable = MutableStateFlow(false)
 	val needsPersonalTimetable: StateFlow<Boolean> = _needsPersonalTimetable
+
+	private val _hourList = MutableStateFlow<List<WeekViewHour>>(emptyList())
+	val hourList: StateFlow<List<WeekViewHour>> = _hourList
 
 	val currentUser: User = userScopeManager.user
 
@@ -73,8 +67,14 @@ class TimetableViewModel @Inject constructor(
 	init {
 		viewModelScope.launch {
 			repository.getSettings().collect { userSettings ->
+				// All properties that are based on preferences are set here
 				_currentUserSettings.value = userSettings
 				_needsPersonalTimetable.value = userSettings.timetablePersonalTimetable.isBlank()
+				_hourList.value = buildHourList(
+					currentUser,
+					userSettings.timetableRange.convertRangeToPair(),
+					userSettings.timetableRangeIndexReset
+				)
 			}
 		}
 	}
@@ -102,6 +102,36 @@ class TimetableViewModel @Inject constructor(
 		/*user.value?.id?.let {
 			themeManager.toggleTheme(it)
 		}*/
+	}
+
+	fun buildHourList(
+		user: User, range: Pair<Int, Int>?, rangeIndexReset: Boolean
+	): List<WeekViewHour> {
+		val hourList = mutableListOf<WeekViewHour>()
+
+		user.timeGrid.days.maxByOrNull { it.units.size }?.units?.forEachIndexed { index, hour ->
+			// Check if outside configured range
+			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
+
+			val startTime = hour.startTime.toLocalTime()
+			val endTime = hour.endTime.toLocalTime()
+
+			// If label is empty, fill it according to preferences
+			val label = hour.label.ifEmpty {
+				if (rangeIndexReset) (index + 1).toString()
+				else ((range?.first ?: 1) + index).toString()
+			}
+
+			hourList.add(
+				WeekViewHour(
+					LocalTime(startTime.hour, startTime.minute),
+					LocalTime(endTime.hour, endTime.minute),
+					label
+				)
+			)
+		}
+
+		return hourList
 	}
 
 	val onAnonymousSettingsClick = {

@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -16,11 +15,9 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -47,7 +44,9 @@ import com.sapuseven.untis.ui.dialogs.FeedbackDialog
 import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
+import com.sapuseven.untis.ui.weekview.WeekViewCompose
 import kotlinx.coroutines.launch
+import org.joda.time.LocalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,6 +59,7 @@ fun Timetable(
 	val users by viewModel.allUsersState.collectAsStateWithLifecycle()
 
 	val needsPersonalTimetable by viewModel.needsPersonalTimetable.collectAsState()
+	val hourList by viewModel.hourList.collectAsState()
 
 	TimetableDrawer(
 		drawerState = drawerState,
@@ -111,8 +111,8 @@ fun Timetable(
 		) { innerPadding ->
 			Box(
 				modifier = Modifier
-					.padding(innerPadding)
-					.fillMaxSize()
+                    .padding(innerPadding)
+                    .fillMaxSize()
 			) {
 				val density = LocalDensity.current
 				val insets = insetsPaddingValues()
@@ -121,91 +121,98 @@ fun Timetable(
 						(insets.calculateBottomPadding() + 48.dp).toPx()
 					}
 				}
-				val timeColumnWidth = with(LocalDensity.current) {
-					/*state.weekView.value?.config?.timeColumnWidth?.toDp()
-						?: */48.dp
-				}
-
-				Text(
-					text = viewModel.lastRefreshText(),
-					modifier = Modifier
-						.align(Alignment.BottomStart)
-						.padding(start = timeColumnWidth + 8.dp, bottom = 8.dp)
-						.bottomInsets()
-						.disabled(user.anonymous == true)
-				)
-
-				IconButton(
-					modifier = Modifier
-						.align(Alignment.BottomEnd)
-						.padding(end = 8.dp)
-						.bottomInsets(),
-					onClick = {
-						viewModel.showFeedback()
-					}
-				) {
-					Icon(
-						painter = painterResource(R.drawable.all_feedback),
-						contentDescription = "Give feedback"
-					)
-				}
 
 				if (viewModel.feedbackDialog)
 					FeedbackDialog(
 						onDismiss = { viewModel.feedbackDialog = false }
 					)
 
-				if (needsPersonalTimetable) {
-					Column(
-						verticalArrangement = Arrangement.Center,
-						horizontalAlignment = Alignment.CenterHorizontally,
-						modifier = Modifier
-							.fillMaxSize()
-							.absolutePadding(left = 16.dp)
-					) {
-						Text(
-							text = stringResource(id = R.string.main_anonymous_login_info_text),
-							textAlign = TextAlign.Center,
-							modifier = Modifier
-								.padding(horizontal = 32.dp)
-						)
-
-						Button(
-							onClick = viewModel.onAnonymousSettingsClick,
-							modifier = Modifier
-								.padding(top = 16.dp)
-						) {
-							Text(text = stringResource(id = R.string.main_go_to_settings))
-						}
-					}
-				}
-
-				if (viewModel.loading)
-					CircularProgressIndicator(
-						modifier = Modifier
-							.align(Alignment.BottomEnd)
-							.padding(8.dp)
-							.bottomInsets()
-					)
-				/*WeekViewCompose(
-					events = state.weekViewEvents,
+				WeekViewCompose(
+					events = emptyMap(),// viewModel.weekViewEvents,
 					onPageChange = { pageOffset ->
-						state.onPageChange(pageOffset)
+						//viewModel.onWeekViewPageChange(pageOffset)
 					},
 					onReload = { pageOffset ->
-						state.loadEvents(startDateForPageIndex(pageOffset))
+						//viewModel.loadEvents(startDateForPageIndex(pageOffset))
 					},
-					onItemClick = { state.timetableItemDetailsDialog = it },
-					startTime = state.weekViewPreferences.hourList.value.firstOrNull()?.startTime
+					onItemClick = { item ->
+						//viewModel.timetableItemDetailsDialog = item
+					},
+					startTime = hourList.firstOrNull()?.startTime
 						?: LocalTime.MIDNIGHT,
-					endTime = state.weekViewPreferences.hourList.value.lastOrNull()?.endTime
+					endTime = hourList.lastOrNull()?.endTime
 						?: LocalTime.MIDNIGHT,
 					endTimeOffset = navBarHeight,
 					hourHeight = /*state.weekViewPreferences.hourHeight ?:*/ 72.dp,
-					hourList = state.weekViewPreferences.hourList.value,
-					dividerWidth = state.weekViewPreferences.dividerWidth,
-					colorScheme = state.weekViewPreferences.colorScheme,
-				)*/
+					hourList = hourList,
+					//dividerWidth = viewModel.weekViewPreferences.dividerWidth,
+					//colorScheme = viewModel.weekViewPreferences.colorScheme,
+					modifier = Modifier
+						.fillMaxSize()
+				) { startPadding ->
+					with(LocalDensity.current) {
+						// Feedback button
+						IconButton(
+							modifier = Modifier
+								.align(Alignment.BottomEnd)
+								.padding(end = 8.dp)
+								.bottomInsets(),
+							onClick = {
+								viewModel.showFeedback()
+							}
+						) {
+							Icon(
+								painter = painterResource(R.drawable.all_feedback),
+								contentDescription = "Give feedback"
+							)
+						}
+
+						// Loading indicator
+						if (viewModel.loading)
+							CircularProgressIndicator(
+								modifier = Modifier
+									.align(Alignment.BottomEnd)
+									.padding(8.dp)
+									.bottomInsets()
+							)
+
+						// Last refresh text
+						Text(
+							text = viewModel.lastRefreshText(),
+							modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .padding(start = startPadding.toDp() + 8.dp, bottom = 8.dp)
+                                .bottomInsets()
+                                .disabled(user.anonymous == true)
+						)
+
+						// Custom personal timetable hint
+						if (needsPersonalTimetable) {
+							Column(
+								verticalArrangement = Arrangement.Center,
+								horizontalAlignment = Alignment.CenterHorizontally,
+								modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(start = startPadding.toDp())
+							) {
+								Text(
+									text = stringResource(id = R.string.main_anonymous_login_info_text),
+									textAlign = TextAlign.Center,
+									modifier = Modifier
+										.padding(horizontal = 32.dp)
+								)
+
+								Button(
+									onClick = viewModel.onAnonymousSettingsClick,
+									modifier = Modifier
+										.padding(top = 16.dp)
+								) {
+									Text(text = stringResource(id = R.string.main_go_to_settings))
+								}
+							}
+						}
+					}
+				}
 			}
 
 			ReportsInfoBottomSheet()
