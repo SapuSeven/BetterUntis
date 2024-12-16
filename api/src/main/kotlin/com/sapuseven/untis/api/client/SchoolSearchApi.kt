@@ -1,6 +1,6 @@
 package com.sapuseven.untis.api.client
 
-import com.sapuseven.untis.api.exceptions.UntisApiException
+import com.sapuseven.untis.api.exception.UntisApiException
 import com.sapuseven.untis.api.model.request.RequestData
 import com.sapuseven.untis.api.model.request.SchoolSearchParams
 import com.sapuseven.untis.api.model.response.SchoolSearchResponse

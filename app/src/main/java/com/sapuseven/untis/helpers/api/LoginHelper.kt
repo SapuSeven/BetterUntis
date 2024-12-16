@@ -2,15 +2,10 @@ package com.sapuseven.untis.helpers.api
 
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.client.SchoolSearchApi
-import com.sapuseven.untis.api.model.response.UserDataResponse
-import com.sapuseven.untis.api.model.response.UserDataResult
-import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
-import com.sapuseven.untis.data.connectivity.Authentication
 import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.models.untis.params.AppSharedSecretParams
-import com.sapuseven.untis.models.untis.params.UserDataParams
 import com.sapuseven.untis.models.untis.response.AppSharedSecretResponse
 import io.ktor.client.engine.cio.CIO
 import kotlinx.serialization.ExperimentalSerializationApi

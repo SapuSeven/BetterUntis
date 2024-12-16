@@ -3,7 +3,6 @@ package com.sapuseven.untis.models.untis
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.api.model.UntisSchoolInfo
 import com.sapuseven.untis.models.untis.response.*
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat

@@ -3,7 +3,6 @@ package com.sapuseven.untis.mocks
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.RIGHT_ABSENCES
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.RIGHT_CLASSREGISTER
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.RIGHT_OFFICEHOURS
-import com.sapuseven.untis.data.databases.LegacyUserDatabase
 import com.sapuseven.untis.models.untis.UntisTime
 import com.sapuseven.untis.models.untis.UntisUserData
 import com.sapuseven.untis.api.model.untis.masterdata.TimeGrid

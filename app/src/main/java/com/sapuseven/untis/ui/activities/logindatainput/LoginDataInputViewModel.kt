@@ -15,7 +15,7 @@ import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.DEMO_API_
 import com.sapuseven.untis.activities.SAVED_STATE_INTENT_DATA
 import com.sapuseven.untis.api.client.SchoolSearchApi
 import com.sapuseven.untis.api.client.UserDataApi
-import com.sapuseven.untis.api.exceptions.UntisApiException
+import com.sapuseven.untis.api.exception.UntisApiException
 import com.sapuseven.untis.api.model.response.UserDataResult
 import com.sapuseven.untis.api.model.untis.MasterData
 import com.sapuseven.untis.api.model.untis.SchoolInfo

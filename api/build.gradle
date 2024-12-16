@@ -19,9 +19,11 @@ dependencies {
 	implementation "io.ktor:ktor-client-content-negotiation:$ktor_version"
 	implementation "io.ktor:ktor-serialization-kotlinx-json:$ktor_version"
 	implementation "androidx.room:room-common:$room_version"
+
+	testImplementation "junit:junit:4.13.2"
 }
 
-/* Auto-generate api code from untis-extern spec - disabled for now, as not in use
+/* Auto-generate api code from untis-extern spec - disabled for now, since not in use
 def apiSpecList = []
 def dir = new File("$projectDir/spec/untis-extern/".toString())
 dir.eachFileRecurse(groovy.io.FileType.FILES) { file ->

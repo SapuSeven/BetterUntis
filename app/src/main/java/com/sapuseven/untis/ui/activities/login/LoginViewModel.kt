@@ -10,7 +10,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.sapuseven.untis.activities.LoginActivity.Companion.EXTRA_BOOLEAN_SHOW_BACK_BUTTON
 import com.sapuseven.untis.api.client.SchoolSearchApi
-import com.sapuseven.untis.api.exceptions.UntisApiException
+import com.sapuseven.untis.api.exception.UntisApiException
 import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON

@@ -1,7 +1,6 @@
 package com.sapuseven.untis.models
 
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat

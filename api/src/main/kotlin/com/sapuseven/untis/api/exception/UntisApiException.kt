@@ -1,4 +1,4 @@
-package com.sapuseven.untis.api.exceptions
+package com.sapuseven.untis.api.exception
 
 import com.sapuseven.untis.api.model.response.Error
 
