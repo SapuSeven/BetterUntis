@@ -150,65 +150,63 @@ fun Timetable(
 					modifier = Modifier
 						.fillMaxSize()
 				) { startPadding ->
-					with(LocalDensity.current) {
-						// Feedback button
-						IconButton(
-							modifier = Modifier
-								.align(Alignment.BottomEnd)
-								.padding(end = 8.dp)
-								.bottomInsets(),
-							onClick = {
-								viewModel.showFeedback()
-							}
-						) {
-							Icon(
-								painter = painterResource(R.drawable.all_feedback),
-								contentDescription = "Give feedback"
-							)
+					// Feedback button
+					IconButton(
+						modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(end = 8.dp)
+                            .bottomInsets(),
+						onClick = {
+							viewModel.showFeedback()
 						}
+					) {
+						Icon(
+							painter = painterResource(R.drawable.all_feedback),
+							contentDescription = "Give feedback"
+						)
+					}
 
-						// Loading indicator
-						if (viewModel.loading)
-							CircularProgressIndicator(
-								modifier = Modifier
-									.align(Alignment.BottomEnd)
-									.padding(8.dp)
-									.bottomInsets()
-							)
-
-						// Last refresh text
-						Text(
-							text = viewModel.lastRefreshText(),
+					// Loading indicator
+					if (viewModel.loading)
+						CircularProgressIndicator(
 							modifier = Modifier
-                                .align(Alignment.BottomStart)
-                                .padding(start = startPadding.toDp() + 8.dp, bottom = 8.dp)
+                                .align(Alignment.BottomEnd)
+                                .padding(8.dp)
                                 .bottomInsets()
-                                .disabled(user.anonymous == true)
 						)
 
-						// Custom personal timetable hint
-						if (needsPersonalTimetable) {
-							Column(
-								verticalArrangement = Arrangement.Center,
-								horizontalAlignment = Alignment.CenterHorizontally,
-								modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(start = startPadding.toDp())
-							) {
-								Text(
-									text = stringResource(id = R.string.main_anonymous_login_info_text),
-									textAlign = TextAlign.Center,
-									modifier = Modifier
-										.padding(horizontal = 32.dp)
-								)
+					// Last refresh text
+					Text(
+						text = viewModel.lastRefreshText(),
+						modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .padding(start = startPadding.dp + 8.dp, bottom = 8.dp)
+                            .bottomInsets()
+                            .disabled(user.anonymous == true)
+					)
 
-								Button(
-									onClick = viewModel.onAnonymousSettingsClick,
-									modifier = Modifier
-										.padding(top = 16.dp)
-								) {
-									Text(text = stringResource(id = R.string.main_go_to_settings))
-								}
+					// Custom personal timetable hint
+					if (needsPersonalTimetable) {
+						Column(
+							verticalArrangement = Arrangement.Center,
+							horizontalAlignment = Alignment.CenterHorizontally,
+							modifier = Modifier
+                                .fillMaxSize()
+                                .padding(start = startPadding.dp)
+						) {
+							Text(
+								text = stringResource(id = R.string.main_anonymous_login_info_text),
+								textAlign = TextAlign.Center,
+								modifier = Modifier
+									.padding(horizontal = 32.dp)
+							)
+
+							Button(
+								onClick = viewModel.onAnonymousSettingsClick,
+								modifier = Modifier
+									.padding(top = 16.dp)
+							) {
+								Text(text = stringResource(id = R.string.main_go_to_settings))
 							}
 						}
 					}

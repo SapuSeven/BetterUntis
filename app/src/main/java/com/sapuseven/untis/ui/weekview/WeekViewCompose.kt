@@ -1,7 +1,10 @@
 package com.sapuseven.untis.ui.weekview
 
 import android.text.format.DateFormat
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -10,11 +13,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
@@ -23,8 +30,13 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,17 +53,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -62,12 +79,11 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.ui.common.ifNotNull
 import com.sapuseven.untis.ui.dialogs.DatePickerDialog
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.joda.time.Days
 import org.joda.time.LocalDate
@@ -609,7 +625,7 @@ fun WeekViewContent(
  * @param onItemClick Callback on event click. First value contains a list of all simultaneous events
  * (including the clicked one) and second value the index of the actually clicked event.
  */
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun WeekViewCompose(
 	events: Map<LocalDate, List<Event>>,
@@ -727,19 +743,29 @@ fun WeekViewCompose(
 				if (hourList.isNotEmpty()) {
 					var isRefreshing by remember { mutableStateOf(false) }
 					val scope = rememberCoroutineScope()
-
-					SwipeRefresh(
-						state = rememberSwipeRefreshState(isRefreshing),
+					val pullRefreshState = rememberPullRefreshState(
+						refreshing = isRefreshing,
 						onRefresh = {
-							isRefreshing = true
 							scope.launch {
+								isRefreshing = true
 								onReload(pageOffset)
 								isRefreshing = false
 							}
-						},
+						})
+
+					Column(
 						modifier = Modifier
-							.weight(1f)
+							.pullRefresh(
+								state = pullRefreshState,
+								enabled = verticalScrollState.value == 0 // Prevent refreshing when flinging to top
+							)
 					) {
+						WeekViewPullRefreshIndicator(
+							refreshing = isRefreshing,
+							state = pullRefreshState,
+							modifier = Modifier
+								.fillMaxWidth())
+
 						WeekViewContent(
 							events = events.getOrDefault(visibleStartDate, emptyList()),
 							eventContent = eventContent,
