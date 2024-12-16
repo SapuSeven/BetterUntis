@@ -650,7 +650,7 @@ fun WeekViewCompose(
 	startTime: LocalTime = hourList.firstOrNull()?.startTime ?: LocalTime.MIDNIGHT.plusHours(6),
 	endTime: LocalTime = hourList.lastOrNull()?.endTime ?: LocalTime.MIDNIGHT.plusHours(18),
 	endTimeOffset: Float = 0f,
-	overlayContent: @Composable ((startPadding: Int) -> Unit)? = null
+	overlayContent: @Composable ((startPadding: Dp) -> Unit)? = null
 ) {
 	val verticalScrollState = rememberScrollState()
 	var sidebarWidth by remember { mutableIntStateOf(0) }
@@ -792,7 +792,9 @@ fun WeekViewCompose(
 		}
 	}
 
-	overlayContent?.invoke(sidebarWidth)
+	with(LocalDensity.current) {
+		overlayContent?.invoke(sidebarWidth.toDp())
+	}
 
 	if (datePickerDialog)
 		DatePickerDialog(

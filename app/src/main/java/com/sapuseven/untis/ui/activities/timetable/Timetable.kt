@@ -1,6 +1,7 @@
 package com.sapuseven.untis.ui.activities.timetable
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -180,7 +182,7 @@ fun Timetable(
 						text = viewModel.lastRefreshText(),
 						modifier = Modifier
                             .align(Alignment.BottomStart)
-                            .padding(start = startPadding.dp + 8.dp, bottom = 8.dp)
+                            .padding(start = startPadding + 8.dp, bottom = 8.dp)
                             .bottomInsets()
                             .disabled(user.anonymous == true)
 					)
@@ -192,7 +194,7 @@ fun Timetable(
 							horizontalAlignment = Alignment.CenterHorizontally,
 							modifier = Modifier
                                 .fillMaxSize()
-                                .padding(start = startPadding.dp)
+                                .padding(start = startPadding)
 						) {
 							Text(
 								text = stringResource(id = R.string.main_anonymous_login_info_text),
