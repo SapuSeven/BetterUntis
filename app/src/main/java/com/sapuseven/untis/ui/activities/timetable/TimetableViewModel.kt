@@ -1,5 +1,6 @@
 package com.sapuseven.untis.ui.activities.timetable
 
+import android.util.Log
 import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -12,21 +13,27 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.sapuseven.compose.protostore.ui.preferences.convertRangeToPair
 import com.sapuseven.untis.R
+import com.sapuseven.untis.api.client.TimetableApi
+import com.sapuseven.untis.api.exception.UntisApiException
 import com.sapuseven.untis.components.ElementPicker
 import com.sapuseven.untis.components.UserManager
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.databases.entities.UserDao
 import com.sapuseven.untis.data.settings.model.UserSettings
+import com.sapuseven.untis.mappers.TimetableMapper
 import com.sapuseven.untis.modules.ThemeManager
 import com.sapuseven.untis.scope.UserScopeManager
 import com.sapuseven.untis.ui.activities.settings.SettingsRepository
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
+import com.sapuseven.untis.ui.weekview.Event
 import com.sapuseven.untis.ui.weekview.WeekViewHour
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.joda.time.LocalDate
 import org.joda.time.LocalTime
 import javax.inject.Inject
 
@@ -38,6 +45,8 @@ class TimetableViewModel @Inject constructor(
 	private val userScopeManager: UserScopeManager,
 	private val userDao: UserDao,
 	private val repository: SettingsRepository,
+	private val api: TimetableApi,
+	private val mapper: TimetableMapper,
 	savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 	val args = savedStateHandle.toRoute<AppRoutes.Timetable>()
@@ -56,6 +65,9 @@ class TimetableViewModel @Inject constructor(
 
 	private val _hourList = MutableStateFlow<List<WeekViewHour>>(emptyList())
 	val hourList: StateFlow<List<WeekViewHour>> = _hourList
+
+	private val _events = MutableStateFlow<Map<LocalDate, List<Event>>>(emptyMap())
+	val events: StateFlow<Map<LocalDate, List<Event>>> = _events
 
 	val currentUser: User = userScopeManager.user
 
@@ -76,6 +88,10 @@ class TimetableViewModel @Inject constructor(
 					userSettings.timetableRangeIndexReset
 				)
 			}
+		}
+
+		viewModelScope.launch {
+			loadItems()
 		}
 	}
 
@@ -101,6 +117,30 @@ class TimetableViewModel @Inject constructor(
 	fun toggleTheme() {
 		/*user.value?.id?.let {
 			themeManager.toggleTheme(it)
+		}*/
+	}
+
+	suspend fun loadItems() {
+		Log.d("TimetableViewModel", mapper.map())
+		/*viewModelScope.launch(Dispatchers.IO) {
+			try {
+				api.loadTimetable(
+					id = 0,
+					type = "",
+					startDate = LocalDate.now(),
+					endDate = LocalDate.now(),
+					masterDataTimestamp = currentUser.masterDataTimestamp,
+					apiUrl = currentUser.apiUrl,
+					user = currentUser.user,
+					key = currentUser.key
+				).timetable
+			} catch (e: UntisApiException) {
+				// TODO
+			} catch (e: Exception) {
+				// TODO
+			} finally {
+				// TODO
+			}
 		}*/
 	}
 

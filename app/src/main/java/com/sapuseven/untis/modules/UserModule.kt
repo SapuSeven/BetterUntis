@@ -9,13 +9,8 @@ import dagger.Provides
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 
-@Module
-@InstallIn(UserComponent::class)
-class UserModule {
-}
-
-@InstallIn(UserComponent::class)
 @EntryPoint
+@InstallIn(UserComponent::class)
 interface UserComponentEntryPoint {
 	fun getUser(): User
 }

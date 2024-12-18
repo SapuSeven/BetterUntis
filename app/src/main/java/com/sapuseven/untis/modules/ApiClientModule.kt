@@ -1,6 +1,7 @@
 package com.sapuseven.untis.modules
 
 import com.sapuseven.untis.api.client.SchoolSearchApi
+import com.sapuseven.untis.api.client.TimetableApi
 import com.sapuseven.untis.api.client.UserDataApi
 import dagger.Module
 import dagger.Provides
@@ -15,4 +16,6 @@ object ApiClientModule {
 	fun provideSchoolSearchApi(): SchoolSearchApi = SchoolSearchApi(CIO)
 	@Provides
 	fun provideUserDataApi(): UserDataApi = UserDataApi(CIO)
+	@Provides
+	fun provideTimetableApi(): TimetableApi = TimetableApi(CIO)
 }

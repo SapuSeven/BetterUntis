@@ -93,6 +93,7 @@ import org.joda.time.Minutes
 import org.joda.time.format.DateTimeFormat
 import kotlin.math.roundToInt
 
+// TODO: Migrate Joda Time to Java Time
 data class Event(
 	val title: String,
 	val top: String = "",

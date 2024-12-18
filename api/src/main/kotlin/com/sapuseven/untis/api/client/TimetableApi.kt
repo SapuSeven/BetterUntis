@@ -12,6 +12,7 @@ import io.ktor.client.engine.HttpClientEngineFactory
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import java.time.LocalDate
+import kotlin.jvm.Throws
 
 open class TimetableApi(
 	engineFactory: HttpClientEngineFactory<*>,

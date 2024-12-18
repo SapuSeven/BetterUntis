@@ -1,7 +1,6 @@
 package com.sapuseven.untis.ui.activities.timetable
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -62,6 +60,7 @@ fun Timetable(
 
 	val needsPersonalTimetable by viewModel.needsPersonalTimetable.collectAsState()
 	val hourList by viewModel.hourList.collectAsState()
+	val events by viewModel.events.collectAsState()
 
 	TimetableDrawer(
 		drawerState = drawerState,
@@ -130,7 +129,7 @@ fun Timetable(
 					)
 
 				WeekViewCompose(
-					events = emptyMap(),// viewModel.weekViewEvents,
+					events = events,
 					onPageChange = { pageOffset ->
 						//viewModel.onWeekViewPageChange(pageOffset)
 					},
@@ -140,10 +139,8 @@ fun Timetable(
 					onItemClick = { item ->
 						//viewModel.timetableItemDetailsDialog = item
 					},
-					startTime = hourList.firstOrNull()?.startTime
-						?: LocalTime.MIDNIGHT,
-					endTime = hourList.lastOrNull()?.endTime
-						?: LocalTime.MIDNIGHT,
+					startTime = hourList.firstOrNull()?.startTime ?: LocalTime.MIDNIGHT,
+					endTime = hourList.lastOrNull()?.endTime ?: LocalTime.MIDNIGHT,
 					endTimeOffset = navBarHeight,
 					hourHeight = /*state.weekViewPreferences.hourHeight ?:*/ 72.dp,
 					hourList = hourList,
