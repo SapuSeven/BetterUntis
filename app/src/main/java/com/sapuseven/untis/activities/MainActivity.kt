@@ -87,7 +87,6 @@ import com.sapuseven.untis.scope.UserScopeManager
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.Weekday
-import com.sapuseven.untis.ui.dialogs.TimetableItemDetailsDialog
 import com.sapuseven.untis.ui.material.scheme.Scheme
 import com.sapuseven.untis.ui.models.NavItemShortcut
 import com.sapuseven.untis.ui.navigation.AppNavHost
@@ -201,7 +200,9 @@ class MainActivity : ComponentActivity() {
 								snapshotFlow { userState }
 									.drop(1)
 									.collect {
-										appNavigator.navigate(AppRoutes.Timetable)
+										appNavigator.navigate(AppRoutes.Timetable) {
+											popUpTo(0) // Clear backstack
+										}
 									}
 							}
 						}
@@ -463,7 +464,7 @@ fun MainApp(state: NewMainAppState) {
 		exit = fullscreenDialogAnimationExit()
 	) {
 		// TODO: Incorrect insets
-		TimetableItemDetailsDialog(timegridItems = remember {
+		/*TimetableItemDetailsDialog(timegridItems = remember {
 			state.timetableItemDetailsDialog?.first ?: emptyList()
 		},
 			initialPage = remember {
@@ -474,7 +475,7 @@ fun MainApp(state: NewMainAppState) {
 			onDismiss = {
 				state.timetableItemDetailsDialog = null
 				it?.let { state.setDisplayedElement(it) }
-			})
+			})*/
 	}
 
 	/*AnimatedVisibility(
@@ -708,145 +709,6 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		var dateRange: Pair<UntisDate, UntisDate>? = null
 	)
 
-	private suspend fun prepareItems(
-		items: List<TimegridItem>
-	): List<TimegridItem> {
-		val newItems = mergeItems(items.mapNotNull { item ->
-			if (item.periodData.isCancelled() && preferences.timetableHideCancelled.getValue()) return@mapNotNull null
-
-			if (preferences.timetableSubstitutionsIrregular.getValue()) {
-				item.periodData.apply {
-					forceIrregular =
-						classes.find { it.id != it.orgId } != null || teachers.find { it.id != it.orgId } != null || subjects.find { it.id != it.orgId } != null || rooms.find { it.id != it.orgId } != null || preferences.timetableBackgroundIrregular.getValue() && item.periodData.element.backColor != UNTIS_DEFAULT_COLOR
-				}
-			}
-			item
-		})
-		colorItems(newItems)
-		return newItems
-	}
-
-	private fun mergeItems(items: List<TimegridItem>): List<TimegridItem> {
-		val days = user.timeGrid.days
-		val itemGrid: Array<Array<MutableList<TimegridItem>>> =
-			Array(days.size) { Array(days.maxByOrNull { it.units.size }!!.units.size) { mutableListOf() } }
-		val leftover: MutableList<TimegridItem> = mutableListOf()
-
-		// TODO: Check if the day from the Untis API is always an english string
-		val firstDayOfWeek =
-			DateTimeConstants.MONDAY //DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(days.first().day).dayOfWeek
-
-		// Put all items into a two dimensional array depending on day and hour
-		items.forEach { item ->
-			val startDateTime = item.periodData.element.startDateTime.toLocalDateTime()
-			val endDateTime = item.periodData.element.endDateTime.toLocalDateTime()
-
-			val day = endDateTime.dayOfWeek - firstDayOfWeek
-
-			if (day < 0 || day >= days.size) return@forEach
-
-			val thisUnitStartIndex = days[day].units.indexOfFirst {
-				it.startTime.time == startDateTime.toString(DateTimeUtils.tTimeNoSeconds())
-			}
-
-			val thisUnitEndIndex = days[day].units.indexOfFirst {
-				it.endTime.time == endDateTime.toString(DateTimeUtils.tTimeNoSeconds())
-			}
-
-			if (thisUnitStartIndex != -1 && thisUnitEndIndex != -1) itemGrid[day][thisUnitStartIndex].add(
-				item
-			)
-			else leftover.add(item)
-		}
-
-		val newItems = mutableListOf<TimegridItem>()
-		newItems.addAll(leftover) // Add items that didn't fit inside the timegrid. These will always be single lessons.
-		itemGrid.forEach { unitsOfDay ->
-			unitsOfDay.forEachIndexed { unitIndex, items ->
-				items.forEach {
-					var i = 1
-					while (unitIndex + i < unitsOfDay.size && it.mergeWith(unitsOfDay[unitIndex + i])) i++
-				}
-
-				newItems.addAll(items)
-			}
-		}
-		return newItems
-	}
-
-	private suspend fun colorItems(
-		items: List<TimegridItem>
-	) {
-		val regularColor = weekViewPreferences.backgroundRegular.value
-		val regularPastColor = weekViewPreferences.backgroundRegularPast.value
-		val examColor = weekViewPreferences.backgroundExam.value
-		val examPastColor = weekViewPreferences.backgroundExamPast.value
-		val cancelledColor = weekViewPreferences.backgroundCancelled.value
-		val cancelledPastColor = weekViewPreferences.backgroundCancelledPast.value
-		val irregularColor = weekViewPreferences.backgroundIrregular.value
-		val irregularPastColor = weekViewPreferences.backgroundIrregularPast.value
-
-		val useDefault = preferences.schoolBackground.getValue()
-
-		items.forEach { item ->
-			val defaultColor = android.graphics.Color.parseColor(item.periodData.element.backColor)
-			val defaultTextColor =
-				android.graphics.Color.parseColor(item.periodData.element.foreColor)
-
-			item.color = when {
-				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor else examColor
-				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else cancelledColor
-				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else irregularColor
-				else -> if (useDefault.contains("regular")) defaultColor else regularColor
-			}
-
-			item.pastColor = when {
-				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor.darken(
-					0.25f
-				) else examPastColor
-
-				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor.darken(
-					0.25f
-				) else cancelledPastColor
-
-				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(
-					0.25f
-				) else irregularPastColor
-
-				else -> if (useDefault.contains("regular")) defaultColor.darken(0.25f) else regularPastColor
-			}
-
-			item.textColor = when {
-				item.periodData.isExam() -> if (useDefault.contains("exam")) defaultTextColor else colorOn(
-					Color(examColor)
-				).toArgb()
-
-				item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultTextColor else colorOn(
-					Color(cancelledColor)
-				).toArgb()
-
-				item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultTextColor else colorOn(
-					Color(irregularColor)
-				).toArgb()
-
-				else -> if (useDefault.contains("regular")) defaultTextColor else colorOn(
-					Color(
-						regularColor
-					)
-				).toArgb()
-			}
-		}
-	}
-
-	private fun colorOn(color: Color): Color {
-		return when (color.copy(alpha = 1f)) {
-			colorScheme.primary -> colorScheme.onPrimary
-			colorScheme.secondary -> colorScheme.onSecondary
-			colorScheme.tertiary -> colorScheme.onTertiary
-			else -> if (ColorUtils.calculateLuminance(color.toArgb()) < 0.5) Color.White else Color.Black
-		}.copy(alpha = color.alpha)
-	}
-
 	private suspend fun loadTimetable(
 		loader: TimetableLoader,
 		target: TimetableLoader.TimetableLoaderTarget,
@@ -873,7 +735,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		loadFromServer = forceRefresh || preferences.connectivityRefreshInBackground.getValue(),
 	)
 
-	@OptIn(ExperimentalCoroutinesApi::class)
+	/*@OptIn(ExperimentalCoroutinesApi::class)
 	suspend fun loadEventsFlow(
 		startDate: LocalDate, endDate: LocalDate
 	): Flow<Pair<Long, List<Event>>> {
@@ -892,7 +754,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			}
 		} ?: emptyFlow()
 
-		/*try {
+		try {
 			displayedElement.value?.let { element ->
 					loadTimetableFlow(
 						timetableLoader,
@@ -910,7 +772,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			}
 		} catch (e: TimetableLoader.TimetableLoaderException) {
 			//cont.resumeWithException(e)
-		}*/
+		}
 	}
 
 	suspend fun loadEvents(startDate: LocalDate = startDateForPageIndex(weekViewPage)) = loadEvents(
@@ -943,7 +805,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 				}
 			}.awaitAll()
 		}
-	}
+	}*/
 
 	// Last refresh
 	@Composable
@@ -999,7 +861,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	val onPageChange: suspend (Int) -> Unit = { pageOffset ->
 		weekViewPage = pageOffset
 		Log.d("WeekView", "Page changed to $pageOffset")
-		loadAllEvents(pageOffset)
+		//loadAllEvents(pageOffset)
 	}
 
 	data class WeekViewPreferences(

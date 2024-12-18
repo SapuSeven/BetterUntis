@@ -5,8 +5,8 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.StrikethroughSpan
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.models.untis.timetable.Period
-import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import com.sapuseven.untis.api.model.untis.timetable.Period
+import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 

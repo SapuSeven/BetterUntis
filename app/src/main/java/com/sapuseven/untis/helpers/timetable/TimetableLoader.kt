@@ -415,7 +415,7 @@ class TimetableLoader(
 			period.startDateTime.toLocalDateTime().toDateTime(),
 			period.endDateTime.toLocalDateTime().toDateTime(),
 			type,
-			PeriodData(timetableDatabaseInterface, period)
+			null!!//PeriodData(timetableDatabaseInterface, period)
 		)
 	}
 

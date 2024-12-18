@@ -67,7 +67,7 @@ import kotlinx.coroutines.launch
 import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
 
-
+/*
 @OptIn(
 	ExperimentalMaterial3Api::class, ExperimentalPagerApi::class,
 	ExperimentalAnimationApi::class
@@ -1139,3 +1139,4 @@ private suspend fun submitLessonTopic(
 }
 
 private class UntisApiException(error: UntisError?) : Throwable(error?.message)
+*/

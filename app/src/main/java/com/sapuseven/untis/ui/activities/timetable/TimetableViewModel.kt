@@ -46,9 +46,11 @@ class TimetableViewModel @Inject constructor(
 	private val userDao: UserDao,
 	private val repository: SettingsRepository,
 	private val api: TimetableApi,
-	private val mapper: TimetableMapper,
+	private val timetableMapperFactory: TimetableMapper.Factory,
 	savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+	private val timetableMapper = timetableMapperFactory.create()
+
 	val args = savedStateHandle.toRoute<AppRoutes.Timetable>()
 
 	private val _currentUserSettings =
@@ -121,7 +123,6 @@ class TimetableViewModel @Inject constructor(
 	}
 
 	suspend fun loadItems() {
-		Log.d("TimetableViewModel", mapper.map())
 		/*viewModelScope.launch(Dispatchers.IO) {
 			try {
 				api.loadTimetable(

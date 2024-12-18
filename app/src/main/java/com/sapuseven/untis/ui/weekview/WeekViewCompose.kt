@@ -95,14 +95,14 @@ import kotlin.math.roundToInt
 
 // TODO: Migrate Joda Time to Java Time
 data class Event(
-	val title: String,
-	val top: String = "",
-	val bottom: String = "",
-	val color: Color,
-	val pastColor: Color,
-	val textColor: Color,
-	val start: LocalDateTime,
-	val end: LocalDateTime,
+	var title: String,
+	var top: String = "",
+	var bottom: String = "",
+	var color: Color,
+	var pastColor: Color,
+	var textColor: Color,
+	var start: LocalDateTime,
+	var end: LocalDateTime,
 	val periodData: PeriodData? = null
 ) {
 	var numSimultaneous: Int = 1 // relative width is determined by 1/x
