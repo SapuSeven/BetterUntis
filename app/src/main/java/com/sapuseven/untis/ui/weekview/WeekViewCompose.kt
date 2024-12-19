@@ -91,6 +91,7 @@ import org.joda.time.LocalDateTime
 import org.joda.time.LocalTime
 import org.joda.time.Minutes
 import org.joda.time.format.DateTimeFormat
+import java.time.Clock
 import kotlin.math.roundToInt
 
 // TODO: Migrate Joda Time to Java Time
@@ -665,7 +666,7 @@ fun WeekViewCompose(
 	val currentOnPageChange by rememberUpdatedState(onPageChange)
 
 	var datePickerDialog by remember { mutableStateOf(false) }
-	var jumpToDate by remember { mutableStateOf<LocalDate?>(null) }
+	var jumpToDate by remember { mutableStateOf<java.time.LocalDate?>(null) }
 
 	LaunchedEffect(events) {
 		// The events object only changes when the user changes.
@@ -676,7 +677,7 @@ fun WeekViewCompose(
 
 	LaunchedEffect(jumpToDate) {
 		jumpToDate?.let {
-			pagerState.scrollToPage(startPage + pageIndexForDate(it))
+			pagerState.scrollToPage((startPage + pageIndexForDate(it)).toInt())
 		}
 	}
 
@@ -799,7 +800,7 @@ fun WeekViewCompose(
 
 	if (datePickerDialog)
 		DatePickerDialog(
-			initialSelection = jumpToDate ?: LocalDate.now(),
+			initialSelection = jumpToDate ?: java.time.LocalDate.now(),
 			onDismiss = { datePickerDialog = false }
 		) {
 			datePickerDialog = false

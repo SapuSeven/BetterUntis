@@ -46,6 +46,7 @@ import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.weekview.WeekViewCompose
 import kotlinx.coroutines.launch
+import org.joda.time.LocalDate
 import org.joda.time.LocalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -129,11 +130,12 @@ fun Timetable(
 					)
 
 				WeekViewCompose(
-					events = events,
+					events = events.mapKeys { LocalDate(it) },
 					onPageChange = { pageOffset ->
 						//viewModel.onWeekViewPageChange(pageOffset)
 					},
 					onReload = { pageOffset ->
+						viewModel.loadEvents()
 						//viewModel.loadEvents(startDateForPageIndex(pageOffset))
 					},
 					onItemClick = { item ->
@@ -146,8 +148,7 @@ fun Timetable(
 					hourList = hourList,
 					//dividerWidth = viewModel.weekViewPreferences.dividerWidth,
 					//colorScheme = viewModel.weekViewPreferences.colorScheme,
-					modifier = Modifier
-						.fillMaxSize()
+					modifier = Modifier.fillMaxSize()
 				) { startPadding ->
 					// Feedback button
 					IconButton(

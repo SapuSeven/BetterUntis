@@ -1,5 +1,6 @@
 package com.sapuseven.untis.mappers
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.toArgb
@@ -44,6 +45,7 @@ class TimetableMapper @AssistedInject constructor(
 		contextType: TimetableDatabaseInterface.Type
 	): List<Event> {
 		waitForSettings().apply {
+			Log.d("TimetableMapper", "Test props: $timetablePersonalTimetable")
 			return items
 				.map(
 					contextType

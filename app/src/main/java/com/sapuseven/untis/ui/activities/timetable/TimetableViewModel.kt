@@ -20,6 +20,7 @@ import com.sapuseven.untis.components.UserManager
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.data.databases.entities.UserDao
 import com.sapuseven.untis.data.settings.model.UserSettings
+import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.mappers.TimetableMapper
 import com.sapuseven.untis.modules.ThemeManager
 import com.sapuseven.untis.scope.UserScopeManager
@@ -28,13 +29,12 @@ import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
 import com.sapuseven.untis.ui.weekview.Event
 import com.sapuseven.untis.ui.weekview.WeekViewHour
+import com.sapuseven.untis.ui.weekview.startDateForPageIndex
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.joda.time.LocalDate
-import org.joda.time.LocalTime
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -93,7 +93,7 @@ class TimetableViewModel @Inject constructor(
 		}
 
 		viewModelScope.launch {
-			loadItems()
+			loadEvents()
 		}
 	}
 
@@ -122,27 +122,36 @@ class TimetableViewModel @Inject constructor(
 		}*/
 	}
 
-	suspend fun loadItems() {
-		/*viewModelScope.launch(Dispatchers.IO) {
-			try {
-				api.loadTimetable(
-					id = 0,
-					type = "",
-					startDate = LocalDate.now(),
-					endDate = LocalDate.now(),
-					masterDataTimestamp = currentUser.masterDataTimestamp,
-					apiUrl = currentUser.apiUrl,
-					user = currentUser.user,
-					key = currentUser.key
-				).timetable
-			} catch (e: UntisApiException) {
-				// TODO
-			} catch (e: Exception) {
-				// TODO
-			} finally {
-				// TODO
-			}
-		}*/
+	suspend fun loadEvents() {
+		timetableMapper.mapTimetablePeriodsToWeekViewEvents(
+			emptyList(),
+			TimetableDatabaseInterface.Type.STUDENT
+		)
+
+		try {
+			val timetableResult = api.loadTimetable(
+				id = 0,
+				type = "",
+				startDate = startDateForPageIndex(0),
+				endDate = startDateForPageIndex(0).plusDays(7),
+				masterDataTimestamp = currentUser.masterDataTimestamp,
+				apiUrl = currentUser.apiUrl,
+				user = currentUser.user,
+				key = currentUser.key
+			).timetable
+
+			/*timetableMapper.mapTimetablePeriodsToWeekViewEvents(
+				.periods,
+				TimetableDatabaseInterface.Type.STUDENT
+			)*/
+			Log.d("TimetableViewModel", "Successfully loaded timetable: $timetableResult")
+		} catch (e: UntisApiException) {
+			Log.e("TimetableViewModel", "Failed to load timetable due to API error", e)
+		} catch (e: Exception) {
+			Log.e("TimetableViewModel", "Failed to load timetable due to other error", e)
+		} finally {
+			loading = false
+		}
 	}
 
 	fun buildHourList(
@@ -165,8 +174,8 @@ class TimetableViewModel @Inject constructor(
 
 			hourList.add(
 				WeekViewHour(
-					LocalTime(startTime.hour, startTime.minute),
-					LocalTime(endTime.hour, endTime.minute),
+					org.joda.time.LocalTime(startTime.hour, startTime.minute),
+					org.joda.time.LocalTime(endTime.hour, endTime.minute),
 					label
 				)
 			)

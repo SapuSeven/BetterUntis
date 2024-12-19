@@ -1,12 +1,13 @@
 package com.sapuseven.untis.mocks
 
+import com.sapuseven.untis.api.model.untis.Time
+import com.sapuseven.untis.api.model.untis.UserData
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.RIGHT_ABSENCES
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.RIGHT_CLASSREGISTER
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.RIGHT_OFFICEHOURS
-import com.sapuseven.untis.models.untis.UntisTime
-import com.sapuseven.untis.models.untis.UntisUserData
 import com.sapuseven.untis.api.model.untis.masterdata.TimeGrid
 import com.sapuseven.untis.api.model.untis.masterdata.timegrid.Day
+import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.utils.SCREENSHOT_API_URL
 import com.sapuseven.untis.utils.SCREENSHOT_PROFILE_NAME
 
@@ -22,7 +23,7 @@ fun userMock(profileName: String = SCREENSHOT_PROFILE_NAME, apiUrl: String = SCR
 	anonymous = false,
 	timeGrid = timeGrid(),
 	masterDataTimestamp = 0,
-	userData = UntisUserData(
+	userData = UserData(
 		elemType = "STUDENT",
 		1,
 		"Test Student",
@@ -55,62 +56,62 @@ fun days(): List<Day> {
 fun units(): List<com.sapuseven.untis.api.model.untis.masterdata.timegrid.Unit> = listOf(
 	com.sapuseven.untis.api.model.untis.masterdata.timegrid.Unit(
 		label = "1",
-		startTime = UntisTime("T07:45"),
-		endTime = UntisTime("T08:35")
+		startTime = Time("T07:45"),
+		endTime = Time("T08:35")
 	),
 	com.sapuseven.untis.api.model.untis.masterdata.timegrid.Unit(
 		label = "2",
-		startTime = UntisTime("T08:40"),
-		endTime = UntisTime("T09:30")
+		startTime = Time("T08:40"),
+		endTime = Time("T09:30")
 	),
 	com.sapuseven.untis.api.model.untis.masterdata.timegrid.Unit(
 		label = "3",
-		startTime = UntisTime("T09:45"),
-		endTime = UntisTime("T10:35")
+		startTime = Time("T09:45"),
+		endTime = Time("T10:35")
 	),
 	com.sapuseven.untis.api.model.untis.masterdata.timegrid.Unit(
 		label = "4",
-		startTime = UntisTime("T10:40"),
-		endTime = UntisTime("T11:30")
+		startTime = Time("T10:40"),
+		endTime = Time("T11:30")
 	),
 	com.sapuseven.untis.api.model.untis.masterdata.timegrid.Unit(
 		label = "5",
-		startTime = UntisTime("T11:35"),
-		endTime = UntisTime("T12:25")
+		startTime = Time("T11:35"),
+		endTime = Time("T12:25")
 	),
 	com.sapuseven.untis.api.model.untis.masterdata.timegrid.Unit(
 		label = "6",
-		startTime = UntisTime("T12:30"),
-		endTime = UntisTime("T13:20")
+		startTime = Time("T12:30"),
+		endTime = Time("T13:20")
 	),
 	com.sapuseven.untis.api.model.untis.masterdata.timegrid.Unit(
 		label = "7",
-		startTime = UntisTime("T13:25"),
-		endTime = UntisTime("T14:15")
+		startTime = Time("T13:25"),
+		endTime = Time("T14:15")
 	),
 	com.sapuseven.untis.api.model.untis.masterdata.timegrid.Unit(
 		label = "8",
-		startTime = UntisTime("T14:20"),
-		endTime = UntisTime("T15:10")
+		startTime = Time("T14:20"),
+		endTime = Time("T15:10")
 	),
 	com.sapuseven.untis.api.model.untis.masterdata.timegrid.Unit(
 		label = "9",
-		startTime = UntisTime("T15:20"),
-		endTime = UntisTime("T16:10")
+		startTime = Time("T15:20"),
+		endTime = Time("T16:10")
 	),
 	com.sapuseven.untis.api.model.untis.masterdata.timegrid.Unit(
 		label = "10",
-		startTime = UntisTime("T16:15"),
-		endTime = UntisTime("T17:05")
+		startTime = Time("T16:15"),
+		endTime = Time("T17:05")
 	),
 	com.sapuseven.untis.api.model.untis.masterdata.timegrid.Unit(
 		label = "11",
-		startTime = UntisTime("T17:10"),
-		endTime = UntisTime("T18:00")
+		startTime = Time("T17:10"),
+		endTime = Time("T18:00")
 	),
 	com.sapuseven.untis.api.model.untis.masterdata.timegrid.Unit(
 		label = "12",
-		startTime = UntisTime("T18:00"),
-		endTime = UntisTime("T18:45")
+		startTime = Time("T18:00"),
+		endTime = Time("T18:45")
 	),
 )

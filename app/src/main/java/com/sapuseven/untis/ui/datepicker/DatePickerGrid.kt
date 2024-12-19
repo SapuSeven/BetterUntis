@@ -18,10 +18,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.common.ifNotNull
-import org.joda.time.LocalDate
-import org.joda.time.format.DateTimeFormat
 import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
+import java.time.temporal.TemporalAdjusters
 import java.util.*
 
 @Composable
@@ -46,8 +47,8 @@ fun DatePickerGrid(
 			}
 		}
 
-		val weekRange = date.dayOfMonth().minimumValue..date.dayOfMonth().maximumValue
-		val emptySpacesBefore = date.dayOfMonth().withMinimumValue().dayOfWeek - 1
+		val weekRange = date.with(TemporalAdjusters.firstDayOfMonth()).dayOfMonth..date.with(TemporalAdjusters.lastDayOfMonth()).dayOfMonth
+		val emptySpacesBefore = date.with(TemporalAdjusters.firstDayOfMonth()).dayOfWeek.minus(1).value
 		val emptySpacesAfter = WEEK_LENGTH * MAX_WEEK_LINES - emptySpacesBefore - weekRange.count()
 
 		LazyVerticalGrid(
@@ -69,11 +70,11 @@ fun DatePickerGrid(
 					val day = date.withDayOfMonth(it)
 
 					DatePickerGridItem(
-						text = day.toString(DateTimeFormat.forPattern("d")),
+						text = day.format(DateTimeFormatter.ofPattern("d")),
 						modifier = Modifier
 							.fillMaxWidth()
 							.aspectRatio(1f, true),
-						isToday = day == LocalDate(),
+						isToday = day == LocalDate.now(),
 						isSelected = day == selectedDay
 					) {
 						onClick(day)
