@@ -1,6 +1,6 @@
 package com.sapuseven.untis.api.model.untis.masterdata.timegrid
 
-import com.sapuseven.untis.api.model.untis.Time
+import com.sapuseven.untis.api.serializer.Time
 import kotlinx.serialization.Serializable
 
 @Serializable

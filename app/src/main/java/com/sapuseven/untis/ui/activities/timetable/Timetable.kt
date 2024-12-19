@@ -46,8 +46,8 @@ import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.weekview.WeekViewCompose
 import kotlinx.coroutines.launch
-import org.joda.time.LocalDate
-import org.joda.time.LocalTime
+import java.time.LocalDate
+import java.time.LocalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -130,13 +130,12 @@ fun Timetable(
 					)
 
 				WeekViewCompose(
-					events = events.mapKeys { LocalDate(it) },
+					events = events,
 					onPageChange = { pageOffset ->
-						//viewModel.onWeekViewPageChange(pageOffset)
+						viewModel.onPageChange(pageOffset)
 					},
 					onReload = { pageOffset ->
-						viewModel.loadEvents()
-						//viewModel.loadEvents(startDateForPageIndex(pageOffset))
+						viewModel.onPageReload(pageOffset)
 					},
 					onItemClick = { item ->
 						//viewModel.timetableItemDetailsDialog = item

@@ -31,6 +31,9 @@ import com.sapuseven.untis.ui.weekview.Event
 import com.sapuseven.untis.ui.weekview.WeekViewHour
 import com.sapuseven.untis.ui.weekview.startDateForPageIndex
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -93,7 +96,7 @@ class TimetableViewModel @Inject constructor(
 		}
 
 		viewModelScope.launch {
-			loadEvents()
+			//loadEvents(0)
 		}
 	}
 
@@ -122,7 +125,30 @@ class TimetableViewModel @Inject constructor(
 		}*/
 	}
 
-	suspend fun loadEvents() {
+	suspend fun onPageChange(pageOffset: Int = 0) {
+		viewModelScope.launch {
+			loading = true
+			((pageOffset - 1)..(pageOffset + 1)).map {
+				async {
+					val startDate = startDateForPageIndex(it.toLong())
+					Log.d(
+						"WeekView",
+						"Items available for $startDate: ${_events.value.contains(startDate)}"
+					)
+					if (!_events.value.contains(startDate)) loadEvents(startDate)
+				}
+			}.awaitAll()
+			loading = false
+		}
+	}
+
+	suspend fun onPageReload(pageOffset: Int) {
+		loading = true
+		loadEvents(startDateForPageIndex(pageOffset.toLong()))
+		loading = false
+	}
+
+	suspend fun loadEvents(startDate: LocalDate) {
 		timetableMapper.mapTimetablePeriodsToWeekViewEvents(
 			emptyList(),
 			TimetableDatabaseInterface.Type.STUDENT
@@ -131,27 +157,41 @@ class TimetableViewModel @Inject constructor(
 		try {
 			val timetableResult = api.loadTimetable(
 				id = 0,
-				type = "",
-				startDate = startDateForPageIndex(0),
-				endDate = startDateForPageIndex(0).plusDays(7),
+				type = TimetableDatabaseInterface.Type.STUDENT.name,
+				startDate = startDate,
+				endDate = startDate.plusDays(5 /*TODO*/),
 				masterDataTimestamp = currentUser.masterDataTimestamp,
 				apiUrl = currentUser.apiUrl,
 				user = currentUser.user,
 				key = currentUser.key
 			).timetable
 
-			/*timetableMapper.mapTimetablePeriodsToWeekViewEvents(
-				.periods,
+			// TODO: Merge with previous events
+			val newEvents = _events.value.toMutableMap()
+			newEvents[startDate] = timetableMapper.mapTimetablePeriodsToWeekViewEvents(
+				timetableResult.periods,
 				TimetableDatabaseInterface.Type.STUDENT
-			)*/
+			)
+			_events.emit(newEvents.toMap())
 			Log.d("TimetableViewModel", "Successfully loaded timetable: $timetableResult")
 		} catch (e: UntisApiException) {
 			Log.e("TimetableViewModel", "Failed to load timetable due to API error", e)
 		} catch (e: Exception) {
 			Log.e("TimetableViewModel", "Failed to load timetable due to other error", e)
-		} finally {
-			loading = false
 		}
+	}
+
+	private fun groupEventsByDate(events: List<Event>): Map<LocalDate, List<Event>> {
+
+		val groupedEvents = mutableMapOf<LocalDate, MutableList<Event>>()
+
+		for (event in events) {
+			val eventDate = event.start.toLocalDate()
+			groupedEvents.computeIfAbsent(eventDate) { mutableListOf() }.add(event)
+		}
+
+		// Convert the map to an immutable version if needed
+		return groupedEvents.mapValues { it.value.toList() }
 	}
 
 	fun buildHourList(
@@ -163,22 +203,13 @@ class TimetableViewModel @Inject constructor(
 			// Check if outside configured range
 			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
 
-			val startTime = hour.startTime.toLocalTime()
-			val endTime = hour.endTime.toLocalTime()
-
 			// If label is empty, fill it according to preferences
 			val label = hour.label.ifEmpty {
 				if (rangeIndexReset) (index + 1).toString()
 				else ((range?.first ?: 1) + index).toString()
 			}
 
-			hourList.add(
-				WeekViewHour(
-					org.joda.time.LocalTime(startTime.hour, startTime.minute),
-					org.joda.time.LocalTime(endTime.hour, endTime.minute),
-					label
-				)
-			)
+			hourList.add(WeekViewHour(hour.startTime, hour.endTime, label))
 		}
 
 		return hourList

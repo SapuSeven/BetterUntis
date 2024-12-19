@@ -48,7 +48,6 @@ import com.sapuseven.untis.models.UntisAbsence
 import com.sapuseven.untis.models.untis.UntisAttachment
 import com.sapuseven.untis.models.untis.UntisDateTime
 import com.sapuseven.untis.models.untis.UntisError
-import com.sapuseven.untis.api.model.untis.Time
 import com.sapuseven.untis.models.untis.params.*
 import com.sapuseven.untis.models.untis.response.*
 import com.sapuseven.untis.models.untis.timetable.Period

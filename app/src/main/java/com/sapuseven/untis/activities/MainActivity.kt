@@ -1741,8 +1741,8 @@ fun buildHourList(
 		// Check if outside configured range
 		if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
 
-		val startTime = hour.startTime.toLocalTime()
-		val endTime = hour.endTime.toLocalTime()
+		val startTime = hour.startTime
+		val endTime = hour.endTime
 
 		// If label is empty, fill it according to preferences
 		val label = hour.label.ifEmpty {
@@ -1750,13 +1750,7 @@ fun buildHourList(
 			else ((range?.first ?: 1) + index).toString()
 		}
 
-		hourList.add(
-			WeekViewHour(
-				LocalTime(startTime.hour, startTime.minute),
-				LocalTime(endTime.hour, endTime.minute),
-				label
-			)
-		)
+		hourList.add(WeekViewHour(startTime, endTime, label))
 	}
 
 	return hourList

@@ -1,6 +1,6 @@
 package com.sapuseven.untis.models
 
-import com.sapuseven.untis.api.model.untis.Time
+import com.sapuseven.untis.api.serializer.Time
 import com.sapuseven.untis.models.untis.UntisDateTime
 import kotlinx.serialization.Serializable
 

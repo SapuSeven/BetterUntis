@@ -10,7 +10,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 object LocalDateSerializer : KSerializer<LocalDate> {
-	private val format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'")
+	private val format = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
 	override val descriptor: SerialDescriptor =
 		PrimitiveSerialDescriptor("java.time.LocalDate", PrimitiveKind.STRING)

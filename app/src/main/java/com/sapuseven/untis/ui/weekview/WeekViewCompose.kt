@@ -1,10 +1,7 @@
 package com.sapuseven.untis.ui.weekview
 
 import android.text.format.DateFormat
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.CubicBezierEasing
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -13,15 +10,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
-import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
@@ -31,10 +24,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Icon
@@ -53,22 +44,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -83,18 +69,16 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.ui.common.ifNotNull
 import com.sapuseven.untis.ui.dialogs.DatePickerDialog
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.joda.time.Days
-import org.joda.time.LocalDate
-import org.joda.time.LocalDateTime
-import org.joda.time.LocalTime
-import org.joda.time.Minutes
-import org.joda.time.format.DateTimeFormat
-import java.time.Clock
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import kotlin.math.roundToInt
 
-// TODO: Migrate Joda Time to Java Time
 data class Event(
 	var title: String,
 	var top: String = "",
@@ -115,7 +99,7 @@ data class Event(
 	var rightX = 0
 }
 
-val eventTimeFormat = DateTimeFormat.forPattern("h:mm a")
+val eventTimeFormat = DateTimeFormatter.ofPattern("h:mm a")
 
 @Composable
 fun WeekViewEvent(
@@ -126,23 +110,23 @@ fun WeekViewEvent(
 ) {
 	Box(
 		modifier = modifier
-            .fillMaxSize()
-            .padding(2.dp) // Outer padding
-            .clip(RoundedCornerShape(4.dp))
-            .drawBehind {
-                drawVerticalSplitRect(
-                    event.pastColor,
-                    event.color,
-                    size = Size(size.width, size.height),
-                    division = ((currentTime.toDateTime().millis - event.start.toDateTime().millis).toFloat()
-                            / (event.end.toDateTime().millis - event.start.toDateTime().millis).toFloat())
-                        .coerceIn(0f, 1f)
-                )
-            }
-            .padding(horizontal = 2.dp) // Inner padding
-            .ifNotNull(onClick) {
-                clickable(onClick = it)
-            }
+			.fillMaxSize()
+			.padding(2.dp) // Outer padding
+			.clip(RoundedCornerShape(4.dp))
+			.drawBehind {
+				drawVerticalSplitRect(
+					event.pastColor,
+					event.color,
+					size = Size(size.width, size.height),
+					division = ((currentTime.seconds() - event.start.seconds()).toFloat()
+						/ (event.end.seconds() - event.start.seconds()).toFloat())
+						.coerceIn(0f, 1f)
+				)
+			}
+			.padding(horizontal = 2.dp) // Inner padding
+			.ifNotNull(onClick) {
+				clickable(onClick = it)
+			}
 	) {
 		Text(
 			text = event.top,
@@ -176,6 +160,7 @@ fun WeekViewEvent(
 	}
 }
 
+private fun LocalDateTime.seconds() = atZone(ZoneId.systemDefault()).toEpochSecond()
 
 @Preview(showBackground = true)
 @Composable
@@ -203,10 +188,10 @@ private class EventDataModifier(
 
 private fun Modifier.eventData(event: Event) = this.then(EventDataModifier(event))
 
-private val dayNameFormat = DateTimeFormat.forPattern("EEE")
-private val dayDateFormat = DateTimeFormat.forPattern("d. MMM")
-private val timeFormat12h = DateTimeFormat.forPattern("h:mm a")
-private val timeFormat24h = DateTimeFormat.forPattern("H:mm")
+private val dayNameFormat = DateTimeFormatter.ofPattern("EEE")
+private val dayDateFormat = DateTimeFormatter.ofPattern("d. MMM")
+private val timeFormat12h = DateTimeFormatter.ofPattern("h:mm a")
+private val timeFormat24h = DateTimeFormatter.ofPattern("H:mm")
 
 @Composable
 fun WeekViewHeaderDay(
@@ -220,7 +205,7 @@ fun WeekViewHeaderDay(
 			.padding(4.dp)
 	) {
 		Text(
-			text = dayNameFormat.print(day),
+			text = dayNameFormat.format(day),
 			textAlign = TextAlign.Center,
 			fontSize = 20.sp,
 			fontWeight = FontWeight.Medium,
@@ -229,7 +214,7 @@ fun WeekViewHeaderDay(
 				.fillMaxWidth()
 		)
 		Text(
-			text = dayDateFormat.print(day),
+			text = dayDateFormat.format(day),
 			textAlign = TextAlign.Center,
 			fontSize = 14.sp,
 			color = if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -261,7 +246,7 @@ fun WeekViewHeader(
 	) {
 		repeat(numDays) { i ->
 			Box(modifier = Modifier.weight(1f)) {
-				dayHeader(startDate.plusDays(i))
+				dayHeader(startDate.plusDays(i.toLong()))
 			}
 		}
 	}
@@ -286,16 +271,16 @@ fun WeekViewSidebarLabel(
 
 	Box(
 		modifier = modifier
-            .padding(horizontal = 4.dp)
-            .fillMaxSize()
+			.padding(horizontal = 4.dp)
+			.fillMaxSize()
 	) {
 		Text(
-			text = timeFormat.print(hour.startTime),
+			text = timeFormat.format(hour.startTime),
 			fontSize = 12.sp,
 			color = MaterialTheme.colorScheme.onSurfaceVariant,
 			modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(end = 4.dp)
+				.align(Alignment.TopStart)
+				.padding(end = 4.dp)
 		)
 		Text(
 			text = hour.label,
@@ -306,12 +291,12 @@ fun WeekViewSidebarLabel(
 				.align(Alignment.Center)
 		)
 		Text(
-			text = timeFormat.print(hour.endTime),
+			text = timeFormat.format(hour.endTime),
 			fontSize = 12.sp,
 			color = MaterialTheme.colorScheme.onSurfaceVariant,
 			modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(start = 4.dp)
+				.align(Alignment.BottomEnd)
+				.padding(start = 4.dp)
 		)
 	}
 }
@@ -321,8 +306,8 @@ fun WeekViewSidebarLabel(
 fun BasicSidebarLabelPreview() {
 	WeekViewSidebarLabel(
 		hour = WeekViewHour(
-			LocalTime(9, 45),
-			LocalTime(10, 30),
+			LocalTime.of(9, 45),
+			LocalTime.of(10, 30),
 			"1"
 		),
 		Modifier.sizeIn(maxHeight = 64.dp, maxWidth = 72.dp)
@@ -334,8 +319,8 @@ fun BasicSidebarLabelPreview() {
 fun CompactSidebarLabelPreview() {
 	WeekViewSidebarLabel(
 		hour = WeekViewHour(
-			LocalTime(9, 45),
-			LocalTime(10, 30),
+			LocalTime.of(9, 45),
+			LocalTime.of(10, 30),
 			"1"
 		),
 		Modifier.sizeIn(maxHeight = 48.dp, maxWidth = 64.dp)
@@ -353,24 +338,24 @@ fun WeekViewSidebar(
 	// TODO: This implementation is prone to alignment issues due to rounding errors. Maybe use a Box with absolute padding instead (like the hour lines).
 	Column(
 		modifier = modifier
-            .width(IntrinsicSize.Max)
-            .padding(bottom = bottomPadding)
+			.width(IntrinsicSize.Max)
+			.padding(bottom = bottomPadding)
 	) {
 		var lastEndTime: LocalTime? = null
 		hourList.forEach { hour ->
 			val totalHourHeight = hourHeight *
-				(Minutes.minutesBetween(hour.startTime, hour.endTime).minutes / 60f)
+				(ChronoUnit.MINUTES.between(hour.startTime, hour.endTime) / 60f)
 
 			val topPadding = lastEndTime?.let {
 				hourHeight *
-					(Minutes.minutesBetween(lastEndTime, hour.startTime).minutes / 60f)
+					(ChronoUnit.MINUTES.between(lastEndTime, hour.startTime) / 60f)
 			} ?: 0.dp
 
 			Box(
 				modifier = Modifier
-                    .padding(top = topPadding)
-                    .height(totalHourHeight)
-                    .fillMaxWidth()
+					.padding(top = topPadding)
+					.height(totalHourHeight)
+					.fillMaxWidth()
 			) {
 				label(hour)
 			}
@@ -388,8 +373,8 @@ fun WeekViewSidebarPreview() {
 		bottomPadding = 16.dp,
 		hourList = (1..4).map {
 			WeekViewHour(
-				LocalTime(it + 8, 45),
-				LocalTime(it + 9, 30),
+				LocalTime.of(it + 8, 45),
+				LocalTime.of(it + 9, 30),
 				it.toString()
 			)
 		}
@@ -408,7 +393,7 @@ fun DrawScope.WeekViewContentGrid(
 
 	hours.forEach {
 		val yPos =
-			Minutes.minutesBetween(startTime, it).minutes / 60f * hourHeight.toPx()
+			ChronoUnit.MINUTES.between(startTime, it) / 60f * hourHeight.toPx()
 
 		if (yPos == 0f || yPos == size.height) return@forEach
 
@@ -430,8 +415,8 @@ fun DrawScope.WeekViewContentGrid(
 	}
 	drawLine(
 		dividerColor,
-		start = Offset(size.width + dividerWidth, 0f),
-		end = Offset(size.width + dividerWidth, size.height),
+		start = Offset(size.width + dividerWidth + 1, 0f),
+		end = Offset(size.width + dividerWidth + 1, size.height),
 		strokeWidth = dividerWidth
 	)
 }
@@ -448,11 +433,10 @@ fun DrawScope.WeekViewBackground(
 	val dayWidth = size.width / numDays;
 
 	repeat(numDays) {
-		val fraction = Minutes
-			.minutesBetween(
-				startTime,
-				currentTime.toLocalTime()
-			).minutes / 60f * hourHeight.toPx()
+		val fraction = ChronoUnit.MINUTES.between(
+			startTime,
+			currentTime.toLocalTime()
+		) / 60f * hourHeight.toPx()
 			.coerceIn(0f, size.height) / size.height
 
 		drawVerticalSplitRect(
@@ -461,8 +445,8 @@ fun DrawScope.WeekViewBackground(
 			topLeft = Offset(it * dayWidth, 0f),
 			size = Size(dayWidth, size.height),
 			division = when {
-				startDate.plusDays(it).isAfter(currentTime.toLocalDate()) -> 0f
-				startDate.plusDays(it).isEqual(currentTime.toLocalDate()) -> fraction
+				startDate.plusDays(it.toLong()).isAfter(currentTime.toLocalDate()) -> 0f
+				startDate.plusDays(it.toLong()).isEqual(currentTime.toLocalDate()) -> fraction
 				else -> 1f
 			}
 		)
@@ -506,12 +490,11 @@ fun DrawScope.WeekViewIndicator(
 ) {
 	val dayWidth = size.width / numDays;
 
-	val yPos = Minutes
-		.minutesBetween( // TODO: Can this be negative?
-			startTime,
-			currentTime.toLocalTime()
-		).minutes / 60f * hourHeight.toPx()
-	val startDayIndex = Days.daysBetween(startDate, currentTime.toLocalDate()).days
+	val yPos = ChronoUnit.MINUTES.between( // TODO: Can this be negative?
+		startTime,
+		currentTime.toLocalTime()
+	) / 60f * hourHeight.toPx()
+	val startDayIndex = ChronoUnit.DAYS.between(startDate, currentTime.toLocalDate())
 
 	if (startDayIndex in 0..numDays && yPos in 0f..size.height)
 		drawLine(
@@ -587,16 +570,16 @@ fun WeekViewContent(
 	) { measureables, constraints ->
 		val height = Math.max(
 			constraints.minHeight,
-			(Minutes.minutesBetween(
+			(ChronoUnit.MINUTES.between(
 				startTime,
 				endTime
-			).minutes / 60f * hourHeight.toPx() + endTimeOffset).roundToInt()
+			) / 60f * hourHeight.toPx() + endTimeOffset).roundToInt()
 		)
-		val width = constraints.maxWidth
+		val width = constraints.maxWidth + dividerWidth.toInt()
 		val dayWidth = width / numDays;
 		val placeablesWithEvents = measureables.map { measurable ->
 			val event = measurable.parentData as Event
-			val eventDurationMinutes = Minutes.minutesBetween(event.start, event.end).minutes
+			val eventDurationMinutes = ChronoUnit.MINUTES.between(event.start, event.end)
 			val eventHeight = ((eventDurationMinutes / 60f) * hourHeight.toPx()).roundToInt()
 			val placeable = measurable.measure(
 				constraints.copy(
@@ -612,12 +595,12 @@ fun WeekViewContent(
 		layout(width, height) {
 			placeablesWithEvents.forEach { (placeable, event) ->
 				val eventOffsetMinutes =
-					Minutes.minutesBetween(startTime, event.start.toLocalTime()).minutes
+					ChronoUnit.MINUTES.between(startTime, event.start.toLocalTime())
 				val eventY = ((eventOffsetMinutes / 60f) * hourHeight.toPx()).roundToInt()
-				val eventOffsetDays = Days.daysBetween(startDate, event.start.toLocalDate()).days
+				val eventOffsetDays = ChronoUnit.DAYS.between(startDate, event.start.toLocalDate())
 				val eventOffset = event.offsetSteps * (dayWidth / event.numSimultaneous)
 				val eventX = eventOffsetDays * dayWidth + eventOffset
-				placeable.place(eventX, eventY)
+				placeable.place(eventX.toInt(), eventY)
 			}
 		}
 	}
@@ -686,8 +669,8 @@ fun WeekViewCompose(
 			Box(
 				contentAlignment = Alignment.Center,
 				modifier = Modifier
-                    .width(with(LocalDensity.current) { sidebarWidth.toDp() })
-                    .height(with(LocalDensity.current) { headerHeight.toDp() })
+					.width(with(LocalDensity.current) { sidebarWidth.toDp() })
+					.height(with(LocalDensity.current) { headerHeight.toDp() })
 			) {
 				IconButton(
 					onClick = {
@@ -706,8 +689,8 @@ fun WeekViewCompose(
 				bottomPadding = with(LocalDensity.current) { endTimeOffset.toDp() },
 				hourList = hourList,
 				modifier = Modifier
-                    .onGloballyPositioned { sidebarWidth = it.size.width }
-                    .verticalScroll(verticalScrollState)
+					.onGloballyPositioned { sidebarWidth = it.size.width }
+					.verticalScroll(verticalScrollState)
 			)
 
 		}
@@ -720,7 +703,6 @@ fun WeekViewCompose(
 
 		HorizontalPager(
 			state = pagerState,
-			pageSpacing = with(LocalDensity.current) { dividerWidth.toDp() },
 			flingBehavior = PagerDefaults.flingBehavior(
 				state = pagerState,
 				snapAnimationSpec = tween(
@@ -730,8 +712,7 @@ fun WeekViewCompose(
 			)
 		) { index ->
 			val pageOffset = index - startPage
-			val visibleStartDate =
-				startDate.withDayOfWeek(1).plusWeeks(pageOffset) // 1 = Monday, 7 = Sunday
+			val visibleStartDate = startDate.with(DayOfWeek.MONDAY).plusWeeks(pageOffset.toLong()) // 1 = Monday, 7 = Sunday
 
 			Column {
 				WeekViewHeader(
@@ -766,9 +747,11 @@ fun WeekViewCompose(
 							refreshing = isRefreshing,
 							state = pullRefreshState,
 							modifier = Modifier
-								.fillMaxWidth())
+								.fillMaxWidth()
+						)
 
 						WeekViewContent(
+							// Potential improvement: Map the event list by individual days to reduce the number of events passed to be rendered
 							events = events.getOrDefault(visibleStartDate, emptyList()),
 							eventContent = eventContent,
 							startDate = visibleStartDate,
@@ -784,9 +767,9 @@ fun WeekViewCompose(
 							pastBackgroundColor = colorScheme.pastBackgroundColor,
 							futureBackgroundColor = colorScheme.futureBackgroundColor,
 							modifier = Modifier
-                                .fillMaxHeight()
-                                .onGloballyPositioned { contentHeight = it.size.height }
-                                .verticalScroll(verticalScrollState)
+								.fillMaxHeight()
+								.onGloballyPositioned { contentHeight = it.size.height }
+								.verticalScroll(verticalScrollState)
 						)
 					}
 				}
@@ -842,8 +825,8 @@ fun WeekViewTest(
 ) {
 	Box(
 		modifier = Modifier
-            .fillMaxSize()
-            .background(bg)
+			.fillMaxSize()
+			.background(bg)
 	)
 }
 

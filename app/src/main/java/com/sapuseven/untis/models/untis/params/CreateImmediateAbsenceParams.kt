@@ -1,7 +1,7 @@
 package com.sapuseven.untis.models.untis.params
 
 import com.sapuseven.untis.api.model.untis.Auth
-import com.sapuseven.untis.api.model.untis.Time
+import com.sapuseven.untis.api.serializer.Time
 import kotlinx.serialization.Serializable
 
 @Serializable

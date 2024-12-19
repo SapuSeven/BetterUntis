@@ -261,9 +261,9 @@ fun RoomFinderHourSelector(state: RoomFinderState) {
 				Text(
 					text = stringResource(
 						id = R.string.roomfinder_current_hour_time,
-						LocalTime(unit.third.startTime.toLocalTime())
+						LocalTime(unit.third.startTime)
 							.toString(DateTimeFormat.shortTime()),
-						LocalTime(unit.third.endTime.toLocalTime())
+						LocalTime(unit.third.endTime)
 							.toString(DateTimeFormat.shortTime())
 					),
 					textAlign = TextAlign.Center,
@@ -484,8 +484,8 @@ class RoomFinderState constructor(
 						.parseDateTime(day.day)
 
 				day.units.forEach { unit ->
-					val unitStartDateTime = unit.startTime.toLocalTime()
-					val unitEndDateTime = unit.endTime.toLocalTime()
+					val unitStartDateTime = unit.startTime
+					val unitEndDateTime = unit.endTime
 
 					var occupied = false
 
@@ -660,7 +660,7 @@ private fun calculateCurrentHourIndex(user: User): Int {
 			DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseLocalDate(day.day)
 		if (dayDate.dayOfWeek == now.dayOfWeek) {
 			day.units.forEach { unit ->
-				if (LocalTime(unit.endTime.toLocalTime()).millisOfDay > now.millisOfDay)
+				if (LocalTime(unit.endTime).millisOfDay > now.millisOfDay)
 					return index
 				index++
 			}

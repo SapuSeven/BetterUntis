@@ -18,8 +18,9 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import org.joda.time.DateTimeConstants
-import org.joda.time.LocalDateTime
+import java.time.DayOfWeek
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 class TimetableMapper @AssistedInject constructor(
 	private val repository: SettingsRepository,
@@ -45,7 +46,6 @@ class TimetableMapper @AssistedInject constructor(
 		contextType: TimetableDatabaseInterface.Type
 	): List<Event> {
 		waitForSettings().apply {
-			Log.d("TimetableMapper", "Test props: $timetablePersonalTimetable")
 			return items
 				.map(
 					contextType
@@ -114,8 +114,8 @@ class TimetableMapper @AssistedInject constructor(
 				color = Color.Transparent,
 				pastColor = Color.Transparent,
 				textColor = Color.Transparent,
-				start = LocalDateTime(period.startDateTime),
-				end = LocalDateTime(period.endDateTime),
+				start = period.startDateTime,
+				end = period.endDateTime,
 				periodData = periodData
 			)
 		}
@@ -158,26 +158,25 @@ class TimetableMapper @AssistedInject constructor(
 		val leftover: MutableList<Event> = mutableListOf()
 
 		// TODO: Check if the day from the Untis API is always an english string
-		val firstDayOfWeek =
-			DateTimeConstants.MONDAY //DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(days.first().day).dayOfWeek
+		val firstDayOfWeek = DayOfWeek.MONDAY //DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(days.first().day).dayOfWeek
 
 		// Put all items into a two dimensional array depending on day and hour
 		forEach { item ->
 			if (item.periodData == null) return@forEach // cannot merge items without period data
 
-			val startDateTime = LocalDateTime(item.periodData.element.startDateTime)
-			val endDateTime = LocalDateTime(item.periodData.element.endDateTime)
+			val startDateTime = item.periodData.element.startDateTime
+			val endDateTime = item.periodData.element.endDateTime
 
-			val day = endDateTime.dayOfWeek - firstDayOfWeek
+			val day = endDateTime.dayOfWeek.value - firstDayOfWeek.value
 
 			if (day < 0 || day >= days.size) return@forEach
 
 			val thisUnitStartIndex = days[day].units.indexOfFirst {
-				it.startTime.time == startDateTime.toString(DateTimeUtils.tTimeNoSeconds())
+				it.startTime.truncatedTo(ChronoUnit.MINUTES).equals(startDateTime.toLocalTime().truncatedTo(ChronoUnit.MINUTES))
 			}
 
 			val thisUnitEndIndex = days[day].units.indexOfFirst {
-				it.endTime.time == endDateTime.toString(DateTimeUtils.tTimeNoSeconds())
+				it.endTime.truncatedTo(ChronoUnit.MINUTES).equals(endDateTime.toLocalTime().truncatedTo(ChronoUnit.MINUTES))
 			}
 
 			if (thisUnitStartIndex != -1 && thisUnitEndIndex != -1) itemGrid[day][thisUnitStartIndex].add(

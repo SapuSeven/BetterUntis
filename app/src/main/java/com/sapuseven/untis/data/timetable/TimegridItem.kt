@@ -5,6 +5,7 @@ import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.ui.weekview.Event
 import com.sapuseven.untis.views.weekview.WeekViewEvent
 import org.joda.time.DateTime
+import java.time.LocalDateTime
 
 class TimegridItem(
 	id: Long,
@@ -74,8 +75,8 @@ class TimegridItem(
 			color = Color(color),
 			pastColor = Color(pastColor),
 			textColor = Color(textColor),
-			start = startTime.toLocalDateTime(),
-			end = endTime.toLocalDateTime(),
+			start = LocalDateTime.of(startTime.year, startTime.monthOfYear, startTime.dayOfMonth, startTime.hourOfDay, startTime.minuteOfHour),
+			end = LocalDateTime.of(endTime.year, endTime.monthOfYear, endTime.dayOfMonth, endTime.hourOfDay, endTime.minuteOfHour),
 			periodData = periodData
 		)
 	}
