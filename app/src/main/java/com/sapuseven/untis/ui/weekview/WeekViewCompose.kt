@@ -2,10 +2,13 @@ package com.sapuseven.untis.ui.weekview
 
 import android.text.format.DateFormat
 import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -52,6 +55,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -706,8 +710,8 @@ fun WeekViewCompose(
 			flingBehavior = PagerDefaults.flingBehavior(
 				state = pagerState,
 				snapAnimationSpec = tween(
-					easing = CubicBezierEasing(0.17f, 0.84f, 0.44f, 1f),
-					durationMillis = 500
+					easing = FastOutSlowInEasing,
+					durationMillis = 300
 				)
 			)
 		) { index ->

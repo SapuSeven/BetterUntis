@@ -41,7 +41,7 @@ fun WeekViewPullRefreshIndicator(
 	state: PullRefreshState,
 	collapsing: Boolean = true,
 	backgroundColor: Color = MaterialTheme.colorScheme.primary,
-	contentColor: Color = contentColorFor(backgroundColor),
+	contentColor: Color = MaterialTheme.colorScheme.onPrimary,//contentColorFor(backgroundColor),
 	collapsedHeight: Int = 4,
 	triggerHeight: Int = 48,
 	modifier: Modifier = Modifier
