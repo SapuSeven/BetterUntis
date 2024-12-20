@@ -235,7 +235,7 @@ fun Timetable(
 				}
 			}
 
-			ReportsInfoBottomSheet()
+			ReportsInfoBottomSheet(viewModel.globalRepository)
 		}
 	}
 

@@ -58,7 +58,15 @@ message UserSettings {
   string infocenterAbsencesTimeRange = 52;
 }
 
+message GlobalSettings {
+  bool initialized = 1;
+  bool errorReportingSet = 2;
+  bool errorReportingEnable = 3;
+  bool errorReportingEnableBreadcrumbs = 4;
+}
+
 message Settings {
   int64 activeUser = 1;
-  map<int64, UserSettings> users = 2;
+  map<int64, UserSettings> userSettings = 2;
+  GlobalSettings globalSettings = 3;
 }

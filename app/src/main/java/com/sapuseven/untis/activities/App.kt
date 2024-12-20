@@ -11,20 +11,26 @@ import androidx.work.Configuration
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.sapuseven.untis.helpers.analytics.initSentry
+import com.sapuseven.untis.ui.activities.settings.GlobalSettingsRepository
 import com.sapuseven.untis.workers.DailyWorker
 import com.sapuseven.untis.workers.DailyWorker.Companion.TAG_DAILY_WORK
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-
-val Context.reportsDataStore: DataStore<Preferences> by preferencesDataStore(name = "reports")
-val reportsDataStoreBreadcrumbsEnable = Pair(booleanPreferencesKey("reportBreadcrumbsEnable"), true)
+import javax.inject.Inject
 
 @HiltAndroidApp
 class App : Application(), Configuration.Provider {
+	@Inject lateinit var globalSettingsRepository: GlobalSettingsRepository;
+
+	private val ioScope: CoroutineScope = CoroutineScope(Dispatchers.IO + Job())
+
 	override fun getWorkManagerConfiguration() =
 		Configuration.Builder()
 			.setMinimumLoggingLevel(Log.VERBOSE)
@@ -34,10 +40,12 @@ class App : Application(), Configuration.Provider {
 	override fun onCreate() {
 		super.onCreate()
 
-		GlobalScope.launch {
-			val reportBreadcrumbsEnbaled = reportsDataStore.loadPref(reportsDataStoreBreadcrumbsEnable.first, reportsDataStoreBreadcrumbsEnable.second)
-			Log.d("Sentry", "Breadcrumbs enabled: $reportBreadcrumbsEnbaled")
-			initSentry(reportBreadcrumbsEnbaled)
+		ioScope.launch {
+			val settings = globalSettingsRepository.getSettings().first()
+			initSentry(
+				settings.errorReportingEnable,
+				settings.errorReportingEnableBreadcrumbs
+			)
 		}
 
 		GlobalScope.launch {

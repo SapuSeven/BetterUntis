@@ -352,7 +352,7 @@
     <string name="infocenter_absences_filter_time_ranges">Zeitraum</string>
     <string name="preference_reports_breadcrumbs">Detaillierte Fehlerberichte senden</string>
     <string name="preference_category_reports">Fehlerberichte</string>
-    <string name="preference_reports_info_desc">Diese Einstellungen helfen dabei, die App zu verbessern.
+    <string name="preference_reports_info_desc">Diese Einstellungen betreffen alle Profile und helfen dabei, die App zu verbessern.
 \nPersönliche Daten werden nie gesammelt.
 \nÄnderungen benötigen einen App-Neustart, um wirksam zu werden.</string>
     <string name="preference_reports_breadcrumbs_desc">Beinhaltet zusätzliche Informationen darüber, was passiert ist, bevor ein Fehler aufgetreten ist.</string>

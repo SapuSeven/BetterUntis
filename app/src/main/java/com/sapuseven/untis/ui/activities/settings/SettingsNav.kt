@@ -252,16 +252,13 @@ fun NavGraphBuilder.SettingsNav(
 					}
 				)
 
-				/*TODO SwitchPreference(
+				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_reports_breadcrumbs)) },
 					summary = { Text(stringResource(R.string.preference_reports_breadcrumbs_desc)) },
-					settingsRepository = viewModel.repository,
-					dataStore = UntisPreferenceDataStore(
-						reportsDataStore,
-						reportsDataStoreBreadcrumbsEnable.first,
-						reportsDataStoreBreadcrumbsEnable.second
-					)
-				)*/
+					settingsRepository = viewModel.globalRepository,
+					value = { it.errorReportingEnableBreadcrumbs },
+					onValueChange = { errorReportingEnableBreadcrumbs = it }
+				)
 
 				if (BuildConfig.DEBUG) {
 					val context = LocalContext.current
@@ -421,6 +418,7 @@ fun NavGraphBuilder.SettingsNav(
 					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
 
+				// TODO Implement
 				/*ConfirmDialogPreference(
 					title = { Text(stringResource(R.string.preference_timetable_colors_reset)) },
 					dialogTitle = { Text(stringResource(R.string.preference_dialog_colors_reset_title)) },

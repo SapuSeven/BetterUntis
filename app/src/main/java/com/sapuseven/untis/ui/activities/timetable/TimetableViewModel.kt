@@ -24,7 +24,8 @@ import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.mappers.TimetableMapper
 import com.sapuseven.untis.modules.ThemeManager
 import com.sapuseven.untis.scope.UserScopeManager
-import com.sapuseven.untis.ui.activities.settings.SettingsRepository
+import com.sapuseven.untis.ui.activities.settings.GlobalSettingsRepository
+import com.sapuseven.untis.ui.activities.settings.UserSettingsRepository
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
 import com.sapuseven.untis.ui.weekview.Event
@@ -50,9 +51,10 @@ class TimetableViewModel @AssistedInject constructor(
 	private val userScopeManager: UserScopeManager,
 	private val userDao: UserDao,
 	private val api: TimetableApi,
-	private val repositoryFactory: SettingsRepository.Factory,
+	private val repositoryFactory: UserSettingsRepository.Factory,
 	private val timetableMapperFactory: TimetableMapper.Factory,
-	@Assisted val colorScheme: ColorScheme,
+	@Assisted private val colorScheme: ColorScheme,
+	internal val globalRepository: GlobalSettingsRepository,
 	savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 	@AssistedFactory

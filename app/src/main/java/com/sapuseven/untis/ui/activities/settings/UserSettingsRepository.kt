@@ -5,23 +5,16 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.datastore.core.DataStore
-import androidx.lifecycle.ViewModel
 import com.sapuseven.compose.protostore.data.MultiUserSettingsRepository
 import com.sapuseven.compose.protostore.ui.preferences.materialColors
 import com.sapuseven.untis.data.settings.model.Settings
 import com.sapuseven.untis.data.settings.model.UserSettings
-import com.sapuseven.untis.mappers.TimetableMapper
 import com.sapuseven.untis.scope.UserScopeManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-class SettingsRepository @AssistedInject constructor(
+class UserSettingsRepository @AssistedInject constructor(
 	private val userScopeManager: UserScopeManager,
 	@Assisted private val colorScheme: ColorScheme,
 	dataStore: DataStore<Settings>
@@ -30,7 +23,7 @@ class SettingsRepository @AssistedInject constructor(
 ) {
 	@AssistedFactory
 	interface Factory {
-		fun create(colorScheme: ColorScheme): SettingsRepository
+		fun create(colorScheme: ColorScheme): UserSettingsRepository
 	}
 
 	private val userId = userScopeManager.user.id
@@ -38,7 +31,13 @@ class SettingsRepository @AssistedInject constructor(
 	override fun getUserSettings(dataStore: Settings): UserSettings {
 		Log.d("SettingsRepository", "DataStore getUserSettings")
 
-		return dataStore.usersMap.getOrDefault(userId, getSettingsDefaults())
+		return dataStore.userSettingsMap.getOrDefault(userId, getSettingsDefaults())
+	}
+
+	override fun updateUserSettings(currentData: Settings, userSettings: UserSettings): Settings {
+		return currentData.toBuilder()
+			.putUserSettings(userId, userSettings)
+			.build()
 	}
 
 	override fun getSettingsDefaults() = UserSettings.newBuilder().apply {
@@ -86,10 +85,4 @@ class SettingsRepository @AssistedInject constructor(
 
 		infocenterAbsencesTimeRange = "current_schoolyear"
 	}.build()
-
-	override fun updateUserSettings(currentData: Settings, userSettings: UserSettings): Settings {
-		return currentData.toBuilder()
-			.putUsers(userId, userSettings)
-			.build()
-	}
 }

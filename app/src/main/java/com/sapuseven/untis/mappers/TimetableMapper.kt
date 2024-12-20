@@ -10,7 +10,7 @@ import com.sapuseven.untis.api.model.untis.timetable.Period
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.scope.UserScopeManager
-import com.sapuseven.untis.ui.activities.settings.SettingsRepository
+import com.sapuseven.untis.ui.activities.settings.UserSettingsRepository
 import com.sapuseven.untis.ui.weekview.Event
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -21,7 +21,7 @@ import java.time.DayOfWeek
 import java.time.temporal.ChronoUnit
 
 class TimetableMapper @AssistedInject constructor(
-	private val repositoryFactory: SettingsRepository.Factory,
+	private val repositoryFactory: UserSettingsRepository.Factory,
 	private val userScopeManager: UserScopeManager,
 	@Assisted private val colorScheme: ColorScheme,
 ) {

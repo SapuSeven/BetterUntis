@@ -27,7 +27,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val USER_PREFERENCES_NAME = "settings"
 private const val DATA_STORE_FILE_NAME = "settings.pb"
 
 @InstallIn(SingletonComponent::class)
@@ -40,7 +39,7 @@ object DataStoreModule {
 			serializer = UserSettingsSerializer,
 			produceFile = { appContext.dataStoreFile(DATA_STORE_FILE_NAME) },
 			corruptionHandler = null,
-			/*migrations = listOf(
+			/*TODO migrations = listOf(
 				SharedPreferencesMigration(
 					appContext,
 					USER_PREFERENCES_NAME
@@ -51,39 +50,21 @@ object DataStoreModule {
 	}
 
 	@Provides
-	fun provideDataStoreUtil(@ApplicationContext context: Context): DataStoreUtil = DataStoreUtil(context)
-
-	@Provides
-	fun provideThemeManager(dataStoreUtil: DataStoreUtil): ThemeManager = ThemeManager(dataStoreUtil)
-}
-
-// TODO Move the following stuff elsewhere
-class DataStoreUtil @Inject constructor(context: Context) {
-	val dataStore = context.dataStore
-	val globalDataStore = context.globalDataStore
-
-	companion object {
-		private val Context.globalDataStore: DataStore<Preferences> by preferencesDataStore("global")
-		private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("settings")
-
-		val USER_ID_KEY = longPreferencesKey("active_user_id")
-
-		fun getDarkModeKey(userId: Long): Preferences.Key<Boolean> = booleanPreferencesKey("${userId}_dark_mode")
-	}
+	fun provideThemeManager(): ThemeManager = ThemeManager()
 }
 
 data class ThemeState(val isDarkMode: Boolean = false)
 
 @Singleton
 class ThemeManager @Inject constructor(
-	private val dataStoreUtil: DataStoreUtil
+	//private val dataStoreUtil: DataStoreUtil
 ) {
 	val _themeState = MutableStateFlow(ThemeState())
 	val themeState: StateFlow<ThemeState> = _themeState
 
 	private val scope = CoroutineScope(Dispatchers.IO)
 
-	init {
+	/*init {
 		scope.launch(Dispatchers.IO) {
 			dataStoreUtil.globalDataStore.data
 				.map { preferences -> preferences[DataStoreUtil.USER_ID_KEY] }
@@ -110,5 +91,5 @@ class ThemeManager @Inject constructor(
 				preferences[DataStoreUtil.getDarkModeKey(userId)] = !(preferences[DataStoreUtil.getDarkModeKey(userId)] ?: false)
 			}
 		}
-	}
+	}*/
 }

@@ -16,9 +16,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.sapuseven.compose.protostore.ui.preferences.SwitchPreference
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.reportsDataStore
-import com.sapuseven.untis.activities.reportsDataStoreBreadcrumbsEnable
 import com.sapuseven.untis.preferences.UntisPreferenceDataStore
+import com.sapuseven.untis.ui.activities.settings.GlobalSettingsRepository
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -27,18 +26,22 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReportsInfoBottomSheet(reportsDataStore: DataStore<Preferences> = LocalContext.current.reportsDataStore) {
+fun ReportsInfoBottomSheet(
+	repository: GlobalSettingsRepository
+) {
 	val scope = rememberCoroutineScope()
 	var bottomSheetVisible by rememberSaveable { mutableStateOf(false) }
 	val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 	var saveEnabled by rememberSaveable { mutableStateOf(true) }
 
 	LaunchedEffect(Unit) {
-		if (reportsDataStore.data.map { prefs ->
-				prefs[reportsDataStoreBreadcrumbsEnable.first]
-			}.first() == null) {
-			bottomSheetVisible = true
-			sheetState.show()
+		scope.launch {
+			repository.getSettings().first().let { it ->
+				if (!it.errorReportingSet) {
+					bottomSheetVisible = true
+					sheetState.show()
+				}
+			}
 		}
 	}
 
@@ -94,16 +97,13 @@ fun ReportsInfoBottomSheet(reportsDataStore: DataStore<Preferences> = LocalConte
 				) {
 					Divider()
 
-					// TODO integrate protostore
-					/*SwitchPreference(
+					SwitchPreference(
 						title = { Text(stringResource(R.string.preference_reports_breadcrumbs)) },
 						summary = { Text(stringResource(R.string.preference_reports_breadcrumbs_desc)) },
-						dataStore = UntisPreferenceDataStore(
-							reportsDataStore,
-							reportsDataStoreBreadcrumbsEnable.first,
-							reportsDataStoreBreadcrumbsEnable.second
-						)
-					)*/
+						settingsRepository = repository,
+						value = { it.errorReportingEnableBreadcrumbs },
+						onValueChange = { errorReportingEnableBreadcrumbs = it }
+					)
 
 					Divider()
 				}
@@ -125,12 +125,9 @@ fun ReportsInfoBottomSheet(reportsDataStore: DataStore<Preferences> = LocalConte
 						onClick = {
 							saveEnabled = false
 							scope.launch {
-								reportsDataStore.edit { prefs ->
-									prefs[reportsDataStoreBreadcrumbsEnable.first] =
-										prefs[reportsDataStoreBreadcrumbsEnable.first]
-											?: reportsDataStoreBreadcrumbsEnable.second
+								repository.updateSettings {
+									errorReportingSet = true
 								}
-
 								sheetState.hide()
 							}.invokeOnCompletion {
 								if (!sheetState.isVisible) {

@@ -13,7 +13,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 
 @HiltViewModel(assistedFactory = SettingsScreenViewModel.Factory::class)
 class SettingsScreenViewModel @AssistedInject constructor(
-	private val settingsRepositoryFactory: SettingsRepository.Factory,
+	private val userSettingsRepositoryFactory: UserSettingsRepository.Factory,
+	private val globalSettingsRepository: GlobalSettingsRepository,
 	private val userScopeManager: UserScopeManager,
 	private val userDao: UserDao,
 	val savedStateHandle: SavedStateHandle,
@@ -24,7 +25,8 @@ class SettingsScreenViewModel @AssistedInject constructor(
 		fun create(colorScheme: ColorScheme): SettingsScreenViewModel
 	}
 
-	val repository = settingsRepositoryFactory.create(colorScheme)
+	val repository = userSettingsRepositoryFactory.create(colorScheme)
+	val globalRepository = globalSettingsRepository
 
 	val elementPicker: ElementPicker
 		get() = ElementPicker(userScopeManager.user, userDao)
