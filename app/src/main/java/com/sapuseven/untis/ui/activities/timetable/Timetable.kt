@@ -2,6 +2,7 @@ package com.sapuseven.untis.ui.activities.timetable
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -170,7 +171,9 @@ fun Timetable(
 					hourList = hourList,
 					//dividerWidth = viewModel.weekViewPreferences.dividerWidth,
 					//colorScheme = viewModel.weekViewPreferences.colorScheme,
-					modifier = Modifier.fillMaxSize()
+					modifier = Modifier
+						.fillMaxSize()
+						.disabled(disabled = needsPersonalTimetable)
 				) { startPadding ->
 					// Feedback button
 					IconButton(
@@ -214,7 +217,6 @@ fun Timetable(
 							horizontalAlignment = Alignment.CenterHorizontally,
 							modifier = Modifier
                                 .fillMaxSize()
-                                .padding(start = startPadding)
 						) {
 							Text(
 								text = stringResource(id = R.string.main_anonymous_login_info_text),
