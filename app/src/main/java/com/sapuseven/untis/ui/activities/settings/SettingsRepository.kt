@@ -10,21 +10,28 @@ import com.sapuseven.compose.protostore.data.MultiUserSettingsRepository
 import com.sapuseven.compose.protostore.ui.preferences.materialColors
 import com.sapuseven.untis.data.settings.model.Settings
 import com.sapuseven.untis.data.settings.model.UserSettings
+import com.sapuseven.untis.mappers.TimetableMapper
 import com.sapuseven.untis.scope.UserScopeManager
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class SettingsRepository @Inject constructor(
+class SettingsRepository @AssistedInject constructor(
 	private val userScopeManager: UserScopeManager,
+	@Assisted private val colorScheme: ColorScheme,
 	dataStore: DataStore<Settings>
 ) : MultiUserSettingsRepository<Settings, Settings.Builder, UserSettings, UserSettings.Builder>(
 	dataStore
 ) {
-	lateinit var colorScheme: ColorScheme
-	private val defaultColor = Color.Magenta.toArgb()
+	@AssistedFactory
+	interface Factory {
+		fun create(colorScheme: ColorScheme): SettingsRepository
+	}
 
 	private val userId = userScopeManager.user.id
 
@@ -43,14 +50,14 @@ class SettingsRepository @Inject constructor(
 		backgroundFuture = Color.Transparent.toArgb()
 		backgroundPast = Color(0x40808080).toArgb()
 		marker = Color.White.toArgb()
-		backgroundRegular = if (::colorScheme.isInitialized) colorScheme.primary.toArgb() else defaultColor
-		backgroundRegularPast = if (::colorScheme.isInitialized) colorScheme.primary.copy(alpha = .7f).toArgb() else defaultColor
-		backgroundExam = if (::colorScheme.isInitialized) colorScheme.error.toArgb() else defaultColor
-		backgroundExamPast = if (::colorScheme.isInitialized) colorScheme.error.copy(alpha = .7f).toArgb() else defaultColor
-		backgroundIrregular = if (::colorScheme.isInitialized) colorScheme.tertiary.toArgb() else defaultColor
-		backgroundIrregularPast = if (::colorScheme.isInitialized) colorScheme.tertiary.copy(alpha = .7f).toArgb() else defaultColor
-		backgroundCancelled = if (::colorScheme.isInitialized) colorScheme.secondary.toArgb() else defaultColor
-		backgroundCancelledPast = if (::colorScheme.isInitialized) colorScheme.secondary.copy(alpha = .7f).toArgb() else defaultColor
+		backgroundRegular = colorScheme.primary.toArgb()
+		backgroundRegularPast = colorScheme.primary.copy(alpha = .7f).toArgb()
+		backgroundExam = colorScheme.error.toArgb()
+		backgroundExamPast = colorScheme.error.copy(alpha = .7f).toArgb()
+		backgroundIrregular = colorScheme.tertiary.toArgb()
+		backgroundIrregularPast = colorScheme.tertiary.copy(alpha = .7f).toArgb()
+		backgroundCancelled = colorScheme.secondary.toArgb()
+		backgroundCancelledPast = colorScheme.secondary.copy(alpha = .7f).toArgb()
 		themeColor = /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
 				with(LocalContext.current) {
 					resources.getColor(android.R.color.system_accent1_500, theme)

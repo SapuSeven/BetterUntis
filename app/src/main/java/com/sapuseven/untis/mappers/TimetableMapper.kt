@@ -1,6 +1,6 @@
 package com.sapuseven.untis.mappers
 
-import android.util.Log
+import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.toArgb
@@ -8,38 +8,34 @@ import androidx.core.graphics.ColorUtils
 import com.sapuseven.untis.api.model.untis.masterdata.timegrid.Day
 import com.sapuseven.untis.api.model.untis.timetable.Period
 import com.sapuseven.untis.data.timetable.PeriodData
-import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.scope.UserScopeManager
 import com.sapuseven.untis.ui.activities.settings.SettingsRepository
 import com.sapuseven.untis.ui.weekview.Event
+import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import java.time.DayOfWeek
-import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
 class TimetableMapper @AssistedInject constructor(
-	private val repository: SettingsRepository,
+	private val repositoryFactory: SettingsRepository.Factory,
 	private val userScopeManager: UserScopeManager,
+	@Assisted private val colorScheme: ColorScheme,
 ) {
-	private val settings = repository.getSettings()
+	private val settings = repositoryFactory.create(colorScheme).getSettings()
 
 	@AssistedFactory
 	interface Factory {
-		fun create(): TimetableMapper
+		fun create(colorScheme: ColorScheme): TimetableMapper
 	}
 
 	private data class Preferences(
 		var hideCancelled: Boolean,
 		var substitutionsIrregular: Boolean,
 	)
-
-	init {
-	}
 
 	public suspend fun mapTimetablePeriodsToWeekViewEvents(
 		items: List<Period>,
@@ -58,7 +54,7 @@ class TimetableMapper @AssistedInject constructor(
 				.merge(
 					userScopeManager.user.timeGrid.days
 				)
-				.color(
+				/*.color(
 					Color(backgroundRegular),
 					Color(backgroundRegularPast),
 					Color(backgroundExam),
@@ -68,7 +64,105 @@ class TimetableMapper @AssistedInject constructor(
 					Color(backgroundIrregular),
 					Color(backgroundIrregularPast),
 					schoolBackgroundList
+				)*/
+		}
+	}
+
+	public suspend fun colorWeekViewTimetableEvents(
+		events: List<Event>
+	): List<Event> {
+		waitForSettings().apply {
+			return events.color(
+				Color(backgroundRegular),
+				Color(backgroundRegularPast),
+				Color(backgroundExam),
+				Color(backgroundExamPast),
+				Color(backgroundCancelled),
+				Color(backgroundCancelledPast),
+				Color(backgroundIrregular),
+				Color(backgroundIrregularPast),
+				schoolBackgroundList
+			).apply {
+				forEach {
+					it.title += backgroundRegular
+				}
+			}
+		}
+	}
+
+	public suspend fun color(event: Event) {
+		waitForSettings().apply {
+			return event.color(
+				Color(backgroundRegular),
+				Color(backgroundRegularPast),
+				Color(backgroundExam),
+				Color(backgroundExamPast),
+				Color(backgroundCancelled),
+				Color(backgroundCancelledPast),
+				Color(backgroundIrregular),
+				Color(backgroundIrregularPast),
+				schoolBackgroundList
+			)
+		}
+	}
+
+	private suspend fun Event.color(
+		regularColor: Color,
+		regularPastColor: Color,
+		examColor: Color,
+		examPastColor: Color,
+		cancelledColor: Color,
+		cancelledPastColor: Color,
+		irregularColor: Color,
+		irregularPastColor: Color,
+		useDefault: List<String>
+	) {
+		periodData?.let {
+			val defaultColor =
+				Color(android.graphics.Color.parseColor(periodData.element.backColor))
+			val defaultTextColor =
+				Color(android.graphics.Color.parseColor(periodData.element.foreColor))
+
+			color = when {
+				periodData.isExam() -> if (useDefault.contains("exam")) defaultColor else examColor
+				periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else cancelledColor
+				periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else irregularColor
+				else -> if (useDefault.contains("regular")) defaultColor else regularColor
+			}
+
+			pastColor = when {
+				periodData.isExam() -> if (useDefault.contains("exam")) defaultColor.darken(
+					0.25f
+				) else examPastColor
+
+				periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor.darken(
+					0.25f
+				) else cancelledPastColor
+
+				periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(
+					0.25f
+				) else irregularPastColor
+
+				else -> if (useDefault.contains("regular")) defaultColor.darken(0.25f) else regularPastColor
+			}
+
+			textColor = when {
+				periodData.isExam() -> if (useDefault.contains("exam")) defaultTextColor else colorOn(
+					examColor
 				)
+
+				periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultTextColor else colorOn(
+					cancelledColor
+				)
+
+				periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultTextColor else colorOn(
+					irregularColor
+				)
+
+				else -> if (useDefault.contains("regular")) defaultTextColor else colorOn(
+					regularColor
+				)
+			}
 		}
 	}
 
@@ -158,7 +252,8 @@ class TimetableMapper @AssistedInject constructor(
 		val leftover: MutableList<Event> = mutableListOf()
 
 		// TODO: Check if the day from the Untis API is always an english string
-		val firstDayOfWeek = DayOfWeek.MONDAY //DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(days.first().day).dayOfWeek
+		val firstDayOfWeek =
+			DayOfWeek.MONDAY //DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(days.first().day).dayOfWeek
 
 		// Put all items into a two dimensional array depending on day and hour
 		forEach { item ->
@@ -172,11 +267,13 @@ class TimetableMapper @AssistedInject constructor(
 			if (day < 0 || day >= days.size) return@forEach
 
 			val thisUnitStartIndex = days[day].units.indexOfFirst {
-				it.startTime.truncatedTo(ChronoUnit.MINUTES).equals(startDateTime.toLocalTime().truncatedTo(ChronoUnit.MINUTES))
+				it.startTime.truncatedTo(ChronoUnit.MINUTES)
+					.equals(startDateTime.toLocalTime().truncatedTo(ChronoUnit.MINUTES))
 			}
 
 			val thisUnitEndIndex = days[day].units.indexOfFirst {
-				it.endTime.truncatedTo(ChronoUnit.MINUTES).equals(endDateTime.toLocalTime().truncatedTo(ChronoUnit.MINUTES))
+				it.endTime.truncatedTo(ChronoUnit.MINUTES)
+					.equals(endDateTime.toLocalTime().truncatedTo(ChronoUnit.MINUTES))
 			}
 
 			if (thisUnitStartIndex != -1 && thisUnitEndIndex != -1) itemGrid[day][thisUnitStartIndex].add(

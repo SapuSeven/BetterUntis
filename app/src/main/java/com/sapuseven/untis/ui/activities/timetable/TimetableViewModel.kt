@@ -30,29 +30,37 @@ import com.sapuseven.untis.ui.navigation.AppRoutes
 import com.sapuseven.untis.ui.weekview.Event
 import com.sapuseven.untis.ui.weekview.WeekViewHour
 import com.sapuseven.untis.ui.weekview.startDateForPageIndex
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import javax.inject.Inject
 
-@HiltViewModel
-class TimetableViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = TimetableViewModel.Factory::class)
+class TimetableViewModel @AssistedInject constructor(
 	private val navigator: AppNavigator,
 	private val themeManager: ThemeManager,
 	internal val userManager: UserManager,
 	private val userScopeManager: UserScopeManager,
 	private val userDao: UserDao,
-	private val repository: SettingsRepository,
 	private val api: TimetableApi,
+	private val repositoryFactory: SettingsRepository.Factory,
 	private val timetableMapperFactory: TimetableMapper.Factory,
+	@Assisted val colorScheme: ColorScheme,
 	savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-	private val timetableMapper = timetableMapperFactory.create()
+	@AssistedFactory
+	interface Factory {
+		fun create(colorScheme: ColorScheme): TimetableViewModel
+	}
+
+	private val timetableMapper = timetableMapperFactory.create(colorScheme)
+	private val repository = repositoryFactory.create(colorScheme)
 
 	val args = savedStateHandle.toRoute<AppRoutes.Timetable>()
 
@@ -64,6 +72,9 @@ class TimetableViewModel @Inject constructor(
 	var feedbackDialog by mutableStateOf(false)
 
 	var loading by mutableStateOf(true)
+
+	private val _debugColor = MutableStateFlow(0x0)
+	val debugColor: StateFlow<Int> = _debugColor
 
 	private val _needsPersonalTimetable = MutableStateFlow(false)
 	val needsPersonalTimetable: StateFlow<Boolean> = _needsPersonalTimetable
@@ -92,16 +103,16 @@ class TimetableViewModel @Inject constructor(
 					userSettings.timetableRange.convertRangeToPair(),
 					userSettings.timetableRangeIndexReset
 				)
+				_debugColor.value = userSettings.backgroundRegular
 			}
 		}
 
 		viewModelScope.launch {
-			//loadEvents(0)
+			debugColor.collect {
+				// TODO: For some reason, the elements are not really getting updated. the view doesn't recompose when it changes, and even when the color-function changes the text, it doesn't update
+				emitEvents(_events.value.mapValues { timetableMapper.colorWeekViewTimetableEvents(it.value) })
+			}
 		}
-	}
-
-	fun setColorScheme(colorScheme: ColorScheme) {
-		repository.colorScheme = colorScheme
 	}
 
 	fun switchUser(user: User) {
@@ -135,7 +146,10 @@ class TimetableViewModel @Inject constructor(
 						"WeekView",
 						"Items available for $startDate: ${_events.value.contains(startDate)}"
 					)
-					if (!_events.value.contains(startDate)) loadEvents(startDate)
+					if (!_events.value.contains(startDate))
+						loadEvents(startDate)?.let { events ->
+							emitEvents(mapOf(startDate to timetableMapper.colorWeekViewTimetableEvents(events)))
+						}
 				}
 			}.awaitAll()
 			loading = false
@@ -144,45 +158,45 @@ class TimetableViewModel @Inject constructor(
 
 	suspend fun onPageReload(pageOffset: Int) {
 		loading = true
-		loadEvents(startDateForPageIndex(pageOffset.toLong()))
+		val startDate = startDateForPageIndex(pageOffset.toLong())
+		loadEvents(startDate)?.let { events ->
+			emitEvents(mapOf(startDate to timetableMapper.colorWeekViewTimetableEvents(events)))
+		}
 		loading = false
 	}
 
-	suspend fun loadEvents(startDate: LocalDate) {
-		timetableMapper.mapTimetablePeriodsToWeekViewEvents(
-			emptyList(),
-			TimetableDatabaseInterface.Type.STUDENT
-		)
-
+	private suspend fun loadEvents(startDate: LocalDate): List<Event>? {
 		try {
-			val timetableResult = api.loadTimetable(
-				id = 0,
-				type = TimetableDatabaseInterface.Type.STUDENT.name,
-				startDate = startDate,
-				endDate = startDate.plusDays(5 /*TODO*/),
-				masterDataTimestamp = currentUser.masterDataTimestamp,
-				apiUrl = currentUser.apiUrl,
-				user = currentUser.user,
-				key = currentUser.key
-			).timetable
-
-			// TODO: Merge with previous events
-			val newEvents = _events.value.toMutableMap()
-			newEvents[startDate] = timetableMapper.mapTimetablePeriodsToWeekViewEvents(
-				timetableResult.periods,
+			return timetableMapper.mapTimetablePeriodsToWeekViewEvents(
+				api.loadTimetable(
+					id = 0,
+					type = TimetableDatabaseInterface.Type.STUDENT.name,
+					startDate = startDate,
+					endDate = startDate.plusDays(5 /*TODO*/),
+					masterDataTimestamp = currentUser.masterDataTimestamp,
+					apiUrl = currentUser.apiUrl,
+					user = currentUser.user,
+					key = currentUser.key
+				).timetable.periods,
 				TimetableDatabaseInterface.Type.STUDENT
 			)
-			_events.emit(newEvents.toMap())
-			Log.d("TimetableViewModel", "Successfully loaded timetable: $timetableResult")
 		} catch (e: UntisApiException) {
 			Log.e("TimetableViewModel", "Failed to load timetable due to API error", e)
 		} catch (e: Exception) {
 			Log.e("TimetableViewModel", "Failed to load timetable due to other error", e)
 		}
+		return null
+	}
+
+	private suspend fun emitEvents(events: Map<LocalDate, List<Event>>) {
+		val newEvents = _events.value.toMutableMap()
+		events.forEach { (date, events) ->
+			newEvents[date] = events
+		}
+		_events.emit(newEvents.toMap())
 	}
 
 	private fun groupEventsByDate(events: List<Event>): Map<LocalDate, List<Event>> {
-
 		val groupedEvents = mutableMapOf<LocalDate, MutableList<Event>>()
 
 		for (event in events) {
@@ -229,5 +243,11 @@ class TimetableViewModel @Inject constructor(
 
 	fun showFeedback() {
 		feedbackDialog = true
+	}
+
+	fun debugAction() = viewModelScope.launch {
+		repository.updateSettings {
+			backgroundRegular = ((Math.random() * 0xFFFFFF).toInt()) or (0xFF shl 24);
+		}
 	}
 }
