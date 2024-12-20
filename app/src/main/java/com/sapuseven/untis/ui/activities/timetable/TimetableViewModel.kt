@@ -38,6 +38,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -109,8 +110,9 @@ class TimetableViewModel @AssistedInject constructor(
 
 		viewModelScope.launch {
 			debugColor.collect {
-				// TODO: For some reason, the elements are not really getting updated. the view doesn't recompose when it changes, and even when the color-function changes the text, it doesn't update
-				emitEvents(_events.value.mapValues { timetableMapper.colorWeekViewTimetableEvents(it.value) })
+				_events.update {
+					it.mapValues { timetableMapper.colorWeekViewTimetableEvents(it.value).toList() }
+				}
 			}
 		}
 	}
@@ -189,11 +191,13 @@ class TimetableViewModel @AssistedInject constructor(
 	}
 
 	private suspend fun emitEvents(events: Map<LocalDate, List<Event>>) {
-		val newEvents = _events.value.toMutableMap()
-		events.forEach { (date, events) ->
-			newEvents[date] = events
+		_events.update {
+			val newEvents = it.toMutableMap()
+			events.forEach { (date, events) ->
+				newEvents[date] = events
+			}
+			newEvents.toMap()
 		}
-		_events.emit(newEvents.toMap())
 	}
 
 	private fun groupEventsByDate(events: List<Event>): Map<LocalDate, List<Event>> {

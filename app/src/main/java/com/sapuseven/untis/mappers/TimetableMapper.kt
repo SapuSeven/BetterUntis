@@ -54,17 +54,6 @@ class TimetableMapper @AssistedInject constructor(
 				.merge(
 					userScopeManager.user.timeGrid.days
 				)
-				/*.color(
-					Color(backgroundRegular),
-					Color(backgroundRegularPast),
-					Color(backgroundExam),
-					Color(backgroundExamPast),
-					Color(backgroundCancelled),
-					Color(backgroundCancelledPast),
-					Color(backgroundIrregular),
-					Color(backgroundIrregularPast),
-					schoolBackgroundList
-				)*/
 		}
 	}
 
@@ -72,7 +61,7 @@ class TimetableMapper @AssistedInject constructor(
 		events: List<Event>
 	): List<Event> {
 		waitForSettings().apply {
-			return events.color(
+			return events.copyWithColor(
 				Color(backgroundRegular),
 				Color(backgroundRegularPast),
 				Color(backgroundExam),
@@ -82,11 +71,7 @@ class TimetableMapper @AssistedInject constructor(
 				Color(backgroundIrregular),
 				Color(backgroundIrregularPast),
 				schoolBackgroundList
-			).apply {
-				forEach {
-					it.title += backgroundRegular
-				}
-			}
+			)
 		}
 	}
 
@@ -297,7 +282,7 @@ class TimetableMapper @AssistedInject constructor(
 		return newItems
 	}
 
-	private suspend fun List<Event>.color(
+	private suspend fun List<Event>.copyWithColor(
 		regularColor: Color,
 		regularPastColor: Color,
 		examColor: Color,
@@ -307,58 +292,56 @@ class TimetableMapper @AssistedInject constructor(
 		irregularColor: Color,
 		irregularPastColor: Color,
 		useDefault: List<String>
-	): List<Event> {
-		forEach { item ->
-			item.periodData?.let {
-				val defaultColor =
-					Color(android.graphics.Color.parseColor(item.periodData.element.backColor))
-				val defaultTextColor =
-					Color(android.graphics.Color.parseColor(item.periodData.element.foreColor))
-
-				item.color = when {
-					item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor else examColor
-					item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else cancelledColor
-					item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else irregularColor
-					else -> if (useDefault.contains("regular")) defaultColor else regularColor
-				}
-
-				item.pastColor = when {
-					item.periodData.isExam() -> if (useDefault.contains("exam")) defaultColor.darken(
-						0.25f
-					) else examPastColor
-
-					item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor.darken(
-						0.25f
-					) else cancelledPastColor
-
-					item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(
-						0.25f
-					) else irregularPastColor
-
-					else -> if (useDefault.contains("regular")) defaultColor.darken(0.25f) else regularPastColor
-				}
-
-				item.textColor = when {
-					item.periodData.isExam() -> if (useDefault.contains("exam")) defaultTextColor else colorOn(
-						examColor
-					)
-
-					item.periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultTextColor else colorOn(
-						cancelledColor
-					)
-
-					item.periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultTextColor else colorOn(
-						irregularColor
-					)
-
-					else -> if (useDefault.contains("regular")) defaultTextColor else colorOn(
-						regularColor
-					)
-				}
-			}
-		}
-		return this
+	): List<Event> = map {
+		it.copyWithColor(
+			regularColor,
+			regularPastColor,
+			examColor,
+			examPastColor,
+			cancelledColor,
+			cancelledPastColor,
+			irregularColor,
+			irregularPastColor,
+			useDefault,
+		)
 	}
+
+	private suspend fun Event.copyWithColor(
+		regularColor: Color,
+		regularPastColor: Color,
+		examColor: Color,
+		examPastColor: Color,
+		cancelledColor: Color,
+		cancelledPastColor: Color,
+		irregularColor: Color,
+		irregularPastColor: Color,
+		useDefault: List<String>
+	): Event = periodData?.let {
+		val defaultColor = Color(android.graphics.Color.parseColor(periodData.element.backColor))
+		val defaultTextColor =
+			Color(android.graphics.Color.parseColor(periodData.element.foreColor))
+
+		copy(
+			color = when {
+				periodData.isExam() -> if (useDefault.contains("exam")) defaultColor else examColor
+				periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else cancelledColor
+				periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else irregularColor
+				else -> if (useDefault.contains("regular")) defaultColor else regularColor
+			},
+			pastColor = when {
+				periodData.isExam() -> if (useDefault.contains("exam")) defaultColor.darken(0.25f) else examPastColor
+				periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor.darken(0.25f) else cancelledPastColor
+				periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(0.25f) else irregularPastColor
+				else -> if (useDefault.contains("regular")) defaultColor.darken(0.25f) else regularPastColor
+			},
+			textColor = when {
+				periodData.isExam() -> if (useDefault.contains("exam")) defaultTextColor else colorOn(examColor)
+				periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultTextColor else colorOn(cancelledColor)
+				periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultTextColor else colorOn(irregularColor)
+				else -> if (useDefault.contains("regular")) defaultTextColor else colorOn(regularColor)
+			}
+		)
+	} ?: this
 
 	private fun Color.darken(ratio: Float) = lerp(this, Color.Black, ratio)
 

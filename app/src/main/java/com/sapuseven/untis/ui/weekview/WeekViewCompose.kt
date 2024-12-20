@@ -655,13 +655,6 @@ fun WeekViewCompose(
 	var datePickerDialog by remember { mutableStateOf(false) }
 	var jumpToDate by remember { mutableStateOf<java.time.LocalDate?>(null) }
 
-	LaunchedEffect(events) {
-		// The events object only changes when the user changes.
-		// When loading new events, only the map value is updated.
-		// This allows to initialize the first page when the user changes.
-		currentOnPageChange(pagerState.currentPage - startPage)
-	}
-
 	LaunchedEffect(jumpToDate) {
 		jumpToDate?.let {
 			pagerState.scrollToPage((startPage + pageIndexForDate(it)).toInt())
