@@ -17,15 +17,38 @@ You can also download the latest automated build [from my website](https://sapus
 | <img src="https://raw.githubusercontent.com/SapuSeven/BetterUntis/master/fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" alt="Screenshot 1" /> | <img src="https://raw.githubusercontent.com/SapuSeven/BetterUntis/master/fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" alt="Screenshot 2" /> | <img src="https://raw.githubusercontent.com/SapuSeven/BetterUntis/master/fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" alt="Screenshot 3" /> | <img src="https://raw.githubusercontent.com/SapuSeven/BetterUntis/master/fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" alt="Screenshot 4" /> |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
 
-## Development notes (v3.x.x)
-My [original version](https://github.com/SapuSeven/BetterUntis-Legacy) of BetterUntis had many design and performance flaws.
-As a result, development became increasingly more difficult.
-I came to the conclusion that it was best to scrap the project and start over from scratch.
+## Development history
 
-Although I reused some parts of the original code, my plan was to entirely switch to Kotlin.
+### v3.x
+The [original version](https://github.com/SapuSeven/BetterUntis-Legacy) of BetterUntis had many design and performance flaws.
+Since development became increasingly more difficult, the project was scrapepd and I started over from scratch.
+
+Although some parts of the original code were reused, the codebase was entirely switched to Kotlin.
 Kotlin has many features and libraries that immensely help to communicate with the Untis API and process the timetable data.
 
-Another major change is the use of a custom WeekView (based on [Till Hellmund](https://github.com/thellmund)'s fork of [Android-Week-View](https://github.com/alamkanak/Android-Week-View)) for the timetable display. This also improved performance by a lot.
+Another major change is the use of a custom WeekView (based on [Till Hellmund](https://github.com/thellmund)'s fork of [Android-Week-View](https://github.com/alamkanak/Android-Week-View)) for the timetable display.
+This also improved performance by a lot.
+
+### v4.x
+This major version updated the WeekView component again to be based entirely on Jetpack Compose.
+Since the rest of the app was already built on Compose, this made it easier to develop and improve the WeekView component.
+
+### v5.x (WIP)
+This version introduces a complete architecture overhaul to follow the latest Android Jetpack guidelines.
+Additionally, several components (like Untis API Client, Compose Preferences, ...) were separated to their own module
+to potentially reuse them in other projects.
+
+As this changes virtually every part of the app, here's a list tracking all migrated components:
+
+- [ ] Timetable view
+  - [x] WeekView
+  - [ ] Element Picker
+  - [ ] Caching
+- [x] Preferences
+- [ ] Room Finder
+- [ ] Info Center
+- [ ] Widget
+- [ ] Notifications
 
 ## New features
 - Search for your school by name or ID, no URL needed
