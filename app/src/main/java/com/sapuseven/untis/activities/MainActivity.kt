@@ -73,6 +73,7 @@ import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.models.NavItemShortcut
 import com.sapuseven.untis.ui.preferences.convertRangeToPair
+import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import com.sapuseven.untis.ui.weekview.*
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
@@ -838,6 +839,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	private suspend fun prepareItems(
 		items: List<TimegridItem>
 	): List<TimegridItem> {
+		val hiddenSubjects = decodeStoredTimetableValue(preferences.timetableHiddenElements.getValue()).orEmpty()
 		val newItems = mergeItems(items.mapNotNull { item ->
 			if (item.periodData.isCancelled() && preferences.timetableHideCancelled.getValue())
 				return@mapNotNull null
@@ -852,6 +854,9 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 								|| preferences.timetableBackgroundIrregular.getValue()
 								&& item.periodData.element.backColor != UNTIS_DEFAULT_COLOR
 				}
+			}
+			if (item.periodData.subjects.isNotEmpty() && hiddenSubjects.containsAll(item.periodData.subjects)) {
+				return@mapNotNull null
 			}
 			item
 		})

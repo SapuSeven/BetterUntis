@@ -57,6 +57,7 @@
     <string name="elementpicker_hint_search_rooms">Search for rooms…</string>
     <string name="elementpicker_hint_search_teachers">Search for teachers…</string>
 	<string name="elementpicker_timetable_select">Select a Timetable</string>
+	<string name="elementpicker_select_all">Select all</string>
 	<string name="errormessagedictionary_generic">Unknown error</string>
     <string name="errormessagedictionary_invalid_credentials">Wrong username or key!</string>
     <string name="errormessagedictionary_invalid_school">The specified school doesn\'t exist!</string>
@@ -387,6 +388,8 @@
     <string name="infocenter_absences_list_thirty_days">Show last 30 days</string>
     <string name="infocenter_absences_list_ninety_days">Show last 90 days</string>
     <string name="infocenter_absences_list_schoolyear">Current school year</string>
+	<string name="maindrawer_hide_subjects">Subjects to hide</string>
+	<string name="maindrawer_hide_subjects_dialogue_title">Subject selection</string>
 	<string name="all_open_datepicker">Open date picker</string>
 	<string name="all_timepicker_select">Select Time</string>
     <string name="all_start_time">Start time</string>
