@@ -1,5 +1,6 @@
 package com.sapuseven.untis.ui.activities.timetable
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
@@ -12,6 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.sapuseven.compose.protostore.ui.preferences.convertRangeToPair
+import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.client.TimetableApi
 import com.sapuseven.untis.api.exception.UntisApiException
@@ -22,12 +24,14 @@ import com.sapuseven.untis.data.databases.entities.UserDao
 import com.sapuseven.untis.data.settings.model.UserSettings
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.mappers.TimetableMapper
+import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.modules.ThemeManager
 import com.sapuseven.untis.scope.UserScopeManager
 import com.sapuseven.untis.ui.activities.settings.GlobalSettingsRepository
 import com.sapuseven.untis.ui.activities.settings.UserSettingsRepository
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
+import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import com.sapuseven.untis.ui.weekview.Event
 import com.sapuseven.untis.ui.weekview.WeekViewHour
 import com.sapuseven.untis.ui.weekview.startDateForPageIndex
@@ -85,6 +89,9 @@ class TimetableViewModel @AssistedInject constructor(
 	private val _hourList = MutableStateFlow<List<WeekViewHour>>(emptyList())
 	val hourList: StateFlow<List<WeekViewHour>> = _hourList
 
+	private val _currentElement = MutableStateFlow<PeriodElement?>(null)
+	val currentElement: StateFlow<PeriodElement?> = _currentElement
+
 	private val _events = MutableStateFlow<Map<LocalDate, List<Event>>>(emptyMap())
 	val events: StateFlow<Map<LocalDate, List<Event>>> = _events
 
@@ -100,7 +107,10 @@ class TimetableViewModel @AssistedInject constructor(
 			repository.getSettings().collect { userSettings ->
 				// All properties that are based on preferences are set here
 				_currentUserSettings.value = userSettings
-				_needsPersonalTimetable.value = userSettings.timetablePersonalTimetable.isBlank()
+				decodeStoredTimetableValue(userSettings.timetablePersonalTimetable)?.let {
+					_needsPersonalTimetable.emit(false)
+					_currentElement.emit(it)
+				} ?: _needsPersonalTimetable.emit(true)
 				_hourList.value = buildHourList(
 					currentUser,
 					userSettings.timetableRange.convertRangeToPair(),
@@ -255,5 +265,13 @@ class TimetableViewModel @AssistedInject constructor(
 		repository.updateSettings {
 			backgroundRegular = ((Math.random() * 0xFFFFFF).toInt()) or (0xFF shl 24);
 		}
+	}
+
+	fun getTitle(context: Context) = _currentElement.value?.let {
+		it.type + " " + it.id
+	} ?: currentUser.getDisplayedName(context) + (if (BuildConfig.DEBUG) " (${currentUser.id})" else "")
+
+	fun showElement(element: PeriodElement?) {
+		TODO("Not yet implemented")
 	}
 }

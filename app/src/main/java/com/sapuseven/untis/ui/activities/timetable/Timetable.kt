@@ -33,6 +33,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -81,18 +82,14 @@ fun Timetable(
 		drawerState = drawerState,
 		elementPicker = viewModel.elementPicker,
 		onShowTimetable = {
-			//it.let { element ->
-			//state.setDisplayedElement(element?.first, element?.second)
-			//}
+			viewModel.showElement(it)
 		}
 	) {
 		AppScaffold(
 			topBar = {
 				CenterAlignedTopAppBar(
 					title = {
-						Text(
-							user.getDisplayedName() + (if (BuildConfig.DEBUG) " (${user.id})" else "")
-						)
+						Text(viewModel.getTitle(LocalContext.current))
 					},
 					navigationIcon = {
 						IconButton(onClick = {
@@ -200,16 +197,6 @@ fun Timetable(
                                 .bottomInsets()
 						)
 
-					// Last refresh text
-					Text(
-						text = viewModel.lastRefreshText(),
-						modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .padding(start = startPadding + 8.dp, bottom = 8.dp)
-                            .bottomInsets()
-                            .disabled(user.anonymous == true)
-					)
-
 					// Custom personal timetable hint
 					if (needsPersonalTimetable) {
 						Column(
@@ -233,6 +220,15 @@ fun Timetable(
 								Text(text = stringResource(id = R.string.main_go_to_settings))
 							}
 						}
+					} else {
+						// Last refresh text
+						Text(
+							text = viewModel.lastRefreshText(),
+							modifier = Modifier
+								.align(Alignment.BottomStart)
+								.padding(start = startPadding + 8.dp, bottom = 8.dp)
+								.bottomInsets()
+						)
 					}
 				}
 			}
