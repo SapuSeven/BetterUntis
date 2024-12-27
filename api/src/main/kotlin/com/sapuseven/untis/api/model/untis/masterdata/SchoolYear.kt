@@ -3,6 +3,7 @@ package com.sapuseven.untis.api.model.untis.masterdata
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
+import com.sapuseven.untis.api.serializer.Date
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
@@ -18,9 +19,9 @@ import kotlinx.serialization.Transient
 	)]
 )
 data class SchoolYear(
-	val id: Int = 0,
+	val id: Long = 0,
 	@Transient val userId: Long = -1,
 	val name: String = "",
-	val startDate: String = "",
-	val endDate: String = ""
+	val startDate: Date,
+	val endDate: Date
 )

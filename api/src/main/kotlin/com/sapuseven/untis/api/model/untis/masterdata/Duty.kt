@@ -3,6 +3,7 @@ package com.sapuseven.untis.api.model.untis.masterdata
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
+import com.sapuseven.untis.api.model.untis.enumeration.DutyType
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
@@ -18,9 +19,9 @@ import kotlinx.serialization.Transient
 	)]
 )
 data class Duty(
-	val id: Int,
+	val id: Long,
 	@Transient val userId: Long = -1,
 	val name: String,
 	val longName: String,
-	val type: String
+	val type: DutyType
 )

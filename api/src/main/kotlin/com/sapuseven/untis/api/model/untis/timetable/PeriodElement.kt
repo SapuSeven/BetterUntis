@@ -1,10 +1,11 @@
 package com.sapuseven.untis.api.model.untis.timetable
 
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class PeriodElement(
-		val type: String,
-		val id: Int,
-		val orgId: Int = id
+	val type: ElementType,
+	val id: Long,
+	val orgId: Long = id
 )

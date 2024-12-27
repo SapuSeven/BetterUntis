@@ -3,6 +3,7 @@ package com.sapuseven.untis.api.model.untis.masterdata
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
@@ -18,11 +19,11 @@ import kotlinx.serialization.Transient
 	)]
 )
 data class EventReason(
-	val id: Int,
+	val id: Long,
 	@Transient val userId: Long = -1,
 	val name: String,
 	val longName: String,
-	val elementType: String,
-	val groupId: Int,
+	val elementType: ElementType,
+	val groupId: Long,
 	val active: Boolean
 )

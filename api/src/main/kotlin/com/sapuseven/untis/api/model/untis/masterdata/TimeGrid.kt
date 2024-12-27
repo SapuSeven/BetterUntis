@@ -2,11 +2,9 @@ package com.sapuseven.untis.api.model.untis.masterdata
 
 import com.sapuseven.untis.api.model.untis.masterdata.timegrid.Day
 import com.sapuseven.untis.api.model.untis.masterdata.timegrid.Unit
-import com.sapuseven.untis.api.serializer.Time
 import kotlinx.serialization.Serializable
 import java.time.DayOfWeek
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 @Serializable
 data class TimeGrid(
@@ -25,7 +23,7 @@ data class TimeGrid(
 			return TimeGrid(
 				// Range of week days to include (0 = Sunday, 1 = Monday, ...)
 				(1..5).map {
-					Day(DateTimeFormatter.ofPattern("E").format(DayOfWeek.of(it)), unitsForDay)
+					Day(DayOfWeek.of(it), unitsForDay)
 				})
 		}
 	}

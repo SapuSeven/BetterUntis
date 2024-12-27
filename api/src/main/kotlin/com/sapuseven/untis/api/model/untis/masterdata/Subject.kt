@@ -16,12 +16,13 @@ import kotlinx.serialization.Transient
 		childColumns = ["userId"],
 		onDelete = ForeignKey.CASCADE
 	)]
-)data class Subject(
-	val id: Int = 0,
+)
+data class Subject(
+	val id: Long = 0,
 	@Transient val userId: Long = -1,
 	val name: String = "",
 	val longName: String = "",
-	val departmentIds: List<Int> = emptyList(),
+	val departmentIds: List<Long> = emptyList(),
 	val foreColor: String? = null,
 	val backColor: String? = null,
 	val active: Boolean = false,

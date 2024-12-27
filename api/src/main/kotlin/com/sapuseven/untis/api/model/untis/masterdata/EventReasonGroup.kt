@@ -19,7 +19,7 @@ import kotlinx.serialization.Transient
 	)]
 )
 data class EventReasonGroup(
-	val id: Int,
+	val id: Long,
 	@Transient val userId: Long = -1,
 	val name: String,
 	val longName: String,

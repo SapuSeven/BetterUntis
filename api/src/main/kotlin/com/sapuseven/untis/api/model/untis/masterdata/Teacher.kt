@@ -3,6 +3,7 @@ package com.sapuseven.untis.api.model.untis.masterdata
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
+import com.sapuseven.untis.api.serializer.Date
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
@@ -18,16 +19,16 @@ import kotlinx.serialization.Transient
 	)]
 )
 data class Teacher(
-	val id: Int = 0,
+	val id: Long = 0,
 	@Transient val userId: Long = -1,
 	val name: String = "",
 	val firstName: String = "",
 	val lastName: String = "",
-	val departmentIds: List<Int> = emptyList(),
+	val departmentIds: List<Long> = emptyList(),
 	val foreColor: String? = null,
 	val backColor: String? = null,
-	val entryDate: String? = null,
-	val exitDate: String? = null,
+	val entryDate: Date? = null,
+	val exitDate: Date? = null,
 	val active: Boolean = false,
 	val displayAllowed: Boolean = false
 ) : Comparable<String> {

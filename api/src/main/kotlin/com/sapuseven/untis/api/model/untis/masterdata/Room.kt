@@ -18,11 +18,11 @@ import kotlinx.serialization.Transient
 	)]
 )
 data class Room(
-	val id: Int = 0,
+	val id: Long = 0,
 	@Transient val userId: Long = -1,
 	val name: String = "",
 	val longName: String = "",
-	val departmentId: Int = 0,
+	val departmentId: Long = 0,
 	val foreColor: String? = null,
 	val backColor: String? = null,
 	val active: Boolean = false,
