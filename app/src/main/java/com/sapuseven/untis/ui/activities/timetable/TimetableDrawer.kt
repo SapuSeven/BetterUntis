@@ -38,9 +38,10 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.MainActivity
 import com.sapuseven.untis.activities.main.DrawerItems
 import com.sapuseven.untis.activities.main.DrawerText
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.components.ElementPicker
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreenNew
@@ -62,13 +63,13 @@ fun TimetableDrawer(
 	val drawerScrollState = rememberScrollState()
 
 	var showElementPicker by remember {
-		mutableStateOf<TimetableDatabaseInterface.Type?>(
+		mutableStateOf<ElementType?>(
 			null
 		)
 	}
 
 	var bookmarksElementPicker by remember {
-		mutableStateOf<TimetableDatabaseInterface.Type?>(
+		mutableStateOf<ElementType?>(
 			null
 		)
 	}
@@ -206,7 +207,7 @@ fun TimetableDrawer(
 					onClick = {
 						scope.launch {
 							drawerState.close()
-							bookmarksElementPicker = TimetableDatabaseInterface.Type.CLASS
+							bookmarksElementPicker = ElementType.CLASS
 						}
 					},
 					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)

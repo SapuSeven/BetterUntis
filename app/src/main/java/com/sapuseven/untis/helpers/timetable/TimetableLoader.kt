@@ -2,16 +2,13 @@ package com.sapuseven.untis.helpers.timetable
 
 import android.content.Context
 import android.util.Log
-import com.sapuseven.untis.data.connectivity.UntisApiConstants
+import com.sapuseven.untis.api.serializer.Date
 import com.sapuseven.untis.data.connectivity.Authentication
+import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisRequest
-import com.sapuseven.untis.data.databases.entities.User
-import com.sapuseven.untis.data.timetable.PeriodData
-import com.sapuseven.untis.data.timetable.TimegridItem
-import com.sapuseven.untis.models.untis.UntisDate
+import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.models.untis.params.TimetableParams
 import com.sapuseven.untis.models.untis.response.TimetableResponse
-import com.sapuseven.untis.models.untis.timetable.Period
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -45,13 +42,6 @@ class TimetableLoader(
 			loadAsync(target, flags, proxyHost)
 		}*/
 
-	data class TimetableItems(
-		val items: List<TimegridItem>,
-		val startDate: UntisDate,
-		val endDate: UntisDate,
-		val timestamp: Long
-	)
-
 	class TimetableLoaderException(
 		val requestId: Int,
 		val untisErrorCode: Int?,
@@ -64,9 +54,9 @@ class TimetableLoader(
 		loadFromServer: Boolean = false,
 		loadFromCache: Boolean = false,
 		loadFromCacheOnly: Boolean = false,
-		onItemsReceived: (timetableItems: TimetableItems) -> Unit
+		//onItemsReceived: (timetableItems: TimetableItems) -> Unit
 	) {
-		requestList.add(target)
+		/*requestList.add(target)
 
 		var shouldLoadFromServer = loadFromServer
 
@@ -98,10 +88,10 @@ class TimetableLoader(
 					}
 				}
 			}
-		}
+		}*/
 	}
 
-	fun loadFlow(
+	/*fun loadFlow(
 		target: TimetableLoaderTarget,
 		proxyHost: String? = null,
 		loadFromServer: Boolean = false,
@@ -169,24 +159,6 @@ class TimetableLoader(
 			)
 			sendBreadcrumb(target, "cache miss", cache = cache)
 			null
-		}
-	}
-
-	private fun sendBreadcrumb(
-		target: TimetableLoaderTarget,
-		status: String,
-		cache: TimetableCache? = null,
-		throwable: Throwable? = null
-	) {
-		Breadcrumb().apply {
-			type = "query"
-			category = "timetable"
-			level = SentryLevel.INFO
-			setData("target", target)
-			setData("status", status)
-			cache?.let { setData("cache_id", cache.toString()) }
-			throwable?.let { setData("throwable", throwable) }
-			Sentry.addBreadcrumb(this)
 		}
 	}
 
@@ -396,7 +368,7 @@ class TimetableLoader(
 		}
 	}
 
-	/*private fun formatJsonParsingException(e: JsonDecodingException, jsonData: String): String {
+	private fun formatJsonParsingException(e: JsonDecodingException, jsonData: String): String {
 		val errorMargin = 20
 		val errorIndex: Int? = e.message?.let {
 			it.split(" ")[3].let { i ->
@@ -409,16 +381,6 @@ class TimetableLoader(
 		else ""
 	}*/
 
-	private fun periodToTimegridItem(period: Period, type: String): TimegridItem {
-		return TimegridItem(
-			period.id.toLong(),
-			period.startDateTime.toLocalDateTime().toDateTime(),
-			period.endDateTime.toLocalDateTime().toDateTime(),
-			type,
-			null!!//PeriodData(timetableDatabaseInterface, period)
-		)
-	}
-
 	/*fun repeat(requestId: Int, flags: Int = 0, proxyHost: String? = null) {
 		Log.d(
 			"TimetableLoaderDebug",
@@ -427,9 +389,27 @@ class TimetableLoader(
 		load(requestList[requestId], flags, proxyHost)
 	}*/
 
+	private fun sendBreadcrumb(
+		target: TimetableLoaderTarget,
+		status: String,
+		cache: TimetableCache? = null,
+		throwable: Throwable? = null
+	) {
+		Breadcrumb().apply {
+			type = "query"
+			category = "timetable"
+			level = SentryLevel.INFO
+			setData("target", target)
+			setData("status", status)
+			cache?.let { setData("cache_id", cache.toString()) }
+			throwable?.let { setData("throwable", throwable) }
+			Sentry.addBreadcrumb(this)
+		}
+	}
+
 	data class TimetableLoaderTarget(
-		val startDate: UntisDate,
-		val endDate: UntisDate,
+		val startDate: Date,
+		val endDate: Date,
 		val id: Int,
 		val type: String
 	)

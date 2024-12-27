@@ -1,7 +1,6 @@
 package com.sapuseven.untis.ui.activities
 
-import com.sapuseven.untis.models.UntisAbsence
-import com.sapuseven.untis.models.untis.UntisDateTime
+import com.sapuseven.untis.ui.activities.infocenter.InfoCenterState
 import io.mockk.every
 import io.mockk.mockk
 import org.joda.time.LocalDateTime

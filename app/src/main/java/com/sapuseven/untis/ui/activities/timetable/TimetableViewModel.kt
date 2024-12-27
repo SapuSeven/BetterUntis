@@ -17,14 +17,15 @@ import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.client.TimetableApi
 import com.sapuseven.untis.api.exception.UntisApiException
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.components.ElementPicker
 import com.sapuseven.untis.components.UserManager
-import com.sapuseven.untis.data.databases.entities.User
-import com.sapuseven.untis.data.databases.entities.UserDao
+import com.sapuseven.untis.data.database.entities.User
+import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.data.settings.model.UserSettings
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.mappers.TimetableMapper
-import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.modules.ThemeManager
 import com.sapuseven.untis.scope.UserScopeManager
 import com.sapuseven.untis.ui.activities.settings.GlobalSettingsRepository
@@ -192,7 +193,7 @@ class TimetableViewModel @AssistedInject constructor(
 					user = currentUser.user,
 					key = currentUser.key
 				).timetable.periods,
-				TimetableDatabaseInterface.Type.STUDENT
+				ElementType.STUDENT
 			)
 		} catch (e: UntisApiException) {
 			Log.e("TimetableViewModel", "Failed to load timetable due to API error", e)
@@ -268,7 +269,7 @@ class TimetableViewModel @AssistedInject constructor(
 	}
 
 	fun getTitle(context: Context) = _currentElement.value?.let {
-		it.type + " " + it.id
+		it.type.name + " " + it.id
 	} ?: currentUser.getDisplayedName(context) + (if (BuildConfig.DEBUG) " (${currentUser.id})" else "")
 
 	fun showElement(element: PeriodElement?) {

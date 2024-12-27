@@ -1,4 +1,4 @@
-package com.sapuseven.untis.data.databases
+package com.sapuseven.untis.data.database
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase

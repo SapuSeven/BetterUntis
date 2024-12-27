@@ -8,14 +8,13 @@ import androidx.activity.ComponentActivity
 import androidx.room.Room
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.data.databases.entities.User
-import com.sapuseven.untis.data.timetable.TimegridItem
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.data.database.UserDatabase
+import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.helpers.config.booleanDataStore
 import com.sapuseven.untis.helpers.config.stringDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
-import com.sapuseven.untis.models.untis.UntisDate
 import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.completeWith
@@ -42,19 +41,20 @@ abstract class TimetableDependantWorker(
 				).getValue()
 			)
 
-			val elemId = customPersonalTimetable?.id ?: user.userData.elemId
-			val elemType = customPersonalTimetable?.type ?: user.userData.elemType ?: ""
+			return null;// TODO
+			/*val elemId = customPersonalTimetable?.id ?: user.userData.elemId
+			val elemType = customPersonalTimetable?.type ?: user.userData.elemType ?: ElementType.SUBJECT
 
-			return if (TimetableDatabaseInterface.Type.values()
+			return if (ElementType.values()
 					.find { it.name == elemType } == null
 			)
 				null // Anonymous / no custom personal timetable
 			else
-				elemId to elemType
+				elemId to elemType*/
 		}
 	}
 
-	protected suspend fun loadTimetable(
+	/*protected suspend fun loadTimetable(
 		user: User,
 		timetableDatabaseInterface: TimetableDatabaseInterface,
 		timetableElement: Pair<Int, String>,
@@ -85,7 +85,7 @@ abstract class TimetableDependantWorker(
 			}
 			completeWith(kotlin.Result.failure(Exception("Timetable loading failed")))
 		}.await()
-	}
+	}*/
 
 	internal fun canAutoMute(): Boolean {
 		val notificationManager =
@@ -120,8 +120,8 @@ abstract class TimetableDependantWorker(
  * Merges all values from contemporaneous lessons.
  * After this operation, every time period only has a single lesson containing all subjects, teachers, rooms and classes.
  */
-internal fun List<TimegridItem>.merged(): List<TimegridItem> = this.groupBy { it.startDateTime }
-	.map { it.value.reduce { item1, item2 -> item1.mergeValuesWith(item2); item1 } }
+//internal fun List<TimegridItem>.merged(): List<TimegridItem> = this.groupBy { it.startDateTime }
+	//.map { it.value.reduce { item1, item2 -> item1.mergeValuesWith(item2); item1 } }
 
 /**
  * Creates a copy of a zipped list with the very last element duplicated into a new Pair whose second element is null.

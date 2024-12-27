@@ -16,9 +16,9 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.data.databases.entities.User
-import com.sapuseven.untis.data.timetable.TimegridItem
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.data.database.UserDatabase
+import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.config.booleanDataStore
 import com.sapuseven.untis.helpers.config.intDataStore
@@ -57,7 +57,7 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 
 		fun enqueue(workManager: WorkManager, user: User) {
 			val data: Data = Data.Builder().run {
-				put(WORKER_DATA_USER_ID, user.id)
+				//put(WORKER_DATA_USER_ID, user.id)
 				build()
 			}
 
@@ -84,7 +84,7 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 	}
 
 	private suspend fun scheduleNotifications(): Result {
-		val userDatabase = UserDatabase.getInstance(applicationContext)
+		/*val userDatabase = UserDatabase.getInstance(applicationContext)
 
 		userDatabase.userDao().getById(inputData.getLong(WORKER_DATA_USER_ID, -1))?.let { user ->
 			var scheduledNotifications = 0
@@ -169,7 +169,7 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 				Log.e(LOG_TAG, "Notifications couldn't be scheduled", e)
 				return Result.failure()
 			}
-		}
+		}*/
 
 		return Result.success()
 	}
@@ -178,10 +178,10 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 		context: Context,
 		userId: Long,
 		notificationTime: DateTime,
-		notificationEndLesson: TimegridItem,
+		//notificationEndLesson: TimegridItem,
 		isFirst: Boolean = false
 	) {
-		val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
+		/*val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
 		val id = notificationTime.millisOfDay / 1000 // generate a unique id
 
 		val intent = Intent(context, NotificationReceiver::class.java)
@@ -194,35 +194,35 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 			)
 			.putExtra(
 				EXTRA_STRING_NEXT_SUBJECT,
-				notificationEndLesson.periodData.getShort(TimetableDatabaseInterface.Type.SUBJECT)
+				notificationEndLesson.periodData.getShort(ElementType.SUBJECT)
 			)
 			.putExtra(
 				EXTRA_STRING_NEXT_SUBJECT_LONG,
-				notificationEndLesson.periodData.getLong(TimetableDatabaseInterface.Type.SUBJECT)
+				notificationEndLesson.periodData.getLong(ElementType.SUBJECT)
 			)
 			.putExtra(
 				EXTRA_STRING_NEXT_ROOM,
-				notificationEndLesson.periodData.getShort(TimetableDatabaseInterface.Type.ROOM)
+				notificationEndLesson.periodData.getShort(ElementType.ROOM)
 			)
 			.putExtra(
 				EXTRA_STRING_NEXT_ROOM_LONG,
-				notificationEndLesson.periodData.getLong(TimetableDatabaseInterface.Type.ROOM)
+				notificationEndLesson.periodData.getLong(ElementType.ROOM)
 			)
 			.putExtra(
 				EXTRA_STRING_NEXT_TEACHER,
-				notificationEndLesson.periodData.getShort(TimetableDatabaseInterface.Type.TEACHER)
+				notificationEndLesson.periodData.getShort(ElementType.TEACHER)
 			)
 			.putExtra(
 				EXTRA_STRING_NEXT_TEACHER_LONG,
-				notificationEndLesson.periodData.getLong(TimetableDatabaseInterface.Type.TEACHER)
+				notificationEndLesson.periodData.getLong(ElementType.TEACHER)
 			)
 			.putExtra(
 				EXTRA_STRING_NEXT_CLASS,
-				notificationEndLesson.periodData.getShort(TimetableDatabaseInterface.Type.CLASS)
+				notificationEndLesson.periodData.getShort(ElementType.CLASS)
 			)
 			.putExtra(
 				EXTRA_STRING_NEXT_CLASS_LONG,
-				notificationEndLesson.periodData.getLong(TimetableDatabaseInterface.Type.CLASS)
+				notificationEndLesson.periodData.getLong(ElementType.CLASS)
 			)
 
 		if (isFirst) intent.putExtra(EXTRA_BOOLEAN_FIRST, true)
@@ -236,7 +236,7 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 		alarmManager.setExact(AlarmManager.RTC_WAKEUP, notificationTime.millis, pendingIntent)
 		Log.d(
 			LOG_TAG,
-			"${notificationEndLesson.periodData.getShort(TimetableDatabaseInterface.Type.SUBJECT)} scheduled for $notificationTime"
+			"${notificationEndLesson.periodData.getShort(ElementType.SUBJECT)} scheduled for $notificationTime"
 		)
 
 		val deletingIntent = Intent(context, NotificationReceiver::class.java)
@@ -255,8 +255,8 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 		)
 		Log.d(
 			LOG_TAG,
-			"${notificationEndLesson.periodData.getShort(TimetableDatabaseInterface.Type.SUBJECT)} delete scheduled for ${notificationEndLesson.startDateTime}"
-		)
+			"${notificationEndLesson.periodData.getShort(ElementType.SUBJECT)} delete scheduled for ${notificationEndLesson.startDateTime}"
+		)*/
 	}
 
 	private fun clearNotification(

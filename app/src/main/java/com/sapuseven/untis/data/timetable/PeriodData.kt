@@ -4,16 +4,18 @@ import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.StrikethroughSpan
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.api.model.untis.enumeration.PeriodState
 import com.sapuseven.untis.api.model.untis.timetable.Period
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
+import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 @Serializable
 class PeriodData(
-		@Transient private var timetableDatabaseInterface: TimetableDatabaseInterface? = null,
-		var element: Period
+	@Transient private var timetableDatabaseInterface: TimetableDatabaseInterface? = null,
+	var element: Period
 ) {
 	val classes = HashSet<PeriodElement>()
 	val teachers = HashSet<PeriodElement>()
@@ -31,10 +33,11 @@ class PeriodData(
 	private fun parseElements() {
 		element.elements.forEach { element ->
 			when (element.type) {
-				TimetableDatabaseInterface.Type.CLASS.name -> addClass(element)
-				TimetableDatabaseInterface.Type.TEACHER.name -> addTeacher(element)
-				TimetableDatabaseInterface.Type.SUBJECT.name -> addSubject(element)
-				TimetableDatabaseInterface.Type.ROOM.name -> addRoom(element)
+				ElementType.CLASS -> addClass(element)
+				ElementType.TEACHER -> addTeacher(element)
+				ElementType.SUBJECT -> addSubject(element)
+				ElementType.ROOM -> addRoom(element)
+				else -> {}
 			}
 		}
 	}
@@ -49,95 +52,103 @@ class PeriodData(
 
 	fun setup() = parseElements()
 
-	fun getShort(type: TimetableDatabaseInterface.Type, list: HashSet<PeriodElement> = getListFor(type)) =
-			list.joinToString(ELEMENT_NAME_SEPARATOR) {
-				timetableDatabaseInterface?.getShortName(it.id, type) ?: ELEMENT_NAME_UNKNOWN
-			}
+	fun getShort(type: ElementType, list: HashSet<PeriodElement> = getListFor(type)) =
+		list.joinToString(ELEMENT_NAME_SEPARATOR) {
+			timetableDatabaseInterface?.getShortName(it.id, type) ?: ELEMENT_NAME_UNKNOWN
+		}
 
-	fun getLong(type: TimetableDatabaseInterface.Type, list: HashSet<PeriodElement> = getListFor(type)) =
-			list.joinToString(ELEMENT_NAME_SEPARATOR) {
-				timetableDatabaseInterface?.getLongName(it.id, type) ?: ELEMENT_NAME_UNKNOWN
-			}
+	fun getLong(type: ElementType, list: HashSet<PeriodElement> = getListFor(type)) =
+		list.joinToString(ELEMENT_NAME_SEPARATOR) {
+			timetableDatabaseInterface?.getLongName(it.id, type) ?: ELEMENT_NAME_UNKNOWN
+		}
 
-	fun getShortSpanned(type: TimetableDatabaseInterface.Type, list: HashSet<PeriodElement> = getListFor(type), includeOrgIds: Boolean = true): SpannableString {
+	fun getShortSpanned(
+		type: ElementType,
+		list: HashSet<PeriodElement> = getListFor(type),
+		includeOrgIds: Boolean = true
+	): SpannableString {
 		val builder = SpannableStringBuilder()
 
 		list.forEach {
 			if (builder.isNotBlank())
 				builder.append(ELEMENT_NAME_SEPARATOR)
-			builder.append(timetableDatabaseInterface?.getShortName(it.id, type)
-					?: ELEMENT_NAME_UNKNOWN)
-			if (includeOrgIds && it.id != it.orgId && it.orgId != 0) {
+			builder.append(
+				timetableDatabaseInterface?.getShortName(it.id, type)
+					?: ELEMENT_NAME_UNKNOWN
+			)
+			if (includeOrgIds && it.id != it.orgId && it.orgId != 0L) {
 				builder.append(ELEMENT_NAME_SEPARATOR)
-				builder.append(timetableDatabaseInterface?.getShortName(it.orgId, type)
+				builder.append(
+					timetableDatabaseInterface?.getShortName(it.orgId, type)
 						?: ELEMENT_NAME_UNKNOWN,
-						StrikethroughSpan(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+					StrikethroughSpan(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+				)
 			}
 		}
 
 		return SpannableString.valueOf(builder)
 	}
 
-	private fun getListFor(type: TimetableDatabaseInterface.Type): java.util.HashSet<PeriodElement> =
+	private fun getListFor(type: ElementType): java.util.HashSet<PeriodElement> =
 		when (type) {
-			TimetableDatabaseInterface.Type.CLASS -> classes
-			TimetableDatabaseInterface.Type.TEACHER -> teachers
-			TimetableDatabaseInterface.Type.SUBJECT -> subjects
-			TimetableDatabaseInterface.Type.ROOM -> rooms
+			ElementType.CLASS -> classes
+			ElementType.TEACHER -> teachers
+			ElementType.SUBJECT -> subjects
+			ElementType.ROOM -> rooms
 			else -> hashSetOf()
 		}
 
 	@Deprecated("Use getShort instead.")
 	fun getShortTitle() = subjects.joinToString(ELEMENT_NAME_SEPARATOR) {
-		timetableDatabaseInterface?.getShortName(it.id, TimetableDatabaseInterface.Type.SUBJECT)
-				?: ELEMENT_NAME_UNKNOWN
+		timetableDatabaseInterface?.getShortName(it.id, ElementType.SUBJECT)
+			?: ELEMENT_NAME_UNKNOWN
 	}
 
 	@Deprecated("Use getLong instead.")
 	fun getLongTitle() = subjects.joinToString(ELEMENT_NAME_SEPARATOR) {
-		timetableDatabaseInterface?.getLongName(it.id, TimetableDatabaseInterface.Type.SUBJECT)
-				?: ELEMENT_NAME_UNKNOWN
+		timetableDatabaseInterface?.getLongName(it.id, ElementType.SUBJECT)
+			?: ELEMENT_NAME_UNKNOWN
 	}
 
 	@Deprecated("Use getShort instead.")
 	fun getShortTeachers() = teachers.joinToString(ELEMENT_NAME_SEPARATOR) {
-		timetableDatabaseInterface?.getShortName(it.id, TimetableDatabaseInterface.Type.TEACHER)
-				?: ELEMENT_NAME_UNKNOWN
+		timetableDatabaseInterface?.getShortName(it.id, ElementType.TEACHER)
+			?: ELEMENT_NAME_UNKNOWN
 	}
 
 	@Deprecated("Use getLong instead.")
 	fun getLongTeachers() = teachers.joinToString(ELEMENT_NAME_SEPARATOR) {
-		timetableDatabaseInterface?.getLongName(it.id, TimetableDatabaseInterface.Type.TEACHER)
-				?: ELEMENT_NAME_UNKNOWN
+		timetableDatabaseInterface?.getLongName(it.id, ElementType.TEACHER)
+			?: ELEMENT_NAME_UNKNOWN
 	}
 
 	@Deprecated("Use getShort instead.")
 	fun getShortRooms() = rooms.joinToString(ELEMENT_NAME_SEPARATOR) {
-		timetableDatabaseInterface?.getShortName(it.id, TimetableDatabaseInterface.Type.ROOM)
-				?: ELEMENT_NAME_UNKNOWN
+		timetableDatabaseInterface?.getShortName(it.id, ElementType.ROOM)
+			?: ELEMENT_NAME_UNKNOWN
 	}
 
 	@Deprecated("Use getLong instead.")
 	fun getLongRooms() = rooms.joinToString(ELEMENT_NAME_SEPARATOR) {
-		timetableDatabaseInterface?.getLongName(it.id, TimetableDatabaseInterface.Type.ROOM)
-				?: ELEMENT_NAME_UNKNOWN
+		timetableDatabaseInterface?.getLongName(it.id, ElementType.ROOM)
+			?: ELEMENT_NAME_UNKNOWN
 	}
 
 	@Deprecated("Use getShort instead.")
 	fun getShortClasses() = classes.joinToString(ELEMENT_NAME_SEPARATOR) {
-		timetableDatabaseInterface?.getShortName(it.id, TimetableDatabaseInterface.Type.CLASS)
-				?: ELEMENT_NAME_UNKNOWN
+		timetableDatabaseInterface?.getShortName(it.id, ElementType.CLASS)
+			?: ELEMENT_NAME_UNKNOWN
 	}
 
 	@Deprecated("Use getLong instead.")
 	fun getLongClasses() = classes.joinToString(ELEMENT_NAME_SEPARATOR) {
-		timetableDatabaseInterface?.getLongName(it.id, TimetableDatabaseInterface.Type.CLASS)
-				?: ELEMENT_NAME_UNKNOWN
+		timetableDatabaseInterface?.getLongName(it.id, ElementType.CLASS)
+			?: ELEMENT_NAME_UNKNOWN
 	}
 
-	fun isCancelled(): Boolean = element.`is`.contains(Period.CODE_CANCELLED)
+	fun isCancelled(): Boolean = element.`is`.contains(PeriodState.CANCELLED)
 
-	fun isIrregular(): Boolean = forceIrregular || element.`is`.contains(Period.CODE_IRREGULAR)
+	fun isIrregular(): Boolean = forceIrregular || element.`is`.contains(PeriodState.IRREGULAR)
 
-	fun isExam(): Boolean = element.`is`.contains(Period.CODE_EXAM)
+	fun isExam(): Boolean = element.`is`.contains(PeriodState.EXAM)
 }

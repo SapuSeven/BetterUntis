@@ -4,7 +4,7 @@ import androidx.compose.material3.ColorScheme
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.sapuseven.untis.components.ElementPicker
-import com.sapuseven.untis.data.databases.entities.UserDao
+import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.scope.UserScopeManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory

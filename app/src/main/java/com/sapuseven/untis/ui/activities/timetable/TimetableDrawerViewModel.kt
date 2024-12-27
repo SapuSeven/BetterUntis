@@ -7,9 +7,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.sapuseven.untis.data.databases.entities.UserDao
+import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
+import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.models.TimetableBookmark
-import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.ui.models.NavItemNavigation
 import com.sapuseven.untis.ui.models.NavItemShortcut
 import com.sapuseven.untis.ui.navigation.AppNavigator

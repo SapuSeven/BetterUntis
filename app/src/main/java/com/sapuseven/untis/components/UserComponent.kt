@@ -1,6 +1,6 @@
 package com.sapuseven.untis.components
 
-import com.sapuseven.untis.data.databases.entities.User
+import com.sapuseven.untis.data.database.entities.User
 import dagger.BindsInstance
 import dagger.hilt.DefineComponent
 import dagger.hilt.components.SingletonComponent

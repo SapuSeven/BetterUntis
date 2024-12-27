@@ -1,6 +1,6 @@
 package com.sapuseven.untis.models.untis.response
 
-import com.sapuseven.untis.models.UntisAbsence
+import com.sapuseven.untis.api.model.untis.absence.StudentAbsence
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -10,5 +10,5 @@ data class CreateImmediateAbsenceResponse(
 
 @Serializable
 data class CreateImmediateAbsenceResult(
-		val absences: List<UntisAbsence>
+		val absences: List<StudentAbsence>
 )

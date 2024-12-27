@@ -1,7 +1,7 @@
 package com.sapuseven.untis.scope
 
 import com.sapuseven.untis.components.UserComponent
-import com.sapuseven.untis.data.databases.entities.User
+import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.modules.UserComponentEntryPoint
 import dagger.hilt.EntryPoints
 import javax.inject.Inject

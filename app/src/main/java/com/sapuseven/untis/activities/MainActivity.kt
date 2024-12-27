@@ -68,18 +68,15 @@ import com.sapuseven.compose.protostore.ui.preferences.convertRangeToPair
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_HIGHLIGHT
 import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_ROUTE
+import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.components.UserManager
 import com.sapuseven.untis.components.UserState
-import com.sapuseven.untis.data.databases.entities.User
+import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.timetable.PeriodData
-import com.sapuseven.untis.data.timetable.TimegridItem
-import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.config.deleteProfile
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.models.TimetableBookmark
-import com.sapuseven.untis.models.untis.UntisDate
-import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.modules.ThemeManager
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
@@ -96,29 +93,19 @@ import com.sapuseven.untis.ui.theme.toColorScheme
 import com.sapuseven.untis.ui.weekview.Event
 import com.sapuseven.untis.ui.weekview.WeekViewColorScheme
 import com.sapuseven.untis.ui.weekview.WeekViewHour
-import com.sapuseven.untis.ui.weekview.pageIndexForDate
-import com.sapuseven.untis.ui.weekview.startDateForPageIndex
 import dagger.hilt.android.AndroidEntryPoint
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import org.joda.time.DateTimeConstants
 import org.joda.time.Instant
 import org.joda.time.LocalDate
-import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
 import java.util.Locale
@@ -569,7 +556,7 @@ class MainDrawerState(
 	}
 
 	fun createBookmark(item: PeriodElement): Boolean {
-		val newBookmark = TimetableBookmark(
+		/*val newBookmark = TimetableBookmark(
 			elementId = item.id,
 			elementType = TimetableDatabaseInterface.Type.valueOf(item.type).name,
 			displayName = timetableDatabaseInterface.getLongName(item)
@@ -583,7 +570,7 @@ class MainDrawerState(
 			user.bookmarks = user.bookmarks.plus(newBookmark)
 			userDatabase.userDao().update(user)
 			return true
-		}
+		}*/
 
 		return false
 	}
@@ -703,7 +690,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	}
 
 	// WeekView
-	data class WeeklyTimetableItems(
+	/*data class WeeklyTimetableItems(
 		var items: List<TimegridItem> = emptyList(),
 		var lastUpdated: Long = 0,
 		var dateRange: Pair<UntisDate, UntisDate>? = null
@@ -733,7 +720,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		preferences.proxyHost.getValue(),
 		loadFromCache = !forceRefresh,
 		loadFromServer = forceRefresh || preferences.connectivityRefreshInBackground.getValue(),
-	)
+	)*/
 
 	/*@OptIn(ExperimentalCoroutinesApi::class)
 	suspend fun loadEventsFlow(
@@ -1787,10 +1774,7 @@ fun rememberWeekViewPreferences(
 		}.collectAsState(initial = 5),
 	weekStartOffset: State<Int> = preferences.weekCustomRange.getValueFlow()
 		.transform<Set<String>, Int> {
-			it.map { day -> Weekday.valueOf(day) }.minOrNull()?.ordinal
-				?: DateTimeFormat.forPattern("E")
-					.withLocale(Locale.ENGLISH) // TODO: Correct locale?
-					.parseDateTime(user.timeGrid.days[0].day).dayOfWeek
+			it.map { day -> Weekday.valueOf(day) }.minOrNull()?.ordinal ?: user.timeGrid.days[0].day
 		}.collectAsState(initial = DateTimeConstants.MONDAY),
 ) = remember {
 	NewMainAppState.WeekViewPreferences(
@@ -1818,13 +1802,13 @@ fun rememberWeekViewPreferences(
 private fun getPersonalTimetableElement(
 	user: User, context: Context
 ): Pair<PeriodElement?, String?>? {
-	return user.userData.elemType?.let { type ->
+	return null/*user.userData.elemType?.let { type ->
 		PeriodElement(
 			type = type,
 			id = user.userData.elemId,
 			orgId = user.userData.elemId,
 		) to user.getDisplayedName(context)
-	}
+	}*/
 }
 
 private val Int.zeroToNull: Int?

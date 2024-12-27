@@ -16,8 +16,8 @@ import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.InfoCenterActivity
 import com.sapuseven.untis.activities.RoomFinderActivity
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.ui.models.NavItemNavigation
 import com.sapuseven.untis.ui.models.NavItemShortcut
 import com.sapuseven.untis.ui.models.NavItemTimetable
@@ -39,19 +39,19 @@ fun DrawerItems(
 			id = 1,
 			icon = painterResource(id = R.drawable.all_classes),
 			label = stringResource(id = R.string.all_classes),
-			elementType = TimetableDatabaseInterface.Type.CLASS
+			elementType = ElementType.CLASS
 		),
 		NavItemTimetable(
 			id = 2,
 			icon = painterResource(id = R.drawable.all_teachers),
 			label = stringResource(id = R.string.all_teachers),
-			elementType = TimetableDatabaseInterface.Type.TEACHER
+			elementType = ElementType.TEACHER
 		),
 		NavItemTimetable(
 			id = 3,
 			icon = painterResource(id = R.drawable.all_rooms),
 			label = stringResource(id = R.string.all_rooms),
-			elementType = TimetableDatabaseInterface.Type.ROOM
+			elementType = ElementType.ROOM
 		),
 	)
 
@@ -95,7 +95,7 @@ fun DrawerItems(
 		NavigationDrawerItem(
 			icon = { Icon(item.icon, contentDescription = null) },
 			label = { Text(item.label) },
-			selected = !disableTypeSelection && item.elementType.name == displayedElement?.type,
+			selected = !disableTypeSelection && item.elementType == displayedElement?.type,
 			onClick = { onTimetableClick(item) },
 			modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 		)

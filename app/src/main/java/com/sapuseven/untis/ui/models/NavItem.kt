@@ -1,6 +1,7 @@
 package com.sapuseven.untis.ui.models
 
 import androidx.compose.ui.graphics.painter.Painter
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 
 open class NavItem(
@@ -13,7 +14,7 @@ data class NavItemTimetable(
 	override val id: Int,
 	override val icon: Painter,
 	override val label: String,
-	val elementType: TimetableDatabaseInterface.Type
+	val elementType: ElementType
 ) : NavItem(id, icon, label)
 
 @Deprecated("Shortcuts are not supported with compose-navigation. Use NavItemNavigation instead")

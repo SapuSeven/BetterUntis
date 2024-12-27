@@ -1,6 +1,5 @@
 package com.sapuseven.untis.api.model.untis.absence
 
-import com.sapuseven.untis.api.model.untis.masterdata.Excuse
 import com.sapuseven.untis.api.serializer.DateTime
 import kotlinx.serialization.Serializable
 

@@ -6,12 +6,10 @@ import com.sapuseven.untis.api.model.untis.enumeration.PeriodState
 import com.sapuseven.untis.api.model.untis.messenger.MessengerChannel
 import com.sapuseven.untis.api.serializer.DateTime
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 @Serializable
 data class Period(
 	val id: Long,
-	@Transient val userId: Long = -1,
 	val lessonId: Long,
 	var startDateTime: DateTime,
 	var endDateTime: DateTime,

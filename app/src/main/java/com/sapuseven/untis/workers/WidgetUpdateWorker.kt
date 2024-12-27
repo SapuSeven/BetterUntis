@@ -14,11 +14,11 @@ import androidx.glance.appwidget.state.getAppWidgetState
 import androidx.glance.background
 import androidx.glance.layout.*
 import androidx.glance.text.Text
-import androidx.room.Room
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.data.database.UserDatabase
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.ui.widgets.WidgetListItemModel
 import com.sapuseven.untis.widgets.BaseComposeWidget.Companion.PREFERENCE_KEY_INT_ELEMENT_ID
@@ -62,7 +62,7 @@ class WidgetUpdateWorker(context: Context, params: WorkerParameters) :
 
 				val user = userDatabase.userDao().getById(userId)
 
-				user?.let {
+				/*user?.let {
 					try {
 						val timetable = loadTimetable(
 							user,
@@ -82,7 +82,7 @@ class WidgetUpdateWorker(context: Context, params: WorkerParameters) :
 
 								WidgetListItemModel(
 									headlineContent = item.periodData.getLong(
-										TimetableDatabaseInterface.Type.SUBJECT
+										ElementType.SUBJECT
 									),
 									supportingContent = arrayOf(item.top, item.bottom)
 										.filter { s -> s.isNotBlank() }
@@ -137,7 +137,7 @@ class WidgetUpdateWorker(context: Context, params: WorkerParameters) :
 						//setError(e) TODO
 						Log.e(LOG_TAG, "Timetable loading error", e)
 					}
-				}
+				}*/
 			}
 
 		return Result.success()

@@ -1,4 +1,4 @@
-package com.sapuseven.untis.api.model.untis.masterdata
+package com.sapuseven.untis.api.model.untis.absence
 
 import com.sapuseven.untis.api.serializer.Date
 import kotlinx.serialization.Serializable
