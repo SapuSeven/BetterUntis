@@ -17,7 +17,7 @@ jobs:
       tag: 2023.10.1
     steps:
       - checkout
-      - android/restore-gradle-cache
+      - android/restore_gradle_cache
       - run:
           name: Download Dependencies
           command: ./gradlew androidDependencies
@@ -39,7 +39,7 @@ jobs:
               -Dorg.gradle.workers.max=3
               -Dkotlin.incremental=false
             '
-      - android/save-gradle-cache
+      - android/save_gradle_cache
       - store_artifacts:
           name: Upload build artifacts
           path: app/build/outputs
