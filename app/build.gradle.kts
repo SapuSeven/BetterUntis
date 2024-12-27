@@ -36,7 +36,7 @@ android {
 	defaultConfig {
 		applicationId = "com.sapuseven.untis"
 		minSdk = 21
-		targetSdk = 33
+		targetSdk = 34
 		versionCode = generateVersionCode()
 		versionName = "4.1.0-beta01"
 		vectorDrawables.useSupportLibrary = true

@@ -9,12 +9,12 @@ plugins {
 val composeCompilerVersion: String by project
 
 android {
-    compileSdkVersion(33)
+    compileSdk = 34
 	namespace = "com.sapuseven.untis.views.weekview"
 
     defaultConfig {
-        minSdkVersion(21)
-        targetSdkVersion(33)
+        minSdk = 21
+        targetSdk = 34
     }
 
     buildFeatures {
