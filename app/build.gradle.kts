@@ -1,3 +1,6 @@
+import com.google.protobuf.gradle.id
+import org.gradle.internal.extensions.stdlib.capitalized
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.Date
 import java.util.Properties
 import java.io.FileInputStream
@@ -157,8 +160,19 @@ protobuf {
 	generateProtoTasks {
 		all().configureEach {
 			builtins {
-				create("java") {
-					options += "lite"
+				id("java") {
+					option("lite")
+				}
+			}
+		}
+	}
+
+	androidComponents {
+		onVariants(selector().all()) { variant ->
+			afterEvaluate {
+				val capName = variant.name.capitalized()
+				tasks.getByName<KotlinCompile>("ksp${capName}Kotlin") {
+					setSource(tasks.getByName("generate${capName}Proto").outputs)
 				}
 			}
 		}
@@ -212,7 +226,7 @@ dependencies {
 	implementation(libs.sentry.android)
 	implementation(libs.sentry.compose.android)
 	implementation(libs.xzing)
-	implementation("com.google.protobuf:protobuf-javalite:3.8.0")
+	implementation("com.google.protobuf:protobuf-javalite:4.28.0")
 	implementation("androidx.transition:transition-ktx:1.5.0-alpha06")
 
 	gmsImplementation(libs.gms.code.scanner)
@@ -220,6 +234,8 @@ dependencies {
 	coreLibraryDesugaring(libs.desugar.jdk.libs)
 
 	ksp(libs.androidx.room.compiler)
+	ksp(libs.dagger.compiler)
+	ksp(libs.hilt.compiler)
 
 	testImplementation(libs.junit.jupiter.api)
 	testImplementation(libs.junit.jupiter.params)
