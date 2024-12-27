@@ -12,7 +12,7 @@ jobs:
   build:
     working_directory: ~/betteruntis
     executor:
-      name: android/android-machine
+      name: android/android_machine
       resource-class: large
       tag: 2023.10.1
     steps:
