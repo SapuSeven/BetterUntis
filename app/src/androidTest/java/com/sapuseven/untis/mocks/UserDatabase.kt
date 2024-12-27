@@ -7,7 +7,7 @@ import com.sapuseven.untis.data.connectivity.UntisApiConstants.RIGHT_CLASSREGIST
 import com.sapuseven.untis.data.connectivity.UntisApiConstants.RIGHT_OFFICEHOURS
 import com.sapuseven.untis.api.model.untis.masterdata.TimeGrid
 import com.sapuseven.untis.api.model.untis.masterdata.timegrid.Day
-import com.sapuseven.untis.data.databases.entities.User
+import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.utils.SCREENSHOT_API_URL
 import com.sapuseven.untis.utils.SCREENSHOT_PROFILE_NAME
 

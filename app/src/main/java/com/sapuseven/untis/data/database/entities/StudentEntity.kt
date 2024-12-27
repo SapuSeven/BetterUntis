@@ -1,0 +1,45 @@
+package com.sapuseven.untis.data.database.entities
+
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import com.sapuseven.untis.api.model.untis.masterdata.SchoolYear
+import com.sapuseven.untis.api.model.untis.masterdata.Student
+import com.sapuseven.untis.api.serializer.Date
+import com.sapuseven.untis.data.database.Mapper
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+
+@Entity(
+	tableName = "Student",
+	primaryKeys = ["id", "userId"],
+	indices = [Index("id"), Index("userId")],
+	foreignKeys = [ForeignKey(
+		entity = User::class,
+		parentColumns = ["id"],
+		childColumns = ["userId"],
+		onDelete = ForeignKey.CASCADE
+	)]
+)
+data class StudentEntity(
+	val id: Long,
+	@Transient val userId: Long = -1,
+	val klasseId: Long? = null,
+	val firstName: String,
+	val lastName: String,
+	val birthDate: Date? = null
+) {
+	companion object : Mapper<Student, StudentEntity> {
+		override fun map(from: Student, userId: Long) = StudentEntity(
+			id = from.id,
+			userId = userId,
+			klasseId = from.klasseId,
+			firstName = from.firstName,
+			lastName = from.lastName,
+			birthDate = from.birthDate,
+		)
+	}
+
+	fun fullName(): String = "$firstName $lastName"
+}
+

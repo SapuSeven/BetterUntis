@@ -34,30 +34,28 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.MainActivity.Companion.EXTRA_STRING_PERIOD_ELEMENT
 import com.sapuseven.untis.activities.RoomFinderState.Companion.ROOM_STATE_FREE
 import com.sapuseven.untis.activities.RoomFinderState.Companion.ROOM_STATE_OCCUPIED
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.masterdata.timegrid.Day
-import com.sapuseven.untis.data.databases.RoomFinderDatabase
-import com.sapuseven.untis.data.databases.entities.User
+import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
+import com.sapuseven.untis.data.database.RoomFinderDatabase
+import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.models.RoomFinderItem
-import com.sapuseven.untis.models.untis.UntisDate
-import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.AppScaffold
-import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.functional.bottomInsets
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import org.joda.time.LocalDate
-import org.joda.time.LocalDateTime
 import org.joda.time.LocalTime
 import org.joda.time.format.DateTimeFormat
-import java.lang.ref.WeakReference
+import java.time.DayOfWeek
+import java.time.format.TextStyle
 import java.util.*
 
 class RoomFinderActivity : BaseComposeActivity() {
@@ -158,7 +156,7 @@ fun RoomFinder(state: RoomFinderState) {
 		enter = fullscreenDialogAnimationEnter(),
 		exit = fullscreenDialogAnimationExit()
 	) {
-		ElementPickerDialogFullscreen(
+		/*ElementPickerDialogFullscreen(
 			title = { Text(stringResource(id = R.string.all_add)) }, // TODO: Proper string resource
 			multiSelect = true,
 			hideTypeSelection = true,
@@ -166,7 +164,7 @@ fun RoomFinder(state: RoomFinderState) {
 			timetableDatabaseInterface = state.timetableDatabaseInterface,
 			onDismiss = { state.onElementPickerDismiss() },
 			onMultiSelect = { state.onElementPickerSelect(it) }
-		)
+		)*/
 	}
 
 	if (state.shouldShowDeleteItem) {
@@ -379,7 +377,7 @@ class RoomFinderState constructor(
 		const val ROOM_STATE_FREE = 1
 		const val ROOM_STATE_LOADING = -1
 
-		const val DELETE_ITEM_NONE = -1
+		const val DELETE_ITEM_NONE = -1L
 	}
 
 	val isRoomListEmpty: Boolean
@@ -421,7 +419,7 @@ class RoomFinderState constructor(
 		*roomFinderDatabase.getAllRooms().map {
 			RoomStatusData(
 				PeriodElement(
-					TimetableDatabaseInterface.Type.ROOM.name, it.id, it.id
+					ElementType.ROOM, it.id.toLong(), it.id.toLong()
 				),
 				timetableDatabaseInterface,
 				it.states
@@ -440,30 +438,24 @@ class RoomFinderState constructor(
 	@Throws(TimetableLoader.TimetableLoaderException::class)
 	private suspend fun loadStates(
 		user: User,
-		roomId: Int,
+		roomId: Long,
 		proxyHost: String?
 	): List<Boolean> {
 		val states = mutableListOf<Boolean>()
 
-		val startDate = UntisDate.fromLocalDate(
-			LocalDate.now().withDayOfWeek(
-				DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH)
-					.parseDateTime(user.timeGrid.days.first().day).dayOfWeek
-			)
+		/*val startDate = UntisDate.fromLocalDate(
+			LocalDate.now().withDayOfWeek(user.timeGrid.days.first().day)
 		)
 		val endDate = UntisDate.fromLocalDate(
-			LocalDate.now().withDayOfWeek(
-				DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH)
-					.parseDateTime(user.timeGrid.days.last().day).dayOfWeek
-			)
-		)
+			LocalDate.now().withDayOfWeek(user.timeGrid.days.last().day)
+		)*/
 
 		// Dummy Data:
 		/*delay(1000 + nextLong(0, 2000))
 		for (i in 0..10)
 			states.add(nextBoolean())*/
 
-		TimetableLoader(
+		/*TimetableLoader(
 			context = WeakReference(contextActivity),
 			user = user,
 			timetableDatabaseInterface = timetableDatabaseInterface
@@ -504,7 +496,7 @@ class RoomFinderState constructor(
 			}
 
 			states.addAll(loadedStates.toList())
-		}
+		}*/
 
 		return states.toList()
 	}
@@ -513,7 +505,7 @@ class RoomFinderState constructor(
 		val periodElement: PeriodElement,
 		val timetableDatabaseInterface: TimetableDatabaseInterface? = null,
 		val states: List<Boolean>? = null,
-		val name: String = timetableDatabaseInterface?.getShortName(periodElement) ?: "",
+		val name: String = "",//timetableDatabaseInterface?.getShortName(periodElement) ?: "",
 		val errorMessage: String? = null,
 		var isLoading: Boolean = states == null,
 		var isError: Boolean = states?.isEmpty() ?: false
@@ -550,13 +542,12 @@ class RoomFinderState constructor(
 		return null
 	}
 
-	fun translateDay(day: String): String {
-		return DateTimeFormat.forPattern("EEEE")
-			.print(DateTimeFormat.forPattern("EEE").withLocale(Locale.ENGLISH).parseDateTime(day))
+	fun translateDay(day: DayOfWeek): String {
+		return day.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault())
 	}
 
 	fun deleteItem(item: RoomStatusData) {
-		if (roomFinderDatabase.deleteRoom(item.periodElement.id))
+		if (roomFinderDatabase.deleteRoom(item.periodElement.id.toInt()))
 			roomList.remove(item)
 	}
 
@@ -632,7 +623,7 @@ class RoomFinderState constructor(
 
 					roomFinderDatabase.addRoom(
 						RoomFinderItem(
-							periodElement.id,
+							periodElement.id.toInt(),
 							states
 						)
 					)
@@ -652,7 +643,8 @@ class RoomFinderState constructor(
 }
 
 private fun calculateCurrentHourIndex(user: User): Int {
-	val now = LocalDateTime.now()
+	// TODO
+	/*val now = LocalDateTime.now()
 	var index = 0
 
 	user.timeGrid.days.forEach { day ->
@@ -668,7 +660,7 @@ private fun calculateCurrentHourIndex(user: User): Int {
 		} else {
 			index += day.units.size
 		}
-	}
+	}*/
 
 	return 0
 }

@@ -1,11 +1,7 @@
 package com.sapuseven.untis.modules
 
-import com.sapuseven.untis.components.ElementPicker
 import com.sapuseven.untis.components.UserComponent
-import com.sapuseven.untis.data.databases.entities.User
-import com.sapuseven.untis.data.databases.entities.UserDao
-import dagger.Module
-import dagger.Provides
+import com.sapuseven.untis.data.database.entities.User
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 

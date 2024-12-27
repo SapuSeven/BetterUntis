@@ -2,9 +2,8 @@ package com.sapuseven.untis.workers
 
 import android.content.Context
 import android.util.Log
-import androidx.room.Room
 import androidx.work.*
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.database.UserDatabase
 import com.sapuseven.untis.helpers.config.booleanDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import org.joda.time.LocalDateTime
@@ -53,11 +52,11 @@ class DailyWorker(context: Context, params: WorkerParameters) :
 
 			try {
 				// Load timetable to cache
-				loadTimetable(
+				/*loadTimetable(
 					user,
 					TimetableDatabaseInterface(userDatabase, user.id),
 					personalTimetable
-				)
+				)*/
 
 				val notificationsEnable = applicationContext.booleanDataStore(
 					user.id,

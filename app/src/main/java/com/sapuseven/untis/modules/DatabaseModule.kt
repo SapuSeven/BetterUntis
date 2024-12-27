@@ -2,9 +2,9 @@ package com.sapuseven.untis.modules
 
 import android.content.Context
 import androidx.room.Room
-import com.sapuseven.untis.data.databases.MIGRATIONS_LEGACY
-import com.sapuseven.untis.data.databases.MIGRATION_7_8
-import com.sapuseven.untis.data.databases.UserDatabase
+import com.sapuseven.untis.data.database.MIGRATIONS_LEGACY
+import com.sapuseven.untis.data.database.MIGRATION_7_8
+import com.sapuseven.untis.data.database.UserDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,7 +21,6 @@ object DatabaseModule {
 		context,
 		UserDatabase::class.java, "userdata.db"
 	)
-		//.allowMainThreadQueries()
 		.addMigrations(
 			*MIGRATIONS_LEGACY.toTypedArray(),
 			MIGRATION_7_8,

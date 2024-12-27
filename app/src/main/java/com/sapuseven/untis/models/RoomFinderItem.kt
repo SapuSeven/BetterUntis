@@ -3,7 +3,7 @@ package com.sapuseven.untis.models
 import android.content.ContentValues
 import android.database.Cursor
 import android.provider.BaseColumns
-import com.sapuseven.untis.data.databases.RoomfinderDatabaseContract
+import com.sapuseven.untis.data.database.RoomfinderDatabaseContract
 
 data class RoomFinderItem(
 		val id: Int,

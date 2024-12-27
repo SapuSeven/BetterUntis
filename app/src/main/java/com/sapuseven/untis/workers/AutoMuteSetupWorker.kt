@@ -11,8 +11,9 @@ import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.data.databases.entities.User
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.data.database.UserDatabase
+import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.helpers.config.booleanDataStore
 import com.sapuseven.untis.helpers.config.intDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
@@ -31,7 +32,7 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 
 		fun enqueue(workManager: WorkManager, user: User) {
 			val data: Data = Data.Builder().run {
-				put(WORKER_DATA_USER_ID, user.id)
+				//put(WORKER_DATA_USER_ID, user.id)
 				build()
 			}
 
@@ -57,7 +58,7 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 	}
 
 	private suspend fun scheduleAutoMute(): Result {
-		val userDatabase = UserDatabase.getInstance(applicationContext)
+		/*val userDatabase = UserDatabase.getInstance(applicationContext)
 
 		userDatabase.userDao().getById(inputData.getLong(WORKER_DATA_USER_ID, -1))?.let { user ->
 			try {
@@ -111,7 +112,7 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 							)
 							Log.d(
 								LOG_TAG,
-								"${item.periodData.getShort(TimetableDatabaseInterface.Type.SUBJECT)} mute scheduled for ${item.startDateTime}"
+								"${item.periodData.getShort(ElementType.SUBJECT)} mute scheduled for ${item.startDateTime}"
 							)
 
 							val minimumBreakLengthMillis = automuteMinimumBreakLength * 60 * 1000
@@ -137,7 +138,7 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 							)
 							Log.d(
 								"AutoMuteSetup",
-								"${item.periodData.getShort(TimetableDatabaseInterface.Type.SUBJECT)} unmute scheduled for ${item.endDateTime}"
+								"${item.periodData.getShort(ElementType.SUBJECT)} unmute scheduled for ${item.endDateTime}"
 							)
 						}
 					}
@@ -145,7 +146,7 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 				Log.e(LOG_TAG, "Auto mute events couldn't be scheduled", e)
 				return Result.failure()
 			}
-		}
+		}*/
 
 		return Result.success()
 	}

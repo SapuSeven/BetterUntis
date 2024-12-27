@@ -14,8 +14,8 @@ import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat.createShortcutResultIntent
 import androidx.core.graphics.drawable.IconCompat
 import com.sapuseven.untis.R
+import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 
@@ -83,7 +83,8 @@ class ShortcutConfigureActivity : BaseComposeActivity() {
 			.putExtra("orgId", element?.orgId)
 			.putExtra("useOrgId", false)
 
-		setResult(
+		// TODO
+		/*setResult(
 			RESULT_OK,
 			createShortcutResultIntent(
 				this,
@@ -102,6 +103,6 @@ class ShortcutConfigureActivity : BaseComposeActivity() {
 					.setIcon(IconCompat.createWithResource(this, R.mipmap.ic_shortcut))
 					.build()
 			)
-		)
+		)*/
 	}
 }

@@ -1,6 +1,6 @@
 package com.sapuseven.untis.data.connectivity
 
-import com.sapuseven.untis.data.databases.entities.User
+import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.api.util.Base32.decode
 import com.sapuseven.untis.api.model.untis.Auth
 import org.joda.time.DateTime

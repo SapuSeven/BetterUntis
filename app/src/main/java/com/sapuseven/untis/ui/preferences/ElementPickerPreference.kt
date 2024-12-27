@@ -11,10 +11,11 @@ import androidx.compose.runtime.setValue
 import com.google.protobuf.MessageLite
 import com.sapuseven.compose.protostore.data.SettingsRepository
 import com.sapuseven.compose.protostore.ui.preferences.Preference
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.components.ElementPicker
 import com.sapuseven.untis.helpers.SerializationUtils
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialogNew
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -33,7 +34,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ElementPickerPrefe
 	onValueChange: (ModelBuilder.(value: String) -> Unit)? = null,
 	elementPicker: ElementPicker
 ) {
-	var selectedType: TimetableDatabaseInterface.Type? by remember { mutableStateOf(null) }
+	var selectedType: ElementType? by remember { mutableStateOf(null) }
 	var showDialog by remember { mutableStateOf(false) }
 
 	Preference(
@@ -55,10 +56,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ElementPickerPrefe
 		enabledCondition = enabledCondition,
 		highlight = highlight,
 		onClick = {
-			selectedType =
-				decodeStoredTimetableValue(value(settingsRepository.getSettingsDefaults()))?.let {
-					TimetableDatabaseInterface.Type.valueOf(it.type)
-				};
+			selectedType = decodeStoredTimetableValue(value(settingsRepository.getSettingsDefaults()))?.type
 			showDialog = true;
 		}
 	)

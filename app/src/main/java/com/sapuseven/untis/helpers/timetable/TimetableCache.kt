@@ -1,8 +1,7 @@
 package com.sapuseven.untis.helpers.timetable
 
 import android.content.Context
-import com.sapuseven.untis.models.untis.UntisDate
-import com.sapuseven.untis.models.untis.timetable.Period
+import com.sapuseven.untis.api.model.untis.timetable.Period
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
@@ -10,12 +9,13 @@ import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
 import java.io.File
 import java.lang.ref.WeakReference
+import java.time.LocalDate
 
 
 class TimetableCache(val context: WeakReference<Context>) {
 	private var target: CacheTarget? = null
 
-	fun setTarget(startDate: UntisDate, endDate: UntisDate, id: Int, type: String, userId: Long) {
+	fun setTarget(startDate: LocalDate, endDate: LocalDate, id: Int, type: String, userId: Long) {
 		target = CacheTarget(startDate, endDate, id, type, userId)
 	}
 
@@ -56,8 +56,8 @@ class TimetableCache(val context: WeakReference<Context>) {
 	)
 
 	private inner class CacheTarget(
-			val startDate: UntisDate,
-			val endDate: UntisDate,
+			val startDate: LocalDate,
+			val endDate: LocalDate,
 			val id: Int,
 			val type: String,
 			val userId: Long

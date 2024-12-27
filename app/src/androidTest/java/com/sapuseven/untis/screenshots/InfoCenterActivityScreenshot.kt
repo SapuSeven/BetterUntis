@@ -7,14 +7,11 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.activities.BaseComposeActivity
-import com.sapuseven.untis.data.databases.LegacyUserDatabase
+import com.sapuseven.untis.data.database.LegacyUserDatabase
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.mocks.MOCK_USER_ID
 import com.sapuseven.untis.mocks.timeGrid
 import com.sapuseven.untis.mocks.userMock
-import com.sapuseven.untis.models.UntisAbsence
-import com.sapuseven.untis.models.UntisMessage
-import com.sapuseven.untis.models.UntisOfficeHour
 import com.sapuseven.untis.models.untis.UntisMasterData
 import com.sapuseven.untis.api.model.untis.masterdata.Room
 import com.sapuseven.untis.preferences.dataStorePreferences

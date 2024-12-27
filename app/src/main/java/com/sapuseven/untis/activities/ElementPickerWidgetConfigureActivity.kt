@@ -24,8 +24,8 @@ import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.work.WorkManager
 import com.sapuseven.untis.R
+import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 import com.sapuseven.untis.widgets.BaseComposeWidget
@@ -75,7 +75,8 @@ class ElementPickerWidgetConfigureActivity : BaseComposeActivity() {
 						timetableDatabaseInterface = timetableDatabaseInterface,
 						onDismiss = { finish() },
 						onSelect = { element ->
-							runBlocking {
+							// TODO
+							/*runBlocking {
 								val user = userDatabase.userDao().getById(selectedUserId) ?: run {
 									setResult(Activity.RESULT_CANCELED)
 									finish()
@@ -117,7 +118,7 @@ class ElementPickerWidgetConfigureActivity : BaseComposeActivity() {
 								)
 								setResult(Activity.RESULT_OK, resultValue)
 								finish()
-							}
+							}*/
 						},
 						additionalActions = {
 							ProfileSelectorAction(

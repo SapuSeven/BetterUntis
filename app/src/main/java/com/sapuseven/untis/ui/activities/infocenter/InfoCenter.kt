@@ -25,10 +25,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
 import com.sapuseven.untis.R
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.models.UntisAbsence
-import com.sapuseven.untis.models.UntisMessage
-import com.sapuseven.untis.models.UntisOfficeHour
-import com.sapuseven.untis.models.untis.UntisAttachment
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.ui.activities.infocenter.InfoCenterState.Companion.ID_ABSENCES
 import com.sapuseven.untis.ui.activities.infocenter.InfoCenterState.Companion.ID_EVENTS
@@ -48,7 +44,7 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun InfoCenter(state: InfoCenterState) {
-	AppScaffold(
+	/*AppScaffold(
 		topBar = {
 			CenterAlignedTopAppBar(
 				title = {
@@ -189,7 +185,7 @@ fun InfoCenter(state: InfoCenterState) {
 		AbsenceFilterDialog(state.preferences) {
 			state.showAbsenceFilter.value = false
 		}
-	}
+	}*/
 }
 
 @Composable
@@ -217,7 +213,7 @@ private fun <T> ItemList(
 		}
 	}
 }
-
+/*
 @Composable
 private fun MessageList(messages: List<UntisMessage>?, loading: Boolean) {
 	var attachmentsDialog by remember { mutableStateOf<List<UntisAttachment>?>(null) }
@@ -307,7 +303,7 @@ private fun MessageItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EventItem(item: EventListItem) {
-	if (item.exam != null) {
+	/*if (item.exam != null) {
 		val subject = item.timetableDatabaseInterface.getShortName(
 			item.exam.subjectId,
 			TimetableDatabaseInterface.Type.SUBJECT
@@ -352,7 +348,7 @@ private fun EventItem(item: EventListItem) {
 				{ Text(item.homework.text) }
 			} else null
 		)
-	}
+	}*/
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -417,7 +413,7 @@ private fun AbsenceItem(item: UntisAbsence) {
 				)
 		}
 	)
-}
+}*/
 
 @Composable
 private fun formatExamTime(startDateTime: LocalDateTime, endDateTime: LocalDateTime): String {

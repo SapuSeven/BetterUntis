@@ -1,10 +1,11 @@
 package com.sapuseven.untis.models.untis.response
 
 import android.os.Parcelable
+import com.sapuseven.untis.api.model.untis.absence.AbsenceResult
+import com.sapuseven.untis.api.model.untis.absence.StudentAbsence
+import com.sapuseven.untis.api.model.untis.classreg.HomeWork
+import com.sapuseven.untis.api.model.untis.timetable.LessonTopic
 import com.sapuseven.untis.models.UnknownObject
-import com.sapuseven.untis.models.UntisAbsence
-import com.sapuseven.untis.models.UntisHomework
-import com.sapuseven.untis.models.untis.UntisTopic
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -30,18 +31,18 @@ data class UntisStudent(
 
 @Serializable
 data class UntisPeriodData(
-		val ttId: Int,
-		val absenceChecked: Boolean,
-		val studentIds: List<Int>?,
-		val absences: List<UntisAbsence>?,
-		val classRegEvents: List<UnknownObject>?,
-		val exemptions: List<UnknownObject>?,
-		val prioritizedAttendances: List<UnknownObject>?,
-		val text: UnknownObject?,
-		val topic: UntisTopic?,
-		val homeWorks: List<UntisHomework>?,
-		val seatingPlan: UnknownObject?,
-		val classRoles: List<UnknownObject>?,
-		val channel: UnknownObject?,
-		val can: List<String>
+	val ttId: Int,
+	val absenceChecked: Boolean,
+	val studentIds: List<Int>?,
+	val absences: List<StudentAbsence>?,
+	val classRegEvents: List<UnknownObject>?,
+	val exemptions: List<UnknownObject>?,
+	val prioritizedAttendances: List<UnknownObject>?,
+	val text: UnknownObject?,
+	val topic: LessonTopic?,
+	val homeWorks: List<HomeWork>?,
+	val seatingPlan: UnknownObject?,
+	val classRoles: List<UnknownObject>?,
+	val channel: UnknownObject?,
+	val can: List<String>
 )

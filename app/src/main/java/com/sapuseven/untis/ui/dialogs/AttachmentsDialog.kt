@@ -18,12 +18,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.sapuseven.untis.R
-import com.sapuseven.untis.models.untis.UntisAttachment
+import com.sapuseven.untis.api.model.untis.Attachment
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AttachmentsDialog(
-	attachments: List<UntisAttachment>,
+	attachments: List<Attachment>,
 	onDismiss: () -> Unit
 ) {
 	val uriHandler = LocalUriHandler.current

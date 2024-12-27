@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Unit(
-		val label: String,
-		val startTime: Time,
-		val endTime: Time
+	val label: String,
+	val startTime: Time,
+	val endTime: Time
 )

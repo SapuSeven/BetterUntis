@@ -57,9 +57,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
 import com.sapuseven.untis.R
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.components.ElementPicker
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.models.untis.timetable.PeriodElement
 import com.sapuseven.untis.ui.common.AbbreviatedText
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.NavigationBarInset
@@ -71,7 +72,7 @@ import com.sapuseven.untis.ui.functional.insetsPaddingValues
 fun ElementPickerDialogFullscreenNew(
 	elementPicker: ElementPicker,
 	title: @Composable () -> Unit,
-	initialType: TimetableDatabaseInterface.Type? = null,
+	initialType: ElementType? = null,
 	multiSelect: Boolean = false,
 	hideTypeSelection: Boolean = false,
 	hideTypeSelectionPersonal: Boolean = false,
@@ -191,7 +192,7 @@ fun ElementPickerDialogFullscreenNew(
 				.padding(innerPadding)
 				.fillMaxSize()
 		) {
-			//Text(text = "${elements.get(TimetableDatabaseInterface.Type.ROOM)?.size ?: "?"} rooms")
+			//Text(text = "${elements.get(ElementType.ROOM)?.size ?: "?"} rooms")
 			ElementPickerElementsNew(
 				elementPicker = elementPicker,
 				selectedType = selectedType,
@@ -224,7 +225,7 @@ fun ElementPickerDialogFullscreenNew(
 fun ElementPickerDialogFullscreen(
 	title: @Composable () -> Unit,
 	timetableDatabaseInterface: TimetableDatabaseInterface,
-	initialType: TimetableDatabaseInterface.Type? = null,
+	initialType: ElementType? = null,
 	multiSelect: Boolean = false,
 	hideTypeSelection: Boolean = false,
 	hideTypeSelectionPersonal: Boolean = false,
@@ -376,7 +377,7 @@ fun ElementPickerDialogFullscreen(
 fun ElementPickerDialogNew(
 	elementPicker: ElementPicker,
 	title: (@Composable () -> Unit)?,
-	initialType: TimetableDatabaseInterface.Type? = null,
+	initialType: ElementType? = null,
 	hideTypeSelection: Boolean = false,
 	hideTypeSelectionPersonal: Boolean = false,
 	onDismiss: (success: Boolean) -> Unit = {},
@@ -446,7 +447,7 @@ fun ElementPickerDialogNew(
 fun ElementPickerDialog(
 	title: (@Composable () -> Unit)?,
 	timetableDatabaseInterface: TimetableDatabaseInterface,
-	initialType: TimetableDatabaseInterface.Type? = null,
+	initialType: ElementType? = null,
 	hideTypeSelection: Boolean = false,
 	hideTypeSelectionPersonal: Boolean = false,
 	onDismiss: (success: Boolean) -> Unit = {},
@@ -513,7 +514,7 @@ fun ElementPickerDialog(
 @Composable
 fun ElementPickerElements(
 	timetableDatabaseInterface: TimetableDatabaseInterface,
-	selectedType: TimetableDatabaseInterface.Type?,
+	selectedType: ElementType?,
 	multiSelect: Boolean = false,
 	modifier: Modifier,
 	onDismiss: (success: Boolean) -> Unit = {},
@@ -606,7 +607,7 @@ fun ElementPickerElements(
 @Composable
 fun ElementPickerElementsNew(
 	elementPicker: ElementPicker,
-	selectedType: TimetableDatabaseInterface.Type?,
+	selectedType: ElementType?,
 	multiSelect: Boolean = false,
 	modifier: Modifier,
 	onDismiss: (success: Boolean) -> Unit = {},
@@ -698,9 +699,9 @@ fun ElementPickerElementsNew(
 
 @Composable
 fun ElementPickerTypeSelection(
-	selectedType: TimetableDatabaseInterface.Type?,
+	selectedType: ElementType?,
 	hideTypeSelectionPersonal: Boolean = false,
-	onTypeChange: (TimetableDatabaseInterface.Type?) -> Unit,
+	onTypeChange: (ElementType?) -> Unit,
 	onDismiss: (success: Boolean) -> Unit = {},
 	onSelect: (selectedItem: PeriodElement?) -> Unit = {}
 ) {
@@ -734,8 +735,8 @@ fun ElementPickerTypeSelection(
 				)
 			},
 			label = { Text(stringResource(id = R.string.all_classes)) },
-			selected = selectedType == TimetableDatabaseInterface.Type.CLASS,
-			onClick = { onTypeChange(TimetableDatabaseInterface.Type.CLASS) }
+			selected = selectedType == ElementType.CLASS,
+			onClick = { onTypeChange(ElementType.CLASS) }
 		)
 		NavigationBarItem(
 			icon = {
@@ -745,8 +746,8 @@ fun ElementPickerTypeSelection(
 				)
 			},
 			label = { Text(stringResource(id = R.string.all_teachers)) },
-			selected = selectedType == TimetableDatabaseInterface.Type.TEACHER,
-			onClick = { onTypeChange(TimetableDatabaseInterface.Type.TEACHER) }
+			selected = selectedType == ElementType.TEACHER,
+			onClick = { onTypeChange(ElementType.TEACHER) }
 		)
 		NavigationBarItem(
 			icon = {
@@ -756,8 +757,8 @@ fun ElementPickerTypeSelection(
 				)
 			},
 			label = { Text(stringResource(id = R.string.all_rooms)) },
-			selected = selectedType == TimetableDatabaseInterface.Type.ROOM,
-			onClick = { onTypeChange(TimetableDatabaseInterface.Type.ROOM) }
+			selected = selectedType == ElementType.ROOM,
+			onClick = { onTypeChange(ElementType.ROOM) }
 		)
 	}
 }
