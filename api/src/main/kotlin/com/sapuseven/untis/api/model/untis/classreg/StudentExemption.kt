@@ -1,5 +1,6 @@
 package com.sapuseven.untis.api.model.untis.classreg
 
+import com.sapuseven.untis.api.serializer.DayOfWeekSerializer
 import kotlinx.serialization.Serializable
 import java.time.DayOfWeek
 
@@ -15,5 +16,6 @@ data class StudentExemption(
 	val subjectGroup: String,
 	val subjectId: Long,
 	val text: String,
-	val weekDay: DayOfWeek // TODO: Write a deserializer for this enum: MON(2), TUE(3), WED(4), THU(5), FRI(6), SAT(7), SUN(1)
+	@Serializable(with = DayOfWeekSerializer::class)
+	val weekDay: DayOfWeek
 )
