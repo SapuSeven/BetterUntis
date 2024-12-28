@@ -53,7 +53,7 @@ android {
 	}
 
 	signingConfigs {
-		val propertiesFile = rootProject.file("signing.properties")
+		val propertiesFile = file("signing.properties")
 
 		val signingProperties = Properties()
 		if (propertiesFile.exists()) {
@@ -62,10 +62,10 @@ android {
 
 		if (file("BetterUntis.jks").exists()) {
 			create("release") {
+				storeFile = file("BetterUntis.jks")
+				storePassword = signingProperties["keystorePassword"] as String? ?: System.getenv("KEYSTORE_PASSWORD")
 				keyAlias = "release"
 				keyPassword = signingProperties["keyReleasePassword"] as String? ?: System.getenv("KEY_RELEASE_PASSWORD")
-				storeFile = file("BetterUntis.jks")
-				storePassword = signingProperties["keystorePassword"] as String? ?: System.getenv("KEYSTORE_PASSWORD") as String
 			}
 
 			getByName("debug") {
