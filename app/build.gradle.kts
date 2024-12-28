@@ -228,6 +228,7 @@ dependencies {
 	implementation(libs.xzing)
 	implementation("com.google.protobuf:protobuf-javalite:4.28.0")
 	implementation("androidx.transition:transition-ktx:1.5.0-alpha06")
+	implementation(libs.andrew0000.cache)
 
 	gmsImplementation(libs.gms.code.scanner)
 

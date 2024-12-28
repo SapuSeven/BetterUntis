@@ -6,6 +6,7 @@ import com.sapuseven.untis.api.model.request.TimetableParams
 import com.sapuseven.untis.api.model.response.TimetableResponse
 import com.sapuseven.untis.api.model.response.TimetableResult
 import com.sapuseven.untis.api.model.untis.Auth
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngineFactory
@@ -26,8 +27,8 @@ open class TimetableApi(
 	@OptIn(ExperimentalSerializationApi::class)
 	open suspend fun loadTimetable(
 		apiUrl: String,
-		id: Int,
-		type: String,
+		id: Long,
+		type: ElementType,
 		startDate: LocalDate,
 		endDate: LocalDate,
 		masterDataTimestamp: Long,
@@ -41,7 +42,7 @@ open class TimetableApi(
 			params = listOf(
 				TimetableParams(
 					id = id,
-					type = type,
+					type = type.name,
 					startDate = startDate,
 					endDate = endDate,
 					masterDataTimestamp = masterDataTimestamp,

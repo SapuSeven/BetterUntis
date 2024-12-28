@@ -15,7 +15,6 @@ import androidx.navigation.toRoute
 import com.sapuseven.compose.protostore.ui.preferences.convertRangeToPair
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
-import com.sapuseven.untis.api.client.TimetableApi
 import com.sapuseven.untis.api.exception.UntisApiException
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
@@ -24,7 +23,7 @@ import com.sapuseven.untis.components.UserManager
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.data.settings.model.UserSettings
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import com.sapuseven.untis.data.repository.TimetableRepository
 import com.sapuseven.untis.mappers.TimetableMapper
 import com.sapuseven.untis.modules.ThemeManager
 import com.sapuseven.untis.scope.UserScopeManager
@@ -36,14 +35,19 @@ import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import com.sapuseven.untis.ui.weekview.Event
 import com.sapuseven.untis.ui.weekview.WeekViewHour
 import com.sapuseven.untis.ui.weekview.startDateForPageIndex
+import crocodile8.universal_cache.FromCache
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -55,11 +59,11 @@ class TimetableViewModel @AssistedInject constructor(
 	internal val userManager: UserManager,
 	private val userScopeManager: UserScopeManager,
 	private val userDao: UserDao,
-	private val api: TimetableApi,
-	private val repositoryFactory: UserSettingsRepository.Factory,
+	private val userSettingsRepositoryFactory: UserSettingsRepository.Factory,
 	private val timetableMapperFactory: TimetableMapper.Factory,
+	private val timetableRepositoryFactory: TimetableRepository.Factory,
+	internal val globalSettingsRepository: GlobalSettingsRepository,
 	@Assisted private val colorScheme: ColorScheme,
-	internal val globalRepository: GlobalSettingsRepository,
 	savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 	@AssistedFactory
@@ -68,12 +72,13 @@ class TimetableViewModel @AssistedInject constructor(
 	}
 
 	private val timetableMapper = timetableMapperFactory.create(colorScheme)
-	private val repository = repositoryFactory.create(colorScheme)
+	private val timetableRepository = timetableRepositoryFactory.create(colorScheme)
+	private val userSettingsRepository = userSettingsRepositoryFactory.create(colorScheme)
 
 	val args = savedStateHandle.toRoute<AppRoutes.Timetable>()
 
 	private val _currentUserSettings =
-		MutableStateFlow<UserSettings>(repository.getSettingsDefaults())
+		MutableStateFlow<UserSettings>(userSettingsRepository.getSettingsDefaults())
 	val currentUserSettings: StateFlow<UserSettings> = _currentUserSettings
 
 	var profileManagementDialog by mutableStateOf(false)
@@ -103,9 +108,14 @@ class TimetableViewModel @AssistedInject constructor(
 	val elementPicker: ElementPicker
 		get() = ElementPicker(userScopeManager.user, userDao)
 
+	private val loadingExceptionHandler: suspend FlowCollector<*>.(Throwable) -> Unit = { throwable ->
+		val message = if (throwable is UntisApiException) "API error" else "other error"
+		Log.e("TimetableViewModel", "Failed to load timetable due to $message", throwable)
+	}
+
 	init {
 		viewModelScope.launch {
-			repository.getSettings().collect { userSettings ->
+			userSettingsRepository.getSettings().collect { userSettings ->
 				// All properties that are based on preferences are set here
 				_currentUserSettings.value = userSettings
 				decodeStoredTimetableValue(userSettings.timetablePersonalTimetable)?.let {
@@ -162,9 +172,11 @@ class TimetableViewModel @AssistedInject constructor(
 						"Items available for $startDate: ${_events.value.contains(startDate)}"
 					)
 					if (!_events.value.contains(startDate))
-						loadEvents(startDate)?.let { events ->
-							emitEvents(mapOf(startDate to timetableMapper.colorWeekViewTimetableEvents(events)))
-						}
+						loadEvents(startDate, FromCache.CACHED_THEN_LOAD)
+							.catch(loadingExceptionHandler)
+							.collect { events ->
+								emitEvents(mapOf(startDate to timetableMapper.colorWeekViewTimetableEvents(events)))
+							}
 				}
 			}.awaitAll()
 			loading = false
@@ -174,33 +186,26 @@ class TimetableViewModel @AssistedInject constructor(
 	suspend fun onPageReload(pageOffset: Int) {
 		loading = true
 		val startDate = startDateForPageIndex(pageOffset.toLong())
-		loadEvents(startDate)?.let { events ->
-			emitEvents(mapOf(startDate to timetableMapper.colorWeekViewTimetableEvents(events)))
-		}
+		loadEvents(startDate, FromCache.NEVER)
+			.catch(loadingExceptionHandler)
+			.collect { events ->
+				emitEvents(mapOf(startDate to timetableMapper.colorWeekViewTimetableEvents(events)))
+			}
 		loading = false
 	}
 
-	private suspend fun loadEvents(startDate: LocalDate): List<Event>? {
-		try {
-			return timetableMapper.mapTimetablePeriodsToWeekViewEvents(
-				api.loadTimetable(
-					id = 0,
-					type = TimetableDatabaseInterface.Type.STUDENT.name,
-					startDate = startDate,
-					endDate = startDate.plusDays(5 /*TODO*/),
-					masterDataTimestamp = currentUser.masterDataTimestamp,
-					apiUrl = currentUser.apiUrl,
-					user = currentUser.user,
-					key = currentUser.key
-				).timetable.periods,
-				ElementType.STUDENT
-			)
-		} catch (e: UntisApiException) {
-			Log.e("TimetableViewModel", "Failed to load timetable due to API error", e)
-		} catch (e: Exception) {
-			Log.e("TimetableViewModel", "Failed to load timetable due to other error", e)
+	private suspend fun loadEvents(startDate: LocalDate, fromCache: FromCache): Flow<List<Event>> {
+		return timetableRepository.timetableSource().get(
+			params = TimetableRepository.TimetableParams(
+				elementId = 0,
+				elementType = ElementType.STUDENT,
+				startDate = startDate,
+			),
+			additionalKey = currentUser.id,
+			fromCache = fromCache
+		).map {
+			timetableMapper.mapTimetablePeriodsToWeekViewEvents(it, ElementType.STUDENT)
 		}
-		return null
 	}
 
 	private suspend fun emitEvents(events: Map<LocalDate, List<Event>>) {
@@ -263,7 +268,7 @@ class TimetableViewModel @AssistedInject constructor(
 	}
 
 	fun debugAction() = viewModelScope.launch {
-		repository.updateSettings {
+		userSettingsRepository.updateSettings {
 			backgroundRegular = ((Math.random() * 0xFFFFFF).toInt()) or (0xFF shl 24);
 		}
 	}

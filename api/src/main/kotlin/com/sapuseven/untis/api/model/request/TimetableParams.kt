@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TimetableParams(
-	val id: Int,
+	val id: Long,
 	val type: String,
 	val startDate: Date,
 	val endDate: Date,

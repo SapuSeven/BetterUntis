@@ -10,6 +10,7 @@ import com.sapuseven.untis.data.settings.model.Settings
 import java.io.InputStream
 import java.io.OutputStream
 
+@Deprecated("ProtoStore should be used instead")
 object UserSettingsSerializer : Serializer<Settings> {
 	override val defaultValue: Settings = Settings.getDefaultInstance()
 
@@ -27,6 +28,7 @@ object UserSettingsSerializer : Serializer<Settings> {
 	) = t.writeTo(output)
 }
 
+@Deprecated("ProtoStore should be used instead")
 val Context.settingsDataStore: DataStore<Settings> by dataStore(
 	fileName = "settings.pb",
 	serializer = UserSettingsSerializer
