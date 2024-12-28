@@ -6,8 +6,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Holiday(
 	val id: Long,
-	val name: String,
-	val longName: String,
-	val startDate: Date,
-	val endDate: Date
+	val name: String = "",
+	val longName: String = "",
+	val startDate: Date? = null,
+	val endDate: Date? = null
 )

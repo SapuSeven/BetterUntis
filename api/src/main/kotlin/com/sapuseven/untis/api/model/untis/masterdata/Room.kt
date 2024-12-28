@@ -5,13 +5,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Room(
 	val id: Long,
-	val name: String,
-	val longName: String,
-	val departmentId: Long,
-	val foreColor: String?,
-	val backColor: String?,
-	val active: Boolean,
-	val displayAllowed: Boolean
+	val name: String = "",
+	val longName: String = "",
+	val departmentId: Long = 0,
+	val foreColor: String? = null,
+	val backColor: String? = null,
+	val active: Boolean = false,
+	val displayAllowed: Boolean = false
 ) : Comparable<String> {
 	override fun compareTo(other: String) = if (
 		name.contains(other, true)

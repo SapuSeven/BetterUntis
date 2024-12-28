@@ -6,16 +6,16 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Teacher(
 	val id: Long,
-	val name: String,
-	val firstName: String,
-	val lastName: String,
+	val name: String = "",
+	val firstName: String = "",
+	val lastName: String = "",
 	val departmentIds: List<Long> = emptyList(),
-	val foreColor: String?,
-	val backColor: String?,
-	val entryDate: Date?,
-	val exitDate: Date?,
-	val active: Boolean,
-	val displayAllowed: Boolean
+	val foreColor: String? = null,
+	val backColor: String? = null,
+	val entryDate: Date? = null,
+	val exitDate: Date? = null,
+	val active: Boolean = false,
+	val displayAllowed: Boolean = false
 ) : Comparable<String> {
 	override fun compareTo(other: String) = if (
 		name.contains(other, true)
