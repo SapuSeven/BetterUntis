@@ -9,8 +9,6 @@ import androidx.room.TypeConverters
 import com.sapuseven.untis.api.model.untis.Settings
 import com.sapuseven.untis.api.model.untis.UserData
 import com.sapuseven.untis.api.model.untis.masterdata.TimeGrid
-import com.sapuseven.untis.api.serializer.Date
-import com.sapuseven.untis.api.serializer.Time
 import com.sapuseven.untis.data.database.entities.AbsenceReasonEntity
 import com.sapuseven.untis.data.database.entities.DepartmentEntity
 import com.sapuseven.untis.data.database.entities.DutyEntity
@@ -24,14 +22,17 @@ import com.sapuseven.untis.data.database.entities.SchoolYearEntity
 import com.sapuseven.untis.data.database.entities.SubjectEntity
 import com.sapuseven.untis.data.database.entities.TeacherEntity
 import com.sapuseven.untis.data.database.entities.TeachingMethodEntity
-import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.data.database.entities.User
+import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.models.TimetableBookmark
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 @Database(
-	version = 9,
+	version = 10,
 	entities = [
 		User::class,
 		AbsenceReasonEntity::class,
@@ -49,7 +50,8 @@ import kotlinx.serialization.json.Json
 		SchoolYearEntity::class,
 	],
 	autoMigrations = [
-		AutoMigration (from = 8, to = 9)
+		AutoMigration(from = 8, to = 9),
+		AutoMigration(from = 9, to = 10)
 	]
 )
 @TypeConverters(Converters::class)
@@ -114,14 +116,16 @@ internal class Converters {
 	fun decodeLongList(string: String?): List<Long>? = decode(string)
 
 	@TypeConverter
-	fun encodeDate(date: Date?): String? = encode(date)
+	fun encodeDate(date: LocalDate?): String? = date?.format(DateTimeFormatter.ISO_LOCAL_DATE)
 
 	@TypeConverter
-	fun decodeDate(date: String?): Date? = decode(date)
+	fun decodeDate(date: String?): LocalDate? =
+		date?.let { runCatching { LocalDate.parse(it, DateTimeFormatter.ISO_LOCAL_DATE) }.getOrNull() }
 
 	@TypeConverter
-	fun encodeTime(date: Time?): String? = encode(date)
+	fun encodeTime(date: LocalTime?): String? = date?.format(DateTimeFormatter.ISO_LOCAL_TIME)
 
 	@TypeConverter
-	fun decodeTime(date: String?): Time? = decode(date)
+	fun decodeTime(date: String?): LocalTime? =
+		date?.let { runCatching { LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME) }.getOrNull() }
 }

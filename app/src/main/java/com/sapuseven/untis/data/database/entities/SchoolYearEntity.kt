@@ -4,8 +4,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import com.sapuseven.untis.api.model.untis.masterdata.SchoolYear
-import com.sapuseven.untis.api.serializer.Date
 import com.sapuseven.untis.data.database.Mapper
+import java.time.LocalDate
 
 @Entity(
 	tableName = "SchoolYear",
@@ -22,8 +22,8 @@ data class SchoolYearEntity(
 	val id: Long = 0,
 	val userId: Long = -1,
 	val name: String = "",
-	val startDate: Date,
-	val endDate: Date
+	val startDate: LocalDate,
+	val endDate: LocalDate
 ) {
 	companion object : Mapper<SchoolYear, SchoolYearEntity> {
 		override fun map(from: SchoolYear, userId: Long) = SchoolYearEntity(

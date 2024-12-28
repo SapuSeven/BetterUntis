@@ -1,5 +1,6 @@
 package com.sapuseven.untis.api.serializer
 
+import com.sapuseven.untis.api.model.untis.masterdata.timegrid.Day
 import kotlinx.serialization.json.Json
 import org.junit.Assert
 import org.junit.Test

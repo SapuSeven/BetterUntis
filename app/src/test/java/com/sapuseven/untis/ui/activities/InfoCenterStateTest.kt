@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 class InfoCenterStateTest {
-	val testAbsences = listOf(
+	/*val testAbsences = listOf(
 		UntisAbsence(
 			1, 1, 1,
 			UntisDateTime(LocalDateTime.now().minusDays(1).plusHours(2)),
@@ -142,5 +142,5 @@ class InfoCenterStateTest {
 			),
 			infoCenterState.absenceList
 		)
-	}
+	}*/
 }

@@ -2,7 +2,6 @@ package com.sapuseven.untis.helpers.timetable
 
 import android.content.Context
 import android.util.Log
-import com.sapuseven.untis.api.serializer.Date
 import com.sapuseven.untis.data.connectivity.Authentication
 import com.sapuseven.untis.data.connectivity.UntisApiConstants
 import com.sapuseven.untis.data.connectivity.UntisRequest
@@ -16,6 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.joda.time.Instant
 import java.lang.ref.WeakReference
+import java.time.LocalDate
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -408,8 +408,8 @@ class TimetableLoader(
 	}
 
 	data class TimetableLoaderTarget(
-		val startDate: Date,
-		val endDate: Date,
+		val startDate: LocalDate,
+		val endDate: LocalDate,
 		val id: Int,
 		val type: String
 	)

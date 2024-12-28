@@ -5,8 +5,8 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
-typealias Date = @Serializable(LocalDateSerializer::class) LocalDate
+internal typealias Date = @Serializable(LocalDateSerializer::class) LocalDate
 
-typealias DateTime = @Serializable(LocalDateTimeSerializer::class) LocalDateTime
+internal typealias DateTime = @Serializable(LocalDateTimeSerializer::class) LocalDateTime
 
-typealias Time = @Serializable(LocalTimeSerializer::class) LocalTime
+internal typealias Time = @Serializable(LocalTimeSerializer::class) LocalTime

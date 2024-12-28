@@ -4,8 +4,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import com.sapuseven.untis.api.model.untis.masterdata.Teacher
-import com.sapuseven.untis.api.serializer.Date
 import com.sapuseven.untis.data.database.Mapper
+import java.time.LocalDate
 
 @Entity(
 	tableName = "Teacher",
@@ -27,8 +27,8 @@ data class TeacherEntity(
 	val departmentIds: List<Long> = emptyList(),
 	val foreColor: String? = null,
 	val backColor: String? = null,
-	val entryDate: Date? = null,
-	val exitDate: Date? = null,
+	val entryDate: LocalDate? = null,
+	val exitDate: LocalDate? = null,
 	val active: Boolean = false,
 	val displayAllowed: Boolean = false
 ) : Comparable<String> {

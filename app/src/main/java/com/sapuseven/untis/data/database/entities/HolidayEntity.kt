@@ -5,10 +5,10 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import com.sapuseven.untis.api.model.untis.masterdata.ExcuseStatus
 import com.sapuseven.untis.api.model.untis.masterdata.Holiday
-import com.sapuseven.untis.api.serializer.Date
 import com.sapuseven.untis.data.database.Mapper
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import java.time.LocalDate
 
 @Entity(
 	tableName = "Holiday",
@@ -26,8 +26,8 @@ data class HolidayEntity(
 	val userId: Long = -1,
 	val name: String = "",
 	val longName: String = "",
-	val startDate: Date,
-	val endDate: Date
+	val startDate: LocalDate? = null,
+	val endDate: LocalDate? = null
 ) {
 	companion object : Mapper<Holiday, HolidayEntity> {
 		override fun map(from: Holiday, userId: Long) = HolidayEntity(

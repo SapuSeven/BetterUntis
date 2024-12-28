@@ -4,9 +4,9 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import com.sapuseven.untis.api.model.untis.masterdata.Klasse
-import com.sapuseven.untis.api.serializer.Date
 import com.sapuseven.untis.data.database.Mapper
 import kotlinx.serialization.Transient
+import java.time.LocalDate
 
 @Entity(
 	tableName = "Klasse",
@@ -25,8 +25,8 @@ data class KlasseEntity(
 	val name: String = "",
 	val longName: String = "",
 	val departmentId: Long = 0,
-	val startDate: Date,
-	val endDate: Date,
+	val startDate: LocalDate? = null,
+	val endDate: LocalDate? = null,
 	val foreColor: String? = "",
 	val backColor: String? = "",
 	val active: Boolean = false,
