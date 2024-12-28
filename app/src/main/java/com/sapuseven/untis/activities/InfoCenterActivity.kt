@@ -16,7 +16,7 @@ class InfoCenterActivity : BaseComposeActivity() {
 					val state = rememberInfoCenterState(
 						userDatabase,
 						user,
-						timetableDatabaseInterface,
+						//timetableDatabaseInterface,
 						dataStorePreferences,
 						this
 					)

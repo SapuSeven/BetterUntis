@@ -2,9 +2,6 @@ package com.sapuseven.untis.helpers.timetable
 
 import android.content.Context
 import android.util.Log
-import com.sapuseven.untis.data.connectivity.Authentication
-import com.sapuseven.untis.data.connectivity.UntisApiConstants
-import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.models.untis.params.TimetableParams
 import com.sapuseven.untis.models.untis.response.TimetableResponse
@@ -32,9 +29,6 @@ class TimetableLoader(
 	}
 
 	private val requestList = ArrayList<TimetableLoaderTarget>()
-
-	private var api: UntisRequest = UntisRequest()
-	private var query: UntisRequest.UntisRequestQuery = UntisRequest.UntisRequestQuery(user)
 
 	/*@OptIn(DelicateCoroutinesApi::class)
 	fun load(target: TimetableLoaderTarget, flags: Int = 0, proxyHost: String? = null) =

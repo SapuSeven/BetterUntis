@@ -4,12 +4,8 @@ import android.app.Activity
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.sapuseven.untis.activities.BaseComposeActivity
-import com.sapuseven.untis.data.connectivity.UntisApiConstants
-import com.sapuseven.untis.data.connectivity.Authentication
-import com.sapuseven.untis.data.connectivity.UntisRequest
 import com.sapuseven.untis.data.database.UserDatabase
 import com.sapuseven.untis.data.database.entities.User
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.*
 import com.sapuseven.untis.api.model.untis.masterdata.SchoolYear
 import com.sapuseven.untis.models.untis.params.*
@@ -23,7 +19,7 @@ import org.joda.time.LocalDateTime
 class InfoCenterState(
 	private val userDatabase: UserDatabase,
 	private val user: User,
-	private val timetableDatabaseInterface: TimetableDatabaseInterface,
+	//private val timetableDatabaseInterface: TimetableDatabaseInterface,
 	private val contextActivity: Activity,
 	val preferences: DataStorePreferences,
 	var selectedItem: MutableState<Int>,
@@ -258,7 +254,7 @@ class InfoCenterState(
 fun rememberInfoCenterState(
 	userDatabase: UserDatabase,
 	user: User,
-	timetableDatabaseInterface: TimetableDatabaseInterface,
+	//timetableDatabaseInterface: TimetableDatabaseInterface,
 	preferences: DataStorePreferences,
 	contextActivity: BaseComposeActivity,
 	selectedItem: MutableState<Int> = rememberSaveable { mutableStateOf(ID_MESSAGES) },
@@ -294,7 +290,7 @@ fun rememberInfoCenterState(
 	InfoCenterState(
 		userDatabase = userDatabase,
 		user = user,
-		timetableDatabaseInterface = timetableDatabaseInterface,
+		//timetableDatabaseInterface = timetableDatabaseInterface,
 		preferences = preferences,
 		contextActivity = contextActivity,
 		selectedItem = selectedItem,
