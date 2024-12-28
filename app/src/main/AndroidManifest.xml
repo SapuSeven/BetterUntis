@@ -3,6 +3,7 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools">
 
+	<uses-feature android:name="android.hardware.camera" android:required="false"/>
 	<uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
 	<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 	<uses-permission android:name="android.permission.INTERNET" />
@@ -136,7 +137,7 @@
 		</activity>
 
 		<activity
-			android:name="com.journeyapps.barcodescanner.CaptureActivity"
+			android:name="com.journeyappws.barcodescanner.CaptureActivity"
 			android:screenOrientation="portrait"
 			tools:replace="screenOrientation" />
 

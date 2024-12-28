@@ -71,7 +71,7 @@ internal class WeekViewGestureHandler<T>(
 		return true
 	}
 
-	override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+	override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
 		if (isZooming) return true
 
 		val absDistanceX = abs(distanceX)
@@ -121,7 +121,7 @@ internal class WeekViewGestureHandler<T>(
 		return true
 	}
 
-	override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+	override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
 		if (isZooming) return true
 
 		if (currentFlingDirection == Direction.LEFT && !config.horizontalFlingEnabled ||

@@ -1,25 +1,38 @@
-plugins {
-	id 'java-library'
-	id 'org.jetbrains.kotlin.jvm'
-	id 'org.openapi.generator' version '7.0.1'
-}
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-apply plugin: 'kotlinx-serialization'
+plugins {
+	alias(libs.plugins.kotlin.jvm)
+	alias(libs.plugins.openapi.generator)
+	alias(libs.plugins.kotlin.serialization)
+}
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
 }
 
+
+tasks {
+	compileKotlin {
+		compilerOptions.jvmTarget = JvmTarget.JVM_17
+		compilerOptions.freeCompilerArgs = listOf(
+			"-opt-in=kotlin.contracts.ExperimentalContracts",
+			"-Xjvm-default=all-compatibility",
+		)
+	}
+	compileTestKotlin {
+		compilerOptions.jvmTarget = JvmTarget.JVM_17
+	}
+}
 //compileKotlin.dependsOn tasks.openApiGenerate
 
 dependencies {
-	implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization_version"
-	implementation "io.ktor:ktor-client-core:$ktor_version"
-	implementation "io.ktor:ktor-client-content-negotiation:$ktor_version"
-	implementation "io.ktor:ktor-serialization-kotlinx-json:$ktor_version"
+	implementation(libs.kotlinx.serialization.json)
+	implementation(libs.ktor.client.core)
+	implementation(libs.ktor.client.content.negotiation)
+	implementation(libs.ktor.serialization)
 
-	testImplementation "junit:junit:4.13.2"
+	testImplementation(libs.junit)
 }
 
 /* Auto-generate api code from untis-extern spec - disabled for now, since not in use
@@ -57,11 +70,13 @@ openApiGenerate {
 	outputDir.set("$buildDir/generated")
 	apiPackage.set("com.sapuseven.untis.api")
 	modelPackage.set("com.sapuseven.untis.model")
-	configOptions.set([
-		library: 'jvm-ktor',
-		dateLibrary: 'java8',
-		serializationLibrary: 'kotlinx_serialization'
-	])
+	configOptions.set(
+		mapOf(
+			"library" to "jvm-ktor",
+			"dateLibrary" to "java8",
+			"serializationLibrary" to "kotlinx_serialization",
+		)
+	)
 }
 
 kotlin.sourceSets.named("main") {
