@@ -73,6 +73,7 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.ui.common.ifNotNull
 import com.sapuseven.untis.ui.dialogs.DatePickerDialog
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -108,8 +109,8 @@ val eventTimeFormat = DateTimeFormatter.ofPattern("h:mm a")
 @Composable
 fun WeekViewEvent(
 	event: Event,
-	modifier: Modifier = Modifier,
 	currentTime: LocalDateTime = LocalDateTime.now(),
+	modifier: Modifier = Modifier,
 	onClick: (() -> Unit)? = null,
 ) {
 	Box(
@@ -339,7 +340,7 @@ fun WeekViewSidebar(
 	hourList: List<WeekViewHour>,
 	label: @Composable (hour: WeekViewHour) -> Unit = { WeekViewSidebarLabel(hour = it) },
 ) {
-	// TODO: This implementation is prone to alignment issues due to rounding errors. Maybe use a Box with absolute padding instead (like the hour lines).
+	// OPTIMIZE: This implementation is prone to alignment issues due to rounding errors. Maybe use a Box with absolute padding instead (like the hour lines).
 	Column(
 		modifier = modifier
 			.width(IntrinsicSize.Max)
@@ -525,9 +526,10 @@ fun WeekViewContent(
 	pastBackgroundColor: Color,
 	futureBackgroundColor: Color,
 	dividerWidth: Float = Stroke.HairlineWidth,
+	currentTime: LocalDateTime = LocalDateTime.now(),
 	eventContent: @Composable (event: Event) -> Unit = { WeekViewEvent(event = it) }
 ) {
-	// TODO: Find a way to arrange events before layout, but calculate minEventWidth to determine maxSimultaneous
+	// OPTIMIZE: Find a way to arrange events before layout, but calculate minEventWidth to determine maxSimultaneous
 	// TODO: Display indicator if there are more events than can be displayed
 	//val minEventWidth = 24.dp
 	val maxSimultaneous = 100//(dayWidth.toFloat() / minEventWidth.toPx()).toInt()
@@ -549,7 +551,8 @@ fun WeekViewContent(
 					startTime = startTime,
 					hourHeight = hourHeight,
 					pastBackgroundColor = pastBackgroundColor,
-					futureBackgroundColor = futureBackgroundColor
+					futureBackgroundColor = futureBackgroundColor,
+					currentTime = currentTime
 				)
 
 				WeekViewContentGrid(
@@ -568,7 +571,8 @@ fun WeekViewContent(
 					startDate = startDate,
 					startTime = startTime,
 					hourHeight = hourHeight,
-					indicatorColor = indicatorColor
+					indicatorColor = indicatorColor,
+					currentTime = currentTime
 				)
 			}
 	) { measureables, constraints ->
@@ -620,13 +624,16 @@ fun WeekViewCompose(
 	events: Map<LocalDate, List<Event>>,
 	onPageChange: suspend (pageIndex: Int) -> Unit,
 	onReload: suspend (pageIndex: Int) -> Unit,
-	onItemClick: (Pair<List<PeriodData>, Int>) -> Unit,
+	onItemClick: (Pair<List<Event>, Int>) -> Unit,
+	currentTime: LocalDateTime = LocalDateTime.now(),
 	modifier: Modifier = Modifier,
-	eventContent: @Composable (event: Event) -> Unit = {
-		WeekViewEvent(event = it, onClick = {
+	eventContent: @Composable (event: Event) -> Unit = { event ->
+		WeekViewEvent(
+			event = event,
+			currentTime = currentTime,
+			onClick = {
 			onItemClick(
-				it.simultaneousEvents.mapNotNull { it.periodData }
-					to it.simultaneousEvents.indexOf(it)
+				event.simultaneousEvents.toList() to event.simultaneousEvents.indexOf(event)
 			)
 		})
 	},
@@ -751,6 +758,7 @@ fun WeekViewCompose(
 							// Potential improvement: Map the event list by individual days to reduce the number of events passed to be rendered
 							events = events.getOrDefault(visibleStartDate, emptyList()),
 							eventContent = eventContent,
+							currentTime = currentTime,
 							startDate = visibleStartDate,
 							numDays = numDays,
 							startTime = startTime,

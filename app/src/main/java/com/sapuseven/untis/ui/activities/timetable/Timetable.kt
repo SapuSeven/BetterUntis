@@ -21,10 +21,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -52,9 +55,12 @@ import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.weekview.WeekViewCompose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -147,6 +153,17 @@ fun Timetable(
 						onDismiss = { viewModel.feedbackDialog = false }
 					)
 
+				var currentTime by remember { mutableStateOf(LocalDateTime.now()) }
+
+				LaunchedEffect(Unit) {
+					while (true) {
+						// Refresh the weekview (and last refresh text) periodically
+						// This could probably be increased to 1 minute, but 10 seconds seems fine
+						currentTime = LocalDateTime.now()
+						delay(10_000)
+					}
+				}
+
 				WeekViewCompose(
 					events = events,
 					onPageChange = { pageOffset ->
@@ -158,6 +175,7 @@ fun Timetable(
 					onItemClick = { item ->
 						//viewModel.timetableItemDetailsDialog = item
 					},
+					currentTime = currentTime,
 					startTime = hourList.firstOrNull()?.startTime ?: LocalTime.MIDNIGHT,
 					endTime = hourList.lastOrNull()?.endTime ?: LocalTime.MIDNIGHT,
 					endTimeOffset = navBarHeight,
@@ -219,10 +237,11 @@ fun Timetable(
 						}
 					} else {
 						// Last refresh text
+						// TODO This doesn't update when time passes
 						Text(
 							text = stringResource(
 								id = R.string.main_last_refreshed,
-								formatTimeDiffMillis(lastRefresh?.let { Instant.now().toEpochMilli() - it.toEpochMilli() })
+								formatTimeDiffMillis(lastRefresh?.let { currentTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() - it.toEpochMilli() })
 							),
 							modifier = Modifier
 								.align(Alignment.BottomStart)
