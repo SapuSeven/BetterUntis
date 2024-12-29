@@ -237,7 +237,6 @@ fun Timetable(
 						}
 					} else {
 						// Last refresh text
-						// TODO This doesn't update when time passes
 						Text(
 							text = stringResource(
 								id = R.string.main_last_refreshed,
