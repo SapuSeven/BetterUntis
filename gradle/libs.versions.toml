@@ -46,6 +46,7 @@ openapi = "7.0.1"
 sentry = "6.33.1"
 sentry-gradle = "3.4.2"
 universal-cache = "1.1.7"
+junit-ktx = "1.2.1"
 
 
 [libraries]
@@ -117,6 +118,7 @@ sentry-android = { module = "io.sentry:sentry-android", version.ref = "sentry" }
 sentry-compose-android = { module = "io.sentry:sentry-compose-android", version.ref = "sentry" }
 andrew0000-cache = { module = "io.github.andrew0000:universal-cache", version.ref = "universal-cache" }
 xzing = { module = "com.journeyapps:zxing-android-embedded", version.ref = "journeyapps-xzing" }
+androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junit-ktx" }
 
 [plugins]
 # Main

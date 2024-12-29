@@ -17,7 +17,6 @@ dependencyResolutionManagement {
 
 
 include(":app")
-include(":weekview")
 include(":material-color-utils")
 include(":api")
 include(":protostore")

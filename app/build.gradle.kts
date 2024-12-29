@@ -254,7 +254,6 @@ dependencies {
 	debugImplementation(libs.androidx.compose.ui.test.manifest)
 
 	implementation(project(":api"))
-	implementation(project(":weekview"))
 	implementation(project(":material-color-utils"))
 	implementation(project(":protostore"))
 }

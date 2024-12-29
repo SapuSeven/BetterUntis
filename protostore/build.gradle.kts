@@ -59,5 +59,6 @@ dependencies {
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test)
+    androidTestImplementation(libs.androidx.junit.ktx)
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
 }
