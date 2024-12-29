@@ -70,6 +70,7 @@ fun Timetable(
 	val needsPersonalTimetable by viewModel.needsPersonalTimetable.collectAsState()
 	val hourList by viewModel.hourList.collectAsState()
 	val events by viewModel.events.collectAsState()
+	val lastRefresh by viewModel.lastRefresh.collectAsState()
 
 	TimetableDrawer(
 		drawerState = drawerState,
@@ -216,7 +217,7 @@ fun Timetable(
 					} else {
 						// Last refresh text
 						Text(
-							text = viewModel.lastRefreshText(),
+							text = lastRefresh.toString(),
 							modifier = Modifier
 								.align(Alignment.BottomStart)
 								.padding(start = startPadding + 8.dp, bottom = 8.dp)

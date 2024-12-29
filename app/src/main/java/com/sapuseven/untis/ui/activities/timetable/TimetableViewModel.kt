@@ -17,13 +17,14 @@ import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.exception.UntisApiException
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.api.model.untis.timetable.Period
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.components.ElementPicker
 import com.sapuseven.untis.components.UserManager
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
-import com.sapuseven.untis.data.settings.model.UserSettings
 import com.sapuseven.untis.data.repository.TimetableRepository
+import com.sapuseven.untis.data.settings.model.UserSettings
 import com.sapuseven.untis.mappers.TimetableMapper
 import com.sapuseven.untis.modules.ThemeManager
 import com.sapuseven.untis.scope.UserScopeManager
@@ -35,6 +36,7 @@ import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import com.sapuseven.untis.ui.weekview.Event
 import com.sapuseven.untis.ui.weekview.WeekViewHour
 import com.sapuseven.untis.ui.weekview.startDateForPageIndex
+import crocodile8.universal_cache.CachedSourceResult
 import crocodile8.universal_cache.FromCache
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -47,10 +49,12 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 @HiltViewModel(assistedFactory = TimetableViewModel.Factory::class)
 class TimetableViewModel @AssistedInject constructor(
@@ -100,6 +104,9 @@ class TimetableViewModel @AssistedInject constructor(
 
 	private val _events = MutableStateFlow<Map<LocalDate, List<Event>>>(emptyMap())
 	val events: StateFlow<Map<LocalDate, List<Event>>> = _events
+
+	private val _lastRefresh = MutableStateFlow<LocalDateTime?>(null)
+	val lastRefresh: StateFlow<LocalDateTime?> = _lastRefresh
 
 	val currentUser: User = userScopeManager.user
 
@@ -164,19 +171,25 @@ class TimetableViewModel @AssistedInject constructor(
 	suspend fun onPageChange(pageOffset: Int = 0) {
 		viewModelScope.launch {
 			loading = true
-			((pageOffset - 1)..(pageOffset + 1)).map {
+			((pageOffset - 1)..(pageOffset + 1)).map { targetPage ->
 				async {
-					val startDate = startDateForPageIndex(it.toLong())
-					Log.d(
-						"WeekView",
-						"Items available for $startDate: ${_events.value.contains(startDate)}"
+					val startDate = startDateForPageIndex(targetPage.toLong())
+					loadEvents(
+						startDate,
+						// TODO: Right now this is a workaround to show the "last refresh" text when changing pages,
+						//  since it isn't stored after emitting the events.
+						//  For that reason the cache is queried more often than necessary.
+						if (_events.value.contains(startDate)) FromCache.ONLY else FromCache.CACHED_THEN_LOAD
 					)
-					if (!_events.value.contains(startDate))
-						loadEvents(startDate, FromCache.CACHED_THEN_LOAD)
-							.catch(loadingExceptionHandler)
-							.collect { events ->
-								emitEvents(mapOf(startDate to timetableMapper.colorWeekViewTimetableEvents(events)))
-							}
+						.catch(loadingExceptionHandler)
+						.collect {
+							val events =
+								timetableMapper.mapTimetablePeriodsToWeekViewEvents(it.value, ElementType.STUDENT)
+							val refreshTimestamp = it.originTimeStamp?.toLocalDateTime() ?: LocalDateTime.now()
+							emitEvents(mapOf(startDate to timetableMapper.colorWeekViewTimetableEvents(events)))
+							if (targetPage == pageOffset)
+								_lastRefresh.emit(refreshTimestamp)
+						}
 				}
 			}.awaitAll()
 			loading = false
@@ -188,14 +201,17 @@ class TimetableViewModel @AssistedInject constructor(
 		val startDate = startDateForPageIndex(pageOffset.toLong())
 		loadEvents(startDate, FromCache.NEVER)
 			.catch(loadingExceptionHandler)
-			.collect { events ->
+			.collect {
+				val events = timetableMapper.mapTimetablePeriodsToWeekViewEvents(it.value, ElementType.STUDENT)
+				val refreshTimestamp = it.originTimeStamp?.toLocalDateTime() ?: LocalDateTime.now()
 				emitEvents(mapOf(startDate to timetableMapper.colorWeekViewTimetableEvents(events)))
+				_lastRefresh.emit(refreshTimestamp)
 			}
 		loading = false
 	}
 
-	private suspend fun loadEvents(startDate: LocalDate, fromCache: FromCache): Flow<List<Event>> {
-		return timetableRepository.timetableSource().get(
+	private suspend fun loadEvents(startDate: LocalDate, fromCache: FromCache): Flow<CachedSourceResult<List<Period>>> {
+		return timetableRepository.timetableSource().getRaw(
 			params = TimetableRepository.TimetableParams(
 				elementId = 0,
 				elementType = ElementType.STUDENT,
@@ -203,9 +219,7 @@ class TimetableViewModel @AssistedInject constructor(
 			),
 			additionalKey = currentUser.id,
 			fromCache = fromCache
-		).map {
-			timetableMapper.mapTimetablePeriodsToWeekViewEvents(it, ElementType.STUDENT)
-		}
+		)
 	}
 
 	private suspend fun emitEvents(events: Map<LocalDate, List<Event>>) {
@@ -230,7 +244,7 @@ class TimetableViewModel @AssistedInject constructor(
 		return groupedEvents.mapValues { it.value.toList() }
 	}
 
-	fun buildHourList(
+	private fun buildHourList(
 		user: User, range: Pair<Int, Int>?, rangeIndexReset: Boolean
 	): List<WeekViewHour> {
 		val hourList = mutableListOf<WeekViewHour>()
@@ -281,3 +295,6 @@ class TimetableViewModel @AssistedInject constructor(
 		TODO("Not yet implemented")
 	}
 }
+
+private fun Long.toLocalDateTime(): LocalDateTime =
+	LocalDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.systemDefault())
