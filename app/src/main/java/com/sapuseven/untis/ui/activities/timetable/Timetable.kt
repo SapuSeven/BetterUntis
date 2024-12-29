@@ -148,10 +148,10 @@ fun Timetable(
 					}
 				}
 
-				if (viewModel.feedbackDialog)
-					FeedbackDialog(
-						onDismiss = { viewModel.feedbackDialog = false }
-					)
+				FeedbackDialog(
+					visible = viewModel.feedbackDialog,
+					onDismiss = { viewModel.feedbackDialog = false }
+				)
 
 				var currentTime by remember { mutableStateOf(LocalDateTime.now()) }
 
