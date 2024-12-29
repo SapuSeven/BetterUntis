@@ -1,20 +1,12 @@
 package com.sapuseven.untis.helpers.timetable
 
 import android.content.Context
-import android.util.Log
 import com.sapuseven.untis.data.database.entities.User
-import com.sapuseven.untis.models.untis.params.TimetableParams
-import com.sapuseven.untis.models.untis.response.TimetableResponse
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import org.joda.time.Instant
 import java.lang.ref.WeakReference
 import java.time.LocalDate
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class TimetableLoader(
 	private val context: WeakReference<Context>,

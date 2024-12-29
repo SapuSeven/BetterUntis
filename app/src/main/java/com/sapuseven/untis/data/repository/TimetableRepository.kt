@@ -3,8 +3,10 @@ package com.sapuseven.untis.data.repository
 import android.content.Context
 import androidx.compose.material3.ColorScheme
 import com.sapuseven.untis.api.client.TimetableApi
+import com.sapuseven.untis.api.model.response.PeriodDataResult
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.Period
+import com.sapuseven.untis.api.model.untis.timetable.PeriodData
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.cache.DiskCache
 import com.sapuseven.untis.mappers.TimetableMapper
@@ -18,7 +20,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.serializer
 import java.io.File
 import java.time.LocalDate
-import javax.inject.Singleton
 
 class TimetableRepository @AssistedInject constructor(
 	private val api: TimetableApi,
@@ -38,7 +39,7 @@ class TimetableRepository @AssistedInject constructor(
 	suspend fun timetableSource(): CachedSource<TimetableParams, List<Period>> {
 		return CachedSource(
 			source = { params ->
-				api.loadTimetable(
+				api.getTimetable(
 					id = params.elementId,
 					type = params.elementType,
 					startDate = params.startDate,
@@ -50,6 +51,21 @@ class TimetableRepository @AssistedInject constructor(
 				).timetable.periods
 			},
 			cache = DiskCache(File(appContext.cacheDir, "timetable"), serializer()),
+			timeProvider = SystemTimeProvider // TODO: Use from DI to allow for testing
+		)
+	}
+
+	suspend fun periodDataSource(): CachedSource<Set<Period>, PeriodDataResult> {
+		return CachedSource(
+			source = { params ->
+				api.getPeriodData(
+					periods = params,
+					apiUrl = user.apiUrl,
+					user = user.user,
+					key = user.key
+				)
+			},
+			cache = DiskCache(File(appContext.cacheDir, "periodData"), serializer()),
 			timeProvider = SystemTimeProvider // TODO: Use from DI to allow for testing
 		)
 	}

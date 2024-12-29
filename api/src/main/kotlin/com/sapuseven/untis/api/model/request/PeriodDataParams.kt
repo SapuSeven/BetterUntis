@@ -1,10 +1,11 @@
-package com.sapuseven.untis.models.untis.params
+package com.sapuseven.untis.api.model.request
 
 import com.sapuseven.untis.api.model.untis.Auth
+import com.sapuseven.untis.api.serializer.Date
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class PeriodDataParams(
-		val ttIds: List<Int>,
-		val auth: Auth
+	val ttIds: Set<Long>,
+	val auth: Auth
 ) : BaseParams()

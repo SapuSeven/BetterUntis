@@ -266,7 +266,8 @@ fun Timetable(
 	) {
 		// TODO: Incorrect insets
 		TimetableItemDetailsDialog(
-			timegridItems = remember {
+			timetableRepository = viewModel.timetableRepository,
+			periodItems = remember {
 				viewModel.timetableItemDetailsDialog?.first?.mapNotNull { it.data } ?: emptyList()
 			},
 			initialPage = remember {

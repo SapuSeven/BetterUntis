@@ -22,7 +22,7 @@ open class UserDataApi(
 	httpClientConfig = config,
 	jsonBlock = jsonBlock
 ) {
-	open suspend fun loadAppSharedSecret(
+	open suspend fun getAppSharedSecret(
 		apiUrl: String,
 		user: String,
 		password: String
@@ -37,7 +37,7 @@ open class UserDataApi(
 		return response.result ?: throw UntisApiException(response.error)
 	}
 
-	open suspend fun loadUserData(
+	open suspend fun getUserData(
 		apiUrl: String,
 		user: String?,
 		key: String?

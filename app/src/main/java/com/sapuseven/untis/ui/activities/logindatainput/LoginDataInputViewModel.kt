@@ -289,14 +289,14 @@ class LoginDataInputViewModel @Inject constructor(
 	private suspend fun loadAppSharedSecret(untisApiUrl: String): String? = when {
 		loginData.anonymous.value == true -> ""
 		loginData.skipAppSecret.value == true -> loginData.password.value
-		else -> userDataApi.loadAppSharedSecret(
+		else -> userDataApi.getAppSharedSecret(
 			untisApiUrl, loginData.username.value ?: "", loginData.password.value ?: ""
 		)
 	}
 
 	private suspend fun loadUserData(untisApiUrl: String, appSharedSecret: String): UserDataResult {
 		val user = if (loginData.anonymous.value == true) null else loginData.username.value
-		return userDataApi.loadUserData(untisApiUrl, user, appSharedSecret)
+		return userDataApi.getUserData(untisApiUrl, user, appSharedSecret)
 	}
 
 	fun goBack() {

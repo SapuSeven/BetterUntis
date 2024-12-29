@@ -26,6 +26,6 @@ data class PeriodData(
 	val homeWorks: List<HomeWork>?,
 	val seatingPlan: SeatingPlan?,
 	val classRoles: List<ClassRole>?,
-	val channel: MessengerChannel,
+	val channel: MessengerChannel?,
 	val can: List<PeriodRight>
 )

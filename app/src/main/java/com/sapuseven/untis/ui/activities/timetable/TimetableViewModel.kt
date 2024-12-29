@@ -77,8 +77,8 @@ class TimetableViewModel @AssistedInject constructor(
 	}
 
 	private val timetableMapper = timetableMapperFactory.create(colorScheme)
-	private val timetableRepository = timetableRepositoryFactory.create(colorScheme)
 	private val userSettingsRepository = userSettingsRepositoryFactory.create(colorScheme)
+	internal val timetableRepository = timetableRepositoryFactory.create(colorScheme)
 
 	val args = savedStateHandle.toRoute<AppRoutes.Timetable>()
 
