@@ -97,7 +97,7 @@ data class Event<T>(
 ) {
 	var numSimultaneous: Int = 1 // relative width is determined by 1/x
 	var offsetSteps: Int = 0 // x-offset in multiples of width
-	var simultaneousEvents = mutableSetOf<Event<*>>()
+	var simultaneousEvents = mutableSetOf<Event<T>>()
 
 	// temp
 	var leftX = 0
@@ -511,8 +511,8 @@ fun DrawScope.WeekViewIndicator(
 }
 
 @Composable
-fun WeekViewContent(
-	events: List<Event<*>>,
+fun <T> WeekViewContent(
+	events: List<Event<T>>,
 	modifier: Modifier = Modifier,
 	numDays: Int = 5,
 	startDate: LocalDate,
@@ -527,7 +527,7 @@ fun WeekViewContent(
 	futureBackgroundColor: Color,
 	dividerWidth: Float = Stroke.HairlineWidth,
 	currentTime: LocalDateTime = LocalDateTime.now(),
-	eventContent: @Composable (event: Event<*>) -> Unit = { WeekViewEvent(event = it) }
+	eventContent: @Composable (event: Event<T>) -> Unit = { WeekViewEvent(event = it) }
 ) {
 	// OPTIMIZE: Find a way to arrange events before layout, but calculate minEventWidth to determine maxSimultaneous
 	// TODO: Display indicator if there are more events than can be displayed
@@ -620,14 +620,14 @@ fun WeekViewContent(
  */
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun WeekViewCompose(
-	events: Map<LocalDate, List<Event<*>>>,
+fun <T> WeekViewCompose(
+	events: Map<LocalDate, List<Event<T>>>,
 	onPageChange: suspend (pageIndex: Int) -> Unit,
 	onReload: suspend (pageIndex: Int) -> Unit,
-	onItemClick: (Pair<List<Event<*>>, Int>) -> Unit,
+	onItemClick: (Pair<List<Event<T>>, Int>) -> Unit,
 	currentTime: LocalDateTime = LocalDateTime.now(),
 	modifier: Modifier = Modifier,
-	eventContent: @Composable (event: Event<*>) -> Unit = { event ->
+	eventContent: @Composable (event: Event<T>) -> Unit = { event ->
 		WeekViewEvent(
 			event = event,
 			currentTime = currentTime,

@@ -37,6 +37,14 @@ data class Period(
 		const val CODE_EXAM = "EXAM"
 	}
 
+	fun can(PersiodRight: PeriodRight): Boolean {
+		return can.contains(PersiodRight)
+	}
+
+	fun `is`(PersiodState: PeriodState): Boolean {
+		return `is`.contains(PersiodState)
+	}
+
 	fun equalsIgnoreTime(second: Period): Boolean {
 		return `is` == second.`is`
 			&& can == second.can

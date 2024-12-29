@@ -1,38 +1,100 @@
-package com.sapuseven.untis.ui.dialogs
+package com.sapuseven.untis.ui.activities.timetable
 
-/*
-@OptIn(
-	ExperimentalMaterial3Api::class, ExperimentalPagerApi::class,
-	ExperimentalAnimationApi::class
-)
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import com.sapuseven.untis.BuildConfig
+import com.sapuseven.untis.R
+import com.sapuseven.untis.activities.BaseComposeActivity
+import com.sapuseven.untis.api.model.untis.Attachment
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.api.model.untis.enumeration.PeriodRight
+import com.sapuseven.untis.api.model.untis.masterdata.Student
+import com.sapuseven.untis.api.model.untis.timetable.PeriodData
+import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
+import com.sapuseven.untis.data.repository.ElementRepository
+import com.sapuseven.untis.models.PeriodItem
+import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
+import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
+import com.sapuseven.untis.ui.common.AppScaffold
+import com.sapuseven.untis.ui.common.ClickableUrlText
+import com.sapuseven.untis.ui.common.DebugTimetableItemDetailsAction
+import com.sapuseven.untis.ui.common.SmallCircularProgressIndicator
+import com.sapuseven.untis.ui.common.VerticalScrollColumn
+import com.sapuseven.untis.ui.common.conditional
+import com.sapuseven.untis.ui.functional.bottomInsets
+import com.sapuseven.untis.ui.functional.insetsPaddingValues
+import kotlinx.coroutines.launch
+import org.joda.time.format.DateTimeFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import kotlin.math.absoluteValue
+import kotlin.math.sign
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimetableItemDetailsDialog(
-	timegridItems: List<PeriodData>,
+	timegridItems: List<PeriodItem>,
+	elementRepository: ElementRepository,
 	initialPage: Int = 0,
-	user: User,
-	timetableDatabaseInterface: TimetableDatabaseInterface,
 	onDismiss: (requestedElement: PeriodElement?) -> Unit
 ) {
 	var dismissed by rememberSaveable { mutableStateOf(false) }
-	val pagerState = rememberPagerState(initialPage)
+	val pagerState = rememberPagerState(initialPage) { timegridItems.size }
 	val scope = rememberCoroutineScope()
 	val context = LocalContext.current
 
 	var absenceCheck by rememberSaveable {
-		mutableStateOf<Triple<Int, UntisDateTime, UntisDateTime>?>(
+		mutableStateOf<Triple<Long, LocalDateTime, LocalDateTime>?>(
 			null
 		)
 	}
 
 	var detailedAbsenceCheck by rememberSaveable {
-		mutableStateOf<Pair<Pair<Int, UntisStudent>, Pair<UntisDateTime, UntisDateTime>>?>(
+		mutableStateOf<Pair<Pair<Long, Student>, Pair<LocalDateTime, LocalDateTime>>?>(
 			null
 		)
 	}
 	var studentName by rememberSaveable { mutableStateOf<String?>(null) }
 
-	var untisPeriodData by remember { mutableStateOf<UntisPeriodData?>(null) }
-	var untisStudents by rememberSaveable { mutableStateOf<List<UntisStudent>?>(null) }
+	// periodData contains additional details for a PeriodItem and is loaded on demand
+	var periodData by remember { mutableStateOf<PeriodData?>(null) }
+
+	var untisStudents by rememberSaveable { mutableStateOf<List<Student>?>(null) }
 	var error by remember { mutableStateOf<Throwable?>(null) }
 	val errorMessage = error?.message?.let { stringResource(id = R.string.all_error_details, it) }
 	val errorMessageGeneric = stringResource(id = R.string.errormessagedictionary_generic)
@@ -88,7 +150,7 @@ fun TimetableItemDetailsDialog(
 
 						if (detailedAbsenceCheck != null) {
 							scope.launch {
-								createAbsence(
+								/*createAbsence(
 									user = user,
 									ttId = detailedAbsenceCheck?.first?.first ?: -1,
 									student = detailedAbsenceCheck?.first?.second!!,
@@ -102,7 +164,7 @@ fun TimetableItemDetailsDialog(
 									Toast
 										.makeText(context, it.message, Toast.LENGTH_LONG)
 										.show()
-								})
+								})*/
 								detailedAbsenceCheck = null
 								loading = false
 							}
@@ -111,7 +173,7 @@ fun TimetableItemDetailsDialog(
 
 
 						scope.launch {
-							submitAbsencesChecked(
+							/*submitAbsencesChecked(
 								user,
 								absenceCheck?.first ?: -1
 							).fold({
@@ -128,7 +190,7 @@ fun TimetableItemDetailsDialog(
 								Toast
 									.makeText(context, it.message, Toast.LENGTH_LONG)
 									.show()
-							})
+							})*/
 							loading = false
 						}
 					}
@@ -152,20 +214,17 @@ fun TimetableItemDetailsDialog(
 				.fillMaxSize()
 		) {
 			HorizontalPager(
-				count = timegridItems.size,
 				state = pagerState,
 				modifier = Modifier
 					.weight(1f)
 			) { page ->
-				timegridItems[page].also { periodData ->
-					val title = periodData.getLong(
-						TimetableDatabaseInterface.Type.SUBJECT
-					).let { title ->
-						if (periodData.isCancelled())
+				timegridItems[page].also { periodItem ->
+					val title = periodItem.getLong(ElementType.SUBJECT).let { title ->
+						if (periodItem.isCancelled())
 							stringResource(R.string.all_lesson_cancelled, title)
-						else if (periodData.isIrregular())
+						else if (periodItem.isIrregular())
 							stringResource(R.string.all_lesson_irregular, title)
-						else if (periodData.isExam())
+						else if (periodItem.isExam())
 							stringResource(R.string.all_lesson_exam, title)
 						else
 							title
@@ -173,19 +232,17 @@ fun TimetableItemDetailsDialog(
 
 					val time = stringResource(
 						R.string.main_dialog_itemdetails_timeformat,
-						periodData.element.startDateTime.toLocalDateTime()
-							.toString(DateTimeFormat.shortTime()),
-						periodData.element.endDateTime.toLocalDateTime()
-							.toString(DateTimeFormat.shortTime())
+						periodItem.originalPeriod.startDateTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)),
+						periodItem.originalPeriod.endDateTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
 					)
 
 					var attachmentsDialog by rememberSaveable {
-						mutableStateOf<List<UntisAttachment>?>(
+						mutableStateOf<List<Attachment>?>(
 							null
 						)
 					}
 
-					var lessonTopicEditDialog by rememberSaveable { mutableStateOf<Int?>(null) }
+					var lessonTopicEditDialog by rememberSaveable { mutableStateOf<Long?>(null) }
 
 					var lessonTopicNew by rememberSaveable { mutableStateOf<String?>(null) }
 
@@ -224,23 +281,23 @@ fun TimetableItemDetailsDialog(
 								.padding(horizontal = 16.dp)
 						)
 
-						timetableDatabaseInterface.run {
+						elementRepository.run {
 							LaunchedEffect(Unit) {
-								loadPeriodData(
+								/*loadPeriodData(
 									user = user,
-									period = periodData.element
+									period = periodData.originalPeriod
 								).fold({
 									untisPeriodData =
-										it.dataByTTId[periodData.element.id.toString()]
+										it.dataByTTId[periodData.originalPeriod.id.toString()]
 									untisStudents = it.referencedStudents
 								}, {
 									error = it
-								})
+								})*/
 							}
 
 							// Lesson teachers
 							TimetableItemDetailsDialogElement(
-								elements = periodData.teachers,
+								elements = periodItem.teachers,
 								onElementClick = { dismiss(it) },
 								useLongName = true,
 								icon = {
@@ -255,7 +312,7 @@ fun TimetableItemDetailsDialog(
 
 							// Lesson classes
 							TimetableItemDetailsDialogElement(
-								elements = periodData.classes,
+								elements = periodItem.classes,
 								onElementClick = { dismiss(it) },
 								icon = {
 									Icon(
@@ -269,7 +326,7 @@ fun TimetableItemDetailsDialog(
 
 							// Lesson rooms
 							TimetableItemDetailsDialogElement(
-								elements = periodData.rooms,
+								elements = periodItem.rooms,
 								onElementClick = { dismiss(it) },
 								icon = {
 									Icon(
@@ -283,9 +340,9 @@ fun TimetableItemDetailsDialog(
 
 							// Lesson info texts
 							setOf(
-								periodData.element.text.lesson,
-								periodData.element.text.substitution,
-								periodData.element.text.info
+								periodItem.originalPeriod.text.lesson,
+								periodItem.originalPeriod.text.substitution,
+								periodItem.originalPeriod.text.info
 							).forEach {
 								if (it.isNotBlank())
 									ListItem(
@@ -302,8 +359,8 @@ fun TimetableItemDetailsDialog(
 							}
 
 							// Lesson homeworks
-							periodData.element.homeWorks?.forEach {
-								val endDate = it.endDate.toLocalDate()
+							periodItem.originalPeriod.homeWorks?.forEach {
+								val endDate = it.endDate
 
 								ListItem(
 									headlineContent = {
@@ -315,7 +372,7 @@ fun TimetableItemDetailsDialog(
 										Text(
 											stringResource(
 												id = R.string.homeworks_due_time,
-												endDate.toString(stringResource(R.string.homeworks_due_time_format))
+												endDate.format(DateTimeFormatter.ofPattern(stringResource(R.string.homeworks_due_time_format)))
 											)
 										)
 									},
@@ -343,7 +400,7 @@ fun TimetableItemDetailsDialog(
 							}
 
 							// Lesson exam
-							periodData.element.exam?.also {
+							periodItem.originalPeriod.exam?.also {
 								ListItem(
 									headlineContent = {
 										Text(it.name ?: stringResource(id = R.string.all_exam))
@@ -361,7 +418,7 @@ fun TimetableItemDetailsDialog(
 							}
 
 							// Online lesson
-							if (periodData.element.isOnlinePeriod == true) {
+							if (periodItem.originalPeriod.isOnlinePeriod == true) {
 								ListItem(
 									headlineContent = { Text(stringResource(R.string.all_lesson_online)) },
 									leadingContent = {
@@ -372,7 +429,7 @@ fun TimetableItemDetailsDialog(
 											modifier = Modifier.padding(horizontal = 8.dp)
 										)
 									},
-									trailingContent = periodData.element.onlinePeriodLink?.let {
+									trailingContent = periodItem.originalPeriod.onlinePeriodLink?.let {
 										{
 											IconButton(onClick = {
 												//openUrl(it) // TODO: Implement
@@ -388,13 +445,13 @@ fun TimetableItemDetailsDialog(
 							}
 
 							// Lesson absence check
-							if (periodData.element.can.contains(CAN_READ_STUDENT_ABSENCE))
-								TimetableItemDetailsDialogWithPeriodData(
+							if (periodItem.originalPeriod.can(PeriodRight.READ_STUD_ABSENCE))
+								ListItemWithPeriodData(
+									periodItem = periodItem,
 									periodData = periodData,
-									untisPeriodData = untisPeriodData,
 									error = error,
 									errorMessage = errorMessage,
-									editPermission = CAN_WRITE_STUDENT_ABSENCE,
+									editRight = PeriodRight.WRITE_STUD_ABSENCE,
 									headlineContent = {
 										Text(stringResource(id = R.string.all_absences))
 									},
@@ -420,7 +477,7 @@ fun TimetableItemDetailsDialog(
 										)
 									},
 									onClick = {
-										absenceCheck = periodData.element.let {
+										absenceCheck = periodItem.originalPeriod.let {
 											Triple(
 												it.id,
 												it.startDateTime,
@@ -431,13 +488,13 @@ fun TimetableItemDetailsDialog(
 								)
 
 							// Lesson topic
-							if (periodData.element.can.contains(CAN_READ_LESSON_TOPIC))
-								TimetableItemDetailsDialogWithPeriodData(
+							if (periodItem.originalPeriod.can(PeriodRight.READ_LESSONTOPIC))
+								ListItemWithPeriodData(
+									periodItem = periodItem,
 									periodData = periodData,
-									untisPeriodData = untisPeriodData,
 									error = error,
 									errorMessage = errorMessage,
-									editPermission = CAN_WRITE_LESSON_TOPIC,
+									editRight = PeriodRight.WRITE_LESSONTOPIC,
 									headlineContent = {
 										Text(stringResource(id = R.string.all_lessontopic))
 									},
@@ -446,9 +503,7 @@ fun TimetableItemDetailsDialog(
 
 										Text(
 											if (topic.isNullOrBlank())
-												if (periodData.element.can.contains(
-														CAN_WRITE_LESSON_TOPIC
-													)
+												if (periodItem.originalPeriod.can(PeriodRight.WRITE_LESSONTOPIC)
 												)
 													stringResource(R.string.all_hint_tap_to_edit)
 												else
@@ -466,16 +521,16 @@ fun TimetableItemDetailsDialog(
 										)
 									},
 									onClick = {
-										lessonTopicEditDialog = periodData.element.id
+										lessonTopicEditDialog = periodItem.originalPeriod.id
 									}
 								)
 						}
 
 						attachmentsDialog?.let { attachments ->
-							AttachmentsDialog(
+							/*AttachmentsDialog(
 								attachments = attachments,
 								onDismiss = { attachmentsDialog = null }
-							)
+							)*/
 						}
 
 						lessonTopicEditDialog?.let { id ->
@@ -483,7 +538,7 @@ fun TimetableItemDetailsDialog(
 							var loading by rememberSaveable { mutableStateOf(false) }
 							var dialogError by rememberSaveable { mutableStateOf<String?>(null) }
 
-							DynamicHeightAlertDialog(
+							/*DynamicHeightAlertDialog(
 								title = { Text(stringResource(id = R.string.all_lessontopic_edit)) },
 								text = {
 									Column(
@@ -538,7 +593,7 @@ fun TimetableItemDetailsDialog(
 										Text(stringResource(id = R.string.all_cancel))
 									}
 								}
-							)
+							)*/
 						}
 					}
 				}
@@ -573,14 +628,14 @@ fun TimetableItemDetailsDialog(
 					.background(MaterialTheme.colorScheme.surface),
 				contentPadding = insetsPaddingValues()
 			) {
-				val students = untisPeriodData?.studentIds?.let { studentIds ->
+				val students = periodData?.studentIds?.let { studentIds ->
 					studentIds.mapNotNull { studentId -> untisStudents?.find { it.id == studentId } }
 				} ?: emptyList()
 
 				items(students) { student ->
 					var loading by remember { mutableStateOf(false) }
 					val absence =
-						untisPeriodData?.absences?.findLast { it.studentId == student.id }
+						periodData?.absences?.findLast { it.studentId == student.id }
 
 					ListItem(
 						headlineContent = {
@@ -613,13 +668,13 @@ fun TimetableItemDetailsDialog(
 									loading = true
 
 									scope.launch {
-										deleteAbsence(
+										/*deleteAbsence(
 											user,
 											absence
 										).fold({
 											if (it)
-												untisPeriodData = untisPeriodData?.copy(
-													absences = untisPeriodData?.absences?.minus(
+												modifiedPeriodData = modifiedPeriodData?.copy(
+													absences = modifiedPeriodData?.absences?.minus(
 														absence
 													)
 												)
@@ -635,28 +690,28 @@ fun TimetableItemDetailsDialog(
 											Toast
 												.makeText(context, it.message, Toast.LENGTH_LONG)
 												.show()
-										})
+										})*/
 										loading = false
 									}
 								} ?: absenceCheck?.let { absenceCheckPeriod ->
 									loading = true
 
 									scope.launch {
-										createAbsence(
+										/*createAbsence(
 											user,
 											absenceCheckPeriod.first,
 											student,
 											absenceCheckPeriod.second.toLocalDateTime(),
 											absenceCheckPeriod.third.toLocalDateTime()
 										).fold({
-											untisPeriodData = untisPeriodData?.copy(
-												absences = untisPeriodData?.absences?.plus(it)
+											modifiedPeriodData = modifiedPeriodData?.copy(
+												absences = modifiedPeriodData?.absences?.plus(it)
 											)
 										}, {
 											Toast
 												.makeText(context, it.message, Toast.LENGTH_LONG)
 												.show()
-										})
+										})*/
 										loading = false
 									}
 								}
@@ -724,12 +779,7 @@ fun TimetableItemDetailsDialog(
 						},
 						trailingContent = {
 							Text(
-								text = detailedAbsenceCheck?.second?.first?.toLocalDateTime()
-									?.toString(
-										DateTimeFormat.forStyle("MS")
-											.withLocale(context.resources.configuration.locales[0])
-									)
-									?: "",
+								text = detailedAbsenceCheck?.second?.first?.format(DateTimeFormatter.ofPattern("MS", context.resources.configuration.locales[0])) ?: "",
 								style = MaterialTheme.typography.labelLarge
 							)
 						}
@@ -744,12 +794,7 @@ fun TimetableItemDetailsDialog(
 						},
 						trailingContent = {
 							Text(
-								text = detailedAbsenceCheck?.second?.second?.toLocalDateTime()
-									?.toString(
-										DateTimeFormat.forStyle("MS")
-											.withLocale(context.resources.configuration.locales[0])
-									)
-									?: "",
+								text = detailedAbsenceCheck?.second?.second?.format(DateTimeFormatter.ofPattern("MS", context.resources.configuration.locales[0])) ?: "",
 								style = MaterialTheme.typography.labelLarge
 							)
 						}
@@ -805,9 +850,9 @@ fun TimetableItemDetailsDialog(
 						}
 					)*/
 
-					if (showStartTimePicker) {
+					/*if (showStartTimePicker) {
 						val startTime = detailedAbsenceCheck?.let {
-							it.second.first.toLocalDateTime()
+							it.second.first
 						} ?: LocalDateTime()
 						TimePickerDialog(
 							initialSelection = startTime.toLocalTime(),
@@ -816,7 +861,7 @@ fun TimetableItemDetailsDialog(
 							}
 						) { time ->
 							detailedAbsenceCheck =
-								detailedAbsenceCheck!!.first to (UntisDateTime(
+								detailedAbsenceCheck!!.first to (LocalDateTime(
 									time.toDateTime(startTime.toDateTime()).toLocalDateTime()
 								) to detailedAbsenceCheck?.second?.second!!)
 							showStartTimePicker = false
@@ -833,12 +878,12 @@ fun TimetableItemDetailsDialog(
 							}
 						) { time ->
 							detailedAbsenceCheck =
-								detailedAbsenceCheck!!.first to (detailedAbsenceCheck?.second?.first!! to UntisDateTime(
+								detailedAbsenceCheck!!.first to (detailedAbsenceCheck?.second?.first!! to LocalDateTime(
 									time.toDateTime(endTime.toDateTime()).toLocalDateTime()
 								))
 							showEndTimePicker = false
 						}
-					}
+					}*/
 				}
 			}
 		}
@@ -846,33 +891,30 @@ fun TimetableItemDetailsDialog(
 }
 
 @Composable
-private fun TimetableItemDetailsDialogWithPeriodData(
-	periodData: PeriodData,
-	untisPeriodData: UntisPeriodData?,
+private fun ListItemWithPeriodData(
+	periodItem: PeriodItem,
+	periodData: PeriodData?,
 	error: Throwable?,
 	errorMessage: String?,
-	editPermission: String? = null,
+	editRight: PeriodRight,
 	headlineContent: @Composable () -> Unit,
-	supportingContent: @Composable (UntisPeriodData) -> Unit,
-	leadingContent: @Composable (UntisPeriodData?) -> Unit,
+	supportingContent: @Composable (PeriodData) -> Unit,
+	leadingContent: @Composable (PeriodData?) -> Unit,
 	onClick: () -> Unit
 ) {
 	val context = LocalContext.current
-	val canEdit =
-		periodData.element.can.contains(editPermission) || untisPeriodData?.can?.contains(
-			editPermission
-		) == true
+	val canEdit = periodItem.originalPeriod.can(editRight)
 
 	ListItem(
 		headlineContent = headlineContent,
 		supportingContent = {
-			untisPeriodData?.let {
+			periodData?.let {
 				supportingContent(it)
 			} ?: error?.let {
 				Text(stringResource(R.string.all_error))
 			} ?: Text(stringResource(R.string.loading))
 		},
-		leadingContent = { leadingContent(untisPeriodData) },
+		leadingContent = { leadingContent(periodData) },
 		modifier = Modifier
 			.conditional(error != null) {
 				clickable {
@@ -895,7 +937,7 @@ private fun TimetableItemDetailsDialogWithPeriodData(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TimetableDatabaseInterface.TimetableItemDetailsDialogElement(
+private fun ElementRepository.TimetableItemDetailsDialogElement(
 	elements: Set<PeriodElement>,
 	icon: (@Composable () -> Unit)? = null,
 	useLongName: Boolean = false,
@@ -941,7 +983,7 @@ private fun TimetableDatabaseInterface.TimetableItemDetailsDialogElement(
 		)
 }
 
-private suspend fun loadPeriodData(
+/*private suspend fun loadPeriodData(
 	user: User,
 	period: Period
 ): Result<PeriodDataResult> {
@@ -967,10 +1009,10 @@ private suspend fun loadPeriodData(
 private suspend fun createAbsence(
 	user: User,
 	ttId: Int,
-	student: UntisStudent,
+	student: Student,
 	startDateTime: LocalDateTime,
 	endDateTime: LocalDateTime
-): Result<UntisAbsence> {
+): Result<Absence> {
 	val query =
 		UntisRequest.UntisRequestQuery(user).apply {
 			data.method = UntisApiConstants.METHOD_CREATE_IMMEDIATE_ABSENCE
@@ -1073,3 +1115,61 @@ private suspend fun submitLessonTopic(
 
 private class UntisApiException(error: UntisError?) : Throwable(error?.message)
 */
+
+// TODO: Move to separate file
+@Composable
+fun HorizontalPagerIndicator(
+	pagerState: PagerState,
+	modifier: Modifier = Modifier,
+	pageCount: Int = pagerState.pageCount,
+	pageIndexMapping: (Int) -> Int = { it },
+	activeColor: Color = androidx.compose.material.LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
+	inactiveColor: Color = activeColor.copy(ContentAlpha.disabled),
+	indicatorWidth: Dp = 8.dp,
+	indicatorHeight: Dp = indicatorWidth,
+	spacing: Dp = indicatorWidth,
+	indicatorShape: Shape = CircleShape,
+) {
+
+	val indicatorWidthPx = LocalDensity.current.run { indicatorWidth.roundToPx() }
+	val spacingPx = LocalDensity.current.run { spacing.roundToPx() }
+
+	Box(
+		modifier = modifier,
+		contentAlignment = Alignment.CenterStart
+	) {
+		Row(
+			horizontalArrangement = Arrangement.spacedBy(spacing),
+			verticalAlignment = Alignment.CenterVertically,
+		) {
+			val indicatorModifier = Modifier
+				.size(width = indicatorWidth, height = indicatorHeight)
+				.background(color = inactiveColor, shape = indicatorShape)
+
+			repeat(pageCount) {
+				Box(indicatorModifier)
+			}
+		}
+
+		Box(
+			Modifier
+				.offset {
+					val position = pageIndexMapping(pagerState.currentPage)
+					val offset = pagerState.currentPageOffsetFraction
+					val next = pageIndexMapping(pagerState.currentPage + offset.sign.toInt())
+					val scrollPosition = ((next - position) * offset.absoluteValue + position)
+						.coerceIn(0f, (pageCount - 1).coerceAtLeast(0).toFloat())
+
+					IntOffset(
+						x = ((spacingPx + indicatorWidthPx) * scrollPosition).toInt(),
+						y = 0
+					)
+				}
+				.size(width = indicatorWidth, height = indicatorHeight)
+				.background(
+					color = activeColor,
+					shape = indicatorShape,
+				)
+		)
+	}
+}

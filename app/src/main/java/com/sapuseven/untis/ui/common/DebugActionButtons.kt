@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.timetable.PeriodData
+import com.sapuseven.untis.models.PeriodItem
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -88,7 +89,7 @@ fun DebugDesclaimerAction() {
 }
 
 @Composable
-fun DebugTimetableItemDetailsAction(timegridItems: List<PeriodData>) {
+fun DebugTimetableItemDetailsAction(timegridItems: List<PeriodItem>) {
 	DebugInfoAction(
 		title = { Text("Raw lesson details") }
 	) {

@@ -3,12 +3,10 @@ package com.sapuseven.untis.ui.activities.timetable
 import android.content.Context
 import android.util.Log
 import androidx.compose.material3.ColorScheme
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,6 +22,7 @@ import com.sapuseven.untis.components.ElementPicker
 import com.sapuseven.untis.components.UserManager
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
+import com.sapuseven.untis.data.repository.ElementRepository
 import com.sapuseven.untis.data.repository.TimetableRepository
 import com.sapuseven.untis.data.settings.model.UserSettings
 import com.sapuseven.untis.mappers.TimetableMapper
@@ -56,8 +55,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZoneId
 
 @HiltViewModel(assistedFactory = TimetableViewModel.Factory::class)
 class TimetableViewModel @AssistedInject constructor(
@@ -69,6 +66,7 @@ class TimetableViewModel @AssistedInject constructor(
 	private val userSettingsRepositoryFactory: UserSettingsRepository.Factory,
 	private val timetableMapperFactory: TimetableMapper.Factory,
 	private val timetableRepositoryFactory: TimetableRepository.Factory,
+	internal val elementRepository: ElementRepository,
 	internal val globalSettingsRepository: GlobalSettingsRepository,
 	@Assisted private val colorScheme: ColorScheme,
 	savedStateHandle: SavedStateHandle,
@@ -89,6 +87,7 @@ class TimetableViewModel @AssistedInject constructor(
 	val currentUserSettings: StateFlow<UserSettings> = _currentUserSettings
 
 	var profileManagementDialog by mutableStateOf(false)
+	var timetableItemDetailsDialog by mutableStateOf<Pair<List<Event<PeriodItem>>, Int>?>(null)
 	var feedbackDialog by mutableStateOf(false)
 
 	var loading by mutableStateOf(true)
@@ -218,6 +217,10 @@ class TimetableViewModel @AssistedInject constructor(
 				emitEvents(mapOf(startDate to timetableMapper.colorWeekViewTimetableEvents(events)))
 				_lastRefresh.emit(refreshTimestamp)
 			}
+	}
+
+	fun onItemClick(itemsWithIndex: Pair<List<Event<PeriodItem>>, Int>) {
+		timetableItemDetailsDialog = itemsWithIndex
 	}
 
 	private suspend fun loadEvents(startDate: LocalDate, fromCache: FromCache): Flow<CachedSourceResult<List<Period>>> {

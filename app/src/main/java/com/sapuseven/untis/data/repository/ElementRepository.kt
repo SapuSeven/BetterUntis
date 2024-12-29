@@ -2,6 +2,7 @@ package com.sapuseven.untis.data.repository
 
 import android.util.Log
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.data.database.entities.KlasseEntity
 import com.sapuseven.untis.data.database.entities.RoomEntity
 import com.sapuseven.untis.data.database.entities.SubjectEntity
@@ -54,6 +55,8 @@ class ElementRepository @Inject constructor(
 		} ?: ELEMENT_NAME_UNKNOWN
 	}
 
+	fun getShortName(periodElement: PeriodElement) = getShortName(periodElement.id, periodElement.type)
+
 	fun getLongName(id: Long, type: ElementType): String {
 		return when (type) {
 			ElementType.CLASS -> allClasses[id]?.longName
@@ -64,6 +67,8 @@ class ElementRepository @Inject constructor(
 		} ?: ELEMENT_NAME_UNKNOWN
 	}
 
+	fun getLongName(periodElement: PeriodElement) = getLongName(periodElement.id, periodElement.type)
+
 	fun isAllowed(id: Long, type: ElementType?): Boolean {
 		return when (type) {
 			ElementType.CLASS -> allClasses[id]?.displayable
@@ -73,4 +78,6 @@ class ElementRepository @Inject constructor(
 			else -> null
 		} ?: false
 	}
+
+	fun isAllowed(periodElement: PeriodElement) = isAllowed(periodElement.id, periodElement.type)
 }

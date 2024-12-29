@@ -12,7 +12,7 @@ import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
-@Deprecated("This class should be removed")
+@Deprecated("Use PeriodItem instead")
 @Serializable
 class PeriodData(
 	@Transient private var timetableDatabaseInterface: TimetableDatabaseInterface? = null,

@@ -57,7 +57,6 @@ import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.weekview.WeekViewCompose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
@@ -173,8 +172,8 @@ fun Timetable(
 					onReload = { pageOffset ->
 						viewModel.onPageReload(pageOffset)
 					},
-					onItemClick = { item ->
-						//viewModel.timetableItemDetailsDialog = item
+					onItemClick = { itemsWithIndex ->
+						viewModel.onItemClick(itemsWithIndex)
 					},
 					currentTime = currentTime,
 					startTime = hourList.firstOrNull()?.startTime ?: LocalTime.MIDNIGHT,
@@ -241,7 +240,10 @@ fun Timetable(
 						Text(
 							text = stringResource(
 								id = R.string.main_last_refreshed,
-								formatTimeDiffMillis(lastRefresh?.let { currentTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() - it.toEpochMilli() })
+								formatTimeDiffMillis(lastRefresh?.let {
+									currentTime.atZone(ZoneId.systemDefault()).toInstant()
+										.toEpochMilli() - it.toEpochMilli()
+								})
 							),
 							modifier = Modifier
 								.align(Alignment.BottomStart)
@@ -254,6 +256,28 @@ fun Timetable(
 
 			ReportsInfoBottomSheet(viewModel.globalSettingsRepository)
 		}
+	}
+
+	// TODO: Implement a smoother animation (see https://m3.material.io/components/dialogs/guidelines#007536b9-76b1-474a-a152-2f340caaff6f)
+	AnimatedVisibility(
+		visible = viewModel.timetableItemDetailsDialog != null,
+		enter = fullscreenDialogAnimationEnter(),
+		exit = fullscreenDialogAnimationExit()
+	) {
+		// TODO: Incorrect insets
+		TimetableItemDetailsDialog(
+			timegridItems = remember {
+				viewModel.timetableItemDetailsDialog?.first?.mapNotNull { it.data } ?: emptyList()
+			},
+			initialPage = remember {
+				viewModel.timetableItemDetailsDialog?.second ?: 0
+			},
+			elementRepository = viewModel.elementRepository,
+			onDismiss = {
+				viewModel.timetableItemDetailsDialog = null
+				//it?.let { viewModel.setDisplayedElement(it) }
+			}
+		)
 	}
 
 	AnimatedVisibility(
