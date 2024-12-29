@@ -197,7 +197,6 @@ class TimetableViewModel @AssistedInject constructor(
 	}
 
 	suspend fun onPageReload(pageOffset: Int) {
-		loading = true
 		val startDate = startDateForPageIndex(pageOffset.toLong())
 		loadEvents(startDate, FromCache.NEVER)
 			.catch(loadingExceptionHandler)
@@ -207,7 +206,6 @@ class TimetableViewModel @AssistedInject constructor(
 				emitEvents(mapOf(startDate to timetableMapper.colorWeekViewTimetableEvents(events)))
 				_lastRefresh.emit(refreshTimestamp)
 			}
-		loading = false
 	}
 
 	private suspend fun loadEvents(startDate: LocalDate, fromCache: FromCache): Flow<CachedSourceResult<List<Period>>> {
