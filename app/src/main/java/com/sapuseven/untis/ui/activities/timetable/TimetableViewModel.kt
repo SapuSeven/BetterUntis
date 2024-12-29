@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -35,6 +36,7 @@ import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
 import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import com.sapuseven.untis.ui.weekview.Event
+import com.sapuseven.untis.ui.weekview.WeekViewColorScheme
 import com.sapuseven.untis.ui.weekview.WeekViewHour
 import com.sapuseven.untis.ui.weekview.startDateForPageIndex
 import crocodile8.universal_cache.CachedSourceResult
@@ -109,6 +111,9 @@ class TimetableViewModel @AssistedInject constructor(
 	private val _lastRefresh = MutableStateFlow<Instant?>(null)
 	val lastRefresh: StateFlow<Instant?> = _lastRefresh
 
+	private val _weekViewColorScheme = MutableStateFlow<WeekViewColorScheme>(WeekViewColorScheme.default(colorScheme))
+	val weekViewColorScheme: StateFlow<WeekViewColorScheme> = _weekViewColorScheme
+
 	val currentUser: User = userScopeManager.user
 
 	val allUsersState: StateFlow<List<User>> = userManager.allUsersState
@@ -131,11 +136,17 @@ class TimetableViewModel @AssistedInject constructor(
 					_currentElement.emit(it)
 				} ?: _needsPersonalTimetable.emit(true)
 				_hourList.value = buildHourList(
-					currentUser,
-					userSettings.timetableRange.convertRangeToPair(),
-					userSettings.timetableRangeIndexReset
+					user = currentUser,
+					range = userSettings.timetableRange.convertRangeToPair(),
+					rangeIndexReset = userSettings.timetableRangeIndexReset
 				)
 				_debugColor.value = userSettings.backgroundRegular
+				_weekViewColorScheme.value = WeekViewColorScheme(
+					dividerColor = colorScheme.outline,
+					pastBackgroundColor = Color(userSettings.backgroundPast),
+					futureBackgroundColor = Color(userSettings.backgroundFuture),
+					indicatorColor = Color(userSettings.marker),
+				)
 			}
 		}
 

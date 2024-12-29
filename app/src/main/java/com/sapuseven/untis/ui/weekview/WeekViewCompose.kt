@@ -31,6 +31,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -803,9 +804,11 @@ data class WeekViewColorScheme(
 ) {
 	companion object {
 		@Composable
-		fun default(): WeekViewColorScheme {
+		fun default(): WeekViewColorScheme = default(MaterialTheme.colorScheme)
+
+		fun default(colorScheme: ColorScheme): WeekViewColorScheme {
 			return WeekViewColorScheme(
-				dividerColor = MaterialTheme.colorScheme.outline,
+				dividerColor = colorScheme.outline,
 				pastBackgroundColor = Color(0x40808080),
 				futureBackgroundColor = Color.Transparent,
 				indicatorColor = Color.White

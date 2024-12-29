@@ -80,6 +80,7 @@ fun Timetable(
 	val hourList by viewModel.hourList.collectAsState()
 	val events by viewModel.events.collectAsState()
 	val lastRefresh by viewModel.lastRefresh.collectAsState()
+	val weekViewColorScheme by viewModel.weekViewColorScheme.collectAsState()
 
 	TimetableDrawer(
 		drawerState = drawerState,
@@ -182,7 +183,7 @@ fun Timetable(
 					hourHeight = /*state.weekViewPreferences.hourHeight ?:*/ 72.dp,
 					hourList = hourList,
 					//dividerWidth = viewModel.weekViewPreferences.dividerWidth,
-					//colorScheme = viewModel.weekViewPreferences.colorScheme,
+					colorScheme = weekViewColorScheme,
 					modifier = Modifier
 						.fillMaxSize()
 						.disabled(disabled = needsPersonalTimetable)
