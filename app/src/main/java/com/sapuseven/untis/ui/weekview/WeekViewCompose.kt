@@ -128,10 +128,10 @@ fun <T> WeekViewEvent(
 						.coerceIn(0f, 1f)
 				)
 			}
-			.padding(horizontal = 2.dp) // Inner padding
 			.ifNotNull(onClick) {
 				clickable(onClick = it)
 			}
+			.padding(horizontal = 2.dp) // Inner padding
 	) {
 		Text(
 			text = event.top,
