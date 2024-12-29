@@ -575,7 +575,7 @@ class MainDrawerState(
 		return false
 	}
 
-	fun removeBookmark(bookmark: TimetableBookmark) {
+	suspend fun removeBookmark(bookmark: TimetableBookmark) {
 		user.bookmarks = user.bookmarks.minus(bookmark)
 		userDatabase.userDao().update(user)
 		bookmarkDeleteDialog.value = null
@@ -623,22 +623,9 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	var profileManagementDialog by mutableStateOf(false)
 	var feedbackDialog by mutableStateOf(false)
 
-	var weekViewPage by mutableStateOf<Int>(0)
-	var weekViewEvents = mutableStateMapOf<LocalDate, List<Event>>()
-	private var weekViewRefreshTimestamps = mutableStateMapOf<Int, Long>()
-
 	init {
 		mainDrawerState.displayedElement = displayedElement
 	}
-
-	val isPersonalTimetable: Boolean
-		get() = displayedElement.value == personalTimetable?.first
-
-	val isAnonymous: Boolean
-		get() = personalTimetable != null && displayedElement.value == null
-
-	val isLoading: Boolean
-		get() = loading > 0
 
 	fun getCurrentUserId() = userId
 
@@ -679,10 +666,10 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	}
 
 	fun setDisplayedElement(element: PeriodElement?, displayName: String? = null) {
-		weekViewEvents.clear()
-		scope.launch {
-			onPageChange(weekViewPage)
-		}
+//		weekViewEvents.clear()
+//		scope.launch {
+//			onPageChange(weekViewPage)
+//		}
 		displayedElement.value = element
 		displayedName.value =
 			displayName ?: element?.let { timetableDatabaseInterface.getLongName(it) }
@@ -794,18 +781,6 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		}
 	}*/
 
-	// Last refresh
-	@Composable
-	fun lastRefreshText() = stringResource(
-		id = R.string.main_last_refreshed,
-		if (weekViewRefreshTimestamps[weekViewPage] ?: 0L > 0L) formatTimeDiff(Instant.now().millis - weekViewRefreshTimestamps[weekViewPage]!!)
-		else stringResource(id = R.string.main_last_refreshed_never)
-	)
-
-	fun showFeedback() {
-		feedbackDialog = true
-	}
-
 	@OptIn(ExperimentalComposeUiApi::class)
 	@Composable
 	private fun formatTimeDiff(diff: Long): String {
@@ -843,12 +818,6 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 			)
 			contextActivity.putBackgroundColorExtra(this)
 		})
-	}
-
-	val onPageChange: suspend (Int) -> Unit = { pageOffset ->
-		weekViewPage = pageOffset
-		Log.d("WeekView", "Page changed to $pageOffset")
-		//loadAllEvents(pageOffset)
 	}
 
 	data class WeekViewPreferences(
@@ -1059,9 +1028,6 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	//val showDatePicker: MutableState<Boolean>,
 	val profileManagementDialog: MutableState<Boolean>,
 	val bookmarkDeleteDialog: MutableState<TimetableBookmark?>,
-	//val weekViewPreferences: MainAppState.WeekViewPreferences,
-	val weekViewEvents: SnapshotStateMap<LocalDate, List<Event>>,
-	val weekViewPage: MutableState<Int>
 ) {
 
 	/*init {
@@ -1129,7 +1095,6 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 		displayedName.value = name ?: element?.let { timetableDatabaseInterface.getLongName(it) }
 			?: defaultDisplayedName
 
-		weekViewEvents.clear()
 		scope.launch {
 			//loadAllEvents()
 		}
@@ -1685,11 +1650,6 @@ fun rememberMainAppState(
 	showDatePicker: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },*/
 	profileManagementDialog: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) },
 	bookmarkDeleteDialog: MutableState<TimetableBookmark?> = rememberSaveable { mutableStateOf(null) },
-	weekViewPreferences: NewMainAppState.WeekViewPreferences = rememberWeekViewPreferences(
-		contextActivity.dataStorePreferences, user
-	),
-	weekViewEvents: SnapshotStateMap<LocalDate, List<Event>> = mutableStateMapOf<LocalDate, List<Event>>(),
-	weekViewPage: MutableState<Int> = rememberSaveable { mutableStateOf(0) },
 ) = remember(user) {
 	MainAppState(
 		user = user,
@@ -1713,9 +1673,6 @@ fun rememberMainAppState(
 //		showDatePicker = showDatePicker,
 		profileManagementDialog = profileManagementDialog,
 		bookmarkDeleteDialog = bookmarkDeleteDialog,
-		//weekViewPreferences = weekViewPreferences,
-		weekViewEvents = weekViewEvents,
-		weekViewPage = weekViewPage
 	)
 }
 

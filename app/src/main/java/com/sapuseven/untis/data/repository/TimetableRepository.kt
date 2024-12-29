@@ -18,6 +18,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.serializer
 import java.io.File
 import java.time.LocalDate
+import javax.inject.Singleton
 
 class TimetableRepository @AssistedInject constructor(
 	private val api: TimetableApi,

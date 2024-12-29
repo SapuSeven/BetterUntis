@@ -8,7 +8,8 @@ import androidx.core.graphics.ColorUtils
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.masterdata.timegrid.Day
 import com.sapuseven.untis.api.model.untis.timetable.Period
-import com.sapuseven.untis.data.timetable.PeriodData
+import com.sapuseven.untis.data.repository.ElementRepository
+import com.sapuseven.untis.models.PeriodItem
 import com.sapuseven.untis.scope.UserScopeManager
 import com.sapuseven.untis.ui.activities.settings.UserSettingsRepository
 import com.sapuseven.untis.ui.weekview.Event
@@ -21,11 +22,12 @@ import java.time.DayOfWeek
 import java.time.temporal.ChronoUnit
 
 class TimetableMapper @AssistedInject constructor(
-	private val repositoryFactory: UserSettingsRepository.Factory,
+	private val settingsRepositoryFactory: UserSettingsRepository.Factory,
+	private val elementRepository: ElementRepository,
 	private val userScopeManager: UserScopeManager,
 	@Assisted private val colorScheme: ColorScheme,
 ) {
-	private val settings = repositoryFactory.create(colorScheme).getSettings()
+	private val settings = settingsRepositoryFactory.create(colorScheme).getSettings()
 
 	@AssistedFactory
 	interface Factory {
@@ -40,26 +42,26 @@ class TimetableMapper @AssistedInject constructor(
 	public suspend fun mapTimetablePeriodsToWeekViewEvents(
 		items: List<Period>,
 		contextType: ElementType
-	): List<Event> {
+	): List<Event<PeriodItem>> {
 		waitForSettings().apply {
 			return items
-				.map(
+				.mapToEvents(
 					contextType
 				)
-				.filter(
+				.filterEvents(
 					timetableHideCancelled,
 					timetableSubstitutionsIrregular,
 					timetableBackgroundIrregular
 				)
-				.merge(
+				.mergeEvents(
 					userScopeManager.user.timeGrid.days
 				)
 		}
 	}
 
 	public suspend fun colorWeekViewTimetableEvents(
-		events: List<Event>
-	): List<Event> {
+		events: List<Event<PeriodItem>>
+	): List<Event<PeriodItem>> {
 		waitForSettings().apply {
 			return events.copyWithColor(
 				Color(backgroundRegular),
@@ -75,7 +77,7 @@ class TimetableMapper @AssistedInject constructor(
 		}
 	}
 
-	public suspend fun color(event: Event) {
+	public suspend fun color(event: Event<PeriodItem>) {
 		waitForSettings().apply {
 			return event.color(
 				Color(backgroundRegular),
@@ -91,7 +93,7 @@ class TimetableMapper @AssistedInject constructor(
 		}
 	}
 
-	private suspend fun Event.color(
+	private suspend fun Event<PeriodItem>.color(
 		regularColor: Color,
 		regularPastColor: Color,
 		examColor: Color,
@@ -102,29 +104,29 @@ class TimetableMapper @AssistedInject constructor(
 		irregularPastColor: Color,
 		useDefault: List<String>
 	) {
-		periodData?.let {
+		data?.let {
 			val defaultColor =
-				Color(android.graphics.Color.parseColor(periodData.element.backColor))
+				Color(android.graphics.Color.parseColor(data.originalPeriod.backColor))
 			val defaultTextColor =
-				Color(android.graphics.Color.parseColor(periodData.element.foreColor))
+				Color(android.graphics.Color.parseColor(data.originalPeriod.foreColor))
 
 			color = when {
-				periodData.isExam() -> if (useDefault.contains("exam")) defaultColor else examColor
-				periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else cancelledColor
-				periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else irregularColor
+				data.isExam() -> if (useDefault.contains("exam")) defaultColor else examColor
+				data.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else cancelledColor
+				data.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else irregularColor
 				else -> if (useDefault.contains("regular")) defaultColor else regularColor
 			}
 
 			pastColor = when {
-				periodData.isExam() -> if (useDefault.contains("exam")) defaultColor.darken(
+				data.isExam() -> if (useDefault.contains("exam")) defaultColor.darken(
 					0.25f
 				) else examPastColor
 
-				periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor.darken(
+				data.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor.darken(
 					0.25f
 				) else cancelledPastColor
 
-				periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(
+				data.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(
 					0.25f
 				) else irregularPastColor
 
@@ -132,15 +134,15 @@ class TimetableMapper @AssistedInject constructor(
 			}
 
 			textColor = when {
-				periodData.isExam() -> if (useDefault.contains("exam")) defaultTextColor else colorOn(
+				data.isExam() -> if (useDefault.contains("exam")) defaultTextColor else colorOn(
 					examColor
 				)
 
-				periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultTextColor else colorOn(
+				data.isCancelled() -> if (useDefault.contains("cancelled")) defaultTextColor else colorOn(
 					cancelledColor
 				)
 
-				periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultTextColor else colorOn(
+				data.isIrregular() -> if (useDefault.contains("irregular")) defaultTextColor else colorOn(
 					irregularColor
 				)
 
@@ -153,39 +155,38 @@ class TimetableMapper @AssistedInject constructor(
 
 	private suspend fun waitForSettings() = settings.filterNotNull().first()
 
-	private fun List<Period>.map(
+	private fun List<Period>.mapToEvents(
 		contextType: ElementType,
 		includeOrgIds: Boolean = true,
-	): List<Event> {
+	): List<Event<PeriodItem>> {
 		return map { period ->
-			// TODO rethink this part
-			val periodData = PeriodData(
-				element = period
+			val periodItem = PeriodItem(
+				elementRepository = elementRepository,
+				originalPeriod = period
 			)
-			periodData.setup()
 
 			Event(
-				title = periodData.getShort(ElementType.SUBJECT),
+				title = periodItem.getShort(ElementType.SUBJECT),
 				top = (
 					if (contextType == ElementType.TEACHER)
-						periodData.getShortSpanned(
+						periodItem.getShortSpanned(
 							ElementType.CLASS,
 							includeOrgIds = includeOrgIds
 						)
 					else
-						periodData.getShortSpanned(
+						periodItem.getShortSpanned(
 							ElementType.TEACHER,
 							includeOrgIds = includeOrgIds
 						)
 					).toString(),
 				bottom = (
 					if (contextType == ElementType.ROOM)
-						periodData.getShortSpanned(
+						periodItem.getShortSpanned(
 							ElementType.CLASS,
 							includeOrgIds = includeOrgIds
 						)
 					else
-						periodData.getShortSpanned(
+						periodItem.getShortSpanned(
 							ElementType.ROOM,
 							includeOrgIds = includeOrgIds
 						)
@@ -195,7 +196,7 @@ class TimetableMapper @AssistedInject constructor(
 				textColor = Color.Transparent,
 				start = period.startDateTime,
 				end = period.endDateTime,
-				periodData = periodData
+				data = periodItem
 			)
 		}
 	}
@@ -211,30 +212,30 @@ class TimetableMapper @AssistedInject constructor(
 	 * @param backgroundIrregular Whether irregular items should have a different background color
 	 * @return A list of prepared items
 	 */
-	private suspend fun List<Event>.filter(
+	private suspend fun List<Event<PeriodItem>>.filterEvents(
 		hideCancelled: Boolean,
 		substitutionsIrregular: Boolean,
 		backgroundIrregular: Boolean
-	): List<Event> = mapNotNull { item ->
-		if (hideCancelled && item.periodData?.isCancelled() == true) return@mapNotNull null
+	): List<Event<PeriodItem>> = mapNotNull { item ->
+		if (hideCancelled && item.data?.isCancelled() == true) return@mapNotNull null
 
 		if (substitutionsIrregular) {
-			item.periodData?.apply {
+			item.data?.apply {
 				forceIrregular =
 					classes.find { it.id != it.orgId } != null
 						|| teachers.find { it.id != it.orgId } != null
 						|| subjects.find { it.id != it.orgId } != null
 						|| rooms.find { it.id != it.orgId } != null
-				//TODO|| backgroundIrregular.getValue() && item.periodData.element.backColor != UNTIS_DEFAULT_COLOR
+				//TODO|| backgroundIrregular.getValue() && item.data.element.backColor != UNTIS_DEFAULT_COLOR
 			}
 		}
 		item
 	}
 
-	private fun List<Event>.merge(days: List<Day>): List<Event> {
-		val itemGrid: Array<Array<MutableList<Event>>> =
+	private fun List<Event<PeriodItem>>.mergeEvents(days: List<Day>): List<Event<PeriodItem>> {
+		val itemGrid: Array<Array<MutableList<Event<PeriodItem>>>> =
 			Array(days.size) { Array(days.maxByOrNull { it.units.size }!!.units.size) { mutableListOf() } }
-		val leftover: MutableList<Event> = mutableListOf()
+		val leftover: MutableList<Event<PeriodItem>> = mutableListOf()
 
 		// TODO: Check if the day from the Untis API is always an english string
 		val firstDayOfWeek =
@@ -242,10 +243,10 @@ class TimetableMapper @AssistedInject constructor(
 
 		// Put all items into a two dimensional array depending on day and hour
 		forEach { item ->
-			if (item.periodData == null) return@forEach // cannot merge items without period data
+			if (item.data == null) return@forEach // cannot merge items without period data
 
-			val startDateTime = item.periodData.element.startDateTime
-			val endDateTime = item.periodData.element.endDateTime
+			val startDateTime = item.data.originalPeriod.startDateTime
+			val endDateTime = item.data.originalPeriod.endDateTime
 
 			val day = endDateTime.dayOfWeek.value - firstDayOfWeek.value
 
@@ -267,7 +268,7 @@ class TimetableMapper @AssistedInject constructor(
 			else leftover.add(item)
 		}
 
-		val newItems = mutableListOf<Event>()
+		val newItems = mutableListOf<Event<PeriodItem>>()
 		newItems.addAll(leftover) // Add items that didn't fit inside the timegrid. These will always be single lessons.
 		itemGrid.forEach { unitsOfDay ->
 			unitsOfDay.forEachIndexed { unitIndex, items ->
@@ -282,7 +283,7 @@ class TimetableMapper @AssistedInject constructor(
 		return newItems
 	}
 
-	private suspend fun List<Event>.copyWithColor(
+	private suspend fun List<Event<PeriodItem>>.copyWithColor(
 		regularColor: Color,
 		regularPastColor: Color,
 		examColor: Color,
@@ -292,7 +293,7 @@ class TimetableMapper @AssistedInject constructor(
 		irregularColor: Color,
 		irregularPastColor: Color,
 		useDefault: List<String>
-	): List<Event> = map {
+	): List<Event<PeriodItem>> = map {
 		it.copyWithColor(
 			regularColor,
 			regularPastColor,
@@ -306,7 +307,7 @@ class TimetableMapper @AssistedInject constructor(
 		)
 	}
 
-	private suspend fun Event.copyWithColor(
+	private suspend fun Event<PeriodItem>.copyWithColor(
 		regularColor: Color,
 		regularPastColor: Color,
 		examColor: Color,
@@ -316,31 +317,31 @@ class TimetableMapper @AssistedInject constructor(
 		irregularColor: Color,
 		irregularPastColor: Color,
 		useDefault: List<String>
-	): Event = periodData?.let {
-		val defaultColor = Color(android.graphics.Color.parseColor(periodData.element.backColor))
+	): Event<PeriodItem> = data?.let {
+		val defaultColor = Color(android.graphics.Color.parseColor(data.originalPeriod.backColor))
 		val defaultTextColor =
-			Color(android.graphics.Color.parseColor(periodData.element.foreColor))
+			Color(android.graphics.Color.parseColor(data.originalPeriod.foreColor))
 
 		copy(
 			color = when {
-				periodData.isExam() -> if (useDefault.contains("exam")) defaultColor else examColor
-				periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else cancelledColor
-				periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else irregularColor
+				data.isExam() -> if (useDefault.contains("exam")) defaultColor else examColor
+				data.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else cancelledColor
+				data.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else irregularColor
 				else -> if (useDefault.contains("regular")) defaultColor else regularColor
 			},
 			pastColor = when {
-				periodData.isExam() -> if (useDefault.contains("exam")) defaultColor.darken(0.25f) else examPastColor
-				periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor.darken(0.25f) else cancelledPastColor
-				periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(0.25f) else irregularPastColor
+				data.isExam() -> if (useDefault.contains("exam")) defaultColor.darken(0.25f) else examPastColor
+				data.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor.darken(0.25f) else cancelledPastColor
+				data.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(0.25f) else irregularPastColor
 				else -> if (useDefault.contains("regular")) defaultColor.darken(0.25f) else regularPastColor
 			},
 			textColor = when {
-				periodData.isExam() -> if (useDefault.contains("exam")) defaultTextColor else colorOn(examColor)
-				periodData.isCancelled() -> if (useDefault.contains("cancelled")) defaultTextColor else colorOn(
+				data.isExam() -> if (useDefault.contains("exam")) defaultTextColor else colorOn(examColor)
+				data.isCancelled() -> if (useDefault.contains("cancelled")) defaultTextColor else colorOn(
 					cancelledColor
 				)
 
-				periodData.isIrregular() -> if (useDefault.contains("irregular")) defaultTextColor else colorOn(
+				data.isIrregular() -> if (useDefault.contains("irregular")) defaultTextColor else colorOn(
 					irregularColor
 				)
 
@@ -361,21 +362,21 @@ class TimetableMapper @AssistedInject constructor(
 	}
 
 
-	private fun Event.mergeWith(items: MutableList<Event>): Boolean {
-		if (periodData == null) return false // cannot merge items without period data
+	private fun Event<PeriodItem>.mergeWith(items: MutableList<Event<PeriodItem>>): Boolean {
+		if (data == null) return false // cannot merge items without period data
 
 		items.toList().forEachIndexed { i, _ ->
 			if (i >= items.size) return@forEachIndexed // Needed because the number of elements can change
 
 			val candidate = items[i]
 
-			if (candidate.periodData == null) return@forEachIndexed // cannot merge items without period data
+			if (candidate.data == null) return@forEachIndexed // cannot merge items without period data
 
 			if (candidate.start.dayOfYear != start.dayOfYear) return@forEachIndexed
 
 			if (this.equalsIgnoreTime(candidate)) {
 				end = candidate.end
-				periodData.element.endDateTime = candidate.periodData.element.endDateTime
+				data.originalPeriod.endDateTime = candidate.data.originalPeriod.endDateTime
 				items.removeAt(i)
 				return true
 			}
@@ -383,17 +384,17 @@ class TimetableMapper @AssistedInject constructor(
 		return false
 	}
 
-	private fun Event.mergeValuesWith(item: Event) {
-		item.periodData?.let { periodData ->
-			this.periodData?.apply {
-				classes.addAll(periodData.classes)
-				teachers.addAll(periodData.teachers)
-				subjects.addAll(periodData.subjects)
-				rooms.addAll(periodData.rooms)
+	private fun Event<PeriodItem>.mergeValuesWith(item: Event<PeriodItem>) {
+		item.data?.let { data ->
+			this.data?.apply {
+				classes.addAll(data.classes)
+				teachers.addAll(data.teachers)
+				subjects.addAll(data.subjects)
+				rooms.addAll(data.rooms)
 			}
 		}
 	}
 
-	private fun Event.equalsIgnoreTime(secondItem: Event) =
-		secondItem.periodData?.element?.let { periodData?.element?.equalsIgnoreTime(it) } == true
+	private fun Event<PeriodItem>.equalsIgnoreTime(secondItem: Event<PeriodItem>) =
+		secondItem.data?.originalPeriod?.let { data?.originalPeriod?.equalsIgnoreTime(it) } == true
 }

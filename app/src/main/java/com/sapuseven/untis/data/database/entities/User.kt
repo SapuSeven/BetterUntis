@@ -94,10 +94,7 @@ interface UserDao {
 	@Query("SELECT * FROM user")
 	fun getAll(): List<User>
 
-	@Deprecated("Should be migrated to getAllFlow()")
-	@Query("SELECT * FROM user")
-	suspend fun getAllAsync(): List<User>
-
+	// TODO: Make suspend
 	@Query("SELECT * FROM user WHERE id LIKE :userId")
 	fun getById(userId: Long): User?
 
@@ -106,56 +103,56 @@ interface UserDao {
 
 	@Transaction
 	@Query("SELECT * FROM user")
-	fun getAllWithData(): List<UserWithData>
+	suspend fun getAllWithData(): List<UserWithData>
 
 	@Transaction
 	@Query("SELECT * FROM user WHERE id LIKE :userId")
-	fun getByIdWithData(userId: Long): UserWithData?
+	suspend fun getByIdWithData(userId: Long): UserWithData?
 
 	@Insert
-	fun insert(user: User): Long
+	suspend fun insert(user: User): Long
 
 	@Insert
-	fun insertAbsenceReasons(absenceReasons: List<AbsenceReasonEntity>)
+	suspend fun insertAbsenceReasons(absenceReasons: List<AbsenceReasonEntity>)
 
 	@Insert
-	fun insertDepartments(departments: List<DepartmentEntity>)
+	suspend fun insertDepartments(departments: List<DepartmentEntity>)
 
 	@Insert
-	fun insertDuties(duties: List<DutyEntity>)
+	suspend fun insertDuties(duties: List<DutyEntity>)
 
 	@Insert
-	fun insertEventReasons(eventReasons: List<EventReasonEntity>)
+	suspend fun insertEventReasons(eventReasons: List<EventReasonEntity>)
 
 	@Insert
-	fun insertEventReasonGroups(eventReasonGroups: List<EventReasonGroupEntity>)
+	suspend fun insertEventReasonGroups(eventReasonGroups: List<EventReasonGroupEntity>)
 
 	@Insert
-	fun insertExcuseStatuses(excuseStatuses: List<ExcuseStatusEntity>)
+	suspend fun insertExcuseStatuses(excuseStatuses: List<ExcuseStatusEntity>)
 
 	@Insert
-	fun insertHolidays(holidays: List<HolidayEntity>)
+	suspend fun insertHolidays(holidays: List<HolidayEntity>)
 
 	@Insert
-	fun insertKlassen(klassen: List<KlasseEntity>)
+	suspend fun insertKlassen(klassen: List<KlasseEntity>)
 
 	@Insert
-	fun insertRooms(rooms: List<RoomEntity>)
+	suspend fun insertRooms(rooms: List<RoomEntity>)
 
 	@Insert
-	fun insertSubjects(subjects: List<SubjectEntity>)
+	suspend fun insertSubjects(subjects: List<SubjectEntity>)
 
 	@Insert
-	fun insertTeachers(teachers: List<TeacherEntity>)
+	suspend fun insertTeachers(teachers: List<TeacherEntity>)
 
 	@Insert
-	fun insertTeachingMethods(teachingMethods: List<TeachingMethodEntity>)
+	suspend fun insertTeachingMethods(teachingMethods: List<TeachingMethodEntity>)
 
 	@Insert
-	fun insertSchoolYears(schoolYears: List<SchoolYearEntity>)
+	suspend fun insertSchoolYears(schoolYears: List<SchoolYearEntity>)
 
 	@Transaction
-	fun insertUserData(userId: Long, masterData: MasterData) {
+	suspend fun insertUserData(userId: Long, masterData: MasterData) {
 		insertAbsenceReasons(masterData.absenceReasons.orEmpty().map { AbsenceReasonEntity.map(it, userId) })
 		insertDepartments(masterData.departments.orEmpty().map { DepartmentEntity.map(it, userId) })
 		insertDuties(masterData.duties.orEmpty().map { DutyEntity.map(it, userId) })
@@ -172,52 +169,52 @@ interface UserDao {
 	}
 
 	@Update
-	fun update(user: User)
+	suspend fun update(user: User)
 
 	@Delete
-	fun delete(user: User)
+	suspend fun delete(user: User)
 
 	@Delete
-	fun deleteAbsenceReasons(absenceReasons: List<AbsenceReasonEntity>)
+	suspend fun deleteAbsenceReasons(absenceReasons: List<AbsenceReasonEntity>)
 
 	@Delete
-	fun deleteDepartments(departments: List<DepartmentEntity>)
+	suspend fun deleteDepartments(departments: List<DepartmentEntity>)
 
 	@Delete
-	fun deleteDuties(duties: List<DutyEntity>)
+	suspend fun deleteDuties(duties: List<DutyEntity>)
 
 	@Delete
-	fun deleteEventReasons(eventReasons: List<EventReasonEntity>)
+	suspend fun deleteEventReasons(eventReasons: List<EventReasonEntity>)
 
 	@Delete
-	fun deleteEventReasonGroups(eventReasonGroups: List<EventReasonGroupEntity>)
+	suspend fun deleteEventReasonGroups(eventReasonGroups: List<EventReasonGroupEntity>)
 
 	@Delete
-	fun deleteExcuseStatuses(excuseStatuses: List<ExcuseStatusEntity>)
+	suspend fun deleteExcuseStatuses(excuseStatuses: List<ExcuseStatusEntity>)
 
 	@Delete
-	fun deleteHolidays(holidays: List<HolidayEntity>)
+	suspend fun deleteHolidays(holidays: List<HolidayEntity>)
 
 	@Delete
-	fun deleteKlassen(klassen: List<KlasseEntity>)
+	suspend fun deleteKlassen(klassen: List<KlasseEntity>)
 
 	@Delete
-	fun deleteRooms(rooms: List<RoomEntity>)
+	suspend fun deleteRooms(rooms: List<RoomEntity>)
 
 	@Delete
-	fun deleteSubjects(subjects: List<SubjectEntity>)
+	suspend fun deleteSubjects(subjects: List<SubjectEntity>)
 
 	@Delete
-	fun deleteTeachers(teachers: List<TeacherEntity>)
+	suspend fun deleteTeachers(teachers: List<TeacherEntity>)
 
 	@Delete
-	fun deleteTeachingMethods(teachingMethods: List<TeachingMethodEntity>)
+	suspend fun deleteTeachingMethods(teachingMethods: List<TeachingMethodEntity>)
 
 	@Delete
-	fun deleteSchoolYears(schoolYears: List<SchoolYearEntity>)
+	suspend fun deleteSchoolYears(schoolYears: List<SchoolYearEntity>)
 
 	@Transaction
-	fun deleteUserData(userWithData: UserWithData) {
+	suspend fun deleteUserData(userWithData: UserWithData) {
 		deleteAbsenceReasons(userWithData.absenceReasons)
 		deleteDepartments(userWithData.departments)
 		deleteDuties(userWithData.duties)
@@ -234,5 +231,5 @@ interface UserDao {
 	}
 
 	@Transaction
-	fun deleteUserData(userId: Long) = getByIdWithData(userId)?.let { deleteUserData(it) }
+	suspend fun deleteUserData(userId: Long) = getByIdWithData(userId)?.let { deleteUserData(it) }
 }

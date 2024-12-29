@@ -26,6 +26,7 @@ import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.data.repository.TimetableRepository
 import com.sapuseven.untis.data.settings.model.UserSettings
 import com.sapuseven.untis.mappers.TimetableMapper
+import com.sapuseven.untis.models.PeriodItem
 import com.sapuseven.untis.modules.ThemeManager
 import com.sapuseven.untis.scope.UserScopeManager
 import com.sapuseven.untis.ui.activities.settings.GlobalSettingsRepository
@@ -102,8 +103,8 @@ class TimetableViewModel @AssistedInject constructor(
 	private val _currentElement = MutableStateFlow<PeriodElement?>(null)
 	val currentElement: StateFlow<PeriodElement?> = _currentElement
 
-	private val _events = MutableStateFlow<Map<LocalDate, List<Event>>>(emptyMap())
-	val events: StateFlow<Map<LocalDate, List<Event>>> = _events
+	private val _events = MutableStateFlow<Map<LocalDate, List<Event<PeriodItem>>>>(emptyMap())
+	val events: StateFlow<Map<LocalDate, List<Event<PeriodItem>>>> = _events
 
 	private val _lastRefresh = MutableStateFlow<Instant?>(null)
 	val lastRefresh: StateFlow<Instant?> = _lastRefresh
@@ -220,7 +221,7 @@ class TimetableViewModel @AssistedInject constructor(
 		)
 	}
 
-	private suspend fun emitEvents(events: Map<LocalDate, List<Event>>) {
+	private suspend fun emitEvents(events: Map<LocalDate, List<Event<PeriodItem>>>) {
 		_events.update {
 			val newEvents = it.toMutableMap()
 			events.forEach { (date, events) ->
@@ -230,8 +231,8 @@ class TimetableViewModel @AssistedInject constructor(
 		}
 	}
 
-	private fun groupEventsByDate(events: List<Event>): Map<LocalDate, List<Event>> {
-		val groupedEvents = mutableMapOf<LocalDate, MutableList<Event>>()
+	private fun groupEventsByDate(events: List<Event<PeriodItem>>): Map<LocalDate, List<Event<PeriodItem>>> {
+		val groupedEvents = mutableMapOf<LocalDate, MutableList<Event<PeriodItem>>>()
 
 		for (event in events) {
 			val eventDate = event.start.toLocalDate()

@@ -70,7 +70,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.ui.common.ifNotNull
 import com.sapuseven.untis.ui.dialogs.DatePickerDialog
 import kotlinx.coroutines.delay
@@ -84,7 +83,7 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import kotlin.math.roundToInt
 
-data class Event(
+data class Event<T>(
 	var title: String,
 	var top: String = "",
 	var bottom: String = "",
@@ -93,11 +92,11 @@ data class Event(
 	var textColor: Color,
 	var start: LocalDateTime,
 	var end: LocalDateTime,
-	val periodData: PeriodData? = null
+	val data: T? = null
 ) {
 	var numSimultaneous: Int = 1 // relative width is determined by 1/x
 	var offsetSteps: Int = 0 // x-offset in multiples of width
-	var simultaneousEvents = mutableSetOf<Event>()
+	var simultaneousEvents = mutableSetOf<Event<*>>()
 
 	// temp
 	var leftX = 0
@@ -107,8 +106,8 @@ data class Event(
 val eventTimeFormat = DateTimeFormatter.ofPattern("h:mm a")
 
 @Composable
-fun WeekViewEvent(
-	event: Event,
+fun <T> WeekViewEvent(
+	event: Event<T>,
 	currentTime: LocalDateTime = LocalDateTime.now(),
 	modifier: Modifier = Modifier,
 	onClick: (() -> Unit)? = null,
@@ -171,7 +170,7 @@ private fun LocalDateTime.seconds() = atZone(ZoneId.systemDefault()).toEpochSeco
 @Composable
 fun EventPreview() {
 	WeekViewEvent(
-		event = Event(
+		event = Event<Nothing>(
 			title = "Test",
 			color = Color(0xFFAFBBF2),
 			pastColor = Color(0xFFAFBBF2),
@@ -186,12 +185,12 @@ fun EventPreview() {
 }
 
 private class EventDataModifier(
-	val event: Event,
+	val event: Event<*>,
 ) : ParentDataModifier {
 	override fun Density.modifyParentData(parentData: Any?) = event
 }
 
-private fun Modifier.eventData(event: Event) = this.then(EventDataModifier(event))
+private fun Modifier.eventData(event: Event<*>) = this.then(EventDataModifier(event))
 
 private val dayNameFormat = DateTimeFormatter.ofPattern("EEE")
 private val dayDateFormat = DateTimeFormatter.ofPattern("d. MMM")
@@ -512,7 +511,7 @@ fun DrawScope.WeekViewIndicator(
 
 @Composable
 fun WeekViewContent(
-	events: List<Event>,
+	events: List<Event<*>>,
 	modifier: Modifier = Modifier,
 	numDays: Int = 5,
 	startDate: LocalDate,
@@ -527,7 +526,7 @@ fun WeekViewContent(
 	futureBackgroundColor: Color,
 	dividerWidth: Float = Stroke.HairlineWidth,
 	currentTime: LocalDateTime = LocalDateTime.now(),
-	eventContent: @Composable (event: Event) -> Unit = { WeekViewEvent(event = it) }
+	eventContent: @Composable (event: Event<*>) -> Unit = { WeekViewEvent(event = it) }
 ) {
 	// OPTIMIZE: Find a way to arrange events before layout, but calculate minEventWidth to determine maxSimultaneous
 	// TODO: Display indicator if there are more events than can be displayed
@@ -537,7 +536,7 @@ fun WeekViewContent(
 
 	Layout(
 		content = {
-			events.sortedBy(Event::start).forEach { event ->
+			events.sortedBy(Event<*>::start).forEach { event ->
 				Box(modifier = Modifier.eventData(event)) {
 					eventContent(event)
 				}
@@ -586,7 +585,7 @@ fun WeekViewContent(
 		val width = constraints.maxWidth + dividerWidth.toInt()
 		val dayWidth = width / numDays;
 		val placeablesWithEvents = measureables.map { measurable ->
-			val event = measurable.parentData as Event
+			val event = measurable.parentData as Event<*>
 			val eventDurationMinutes = ChronoUnit.MINUTES.between(event.start, event.end)
 			val eventHeight = ((eventDurationMinutes / 60f) * hourHeight.toPx()).roundToInt()
 			val placeable = measurable.measure(
@@ -621,13 +620,13 @@ fun WeekViewContent(
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun WeekViewCompose(
-	events: Map<LocalDate, List<Event>>,
+	events: Map<LocalDate, List<Event<*>>>,
 	onPageChange: suspend (pageIndex: Int) -> Unit,
 	onReload: suspend (pageIndex: Int) -> Unit,
-	onItemClick: (Pair<List<Event>, Int>) -> Unit,
+	onItemClick: (Pair<List<Event<*>>, Int>) -> Unit,
 	currentTime: LocalDateTime = LocalDateTime.now(),
 	modifier: Modifier = Modifier,
-	eventContent: @Composable (event: Event) -> Unit = { event ->
+	eventContent: @Composable (event: Event<*>) -> Unit = { event ->
 		WeekViewEvent(
 			event = event,
 			currentTime = currentTime,

@@ -32,7 +32,7 @@ class TimetableDatabaseInterface(val userDatabase: UserDatabase, val id: Long) {
 
 	init {
 		val userDao = userDatabase.userDao()
-		userDao.getByIdWithData(id)?.let {
+		/*userDao.getByIdWithData(id)?.let {
 			allClasses =
 				it.klassen.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
 			allTeachers =
@@ -41,7 +41,7 @@ class TimetableDatabaseInterface(val userDatabase: UserDatabase, val id: Long) {
 				it.subjects.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
 			allRooms =
 				it.rooms.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
-		}
+		}*/
 	}
 
 	fun getShortName(id: Long, type: ElementType?): String {
