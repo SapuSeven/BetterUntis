@@ -26,11 +26,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -51,6 +53,7 @@ import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.weekview.WeekViewCompose
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.time.LocalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -128,8 +131,8 @@ fun Timetable(
 		) { innerPadding ->
 			Box(
 				modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
+					.padding(innerPadding)
+					.fillMaxSize()
 			) {
 				val density = LocalDensity.current
 				val insets = insetsPaddingValues()
@@ -169,9 +172,9 @@ fun Timetable(
 					// Feedback button
 					IconButton(
 						modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(end = 8.dp)
-                            .bottomInsets(),
+							.align(Alignment.BottomEnd)
+							.padding(end = 8.dp)
+							.bottomInsets(),
 						onClick = {
 							viewModel.showFeedback()
 						}
@@ -186,9 +189,9 @@ fun Timetable(
 					if (viewModel.loading)
 						CircularProgressIndicator(
 							modifier = Modifier
-                                .align(Alignment.BottomEnd)
-                                .padding(8.dp)
-                                .bottomInsets()
+								.align(Alignment.BottomEnd)
+								.padding(8.dp)
+								.bottomInsets()
 						)
 
 					// Custom personal timetable hint
@@ -197,7 +200,7 @@ fun Timetable(
 							verticalArrangement = Arrangement.Center,
 							horizontalAlignment = Alignment.CenterHorizontally,
 							modifier = Modifier
-                                .fillMaxSize()
+								.fillMaxSize()
 						) {
 							Text(
 								text = stringResource(id = R.string.main_anonymous_login_info_text),
@@ -217,7 +220,10 @@ fun Timetable(
 					} else {
 						// Last refresh text
 						Text(
-							text = lastRefresh.toString(),
+							text = stringResource(
+								id = R.string.main_last_refreshed,
+								formatTimeDiffMillis(lastRefresh?.let { Instant.now().toEpochMilli() - it.toEpochMilli() })
+							),
 							modifier = Modifier
 								.align(Alignment.BottomStart)
 								.padding(start = startPadding + 8.dp, bottom = 8.dp)
@@ -244,6 +250,31 @@ fun Timetable(
 			onDismiss = {
 				viewModel.profileManagementDialog = false
 			}
+		)
+	}
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun formatTimeDiffMillis(diff: Long?): String {
+	val MINUTE_MILLIS: Int = 60 * 1000
+	val HOUR_MILLIS: Int = 60 * MINUTE_MILLIS
+	val DAY_MILLIS: Int = 24 * HOUR_MILLIS
+
+	if (diff == null) return stringResource(R.string.main_last_refreshed_never)
+
+	return when {
+		diff < MINUTE_MILLIS -> stringResource(R.string.main_time_diff_just_now)
+		diff < HOUR_MILLIS -> pluralStringResource(
+			R.plurals.main_time_diff_minutes, ((diff / MINUTE_MILLIS).toInt()), diff / MINUTE_MILLIS
+		)
+
+		diff < DAY_MILLIS -> pluralStringResource(
+			R.plurals.main_time_diff_hours, ((diff / HOUR_MILLIS).toInt()), diff / HOUR_MILLIS
+		)
+
+		else -> pluralStringResource(
+			R.plurals.main_time_diff_days, ((diff / DAY_MILLIS).toInt()), diff / DAY_MILLIS
 		)
 	}
 }

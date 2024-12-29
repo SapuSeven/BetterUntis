@@ -105,8 +105,8 @@ class TimetableViewModel @AssistedInject constructor(
 	private val _events = MutableStateFlow<Map<LocalDate, List<Event>>>(emptyMap())
 	val events: StateFlow<Map<LocalDate, List<Event>>> = _events
 
-	private val _lastRefresh = MutableStateFlow<LocalDateTime?>(null)
-	val lastRefresh: StateFlow<LocalDateTime?> = _lastRefresh
+	private val _lastRefresh = MutableStateFlow<Instant?>(null)
+	val lastRefresh: StateFlow<Instant?> = _lastRefresh
 
 	val currentUser: User = userScopeManager.user
 
@@ -185,7 +185,7 @@ class TimetableViewModel @AssistedInject constructor(
 						.collect {
 							val events =
 								timetableMapper.mapTimetablePeriodsToWeekViewEvents(it.value, ElementType.STUDENT)
-							val refreshTimestamp = it.originTimeStamp?.toLocalDateTime() ?: LocalDateTime.now()
+							val refreshTimestamp = it.originTimeStamp?.let { Instant.ofEpochMilli(it) } ?: Instant.now()
 							emitEvents(mapOf(startDate to timetableMapper.colorWeekViewTimetableEvents(events)))
 							if (targetPage == pageOffset)
 								_lastRefresh.emit(refreshTimestamp)
@@ -203,7 +203,7 @@ class TimetableViewModel @AssistedInject constructor(
 			.catch(loadingExceptionHandler)
 			.collect {
 				val events = timetableMapper.mapTimetablePeriodsToWeekViewEvents(it.value, ElementType.STUDENT)
-				val refreshTimestamp = it.originTimeStamp?.toLocalDateTime() ?: LocalDateTime.now()
+				val refreshTimestamp = it.originTimeStamp?.let { Instant.ofEpochMilli(it) } ?: Instant.now()
 				emitEvents(mapOf(startDate to timetableMapper.colorWeekViewTimetableEvents(events)))
 				_lastRefresh.emit(refreshTimestamp)
 			}
@@ -269,14 +269,6 @@ class TimetableViewModel @AssistedInject constructor(
 		navigator.navigate(AppRoutes.Settings.Timetable(highlightTitle = R.string.preference_timetable_personal_timetable))
 	}
 
-	// TODO
-	@Composable
-	fun lastRefreshText() = stringResource(
-		id = R.string.main_last_refreshed,
-		/*if (weekViewRefreshTimestamps[weekViewPage] ?: 0L > 0L) formatTimeDiff(Instant.now().millis - weekViewRefreshTimestamps[weekViewPage]!!)
-		else*/ stringResource(id = R.string.main_last_refreshed_never)
-	)
-
 	fun showFeedback() {
 		feedbackDialog = true
 	}
@@ -295,6 +287,3 @@ class TimetableViewModel @AssistedInject constructor(
 		TODO("Not yet implemented")
 	}
 }
-
-private fun Long.toLocalDateTime(): LocalDateTime =
-	LocalDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.systemDefault())
