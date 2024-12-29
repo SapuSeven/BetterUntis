@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.setContent
@@ -20,6 +19,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -40,14 +40,12 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -69,6 +67,7 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_HIGHLIGHT
 import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_ROUTE
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
+import com.sapuseven.untis.components.ThemeManager
 import com.sapuseven.untis.components.UserManager
 import com.sapuseven.untis.components.UserState
 import com.sapuseven.untis.data.database.entities.User
@@ -77,7 +76,6 @@ import com.sapuseven.untis.helpers.config.deleteProfile
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.helpers.timetable.TimetableLoader
 import com.sapuseven.untis.models.TimetableBookmark
-import com.sapuseven.untis.modules.ThemeManager
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.scope.UserScopeManager
@@ -90,7 +88,6 @@ import com.sapuseven.untis.ui.navigation.AppNavHost
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
 import com.sapuseven.untis.ui.theme.toColorScheme
-import com.sapuseven.untis.ui.weekview.Event
 import com.sapuseven.untis.ui.weekview.WeekViewColorScheme
 import com.sapuseven.untis.ui.weekview.WeekViewHour
 import dagger.hilt.android.AndroidEntryPoint
@@ -98,17 +95,13 @@ import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import org.joda.time.DateTimeConstants
-import org.joda.time.Instant
 import org.joda.time.LocalDate
-import org.joda.time.format.DateTimeFormat
 import java.lang.ref.WeakReference
-import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -122,7 +115,7 @@ class MainActivity : ComponentActivity() {
 	private val weekViewRefreshHandler = Handler(Looper.getMainLooper())
 
 	@Inject
-	lateinit var themeManager: ThemeManager
+	lateinit var themeManagerFactory: ThemeManager.Factory
 
 	@Inject
 	lateinit var appNavigator: AppNavigator
@@ -272,43 +265,46 @@ class MainActivity : ComponentActivity() {
 
 	@Composable
 	fun AppTheme(
-		//initialDarkTheme: Boolean = isSystemInDarkTheme(),
+		defaultDarkTheme: Boolean = isSystemInDarkTheme(),
 		systemUiController: SystemUiController? = rememberSystemUiController(),
 		dynamicColor: Boolean = true,
 		content: @Composable () -> Unit
 	) {
+		// TODO - This kind of works. When the system theme changes, the app theme changes as well.
+		//  However, updates to the settings are not reflected in the app theme in realtime and need a restart.
+		//  If the theme setting is set to "auto", the app theme will again change when the system theme changes.
+		//  Maybe the current theme state should be provided as a parameter?
+
+		val scope = rememberCoroutineScope()
+		val themeManager = themeManagerFactory.create(scope, MaterialTheme.colorScheme)
 		val themeState by themeManager.themeState.collectAsState()
+
+		val darkTheme = themeState.forceDarkTheme ?: defaultDarkTheme;
 
 		val colorScheme = when {
 			dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
 				val context = LocalContext.current
-				if (themeState.isDarkMode) dynamicDarkColorScheme(context) else dynamicLightColorScheme(
+				if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(
 					context
 				)
 			}
 
-			themeState.isDarkMode -> Scheme.dark(Color.Red.toArgb()).toColorScheme()
+			darkTheme -> Scheme.dark(Color.Red.toArgb()).toColorScheme()
 			else -> Scheme.light(Color.Red.toArgb()).toColorScheme()
 		}
 
 		SideEffect {
+			Log.d("AppTheme", "Setting system UI color")
+			val darkIcons = colorScheme.background.luminance() > .5f
 			systemUiController?.let {
-				setSystemUiColor(it, Color.Transparent)
+				setSystemUiColor(it, Color.Transparent, darkIcons)
 			}
 		}
 
 		MaterialTheme(
 			colorScheme = colorScheme,//.animated(),
 			content = content
-		) /*{
-			val darkIcons = MaterialTheme.colorScheme.background.luminance() > .5f
-
-			SideEffect {
-				systemUiController?.let {
-					setSystemUiColor(it, Color.Transparent, darkIcons)
-				}
-			}
-		}*/
+		)
 	}
 }
 

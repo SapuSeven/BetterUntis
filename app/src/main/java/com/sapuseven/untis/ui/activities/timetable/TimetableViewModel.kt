@@ -27,7 +27,6 @@ import com.sapuseven.untis.data.repository.TimetableRepository
 import com.sapuseven.untis.data.settings.model.UserSettings
 import com.sapuseven.untis.mappers.TimetableMapper
 import com.sapuseven.untis.models.PeriodItem
-import com.sapuseven.untis.modules.ThemeManager
 import com.sapuseven.untis.scope.UserScopeManager
 import com.sapuseven.untis.ui.activities.settings.GlobalSettingsRepository
 import com.sapuseven.untis.ui.activities.settings.UserSettingsRepository
@@ -59,7 +58,6 @@ import java.time.LocalDate
 @HiltViewModel(assistedFactory = TimetableViewModel.Factory::class)
 class TimetableViewModel @AssistedInject constructor(
 	private val navigator: AppNavigator,
-	private val themeManager: ThemeManager,
 	internal val userManager: UserManager,
 	private val userScopeManager: UserScopeManager,
 	private val userDao: UserDao,
@@ -288,7 +286,8 @@ class TimetableViewModel @AssistedInject constructor(
 
 	fun debugAction() = viewModelScope.launch {
 		userSettingsRepository.updateSettings {
-			backgroundRegular = ((Math.random() * 0xFFFFFF).toInt()) or (0xFF shl 24);
+			//backgroundRegular = ((Math.random() * 0xFFFFFF).toInt()) or (0xFF shl 24);
+			//darkTheme = if (darkTheme == "on") "off" else "on"
 		}
 	}
 

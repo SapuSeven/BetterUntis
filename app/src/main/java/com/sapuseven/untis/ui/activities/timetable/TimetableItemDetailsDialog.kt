@@ -1,5 +1,6 @@
 package com.sapuseven.untis.ui.activities.timetable
 
+import android.os.Parcelable
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -65,6 +66,7 @@ import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import crocodile8.universal_cache.FromCache
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -72,14 +74,12 @@ import java.time.format.FormatStyle
 import kotlin.math.absoluteValue
 import kotlin.math.sign
 
-@Serializable
+@Parcelize
 private data class AbsenceCheckParams(
 	val periodDataId: Long,
-	@Serializable(LocalDateTimeSerializer::class)
 	val startDateTime: LocalDateTime,
-	@Serializable(LocalDateTimeSerializer::class)
 	val endDateTime: LocalDateTime
-) {
+) : Parcelable {
 	constructor(period: Period) : this(
 		period.id,
 		period.startDateTime,
@@ -182,6 +182,8 @@ fun TimetableItemDetailsDialog(
 			) {
 				FloatingActionButton(
 					modifier = Modifier.bottomInsets(),
+					containerColor = MaterialTheme.colorScheme.primary,
+					contentColor = MaterialTheme.colorScheme.onPrimary,
 					onClick = {
 						loading = true
 
