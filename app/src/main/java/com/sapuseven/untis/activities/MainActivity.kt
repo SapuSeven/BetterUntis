@@ -36,7 +36,6 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -62,12 +61,13 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.google.android.material.color.MaterialColors
 import com.sapuseven.compose.protostore.ui.preferences.convertRangeToPair
+import com.sapuseven.compose.protostore.ui.preferences.materialColors
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_HIGHLIGHT
 import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_ROUTE
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
-import com.sapuseven.untis.components.ThemeManager
 import com.sapuseven.untis.components.UserManager
 import com.sapuseven.untis.components.UserState
 import com.sapuseven.untis.data.database.entities.User
@@ -79,6 +79,7 @@ import com.sapuseven.untis.models.TimetableBookmark
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.scope.UserScopeManager
+import com.sapuseven.untis.ui.activities.settings.UserSettingsRepository
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.Weekday
@@ -87,6 +88,7 @@ import com.sapuseven.untis.ui.models.NavItemShortcut
 import com.sapuseven.untis.ui.navigation.AppNavHost
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
+import com.sapuseven.untis.ui.theme.animated
 import com.sapuseven.untis.ui.theme.toColorScheme
 import com.sapuseven.untis.ui.weekview.WeekViewColorScheme
 import com.sapuseven.untis.ui.weekview.WeekViewHour
@@ -97,6 +99,7 @@ import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import org.joda.time.DateTimeConstants
@@ -115,7 +118,7 @@ class MainActivity : ComponentActivity() {
 	private val weekViewRefreshHandler = Handler(Looper.getMainLooper())
 
 	@Inject
-	lateinit var themeManagerFactory: ThemeManager.Factory
+	lateinit var userSettingsRepositoryFactory: UserSettingsRepository.Factory
 
 	@Inject
 	lateinit var appNavigator: AppNavigator
@@ -125,14 +128,6 @@ class MainActivity : ComponentActivity() {
 
 	@Inject
 	lateinit var userScopeManager: UserScopeManager
-
-	// TODO
-	/*private val weekViewUpdate = object : Runnable {
-		override fun run() {
-			weekView.invalidate()
-			weekViewRefreshHandler.postDelayed(this, 60 * 1000)
-		}
-	}*/
 
 	private val loginLauncher =
 		registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -146,11 +141,27 @@ class MainActivity : ComponentActivity() {
 		super.onCreate(savedInstanceState)
 
 		setContent {
-			AppTheme {
+			val userSettingsRepository = userSettingsRepositoryFactory.create(MaterialTheme.colorScheme)
+
+			val darkTheme by userSettingsRepository.getSettings().map {
+				when (it.darkTheme) {
+					"on" -> ThemeMode.AlwaysDark
+					"off" -> ThemeMode.AlwaysLight
+					else -> ThemeMode.FollowSystem
+				}
+			}.collectAsState(ThemeMode.FollowSystem)
+
+			val darkThemeOled by userSettingsRepository.getSettings().map {
+				it.darkThemeOled
+			}.collectAsState(false)
+
+			val themeColor by userSettingsRepository.getSettings().map {
+				if (it.customThemeColor) Color(it.themeColor) else null
+			}.collectAsState(null)
+
+			AppTheme(darkTheme, darkThemeOled, themeColor) {
 				Surface(
 					modifier = Modifier.fillMaxSize()
-					//.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top))
-					//.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top))
 				) {
 					val userState by userManager.userState.collectAsState()
 
@@ -188,63 +199,8 @@ class MainActivity : ComponentActivity() {
 						}
 					}
 				}
-
-				/*withUser(
-								invalidContent = { login() }
-							) { user ->
-								/*val state =
-									rememberMainAppState(
-										user = user,
-										contextActivity = this,
-										//customThemeColor = customThemeColor,
-										preferences = dataStorePreferences,
-										globalPreferences = globalDataStore,
-										//colorScheme = MaterialTheme.colorScheme//!! // Can't be null, AppTheme content isn't rendered if colorScheme is null
-									)
-
-								val prefs = dataStorePreferences
-								LaunchedEffect(Unit) {
-									val personalTimetableFlow = prefs.timetablePersonalTimetable.getValueFlow()
-
-									state.scope.launch {
-										personalTimetableFlow.collect { customTimetable ->
-											if (user.anonymous || customTimetable != "") {
-												val element = decodeStoredTimetableValue(customTimetable)
-												val previousElement = state.personalTimetable?.first
-												state.personalTimetable =
-													element to element?.let { timetableDatabaseInterface.getLongName(it) }
-
-												if (element != previousElement)
-													state.displayElement(state.personalTimetable?.first, state.personalTimetable?.second)
-											}
-										}
-									}
-								}*/
-
-								/*LaunchedEffect(user) {
-									state.displayElement(
-										state.personalTimetable?.first,
-										state.personalTimetable?.second
-									)
-								}*/
-
-								val state = rememberNewMainAppState(
-									user = user,
-									contextActivity = this,
-									preferences = dataStorePreferences
-								)
-
-								//MainApp(state)
-							}*/
 			}
 		}
-	}
-
-	private fun login() {
-		loginLauncher.launch(Intent(this, LoginActivity::class.java).apply {
-			//putUserIdExtra(this)
-			//putBackgroundColorExtra(this)
-		})
 	}
 
 	fun setSystemUiColor(
@@ -265,44 +221,42 @@ class MainActivity : ComponentActivity() {
 
 	@Composable
 	fun AppTheme(
-		defaultDarkTheme: Boolean = isSystemInDarkTheme(),
+		darkTheme: ThemeMode = ThemeMode.FollowSystem,
+		darkThemeOled: Boolean = false,
+		themeColor: Color? = null,
 		systemUiController: SystemUiController? = rememberSystemUiController(),
-		dynamicColor: Boolean = true,
 		content: @Composable () -> Unit
 	) {
-		// TODO - This kind of works. When the system theme changes, the app theme changes as well.
-		//  However, updates to the settings are not reflected in the app theme in realtime and need a restart.
-		//  If the theme setting is set to "auto", the app theme will again change when the system theme changes.
-		//  Maybe the current theme state should be provided as a parameter?
-
-		val scope = rememberCoroutineScope()
-		val themeManager = themeManagerFactory.create(scope, MaterialTheme.colorScheme)
-		val themeState by themeManager.themeState.collectAsState()
-
-		val darkTheme = themeState.forceDarkTheme ?: defaultDarkTheme;
+		val defaultThemeColor = materialColors[0]
+		val isDarkTheme = when (darkTheme) {
+			ThemeMode.AlwaysLight -> false
+			ThemeMode.AlwaysDark -> true
+			ThemeMode.FollowSystem -> isSystemInDarkTheme()
+		}
+		Log.d("AppTheme", "Theme mode: $darkTheme, isDarkTheme: $isDarkTheme")
 
 		val colorScheme = when {
-			dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+			themeColor == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
 				val context = LocalContext.current
-				if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(
-					context
-				)
+				if (isDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
 			}
 
-			darkTheme -> Scheme.dark(Color.Red.toArgb()).toColorScheme()
-			else -> Scheme.light(Color.Red.toArgb()).toColorScheme()
+			isDarkTheme -> Scheme.dark((themeColor ?: defaultThemeColor).toArgb()).toColorScheme()
+			else -> Scheme.light((themeColor ?: defaultThemeColor).toArgb()).toColorScheme()
+		}.run {
+			if (isDarkTheme && darkThemeOled)
+				copy(background = Color.Black, surface = Color.Black)
+			else
+				this
 		}
 
-		SideEffect {
-			Log.d("AppTheme", "Setting system UI color")
-			val darkIcons = colorScheme.background.luminance() > .5f
-			systemUiController?.let {
-				setSystemUiColor(it, Color.Transparent, darkIcons)
-			}
+		val darkIcons = colorScheme.background.luminance() > .5f
+		systemUiController?.let {
+			setSystemUiColor(it, Color.Transparent, darkIcons)
 		}
 
 		MaterialTheme(
-			colorScheme = colorScheme,//.animated(),
+			colorScheme = colorScheme.animated(),
 			content = content
 		)
 	}
@@ -1005,7 +959,8 @@ fun BaseComposeActivity.MainApp(state: MainAppState) {
 */
 class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	val user: User,
-	val contextActivity: BaseComposeActivity,    /*val weekViewSwipeRefresh: MutableState<WeekViewSwipeRefreshLayout?>,
+	val contextActivity: BaseComposeActivity,
+	/*val weekViewSwipeRefresh: MutableState<WeekViewSwipeRefreshLayout?>,
 	val weekView: MutableState<WeekView<TimegridItem>?>,
 	val context: Context,*/
 	val scope: CoroutineScope,
@@ -1016,7 +971,8 @@ class MainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	var personalTimetable: Pair<PeriodElement?, String?>?,
 	val defaultDisplayedName: String,
 	val drawerState: DrawerState,
-	var drawerGestureState: MutableState<Boolean>,    /*val loading: MutableState<Int>,
+	var drawerGestureState: MutableState<Boolean>,
+	/*val loading: MutableState<Int>,
 	val currentWeekIndex: MutableState<Int>,*/
 	val lastRefreshTimestamp: MutableState<Long>,
 	//val weeklyTimetableItems: SnapshotStateMap<Int, WeeklyTimetableItems?>,
@@ -1766,3 +1722,9 @@ private fun getPersonalTimetableElement(
 
 private val Int.zeroToNull: Int?
 	get() = if (this != 0) this else null
+
+enum class ThemeMode {
+	AlwaysLight,
+	AlwaysDark,
+	FollowSystem
+}

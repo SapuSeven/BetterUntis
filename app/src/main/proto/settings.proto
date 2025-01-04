@@ -25,6 +25,7 @@ message UserSettings {
   int32 backgroundIrregularPast = 19;
   int32 backgroundCancelled = 20;
   int32 backgroundCancelledPast = 21;
+  bool customThemeColor = 53;
   int32 themeColor = 22;
   string darkTheme = 23;
   bool darkThemeOled = 24;

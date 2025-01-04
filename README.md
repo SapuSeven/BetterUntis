@@ -42,13 +42,56 @@ As this changes virtually every part of the app, here's a list tracking all migr
 
 - [ ] Timetable view
   - [x] WeekView
-  - [ ] Element Picker
-  - [ ] Caching
+  - [ ] Element picker
+  - [x] Caching
+  - [ ] Element info
+    - [x] Basic view
+    - [ ] Teacher features
 - [x] Preferences
-- [ ] Room Finder
-- [ ] Info Center
+  - [x] Theme management
+- [ ] Room finder
+- [ ] Info center
 - [ ] Widget
 - [ ] Notifications
+
+Package structure overview:
+
+- `activities`: Entry points for the app
+- `annotations`: Custom annotations
+- `components`: Reusable components for DI - _needs evaultion_
+- `data`: Data layer
+  - `cache`: Caching-related code
+  - `database`: Room database and DAOs
+  - `model`: (Not used yet) Data models
+  - `repository`: Repositories for accessing data in a domain-specific way
+  - `settings`: _To be removed_
+  - `timetable`: _To be removed_
+- `helpers`: _To be removed_
+- `mappers`: Mapping between different data models
+- `models`: Old data models, _to be removed_
+- `modules`: Dagger Hilt modules for DI
+- `preferences`: _To be removed_
+- `receivers`: Broadcast receivers
+- `scope`: Custom DI scopes - _needs evaluation_
+- `services`: _To be removed_
+- `ui`: UI layer
+  - `activities`: Contains every main page in a sub-package. _to be renamed ("pages"?)_
+  - `animations`: Custom animation implementations
+  - `common`: Shared Compose UI components
+  - `datepicker`: Date picker implementation
+  - `dialogs`: Custom dialogs
+  - `functional`: Functional Compose components - _could be merged with `common`_
+  - `models`: _To be removed_
+  - `navigation`: App navigation
+  - `preferences`: Custom ProtoStore preference implementations
+  - `theme`: Theme-related code
+  - `weekview`: WeekView implementation
+  - `widgets`: Glance Compose widget components - _needs evaluation_
+- `widgets`: Existing widget implementation, _consolidate with above_
+- `workers`: WorkManager workers and background tasks
+
+It may be viable to switch to a feature-based package structure, but this needs further evaluation.
+In any case, any larger changes will need to wait until this version is released and old code is removed.
 
 ## New features
 - Search for your school by name or ID, no URL needed

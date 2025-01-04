@@ -3,6 +3,7 @@ package com.sapuseven.untis.ui.activities.settings
 import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -10,6 +11,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
@@ -22,6 +24,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.google.accompanist.flowlayout.MainAxisAlignment
 import com.sapuseven.compose.protostore.ui.preferences.ColorPreference
+import com.sapuseven.compose.protostore.ui.preferences.ConfirmDialogPreference
 import com.sapuseven.compose.protostore.ui.preferences.InputPreference
 import com.sapuseven.compose.protostore.ui.preferences.ListPreference
 import com.sapuseven.compose.protostore.ui.preferences.MultiSelectListPreference
@@ -418,14 +421,21 @@ fun NavGraphBuilder.SettingsNav(
 					defaultValueLabel = stringResource(id = R.string.preferences_theme_color)
 				)
 
-				// TODO Implement
-				/*ConfirmDialogPreference(
+				ConfirmDialogPreference(
 					title = { Text(stringResource(R.string.preference_timetable_colors_reset)) },
+					summary = { Text(stringResource(R.string.preference_timetable_colors_reset_desc)) },
+					leadingContent = {
+						Icon(
+							painter = painterResource(R.drawable.settings_reset),
+							contentDescription = null
+						)
+					},
 					dialogTitle = { Text(stringResource(R.string.preference_dialog_colors_reset_title)) },
 					dialogText = { Text(stringResource(R.string.preference_dialog_colors_reset_text)) },
 					onConfirm = {
+						viewModel.resetColors()
 					}
-				)*/
+				)
 			}
 
 			PreferenceGroup(stringResource(id = R.string.preference_category_styling_themes)) {
@@ -438,12 +448,17 @@ fun NavGraphBuilder.SettingsNav(
 						)
 					},
 					settingsRepository = viewModel.repository,
-					value = { it.themeColor },
-					onValueChange = { themeColor = it },
-					/*defaultValueLabel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-						stringResource(id = R.string.preferences_theme_color_system)
-					else
-						null*/
+					value = {
+						if (it.customThemeColor)
+							it.themeColor
+						else
+							viewModel.repository.getSettingsDefaults().themeColor
+					},
+					onValueChange = {
+						customThemeColor = it != viewModel.repository.getSettingsDefaults().themeColor
+						themeColor = it
+					},
+					defaultValueLabel = stringResource(id = R.string.preferences_theme_color_system)
 				)
 
 				ListPreference(

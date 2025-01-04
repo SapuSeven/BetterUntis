@@ -57,12 +57,7 @@ class UserSettingsRepository @AssistedInject constructor(
 		backgroundIrregularPast = colorScheme.tertiary.copy(alpha = .7f).toArgb()
 		backgroundCancelled = colorScheme.secondary.toArgb()
 		backgroundCancelledPast = colorScheme.secondary.copy(alpha = .7f).toArgb()
-		themeColor = /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-				with(LocalContext.current) {
-					resources.getColor(android.R.color.system_accent1_500, theme)
-				}
-			else*/
-			materialColors[0].toArgb()
+		themeColor = colorScheme.primary.toArgb() // TODO: This should always be the system theme color, not the current theme primary color
 		darkTheme = "auto"
 
 		timetableSubstitutionsIrregular = true

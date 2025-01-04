@@ -234,10 +234,6 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ColorPreference(
 							onClick = {
 								showDialog = false
 								scope.launch {
-									/*if (color == defaultColor)
-										dataStore.clearValue()
-									else
-										dataStore.saveValue(color.toArgb())*/
 									settingsRepository.updateSettings {
 										onValueChange?.invoke(this, color.toArgb())
 									}
