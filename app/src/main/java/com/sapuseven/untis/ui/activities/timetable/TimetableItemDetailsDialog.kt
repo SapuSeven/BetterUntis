@@ -141,7 +141,7 @@ fun TimetableItemDetailsDialog(
 			}
 			.collect {
 				it.dataByTTId.forEach { (id, periodData) ->
-					periodDataMap.set(id, periodData)
+					periodDataMap[id] = periodData
 				}
 				studentData = it.referencedStudents.toSet()
 			}
@@ -248,9 +248,9 @@ fun TimetableItemDetailsDialog(
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
 			modifier = Modifier
-                .padding(innerPadding)
-                .bottomInsets()
-                .fillMaxSize()
+				.padding(innerPadding)
+				.bottomInsets()
+				.fillMaxSize()
 		) {
 			HorizontalPager(
 				state = pagerState,
@@ -271,8 +271,16 @@ fun TimetableItemDetailsDialog(
 
 					val time = stringResource(
 						R.string.main_dialog_itemdetails_timeformat,
-						periodItem.originalPeriod.startDateTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)),
-						periodItem.originalPeriod.endDateTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
+						periodItem.originalPeriod.startDateTime.format(
+							DateTimeFormatter.ofLocalizedTime(
+								FormatStyle.SHORT
+							)
+						),
+						periodItem.originalPeriod.endDateTime.format(
+							DateTimeFormatter.ofLocalizedTime(
+								FormatStyle.SHORT
+							)
+						)
 					)
 
 					var errorDialog by rememberSaveable { mutableStateOf<String?>(null) }
@@ -290,16 +298,16 @@ fun TimetableItemDetailsDialog(
 					Column(
 						horizontalAlignment = Alignment.CenterHorizontally,
 						modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
+							.fillMaxSize()
+							.verticalScroll(rememberScrollState())
 					) {
 						Icon(
 							painter = painterResource(R.drawable.all_subject),
 							contentDescription = null,
 							tint = MaterialTheme.colorScheme.tertiary,
 							modifier = Modifier
-                                .padding(top = 24.dp, bottom = 8.dp)
-                                .size(dimensionResource(id = R.dimen.size_header_icon))
+								.padding(top = 24.dp, bottom = 8.dp)
+								.size(dimensionResource(id = R.dimen.size_header_icon))
 						)
 
 						Text(
@@ -318,8 +326,8 @@ fun TimetableItemDetailsDialog(
 						Divider(
 							color = MaterialTheme.colorScheme.outline,
 							modifier = Modifier
-                                .padding(top = 24.dp, bottom = 12.dp)
-                                .padding(horizontal = 16.dp)
+								.padding(top = 24.dp, bottom = 12.dp)
+								.padding(horizontal = 16.dp)
 						)
 
 						elementRepository.run {
@@ -400,7 +408,11 @@ fun TimetableItemDetailsDialog(
 										Text(
 											stringResource(
 												id = R.string.homeworks_due_time,
-												endDate.format(DateTimeFormatter.ofPattern(stringResource(R.string.homeworks_due_time_format)))
+												endDate.format(
+													DateTimeFormatter.ofPattern(
+														stringResource(R.string.homeworks_due_time_format)
+													)
+												)
 											)
 										)
 									},
@@ -619,13 +631,22 @@ fun TimetableItemDetailsDialog(
 											loading = true
 
 											scope.launch {
-												/*submitLessonTopic(user, id, text).fold({
-													lessonTopicNew = it
-													lessonTopicEditDialog = null
-												}, {
-													dialogError = it.message
-													loading = false
-												})*/
+												timetableRepository.postLessonTopic(id, text)
+													.onSuccess {
+														if (it) {
+															lessonTopicNew = text
+															lessonTopicEditDialog = null
+														} else {
+															dialogError =
+																"Unknown error" // TODO Use string resource
+															loading = false
+														}
+													}
+													.onFailure {
+														dialogError =
+															"API error: ${it.message}" // TODO Use string resource
+														loading = false
+													}
 											}
 										}) {
 										Text(stringResource(id = R.string.all_ok))
@@ -650,8 +671,8 @@ fun TimetableItemDetailsDialog(
 					activeColor = MaterialTheme.colorScheme.primary,
 					inactiveColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
 					modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(16.dp),
+						.align(Alignment.CenterHorizontally)
+						.padding(16.dp),
 				)
 		}
 
@@ -668,9 +689,9 @@ fun TimetableItemDetailsDialog(
 
 			LazyColumn(
 				modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surface),
+					.padding(innerPadding)
+					.fillMaxSize()
+					.background(MaterialTheme.colorScheme.surface),
 				contentPadding = insetsPaddingValues()
 			) {
 				periodDataMap.get(absenceCheck?.periodDataId)?.let { periodData ->
@@ -766,7 +787,8 @@ fun TimetableItemDetailsDialog(
 								IconButton(
 									onClick = {
 										absenceCheck?.let {
-											detailedAbsenceCheck = (it.periodDataId to student) to (it.startDateTime to it.endDateTime)
+											detailedAbsenceCheck =
+												(it.periodDataId to student) to (it.startDateTime to it.endDateTime)
 										}
 									}
 								) {
@@ -797,9 +819,9 @@ fun TimetableItemDetailsDialog(
 			}
 			Box(
 				modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surface)
+					.padding(innerPadding)
+					.fillMaxSize()
+					.background(MaterialTheme.colorScheme.surface)
 			) {
 				VerticalScrollColumn {
 					var showStartTimePicker by remember { mutableStateOf(false) }
@@ -991,11 +1013,11 @@ private fun ElementRepository.TimetableItemDetailsDialogElement(
 						Text(
 							text = if (useLongName) getLongName(element) else getShortName(element),
 							modifier = Modifier
-                                .clip(RoundedCornerShape(50))
-                                .clickable {
-                                    onElementClick(element)
-                                }
-                                .padding(8.dp)
+								.clip(RoundedCornerShape(50))
+								.clickable {
+									onElementClick(element)
+								}
+								.padding(8.dp)
 						)
 
 						if (element.id != element.orgId)
@@ -1006,11 +1028,11 @@ private fun ElementRepository.TimetableItemDetailsDialogElement(
 									),
 									style = LocalTextStyle.current.copy(textDecoration = TextDecoration.LineThrough),
 									modifier = Modifier
-                                        .clip(RoundedCornerShape(50))
-                                        .clickable {
-                                            onElementClick(orgElement)
-                                        }
-                                        .padding(8.dp)
+										.clip(RoundedCornerShape(50))
+										.clickable {
+											onElementClick(orgElement)
+										}
+										.padding(8.dp)
 								)
 							}
 					}
@@ -1157,8 +1179,8 @@ fun HorizontalPagerIndicator(
 			verticalAlignment = Alignment.CenterVertically,
 		) {
 			val indicatorModifier = Modifier
-                .size(width = indicatorWidth, height = indicatorHeight)
-                .background(color = inactiveColor, shape = indicatorShape)
+				.size(width = indicatorWidth, height = indicatorHeight)
+				.background(color = inactiveColor, shape = indicatorShape)
 
 			repeat(pageCount) {
 				Box(indicatorModifier)
@@ -1166,29 +1188,29 @@ fun HorizontalPagerIndicator(
 		}
 
 		Box(
-            Modifier
-                .offset {
-                    val position = pageIndexMapping(pagerState.currentPage)
-                    val offset = pagerState.currentPageOffsetFraction
-                    val next = pageIndexMapping(pagerState.currentPage + offset.sign.toInt())
-                    val scrollPosition = ((next - position) * offset.absoluteValue + position)
-                        .coerceIn(
-                            0f,
-                            (pageCount - 1)
-                                .coerceAtLeast(0)
-                                .toFloat()
-                        )
+			Modifier
+				.offset {
+					val position = pageIndexMapping(pagerState.currentPage)
+					val offset = pagerState.currentPageOffsetFraction
+					val next = pageIndexMapping(pagerState.currentPage + offset.sign.toInt())
+					val scrollPosition = ((next - position) * offset.absoluteValue + position)
+						.coerceIn(
+							0f,
+							(pageCount - 1)
+								.coerceAtLeast(0)
+								.toFloat()
+						)
 
-                    IntOffset(
-                        x = ((spacingPx + indicatorWidthPx) * scrollPosition).toInt(),
-                        y = 0
-                    )
-                }
-                .size(width = indicatorWidth, height = indicatorHeight)
-                .background(
-                    color = activeColor,
-                    shape = indicatorShape,
-                )
+					IntOffset(
+						x = ((spacingPx + indicatorWidthPx) * scrollPosition).toInt(),
+						y = 0
+					)
+				}
+				.size(width = indicatorWidth, height = indicatorHeight)
+				.background(
+					color = activeColor,
+					shape = indicatorShape,
+				)
 		)
 	}
 }

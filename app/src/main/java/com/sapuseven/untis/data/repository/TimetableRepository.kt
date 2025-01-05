@@ -34,9 +34,8 @@ class TimetableRepository @AssistedInject constructor(
 	}
 
 	private val user: User = userScopeManager.user
-	private val timetableMapper = timetableMapperFactory.create(colorScheme)
 
-	suspend fun timetableSource(): CachedSource<TimetableParams, List<Period>> {
+	fun timetableSource(): CachedSource<TimetableParams, List<Period>> {
 		return CachedSource(
 			source = { params ->
 				api.getTimetable(
@@ -55,11 +54,11 @@ class TimetableRepository @AssistedInject constructor(
 		)
 	}
 
-	suspend fun periodDataSource(): CachedSource<Set<Period>, PeriodDataResult> {
+	fun periodDataSource(): CachedSource<Set<Period>, PeriodDataResult> {
 		return CachedSource(
 			source = { params ->
 				api.getPeriodData(
-					periods = params,
+					periodIds = params.map { it.id }.toSet(),
 					apiUrl = user.apiUrl,
 					user = user.user,
 					key = user.key
@@ -67,6 +66,16 @@ class TimetableRepository @AssistedInject constructor(
 			},
 			cache = DiskCache(File(appContext.cacheDir, "periodData"), serializer()),
 			timeProvider = SystemTimeProvider // TODO: Use from DI to allow for testing
+		)
+	}
+
+	suspend fun postLessonTopic(periodId: Long, lessonTopic: String) = runCatching {
+		api.postLessonTopic(
+			periodId = periodId,
+			lessonTopic = lessonTopic,
+			apiUrl = user.apiUrl,
+			user = user.user,
+			key = user.key
 		)
 	}
 
