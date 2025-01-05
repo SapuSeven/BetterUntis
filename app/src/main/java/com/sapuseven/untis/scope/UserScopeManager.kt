@@ -15,7 +15,10 @@ class UserScopeManager @Inject constructor(
 	private var entryPoint: UserComponentEntryPoint? = null
 
 	val user: User
-		get() = entryPoint?.getUser()!!
+		get() = userOptional!!
+
+	val userOptional: User?
+		get() = entryPoint?.getUser()
 
 	/**
 	 * Get or create the UserComponent for the given user.

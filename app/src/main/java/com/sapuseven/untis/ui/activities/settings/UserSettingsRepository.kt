@@ -15,8 +15,8 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 
 class UserSettingsRepository @AssistedInject constructor(
-	private val userScopeManager: UserScopeManager,
 	@Assisted private val colorScheme: ColorScheme,
+	userScopeManager: UserScopeManager,
 	dataStore: DataStore<Settings>
 ) : MultiUserSettingsRepository<Settings, Settings.Builder, UserSettings, UserSettings.Builder>(
 	dataStore
@@ -26,7 +26,7 @@ class UserSettingsRepository @AssistedInject constructor(
 		fun create(colorScheme: ColorScheme): UserSettingsRepository
 	}
 
-	private val userId = userScopeManager.user.id
+	private val userId = userScopeManager.userOptional?.id
 
 	override fun getUserSettings(dataStore: Settings): UserSettings {
 		Log.d("SettingsRepository", "DataStore getUserSettings")
@@ -36,11 +36,15 @@ class UserSettingsRepository @AssistedInject constructor(
 
 	override fun updateUserSettings(currentData: Settings, userSettings: UserSettings): Settings {
 		return currentData.toBuilder()
-			.putUserSettings(userId, userSettings)
+			.apply {
+				userId?.let {
+					putUserSettings(userId, userSettings)
+				}
+			}
 			.build()
 	}
 
-	override fun getSettingsDefaults() = UserSettings.newBuilder().apply {
+	override fun getSettingsDefaults(): UserSettings = UserSettings.newBuilder().apply {
 		automuteCancelledLessons = true
 		automuteMutePriority = true
 		automuteMinimumBreakLength = 5.0f
@@ -57,7 +61,8 @@ class UserSettingsRepository @AssistedInject constructor(
 		backgroundIrregularPast = colorScheme.tertiary.copy(alpha = .7f).toArgb()
 		backgroundCancelled = colorScheme.secondary.toArgb()
 		backgroundCancelledPast = colorScheme.secondary.copy(alpha = .7f).toArgb()
-		themeColor = colorScheme.primary.toArgb() // TODO: This should always be the system theme color, not the current theme primary color
+		themeColor =
+			colorScheme.primary.toArgb() // TODO: This should always be the system theme color, not the current theme primary color
 		darkTheme = "auto"
 
 		timetableSubstitutionsIrregular = true
