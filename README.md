@@ -44,9 +44,9 @@ As this changes virtually every part of the app, here's a list tracking all migr
   - [x] WeekView
   - [ ] Element picker
   - [x] Caching
-  - [ ] Element info
+  - [x] Element info
     - [x] Basic view
-    - [ ] Teacher features
+    - [x] Teacher features
 - [x] Preferences
   - [x] Theme management
 - [ ] Room finder

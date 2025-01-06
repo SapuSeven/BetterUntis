@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -241,6 +242,7 @@ private fun TimetableItemDetailsDialogPage(
 	onAbsenceCheck: (periodData: PeriodData) -> Unit
 ) {
 	val context = LocalContext.current
+	val uriHandler = LocalUriHandler.current
 	val scope = rememberCoroutineScope()
 	val title = periodItem.getLong(ElementType.SUBJECT).let { title ->
 		if (periodItem.isCancelled())
@@ -458,7 +460,7 @@ private fun TimetableItemDetailsDialogPage(
 					trailingContent = periodItem.originalPeriod.onlinePeriodLink?.let {
 						{
 							IconButton(onClick = {
-								//openUrl(it) // TODO: Implement
+								uriHandler.openUri(it)
 							}) {
 								Icon(
 									painter = painterResource(id = R.drawable.all_open_in_new),
