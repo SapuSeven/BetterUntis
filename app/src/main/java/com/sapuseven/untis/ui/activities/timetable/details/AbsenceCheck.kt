@@ -40,19 +40,6 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-@Parcelize
-private data class AbsenceCheckParams(
-	val periodDataId: Long,
-	val startDateTime: LocalDateTime,
-	val endDateTime: LocalDateTime
-) : Parcelable {
-	constructor(period: Period) : this(
-		period.id,
-		period.startDateTime,
-		period.endDateTime
-	)
-}
-
 data class AbsenceCheckState(
 	var studentData: Set<Person>,
 	val timetableRepository: TimetableRepository,
