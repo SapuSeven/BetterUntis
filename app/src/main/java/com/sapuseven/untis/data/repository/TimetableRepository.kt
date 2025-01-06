@@ -6,7 +6,6 @@ import com.sapuseven.untis.api.client.TimetableApi
 import com.sapuseven.untis.api.model.response.PeriodDataResult
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.Period
-import com.sapuseven.untis.api.model.untis.timetable.PeriodData
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.cache.DiskCache
 import com.sapuseven.untis.mappers.TimetableMapper
@@ -20,6 +19,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.serializer
 import java.io.File
 import java.time.LocalDate
+import java.time.LocalTime
 
 class TimetableRepository @AssistedInject constructor(
 	private val api: TimetableApi,
@@ -73,6 +73,36 @@ class TimetableRepository @AssistedInject constructor(
 		api.postLessonTopic(
 			periodId = periodId,
 			lessonTopic = lessonTopic,
+			apiUrl = user.apiUrl,
+			user = user.user,
+			key = user.key
+		)
+	}
+
+	suspend fun postAbsence(periodId: Long, studentId: Long, startTime: LocalTime, endTime: LocalTime) = runCatching {
+		api.postAbsence(
+			periodId = periodId,
+			studentId = studentId,
+			startTime = startTime,
+			endTime = endTime,
+			apiUrl = user.apiUrl,
+			user = user.user,
+			key = user.key
+		)
+	}
+
+	suspend fun deleteAbsence(absenceId: Long) = runCatching {
+		api.deleteAbsence(
+			absenceId = absenceId,
+			apiUrl = user.apiUrl,
+			user = user.user,
+			key = user.key
+		)
+	}
+
+	suspend fun postAbsencesChecked(periodIds: Set<Long>) = runCatching {
+		api.postAbsencesChecked(
+			periodIds = periodIds,
 			apiUrl = user.apiUrl,
 			user = user.user,
 			key = user.key

@@ -26,13 +26,13 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.api.model.untis.Person
 import com.sapuseven.untis.api.model.untis.timetable.Period
 import com.sapuseven.untis.api.model.untis.timetable.PeriodData
+import com.sapuseven.untis.data.repository.TimetableRepository
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.SmallCircularProgressIndicator
 import com.sapuseven.untis.ui.dialogs.TimePickerDialog
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
@@ -55,7 +55,9 @@ private data class AbsenceCheckParams(
 
 data class AbsenceCheckState(
 	var studentData: Set<Person>,
+	val timetableRepository: TimetableRepository,
 	val scope: CoroutineScope,
+	private val onPeriodDataUpdate: (PeriodData) -> Unit
 ) {
 	private var _visible by mutableStateOf(false)
 	val visible: Boolean
@@ -94,34 +96,52 @@ data class AbsenceCheckState(
 	fun hideDetailed() {
 		_detailedPerson = null
 	}
+
+	private fun updatePeriodData(periodData: PeriodData?) {
+		periodData?.let {
+			_periodData = it
+			onPeriodDataUpdate(it)
+		}
+	}
+
 	suspend fun createAbsence(
 		studentId: Long,
 		periodId: Long = _period!!.id,
 		startTime: LocalTime = _period!!.startDateTime.toLocalTime(),
 		endTime: LocalTime = _period!!.endDateTime.toLocalTime()
 	) {
-		delay(500)
+		timetableRepository.postAbsence(periodId, studentId, startTime, endTime).onSuccess { newAbsences ->
+			updatePeriodData(_periodData?.let { it.copy(absences = (it.absences ?: emptyList()).plus(newAbsences)) })
+		}
 	}
 
-	suspend fun deleteAbsence() {
-		delay(500)
+	suspend fun deleteAbsence(absenceId: Long) {
+		timetableRepository.deleteAbsence(absenceId).onSuccess {
+			updatePeriodData(_periodData?.let { it.copy(absences = (it.absences ?: emptyList()).filterNot { it.id == absenceId }) })
+		}
 	}
 
 	suspend fun submitAbsencesChecked() {
-		delay(500)
+		timetableRepository.postAbsencesChecked(setOf(_period!!.id)).onSuccess {
+			updatePeriodData(_periodData?.copy(absenceChecked = true))
+		}
 	}
 }
 
 @Composable
 fun rememberAbsenceCheckState(
 	studentData: Set<Person>,
-	scope: CoroutineScope = rememberCoroutineScope()
+	timetableRepository: TimetableRepository,
+	scope: CoroutineScope = rememberCoroutineScope(),
+	onPeriodDataUpdate: (PeriodData) -> Unit
 ): AbsenceCheckState {
 	// TODO: Add rememberSavable support and use that one instead
 	return remember {
 		AbsenceCheckState(
 			studentData = studentData,
-			scope = scope
+			timetableRepository = timetableRepository,
+			scope = scope,
+			onPeriodDataUpdate = onPeriodDataUpdate
 		)
 	}
 }
@@ -129,7 +149,7 @@ fun rememberAbsenceCheckState(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun AbsenceCheck(
-	state: AbsenceCheckState = rememberAbsenceCheckState(emptySet()),
+	state: AbsenceCheckState,
 	modifier: Modifier = Modifier
 ) {
 	BackHandler(
@@ -155,8 +175,7 @@ internal fun AbsenceCheck(
 
 			items(students) { student ->
 				var loading by remember { mutableStateOf(false) }
-				val existingAbsence =
-					state.periodData!!.absences?.findLast { it.studentId == student.id }
+				val existingAbsence = state.periodData!!.absences?.findLast { it.studentId == student.id }
 
 				ListItem(
 					headlineContent = {
@@ -186,7 +205,7 @@ internal fun AbsenceCheck(
 							state.scope.launch {
 								existingAbsence?.let {
 									loading = true
-									state.deleteAbsence()
+									state.deleteAbsence(it.id)
 									loading = false
 								} ?: let {
 									loading = true

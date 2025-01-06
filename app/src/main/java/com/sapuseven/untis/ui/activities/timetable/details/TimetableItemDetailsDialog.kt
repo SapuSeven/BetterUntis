@@ -75,13 +75,15 @@ fun TimetableItemDetailsDialog(
 	val scope = rememberCoroutineScope()
 	var error by remember { mutableStateOf<Throwable?>(null) }
 
-	// contains additional details for the period items
+	// contains additional details for the period items. Key is periodId (ttId)
 	val periodDataMap = remember { mutableStateMapOf<Long, PeriodData?>() }
 
 	// contains a set of all students referenced in the periodData
 	var studentData by remember { mutableStateOf<Set<Person>?>(null) }
 
-	var absenceCheckState = rememberAbsenceCheckState(emptySet())
+	var absenceCheckState = rememberAbsenceCheckState(emptySet(), timetableRepository) {
+		periodDataMap[it.ttId] = it
+	}
 
 	fun dismiss(requestedElement: PeriodElement? = null) {
 		onDismiss(requestedElement)
