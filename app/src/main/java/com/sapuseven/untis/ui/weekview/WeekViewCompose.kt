@@ -26,16 +26,16 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -618,7 +618,7 @@ fun <T> WeekViewContent(
  * @param onItemClick Callback on event click. First value contains a list of all simultaneous events
  * (including the clicked one) and second value the index of the actually clicked event.
  */
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun <T> WeekViewCompose(
 	events: Map<LocalDate, List<Event<T>>>,
@@ -729,22 +729,24 @@ fun <T> WeekViewCompose(
 
 				if (hourList.isNotEmpty()) {
 					var isRefreshing by remember { mutableStateOf(false) }
+					val pullRefreshState = rememberPullToRefreshState()
 					val scope = rememberCoroutineScope()
-					val pullRefreshState = rememberPullRefreshState(
-						refreshing = isRefreshing,
-						onRefresh = {
-							scope.launch {
-								isRefreshing = true
-								onReload(pageOffset)
-								isRefreshing = false
-							}
-						})
+					val onRefresh: () -> Unit = {
+						isRefreshing = true
+						scope.launch {
+							onReload(pageOffset)
+							pullRefreshState.snapTo(0f)
+							isRefreshing = false
+						}
+					}
 
 					Column(
 						modifier = Modifier
-							.pullRefresh(
+							.pullToRefresh(
 								state = pullRefreshState,
-								enabled = verticalScrollState.value == 0 // Prevent refreshing when flinging to top
+								enabled = verticalScrollState.value == 0, // Prevent refreshing when flinging to top
+								isRefreshing = isRefreshing,
+								onRefresh = onRefresh
 							)
 					) {
 						WeekViewPullRefreshIndicator(

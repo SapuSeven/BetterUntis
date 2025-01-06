@@ -104,8 +104,7 @@ fun FeedbackDialog(
 	if (visible)
 		ModalBottomSheet(
 			onDismissRequest = onDismiss,
-			sheetState = sheetState,
-			windowInsets = WindowInsets.None
+			sheetState = sheetState
 		) {
 			Column(
 				modifier = Modifier

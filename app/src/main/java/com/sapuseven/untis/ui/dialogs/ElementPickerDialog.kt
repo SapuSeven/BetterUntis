@@ -35,7 +35,6 @@ import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TextFieldDefaults.TextFieldDecorationBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -111,7 +110,7 @@ fun ElementPickerDialogFullscreenNew(
 							onValueChange = { search = it },
 							singleLine = true,
 							decorationBox = { innerTextField ->
-								TextFieldDecorationBox(
+								TextFieldDefaults.DecorationBox(
 									value = search,
 									innerTextField = innerTextField,
 									enabled = true,
@@ -120,9 +119,11 @@ fun ElementPickerDialogFullscreenNew(
 									interactionSource = remember { MutableInteractionSource() },
 									placeholder = { Text("Search") },
 									contentPadding = PaddingValues(horizontal = 0.dp),
-									colors = TextFieldDefaults.textFieldColors(
-										containerColor = Color.Transparent,
-										focusedIndicatorColor = Color.Transparent,
+									colors = TextFieldDefaults.colors(
+										focusedContainerColor = Color.Transparent,
+										unfocusedContainerColor = Color.Transparent,
+										errorContainerColor = Color.Transparent,
+										disabledContainerColor = Color.Transparent,
 										unfocusedIndicatorColor = Color.Transparent,
 										disabledIndicatorColor = Color.Transparent
 									)
@@ -266,7 +267,7 @@ fun ElementPickerDialogFullscreen(
 							onValueChange = { search = it },
 							singleLine = true,
 							decorationBox = { innerTextField ->
-								TextFieldDecorationBox(
+								TextFieldDefaults.DecorationBox(
 									value = search,
 									innerTextField = innerTextField,
 									enabled = true,
@@ -275,9 +276,11 @@ fun ElementPickerDialogFullscreen(
 									interactionSource = remember { MutableInteractionSource() },
 									placeholder = { Text("Search") },
 									contentPadding = PaddingValues(horizontal = 0.dp),
-									colors = TextFieldDefaults.textFieldColors(
-										containerColor = Color.Transparent,
-										focusedIndicatorColor = Color.Transparent,
+									colors = TextFieldDefaults.colors(
+										focusedContainerColor = Color.Transparent,
+										unfocusedContainerColor = Color.Transparent,
+										errorContainerColor = Color.Transparent,
+										disabledContainerColor = Color.Transparent,
 										unfocusedIndicatorColor = Color.Transparent,
 										disabledIndicatorColor = Color.Transparent
 									)

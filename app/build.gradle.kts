@@ -181,8 +181,6 @@ protobuf {
 
 dependencies {
 	implementation(libs.accompanist.flowlayout)
-	implementation(libs.accompanist.pager)
-	implementation(libs.accompanist.pager.indicators)
 	implementation(libs.accompanist.swiperefresh)
 	implementation(libs.accompanist.systemuicontroller)
 	implementation(libs.androidx.activity.compose)
@@ -230,7 +228,7 @@ dependencies {
 	implementation("androidx.transition:transition-ktx:1.5.0-alpha06")
 	implementation(libs.andrew0000.cache)
 
-	gmsImplementation(libs.gms.code.scanner)
+    gmsImplementation(libs.gms.code.scanner)
 
 	coreLibraryDesugaring(libs.desugar.jdk.libs)
 

@@ -25,10 +25,8 @@ data class Period(
 	val exam: PeriodExam? = null,
 	val isOnlinePeriod: Boolean? = null,
 	val messengerChannel: MessengerChannel? = null,
-	@Deprecated("Not present in Untis API anymore")
-	val onlinePeriodLink: String? = null,
-	@Deprecated("Not present in Untis API anymore")
-	val blockHash: Int? = null
+	val onlinePeriodLink: String? = null, // Note: This value still seems to be present in the response, but missing in the Untis Mobile sources
+	val blockHash: Int? = null // Note: This value still seems to be present in the response, but missing in the Untis Mobile sources
 ) {
 	companion object {
 		const val CODE_REGULAR = "REGULAR"

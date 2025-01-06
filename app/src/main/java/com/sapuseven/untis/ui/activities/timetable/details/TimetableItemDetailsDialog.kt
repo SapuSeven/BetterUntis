@@ -12,8 +12,6 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.*
@@ -50,9 +48,11 @@ import com.sapuseven.untis.models.PeriodItem
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.ClickableUrlText
 import com.sapuseven.untis.ui.common.DebugTimetableItemDetailsAction
+import com.sapuseven.untis.ui.common.HorizontalPagerIndicator
 import com.sapuseven.untis.ui.common.SmallCircularProgressIndicator
 import com.sapuseven.untis.ui.dialogs.AttachmentsDialog
 import com.sapuseven.untis.ui.dialogs.DynamicHeightAlertDialog
+import com.sapuseven.untis.ui.functional.StringResourceDescriptor
 import com.sapuseven.untis.ui.functional.bottomInsets
 import crocodile8.universal_cache.FromCache
 import kotlinx.coroutines.flow.catch
@@ -168,7 +168,7 @@ fun TimetableItemDetailsDialog(
 					else if (absenceCheckState.detailedPerson != null)
 						Icon(
 							painter = painterResource(id = R.drawable.all_check),
-							contentDescription = stringResource(R.string.all_dialog_absences_save) // TODO Wrong string resource
+							contentDescription = stringResource(R.string.all_dialog_absences_save_detailed)
 						)
 					else
 						Icon(
@@ -202,7 +202,6 @@ fun TimetableItemDetailsDialog(
 							error = error,
 							onElementClick = { dismiss(it) },
 							onAbsenceCheck = { periodData ->
-								Log.d("TimetableItemDetailsDialog", "onAbsenceCheck $periodData")
 								absenceCheckState.show(periodItem.originalPeriod, periodData)
 							}
 						)
@@ -579,7 +578,7 @@ private fun TimetableItemDetailsDialogPage(
 		lessonTopicEditDialog?.let { id ->
 			var text by rememberSaveable { mutableStateOf(periodData?.topic?.text ?: lessonTopicNew ?: "") }
 			var loading by rememberSaveable { mutableStateOf(false) }
-			var dialogError by rememberSaveable { mutableStateOf<String?>(null) }
+			var dialogError by rememberSaveable { mutableStateOf<StringResourceDescriptor?>(null) }
 
 			DynamicHeightAlertDialog(
 				title = { Text(stringResource(id = R.string.all_lessontopic_edit)) },
@@ -604,7 +603,7 @@ private fun TimetableItemDetailsDialogPage(
 								),
 								color = MaterialTheme.colorScheme.error,
 								style = MaterialTheme.typography.bodyMedium,
-								text = dialogError ?: ""
+								text = dialogError?.let { it.stringResource() } ?: ""
 							)
 						}
 					}
@@ -623,14 +622,12 @@ private fun TimetableItemDetailsDialogPage(
 											lessonTopicNew = text
 											lessonTopicEditDialog = null
 										} else {
-											dialogError =
-												"Unknown error" // TODO Use string resource
+											dialogError = StringResourceDescriptor(R.string.errormessagedictionary_generic)
 											loading = false
 										}
 									}
 									.onFailure {
-										dialogError =
-											"API error: ${it.message}" // TODO Use string resource
+										dialogError = StringResourceDescriptor(R.string.all_api_error_generic, it.message ?: "null")
 										loading = false
 									}
 							}
@@ -721,67 +718,4 @@ private fun ElementRepository.TimetableItemDetailsDialogElement(
 			},
 			leadingContent = icon
 		)
-}
-
-// TODO: Move to separate file
-@Composable
-fun HorizontalPagerIndicator(
-	pagerState: PagerState,
-	modifier: Modifier = Modifier,
-	pageCount: Int = pagerState.pageCount,
-	pageIndexMapping: (Int) -> Int = { it },
-	activeColor: Color = androidx.compose.material.LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
-	inactiveColor: Color = activeColor.copy(ContentAlpha.disabled),
-	indicatorWidth: Dp = 8.dp,
-	indicatorHeight: Dp = indicatorWidth,
-	spacing: Dp = indicatorWidth,
-	indicatorShape: Shape = CircleShape,
-) {
-
-	val indicatorWidthPx = LocalDensity.current.run { indicatorWidth.roundToPx() }
-	val spacingPx = LocalDensity.current.run { spacing.roundToPx() }
-
-	Box(
-		modifier = modifier,
-		contentAlignment = Alignment.CenterStart
-	) {
-		Row(
-			horizontalArrangement = Arrangement.spacedBy(spacing),
-			verticalAlignment = Alignment.CenterVertically,
-		) {
-			val indicatorModifier = Modifier
-				.size(width = indicatorWidth, height = indicatorHeight)
-				.background(color = inactiveColor, shape = indicatorShape)
-
-			repeat(pageCount) {
-				Box(indicatorModifier)
-			}
-		}
-
-		Box(
-			Modifier
-				.offset {
-					val position = pageIndexMapping(pagerState.currentPage)
-					val offset = pagerState.currentPageOffsetFraction
-					val next = pageIndexMapping(pagerState.currentPage + offset.sign.toInt())
-					val scrollPosition = ((next - position) * offset.absoluteValue + position)
-						.coerceIn(
-							0f,
-							(pageCount - 1)
-								.coerceAtLeast(0)
-								.toFloat()
-						)
-
-					IntOffset(
-						x = ((spacingPx + indicatorWidthPx) * scrollPosition).toInt(),
-						y = 0
-					)
-				}
-				.size(width = indicatorWidth, height = indicatorHeight)
-				.background(
-					color = activeColor,
-					shape = indicatorShape,
-				)
-		)
-	}
 }

@@ -17,6 +17,7 @@
     <string name="all_dialog_absences_checked">Absences checked.</string>
     <string name="all_dialog_absences_not_checked">Absences not checked.</string>
     <string name="all_dialog_absences_save">Submit absence check</string>
+    <string name="all_dialog_absences_save_detailed">Submit detailed absence</string>
     <string name="all_dialog_crash_copied">Crash log copied to clipboard.</string>
     <string name="all_dialog_crash_title">Crash log found</string>
     <string name="all_dialog_datepicker_button_today">Today</string>
@@ -24,6 +25,7 @@
     <string name="all_dialog_error_title">Error information</string>
     <string name="all_edit">Edit</string>
     <string name="all_error">Error</string>
+    <string name="all_api_error_generic">API Error: %1$s</string>
     <string name="all_error_details">Error: %1$s</string>
     <string name="all_exam">Exam</string>
     <string name="all_exit">Exit</string>
