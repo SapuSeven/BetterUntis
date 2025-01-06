@@ -80,15 +80,16 @@ class TimetableViewModel @AssistedInject constructor(
 
 	val args = savedStateHandle.toRoute<AppRoutes.Timetable>()
 
-	private val _currentUserSettings =
-		MutableStateFlow<UserSettings>(userSettingsRepository.getSettingsDefaults())
+	private val _currentUserSettings = MutableStateFlow<UserSettings>(userSettingsRepository.getSettingsDefaults())
 	val currentUserSettings: StateFlow<UserSettings> = _currentUserSettings
 
 	var profileManagementDialog by mutableStateOf(false)
 	var timetableItemDetailsDialog by mutableStateOf<Pair<List<Event<PeriodItem>>, Int>?>(null)
 	var feedbackDialog by mutableStateOf(false)
-
 	var loading by mutableStateOf(true)
+
+	val currentUser: User = userScopeManager.user
+	val allUsersState: StateFlow<List<User>> = userManager.allUsersState
 
 	private val _debugColor = MutableStateFlow(0x0)
 	val debugColor: StateFlow<Int> = _debugColor
@@ -99,7 +100,7 @@ class TimetableViewModel @AssistedInject constructor(
 	private val _hourList = MutableStateFlow<List<WeekViewHour>>(emptyList())
 	val hourList: StateFlow<List<WeekViewHour>> = _hourList
 
-	private val _currentElement = MutableStateFlow<PeriodElement?>(null)
+	private val _currentElement = MutableStateFlow<PeriodElement?>(currentUser.userData.elemType?.let { PeriodElement(it, currentUser.userData.elemId) })
 	val currentElement: StateFlow<PeriodElement?> = _currentElement
 
 	private val _events = MutableStateFlow<Map<LocalDate, List<Event<PeriodItem>>>>(emptyMap())
@@ -111,9 +112,7 @@ class TimetableViewModel @AssistedInject constructor(
 	private val _weekViewColorScheme = MutableStateFlow<WeekViewColorScheme>(WeekViewColorScheme.default(colorScheme))
 	val weekViewColorScheme: StateFlow<WeekViewColorScheme> = _weekViewColorScheme
 
-	val currentUser: User = userScopeManager.user
-
-	val allUsersState: StateFlow<List<User>> = userManager.allUsersState
+	private var currentPage = 0
 
 	val elementPicker: ElementPicker
 		get() = ElementPicker(userScopeManager.user, userDao)
@@ -158,9 +157,6 @@ class TimetableViewModel @AssistedInject constructor(
 
 	fun switchUser(user: User) {
 		userManager.switchUser(user)
-		/*navigator.navigate(AppRoutes.Timetable(user.id)) {
-			popUpTo(0) // Pop all previous routes
-		}*/
 	}
 
 	fun editUser(user: User?) {
@@ -171,13 +167,8 @@ class TimetableViewModel @AssistedInject constructor(
 		profileManagementDialog = true
 	}
 
-	fun toggleTheme() {
-		/*user.value?.id?.let {
-			themeManager.toggleTheme(it)
-		}*/
-	}
-
-	suspend fun onPageChange(pageOffset: Int = 0) {
+	suspend fun onPageChange(pageOffset: Int = currentPage) {
+		currentPage = pageOffset
 		viewModelScope.launch {
 			loading = true
 			((pageOffset - 1)..(pageOffset + 1)).map { targetPage ->
@@ -284,18 +275,15 @@ class TimetableViewModel @AssistedInject constructor(
 		feedbackDialog = true
 	}
 
-	fun debugAction() = viewModelScope.launch {
-		userSettingsRepository.updateSettings {
-			//backgroundRegular = ((Math.random() * 0xFFFFFF).toInt()) or (0xFF shl 24);
-			//darkTheme = if (darkTheme == "on") "off" else "on"
-		}
-	}
-
 	fun getTitle(context: Context) = _currentElement.value?.let {
 		it.type.name + " " + it.id
 	} ?: currentUser.getDisplayedName(context) + (if (BuildConfig.DEBUG) " (${currentUser.id})" else "")
 
 	fun showElement(element: PeriodElement?) {
-		TODO("Not yet implemented")
+		_events.value = emptyMap()
+		_currentElement.value = element
+		viewModelScope.launch {
+			onPageChange()
+		}
 	}
 }

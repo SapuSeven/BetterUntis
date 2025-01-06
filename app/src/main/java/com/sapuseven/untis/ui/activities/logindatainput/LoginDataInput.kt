@@ -102,6 +102,7 @@ fun LoginDataInput(
 			floatingActionButton = {
 				ExtendedFloatingActionButton(
 					modifier = Modifier.bottomInsets(),
+					containerColor = MaterialTheme.colorScheme.primary,
 					icon = {
 						if (viewModel.loading)
 							SmallCircularProgressIndicator()
@@ -227,14 +228,15 @@ fun LoginDataInput(
 				)
 				AnimatedVisibility(visible = viewModel.advanced) {
 					Column {
-						InputField(
+						// Proxy is not supported currently
+						/*InputField(
 							state = viewModel.loginData.proxyUrl,
 							type = KeyboardType.Uri,
 							label = { Text(stringResource(id = R.string.logindatainput_proxy_host)) },
 							enabled = !viewModel.loading,
 							valid = !viewModel.validate || viewModel.proxyUrlValid.value,
 							errorText = stringResource(id = R.string.logindatainput_error_invalid_url)
-						)
+						)*/
 						InputField(
 							state = viewModel.loginData.apiUrl,
 							type = KeyboardType.Uri,
@@ -242,11 +244,6 @@ fun LoginDataInput(
 							enabled = !viewModel.loading,
 							valid = !viewModel.validate || viewModel.apiUrlValid.value,
 							errorText = stringResource(id = R.string.logindatainput_error_invalid_url)
-						)
-						InputCheckbox(
-							state = viewModel.loginData.skipAppSecret,
-							label = { Text(stringResource(id = R.string.logindatainput_skip_app_secret)) },
-							enabled = !viewModel.loading
 						)
 					}
 				}

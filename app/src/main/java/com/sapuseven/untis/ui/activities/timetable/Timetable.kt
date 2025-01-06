@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
@@ -31,7 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -75,7 +73,7 @@ fun Timetable(
 	val user = viewModel.currentUser
 	val users by viewModel.allUsersState.collectAsStateWithLifecycle()
 
-	val debugColor by viewModel.debugColor.collectAsState()
+	val currentElement by viewModel.currentElement.collectAsState()
 	val needsPersonalTimetable by viewModel.needsPersonalTimetable.collectAsState()
 	val hourList by viewModel.hourList.collectAsState()
 	val events by viewModel.events.collectAsState()
@@ -85,7 +83,8 @@ fun Timetable(
 	TimetableDrawer(
 		drawerState = drawerState,
 		elementPicker = viewModel.elementPicker,
-		onShowTimetable = {
+		currentElement = currentElement,
+		onElementPicked = {
 			viewModel.showElement(it)
 		}
 	) {
@@ -108,16 +107,6 @@ fun Timetable(
 						}
 					},
 					actions = {
-						IconButton(onClick = {
-							viewModel.debugAction()
-						}) {
-							Icon(
-								imageVector = Icons.Outlined.PlayArrow,
-								contentDescription = "Debug action",
-								tint = Color(debugColor)
-							)
-						}
-
 						if (BuildConfig.DEBUG)
 							DebugDesclaimerAction()
 
@@ -259,13 +248,12 @@ fun Timetable(
 		}
 	}
 
-	// TODO: Implement a smoother animation (see https://m3.material.io/components/dialogs/guidelines#007536b9-76b1-474a-a152-2f340caaff6f)
+	// TODO: Implement a nicer animation (see https://m3.material.io/components/dialogs/guidelines#007536b9-76b1-474a-a152-2f340caaff6f)
 	AnimatedVisibility(
 		visible = viewModel.timetableItemDetailsDialog != null,
 		enter = fullscreenDialogAnimationEnter(),
 		exit = fullscreenDialogAnimationExit()
 	) {
-		// TODO: Incorrect insets
 		TimetableItemDetailsDialog(
 			timetableRepository = viewModel.timetableRepository,
 			periodItems = remember {
@@ -277,7 +265,7 @@ fun Timetable(
 			elementRepository = viewModel.elementRepository,
 			onDismiss = {
 				viewModel.timetableItemDetailsDialog = null
-				//it?.let { viewModel.setDisplayedElement(it) }
+				it?.let { viewModel.showElement(it) }
 			}
 		)
 	}

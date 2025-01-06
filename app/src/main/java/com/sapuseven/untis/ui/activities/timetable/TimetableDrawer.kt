@@ -41,7 +41,6 @@ import com.sapuseven.untis.activities.main.DrawerText
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.components.ElementPicker
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreenNew
@@ -53,9 +52,9 @@ import kotlinx.serialization.json.Json
 fun TimetableDrawer(
 	viewModel: TimetableDrawerViewModel = hiltViewModel(),
 	drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
-	//timetableDatabaseInterface: TimetableDatabaseInterface,
 	elementPicker: ElementPicker,
-	onShowTimetable: (PeriodElement?) -> Unit,
+	currentElement: PeriodElement? = null,
+	onElementPicked: (PeriodElement?) -> Unit,
 	content: @Composable () -> Unit
 ) {
 	//val user by viewModel.user.collectAsState()
@@ -218,7 +217,7 @@ fun TimetableDrawer(
 				DrawerItems(
 					isMessengerAvailable = false,//todo state.isMessengerAvailable(),
 					disableTypeSelection = false,//todo state.isPersonalTimetableDisplayed() || isBookmarkSelected,
-					displayedElement = null,//todo state.displayedElement.value,
+					displayedElement = currentElement,
 					onTimetableClick = { item ->
 						scope.launch {
 							drawerState.close()
@@ -254,9 +253,9 @@ fun TimetableDrawer(
 			onDismiss = { showElementPicker = null },
 			onSelect = { item ->
 				item?.let {
-					onShowTimetable(item)
+					onElementPicked(item)
 				} ?: run {
-					onShowTimetable(null)
+					onElementPicked(null)
 				}
 			},
 			initialType = showElementPicker

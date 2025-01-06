@@ -184,11 +184,7 @@ class LoginDataInputViewModel @Inject constructor(
 
 			val untisApiUrl = buildUntisApiUrl(schoolInfo)
 
-			val appSharedSecret = loadAppSharedSecret(untisApiUrl) ?: run {
-				// TODO properly handle this error
-				//events.emit(LoginDataInputEvents.DisplaySnackbar(R.string.logindatainput_error_invalid_school))
-				return@launch
-			}
+			val appSharedSecret = loadAppSharedSecret(untisApiUrl)
 
 			val userData = loadUserData(untisApiUrl, appSharedSecret)
 			val user = buildUser(untisApiUrl, appSharedSecret, schoolInfo, userData)
@@ -286,12 +282,22 @@ class LoginDataInputViewModel @Inject constructor(
 		}
 	}
 
-	private suspend fun loadAppSharedSecret(untisApiUrl: String): String? = when {
-		loginData.anonymous.value == true -> ""
-		loginData.skipAppSecret.value == true -> loginData.password.value
-		else -> userDataApi.getAppSharedSecret(
-			untisApiUrl, loginData.username.value ?: "", loginData.password.value ?: ""
-		)
+	/**
+	 * This method tries to get the app secret from the supplied password.
+	 * If the call fails, the password is assumed to be the app secret already and is returned directly.
+	 */
+	private suspend fun loadAppSharedSecret(untisApiUrl: String): String {
+		if (loginData.anonymous.value == true) return ""
+
+		return try {
+			userDataApi.getAppSharedSecret(
+				untisApiUrl, loginData.username.value ?: "", loginData.password.value ?: ""
+			)
+		} catch (e: UntisApiException) {
+			// If we want to filter for some exceptions and throw others, we can implement it here
+			/*if (e.error?.code != SOME_ERROR_CODE) throw e
+			else */loginData.password.value ?: ""
+		}
 	}
 
 	private suspend fun loadUserData(untisApiUrl: String, appSharedSecret: String): UserDataResult {

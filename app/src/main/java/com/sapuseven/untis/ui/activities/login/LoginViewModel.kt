@@ -20,13 +20,18 @@ import com.sapuseven.untis.ui.activities.ActivityViewModel
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import javax.inject.Inject
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class LoginViewModel @Inject constructor(
 	val schoolSearchApi: SchoolSearchApi,
@@ -43,8 +48,8 @@ class LoginViewModel @Inject constructor(
 		searchMode || savedStateHandle.get<Boolean>(EXTRA_BOOLEAN_SHOW_BACK_BUTTON) ?: false
 	}
 
-	var schoolSearchText by mutableStateOf("")
-		private set
+	private val _schoolSearchText = MutableStateFlow<String>("")
+	val schoolSearchText: StateFlow<String> = _schoolSearchText
 
 	var schoolSearchItems by mutableStateOf<List<SchoolInfo>>(emptyList())
 		private set
@@ -58,10 +63,18 @@ class LoginViewModel @Inject constructor(
 	var schoolSearchLoading by mutableStateOf(false)
 		private set
 
-	var schoolSearchJob by mutableStateOf<Job?>(null)
-		private set
-
 	val events = MutableSharedFlow<LoginEvents>()
+
+	init {
+		viewModelScope.launch {
+			_schoolSearchText
+				.debounce(500)
+				.distinctUntilChanged()
+				.collect { input ->
+					searchSchools(input)
+				}
+		}
+	}
 
 	fun onSchoolSearchFocusChanged(focused: Boolean) {
 		if (focused) searchMode = true
@@ -72,7 +85,7 @@ class LoginViewModel @Inject constructor(
 		if (!enabled) {
 			viewModelScope.launch {
 				events.emit(LoginEvents.ClearFocus)
-				schoolSearchText = ""
+				_schoolSearchText.value = ""
 			}
 		}
 	}
@@ -86,37 +99,30 @@ class LoginViewModel @Inject constructor(
 	}
 
 	fun updateSchoolSearchText(text: String) {
-		schoolSearchText = text
+		_schoolSearchText.value = text
 	}
 
-	fun startSchoolSearch() {
+	suspend fun searchSchools(input: String) {
+		if (input.isEmpty()) return
+
 		schoolSearchError = null
 		schoolSearchErrorRaw = null
 		schoolSearchItems = emptyList()
 
-		schoolSearchJob?.cancel()
-		schoolSearchJob = viewModelScope.launch {
-			if (schoolSearchText.isEmpty()) return@launch
-
-			schoolSearchLoading = true
-			delay(debounceMillis)
-			try {
-				schoolSearchItems = schoolSearchApi.searchSchools(schoolSearchText).schools
-			} catch (e: UntisApiException) {
-				schoolSearchError =
-					ErrorMessageDictionary.getErrorMessageResource(e.error?.code, false)
-				schoolSearchErrorRaw = e.message.orEmpty()
-			} catch (e: Exception) {
-				schoolSearchError = null
-				schoolSearchErrorRaw = e.message.orEmpty()
-			} finally {
-				schoolSearchLoading = false
-			}
+		schoolSearchLoading = true
+		delay(debounceMillis)
+		try {
+			schoolSearchItems = schoolSearchApi.searchSchools(input).schools
+		} catch (e: UntisApiException) {
+			schoolSearchError =
+				ErrorMessageDictionary.getErrorMessageResource(e.error?.code, false)
+			schoolSearchErrorRaw = e.message.orEmpty()
+		} catch (e: Exception) {
+			schoolSearchError = null
+			schoolSearchErrorRaw = e.message.orEmpty()
+		} finally {
+			schoolSearchLoading = false
 		}
-	}
-
-	fun stopSchoolSearch() {
-		schoolSearchJob?.cancel()
 	}
 
 	fun onLoginResult(result: ActivityResult) {

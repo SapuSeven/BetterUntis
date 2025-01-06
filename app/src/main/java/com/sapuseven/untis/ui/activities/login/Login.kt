@@ -1,7 +1,6 @@
 package com.sapuseven.untis.ui.activities.login
 
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
@@ -30,6 +30,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -85,7 +86,7 @@ fun Login(
 						viewModel.goBack()
 					}) {
 						Icon(
-							imageVector = Icons.Outlined.ArrowBack,
+							imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
 							contentDescription = stringResource(id = R.string.all_back)
 						)
 					}
@@ -100,6 +101,8 @@ fun Login(
 		modifier = Modifier
 			.safeDrawingPadding()
 	) { innerPadding ->
+		val schoolSearchText = viewModel.schoolSearchText.collectAsState("")
+
 		Column(
 			modifier = Modifier
 				.padding(innerPadding)
@@ -137,7 +140,8 @@ fun Login(
 			Column(
 				modifier = Modifier.fillMaxWidth()
 			) {
-				OutlinedTextField(value = viewModel.schoolSearchText,
+				OutlinedTextField(
+					value = schoolSearchText.value,
 					onValueChange = { viewModel.updateSchoolSearchText(it) },
 					singleLine = true,
 					modifier = Modifier
@@ -154,7 +158,8 @@ fun Login(
 						),
 					label = {
 						Text(stringResource(id = R.string.login_search_by_school_name_or_address))
-					})
+					}
+				)
 				if (!viewModel.searchMode) Row(
 					modifier = Modifier
 						.fillMaxWidth()
@@ -182,14 +187,6 @@ fun SchoolSearch(
 	modifier: Modifier,
 	viewModel: LoginViewModel
 ) {
-	DisposableEffect(viewModel.schoolSearchText) {
-		viewModel.startSchoolSearch()
-
-		onDispose {
-			viewModel.stopSchoolSearch()
-		}
-	}
-
 	if (viewModel.schoolSearchItems.isNotEmpty()) LazyColumn(modifier) {
 		items(viewModel.schoolSearchItems) {
 			ListItem(
