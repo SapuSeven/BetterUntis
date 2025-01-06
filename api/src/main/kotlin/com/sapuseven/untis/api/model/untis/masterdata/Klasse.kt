@@ -11,8 +11,8 @@ data class Klasse(
 	val departmentId: Long = 0,
 	val startDate: Date? = null,
 	val endDate: Date? = null,
-	val foreColor: String? = "",
-	val backColor: String? = "",
+	val foreColor: String? = null,
+	val backColor: String? = null,
 	val active: Boolean = false,
 	val displayable: Boolean = false
 ) : Comparable<String> {
