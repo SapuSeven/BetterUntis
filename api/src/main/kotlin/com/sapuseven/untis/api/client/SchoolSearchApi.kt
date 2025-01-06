@@ -23,12 +23,12 @@ open class SchoolSearchApi(
 	@OptIn(ExperimentalSerializationApi::class)
 	open suspend fun searchSchools(
 		search: String? = null,
-		schoolid: Int = 0,
-		schoolname: String = ""
+		schoolId: Int = 0,
+		schoolName: String = ""
 	): SchoolSearchResult {
 		val body = RequestData(
 			method = ApiClient.METHOD_SEARCH_SCHOOLS,
-			params = listOf(SchoolSearchParams(search, schoolid, schoolname))
+			params = listOf(SchoolSearchParams(search, schoolId, schoolName))
 		)
 
 		val response: SchoolSearchResponse = request(DEFAULT_SCHOOLSEARCH_URL, body).body()

@@ -19,6 +19,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material3.AlertDialog
@@ -29,6 +31,7 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -105,9 +108,9 @@ fun LoginDataInput(
 					containerColor = MaterialTheme.colorScheme.primary,
 					icon = {
 						if (viewModel.loading)
-							SmallCircularProgressIndicator()
+							SmallCircularProgressIndicator(color = LocalContentColor.current)
 						else
-							Icon(Icons.Outlined.ArrowForward, contentDescription = null)
+							Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
 					},
 					text = { Text(stringResource(id = R.string.logindatainput_login)) },
 					onClick = { viewModel.onLoginClick() }
@@ -128,7 +131,7 @@ fun LoginDataInput(
 							viewModel.goBack()
 						}) {
 							Icon(
-								imageVector = Icons.Outlined.ArrowBack,
+								imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
 								contentDescription = stringResource(id = R.string.all_back)
 							)
 						}
@@ -203,7 +206,7 @@ fun LoginDataInput(
 							type = KeyboardType.Password,
 							label = {
 								Text(
-									if (viewModel.isExistingUser && !viewModel.loginData.password.value.isNullOrEmpty())
+									if (viewModel.useStoredPassword)
 										stringResource(id = R.string.logindatainput_key_saved)
 									else
 										stringResource(id = R.string.logindatainput_key)

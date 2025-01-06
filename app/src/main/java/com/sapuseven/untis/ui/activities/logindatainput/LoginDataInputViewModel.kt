@@ -34,9 +34,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.math.log
 
 // TODO: Things to check:
-//       - app secret resolution
 //       - respect proxy host
 //       - bookmarks
 @HiltViewModel
@@ -50,7 +50,12 @@ class LoginDataInputViewModel @Inject constructor(
 ) : ActivityViewModel() {
 	val args = savedStateHandle.toRoute<AppRoutes.LoginDataInput>()
 
-	val existingUserId = if (args.userId == -1L) null else args.userId
+	private val existingUserId = if (args.userId == -1L) null else args.userId
+
+	val isExistingUser = existingUserId != null
+
+	val useStoredPassword
+		get() = isExistingUser && loginData.password.value.isNullOrEmpty() && loginData.storedPassword != null
 
 	val loginData = LoginData()
 
@@ -68,9 +73,6 @@ class LoginDataInputViewModel @Inject constructor(
 		private set
 
 	var errorTextRaw: String? by mutableStateOf(null)
-		private set
-
-	var isExistingUser by mutableStateOf(false)
 		private set
 
 	var showQrCodeErrorDialog by mutableStateOf(false)
@@ -197,13 +199,17 @@ class LoginDataInputViewModel @Inject constructor(
 				}
 			}
 		} catch (e: UntisApiException) {
-			Log.e(LoginDataInputViewModel::class.simpleName, "loadData error", e)
+			Log.e(LoginDataInputViewModel::class.simpleName, "loadData Untis error", e)
 			val errorTextRes = ErrorMessageDictionary.getErrorMessageResource(e.error?.code, false)
 			errorText = errorTextRes ?: R.string.errormessagedictionary_generic
 			errorTextRaw = when (e.error?.code) {
 				ERROR_CODE_TOO_MANY_RESULTS -> "Check the school id" // TODO: This is an exampe. Add detailed descriptions to errormessagedictionary
 				else -> if (errorTextRes == null) e.error?.message else null
 			}
+		} catch (e: Exception) {
+			Log.e(LoginDataInputViewModel::class.simpleName, "loadData error", e)
+			errorText = R.string.errormessagedictionary_generic
+			errorTextRaw = e.message
 		} finally {
 			loading = false
 		}
@@ -267,7 +273,11 @@ class LoginDataInputViewModel @Inject constructor(
 			else {
 				val school = loginData.schoolId.value ?: ""
 				val schoolId = school.toIntOrNull()
-				val schoolSearchResult = schoolSearchApi.searchSchools(school)
+
+				val schoolSearchResult = schoolId?.let {
+					schoolSearchApi.searchSchools(schoolId = it)
+				} ?: schoolSearchApi.searchSchools(search = school)
+
 				if (schoolSearchResult.size == 1) schoolSearchResult.schools.first()
 				else
 				// TODO: Show manual selection dialog when more than one results are returned.
@@ -288,6 +298,8 @@ class LoginDataInputViewModel @Inject constructor(
 	 */
 	private suspend fun loadAppSharedSecret(untisApiUrl: String): String {
 		if (loginData.anonymous.value == true) return ""
+
+		if (useStoredPassword) return loginData.storedPassword!!
 
 		return try {
 			userDataApi.getAppSharedSecret(
@@ -328,6 +340,7 @@ class LoginDataInputViewModel @Inject constructor(
 		val proxyUrl = mutableStateOf<String?>(null)
 		val apiUrl = mutableStateOf(initialApiUrl)
 		val skipAppSecret = mutableStateOf<Boolean?>(null)
+		var storedPassword: String? = null
 
 		fun loadFromUser(user: User) {
 			profileName.value = user.profileName
@@ -335,6 +348,7 @@ class LoginDataInputViewModel @Inject constructor(
 			anonymous.value = user.anonymous
 			username.value = user.user
 			apiUrl.value = user.apiUrl
+			storedPassword = user.key
 		}
 	}
 }
