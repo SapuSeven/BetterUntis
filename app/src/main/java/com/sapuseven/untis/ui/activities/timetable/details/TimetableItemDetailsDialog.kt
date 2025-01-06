@@ -320,7 +320,7 @@ private fun TimetableItemDetailsDialogPage(
 
 	var lessonTopicEditDialog by rememberSaveable { mutableStateOf<Long?>(null) }
 
-	var lessonTopicNew by rememberSaveable { mutableStateOf<String?>(null) }
+	var lessonTopicNew by rememberSaveable { mutableStateOf<String?>(periodData?.topic?.text) }
 
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
@@ -616,7 +616,7 @@ private fun TimetableItemDetailsDialogPage(
 		}
 
 		lessonTopicEditDialog?.let { id ->
-			var text by rememberSaveable { mutableStateOf("") }
+			var text by rememberSaveable { mutableStateOf(periodData?.topic?.text ?: lessonTopicNew ?: "") }
 			var loading by rememberSaveable { mutableStateOf(false) }
 			var dialogError by rememberSaveable { mutableStateOf<String?>(null) }
 
