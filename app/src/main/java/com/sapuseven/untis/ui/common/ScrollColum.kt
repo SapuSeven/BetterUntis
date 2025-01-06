@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.sapuseven.untis.ui.functional.bottomInsets
 
-
+@Deprecated("Please use Modifier.verticalScroll(rememberScrollState()) directly")
 @Composable
 fun VerticalScrollColumn(content: @Composable ColumnScope.() -> Unit) {
 	Column(
