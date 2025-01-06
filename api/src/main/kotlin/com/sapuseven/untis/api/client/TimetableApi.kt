@@ -1,17 +1,25 @@
 package com.sapuseven.untis.api.client
 
 import com.sapuseven.untis.api.exception.UntisApiException
+import com.sapuseven.untis.api.model.request.CreateImmediateAbsenceParams
+import com.sapuseven.untis.api.model.request.DeleteAbsenceParams
 import com.sapuseven.untis.api.model.request.PeriodDataParams
 import com.sapuseven.untis.api.model.request.RequestData
+import com.sapuseven.untis.api.model.request.SubmitAbsencesCheckedParams
 import com.sapuseven.untis.api.model.request.SubmitLessonTopicParams
 import com.sapuseven.untis.api.model.request.TimetableParams
+import com.sapuseven.untis.api.model.response.BaseResponse
+import com.sapuseven.untis.api.model.response.CreateImmediateAbsenceResponse
+import com.sapuseven.untis.api.model.response.DeleteAbsenceResponse
 import com.sapuseven.untis.api.model.response.PeriodDataResponse
 import com.sapuseven.untis.api.model.response.PeriodDataResult
 import com.sapuseven.untis.api.model.response.SubmitLessonTopicResponse
 import com.sapuseven.untis.api.model.response.TimetableResponse
 import com.sapuseven.untis.api.model.response.TimetableResult
 import com.sapuseven.untis.api.model.untis.Auth
+import com.sapuseven.untis.api.model.untis.absence.StudentAbsence
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.api.serializer.Time
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngineFactory
@@ -107,5 +115,75 @@ open class TimetableApi(
 		val response: SubmitLessonTopicResponse = request(apiUrl, body).body()
 
 		return response.result?.success ?: throw UntisApiException(response.error)
+	}
+
+	open suspend fun postAbsence(
+		apiUrl: String,
+		periodId: Long,
+		studentId: Long,
+		startTime: Time,
+		endTime: Time,
+		user: String?,
+		key: String?
+	): List<StudentAbsence> {
+		val body = RequestData(
+			method = METHOD_CREATE_IMMEDIATE_ABSENCE,
+			params = listOf(
+				CreateImmediateAbsenceParams(
+					periodId = periodId,
+					studentId = studentId,
+					startTime = startTime,
+					endTime = endTime,
+					auth = Auth(user, key)
+				)
+			)
+		)
+
+		val response: CreateImmediateAbsenceResponse = request(apiUrl, body).body()
+
+		return response.result?.absences ?: throw UntisApiException(response.error)
+	}
+
+	open suspend fun deleteAbsence(
+		apiUrl: String,
+		absenceId: Long,
+		user: String?,
+		key: String?
+	): Boolean {
+		val body = RequestData(
+			method = METHOD_DELETE_ABSENCE,
+			params = listOf(
+				DeleteAbsenceParams(
+					absenceId = absenceId,
+					auth = Auth(user, key)
+				)
+			)
+		)
+
+		val response: DeleteAbsenceResponse = request(apiUrl, body).body()
+
+		return response.result?.success ?: throw UntisApiException(response.error)
+	}
+
+	open suspend fun postAbsencesChecked(
+		apiUrl: String,
+		periodIds: Set<Long>,
+		user: String?,
+		key: String?
+	) {
+		val body = RequestData(
+			method = METHOD_SUBMIT_ABSENCES_CHECKED,
+			params = listOf(
+				SubmitAbsencesCheckedParams(
+					periodIds = periodIds,
+					auth = Auth(user, key)
+				)
+			)
+		)
+
+		// Nothing is returned in the response
+		val response: BaseResponse = request(apiUrl, body).body()
+
+		response.error?.let { throw UntisApiException(it) }
 	}
 }
