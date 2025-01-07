@@ -22,6 +22,10 @@ class TimetableDrawerViewModel @Inject constructor(
 	private val navigator: AppNavigator,
 ) : ViewModel() {
 	var displayedElement by mutableStateOf<PeriodElement?>(null)
+	var personalElement by mutableStateOf<PeriodElement?>(null)
+
+	val personalTimetableDisplayed
+		get() = personalElement != null && displayedElement == personalElement
 
 	var enableDrawerGestures: Boolean = true
 		private set
@@ -123,6 +127,4 @@ class TimetableDrawerViewModel @Inject constructor(
 	fun dismissBookmarkDeleteDialog() {
 		bookmarkDeleteDialog = null
 	}
-
-	fun isPersonalTimetableDisplayed() = true//displayedElement == personalTimetable?.first
 }

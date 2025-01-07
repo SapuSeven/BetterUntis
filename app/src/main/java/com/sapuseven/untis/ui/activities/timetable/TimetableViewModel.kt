@@ -50,6 +50,7 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -94,13 +95,18 @@ class TimetableViewModel @AssistedInject constructor(
 	private val _debugColor = MutableStateFlow(0x0)
 	val debugColor: StateFlow<Int> = _debugColor
 
+	private val _personalElement = MutableStateFlow<PeriodElement?>(null)
+	val personalElement: StateFlow<PeriodElement?> = _personalElement
+
 	private val _needsPersonalTimetable = MutableStateFlow(false)
 	val needsPersonalTimetable: StateFlow<Boolean> = _needsPersonalTimetable
 
 	private val _hourList = MutableStateFlow<List<WeekViewHour>>(emptyList())
 	val hourList: StateFlow<List<WeekViewHour>> = _hourList
 
-	private val _currentElement = MutableStateFlow<PeriodElement?>(currentUser.userData.elemType?.let { PeriodElement(it, currentUser.userData.elemId) })
+	private val _currentElement = MutableStateFlow<PeriodElement?>(currentUser.userData.elemType?.let {
+		PeriodElement(it, currentUser.userData.elemId)
+	})
 	val currentElement: StateFlow<PeriodElement?> = _currentElement
 
 	private val _events = MutableStateFlow<Map<LocalDate, List<Event<PeriodItem>>>>(emptyMap())
@@ -128,9 +134,15 @@ class TimetableViewModel @AssistedInject constructor(
 				// All properties that are based on preferences are set here
 				_currentUserSettings.value = userSettings
 				decodeStoredTimetableValue(userSettings.timetablePersonalTimetable)?.let {
+					_personalElement.value = it
 					_needsPersonalTimetable.emit(false)
 					_currentElement.emit(it)
-				} ?: _needsPersonalTimetable.emit(true)
+				} ?: run {
+					_personalElement.value = currentUser.userData.elemType?.let {
+						PeriodElement(it, currentUser.userData.elemId)
+					}
+					_needsPersonalTimetable.emit(_personalElement.value == null)
+				}
 				_hourList.value = buildHourList(
 					user = currentUser,
 					range = userSettings.timetableRange.convertRangeToPair(),
@@ -213,15 +225,17 @@ class TimetableViewModel @AssistedInject constructor(
 	}
 
 	private suspend fun loadEvents(startDate: LocalDate, fromCache: FromCache): Flow<CachedSourceResult<List<Period>>> {
-		return timetableRepository.timetableSource().getRaw(
-			params = TimetableRepository.TimetableParams(
-				elementId = 0,
-				elementType = ElementType.STUDENT,
-				startDate = startDate,
-			),
-			additionalKey = currentUser.id,
-			fromCache = fromCache
-		)
+		return currentElement.value?.let {
+			timetableRepository.timetableSource().getRaw(
+				params = TimetableRepository.TimetableParams(
+					elementId = it.id,
+					elementType = it.type,
+					startDate = startDate,
+				),
+				additionalKey = currentUser.id,
+				fromCache = fromCache
+			)
+		} ?: emptyFlow()
 	}
 
 	private suspend fun emitEvents(events: Map<LocalDate, List<Event<PeriodItem>>>) {

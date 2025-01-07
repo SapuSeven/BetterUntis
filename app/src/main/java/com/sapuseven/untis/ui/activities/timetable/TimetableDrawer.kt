@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,11 +54,11 @@ fun TimetableDrawer(
 	viewModel: TimetableDrawerViewModel = hiltViewModel(),
 	drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
 	elementPicker: ElementPicker,
+	personalElement: PeriodElement? = null,
 	currentElement: PeriodElement? = null,
 	onElementPicked: (PeriodElement?) -> Unit,
 	content: @Composable () -> Unit
 ) {
-	//val user by viewModel.user.collectAsState()
 	val scope = rememberCoroutineScope()
 	val drawerScrollState = rememberScrollState()
 
@@ -102,6 +103,14 @@ fun TimetableDrawer(
 			}
 	}*/
 
+	LaunchedEffect(currentElement) {
+		viewModel.displayedElement = currentElement
+	}
+
+	LaunchedEffect(personalElement) {
+		viewModel.personalElement = personalElement
+	}
+
 	BackHandler(enabled = drawerState.isOpen) {
 		scope.launch {
 			drawerState.close()
@@ -130,11 +139,11 @@ fun TimetableDrawer(
 						)
 					},
 					label = { Text(stringResource(id = R.string.all_personal_timetable)) },
-					selected = viewModel.isPersonalTimetableDisplayed(),
+					selected = viewModel.personalTimetableDisplayed,
 					onClick = {
 						scope.launch {
 							drawerState.close()
-							//todo onShowTimetable(state.personalTimetable)
+							onElementPicked(viewModel.personalElement)
 						}
 					},
 					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -216,7 +225,7 @@ fun TimetableDrawer(
 
 				DrawerItems(
 					isMessengerAvailable = false,//todo state.isMessengerAvailable(),
-					disableTypeSelection = false,//todo state.isPersonalTimetableDisplayed() || isBookmarkSelected,
+					disableTypeSelection = viewModel.personalTimetableDisplayed || isBookmarkSelected,
 					displayedElement = currentElement,
 					onTimetableClick = { item ->
 						scope.launch {

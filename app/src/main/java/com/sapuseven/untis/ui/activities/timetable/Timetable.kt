@@ -74,6 +74,7 @@ fun Timetable(
 	val users by viewModel.allUsersState.collectAsStateWithLifecycle()
 
 	val currentElement by viewModel.currentElement.collectAsState()
+	val personalElement by viewModel.personalElement.collectAsState()
 	val needsPersonalTimetable by viewModel.needsPersonalTimetable.collectAsState()
 	val hourList by viewModel.hourList.collectAsState()
 	val events by viewModel.events.collectAsState()
@@ -84,6 +85,7 @@ fun Timetable(
 		drawerState = drawerState,
 		elementPicker = viewModel.elementPicker,
 		currentElement = currentElement,
+		personalElement = personalElement,
 		onElementPicked = {
 			viewModel.showElement(it)
 		}
