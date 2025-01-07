@@ -12,6 +12,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.*
@@ -287,6 +288,7 @@ private fun TimetableItemDetailsDialogPage(
 		modifier = Modifier
 			.fillMaxSize()
 			.verticalScroll(rememberScrollState())
+			.bottomInsets()
 	) {
 		Icon(
 			painter = painterResource(R.drawable.all_subject),
@@ -368,17 +370,19 @@ private fun TimetableItemDetailsDialogPage(
 				periodItem.originalPeriod.text.info
 			).forEach {
 				if (it.isNotBlank())
-					ListItem(
-						headlineContent = { Text(it) },
-						leadingContent = {
-							Icon(
-								painter = painterResource(id = R.drawable.all_info),
-								contentDescription = stringResource(id = R.string.all_lesson_info),
-								tint = MaterialTheme.colorScheme.onSurface,
-								modifier = Modifier.padding(horizontal = 8.dp)
-							)
-						}
-					)
+					SelectionContainer {
+						ListItem(
+							headlineContent = { Text(it) },
+							leadingContent = {
+								Icon(
+									painter = painterResource(id = R.drawable.all_info),
+									contentDescription = stringResource(id = R.string.all_lesson_info),
+									tint = MaterialTheme.colorScheme.onSurface,
+									modifier = Modifier.padding(horizontal = 8.dp)
+								)
+							}
+						)
+					}
 			}
 
 			// Lesson homeworks
