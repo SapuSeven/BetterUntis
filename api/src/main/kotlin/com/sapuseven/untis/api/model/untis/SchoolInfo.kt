@@ -10,7 +10,7 @@ data class SchoolInfo(
 	var address: String,
 	var displayName: String,
 	var loginName: String,
-	var schoolId: Int,
+	var schoolId: Long,
 	var serverUrl: String,
 	var mobileServiceUrl: String?
 )

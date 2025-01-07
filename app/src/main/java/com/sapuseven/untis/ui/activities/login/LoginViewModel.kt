@@ -39,8 +39,6 @@ class LoginViewModel @Inject constructor(
 	private val navigator: AppNavigator,
 	savedStateHandle: SavedStateHandle
 ) : ActivityViewModel() {
-	val debounceMillis: Long = 300
-
 	var searchMode by mutableStateOf(false)
 		private set
 
@@ -51,30 +49,7 @@ class LoginViewModel @Inject constructor(
 	private val _schoolSearchText = MutableStateFlow<String>("")
 	val schoolSearchText: StateFlow<String> = _schoolSearchText
 
-	var schoolSearchItems by mutableStateOf<List<SchoolInfo>>(emptyList())
-		private set
-
-	var schoolSearchError: Int? by mutableStateOf(null)
-		private set
-
-	var schoolSearchErrorRaw: String? by mutableStateOf(null)
-		private set
-
-	var schoolSearchLoading by mutableStateOf(false)
-		private set
-
 	val events = MutableSharedFlow<LoginEvents>()
-
-	init {
-		viewModelScope.launch {
-			_schoolSearchText
-				.debounce(500)
-				.distinctUntilChanged()
-				.collect { input ->
-					searchSchools(input)
-				}
-		}
-	}
 
 	fun onSchoolSearchFocusChanged(focused: Boolean) {
 		if (focused) searchMode = true
@@ -100,29 +75,6 @@ class LoginViewModel @Inject constructor(
 
 	fun updateSchoolSearchText(text: String) {
 		_schoolSearchText.value = text
-	}
-
-	suspend fun searchSchools(input: String) {
-		if (input.isEmpty()) return
-
-		schoolSearchError = null
-		schoolSearchErrorRaw = null
-		schoolSearchItems = emptyList()
-
-		schoolSearchLoading = true
-		delay(debounceMillis)
-		try {
-			schoolSearchItems = schoolSearchApi.searchSchools(input).schools
-		} catch (e: UntisApiException) {
-			schoolSearchError =
-				ErrorMessageDictionary.getErrorMessageResource(e.error?.code, false)
-			schoolSearchErrorRaw = e.message.orEmpty()
-		} catch (e: Exception) {
-			schoolSearchError = null
-			schoolSearchErrorRaw = e.message.orEmpty()
-		} finally {
-			schoolSearchLoading = false
-		}
 	}
 
 	fun onLoginResult(result: ActivityResult) {

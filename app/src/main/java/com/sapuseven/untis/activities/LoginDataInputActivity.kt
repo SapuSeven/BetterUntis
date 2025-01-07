@@ -2,7 +2,7 @@ package com.sapuseven.untis.activities
 
 import android.os.Bundle
 import com.sapuseven.untis.data.database.entities.User
-import com.sapuseven.untis.ui.activities.logindatainput.LoginDataInputViewModel
+import com.sapuseven.untis.ui.activities.login.datainput.LoginDataInputViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

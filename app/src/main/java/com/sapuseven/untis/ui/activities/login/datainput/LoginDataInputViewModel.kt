@@ -1,4 +1,4 @@
-package com.sapuseven.untis.ui.activities.logindatainput
+package com.sapuseven.untis.ui.activities.login.datainput
 
 import android.net.Uri
 import android.util.Log
@@ -34,7 +34,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.math.log
 
 // TODO: Things to check:
 //       - respect proxy host
@@ -62,6 +61,8 @@ class LoginDataInputViewModel @Inject constructor(
 	var advanced by mutableStateOf(
 		loginData.proxyUrl.value?.isNotEmpty() == true || loginData.apiUrl.value?.isNotEmpty() == true
 	)
+
+	var searchMode by mutableStateOf(false)
 
 	var validate by mutableStateOf(false)
 		private set
@@ -266,13 +267,13 @@ class LoginDataInputViewModel @Inject constructor(
 				address = "",
 				displayName = loginData.schoolId.value ?: "",
 				loginName = loginData.schoolId.value ?: "",
-				schoolId = loginData.schoolId.value?.toIntOrNull() ?: 0,
+				schoolId = loginData.schoolId.value?.toLongOrNull() ?: 0,
 				serverUrl = loginData.apiUrl.value ?: "",
 				mobileServiceUrl = loginData.apiUrl.value
 			)
 			else {
 				val school = loginData.schoolId.value ?: ""
-				val schoolId = school.toIntOrNull()
+				val schoolId = school.toLongOrNull()
 
 				val schoolSearchResult = schoolId?.let {
 					schoolSearchApi.searchSchools(schoolId = it)
@@ -318,11 +319,17 @@ class LoginDataInputViewModel @Inject constructor(
 	}
 
 	fun goBack() {
-		navigator.popBackStack()
+		if (searchMode) searchMode = false
+		else navigator.popBackStack()
 	}
 
 	fun onQrCodeErrorDialogDismiss() {
 		showQrCodeErrorDialog = false
+	}
+
+	fun selectSchool(it: SchoolInfo) {
+		loginData.schoolId.value = it.schoolId.toString()
+		searchMode = false
 	}
 
 	class LoginData(

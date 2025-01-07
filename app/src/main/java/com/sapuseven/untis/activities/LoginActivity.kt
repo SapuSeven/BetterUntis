@@ -1,13 +1,9 @@
 package com.sapuseven.untis.activities
 
-import android.app.Activity
 import android.os.Bundle
-import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import com.sapuseven.untis.services.CodeScanServiceImpl
-import com.sapuseven.untis.ui.activities.login.Login
 import com.sapuseven.untis.ui.activities.login.LoginViewModel
-import com.sapuseven.untis.ui.activities.logindatainput.LoginDataInputViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

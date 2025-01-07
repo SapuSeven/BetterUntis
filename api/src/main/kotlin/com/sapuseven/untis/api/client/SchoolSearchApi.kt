@@ -23,7 +23,7 @@ open class SchoolSearchApi(
 	@OptIn(ExperimentalSerializationApi::class)
 	open suspend fun searchSchools(
 		search: String? = null,
-		schoolId: Int = 0,
+		schoolId: Long = 0,
 		schoolName: String = ""
 	): SchoolSearchResult {
 		val body = RequestData(

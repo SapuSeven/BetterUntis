@@ -42,6 +42,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sapuseven.untis.R
+import com.sapuseven.untis.ui.activities.login.schoolsearch.SchoolSearch
+import com.sapuseven.untis.ui.activities.login.schoolsearch.SchoolSearchViewModel
 import com.sapuseven.untis.ui.common.AppScaffold
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -130,13 +132,16 @@ fun Login(
 					textAlign = TextAlign.Center,
 					modifier = Modifier.fillMaxWidth()
 				)
+			} else {
+				SchoolSearch(
+					modifier = Modifier
+						.fillMaxWidth()
+						.weight(1f),
+					searchText = schoolSearchText.value,
+					onSchoolSelected = { viewModel.onSchoolSelected(it) }
+				)
 			}
-			else SchoolSearch(
-				modifier = Modifier
-					.fillMaxWidth()
-					.weight(1f),
-				viewModel = viewModel
-			)
+
 			Column(
 				modifier = Modifier.fillMaxWidth()
 			) {
@@ -178,32 +183,5 @@ fun Login(
 				}
 			}
 		}
-	}
-}
-
-@OptIn(ExperimentalSerializationApi::class, ExperimentalMaterial3Api::class)
-@Composable
-fun SchoolSearch(
-	modifier: Modifier,
-	viewModel: LoginViewModel
-) {
-	if (viewModel.schoolSearchItems.isNotEmpty()) LazyColumn(modifier) {
-		items(viewModel.schoolSearchItems) {
-			ListItem(
-				headlineContent = { Text(it.displayName) },
-				supportingContent = { Text(it.address) },
-				modifier = Modifier.clickable { viewModel.onSchoolSelected(it) }
-			)
-		}
-	}
-	else Column(
-		verticalArrangement = Arrangement.Center,
-		horizontalAlignment = Alignment.CenterHorizontally,
-		modifier = modifier
-	) {
-		if (viewModel.schoolSearchLoading) CircularProgressIndicator()
-		else if (viewModel.schoolSearchError != null) Text(text = stringResource(id = viewModel.schoolSearchError!!))
-		else if (viewModel.schoolSearchErrorRaw != null) Text(text = viewModel.schoolSearchErrorRaw!!)
-		else if (viewModel.schoolSearchItems.isEmpty()) Text(text = stringResource(id = R.string.login_no_results))
 	}
 }
