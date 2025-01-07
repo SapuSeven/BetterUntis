@@ -42,7 +42,7 @@ As this changes virtually every part of the app, here's a list tracking all migr
 
 - [ ] Timetable view
   - [x] WeekView
-  - [ ] Element picker
+  - [x] Element picker
   - [x] Caching
   - [x] Element info
     - [x] Basic view

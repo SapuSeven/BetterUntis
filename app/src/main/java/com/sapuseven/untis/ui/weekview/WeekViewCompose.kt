@@ -135,32 +135,29 @@ fun <T> WeekViewEvent(
 	) {
 		Text(
 			text = event.top,
-			fontSize = 10.sp,
+			style = MaterialTheme.typography.bodySmall,
 			textAlign = TextAlign.Start,
 			maxLines = 1,
 			color = event.textColor,
-			modifier = Modifier
-				.align(Alignment.TopStart)
+			modifier = Modifier.align(Alignment.TopStart)
 		)
 
 		Text(
 			text = event.title,
-			fontWeight = FontWeight.Bold,
+			style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
 			textAlign = TextAlign.Center,
 			maxLines = 1,
 			color = event.textColor,
-			modifier = Modifier
-				.align(Alignment.Center)
+			modifier = Modifier.align(Alignment.Center)
 		)
 
 		Text(
 			text = event.bottom,
-			fontSize = 10.sp,
+			style = MaterialTheme.typography.bodySmall,
 			textAlign = TextAlign.End,
 			maxLines = 1,
 			color = event.textColor,
-			modifier = Modifier
-				.align(Alignment.BottomEnd)
+			modifier = Modifier.align(Alignment.BottomEnd)
 		)
 	}
 }
@@ -212,8 +209,8 @@ fun WeekViewHeaderDay(
 		Text(
 			text = dayNameFormat.format(day),
 			textAlign = TextAlign.Center,
-			fontSize = 20.sp,
-			fontWeight = FontWeight.Medium,
+			style = MaterialTheme.typography.titleLarge,
+			maxLines = 1,
 			color = if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
 			modifier = modifier
 				.fillMaxWidth()
@@ -221,7 +218,8 @@ fun WeekViewHeaderDay(
 		Text(
 			text = dayDateFormat.format(day),
 			textAlign = TextAlign.Center,
-			fontSize = 14.sp,
+			style = MaterialTheme.typography.titleSmall,
+			maxLines = 1,
 			color = if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
 			modifier = modifier
 				.fillMaxWidth()
@@ -262,7 +260,8 @@ fun WeekViewHeader(
 fun WeekViewHeaderPreview() {
 	WeekViewHeader(
 		startDate = LocalDate.now(),
-		numDays = 5
+		numDays = 5,
+		modifier = Modifier.sizeIn(maxWidth = 360.dp)
 	)
 }
 
@@ -281,7 +280,8 @@ fun WeekViewSidebarLabel(
 	) {
 		Text(
 			text = timeFormat.format(hour.startTime),
-			fontSize = 12.sp,
+			style = MaterialTheme.typography.bodySmall,
+			maxLines = 1,
 			color = MaterialTheme.colorScheme.onSurfaceVariant,
 			modifier = Modifier
 				.align(Alignment.TopStart)
@@ -289,15 +289,16 @@ fun WeekViewSidebarLabel(
 		)
 		Text(
 			text = hour.label,
-			fontSize = 16.sp,
-			fontWeight = FontWeight.Medium,
+			style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+			maxLines = 1,
 			color = MaterialTheme.colorScheme.onSurface,
 			modifier = Modifier
 				.align(Alignment.Center)
 		)
 		Text(
 			text = timeFormat.format(hour.endTime),
-			fontSize = 12.sp,
+			style = MaterialTheme.typography.bodySmall,
+			maxLines = 1,
 			color = MaterialTheme.colorScheme.onSurfaceVariant,
 			modifier = Modifier
 				.align(Alignment.BottomEnd)
@@ -328,7 +329,7 @@ fun CompactSidebarLabelPreview() {
 			LocalTime.of(10, 30),
 			"1"
 		),
-		Modifier.sizeIn(maxHeight = 48.dp, maxWidth = 64.dp)
+		Modifier.sizeIn(maxHeight = 48.dp, maxWidth = 68.dp)
 	)
 }
 
