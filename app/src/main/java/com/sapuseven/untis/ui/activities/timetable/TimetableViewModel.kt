@@ -290,7 +290,8 @@ class TimetableViewModel @AssistedInject constructor(
 	}
 
 	fun getTitle(context: Context) = _currentElement.value?.let {
-		it.type.name + " " + it.id
+		if (it == _personalElement.value) null // Use Profile name for personal timetable
+		else elementRepository.getLongName(it)
 	} ?: currentUser.getDisplayedName(context) + (if (BuildConfig.DEBUG) " (${currentUser.id})" else "")
 
 	fun showElement(element: PeriodElement?) {
