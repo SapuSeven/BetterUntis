@@ -63,6 +63,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -85,9 +86,9 @@ import java.time.temporal.ChronoUnit
 import kotlin.math.roundToInt
 
 data class Event<T>(
-	var title: String,
-	var top: String = "",
-	var bottom: String = "",
+	var title: CharSequence,
+	var top: CharSequence = "",
+	var bottom: CharSequence = "",
 	var color: Color,
 	var pastColor: Color,
 	var textColor: Color,
@@ -134,7 +135,7 @@ fun <T> WeekViewEvent(
 			.padding(horizontal = 2.dp) // Inner padding
 	) {
 		Text(
-			text = event.top,
+			text = event.top.asAnnotatedString(),
 			style = MaterialTheme.typography.bodySmall,
 			textAlign = TextAlign.Start,
 			maxLines = 1,
@@ -143,7 +144,7 @@ fun <T> WeekViewEvent(
 		)
 
 		Text(
-			text = event.title,
+			text = event.title.asAnnotatedString(),
 			style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
 			textAlign = TextAlign.Center,
 			maxLines = 1,
@@ -152,7 +153,7 @@ fun <T> WeekViewEvent(
 		)
 
 		Text(
-			text = event.bottom,
+			text = event.bottom.asAnnotatedString(),
 			style = MaterialTheme.typography.bodySmall,
 			textAlign = TextAlign.End,
 			maxLines = 1,
@@ -160,6 +161,10 @@ fun <T> WeekViewEvent(
 			modifier = Modifier.align(Alignment.BottomEnd)
 		)
 	}
+}
+
+private fun CharSequence.asAnnotatedString(): AnnotatedString = let {
+	if (it is AnnotatedString) it else AnnotatedString(it.toString())
 }
 
 private fun LocalDateTime.seconds() = atZone(ZoneId.systemDefault()).toEpochSecond()

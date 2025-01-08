@@ -4,6 +4,11 @@ import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.StrikethroughSpan
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.enumeration.PeriodState
 import com.sapuseven.untis.api.model.untis.timetable.Period
@@ -65,31 +70,24 @@ class PeriodItem(
 			elementRepository?.getLongName(it.id, type) ?: ELEMENT_NAME_UNKNOWN
 		}
 
-	fun getShortSpanned(
+	fun getShortAnnotated(
 		type: ElementType,
 		list: HashSet<PeriodElement> = getListFor(type),
 		includeOrgIds: Boolean = true
-	): SpannableString {
-		val builder = SpannableStringBuilder()
+	): AnnotatedString {
+		return buildAnnotatedString {
+			list.forEach {
+				if (length > 0) append(ELEMENT_NAME_SEPARATOR)
+				append(elementRepository?.getShortName(it.id, type) ?: ELEMENT_NAME_UNKNOWN)
 
-		list.forEach {
-			if (builder.isNotBlank())
-				builder.append(ELEMENT_NAME_SEPARATOR)
-			builder.append(
-				elementRepository?.getShortName(it.id, type)
-					?: ELEMENT_NAME_UNKNOWN
-			)
-			if (includeOrgIds && it.id != it.orgId && it.orgId != 0L) {
-				builder.append(ELEMENT_NAME_SEPARATOR)
-				builder.append(
-					elementRepository?.getShortName(it.orgId, type)
-						?: ELEMENT_NAME_UNKNOWN,
-					StrikethroughSpan(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-				)
+				if (includeOrgIds && it.id != it.orgId && it.orgId != 0L) {
+					append(ELEMENT_NAME_SEPARATOR)
+					withStyle(SpanStyle(textDecoration = TextDecoration.LineThrough)) {
+						append(elementRepository?.getShortName(it.orgId, type) ?: ELEMENT_NAME_UNKNOWN)
+					}
+				}
 			}
 		}
-
-		return SpannableString.valueOf(builder)
 	}
 
 	fun isCancelled(): Boolean = originalPeriod.`is`.contains(PeriodState.CANCELLED)

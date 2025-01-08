@@ -170,28 +170,28 @@ class TimetableMapper @AssistedInject constructor(
 				title = periodItem.getShort(ElementType.SUBJECT),
 				top = (
 					if (contextType == ElementType.TEACHER)
-						periodItem.getShortSpanned(
+						periodItem.getShortAnnotated(
 							ElementType.CLASS,
 							includeOrgIds = includeOrgIds
 						)
 					else
-						periodItem.getShortSpanned(
+						periodItem.getShortAnnotated(
 							ElementType.TEACHER,
 							includeOrgIds = includeOrgIds
 						)
-					).toString(),
+					),
 				bottom = (
 					if (contextType == ElementType.ROOM)
-						periodItem.getShortSpanned(
+						periodItem.getShortAnnotated(
 							ElementType.CLASS,
 							includeOrgIds = includeOrgIds
 						)
 					else
-						periodItem.getShortSpanned(
+						periodItem.getShortAnnotated(
 							ElementType.ROOM,
 							includeOrgIds = includeOrgIds
 						)
-					).toString(),
+					),
 				color = Color.Transparent,
 				pastColor = Color.Transparent,
 				textColor = Color.Transparent,
