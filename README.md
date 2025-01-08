@@ -40,7 +40,7 @@ to potentially reuse them in other projects.
 
 As this changes virtually every part of the app, here's a list tracking all migrated components:
 
-- [ ] Timetable view
+- [x] Timetable view
   - [x] WeekView
   - [x] Element picker
   - [x] Caching
