@@ -100,9 +100,10 @@ abstract class TimetableDependantWorker(
 	}
 
 	internal fun canScheduleExactAlarms(): Boolean {
-		val alarmManager =
+		return false
+		/*TODO val alarmManager =
 			applicationContext.getSystemService(ComponentActivity.ALARM_SERVICE) as AlarmManager
-		return (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms())
+		return (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms())*/
 	}
 
 	internal suspend fun disablePreference(key: String) {

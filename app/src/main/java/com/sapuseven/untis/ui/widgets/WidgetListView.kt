@@ -10,8 +10,8 @@ import androidx.glance.action.Action
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.items
-import androidx.glance.appwidget.unit.ColorProvider
 import androidx.glance.background
+import androidx.glance.color.ColorProvider
 import androidx.glance.layout.*
 import androidx.glance.text.Text
 import androidx.glance.unit.ColorProvider

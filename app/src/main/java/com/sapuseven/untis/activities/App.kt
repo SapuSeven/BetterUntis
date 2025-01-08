@@ -31,11 +31,6 @@ class App : Application(), Configuration.Provider {
 
 	private val ioScope: CoroutineScope = CoroutineScope(Dispatchers.IO + Job())
 
-	override fun getWorkManagerConfiguration() =
-		Configuration.Builder()
-			.setMinimumLoggingLevel(Log.VERBOSE)
-			.build()
-
 	@OptIn(DelicateCoroutinesApi::class)
 	override fun onCreate() {
 		super.onCreate()
@@ -55,6 +50,11 @@ class App : Application(), Configuration.Provider {
 			}
 		}
 	}
+
+	override val workManagerConfiguration: Configuration
+		get() = Configuration.Builder()
+			.setMinimumLoggingLevel(Log.VERBOSE)
+			.build()
 }
 
 private suspend fun <T> DataStore<Preferences>.loadPref(key: Preferences.Key<T>, default: T) =

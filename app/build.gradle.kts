@@ -27,7 +27,7 @@ fun generateVersionCode(): Int {
 val gmsImplementation by configurations.creating
 
 android {
-	compileSdk = 34
+	compileSdk = 35
 	namespace = "com.sapuseven.untis"
 
 	androidResources {
@@ -37,9 +37,9 @@ android {
 	defaultConfig {
 		applicationId = "com.sapuseven.untis"
 		minSdk = 21
-		targetSdk = 34
+		targetSdk = 35
 		versionCode = generateVersionCode()
-		versionName = "4.1.0-beta01"
+		versionName = "5.0.0-beta01"
 		vectorDrawables.useSupportLibrary = true
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -99,6 +99,7 @@ android {
 	}
 
 	buildFeatures {
+		buildConfig = true
 		compose = true
 	}
 

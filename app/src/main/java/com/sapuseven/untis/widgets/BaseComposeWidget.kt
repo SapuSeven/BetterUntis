@@ -1,5 +1,6 @@
 package com.sapuseven.untis.widgets
 
+import android.content.Context
 import android.os.Build
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
@@ -13,13 +14,14 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.LocalContext
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.appWidgetBackground
 import androidx.glance.appwidget.background
-import androidx.glance.appwidget.unit.ColorProvider
+import androidx.glance.color.ColorProvider
 import androidx.glance.currentState
 import androidx.glance.layout.*
 import androidx.glance.text.Text
@@ -83,7 +85,7 @@ open class BaseComposeWidget : GlanceAppWidget() {
 	}
 
 	@Composable
-	override fun Content() {
+	/*override */fun Content() {
 		val prefs = currentState<Preferences>()
 		val userId = prefs[longPreferencesKey(PREFERENCE_KEY_LONG_USER)] ?: -1
 		elementId = prefs[intPreferencesKey(PREFERENCE_KEY_INT_ELEMENT_ID)] ?: -1
@@ -145,5 +147,9 @@ open class BaseComposeWidget : GlanceAppWidget() {
 
 	fun setData(data: List<WidgetListItemModel>) {
 		items = data
+	}
+
+	override suspend fun provideGlance(context: Context, id: GlanceId) {
+		TODO("Not yet implemented")
 	}
 }
