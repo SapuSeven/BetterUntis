@@ -54,8 +54,7 @@ fun TimetableDrawer(
 	viewModel: TimetableDrawerViewModel = hiltViewModel(),
 	drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
 	elementPicker: ElementPicker,
-	personalElement: PeriodElement? = null,
-	currentElement: PeriodElement? = null,
+	displayedElement: PeriodElement? = null,
 	onElementPicked: (PeriodElement?) -> Unit,
 	content: @Composable () -> Unit
 ) {
@@ -103,12 +102,8 @@ fun TimetableDrawer(
 			}
 	}*/
 
-	LaunchedEffect(currentElement) {
-		viewModel.displayedElement = currentElement
-	}
-
-	LaunchedEffect(personalElement) {
-		viewModel.personalElement = personalElement
+	LaunchedEffect(displayedElement) {
+		viewModel.displayedElement = displayedElement
 	}
 
 	BackHandler(enabled = drawerState.isOpen) {
@@ -143,7 +138,7 @@ fun TimetableDrawer(
 					onClick = {
 						scope.launch {
 							drawerState.close()
-							onElementPicked(viewModel.personalElement)
+							onElementPicked(null)
 						}
 					},
 					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -226,7 +221,7 @@ fun TimetableDrawer(
 				DrawerItems(
 					isMessengerAvailable = false,//todo state.isMessengerAvailable(),
 					disableTypeSelection = viewModel.personalTimetableDisplayed || isBookmarkSelected,
-					displayedElement = currentElement,
+					displayedElement = displayedElement,
 					onTimetableClick = { item ->
 						scope.launch {
 							drawerState.close()

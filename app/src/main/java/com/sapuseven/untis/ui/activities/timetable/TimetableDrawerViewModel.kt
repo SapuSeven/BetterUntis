@@ -22,10 +22,9 @@ class TimetableDrawerViewModel @Inject constructor(
 	private val navigator: AppNavigator,
 ) : ViewModel() {
 	var displayedElement by mutableStateOf<PeriodElement?>(null)
-	var personalElement by mutableStateOf<PeriodElement?>(null)
 
 	val personalTimetableDisplayed
-		get() = personalElement != null && displayedElement == personalElement
+		get() = displayedElement == null
 
 	var enableDrawerGestures: Boolean = true
 		private set

@@ -50,7 +50,13 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -81,6 +87,8 @@ class TimetableViewModel @AssistedInject constructor(
 
 	val args = savedStateHandle.toRoute<AppRoutes.Timetable>()
 
+	val requestedElement = args.getElement()
+
 	private val _currentUserSettings = MutableStateFlow<UserSettings>(userSettingsRepository.getSettingsDefaults())
 	val currentUserSettings: StateFlow<UserSettings> = _currentUserSettings
 
@@ -96,18 +104,12 @@ class TimetableViewModel @AssistedInject constructor(
 	val debugColor: StateFlow<Int> = _debugColor
 
 	private val _personalElement = MutableStateFlow<PeriodElement?>(null)
-	val personalElement: StateFlow<PeriodElement?> = _personalElement
 
 	private val _needsPersonalTimetable = MutableStateFlow(false)
 	val needsPersonalTimetable: StateFlow<Boolean> = _needsPersonalTimetable
 
 	private val _hourList = MutableStateFlow<List<WeekViewHour>>(emptyList())
 	val hourList: StateFlow<List<WeekViewHour>> = _hourList
-
-	private val _currentElement = MutableStateFlow<PeriodElement?>(currentUser.userData.elemType?.let {
-		PeriodElement(it, currentUser.userData.elemId)
-	})
-	val currentElement: StateFlow<PeriodElement?> = _currentElement
 
 	private val _events = MutableStateFlow<Map<LocalDate, List<Event<PeriodItem>>>>(emptyMap())
 	val events: StateFlow<Map<LocalDate, List<Event<PeriodItem>>>> = _events
@@ -136,7 +138,7 @@ class TimetableViewModel @AssistedInject constructor(
 				decodeStoredTimetableValue(userSettings.timetablePersonalTimetable)?.let {
 					_personalElement.value = it
 					_needsPersonalTimetable.emit(false)
-					_currentElement.emit(it)
+					//_currentElement.update { prev -> prev ?: it } // Update only if null
 				} ?: run {
 					_personalElement.value = currentUser.userData.elemType?.let {
 						PeriodElement(it, currentUser.userData.elemId)
@@ -225,7 +227,12 @@ class TimetableViewModel @AssistedInject constructor(
 	}
 
 	private suspend fun loadEvents(startDate: LocalDate, fromCache: FromCache): Flow<CachedSourceResult<List<Period>>> {
-		return currentElement.value?.let {
+		// Load the requested element (nav args) or the personal element
+		val elementToLoad = requestedElement ?: _personalElement
+			.combine(_needsPersonalTimetable) { element, _ -> element } // Emit a value if _personalElement or _needsPersonalTimetable changes
+			.first { it != null || _needsPersonalTimetable.value } // Take the first non-null _personalElement or null if _needsPersonalTimetable
+
+		return elementToLoad?.let {
 			timetableRepository.timetableSource().getRaw(
 				params = TimetableRepository.TimetableParams(
 					elementId = it.id,
@@ -289,16 +296,12 @@ class TimetableViewModel @AssistedInject constructor(
 		feedbackDialog = true
 	}
 
-	fun getTitle(context: Context) = _currentElement.value?.let {
+	fun getTitle(context: Context) = requestedElement?.let {
 		if (it == _personalElement.value) null // Use Profile name for personal timetable
 		else elementRepository.getLongName(it)
 	} ?: currentUser.getDisplayedName(context) + (if (BuildConfig.DEBUG) " (${currentUser.id})" else "")
 
 	fun showElement(element: PeriodElement?) {
-		_events.value = emptyMap()
-		_currentElement.value = element
-		viewModelScope.launch {
-			onPageChange()
-		}
+		navigator.navigate(AppRoutes.Timetable(element))
 	}
 }

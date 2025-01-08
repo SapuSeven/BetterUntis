@@ -133,7 +133,7 @@ fun FeedbackDialog(
 				}
 
 				Text(
-					text = "Please use this form to send feedback about the timetable display.",
+					text = "Please use this form to report any issues with the timetable display.",
 					modifier = Modifier
 						.padding(horizontal = 16.dp)
 				)

@@ -183,7 +183,7 @@ class MainActivity : ComponentActivity() {
 						is UserState.User -> {
 							AppNavHost(
 								navigator = appNavigator,
-								startDestination = AppRoutes.Timetable
+								startDestination = AppRoutes.Timetable()
 							)
 
 							// Re-create the view when the user changes
@@ -191,7 +191,7 @@ class MainActivity : ComponentActivity() {
 								snapshotFlow { userState }
 									.drop(1)
 									.collect {
-										appNavigator.navigate(AppRoutes.Timetable) {
+										appNavigator.navigate(AppRoutes.Timetable()) {
 											popUpTo(0) // Clear backstack
 										}
 									}

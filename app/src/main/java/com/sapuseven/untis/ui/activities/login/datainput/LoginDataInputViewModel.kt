@@ -195,7 +195,7 @@ class LoginDataInputViewModel @Inject constructor(
 			withContext(Dispatchers.IO) {
 				val userId = saveUser(user, userData.masterData)
 				userManager.switchUser(userId)
-				navigator.navigate(AppRoutes.Timetable) {
+				navigator.navigate(AppRoutes.Timetable()) {
 					popUpTo(0) // Pop all previous routes
 				}
 			}

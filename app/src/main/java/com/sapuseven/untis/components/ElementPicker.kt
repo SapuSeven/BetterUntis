@@ -89,6 +89,7 @@ class ElementPicker(
 	}
 
 	fun isAllowed(id: Long, type: ElementType?): Boolean {
+		return true
 		return when (type) {
 			ElementType.CLASS -> _allClasses.value?.get(id)?.displayable
 			ElementType.TEACHER -> _allTeachers.value?.get(id)?.displayAllowed

@@ -16,17 +16,20 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.ui.activities.login.Login
 import com.sapuseven.untis.ui.activities.login.datainput.LoginDataInput
 import com.sapuseven.untis.ui.activities.settings.SettingsNav
 import com.sapuseven.untis.ui.activities.splash.Splash
 import com.sapuseven.untis.ui.activities.timetable.Timetable
 import kotlinx.coroutines.flow.Flow
+import kotlin.reflect.typeOf
 
 @Composable
 fun AppNavHost(
@@ -116,6 +119,7 @@ fun AppNavHost(
 		) { LoginDataInput() }
 
 		composable<AppRoutes.Timetable>(
+			typeMap = mapOf(typeOf<ElementType>() to NavType.EnumType(ElementType::class.java)),
 			enterTransition = {
 				fadeIn(animationSpec = tween(500))
 			},

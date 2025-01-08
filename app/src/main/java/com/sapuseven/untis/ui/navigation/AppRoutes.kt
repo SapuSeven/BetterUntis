@@ -1,6 +1,8 @@
 package com.sapuseven.untis.ui.navigation
 
 import androidx.annotation.StringRes
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import kotlinx.serialization.Serializable
 
 object AppRoutes {
@@ -8,7 +10,19 @@ object AppRoutes {
 	data object Splash
 
 	@Serializable
-	data object Timetable
+	data class Timetable(
+		val type: ElementType? = null,
+		val id: Long? = null,
+	) {
+		constructor(element: PeriodElement?) : this(element?.type, element?.id)
+
+		fun getElement(): PeriodElement? {
+			return PeriodElement(
+				type ?: return null,
+				id ?: return null
+			)
+		}
+	}
 
 	@Serializable
 	data object Login
