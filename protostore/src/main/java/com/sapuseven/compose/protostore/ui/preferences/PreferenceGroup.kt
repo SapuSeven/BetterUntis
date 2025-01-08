@@ -3,6 +3,7 @@ package com.sapuseven.compose.protostore.ui.preferences
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,8 +24,8 @@ fun PreferenceGroup(
 	Column {
 		children()
 	}
-	Divider(
-		color = MaterialTheme.colorScheme.outlineVariant,
-		modifier = Modifier.padding(vertical = 8.dp)
+	HorizontalDivider(
+		modifier = Modifier.padding(vertical = 8.dp),
+		color = MaterialTheme.colorScheme.outlineVariant
 	)
 }
