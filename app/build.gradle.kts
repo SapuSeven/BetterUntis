@@ -18,9 +18,6 @@ plugins {
 	alias(libs.plugins.protobuf)
 }
 
-val composeCompilerVersion: String by project
-
-
 // Auto-generates a new version code every minute
 fun generateVersionCode(): Int {
 	return (Date().time / 1000 / 60).toInt()
@@ -120,7 +117,7 @@ android {
 	}
 
 	composeOptions {
-		kotlinCompilerExtensionVersion = composeCompilerVersion
+		kotlinCompilerExtensionVersion = libs.versions.kotlin.compiler.get()
 	}
 
 	lint {
@@ -224,8 +221,8 @@ dependencies {
 	implementation(libs.sentry.android)
 	implementation(libs.sentry.compose.android)
 	implementation(libs.xzing)
-	implementation("com.google.protobuf:protobuf-javalite:4.28.0")
-	implementation("androidx.transition:transition-ktx:1.5.0-alpha06")
+	implementation(libs.protobuf.javalite)
+	implementation(libs.androidx.transition.ktx)
 	implementation(libs.andrew0000.cache)
 
     gmsImplementation(libs.gms.code.scanner)

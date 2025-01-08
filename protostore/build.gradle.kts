@@ -29,7 +29,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.10"
+        kotlinCompilerExtensionVersion = libs.versions.kotlin.compiler.get()
     }
 
     compileOptions {
@@ -42,7 +42,7 @@ android {
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.13.1")
+    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
@@ -52,7 +52,7 @@ dependencies {
 
     // DataStore and Protobuf
     implementation(libs.androidx.datastore)
-    implementation("com.google.protobuf:protobuf-javalite:4.28.0")
+    implementation(libs.protobuf.javalite)
 
     // Utils
     implementation(libs.colormath)
@@ -60,5 +60,5 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test)
     androidTestImplementation(libs.androidx.junit.ktx)
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation(libs.androidx.espresso.core)
 }
