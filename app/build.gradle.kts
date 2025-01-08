@@ -9,6 +9,7 @@ plugins {
 	alias(libs.plugins.agp.application)
 	alias(libs.plugins.sentry.gradle)
 	alias(libs.plugins.kotlin.android)
+	alias(libs.plugins.kotlin.compose)
 	alias(libs.plugins.kotlin.serialization)
 	alias(libs.plugins.mikepenz.aboutlibraries)
 	alias(libs.plugins.ksp)
@@ -114,10 +115,6 @@ android {
 
 	packaging {
 		resources.excludes.add("META-INF/gradle/incremental.annotation.processors")
-	}
-
-	composeOptions {
-		kotlinCompilerExtensionVersion = libs.versions.kotlin.compiler.get()
 	}
 
 	lint {
