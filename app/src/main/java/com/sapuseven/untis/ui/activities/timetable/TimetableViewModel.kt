@@ -51,12 +51,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -190,7 +186,7 @@ class TimetableViewModel @AssistedInject constructor(
 					val startDate = startDateForPageIndex(targetPage.toLong())
 					loadEvents(
 						startDate,
-						// TODO: Right now this is a workaround to show the "last refresh" text when changing pages,
+						// Note: Right now this is a workaround to show the "last refresh" text when changing pages,
 						//  since it isn't stored after emitting the events.
 						//  For that reason the cache is queried more often than necessary.
 						if (_events.value.contains(startDate)) FromCache.ONLY else FromCache.CACHED_THEN_LOAD

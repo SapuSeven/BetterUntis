@@ -1,5 +1,6 @@
 package com.sapuseven.untis.mappers
 
+import android.util.Log
 import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp

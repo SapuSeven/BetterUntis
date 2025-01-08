@@ -18,7 +18,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.measureTime
 
-@Singleton
 class ElementRepository @Inject constructor(
 	private val userDao: UserDao,
 	private val userScopeManager: UserScopeManager,
