@@ -19,9 +19,11 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -71,6 +73,7 @@ val materialColors = arrayOf(
 	Color(0xFF9E9E9E), // GREY 500
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ColorPreference(
 	title: (@Composable () -> Unit),
@@ -97,12 +100,12 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ColorPreference(
 		trailingContent = { currentValue, enabled ->
 			Box(
 				modifier = Modifier
-					.disabled(!enabled)
-					.size(24.dp)
-					.clip(CircleShape)
-					.background(MaterialTheme.colorScheme.surface)
-					.background(Color(currentValue))
-					.border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
+                    .disabled(!enabled)
+                    .size(24.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .background(Color(currentValue))
+                    .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
 			)
 		},
 		settingsRepository = settingsRepository,
@@ -172,12 +175,12 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ColorPreference(
 								Row(
 									verticalAlignment = Alignment.CenterVertically,
 									modifier = Modifier
-										.fillMaxWidth()
-										.clip(RoundedCornerShape(50))
-										.clickable {
-											selectedPreset = -1
-											dialogValue = defaultColor.toArgb()
-										}
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(50))
+                                        .clickable {
+                                            selectedPreset = -1
+                                            dialogValue = defaultColor.toArgb()
+                                        }
 								) {
 									ColorBox(
 										color = defaultColor,
@@ -202,6 +205,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ColorPreference(
 									onValueChange = {
 										dialogValue = color.copy(alpha = it).toArgb()
 									},
+									track = { SliderDefaults.Track(sliderState = it, drawStopIndicator = null) },
 									modifier = Modifier.fillMaxWidth()
 								)
 							}
@@ -256,25 +260,25 @@ fun ColorBox(
 ) {
 	Box(
 		modifier = Modifier
-			.requiredSize(56.dp)
-			.padding(4.dp)
-			.clip(CircleShape)
-			.background(MaterialTheme.colorScheme.surface)
-			.background(color)
-			.border(
-				1.dp,
-				MaterialTheme.colorScheme.outline,
-				shape = CircleShape
-			)
-			.padding(1.dp)
-			.border(
-				1.dp,
-				color.copy(alpha = 1f),
-				shape = CircleShape
-			)
-			.clickable {
-				onSelect(color)
-			},
+            .requiredSize(56.dp)
+            .padding(4.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.surface)
+            .background(color)
+            .border(
+                1.dp,
+                MaterialTheme.colorScheme.outline,
+                shape = CircleShape
+            )
+            .padding(1.dp)
+            .border(
+                1.dp,
+                color.copy(alpha = 1f),
+                shape = CircleShape
+            )
+            .clickable {
+                onSelect(color)
+            },
 		contentAlignment = Alignment.Center
 	) {
 		if (selected)

@@ -26,9 +26,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 /**
@@ -39,6 +42,7 @@ import androidx.compose.ui.unit.dp
  * @param alphaChannel whether or not to show the alpha channel when picking a color.
  * @param initialColor the initial color to set on the picker.
  * @param onColorChanged callback that is triggered when the color changes.
+ * @param showPreviewText whether or not to show a preview text in the color preview box.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,7 +50,8 @@ fun ColorPicker(
 	modifier: Modifier = Modifier,
 	alphaChannel: Boolean = true,
 	initialColor: Color,
-	onColorChanged: (Color) -> Unit
+	onColorChanged: (Color) -> Unit,
+	showPreviewText: Boolean = true
 ) {
 	var color by remember { mutableStateOf(HsvColor.from(initialColor)) }
 	var colorHex by remember { mutableStateOf('#' + initialColor.toArgb().toColorHex(alphaChannel)) }
@@ -112,16 +117,25 @@ fun ColorPicker(
 			verticalAlignment = Alignment.CenterVertically,
 			modifier = Modifier.padding(top = 16.dp)
 		) {
+			val previewColor = color.toColor().compositeOver(MaterialTheme.colorScheme.surface)
 			Box(
 				modifier = Modifier
                     .padding(end = 16.dp)
                     .weight(1f)
                     .height(56.dp)
                     .clip(RoundedCornerShape(4.dp))
-                    .background(MaterialTheme.colorScheme.surface)
-                    .background(color.toColor())
+                    .background(previewColor)
                     .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(4.dp))
-			)
+			) {
+				if (showPreviewText)
+				Text(
+					text = "Preview",
+					style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+					color = if (previewColor.luminance() < 0.5) Color.White else Color.Black,
+					modifier = Modifier
+						.align(Alignment.Center)
+				)
+			}
 
 			TextField(
 				modifier = Modifier.width(128.dp),
