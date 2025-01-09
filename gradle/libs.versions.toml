@@ -46,6 +46,7 @@ mockito = "4.6.1"
 mockk = "1.13.4"
 openapi = "7.0.1"
 protobuf-javalite = "4.28.0"
+protostore = "0.1.0"
 sentry = "6.33.1"
 sentry-gradle = "3.4.2"
 transition-ktx = "1.5.1"
@@ -121,6 +122,7 @@ mikepenz-aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", ve
 mock = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobuf-javalite" }
+sapuseven-protostore = { module = "com.sapuseven.compose:protostore", version.ref = "protostore" }
 sentry-android = { module = "io.sentry:sentry-android", version.ref = "sentry" }
 sentry-compose-android = { module = "io.sentry:sentry-compose-android", version.ref = "sentry" }
 xzing = { module = "com.journeyapps:zxing-android-embedded", version.ref = "journeyapps-xzing" }

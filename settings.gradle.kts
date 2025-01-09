@@ -19,4 +19,3 @@ dependencyResolutionManagement {
 include(":app")
 include(":material-color-utils")
 include(":api")
-include(":protostore")

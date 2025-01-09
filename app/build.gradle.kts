@@ -222,6 +222,7 @@ dependencies {
 	implementation(libs.protobuf.javalite)
 	implementation(libs.androidx.transition.ktx)
 	implementation(libs.andrew0000.cache)
+	implementation(libs.sapuseven.protostore)
 
     gmsImplementation(libs.gms.code.scanner)
 
@@ -248,5 +249,4 @@ dependencies {
 
 	implementation(project(":api"))
 	implementation(project(":material-color-utils"))
-	implementation(project(":protostore"))
 }
