@@ -30,9 +30,11 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.sapuseven.compose.protostore.R
 
 /**
  * Classic Color Picker Component that shows a HSV representation of a color, with a Hue Bar on the right,
@@ -120,16 +122,16 @@ fun ColorPicker(
 			val previewColor = color.toColor().compositeOver(MaterialTheme.colorScheme.surface)
 			Box(
 				modifier = Modifier
-                    .padding(end = 16.dp)
-                    .weight(1f)
-                    .height(56.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(previewColor)
-                    .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(4.dp))
+					.padding(end = 16.dp)
+					.weight(1f)
+					.height(56.dp)
+					.clip(RoundedCornerShape(4.dp))
+					.background(previewColor)
+					.border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(4.dp))
 			) {
 				if (showPreviewText)
 				Text(
-					text = "Preview",
+					text = stringResource(R.string.colorpicker_preview),
 					style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
 					color = if (previewColor.luminance() < 0.5) Color.White else Color.Black,
 					modifier = Modifier
@@ -149,7 +151,7 @@ fun ColorPicker(
 						}
 					}
 				},
-				label = { Text(if (alphaChannel) "ARGB Hex" else "RGB Hex") }, // TODO: Localize
+				label = { Text(stringResource(if (alphaChannel) R.string.colorpicker_code_argb else R.string.colorpicker_code_rgb)) },
 				singleLine = true,
 				textStyle = LocalTextStyle.current.copy(
 					fontFamily = FontFamily.Monospace

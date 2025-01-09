@@ -7,4 +7,7 @@
 	<string name="preference_week_custom_range_summary_short">%1$s</string>
 	<string name="preference_range_from">from</string>
 	<string name="preference_range_to">to</string>
+	<string name="colorpicker_code_argb">ARGB Hex</string>
+	<string name="colorpicker_code_rgb">RGB Hex</string>
+	<string name="colorpicker_preview">Preview</string>
 </resources>
