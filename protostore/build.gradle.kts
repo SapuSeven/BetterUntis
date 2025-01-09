@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.sapuseven.compose.protostore"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 21
@@ -53,6 +53,7 @@ dependencies {
 
     // Utils
     implementation(libs.colormath)
+    implementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test)

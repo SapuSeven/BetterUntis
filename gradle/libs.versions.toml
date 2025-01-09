@@ -50,6 +50,7 @@ sentry = "6.33.1"
 sentry-gradle = "3.4.2"
 transition-ktx = "1.5.1"
 universal-cache = "1.1.7"
+ui-tooling-preview-android = "1.7.6"
 
 
 [libraries]
@@ -123,6 +124,7 @@ protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.
 sentry-android = { module = "io.sentry:sentry-android", version.ref = "sentry" }
 sentry-compose-android = { module = "io.sentry:sentry-compose-android", version.ref = "sentry" }
 xzing = { module = "com.journeyapps:zxing-android-embedded", version.ref = "journeyapps-xzing" }
+androidx-ui-tooling-preview-android = { group = "androidx.compose.ui", name = "ui-tooling-preview-android", version.ref = "ui-tooling-preview-android" }
 
 [plugins]
 # Main

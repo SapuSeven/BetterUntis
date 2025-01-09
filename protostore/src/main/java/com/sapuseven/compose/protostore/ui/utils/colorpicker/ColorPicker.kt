@@ -9,8 +9,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 
@@ -45,11 +48,11 @@ fun ColorPicker(
 		Row(
 			modifier = Modifier.weight(1f)
 		) {
-			val barThickness = 32.dp
 			val paddingBetweenBars = 8.dp
 			Column(modifier = Modifier.weight(0.8f)) {
 				SaturationValueArea(
-					modifier = Modifier.weight(0.8f),
+					modifier = Modifier.weight(1f),
+					cornerRadius = CornerRadius(with(LocalDensity.current) { 4.dp.toPx() }),
 					currentColor = color,
 					onSaturationValueChanged = { saturation, value ->
 						onColorChanged(color.copy(saturation = saturation, value = value))
@@ -57,22 +60,30 @@ fun ColorPicker(
 				)
 				if (showAlphaBar) {
 					Spacer(modifier = Modifier.height(paddingBetweenBars))
-					AlphaBar(
-						modifier = Modifier.height(barThickness),
-						currentColor = color,
-						onAlphaChanged = { alpha ->
-							onColorChanged(color.copy(alpha = alpha))
-						}
+					HorizontalGradientSlider(
+						brush = Brush.linearGradient(listOf(color.copy(alpha = 1f).toColor(), color.copy(alpha = 0f).toColor())),
+						value = 1 - color.alpha,
+						onValueChanged = { onColorChanged(color.copy(alpha = 1 - it)) },
+						thumbColor = color.copy(alpha = 1f).toColor(),
 					)
 				}
 			}
 			Spacer(modifier = Modifier.width(paddingBetweenBars))
-			HueBar(
-				modifier = Modifier.width(barThickness),
-				currentColor = color,
-				onHueChanged = { newHue ->
-					onColorChanged(color.copy(hue = newHue))
-				}
+
+			VerticalGradientSlider(
+				brush = Brush.linearGradient(listOf(
+					Color.Red,
+					Color.Yellow,
+					Color.Green,
+					Color.Cyan,
+					Color.Blue,
+					Color.Magenta,
+					Color.Red
+				)),
+				value = color.hue,
+				onValueChanged = { onColorChanged(color.copy(hue = it)) },
+				valueRange = 0f..360f,
+				thumbColor = color.copy(alpha = 1f, saturation = 1f, value = 1f).toColor(),
 			)
 		}
 
