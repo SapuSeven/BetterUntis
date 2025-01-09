@@ -2,10 +2,24 @@ package com.sapuseven.compose.protostore.ui.utils.colorpicker
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,7 +36,7 @@ import androidx.compose.ui.unit.dp
  * Alpha Bar on the bottom and the rest of the area covered with an area with saturation value touch area.
  *
  * @param modifier modifiers to set to this color picker.
- * @param showAlphaBar whether or not to show the bottom alpha bar on the color picker.
+ * @param alphaChannel whether or not to show the alpha channel when picking a color.
  * @param initialColor the initial color to set on the picker.
  * @param onColorChanged callback that is triggered when the color changes.
  */
@@ -30,17 +44,17 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ColorPicker(
 	modifier: Modifier = Modifier,
-	showAlphaBar: Boolean = true,
+	alphaChannel: Boolean = true,
 	initialColor: Color,
 	onColorChanged: (Color) -> Unit
 ) {
 	var color by remember { mutableStateOf(HsvColor.from(initialColor)) }
-	var colorHex by remember { mutableStateOf('#' + initialColor.toArgb().toColorHex()) }
+	var colorHex by remember { mutableStateOf('#' + initialColor.toArgb().toColorHex(alphaChannel)) }
 
 	fun onColorChanged(newColor: HsvColor, updateColorHex: Boolean = true) {
 		color = newColor
 		if (updateColorHex)
-			colorHex = '#' + newColor.toColor().toArgb().toColorHex()
+			colorHex = '#' + newColor.toColor().toArgb().toColorHex(alphaChannel)
 		onColorChanged(newColor.toColor())
 	}
 
@@ -58,10 +72,15 @@ fun ColorPicker(
 						onColorChanged(color.copy(saturation = saturation, value = value))
 					}
 				)
-				if (showAlphaBar) {
+				if (alphaChannel) {
 					Spacer(modifier = Modifier.height(paddingBetweenBars))
 					HorizontalGradientSlider(
-						brush = Brush.linearGradient(listOf(color.copy(alpha = 1f).toColor(), color.copy(alpha = 0f).toColor())),
+						brush = Brush.linearGradient(
+							listOf(
+								color.copy(alpha = 1f).toColor(),
+								color.copy(alpha = 0f).toColor()
+							)
+						),
 						value = 1 - color.alpha,
 						onValueChanged = { onColorChanged(color.copy(alpha = 1 - it)) },
 						thumbColor = color.copy(alpha = 1f).toColor(),
@@ -71,15 +90,17 @@ fun ColorPicker(
 			Spacer(modifier = Modifier.width(paddingBetweenBars))
 
 			VerticalGradientSlider(
-				brush = Brush.linearGradient(listOf(
-					Color.Red,
-					Color.Yellow,
-					Color.Green,
-					Color.Cyan,
-					Color.Blue,
-					Color.Magenta,
-					Color.Red
-				)),
+				brush = Brush.linearGradient(
+					listOf(
+						Color.Red,
+						Color.Yellow,
+						Color.Green,
+						Color.Cyan,
+						Color.Blue,
+						Color.Magenta,
+						Color.Red
+					)
+				),
 				value = color.hue,
 				onValueChanged = { onColorChanged(color.copy(hue = it)) },
 				valueRange = 0f..360f,
@@ -91,28 +112,30 @@ fun ColorPicker(
 			verticalAlignment = Alignment.CenterVertically,
 			modifier = Modifier.padding(top = 16.dp)
 		) {
-			Box(modifier = Modifier
-				.padding(end = 16.dp)
-				.weight(1f)
-				.height(56.dp)
-				.clip(RoundedCornerShape(4.dp))
-				.background(MaterialTheme.colorScheme.surface)
-				.background(color.toColor())
-				.border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(4.dp))
+			Box(
+				modifier = Modifier
+                    .padding(end = 16.dp)
+                    .weight(1f)
+                    .height(56.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(MaterialTheme.colorScheme.surface)
+                    .background(color.toColor())
+                    .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(4.dp))
 			)
 
 			TextField(
 				modifier = Modifier.width(128.dp),
 				value = colorHex,
 				onValueChange = { newColor ->
-					if (newColor.matches(Regex("^#[0-9a-fA-F]{0,8}$"))) {
+					val regex = Regex(if (alphaChannel) "^#[0-9a-fA-F]{0,8}$" else "^#[0-9a-fA-F]{0,6}$")
+					if (newColor.matches(regex)) {
 						colorHex = newColor
-						newColor.replace("#", "").toUIntOrNull(16)?.let {
+						newColor.drop(1).toUIntOrNull(16)?.let {
 							onColorChanged(HsvColor.from(Color(it.toInt())), false)
 						}
 					}
 				},
-				label = { Text("ARGB Hex") }, // TODO: Localize
+				label = { Text(if (alphaChannel) "ARGB Hex" else "RGB Hex") }, // TODO: Localize
 				singleLine = true,
 				textStyle = LocalTextStyle.current.copy(
 					fontFamily = FontFamily.Monospace
@@ -122,4 +145,6 @@ fun ColorPicker(
 	}
 }
 
-private fun Int.toColorHex(): String = this.toUInt().toString(16).padStart(8, '0')
+private fun Int.toColorHex(alphaChannel: Boolean): String = toUInt().toString(16).let {
+    if (alphaChannel) it.padStart(8, '0') else it.takeLast(6).padStart(6, '0')
+}

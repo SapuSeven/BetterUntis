@@ -141,7 +141,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ColorPreference(
 						selectedPreset = -1
 						ColorPicker(
 							modifier = Modifier.height(320.dp),
-							showAlphaBar = showAlphaSlider,
+							alphaChannel = showAlphaSlider,
 							initialColor = color,
 							onColorChanged = { newColor ->
 								dialogValue = newColor.toArgb()
