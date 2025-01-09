@@ -1,6 +1,5 @@
 package com.sapuseven.untis.mappers
 
-import android.util.Log
 import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
@@ -12,7 +11,7 @@ import com.sapuseven.untis.api.model.untis.timetable.Period
 import com.sapuseven.untis.data.repository.ElementRepository
 import com.sapuseven.untis.models.PeriodItem
 import com.sapuseven.untis.scope.UserScopeManager
-import com.sapuseven.untis.ui.activities.settings.UserSettingsRepository
+import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
 import com.sapuseven.untis.ui.weekview.Event
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory

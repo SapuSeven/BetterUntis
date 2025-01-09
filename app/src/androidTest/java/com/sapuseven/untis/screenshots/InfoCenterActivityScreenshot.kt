@@ -15,10 +15,10 @@ import com.sapuseven.untis.mocks.userMock
 import com.sapuseven.untis.models.untis.UntisMasterData
 import com.sapuseven.untis.api.model.untis.masterdata.Room
 import com.sapuseven.untis.preferences.dataStorePreferences
-import com.sapuseven.untis.ui.activities.EventListItem
-import com.sapuseven.untis.ui.activities.InfoCenter
-import com.sapuseven.untis.ui.activities.InfoCenterState
-import com.sapuseven.untis.ui.activities.rememberInfoCenterState
+import com.sapuseven.untis.ui.pages.EventListItem
+import com.sapuseven.untis.ui.pages.InfoCenter
+import com.sapuseven.untis.ui.pages.InfoCenterState
+import com.sapuseven.untis.ui.pages.rememberInfoCenterState
 import com.sapuseven.untis.utils.WithScreenshot
 import com.sapuseven.untis.utils.preferenceWithTheme
 import com.sapuseven.untis.utils.takeScreenshot

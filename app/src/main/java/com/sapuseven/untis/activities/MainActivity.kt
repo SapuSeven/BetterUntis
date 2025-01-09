@@ -61,7 +61,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.google.android.material.color.MaterialColors
 import com.sapuseven.compose.protostore.ui.preferences.convertRangeToPair
 import com.sapuseven.compose.protostore.ui.preferences.materialColors
 import com.sapuseven.untis.R
@@ -79,7 +78,7 @@ import com.sapuseven.untis.models.TimetableBookmark
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.preferences.dataStorePreferences
 import com.sapuseven.untis.scope.UserScopeManager
-import com.sapuseven.untis.ui.activities.settings.UserSettingsRepository
+import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.Weekday

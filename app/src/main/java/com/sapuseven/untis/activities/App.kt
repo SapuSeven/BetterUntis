@@ -1,17 +1,14 @@
 package com.sapuseven.untis.activities
 
 import android.app.Application
-import android.content.Context
 import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.work.Configuration
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.sapuseven.untis.helpers.analytics.initSentry
-import com.sapuseven.untis.ui.activities.settings.GlobalSettingsRepository
+import com.sapuseven.untis.ui.pages.settings.GlobalSettingsRepository
 import com.sapuseven.untis.workers.DailyWorker
 import com.sapuseven.untis.workers.DailyWorker.Companion.TAG_DAILY_WORK
 import dagger.hilt.android.HiltAndroidApp

@@ -23,11 +23,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
-import com.sapuseven.untis.ui.activities.login.Login
-import com.sapuseven.untis.ui.activities.login.datainput.LoginDataInput
-import com.sapuseven.untis.ui.activities.settings.SettingsNav
-import com.sapuseven.untis.ui.activities.splash.Splash
-import com.sapuseven.untis.ui.activities.timetable.Timetable
+import com.sapuseven.untis.ui.pages.login.Login
+import com.sapuseven.untis.ui.pages.login.datainput.LoginDataInput
+import com.sapuseven.untis.ui.pages.settings.SettingsNav
+import com.sapuseven.untis.ui.pages.splash.Splash
+import com.sapuseven.untis.ui.pages.timetable.Timetable
 import kotlinx.coroutines.flow.Flow
 import kotlin.reflect.typeOf
 

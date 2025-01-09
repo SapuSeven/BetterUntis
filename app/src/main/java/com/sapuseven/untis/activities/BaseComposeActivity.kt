@@ -55,8 +55,8 @@ import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.helpers.config.globalDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.preferences.dataStorePreferences
-import com.sapuseven.untis.ui.activities.ActivityEvents
-import com.sapuseven.untis.ui.activities.ActivityViewModel
+import com.sapuseven.untis.ui.pages.ActivityEvents
+import com.sapuseven.untis.ui.pages.ActivityViewModel
 import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.material.scheme.Scheme

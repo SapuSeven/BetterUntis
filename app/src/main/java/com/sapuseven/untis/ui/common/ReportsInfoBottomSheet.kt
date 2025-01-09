@@ -7,20 +7,14 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
 import com.sapuseven.compose.protostore.ui.preferences.SwitchPreference
 import com.sapuseven.untis.R
-import com.sapuseven.untis.preferences.UntisPreferenceDataStore
-import com.sapuseven.untis.ui.activities.settings.GlobalSettingsRepository
+import com.sapuseven.untis.ui.pages.settings.GlobalSettingsRepository
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 

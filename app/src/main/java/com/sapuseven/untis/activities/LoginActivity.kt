@@ -3,7 +3,7 @@ package com.sapuseven.untis.activities
 import android.os.Bundle
 import androidx.activity.viewModels
 import com.sapuseven.untis.services.CodeScanServiceImpl
-import com.sapuseven.untis.ui.activities.login.LoginViewModel
+import com.sapuseven.untis.ui.pages.login.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
