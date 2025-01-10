@@ -64,8 +64,6 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.compose.protostore.ui.preferences.convertRangeToPair
 import com.sapuseven.compose.protostore.ui.preferences.materialColors
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_HIGHLIGHT
-import com.sapuseven.untis.activities.SettingsActivity.Companion.EXTRA_STRING_PREFERENCE_ROUTE
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.components.UserManager
 import com.sapuseven.untis.components.UserState
@@ -464,7 +462,6 @@ class MainDrawerState(
 		Breadcrumb().apply {
 			category = "ui.drawer.click"
 			level = SentryLevel.INFO
-			setData("id", item.id)
 			setData("label", item.label)
 			Sentry.addBreadcrumb(this)
 		}
@@ -585,12 +582,7 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 	fun editUser(
 		user: User?, loginLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
 	) {
-		loginLauncher.launch(Intent(contextActivity,
-			user?.let { LoginDataInputActivity::class.java } ?: LoginActivity::class.java).apply {
-			user?.id?.let { contextActivity.putUserIdExtra(this, it) }
-			contextActivity.putBackgroundColorExtra(this)
-			putExtra(LoginActivity.EXTRA_BOOLEAN_SHOW_BACK_BUTTON, true)
-		})
+
 	}
 
 	fun deleteUser(
@@ -755,18 +747,6 @@ class NewMainAppState @OptIn(ExperimentalMaterial3Api::class) constructor(
 
 	// Event listeners
 	val onAnonymousSettingsClick: () -> Unit = {
-		contextActivity.startActivity(Intent(
-			contextActivity, SettingsActivity::class.java
-		).apply {
-			contextActivity.putUserIdExtra(this, user.id)
-			putExtra(
-				EXTRA_STRING_PREFERENCE_ROUTE, "preferences_timetable"
-			)
-			putExtra(
-				EXTRA_STRING_PREFERENCE_HIGHLIGHT, "preference_timetable_personal_timetable"
-			)
-			contextActivity.putBackgroundColorExtra(this)
-		})
 	}
 
 	data class WeekViewPreferences(

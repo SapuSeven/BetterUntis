@@ -36,6 +36,24 @@ object AppRoutes {
 	)
 
 	@Serializable
+	data object InfoCenter {
+		@Serializable
+		data object Messages
+
+		@Serializable
+		data object Events
+
+		@Serializable
+		data object Absences
+
+		@Serializable
+		data object OfficeHours
+	}
+
+	@Serializable
+	data object RoomFinder
+
+	@Serializable
 	data object Settings {
 
 		@Serializable

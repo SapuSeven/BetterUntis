@@ -1,44 +1,68 @@
 package com.sapuseven.untis.ui.pages.infocenter
 
 import androidx.activity.compose.BackHandler
-import androidx.annotation.StringRes
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.sapuseven.untis.R
 import com.sapuseven.untis.preferences.DataStorePreferences
+import com.sapuseven.untis.ui.common.AppScaffold
+import com.sapuseven.untis.ui.common.NavigationBarInset
 import com.sapuseven.untis.ui.common.VerticalScrollColumn
+import com.sapuseven.untis.ui.navigation.AppRoutes
 import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InfoCenter(state: InfoCenterState) {
-	/*AppScaffold(
+fun InfoCenter(
+	bottomNavController: NavHostController = rememberNavController(),
+	viewModel: InfoCenterViewModel = hiltViewModel()
+) {
+	AppScaffold(
 		topBar = {
 			CenterAlignedTopAppBar(
 				title = {
 					Text(stringResource(id = R.string.activity_title_info_center))
 				},
 				navigationIcon = {
-					IconButton(onClick = { state.onBackClick() }) {
+					IconButton(onClick = { viewModel.goBack() }) {
 						Icon(
-							imageVector = Icons.Outlined.ArrowBack,
+							imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
 							contentDescription = stringResource(id = R.string.all_back)
 						)
 					}
 				},
 				actions = {
-					if (state.selectedItem.value == ID_ABSENCES) {
+					/*if (viewModel.selectedItem.value == ID_ABSENCES) {
 						IconButton(
 							onClick = {
 								state.showAbsenceFilter.value = true
@@ -46,7 +70,7 @@ fun InfoCenter(state: InfoCenterState) {
 						) {
 							Icon(painter = painterResource(id = R.drawable.all_filter), contentDescription = null)
 						}
-					}
+					}*/
 				}
 			)
 		}
@@ -59,7 +83,7 @@ fun InfoCenter(state: InfoCenterState) {
 				.fillMaxSize()
 		) {
 			// Initially load all items
-			LaunchedEffect(Unit) {
+			/*LaunchedEffect(Unit) {
 				if (state.messages.value == null)
 					coroutineScope.launch {
 						state.loadMessages()/*?.also {
@@ -86,7 +110,7 @@ fun InfoCenter(state: InfoCenterState) {
 					coroutineScope.launch {
 						state.loadOfficeHours()
 					}
-			}
+			}*/
 
 			Box(
 				contentAlignment = Alignment.Center,
@@ -94,12 +118,26 @@ fun InfoCenter(state: InfoCenterState) {
 					.fillMaxWidth()
 					.weight(1f)
 			) {
-				when (state.selectedItem.value) {
-					ID_MESSAGES -> MessageList(state.messageList, state.messagesLoading.value)
-					ID_EVENTS -> EventList(state.eventList, state.eventsLoading.value)
-					ID_ABSENCES -> AbsenceList(state.absenceList, state.absencesLoading.value)
-					ID_OFFICEHOURS -> OfficeHourList(state.officeHourList, state.officeHoursLoading.value)
+				NavHost(
+					navController = bottomNavController,
+					startDestination = AppRoutes.InfoCenter.Messages
+				) {
+					InfoCenterNav(viewModel = viewModel)
 				}
+			}
+
+			val currentRoute by bottomNavController.currentBackStackEntryAsState()
+
+			fun <T : Any> isCurrentRoute(route: T) = currentRoute?.destination?.route == route::class.qualifiedName
+
+			fun <T : Any> navigate(route: T) = {
+				if (!isCurrentRoute(route))
+					bottomNavController.navigate(route) {
+						bottomNavController.graph.startDestinationRoute?.let { route ->
+							popUpTo(route)
+						}
+						launchSingleTop = true
+					}
 			}
 
 			NavigationBarInset {
@@ -111,8 +149,8 @@ fun InfoCenter(state: InfoCenterState) {
 						)
 					},
 					label = { Text(stringResource(id = R.string.menu_infocenter_messagesofday)) },
-					selected = state.isItemSelected(ID_MESSAGES),
-					onClick = state.onItemSelect(ID_MESSAGES)
+					selected = isCurrentRoute(AppRoutes.InfoCenter.Messages),
+					onClick = navigate(AppRoutes.InfoCenter.Messages)
 				)
 
 				NavigationBarItem(
@@ -123,11 +161,11 @@ fun InfoCenter(state: InfoCenterState) {
 						)
 					},
 					label = { Text(stringResource(id = R.string.menu_infocenter_events)) },
-					selected = state.isItemSelected(ID_EVENTS),
-					onClick = state.onItemSelect(ID_EVENTS)
+					selected = isCurrentRoute(AppRoutes.InfoCenter.Events),
+					onClick = navigate(AppRoutes.InfoCenter.Events)
 				)
 
-				if (state.shouldShowAbsences)
+				if (viewModel.shouldShowAbsences)
 					NavigationBarItem(
 						icon = {
 							Icon(
@@ -136,11 +174,11 @@ fun InfoCenter(state: InfoCenterState) {
 							)
 						},
 						label = { Text(stringResource(id = R.string.menu_infocenter_absences)) },
-						selected = state.isItemSelected(ID_ABSENCES),
-						onClick = state.onItemSelect(ID_ABSENCES)
+						selected = isCurrentRoute(AppRoutes.InfoCenter.Absences),
+						onClick = navigate(AppRoutes.InfoCenter.Absences)
 					)
 
-				if (state.shouldShowOfficeHours)
+				if (viewModel.shouldShowOfficeHours)
 					NavigationBarItem(
 						icon = {
 							Icon(
@@ -149,67 +187,29 @@ fun InfoCenter(state: InfoCenterState) {
 							)
 						},
 						label = { Text(stringResource(id = R.string.menu_infocenter_officehours)) },
-						selected = state.isItemSelected(ID_OFFICEHOURS),
-						onClick = state.onItemSelect(ID_OFFICEHOURS)
+						selected = isCurrentRoute(AppRoutes.InfoCenter.OfficeHours),
+						onClick = navigate(AppRoutes.InfoCenter.OfficeHours)
 					)
 			}
 		}
 	}
 
-	AnimatedVisibility(
-		visible = state.showAbsenceFilter.value,
+	/*AnimatedVisibility(
+		visible = viewModel.showAbsenceFilter.value,
 		enter = fullscreenDialogAnimationEnter(),
 		exit = fullscreenDialogAnimationExit()
 	) {
-		AbsenceFilterDialog(state.preferences) {
-			state.showAbsenceFilter.value = false
+		AbsenceFilterDialog(viewModel.preferences) {
+			viewModel.showAbsenceFilter.value = false
 		}
 	}*/
 }
 
-@Composable
-private fun <T> ItemList(
-	items: List<T>?,
-	itemRenderer: @Composable (T) -> Unit,
-	@StringRes itemsEmptyMessage: Int,
-	loading: Boolean
-) {
-	if (loading) {
-		CircularProgressIndicator()
-	} else if (items.isNullOrEmpty()) {
-		Text(
-			text = stringResource(id = itemsEmptyMessage),
-			textAlign = TextAlign.Center,
-			modifier = Modifier.fillMaxWidth()
-		)
-	} else {
-		LazyColumn(
-			modifier = Modifier.fillMaxSize()
-		) {
-			items(items) {
-				itemRenderer(it)
-			}
-		}
-	}
-}
-/*
-@Composable
-private fun MessageList(messages: List<UntisMessage>?, loading: Boolean) {
-	var attachmentsDialog by remember { mutableStateOf<List<UntisAttachment>?>(null) }
-
-	ItemList(
-		items = messages,
-		itemRenderer = { MessageItem(it) { attachments -> attachmentsDialog = attachments } },
-		itemsEmptyMessage = R.string.infocenter_messages_empty,
-		loading = loading
-	)
-
-	attachmentsDialog?.let { attachments ->
-		AttachmentsDialog(
-			attachments = attachments,
-			onDismiss = { attachmentsDialog = null }
-		)
-	}
+/*when (state.selectedItem.value) {
+	ID_MESSAGES -> MessageList(state.messageList, state.messagesLoading.value)
+	ID_EVENTS -> EventList(state.eventList, state.eventsLoading.value)
+	ID_ABSENCES -> AbsenceList(state.absenceList, state.absencesLoading.value)
+	ID_OFFICEHOURS -> OfficeHourList(state.officeHourList, state.officeHoursLoading.value)
 }
 
 @Composable
@@ -241,44 +241,6 @@ private fun OfficeHourList(officeHours: List<UntisOfficeHour>?, loading: Boolean
 		loading = loading
 	)
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun MessageItem(
-	item: UntisMessage,
-	onShowAttachments: (List<UntisAttachment>) -> Unit
-) {
-	val textColor = MaterialTheme.colorScheme.onSurfaceVariant
-
-	ListItem(
-		headlineContent = { Text(item.subject) },
-		supportingContent = {
-			AndroidView(
-				factory = { context ->
-					TextView(context).apply {
-						setTextColor(textColor.toArgb())
-					}
-				},
-				update = {
-					it.text = HtmlCompat.fromHtml(item.body, HtmlCompat.FROM_HTML_MODE_COMPACT)
-				}
-			)
-		},
-		trailingContent = if (item.attachments.isNotEmpty()) {
-			{
-				IconButton(onClick = {
-					onShowAttachments(item.attachments)
-				}) {
-					Icon(
-						painter = painterResource(id = R.drawable.infocenter_attachments),
-						contentDescription = stringResource(id = R.string.infocenter_messages_attachments)
-					)
-				}
-			}
-		} else null
-	)
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EventItem(item: EventListItem) {
@@ -477,7 +439,7 @@ private fun AbsenceFilterDialog(
 			)
 		}
 	) { padding ->
-		Box(modifier = Modifier.padding(padding)){
+		Box(modifier = Modifier.padding(padding)) {
 			VerticalScrollColumn {
 				// TODO implement protostore
 				/*val sortReversed by preferences.infocenterAbsencesSortReverse.getState()

@@ -5,6 +5,10 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOut
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -23,6 +27,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.ui.pages.infocenter.InfoCenter
 import com.sapuseven.untis.ui.pages.login.Login
 import com.sapuseven.untis.ui.pages.login.datainput.LoginDataInput
 import com.sapuseven.untis.ui.pages.settings.SettingsNav
@@ -133,6 +138,23 @@ fun AppNavHost(
 				fadeOut(animationSpec = tween(500))
 			},
 		) { Timetable() }
+
+		composable<AppRoutes.InfoCenter>(
+			enterTransition = {
+				slideInVertically() { it / 2 } + fadeIn()
+			},
+			exitTransition = {
+				slideOutVertically() { it / 2 } + fadeOut()
+			},
+			popEnterTransition = {
+				slideInVertically() { it / 2 } + fadeIn()
+			},
+			popExitTransition = {
+				slideOutVertically() { it / 2 } + fadeOut()
+			},
+		) {
+			InfoCenter()
+		}
 
 		navigation<AppRoutes.Settings>(startDestination = AppRoutes.Settings.Categories) {
 			SettingsNav(navController = navController)

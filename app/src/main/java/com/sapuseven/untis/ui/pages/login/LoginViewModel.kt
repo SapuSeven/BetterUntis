@@ -8,7 +8,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.sapuseven.untis.activities.LoginActivity.Companion.EXTRA_BOOLEAN_SHOW_BACK_BUTTON
 import com.sapuseven.untis.api.client.SchoolSearchApi
 import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
@@ -38,7 +37,7 @@ class LoginViewModel @Inject constructor(
 		private set
 
 	var shouldShowBackButton = derivedStateOf {
-		searchMode || savedStateHandle.get<Boolean>(EXTRA_BOOLEAN_SHOW_BACK_BUTTON) ?: false
+		searchMode //|| savedStateHandle.get<Boolean>(EXTRA_BOOLEAN_SHOW_BACK_BUTTON) ?: false
 	}
 
 	private val _schoolSearchText = MutableStateFlow<String>("")

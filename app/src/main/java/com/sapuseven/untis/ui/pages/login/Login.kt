@@ -84,7 +84,6 @@ fun Login(
 						)
 					}
 				},
-				// TODO: Maybe use this in preferences where the theme can be changed
 				colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
 					containerColor = Color.Transparent,
 					scrolledContainerColor = Color.Transparent

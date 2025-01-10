@@ -11,7 +11,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.LoginDataInputActivity.Companion.DEMO_API_URL
 import com.sapuseven.untis.activities.SAVED_STATE_INTENT_DATA
 import com.sapuseven.untis.api.client.SchoolSearchApi
 import com.sapuseven.untis.api.client.UserDataApi
@@ -34,6 +33,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+
+const val DEMO_API_URL = "https://api.sapuseven.com/untis/testing"
 
 // TODO: Things to check:
 //       - respect proxy host

@@ -3,6 +3,7 @@ package com.sapuseven.untis.activities.main
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationDrawerItem
@@ -14,7 +15,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.InfoCenterActivity
 import com.sapuseven.untis.activities.RoomFinderActivity
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
@@ -36,19 +36,16 @@ fun DrawerItems(
 ) {
 	val navItemsElementTypes = listOf(
 		NavItemTimetable(
-			id = 1,
 			icon = painterResource(id = R.drawable.all_classes),
 			label = stringResource(id = R.string.all_classes),
 			elementType = ElementType.CLASS
 		),
 		NavItemTimetable(
-			id = 2,
 			icon = painterResource(id = R.drawable.all_teachers),
 			label = stringResource(id = R.string.all_teachers),
 			elementType = ElementType.TEACHER
 		),
 		NavItemTimetable(
-			id = 3,
 			icon = painterResource(id = R.drawable.all_rooms),
 			label = stringResource(id = R.string.all_rooms),
 			elementType = ElementType.ROOM
@@ -57,13 +54,6 @@ fun DrawerItems(
 
 	var navItemsShortcuts = listOf(
 		NavItemShortcut(
-			id = 1,
-			icon = painterResource(id = R.drawable.all_infocenter),
-			label = stringResource(id = R.string.activity_title_info_center),
-			InfoCenterActivity::class.java
-		),
-		NavItemShortcut(
-			id = 2,
 			icon = painterResource(id = R.drawable.all_search_rooms),
 			label = stringResource(id = R.string.activity_title_free_rooms),
 			RoomFinderActivity::class.java
@@ -72,19 +62,20 @@ fun DrawerItems(
 	if (isMessengerAvailable) {
 		navItemsShortcuts = navItemsShortcuts.plus(
 			NavItemShortcut(
-				id = 3,
 				icon = painterResource(id = R.drawable.all_messenger),
 				label = stringResource(id = R.string.activity_title_messenger),
 				null
 			)
-		).sortedBy {
-			it.id
-		}
+		)
 	}
 
 	var navItemsNavigation = listOf(
 		NavItemNavigation(
-			id = 4,
+			icon = painterResource(id = R.drawable.all_infocenter),
+			label = stringResource(id = R.string.activity_title_info_center),
+			route = AppRoutes.InfoCenter
+		),
+		NavItemNavigation(
 			icon = painterResource(id = R.drawable.all_settings),
 			label = stringResource(id = R.string.activity_title_settings),
 			route = AppRoutes.Settings
@@ -125,7 +116,7 @@ fun DrawerItems(
 
 @Composable
 fun DrawerDivider() {
-	Divider(
+	HorizontalDivider(
 		color = MaterialTheme.colorScheme.outline,
 		modifier = Modifier.padding(vertical = 8.dp)
 	)
