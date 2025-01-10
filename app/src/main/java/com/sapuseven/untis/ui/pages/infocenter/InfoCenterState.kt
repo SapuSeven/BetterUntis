@@ -302,28 +302,3 @@ fun rememberInfoCenterState(
 		absencesTimeRange = absencesTimeRange
 	)
 }
-
-/*class EventListItem private constructor(
-	@Suppress("unused") private val init: Nothing? = null, // Dummy parameter to avoid infinite constructor loops below
-	val timetableDatabaseInterface: TimetableDatabaseInterface,
-	val exam: UntisExam? = null,
-	val homework: UntisHomework? = null,
-	val lessonsById: Map<String, UntisHomeworkLesson>? = null
-) {
-	constructor(timetableDatabaseInterface: TimetableDatabaseInterface, exam: UntisExam) : this(
-		init = null,
-		timetableDatabaseInterface = timetableDatabaseInterface,
-		exam = exam
-	)
-
-	constructor(
-		timetableDatabaseInterface: TimetableDatabaseInterface,
-		homework: UntisHomework,
-		lessonsById: Map<String, UntisHomeworkLesson>
-	) : this(
-		init = null,
-		timetableDatabaseInterface = timetableDatabaseInterface,
-		homework = homework,
-		lessonsById = lessonsById
-	)
-}*/

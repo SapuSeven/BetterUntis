@@ -17,6 +17,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -32,6 +33,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.sapuseven.untis.R
+import com.sapuseven.untis.data.repository.LocalElementRepository
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.NavigationBarInset
@@ -75,8 +77,6 @@ fun InfoCenter(
 			)
 		}
 	) { innerPadding ->
-		val coroutineScope = rememberCoroutineScope()
-
 		Column(
 			modifier = Modifier
 				.padding(innerPadding)
@@ -112,17 +112,19 @@ fun InfoCenter(
 					}
 			}*/
 
-			Box(
-				contentAlignment = Alignment.Center,
-				modifier = Modifier
-					.fillMaxWidth()
-					.weight(1f)
-			) {
-				NavHost(
-					navController = bottomNavController,
-					startDestination = AppRoutes.InfoCenter.Messages
+			CompositionLocalProvider(LocalElementRepository provides viewModel.elementRepository) {
+				Box(
+					contentAlignment = Alignment.Center,
+					modifier = Modifier
+						.fillMaxWidth()
+						.weight(1f)
 				) {
-					InfoCenterNav(viewModel = viewModel)
+					NavHost(
+						navController = bottomNavController,
+						startDestination = AppRoutes.InfoCenter.Messages
+					) {
+						InfoCenterNav(viewModel = viewModel)
+					}
 				}
 			}
 
@@ -213,16 +215,6 @@ fun InfoCenter(
 }
 
 @Composable
-private fun EventList(events: List<EventListItem>?, loading: Boolean) {
-	ItemList(
-		items = events,
-		itemRenderer = { EventItem(it) },
-		itemsEmptyMessage = R.string.infocenter_events_empty,
-		loading = loading
-	)
-}
-
-@Composable
 private fun AbsenceList(absences: List<UntisAbsence>?, loading: Boolean) {
 	ItemList(
 		items = absences,
@@ -240,56 +232,6 @@ private fun OfficeHourList(officeHours: List<UntisOfficeHour>?, loading: Boolean
 		itemsEmptyMessage = R.string.infocenter_officehours_empty,
 		loading = loading
 	)
-}
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun EventItem(item: EventListItem) {
-	/*if (item.exam != null) {
-		val subject = item.timetableDatabaseInterface.getShortName(
-			item.exam.subjectId,
-			TimetableDatabaseInterface.Type.SUBJECT
-		)
-		ListItem(
-			overlineContent = {
-				Text(
-					formatExamTime(
-						item.exam.startDateTime.toLocalDateTime(),
-						item.exam.endDateTime.toLocalDateTime()
-					)
-				)
-			},
-			headlineContent = {
-				Text(
-					if (!item.exam.name.contains(subject)) stringResource(
-						R.string.infocenter_events_exam_name_long,
-						subject,
-						item.exam.name
-					) else item.exam.name
-				)
-			}
-		)
-	}
-
-	if (item.homework != null) {
-		ListItem(
-			overlineContent = {
-				Text(
-					item.homework.endDate.toLocalDate().toString(DateTimeFormat.mediumDate())
-				)
-			},
-			headlineContent = {
-				Text(
-					item.timetableDatabaseInterface.getLongName(
-						item.lessonsById?.get(item.homework.lessonId.toString())?.subjectId
-							?: 0, TimetableDatabaseInterface.Type.SUBJECT
-					)
-				)
-			},
-			supportingContent = if (item.homework.text.isNotBlank()) {
-				{ Text(item.homework.text) }
-			} else null
-		)
-	}*/
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -355,20 +297,6 @@ private fun AbsenceItem(item: UntisAbsence) {
 		}
 	)
 }*/
-
-@Composable
-private fun formatExamTime(startDateTime: LocalDateTime, endDateTime: LocalDateTime): String {
-	return stringResource(
-		if (startDateTime.dayOfYear == endDateTime.dayOfYear)
-			R.string.infocenter_timeformat_sameday
-		else
-			R.string.infocenter_timeformat,
-		startDateTime.toString(DateTimeFormat.mediumDate()),
-		startDateTime.toString(DateTimeFormat.shortTime()),
-		endDateTime.toString(DateTimeFormat.mediumDate()),
-		endDateTime.toString(DateTimeFormat.shortTime())
-	)
-}
 
 @Composable
 private fun formatAbsenceTime(

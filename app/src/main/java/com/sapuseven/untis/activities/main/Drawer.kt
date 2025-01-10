@@ -52,13 +52,7 @@ fun DrawerItems(
 		),
 	)
 
-	var navItemsShortcuts = listOf(
-		NavItemShortcut(
-			icon = painterResource(id = R.drawable.all_search_rooms),
-			label = stringResource(id = R.string.activity_title_free_rooms),
-			RoomFinderActivity::class.java
-		),
-	)
+	var navItemsShortcuts = listOf<NavItemShortcut>()
 	if (isMessengerAvailable) {
 		navItemsShortcuts = navItemsShortcuts.plus(
 			NavItemShortcut(
@@ -74,6 +68,11 @@ fun DrawerItems(
 			icon = painterResource(id = R.drawable.all_infocenter),
 			label = stringResource(id = R.string.activity_title_info_center),
 			route = AppRoutes.InfoCenter
+		),
+		NavItemNavigation(
+			icon = painterResource(id = R.drawable.all_search_rooms),
+			label = stringResource(id = R.string.activity_title_free_rooms),
+			route = AppRoutes.RoomFinder
 		),
 		NavItemNavigation(
 			icon = painterResource(id = R.drawable.all_settings),

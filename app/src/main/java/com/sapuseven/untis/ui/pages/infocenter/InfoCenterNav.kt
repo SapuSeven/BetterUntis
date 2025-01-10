@@ -42,7 +42,7 @@ fun NavGraphBuilder.InfoCenterNav(
         popEnterTransition = { slideIntoContainer(slideDirection()) },
         popExitTransition = { slideOutOfContainer(slideDirection()) }
     ) {
-        InfoCenterEvents()
+        InfoCenterEvents(viewModel.events.value)
     }
 
     composable<AppRoutes.InfoCenter.Absences>(
@@ -51,7 +51,7 @@ fun NavGraphBuilder.InfoCenterNav(
         popEnterTransition = { slideIntoContainer(slideDirection()) },
         popExitTransition = { slideOutOfContainer(slideDirection()) }
     ) {
-        InfoCenterEvents()
+        //InfoCenterEvents()
     }
 
     composable<AppRoutes.InfoCenter.OfficeHours>(
@@ -60,6 +60,6 @@ fun NavGraphBuilder.InfoCenterNav(
         popEnterTransition = { slideIntoContainer(slideDirection()) },
         popExitTransition = { slideOutOfContainer(slideDirection()) }
     ) {
-        InfoCenterEvents()
+        //InfoCenterEvents()
     }
 }

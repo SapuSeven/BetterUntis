@@ -261,26 +261,6 @@ fun TimetableDrawer(
 		)
 	}
 
-	/*AnimatedVisibility(
-		visible = bookmarksElementPicker != null,
-		enter = fullscreenDialogAnimationEnter(),
-		exit = fullscreenDialogAnimationExit()
-	) {
-		ElementPickerDialogFullscreen(
-			title = { Text(stringResource(id = R.string.maindrawer_bookmarks_add)) },
-			timetableDatabaseInterface = state.timetableDatabaseInterface,
-			hideTypeSelectionPersonal = true,
-			onDismiss = { bookmarksElementPicker = null },
-			onSelect = { item ->
-				item?.let {
-					if (state.createBookmark(item))
-						onShowTimetable(item to state.timetableDatabaseInterface.getLongName(it))
-				}
-			},
-			initialType = bookmarksElementPicker
-		)
-	}*/
-
 	viewModel.bookmarkDeleteDialog?.let { bookmark ->
 		AlertDialog(
 			text = { Text(stringResource(id = R.string.main_dialog_delete_bookmark)) },

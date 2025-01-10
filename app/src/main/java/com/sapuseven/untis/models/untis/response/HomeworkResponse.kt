@@ -16,8 +16,8 @@ data class HomeworkResult(
 
 @Serializable
 data class UntisHomeworkLesson(
-		val id: Int,
-		val subjectId: Int,
-		val klassenIds: List<Int>,
-		val teacherIds: List<Int>
+		val id: Long,
+		val subjectId: Long,
+		val klassenIds: List<Long>,
+		val teacherIds: List<Long>
 )
