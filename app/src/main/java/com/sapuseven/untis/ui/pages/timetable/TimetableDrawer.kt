@@ -45,6 +45,7 @@ import com.sapuseven.untis.components.ElementPicker
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreenNew
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
@@ -223,22 +224,16 @@ fun TimetableDrawer(
 					disableTypeSelection = viewModel.personalTimetableDisplayed || isBookmarkSelected,
 					displayedElement = displayedElement,
 					onTimetableClick = { item ->
-						scope.launch {
-							drawerState.close()
-							showElementPicker = item.elementType
-						}
+						scope.launch { drawerState.close() }
+						showElementPicker = item.elementType
 					},
 					onShortcutClick = { item ->
-						scope.launch {
-							drawerState.close()
-							viewModel.onShortcutItemClick(item, shortcutLauncher)
-						}
+						scope.launch { drawerState.close() }
+						viewModel.onShortcutItemClick(item, shortcutLauncher)
 					},
 					onNavigationClick = { item ->
-						scope.launch {
-							drawerState.close()
-							viewModel.onNavigationItemClick(item)
-						}
+						scope.launch { drawerState.close() }
+						viewModel.onNavigationItemClick(item)
 					}
 				)
 			}
