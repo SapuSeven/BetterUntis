@@ -1,41 +1,52 @@
 package com.sapuseven.untis.data.repository
 
-import android.content.Context
-import androidx.compose.material3.ColorScheme
 import com.sapuseven.untis.api.client.TimetableApi
 import com.sapuseven.untis.api.model.response.PeriodDataResult
+import com.sapuseven.untis.api.model.untis.absence.StudentAbsence
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.Period
-import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.cache.DiskCache
-import com.sapuseven.untis.mappers.TimetableMapper
+import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.scope.UserScopeManager
 import crocodile8.universal_cache.CachedSource
 import crocodile8.universal_cache.time.SystemTimeProvider
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.serializer
 import java.io.File
 import java.time.LocalDate
 import java.time.LocalTime
+import javax.inject.Inject
+import javax.inject.Named
 
-class TimetableRepository @AssistedInject constructor(
+interface TimetableRepository {
+	fun timetableSource(): CachedSource<TimetableParams, List<Period>>
+	fun periodDataSource(): CachedSource<Set<Period>, PeriodDataResult>
+
+	suspend fun postLessonTopic(periodId: Long, lessonTopic: String): Result<Boolean>
+
+	suspend fun postAbsence(
+		periodId: Long, studentId: Long, startTime: LocalTime, endTime: LocalTime
+	): Result<List<StudentAbsence>>
+
+	suspend fun deleteAbsence(absenceId: Long): Result<Boolean>
+
+	suspend fun postAbsencesChecked(periodIds: Set<Long>): Result<Unit>
+
+	data class TimetableParams(
+		val elementId: Long,
+		val elementType: ElementType,
+		val startDate: LocalDate,
+		val endDate: LocalDate = startDate.plusDays(5 /*TODO*/)
+	)
+}
+
+class UntisTimetableRepository @Inject constructor(
 	private val api: TimetableApi,
-	private val userScopeManager: UserScopeManager,
-	private val timetableMapperFactory: TimetableMapper.Factory,
-	@Assisted private val colorScheme: ColorScheme,
-	@ApplicationContext private val appContext: Context
-) {
-	@AssistedFactory
-	interface Factory {
-		fun create(colorScheme: ColorScheme): TimetableRepository
-	}
-
+	@Named("cacheDir") private val cacheDir: File,
+	userScopeManager: UserScopeManager
+) : TimetableRepository {
 	private val user: User = userScopeManager.user
 
-	fun timetableSource(): CachedSource<TimetableParams, List<Period>> {
+	override fun timetableSource(): CachedSource<TimetableRepository.TimetableParams, List<Period>> {
 		return CachedSource(
 			source = { params ->
 				api.getTimetable(
@@ -49,12 +60,12 @@ class TimetableRepository @AssistedInject constructor(
 					key = user.key
 				).timetable.periods
 			},
-			cache = DiskCache(File(appContext.cacheDir, "timetable"), serializer()),
+			cache = DiskCache(File(cacheDir, "timetable"), serializer()),
 			timeProvider = SystemTimeProvider // TODO: Use from DI to allow for testing
 		)
 	}
 
-	fun periodDataSource(): CachedSource<Set<Period>, PeriodDataResult> {
+	override fun periodDataSource(): CachedSource<Set<Period>, PeriodDataResult> {
 		return CachedSource(
 			source = { params ->
 				api.getPeriodData(
@@ -64,12 +75,12 @@ class TimetableRepository @AssistedInject constructor(
 					key = user.key
 				)
 			},
-			cache = DiskCache(File(appContext.cacheDir, "periodData"), serializer()),
+			cache = DiskCache(File(cacheDir, "periodData"), serializer()),
 			timeProvider = SystemTimeProvider // TODO: Use from DI to allow for testing
 		)
 	}
 
-	suspend fun postLessonTopic(periodId: Long, lessonTopic: String) = runCatching {
+	override suspend fun postLessonTopic(periodId: Long, lessonTopic: String) = runCatching {
 		api.postLessonTopic(
 			periodId = periodId,
 			lessonTopic = lessonTopic,
@@ -79,40 +90,28 @@ class TimetableRepository @AssistedInject constructor(
 		)
 	}
 
-	suspend fun postAbsence(periodId: Long, studentId: Long, startTime: LocalTime, endTime: LocalTime) = runCatching {
-		api.postAbsence(
-			periodId = periodId,
-			studentId = studentId,
-			startTime = startTime,
-			endTime = endTime,
-			apiUrl = user.apiUrl,
-			user = user.user,
-			key = user.key
-		)
-	}
+	override suspend fun postAbsence(periodId: Long, studentId: Long, startTime: LocalTime, endTime: LocalTime) =
+		runCatching {
+			api.postAbsence(
+				periodId = periodId,
+				studentId = studentId,
+				startTime = startTime,
+				endTime = endTime,
+				apiUrl = user.apiUrl,
+				user = user.user,
+				key = user.key
+			)
+		}
 
-	suspend fun deleteAbsence(absenceId: Long) = runCatching {
+	override suspend fun deleteAbsence(absenceId: Long) = runCatching {
 		api.deleteAbsence(
-			absenceId = absenceId,
-			apiUrl = user.apiUrl,
-			user = user.user,
-			key = user.key
+			absenceId = absenceId, apiUrl = user.apiUrl, user = user.user, key = user.key
 		)
 	}
 
-	suspend fun postAbsencesChecked(periodIds: Set<Long>) = runCatching {
+	override suspend fun postAbsencesChecked(periodIds: Set<Long>) = runCatching {
 		api.postAbsencesChecked(
-			periodIds = periodIds,
-			apiUrl = user.apiUrl,
-			user = user.user,
-			key = user.key
+			periodIds = periodIds, apiUrl = user.apiUrl, user = user.user, key = user.key
 		)
 	}
-
-	data class TimetableParams(
-		val elementId: Long,
-		val elementType: ElementType,
-		val startDate: LocalDate,
-		val endDate: LocalDate = startDate.plusDays(5 /*TODO*/)
-	)
 }

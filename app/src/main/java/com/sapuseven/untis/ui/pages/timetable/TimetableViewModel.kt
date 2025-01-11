@@ -24,14 +24,13 @@ import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.data.repository.ElementRepository
 import com.sapuseven.untis.data.repository.TimetableRepository
-import com.sapuseven.untis.data.settings.model.UserSettings
 import com.sapuseven.untis.mappers.TimetableMapper
 import com.sapuseven.untis.models.PeriodItem
 import com.sapuseven.untis.scope.UserScopeManager
-import com.sapuseven.untis.ui.pages.settings.GlobalSettingsRepository
-import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
+import com.sapuseven.untis.ui.pages.settings.GlobalSettingsRepository
+import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
 import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import com.sapuseven.untis.ui.weekview.Event
 import com.sapuseven.untis.ui.weekview.WeekViewColorScheme
@@ -64,12 +63,12 @@ class TimetableViewModel @AssistedInject constructor(
 	internal val userManager: UserManager,
 	private val userScopeManager: UserScopeManager,
 	private val userDao: UserDao,
-	private val userSettingsRepositoryFactory: UserSettingsRepository.Factory,
-	private val timetableMapperFactory: TimetableMapper.Factory,
-	private val timetableRepositoryFactory: TimetableRepository.Factory,
+	internal val timetableRepository: TimetableRepository,
 	internal val elementRepository: ElementRepository,
 	internal val globalSettingsRepository: GlobalSettingsRepository,
 	@Assisted private val colorScheme: ColorScheme,
+	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
+	timetableMapperFactory: TimetableMapper.Factory,
 	savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 	@AssistedFactory
@@ -79,14 +78,10 @@ class TimetableViewModel @AssistedInject constructor(
 
 	private val timetableMapper = timetableMapperFactory.create(colorScheme)
 	private val userSettingsRepository = userSettingsRepositoryFactory.create(colorScheme)
-	internal val timetableRepository = timetableRepositoryFactory.create(colorScheme)
 
-	val args = savedStateHandle.toRoute<AppRoutes.Timetable>()
+	private val args = savedStateHandle.toRoute<AppRoutes.Timetable>()
 
 	val requestedElement = args.getElement()
-
-	private val _currentUserSettings = MutableStateFlow<UserSettings>(userSettingsRepository.getSettingsDefaults())
-	val currentUserSettings: StateFlow<UserSettings> = _currentUserSettings
 
 	var profileManagementDialog by mutableStateOf(false)
 	var timetableItemDetailsDialog by mutableStateOf<Pair<List<Event<PeriodItem>>, Int>?>(null)
@@ -95,9 +90,6 @@ class TimetableViewModel @AssistedInject constructor(
 
 	val currentUser: User = userScopeManager.user
 	val allUsersState: StateFlow<List<User>> = userManager.allUsersState
-
-	private val _debugColor = MutableStateFlow(0x0)
-	val debugColor: StateFlow<Int> = _debugColor
 
 	private val _personalElement = MutableStateFlow<PeriodElement?>(null)
 
@@ -130,7 +122,6 @@ class TimetableViewModel @AssistedInject constructor(
 		viewModelScope.launch {
 			userSettingsRepository.getSettings().collect { userSettings ->
 				// All properties that are based on preferences are set here
-				_currentUserSettings.value = userSettings
 				decodeStoredTimetableValue(userSettings.timetablePersonalTimetable)?.let {
 					_personalElement.value = it
 					_needsPersonalTimetable.emit(false)
@@ -146,21 +137,12 @@ class TimetableViewModel @AssistedInject constructor(
 					range = userSettings.timetableRange.convertRangeToPair(),
 					rangeIndexReset = userSettings.timetableRangeIndexReset
 				)
-				_debugColor.value = userSettings.backgroundRegular
 				_weekViewColorScheme.value = WeekViewColorScheme(
 					dividerColor = colorScheme.outline,
 					pastBackgroundColor = Color(userSettings.backgroundPast),
 					futureBackgroundColor = Color(userSettings.backgroundFuture),
 					indicatorColor = Color(userSettings.marker),
 				)
-			}
-		}
-
-		viewModelScope.launch {
-			debugColor.collect {
-				_events.update {
-					it.mapValues { timetableMapper.colorWeekViewTimetableEvents(it.value).toList() }
-				}
 			}
 		}
 	}
@@ -177,7 +159,7 @@ class TimetableViewModel @AssistedInject constructor(
 		profileManagementDialog = true
 	}
 
-	suspend fun onPageChange(pageOffset: Int = currentPage) {
+	fun onPageChange(pageOffset: Int = currentPage) {
 		currentPage = pageOffset
 		viewModelScope.launch {
 			loading = true
@@ -192,10 +174,10 @@ class TimetableViewModel @AssistedInject constructor(
 						if (_events.value.contains(startDate)) FromCache.ONLY else FromCache.CACHED_THEN_LOAD
 					)
 						.catch(loadingExceptionHandler)
-						.collect {
+						.collect { result ->
 							val events =
-								timetableMapper.mapTimetablePeriodsToWeekViewEvents(it.value, ElementType.STUDENT)
-							val refreshTimestamp = it.originTimeStamp?.let { Instant.ofEpochMilli(it) } ?: Instant.now()
+								timetableMapper.mapTimetablePeriodsToWeekViewEvents(result.value, ElementType.STUDENT)
+							val refreshTimestamp = result.originTimeStamp?.let { Instant.ofEpochMilli(it) } ?: Instant.now()
 							emitEvents(mapOf(startDate to timetableMapper.colorWeekViewTimetableEvents(events)))
 							if (targetPage == pageOffset)
 								_lastRefresh.emit(refreshTimestamp)
@@ -210,9 +192,9 @@ class TimetableViewModel @AssistedInject constructor(
 		val startDate = startDateForPageIndex(pageOffset.toLong())
 		loadEvents(startDate, FromCache.NEVER)
 			.catch(loadingExceptionHandler)
-			.collect {
-				val events = timetableMapper.mapTimetablePeriodsToWeekViewEvents(it.value, ElementType.STUDENT)
-				val refreshTimestamp = it.originTimeStamp?.let { Instant.ofEpochMilli(it) } ?: Instant.now()
+			.collect { result ->
+				val events = timetableMapper.mapTimetablePeriodsToWeekViewEvents(result.value, ElementType.STUDENT)
+				val refreshTimestamp = result.originTimeStamp?.let { Instant.ofEpochMilli(it) } ?: Instant.now()
 				emitEvents(mapOf(startDate to timetableMapper.colorWeekViewTimetableEvents(events)))
 				_lastRefresh.emit(refreshTimestamp)
 			}
@@ -241,7 +223,7 @@ class TimetableViewModel @AssistedInject constructor(
 		} ?: emptyFlow()
 	}
 
-	private suspend fun emitEvents(events: Map<LocalDate, List<Event<PeriodItem>>>) {
+	private fun emitEvents(events: Map<LocalDate, List<Event<PeriodItem>>>) {
 		_events.update {
 			val newEvents = it.toMutableMap()
 			events.forEach { (date, events) ->
@@ -295,7 +277,8 @@ class TimetableViewModel @AssistedInject constructor(
 	fun getTitle(context: Context) = requestedElement?.let {
 		if (it == _personalElement.value) null // Use Profile name for personal timetable
 		else elementRepository.getLongName(it)
-	} ?: currentUser.getDisplayedName(context) + (if (BuildConfig.DEBUG) " (${currentUser.id})" else "")
+	}
+		?: (currentUser.getDisplayedName(context) + (if (BuildConfig.DEBUG) " (${currentUser.id})" else ""))
 
 	fun showElement(element: PeriodElement?) {
 		navigator.navigate(AppRoutes.Timetable(element))
