@@ -9,7 +9,7 @@ import com.sapuseven.untis.data.cache.DiskCache
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.scope.UserScopeManager
 import crocodile8.universal_cache.CachedSource
-import crocodile8.universal_cache.time.SystemTimeProvider
+import crocodile8.universal_cache.time.TimeProvider
 import kotlinx.serialization.serializer
 import java.io.File
 import java.time.LocalDate
@@ -42,6 +42,7 @@ interface TimetableRepository {
 class UntisTimetableRepository @Inject constructor(
 	private val api: TimetableApi,
 	@Named("cacheDir") private val cacheDir: File,
+	private val timeProvider: TimeProvider,
 	userScopeManager: UserScopeManager
 ) : TimetableRepository {
 	private val user: User = userScopeManager.user
@@ -61,7 +62,7 @@ class UntisTimetableRepository @Inject constructor(
 				).timetable.periods
 			},
 			cache = DiskCache(File(cacheDir, "timetable"), serializer()),
-			timeProvider = SystemTimeProvider // TODO: Use from DI to allow for testing
+			timeProvider = timeProvider
 		)
 	}
 
@@ -76,7 +77,7 @@ class UntisTimetableRepository @Inject constructor(
 				)
 			},
 			cache = DiskCache(File(cacheDir, "periodData"), serializer()),
-			timeProvider = SystemTimeProvider // TODO: Use from DI to allow for testing
+			timeProvider = timeProvider
 		)
 	}
 

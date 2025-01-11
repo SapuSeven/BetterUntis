@@ -1,6 +1,8 @@
 package com.sapuseven.untis.modules
 
 import android.content.Context
+import crocodile8.universal_cache.time.SystemTimeProvider
+import crocodile8.universal_cache.time.TimeProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,4 +19,7 @@ object ConfigurationModule {
 	fun provideCacheDir(
 		@ApplicationContext appContext: Context,
 	): File = appContext.cacheDir
+
+	@Provides
+	fun provideTimeProvider(): TimeProvider = SystemTimeProvider
 }

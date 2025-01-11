@@ -1,5 +1,6 @@
 package com.sapuseven.untis.modules
 
+import com.sapuseven.untis.api.client.MessagesApi
 import com.sapuseven.untis.api.client.SchoolSearchApi
 import com.sapuseven.untis.api.client.TimetableApi
 import com.sapuseven.untis.api.client.UserDataApi
@@ -18,4 +19,6 @@ object ApiClientModule {
 	fun provideUserDataApi(): UserDataApi = UserDataApi(CIO)
 	@Provides
 	fun provideTimetableApi(): TimetableApi = TimetableApi(CIO)
+	@Provides
+	fun provideMessagesApi(): MessagesApi = MessagesApi(CIO)
 }
