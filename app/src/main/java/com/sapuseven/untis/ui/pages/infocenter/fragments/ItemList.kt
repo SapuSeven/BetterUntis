@@ -1,6 +1,7 @@
 package com.sapuseven.untis.ui.pages.infocenter.fragments
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,14 +25,16 @@ internal fun <T> ItemList(
 	itemRenderer: @Composable (T) -> Unit,
 	@StringRes itemsEmptyMessage: Int,
 ) {
-	if (items == null) {
+	AnimatedVisibility(items == null) {
 		Box(
-			contentAlignment = Alignment.Center,
+			contentAlignment = Alignment.TopCenter,
 			modifier = Modifier.fillMaxSize()
 		) {
-			CircularProgressIndicator()
+			LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
 		}
-	} else if (items.isEmpty()) {
+	}
+
+	if (items?.isEmpty() == true) {
 		Box(
 			contentAlignment = Alignment.Center,
 			modifier = Modifier.fillMaxSize()
@@ -45,7 +49,7 @@ internal fun <T> ItemList(
 		LazyColumn(
 			modifier = Modifier.fillMaxSize()
 		) {
-			items(items) {
+			items(items ?: emptyList()) {
 				itemRenderer(it)
 			}
 		}
