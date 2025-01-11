@@ -3,8 +3,6 @@ package com.sapuseven.untis.ui.weekview
 import android.text.format.DateFormat
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -92,13 +90,7 @@ data class Event<T>(
 	var numSimultaneous: Int = 1 // relative width is determined by 1/x
 	var offsetSteps: Int = 0 // x-offset in multiples of width
 	var simultaneousEvents = mutableSetOf<Event<T>>()
-
-	// temp
-	var leftX = 0
-	var rightX = 0
 }
-
-val eventTimeFormat = DateTimeFormatter.ofPattern("h:mm a")
 
 @Composable
 fun <T> WeekViewEvent(
@@ -385,7 +377,7 @@ fun WeekViewSidebarPreview() {
 	)
 }
 
-fun DrawScope.WeekViewContentGrid(
+fun DrawScope.weekViewContentGrid(
 	numDays: Int = 5,
 	startTime: LocalTime,
 	hourHeight: Dp,
@@ -425,7 +417,7 @@ fun DrawScope.WeekViewContentGrid(
 	)
 }
 
-fun DrawScope.WeekViewBackground(
+fun DrawScope.weekViewBackground(
 	numDays: Int = 5,
 	startDate: LocalDate,
 	startTime: LocalTime,
@@ -434,7 +426,7 @@ fun DrawScope.WeekViewBackground(
 	futureBackgroundColor: Color,
 	currentTime: LocalDateTime = LocalDateTime.now(),
 ) {
-	val dayWidth = size.width / numDays;
+	val dayWidth = size.width / numDays
 
 	repeat(numDays) {
 		val fraction = ChronoUnit.MINUTES.between(
@@ -483,7 +475,7 @@ fun DrawScope.drawVerticalSplitRect(
 	}
 }
 
-fun DrawScope.WeekViewIndicator(
+fun DrawScope.weekViewIndicator(
 	numDays: Int = 5,
 	startDate: LocalDate,
 	startTime: LocalTime,
@@ -492,7 +484,7 @@ fun DrawScope.WeekViewIndicator(
 	indicatorWidth: Float = 2.dp.toPx(),
 	currentTime: LocalDateTime = LocalDateTime.now(),
 ) {
-	val dayWidth = size.width / numDays;
+	val dayWidth = size.width / numDays
 
 	val yPos = ChronoUnit.MINUTES.between( // TODO: Can this be negative?
 		startTime,
@@ -532,7 +524,8 @@ fun <T> WeekViewContent(
 	// TODO: Display indicator if there are more events than can be displayed
 	//val minEventWidth = 24.dp
 	val maxSimultaneous = 100//(dayWidth.toFloat() / minEventWidth.toPx()).toInt()
-	arrangeEvents(events, maxSimultaneous);
+
+	arrangeEvents(events, maxSimultaneous)
 
 	Layout(
 		content = {
@@ -544,7 +537,7 @@ fun <T> WeekViewContent(
 		},
 		modifier = modifier
 			.drawWithContent {
-				WeekViewBackground(
+				weekViewBackground(
 					numDays = numDays,
 					startDate = startDate,
 					startTime = startTime,
@@ -554,7 +547,7 @@ fun <T> WeekViewContent(
 					currentTime = currentTime
 				)
 
-				WeekViewContentGrid(
+				weekViewContentGrid(
 					numDays = numDays,
 					startTime = startTime,
 					hourHeight = hourHeight,
@@ -565,7 +558,7 @@ fun <T> WeekViewContent(
 
 				drawContent()
 
-				WeekViewIndicator(
+				weekViewIndicator(
 					numDays = numDays,
 					startDate = startDate,
 					startTime = startTime,
@@ -575,15 +568,14 @@ fun <T> WeekViewContent(
 				)
 			}
 	) { measureables, constraints ->
-		val height = Math.max(
-			constraints.minHeight,
+		val height = constraints.minHeight.coerceAtLeast(
 			(ChronoUnit.MINUTES.between(
 				startTime,
 				endTime
 			) / 60f * hourHeight.toPx() + endTimeOffset).roundToInt()
 		)
 		val width = constraints.maxWidth + dividerWidth.toInt()
-		val dayWidth = width / numDays;
+		val dayWidth = width / numDays
 		val placeablesWithEvents = measureables.map { measurable ->
 			val event = measurable.parentData as Event<*>
 			val eventDurationMinutes = ChronoUnit.MINUTES.between(event.start, event.end)
@@ -617,7 +609,7 @@ fun <T> WeekViewContent(
  * @param onItemClick Callback on event click. First value contains a list of all simultaneous events
  * (including the clicked one) and second value the index of the actually clicked event.
  */
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T> WeekViewCompose(
 	events: Map<LocalDate, List<Event<T>>>,
@@ -659,7 +651,7 @@ fun <T> WeekViewCompose(
 	val currentOnPageChange by rememberUpdatedState(onPageChange)
 
 	var datePickerDialog by remember { mutableStateOf(false) }
-	var jumpToDate by remember { mutableStateOf<java.time.LocalDate?>(null) }
+	var jumpToDate by remember { mutableStateOf<LocalDate?>(null) }
 
 	LaunchedEffect(jumpToDate) {
 		jumpToDate?.let {
@@ -789,7 +781,7 @@ fun <T> WeekViewCompose(
 
 	if (datePickerDialog)
 		DatePickerDialog(
-			initialSelection = jumpToDate ?: java.time.LocalDate.now(),
+			initialSelection = jumpToDate ?: LocalDate.now(),
 			onDismiss = { datePickerDialog = false }
 		) {
 			datePickerDialog = false
@@ -826,17 +818,6 @@ fun WeekViewPreview() {
 		loadItems = { _, _, _ -> }
 	)
 }*/
-
-@Composable
-fun WeekViewTest(
-	bg: Color
-) {
-	Box(
-		modifier = Modifier
-			.fillMaxSize()
-			.background(bg)
-	)
-}
 
 data class WeekViewHour(
 	val startTime: LocalTime,
