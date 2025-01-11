@@ -35,7 +35,7 @@ interface ElementRepository {
 	fun isAllowed(periodElement: PeriodElement): Boolean
 }
 
-class ElementRepositoryDefaultImpl : ElementRepository {
+class DefaultElementRepository : ElementRepository {
 	override fun getShortName(id: Long, type: ElementType?): String = "$type:$id"
 
 	override fun getShortName(periodElement: PeriodElement) = getShortName(periodElement.id, periodElement.type)
@@ -49,7 +49,7 @@ class ElementRepositoryDefaultImpl : ElementRepository {
 	override fun isAllowed(periodElement: PeriodElement): Boolean = true
 }
 
-class ElementRepositoryImpl @Inject constructor(
+class UntisElementRepository @Inject constructor(
 	private val userDao: UserDao,
 	private val userScopeManager: UserScopeManager,
 ): ElementRepository {
@@ -63,11 +63,11 @@ class ElementRepositoryImpl @Inject constructor(
 		measureTime {
 			// We need to run blocking to prevent a race condition
 			runBlocking(Dispatchers.IO) {
-				userDao.getByIdWithData(userScopeManager.user.id)?.let {
-					allClasses = it.klassen.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
-					allTeachers = it.teachers.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
-					allSubjects = it.subjects.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
-					allRooms = it.rooms.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
+				userDao.getByIdWithData(userScopeManager.user.id)?.let { userData ->
+					allClasses = userData.klassen.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
+					allTeachers = userData.teachers.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
+					allSubjects = userData.subjects.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
+					allRooms = userData.rooms.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
 				}
 			}
 		}.let {
@@ -112,4 +112,4 @@ class ElementRepositoryImpl @Inject constructor(
 	override fun isAllowed(periodElement: PeriodElement) = isAllowed(periodElement.id, periodElement.type)
 }
 
-val LocalElementRepository = compositionLocalOf<ElementRepository> { ElementRepositoryDefaultImpl() }
+val LocalElementRepository = compositionLocalOf<ElementRepository> { DefaultElementRepository() }
