@@ -28,7 +28,7 @@ sealed class EventList {
 @Composable
 fun InfoCenterEvents(events: List<EventList>?) {
 	ItemList(
-		items = events,
+		itemResult = events,
 		itemRenderer = { EventItem(it) },
 		itemsEmptyMessage = R.string.infocenter_events_empty
 	)
