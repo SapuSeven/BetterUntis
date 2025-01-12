@@ -3,6 +3,7 @@ package com.sapuseven.untis.ui.pages.infocenter
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -33,7 +34,8 @@ fun NavGraphBuilder.InfoCenterNav(
         popEnterTransition = { slideIntoContainer(slideDirection()) },
         popExitTransition = { slideOutOfContainer(slideDirection()) }
     ) {
-        InfoCenterMessages(viewModel.messages.value)
+		val messages = viewModel.messages.collectAsState()
+        InfoCenterMessages(messages.value)
     }
 
     composable<AppRoutes.InfoCenter.Events>(
@@ -42,7 +44,8 @@ fun NavGraphBuilder.InfoCenterNav(
         popEnterTransition = { slideIntoContainer(slideDirection()) },
         popExitTransition = { slideOutOfContainer(slideDirection()) }
     ) {
-        InfoCenterEvents(viewModel.events.value)
+		val events = viewModel.events.collectAsState()
+        InfoCenterEvents(events.value)
     }
 
     composable<AppRoutes.InfoCenter.Absences>(

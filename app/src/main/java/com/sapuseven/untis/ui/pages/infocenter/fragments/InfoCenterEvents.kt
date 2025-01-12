@@ -26,7 +26,7 @@ sealed class EventList {
 }
 
 @Composable
-fun InfoCenterEvents(events: List<EventList>?) {
+fun InfoCenterEvents(events: Result<List<EventList>>?) {
 	ItemList(
 		itemResult = events,
 		itemRenderer = { EventItem(it) },

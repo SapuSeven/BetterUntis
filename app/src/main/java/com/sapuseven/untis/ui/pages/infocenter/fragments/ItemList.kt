@@ -54,8 +54,8 @@ internal fun <T> ItemList(
 						contentDescription = stringResource(id = R.string.all_error)
 					)
 				},
-				messageText = viewModel.errorText,
-				messageTextRaw = viewModel.errorTextRaw
+				messageText = R.string.errormessagedictionary_generic,
+				messageTextRaw = error.message
 			)
 
 		}
