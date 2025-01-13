@@ -25,9 +25,9 @@ import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.ErrorMessageDictionary.ERROR_CODE_TOO_MANY_RESULTS
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
-import com.sapuseven.untis.ui.pages.ActivityViewModel
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
+import com.sapuseven.untis.ui.pages.ActivityViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,14 +41,14 @@ const val DEMO_API_URL = "https://api.sapuseven.com/untis/testing"
 //       - bookmarks
 @HiltViewModel
 class LoginDataInputViewModel @Inject constructor(
-	val schoolSearchApi: SchoolSearchApi,
-	val userDataApi: UserDataApi,
-	val userDao: UserDao,
+	private val userDao: UserDao,
+	private val schoolSearchApi: SchoolSearchApi,
+	private val userDataApi: UserDataApi,
 	private val navigator: AppNavigator,
 	private val userManager: UserManager,
 	savedStateHandle: SavedStateHandle
 ) : ActivityViewModel() {
-	val args = savedStateHandle.toRoute<AppRoutes.LoginDataInput>()
+	private val args = savedStateHandle.toRoute<AppRoutes.LoginDataInput>()
 
 	private val existingUserId = if (args.userId == -1L) null else args.userId
 
@@ -59,9 +59,7 @@ class LoginDataInputViewModel @Inject constructor(
 
 	val loginData = LoginData()
 
-	var advanced by mutableStateOf(
-		loginData.proxyUrl.value?.isNotEmpty() == true || loginData.apiUrl.value?.isNotEmpty() == true
-	)
+	var advanced by mutableStateOf(false)
 
 	var searchMode by mutableStateOf(false)
 
@@ -80,20 +78,16 @@ class LoginDataInputViewModel @Inject constructor(
 	var showQrCodeErrorDialog by mutableStateOf(false)
 		private set
 
-	val showProfileUpdate = args.profileUpdate == true
+	val showProfileUpdate = args.profileUpdate
 
 	var schoolIdLocked by mutableStateOf(false)
 
 	val schoolIdValid = derivedStateOf {
-		loginData.schoolId.value?.let {
-			it.isNotEmpty()
-		} ?: false
+		loginData.schoolId.value?.isNotEmpty() ?: false
 	}
 
 	val usernameValid = derivedStateOf {
-		loginData.username.value?.let {
-			it.isNotEmpty()
-		} ?: false || (loginData.anonymous.value == true)
+		loginData.username.value?.isNotEmpty() ?: false || (loginData.anonymous.value == true)
 	}
 
 	val proxyUrlValid = derivedStateOf {
@@ -108,16 +102,19 @@ class LoginDataInputViewModel @Inject constructor(
 		} ?: true
 	}
 
-	val schoolInfoFromSearch = args.schoolInfoSerialized?.let {
+	private val schoolInfoFromSearch = args.schoolInfoSerialized?.let {
 		getJSON().decodeFromString<SchoolInfo>(it)
 	}
 
 	init {
 		viewModelScope.launch(Dispatchers.IO) {
-			existingUserId?.let { userDao.getById(it) }?.let { loginData.loadFromUser(it) }
+			existingUserId?.let { userDao.getById(it) }?.let {
+				loginData.loadFromUser(it)
+				advanced = loginData.proxyUrl.value?.isNotEmpty() == true || loginData.apiUrl.value?.isNotEmpty() == true
+			}
 		}
 
-		if (args.demoLogin == true) {
+		if (args.demoLogin) {
 			loginData.anonymous.value = true
 			loginData.schoolId.value = "demo"
 			advanced = true
@@ -153,7 +150,7 @@ class LoginDataInputViewModel @Inject constructor(
 	}
 
 	private fun loadFromAppLinkData(appLinkDataString: String?) {
-		if (appLinkDataString == null) return;
+		if (appLinkDataString == null) return
 
 		val appLinkData = Uri.parse(appLinkDataString)
 
@@ -205,7 +202,7 @@ class LoginDataInputViewModel @Inject constructor(
 			val errorTextRes = ErrorMessageDictionary.getErrorMessageResource(e.error?.code, false)
 			errorText = errorTextRes ?: R.string.errormessagedictionary_generic
 			errorTextRaw = when (e.error?.code) {
-				ERROR_CODE_TOO_MANY_RESULTS -> "Check the school id" // TODO: This is an exampe. Add detailed descriptions to errormessagedictionary
+				ERROR_CODE_TOO_MANY_RESULTS -> "Check the school id" // TODO: This is an example. Add detailed descriptions to errormessagedictionary
 				else -> if (errorTextRes == null) e.error?.message else null
 			}
 		} catch (e: Exception) {
