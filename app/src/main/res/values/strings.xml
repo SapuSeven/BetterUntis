@@ -81,7 +81,8 @@
     <string name="infocenter_absence_unexcused">Unexcused</string>
     <string name="infocenter_absence_unknown_reason">Unknown reason</string>
     <string name="infocenter_absences_empty">No absences</string>
-    <string name="infocenter_events_empty">No events</string>
+    <string name="infocenter_exams_empty">No exams</string>
+    <string name="infocenter_homework_empty">No homework</string>
     <string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
     <string name="infocenter_messages_attachments">Attachments</string>
     <string name="infocenter_messages_empty">No messages</string>

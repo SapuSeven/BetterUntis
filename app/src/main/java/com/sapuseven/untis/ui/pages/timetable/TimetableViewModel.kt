@@ -22,7 +22,7 @@ import com.sapuseven.untis.components.ElementPicker
 import com.sapuseven.untis.components.UserManager
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
-import com.sapuseven.untis.data.repository.ElementRepository
+import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.data.repository.TimetableRepository
 import com.sapuseven.untis.mappers.TimetableMapper
 import com.sapuseven.untis.models.PeriodItem
@@ -59,17 +59,17 @@ import java.time.LocalDate
 
 @HiltViewModel(assistedFactory = TimetableViewModel.Factory::class)
 class TimetableViewModel @AssistedInject constructor(
-	private val navigator: AppNavigator,
-	internal val userManager: UserManager,
-	private val userScopeManager: UserScopeManager,
-	private val userDao: UserDao,
-	internal val timetableRepository: TimetableRepository,
-	internal val elementRepository: ElementRepository,
-	internal val globalSettingsRepository: GlobalSettingsRepository,
-	@Assisted private val colorScheme: ColorScheme,
-	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
-	timetableMapperFactory: TimetableMapper.Factory,
-	savedStateHandle: SavedStateHandle,
+    private val navigator: AppNavigator,
+    internal val userManager: UserManager,
+    private val userScopeManager: UserScopeManager,
+    private val userDao: UserDao,
+    internal val timetableRepository: TimetableRepository,
+    internal val masterDataRepository: MasterDataRepository,
+    internal val globalSettingsRepository: GlobalSettingsRepository,
+    @Assisted private val colorScheme: ColorScheme,
+    userSettingsRepositoryFactory: UserSettingsRepository.Factory,
+    timetableMapperFactory: TimetableMapper.Factory,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 	@AssistedFactory
 	interface Factory {
@@ -276,7 +276,7 @@ class TimetableViewModel @AssistedInject constructor(
 
 	fun getTitle(context: Context) = requestedElement?.let {
 		if (it == _personalElement.value) null // Use Profile name for personal timetable
-		else elementRepository.getLongName(it)
+		else masterDataRepository.getLongName(it)
 	}
 		?: (currentUser.getDisplayedName(context) + (if (BuildConfig.DEBUG) " (${currentUser.id})" else ""))
 

@@ -6,22 +6,20 @@ import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.data.database.entities.KlasseEntity
 import com.sapuseven.untis.data.database.entities.RoomEntity
+import com.sapuseven.untis.data.database.entities.SchoolYearEntity
 import com.sapuseven.untis.data.database.entities.SubjectEntity
 import com.sapuseven.untis.data.database.entities.TeacherEntity
 import com.sapuseven.untis.data.database.entities.UserDao
+import com.sapuseven.untis.data.database.entities.UserWithData
 import com.sapuseven.untis.models.PeriodItem.Companion.ELEMENT_NAME_UNKNOWN
 import com.sapuseven.untis.scope.UserScopeManager
-import dagger.hilt.android.scopes.ViewModelScoped
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.w3c.dom.Element
+import java.time.LocalDate
 import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.time.measureTime
 
-interface ElementRepository {
+interface MasterDataRepository {
 	fun getShortName(id: Long, type: ElementType?): String
 
 	fun getShortName(periodElement: PeriodElement): String
@@ -33,9 +31,11 @@ interface ElementRepository {
 	fun isAllowed(id: Long, type: ElementType?): Boolean
 
 	fun isAllowed(periodElement: PeriodElement): Boolean
+
+	fun currentSchoolYear(currentDate: LocalDate = LocalDate.now()): SchoolYearEntity?
 }
 
-class DefaultElementRepository : ElementRepository {
+class DefaultMasterDataRepository : MasterDataRepository {
 	override fun getShortName(id: Long, type: ElementType?): String = "$type:$id"
 
 	override fun getShortName(periodElement: PeriodElement) = getShortName(periodElement.id, periodElement.type)
@@ -47,31 +47,38 @@ class DefaultElementRepository : ElementRepository {
 	override fun isAllowed(id: Long, type: ElementType?): Boolean = true
 
 	override fun isAllowed(periodElement: PeriodElement): Boolean = true
+
+	override fun currentSchoolYear(currentDate: LocalDate): SchoolYearEntity? = null
 }
 
-class UntisElementRepository @Inject constructor(
+class UntisMasterDataRepository @Inject constructor(
 	private val userDao: UserDao,
 	private val userScopeManager: UserScopeManager,
-): ElementRepository {
-	private lateinit var allClasses: Map<Long, KlasseEntity>
-	private lateinit var allTeachers: Map<Long, TeacherEntity>
-	private lateinit var allSubjects: Map<Long, SubjectEntity>
-	private lateinit var allRooms: Map<Long, RoomEntity>
+): MasterDataRepository {
+	private var userWithData: UserWithData? = null
+
+	private val allClasses: Map<Long, KlasseEntity> by lazy {
+		(userWithData?.klassen ?: emptyList()).filter { it.active }.sortedBy { it.name }.associateBy { it.id }
+	}
+	private val allTeachers: Map<Long, TeacherEntity> by lazy {
+		(userWithData?.teachers ?: emptyList()).filter { it.active }.sortedBy { it.name }.associateBy { it.id }
+	}
+	private val allSubjects: Map<Long, SubjectEntity> by lazy {
+		(userWithData?.subjects ?: emptyList()).filter { it.active }.sortedBy { it.name }.associateBy { it.id }
+	}
+	private val allRooms: Map<Long, RoomEntity> by lazy {
+		(userWithData?.rooms ?: emptyList()).filter { it.active }.sortedBy { it.name }.associateBy { it.id }
+	}
 
 	init {
 		// If performance becomes an issue, consider implementing Dagger Producers or similar asynchronous dependency initialization
 		measureTime {
 			// We need to run blocking to prevent a race condition
 			runBlocking(Dispatchers.IO) {
-				userDao.getByIdWithData(userScopeManager.user.id)?.let { userData ->
-					allClasses = userData.klassen.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
-					allTeachers = userData.teachers.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
-					allSubjects = userData.subjects.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
-					allRooms = userData.rooms.toList().filter { it.active }.sortedBy { it.name }.associateBy { it.id }
-				}
+				userWithData = userDao.getByIdWithData(userScopeManager.user.id)
 			}
 		}.let {
-			Log.d("Performance", "ElementRepository init took $it")
+			Log.d("Performance", "MasterDataRepository init took $it")
 		}
 	}
 
@@ -110,6 +117,10 @@ class UntisElementRepository @Inject constructor(
 	}
 
 	override fun isAllowed(periodElement: PeriodElement) = isAllowed(periodElement.id, periodElement.type)
+
+	override fun currentSchoolYear(currentDate: LocalDate): SchoolYearEntity? = userWithData?.schoolYears?.find {
+		currentDate.isAfter(it.startDate) && currentDate.isBefore(it.endDate)
+	}
 }
 
-val LocalElementRepository = compositionLocalOf<ElementRepository> { DefaultElementRepository() }
+val LocalMasterDataRepository = compositionLocalOf<MasterDataRepository> { DefaultMasterDataRepository() }

@@ -261,7 +261,7 @@ fun Timetable(
 			initialPage = remember {
 				viewModel.timetableItemDetailsDialog?.second ?: 0
 			},
-			elementRepository = viewModel.elementRepository,
+			masterDataRepository = viewModel.masterDataRepository,
 			onDismiss = {
 				viewModel.timetableItemDetailsDialog = null
 				it?.let { viewModel.showElement(it) }

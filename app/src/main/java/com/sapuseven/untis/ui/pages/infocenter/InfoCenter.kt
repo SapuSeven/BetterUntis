@@ -20,10 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -33,7 +31,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.repository.LocalElementRepository
+import com.sapuseven.untis.data.repository.LocalMasterDataRepository
 import com.sapuseven.untis.preferences.DataStorePreferences
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.NavigationBarInset
@@ -112,9 +110,8 @@ fun InfoCenter(
 					}
 			}*/
 
-			CompositionLocalProvider(LocalElementRepository provides viewModel.elementRepository) {
+			CompositionLocalProvider(LocalMasterDataRepository provides viewModel.masterDataRepository) {
 				Box(
-					contentAlignment = Alignment.Center,
 					modifier = Modifier
 						.fillMaxWidth()
 						.weight(1f)
@@ -123,7 +120,7 @@ fun InfoCenter(
 						navController = bottomNavController,
 						startDestination = AppRoutes.InfoCenter.Messages
 					) {
-						InfoCenterNav(viewModel = viewModel)
+						infoCenterNav(viewModel = viewModel)
 					}
 				}
 			}
@@ -132,7 +129,7 @@ fun InfoCenter(
 
 			fun <T : Any> isCurrentRoute(route: T) = currentRoute?.destination?.route == route::class.qualifiedName
 
-			fun <T : Any> navigate(route: T) = {
+			fun <T : Any> navigate(route: T): () -> Unit = {
 				if (!isCurrentRoute(route))
 					bottomNavController.navigate(route) {
 						bottomNavController.graph.startDestinationRoute?.let { route ->

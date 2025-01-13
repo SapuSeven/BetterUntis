@@ -8,7 +8,7 @@ import androidx.core.graphics.ColorUtils
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.masterdata.timegrid.Day
 import com.sapuseven.untis.api.model.untis.timetable.Period
-import com.sapuseven.untis.data.repository.ElementRepository
+import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.models.PeriodItem
 import com.sapuseven.untis.scope.UserScopeManager
 import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
@@ -22,10 +22,10 @@ import java.time.DayOfWeek
 import java.time.temporal.ChronoUnit
 
 class TimetableMapper @AssistedInject constructor(
-	private val settingsRepositoryFactory: UserSettingsRepository.Factory,
-	private val elementRepository: ElementRepository,
-	private val userScopeManager: UserScopeManager,
-	@Assisted private val colorScheme: ColorScheme,
+    private val settingsRepositoryFactory: UserSettingsRepository.Factory,
+    private val masterDataRepository: MasterDataRepository,
+    private val userScopeManager: UserScopeManager,
+    @Assisted private val colorScheme: ColorScheme,
 ) {
 	private val settings = settingsRepositoryFactory.create(colorScheme).getSettings()
 
@@ -161,7 +161,7 @@ class TimetableMapper @AssistedInject constructor(
 	): List<Event<PeriodItem>> {
 		return map { period ->
 			val periodItem = PeriodItem(
-				elementRepository = elementRepository,
+				masterDataRepository = masterDataRepository,
 				originalPeriod = period
 			)
 

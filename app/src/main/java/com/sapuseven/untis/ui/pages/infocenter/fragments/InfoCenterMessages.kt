@@ -1,6 +1,8 @@
 package com.sapuseven.untis.ui.pages.infocenter.fragments
 
 import android.widget.TextView
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -11,6 +13,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -25,11 +29,16 @@ import com.sapuseven.untis.ui.dialogs.AttachmentsDialog
 fun InfoCenterMessages(messages: Result<List<MessageOfDay>>?) {
 	var attachmentsDialog by remember { mutableStateOf<List<Attachment>?>(null) }
 
-	ItemList(
-		itemResult = messages,
-		itemRenderer = { MessageItem(it) { attachments -> attachmentsDialog = attachments } },
-		itemsEmptyMessage = R.string.infocenter_messages_empty,
-	)
+	LazyColumn(
+		horizontalAlignment = Alignment.CenterHorizontally,
+		modifier = Modifier.fillMaxSize()
+	) {
+		itemList(
+			itemResult = messages,
+			itemRenderer = { MessageItem(it) { attachments -> attachmentsDialog = attachments } },
+			itemsEmptyMessage = R.string.infocenter_messages_empty,
+		)
+	}
 
 	attachmentsDialog?.let { attachments ->
 		AttachmentsDialog(

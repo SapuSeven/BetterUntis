@@ -36,7 +36,7 @@ import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.enumeration.PeriodRight
 import com.sapuseven.untis.api.model.untis.timetable.PeriodData
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
-import com.sapuseven.untis.data.repository.ElementRepository
+import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.data.repository.TimetableRepository
 import com.sapuseven.untis.models.PeriodItem
 import com.sapuseven.untis.ui.common.AppScaffold
@@ -59,7 +59,7 @@ import java.time.format.FormatStyle
 fun TimetableItemDetailsDialog(
 	periodItems: List<PeriodItem>,
 	timetableRepository: TimetableRepository,
-	elementRepository: ElementRepository,
+	masterDataRepository: MasterDataRepository,
 	initialPage: Int = 0,
 	onDismiss: (requestedElement: PeriodElement?) -> Unit
 ) {
@@ -187,7 +187,7 @@ fun TimetableItemDetailsDialog(
 				) { page ->
 					periodItems[page].also { periodItem ->
 						TimetableItemDetailsDialogPage(
-							elementRepository,
+							masterDataRepository,
 							timetableRepository,
 							periodItem,
 							periodDataMap[periodItem.originalPeriod.id],
@@ -224,7 +224,7 @@ fun TimetableItemDetailsDialog(
 
 @Composable
 private fun TimetableItemDetailsDialogPage(
-	elementRepository: ElementRepository,
+	masterDataRepository: MasterDataRepository,
 	timetableRepository: TimetableRepository,
 	periodItem: PeriodItem,
 	periodData: PeriodData?,
@@ -310,7 +310,7 @@ private fun TimetableItemDetailsDialogPage(
 				.padding(horizontal = 16.dp)
 		)
 
-		elementRepository.run {
+		masterDataRepository.run {
 			// Lesson teachers
 			TimetableItemDetailsDialogElement(
 				elements = periodItem.teachers,
@@ -669,7 +669,7 @@ private fun ListItemWithPeriodData(
 }
 
 @Composable
-private fun ElementRepository.TimetableItemDetailsDialogElement(
+private fun MasterDataRepository.TimetableItemDetailsDialogElement(
 	elements: Set<PeriodElement>,
 	icon: (@Composable () -> Unit)? = null,
 	useLongName: Boolean = false,

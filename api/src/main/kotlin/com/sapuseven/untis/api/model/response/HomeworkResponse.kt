@@ -1,6 +1,7 @@
-/*package com.sapuseven.untis.models.untis.response
+package com.sapuseven.untis.api.model.response
 
 import com.sapuseven.untis.api.model.untis.classreg.HomeWork
+import com.sapuseven.untis.api.model.untis.timetable.Lesson
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -11,14 +12,5 @@ data class HomeworkResponse(
 @Serializable
 data class HomeworkResult(
 		val homeWorks: List<HomeWork>,
-		val lessonsById: Map<String, UntisHomeworkLesson>
+		val lessonsById: Map<Long, Lesson>
 )
-
-@Serializable
-data class UntisHomeworkLesson(
-		val id: Long,
-		val subjectId: Long,
-		val klassenIds: List<Long>,
-		val teacherIds: List<Long>
-)
-*/
