@@ -37,6 +37,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 data class AbsenceCheckState(
 	var studentData: Set<Person>,
@@ -258,7 +259,7 @@ internal fun AbsenceCheck(
 				},
 				trailingContent = {
 					Text(
-						text = newAbsenceStartTime.format(DateTimeFormatter.ISO_LOCAL_TIME),
+						text = newAbsenceStartTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)),
 						style = MaterialTheme.typography.labelLarge
 					)
 				}
@@ -273,7 +274,7 @@ internal fun AbsenceCheck(
 				},
 				trailingContent = {
 					Text(
-						text = newAbsenceEndTime.format(DateTimeFormatter.ISO_LOCAL_TIME),
+						text = newAbsenceEndTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)),
 						style = MaterialTheme.typography.labelLarge
 					)
 				}

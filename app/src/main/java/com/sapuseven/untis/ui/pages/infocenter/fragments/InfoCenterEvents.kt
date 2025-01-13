@@ -18,6 +18,7 @@ import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.data.repository.LocalMasterDataRepository
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 
 @Composable
@@ -86,7 +87,7 @@ private fun ExamItem(item: Exam) {
 private fun HomeworkItem(item: HomeWork) {
 	ListItem(
 		overlineContent = {
-			Text(item.endDate.format(DateTimeFormatter.ISO_LOCAL_DATE))
+			Text(item.endDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)))
 		},
 		headlineContent = {
 			/* TODO Text(
@@ -109,9 +110,9 @@ private fun formatExamTime(startDateTime: LocalDateTime, endDateTime: LocalDateT
 			R.string.infocenter_timeformat_sameday
 		else
 			R.string.infocenter_timeformat,
-		startDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE),
-		startDateTime.format(DateTimeFormatter.ISO_LOCAL_TIME),
-		endDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE),
-		endDateTime.format(DateTimeFormatter.ISO_LOCAL_TIME)
+		startDateTime.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)),
+		startDateTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)),
+		endDateTime.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)),
+		endDateTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
 	)
 }
