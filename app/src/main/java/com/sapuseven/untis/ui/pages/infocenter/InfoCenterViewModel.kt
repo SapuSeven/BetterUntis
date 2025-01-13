@@ -64,7 +64,7 @@ class InfoCenterViewModel @Inject constructor(
 
 	private fun loadMessages() = viewModelScope.launch {
 		infoCenterRepository.messagesOfDaySource()
-			.get(LocalDate.now(), FromCache.CACHED_THEN_LOAD, maxAge = 60 * 60 * 1000 /* 1h */)
+			.get(LocalDate.now(), FromCache.CACHED_THEN_LOAD, maxAge = 60 * 60 * 1000 /* 1h */, additionalKey = currentUser)
 			.collectToStateResult(_messages)
 	}
 
@@ -78,7 +78,8 @@ class InfoCenterViewModel @Inject constructor(
 					currentSchoolYearEndDate
 				),
 				FromCache.CACHED_THEN_LOAD,
-				maxAge = 60 * 60 * 1000 /* 1h */
+				maxAge = 60 * 60 * 1000, /* 1h */
+				additionalKey = currentUser
 			)
 			.collectToStateResult(_exams)
 	}
@@ -93,7 +94,8 @@ class InfoCenterViewModel @Inject constructor(
 					currentSchoolYearEndDate
 				),
 				FromCache.CACHED_THEN_LOAD,
-				maxAge = 60 * 60 * 1000 /* 1h */
+				maxAge = 60 * 60 * 1000, /* 1h */
+				additionalKey = currentUser
 			)
 			.collectToStateResult(_homework)
 	}

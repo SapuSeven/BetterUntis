@@ -9,6 +9,7 @@ import com.sapuseven.untis.data.database.entities.RoomEntity
 import com.sapuseven.untis.data.database.entities.SchoolYearEntity
 import com.sapuseven.untis.data.database.entities.SubjectEntity
 import com.sapuseven.untis.data.database.entities.TeacherEntity
+import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.data.database.entities.UserWithData
 import com.sapuseven.untis.models.PeriodItem.Companion.ELEMENT_NAME_UNKNOWN
@@ -20,6 +21,8 @@ import javax.inject.Inject
 import kotlin.time.measureTime
 
 interface MasterDataRepository {
+	val currentUser: User?
+
 	fun getShortName(id: Long, type: ElementType?): String
 
 	fun getShortName(periodElement: PeriodElement): String
@@ -36,6 +39,8 @@ interface MasterDataRepository {
 }
 
 class DefaultMasterDataRepository : MasterDataRepository {
+	override val currentUser: User? = null
+
 	override fun getShortName(id: Long, type: ElementType?): String = "$type:$id"
 
 	override fun getShortName(periodElement: PeriodElement) = getShortName(periodElement.id, periodElement.type)
@@ -55,6 +60,8 @@ class UntisMasterDataRepository @Inject constructor(
 	private val userDao: UserDao,
 	private val userScopeManager: UserScopeManager,
 ): MasterDataRepository {
+	override val currentUser: User? = userScopeManager.userOptional
+
 	private var userWithData: UserWithData? = null
 
 	private val allClasses: Map<Long, KlasseEntity> by lazy {

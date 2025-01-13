@@ -217,8 +217,8 @@ class TimetableViewModel @AssistedInject constructor(
 					elementType = it.type,
 					startDate = startDate,
 				),
-				additionalKey = currentUser.id,
-				fromCache = fromCache
+				fromCache = fromCache,
+				additionalKey = currentUser
 			)
 		} ?: emptyFlow()
 	}

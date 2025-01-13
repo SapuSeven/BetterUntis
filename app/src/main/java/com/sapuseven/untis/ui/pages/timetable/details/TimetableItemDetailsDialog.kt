@@ -5,17 +5,47 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -66,7 +96,7 @@ fun TimetableItemDetailsDialog(
 	var dismissed by rememberSaveable { mutableStateOf(false) }
 	val pagerState = rememberPagerState(initialPage) { periodItems.size }
 	val scope = rememberCoroutineScope()
-	var error by remember { mutableStateOf<Throwable?>(null) }
+	val error by remember { mutableStateOf<Throwable?>(null) }
 
 	// contains additional details for the period items. Key is periodId (ttId)
 	val periodDataMap = remember { mutableStateMapOf<Long, PeriodData?>() }
@@ -74,7 +104,7 @@ fun TimetableItemDetailsDialog(
 	// contains a set of all students referenced in the periodData
 	var studentData by remember { mutableStateOf<Set<Person>?>(null) }
 
-	var absenceCheckState = rememberAbsenceCheckState(emptySet(), timetableRepository) {
+	val absenceCheckState = rememberAbsenceCheckState(emptySet(), timetableRepository) {
 		periodDataMap[it.ttId] = it
 	}
 
@@ -93,7 +123,7 @@ fun TimetableItemDetailsDialog(
 		val periods = periodItems.map { it.originalPeriod }.toSet()
 		Log.d("TimetableItemDetailsDlg", "Fetching period data for ${periods.map { it.id }}")
 		timetableRepository.periodDataSource()
-			.get(periods, FromCache.IF_FAILED)
+			.get(periods, FromCache.IF_FAILED, additionalKey = masterDataRepository.currentUser)
 			.catch {
 				//error = it
 			}
@@ -303,7 +333,7 @@ private fun TimetableItemDetailsDialogPage(
 			modifier = Modifier.padding(top = 8.dp)
 		)
 
-		Divider(
+		HorizontalDivider(
 			color = MaterialTheme.colorScheme.outline,
 			modifier = Modifier
 				.padding(top = 24.dp, bottom = 12.dp)
@@ -540,7 +570,7 @@ private fun TimetableItemDetailsDialogPage(
 						errorMessage?.let {
 							errorDialog = it
 						} ?: run {
-							if (periodItem.originalPeriod.can(PeriodRight.WRITE_LESSONTOPIC) == true) {
+							if (periodItem.originalPeriod.can(PeriodRight.WRITE_LESSONTOPIC)) {
 								lessonTopicEditDialog = periodItem.originalPeriod.id
 							}
 						}
@@ -598,7 +628,7 @@ private fun TimetableItemDetailsDialogPage(
 								),
 								color = MaterialTheme.colorScheme.error,
 								style = MaterialTheme.typography.bodyMedium,
-								text = dialogError?.let { it.stringResource() } ?: ""
+								text = dialogError?.stringResource() ?: ""
 							)
 						}
 					}

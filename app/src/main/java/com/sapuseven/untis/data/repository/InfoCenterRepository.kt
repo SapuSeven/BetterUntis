@@ -51,7 +51,7 @@ class UntisInfoCenterRepository @Inject constructor(
 					key = user.key
 				).messages
 			},
-			cache = DiskCache(File(cacheDir, "infocenter"), serializer()),
+			cache = DiskCache(File(cacheDir, "infocenter/messages"), serializer()),
 			timeProvider = timeProvider
 		)
 	}
@@ -69,7 +69,7 @@ class UntisInfoCenterRepository @Inject constructor(
 					key = user.key
 				).exams
 			},
-			cache = DiskCache(File(cacheDir, "infocenter"), serializer()),
+			cache = DiskCache(File(cacheDir, "infocenter/exams"), serializer()),
 			timeProvider = timeProvider
 		)
 	}
@@ -87,7 +87,7 @@ class UntisInfoCenterRepository @Inject constructor(
 					key = user.key
 				).homeWorks
 			},
-			cache = DiskCache(File(cacheDir, "infocenter"), serializer()),
+			cache = DiskCache(File(cacheDir, "infocenter/homework"), serializer()),
 			timeProvider = timeProvider
 		)
 	}

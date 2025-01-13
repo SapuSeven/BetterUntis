@@ -34,7 +34,7 @@ fun InfoCenterEvents(
 			Text(
 				text = "Exams",
 				style = MaterialTheme.typography.labelLarge,
-				modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+				modifier = Modifier.padding(bottom = 8.dp)
 			)
 		}
 
@@ -48,7 +48,7 @@ fun InfoCenterEvents(
 			Text(
 				text = "Homework",
 				style = MaterialTheme.typography.labelLarge,
-				modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+				modifier = Modifier.padding(top = 24.dp, bottom = 8.dp)
 			)
 		}
 
