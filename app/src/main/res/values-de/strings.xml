@@ -121,7 +121,6 @@
     <string name="infocenter_timeformat_sameday">%2$s - %4$s, %1$s</string>
     <string name="infocenter_officehours_empty">Keine Sprechstunden</string>
     <string name="infocenter_messages_empty">Keine Nachrichten</string>
-    <string name="infocenter_events_empty">Keine Termine</string>
     <string name="infocenter_absences_empty">Keine Abwesenheiten</string>
     <string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
     <string name="infocenter_absence_excused">Entschuldigt</string>

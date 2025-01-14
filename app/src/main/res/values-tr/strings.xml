@@ -61,7 +61,6 @@
     <string name="infocenter_messages_empty">Mesaj yok</string>
     <string name="infocenter_messages_attachments">Ekler</string>
     <string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
-    <string name="infocenter_events_empty">Etkinlik yok</string>
     <string name="infocenter_absences_empty">Devamsızlık yok</string>
     <string name="roomfinder_no_rooms">Görüntülenebilecek bir oda yok.
 \nYeni bir tane eklemek için +\'ya basın!</string>

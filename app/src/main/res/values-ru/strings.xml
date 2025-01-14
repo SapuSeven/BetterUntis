@@ -128,7 +128,6 @@
     <string name="main_dialog_update_profile_button">Обновить профиль</string>
     <string name="logindatainput_delete">Удалить профиль</string>
     <string name="main_dialog_delete_profile_title">Удалить профиль\?</string>
-    <string name="infocenter_events_empty">Событий нет</string>
     <string name="logindatainput_anonymous_login">Анонимный вход</string>
     <string name="errors_crash_title">Похоже, что BetterUntis вылетело.</string>
     <string name="infocenter_messages_empty">Сообщений нет</string>

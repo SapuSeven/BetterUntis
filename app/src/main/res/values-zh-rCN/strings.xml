@@ -107,7 +107,6 @@
     <string name="roomfinder_loading_data">数据加载中…</string>
     <string name="infocenter_officehours_empty">无办公时间</string>
     <string name="infocenter_messages_empty">无消息</string>
-    <string name="infocenter_events_empty">无活动</string>
     <string name="infocenter_absences_empty">无缺勤</string>
     <string name="elementpicker_hint_search">搜索…</string>
     <string name="elementpicker_hint_search_classes">搜索课程…</string>

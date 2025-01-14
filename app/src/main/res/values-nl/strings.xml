@@ -40,7 +40,6 @@
     <string name="all_lessontopic_edit">Lesonderwerp bewerken</string>
     <string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
     <string name="all_lesson_details">Lesdetails</string>
-    <string name="infocenter_events_empty">Geen gebeurtenissen</string>
     <string name="all_failed">mislukt</string>
     <string name="infocenter_absence_unknown_reason">Onbekende reden</string>
     <string name="infocenter_messages_attachments">Bijlagen</string>

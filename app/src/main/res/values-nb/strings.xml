@@ -102,7 +102,6 @@
     <string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
     <string name="infocenter_timeformat_sameday">%2$s - %4$s, %1$s</string>
     <string name="infocenter_messages_empty">Ingen meldinger</string>
-    <string name="infocenter_events_empty">Ingen hendelser</string>
     <string name="infocenter_absences_empty">Ingen fravær</string>
     <string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
     <string name="elementpicker_hint_search">Søk…</string>

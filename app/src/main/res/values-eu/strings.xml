@@ -10,7 +10,6 @@
     <string name="infocenter_messages_empty">Mezurik ez</string>
     <string name="infocenter_messages_attachments">Eranskinak</string>
     <string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
-    <string name="infocenter_events_empty">Gertaerarik ez</string>
     <string name="roomfinder_no_rooms">Ez dago gelarik erakusteko.
 \nUkitu + bat gehitzeko!</string>
     <string name="roomfinder_loading_data">Datuak kargatzen…</string>
