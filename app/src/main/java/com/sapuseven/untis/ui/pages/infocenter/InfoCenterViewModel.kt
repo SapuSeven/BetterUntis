@@ -1,7 +1,7 @@
 package com.sapuseven.untis.ui.pages.infocenter
 
+import androidx.compose.material3.darkColorScheme
 import androidx.lifecycle.viewModelScope
-import com.sapuseven.untis.api.client.OfficeHoursApi
 import com.sapuseven.untis.api.model.untis.MessageOfDay
 import com.sapuseven.untis.api.model.untis.absence.StudentAbsence
 import com.sapuseven.untis.api.model.untis.classreg.Exam
@@ -15,6 +15,7 @@ import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.scope.UserScopeManager
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.pages.ActivityViewModel
+import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
 import crocodile8.universal_cache.FromCache
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
@@ -32,8 +34,11 @@ class InfoCenterViewModel @Inject constructor(
 	internal val masterDataRepository: MasterDataRepository,
 	private val infoCenterRepository: InfoCenterRepository,
 	private val navigator: AppNavigator,
+	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
 	userScopeManager: UserScopeManager,
 ) : ActivityViewModel() {
+	val userSettingsRepository = userSettingsRepositoryFactory.create(darkColorScheme()) // Color scheme doesn't matter here
+
 	private val currentUser: User = userScopeManager.user
 	private val currentSchoolYear by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
 		masterDataRepository.currentSchoolYear()
@@ -53,6 +58,9 @@ class InfoCenterViewModel @Inject constructor(
 
 	private val _officeHours = MutableStateFlow<Result<List<OfficeHour>>?>(null)
 	val officeHours: StateFlow<Result<List<OfficeHour>>?> = _officeHours
+
+	private val _showAbsenceFilter = MutableStateFlow(false)
+	val showAbsenceFilter: StateFlow<Boolean> = _showAbsenceFilter
 
 	val shouldShowAbsences: Boolean = Right.R_MY_ABSENCES in currentUser.userData.rights
 	val shouldShowAbsencesAdd: Boolean = Right.W_OWN_ABSENCE in currentUser.userData.rights
@@ -122,18 +130,41 @@ class InfoCenterViewModel @Inject constructor(
 	private suspend fun loadAbsences() {
 		if (!shouldShowAbsences) return
 
+		val settings = userSettingsRepository.getSettings().first()
+
+		val daysAgo: Long = when (settings.infocenterAbsencesTimeRange) {
+			"seven_days" -> 7
+			"fourteen_days" -> 14
+			"thirty_days" -> 30
+			"ninety_days" -> 90
+			else -> 0
+		}
+
+		val timeRange = if (daysAgo > 0) {
+			LocalDate.now().minusDays(daysAgo) to LocalDate.now()
+		} else {
+			(currentSchoolYear?.startDate ?: LocalDate.now()) to (currentSchoolYear?.endDate ?: LocalDate.now())
+		}
+
+		val params = InfoCenterRepository.AbsencesParams(
+			timeRange.first,
+			timeRange.second,
+			includeExcused = !settings.infocenterAbsencesOnlyUnexcused,
+		)
+
 		infoCenterRepository.absencesSource()
 			.get(
-				InfoCenterRepository.AbsencesParams(
-					currentSchoolYear?.startDate ?: LocalDate.now(),
-					currentSchoolYear?.endDate ?: LocalDate.now(),
-					// TODO: Implement and honor filter: include excused + time range (last 7 days, last 30 days etc.)
-				),
+				params,
 				FromCache.CACHED_THEN_LOAD,
 				maxAge = 60 * 60 * 1000, /* 1h */
 				additionalKey = currentUser
 			)
-			.collectToStateResult(_absences)
+			.collectToStateResult(_absences) {
+				if (settings.infocenterAbsencesSortReverse)
+					it.sortedBy { absence -> absence.startDateTime } // oldest first
+				else
+					it.sortedByDescending { absence -> absence.startDateTime } // newest first
+			}
 	}
 
 	private suspend fun loadOfficeHours() {
@@ -148,13 +179,24 @@ class InfoCenterViewModel @Inject constructor(
 			)
 			.collectToStateResult(_officeHours)
 	}
+
+	fun onAbsenceFilterDismiss() {
+		_showAbsenceFilter.value = false
+	}
+
+	fun onAbsenceFilterShow() {
+		_showAbsenceFilter.value = true
+	}
 }
 
 // Maybe this can be reused elsewhere?
-private suspend fun <T> Flow<T>.collectToStateResult(state: MutableStateFlow<Result<T>?>) {
+private suspend fun <T> Flow<T>.collectToStateResult(
+	state: MutableStateFlow<Result<T>?>,
+	transform: (T) -> T = { it }
+) {
 	catch { throwable ->
 		state.value = Result.failure(throwable)
 	}.collect { value ->
-		state.value = Result.success(value)
+		state.value = Result.success(transform(value))
 	}
 }

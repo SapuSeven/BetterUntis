@@ -15,8 +15,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = SettingsScreenViewModel.Factory::class)
 class SettingsScreenViewModel @AssistedInject constructor(
-	private val userSettingsRepositoryFactory: UserSettingsRepository.Factory,
-	private val globalSettingsRepository: GlobalSettingsRepository,
+	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
+	globalSettingsRepository: GlobalSettingsRepository,
 	private val userScopeManager: UserScopeManager,
 	private val userDao: UserDao,
 	val savedStateHandle: SavedStateHandle,
