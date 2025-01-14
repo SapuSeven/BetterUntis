@@ -257,61 +257,7 @@ private fun OfficeHourItem(item: UntisOfficeHour) {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun AbsenceItem(item: UntisAbsence) {
-	ListItem(
-		overlineContent = {
-			Text(
-				formatAbsenceTime(
-					item.startDateTime.toLocalDateTime(),
-					item.endDateTime.toLocalDateTime()
-				)
-			)
-		},
-		headlineContent = {
-			Text(
-				if (item.absenceReason.isNotEmpty())
-					item.absenceReason.substring(0, 1)
-						.uppercase(Locale.getDefault()) + item.absenceReason.substring(1)
-				else
-					stringResource(R.string.infocenter_absence_unknown_reason)
-			)
-		},
-		supportingContent = if (item.text.isNotBlank()) {
-			{ Text(item.text) }
-		} else null,
-		leadingContent = {
-			if (item.excused)
-				Icon(
-					painter = painterResource(R.drawable.infocenter_absences_excused),
-					contentDescription = stringResource(id = R.string.infocenter_absence_excused)
-				)
-			else
-				Icon(
-					painter = painterResource(R.drawable.infocenter_absences_unexcused),
-					contentDescription = stringResource(id = R.string.infocenter_absence_unexcused)
-				)
-		}
-	)
-}*/
-
-@Composable
-private fun formatAbsenceTime(
-	startDateTime: LocalDateTime,
-	endDateTime: LocalDateTime,
-): String {
-	return stringResource(
-		if (startDateTime.dayOfYear == endDateTime.dayOfYear)
-			R.string.infocenter_timeformat_sameday
-		else
-			R.string.infocenter_timeformat,
-		startDateTime.toString(DateTimeFormat.mediumDate()),
-		startDateTime.toString(DateTimeFormat.shortTime()),
-		endDateTime.toString(DateTimeFormat.mediumDate()),
-		endDateTime.toString(DateTimeFormat.shortTime())
-	)
-}
-
+*/
 @Composable
 private fun formatOfficeHourTime(
 	startDateTime: LocalDateTime,

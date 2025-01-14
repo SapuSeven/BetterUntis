@@ -2,9 +2,11 @@ package com.sapuseven.untis.ui.pages.infocenter
 
 import androidx.lifecycle.viewModelScope
 import com.sapuseven.untis.api.model.untis.MessageOfDay
+import com.sapuseven.untis.api.model.untis.absence.StudentAbsence
 import com.sapuseven.untis.api.model.untis.classreg.Exam
 import com.sapuseven.untis.api.model.untis.classreg.HomeWork
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.api.model.untis.enumeration.Right
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.repository.InfoCenterRepository
 import com.sapuseven.untis.data.repository.MasterDataRepository
@@ -27,12 +29,12 @@ import javax.inject.Inject
 class InfoCenterViewModel @Inject constructor(
 	internal val masterDataRepository: MasterDataRepository,
 	private val infoCenterRepository: InfoCenterRepository,
-	private val userScopeManager: UserScopeManager,
 	private val navigator: AppNavigator,
+	userScopeManager: UserScopeManager,
 ) : ActivityViewModel() {
 	private val currentUser: User = userScopeManager.user
-	private val currentSchoolYearEndDate by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
-		masterDataRepository.currentSchoolYear()?.endDate ?: LocalDate.now()
+	private val currentSchoolYear by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
+		masterDataRepository.currentSchoolYear()
 	}
 
 	private val _messages = MutableStateFlow<Result<List<MessageOfDay>>?>(null)
@@ -44,9 +46,14 @@ class InfoCenterViewModel @Inject constructor(
 	private val _homework = MutableStateFlow<Result<List<HomeWork>>?>(null)
 	val homework: StateFlow<Result<List<HomeWork>>?> = _homework
 
-	val shouldShowAbsences: Boolean = true
+	private val _absences = MutableStateFlow<Result<List<StudentAbsence>>?>(null)
+	val absences: StateFlow<Result<List<StudentAbsence>>?> = _absences
 
-	val shouldShowOfficeHours: Boolean = true
+	val shouldShowAbsences: Boolean = Right.R_MY_ABSENCES in currentUser.userData.rights
+	val shouldShowAbsencesAdd: Boolean = Right.W_OWN_ABSENCE in currentUser.userData.rights
+	val shouldShowAbsencesAddReason: Boolean = Right.W_OWN_ABSENCEREASON in currentUser.userData.rights
+
+	val shouldShowOfficeHours: Boolean = Right.R_OFFICEHOURS in currentUser.userData.rights
 
 	fun goBack() {
 		navigator.popBackStack()
@@ -57,25 +64,31 @@ class InfoCenterViewModel @Inject constructor(
 			listOf(
 				async { loadMessages() },
 				async { loadExams() },
-				async { loadHomeworks() }
+				async { loadHomework() },
+				async { loadAbsences() },
 			).awaitAll()
 		}
 	}
 
 	private fun loadMessages() = viewModelScope.launch {
 		infoCenterRepository.messagesOfDaySource()
-			.get(LocalDate.now(), FromCache.CACHED_THEN_LOAD, maxAge = 60 * 60 * 1000 /* 1h */, additionalKey = currentUser)
+			.get(
+				LocalDate.now(),
+				FromCache.CACHED_THEN_LOAD,
+				maxAge = 60 * 60 * 1000 /* 1h */,
+				additionalKey = currentUser
+			)
 			.collectToStateResult(_messages)
 	}
 
 	private suspend fun loadExams() {
 		infoCenterRepository.examsSource()
 			.get(
-				InfoCenterRepository.ClassRegParams(
+				InfoCenterRepository.EventsParams(
 					currentUser.userData.elemId,
 					currentUser.userData.elemType ?: ElementType.STUDENT,
 					LocalDate.now(),
-					currentSchoolYearEndDate
+					currentSchoolYear?.endDate ?: LocalDate.now()
 				),
 				FromCache.CACHED_THEN_LOAD,
 				maxAge = 60 * 60 * 1000, /* 1h */
@@ -84,20 +97,37 @@ class InfoCenterViewModel @Inject constructor(
 			.collectToStateResult(_exams)
 	}
 
-	private suspend fun loadHomeworks() {
-		infoCenterRepository.homeworksSource()
+	private suspend fun loadHomework() {
+		infoCenterRepository.homeworkSource()
 			.get(
-				InfoCenterRepository.ClassRegParams(
+				InfoCenterRepository.EventsParams(
 					currentUser.userData.elemId,
 					currentUser.userData.elemType ?: ElementType.STUDENT,
 					LocalDate.now(),
-					currentSchoolYearEndDate
+					currentSchoolYear?.endDate ?: LocalDate.now()
 				),
 				FromCache.CACHED_THEN_LOAD,
 				maxAge = 60 * 60 * 1000, /* 1h */
 				additionalKey = currentUser
 			)
 			.collectToStateResult(_homework)
+	}
+
+	private suspend fun loadAbsences() {
+		if (!shouldShowAbsences) return
+
+		infoCenterRepository.absencesSource()
+			.get(
+				InfoCenterRepository.AbsencesParams(
+					currentSchoolYear?.startDate ?: LocalDate.now(),
+					currentSchoolYear?.endDate ?: LocalDate.now(),
+					// TODO: Implement and honor filter: include excused + time range (last 7 days, last 30 days etc.)
+				),
+				FromCache.CACHED_THEN_LOAD,
+				maxAge = 60 * 60 * 1000, /* 1h */
+				additionalKey = currentUser
+			)
+			.collectToStateResult(_absences)
 	}
 }
 

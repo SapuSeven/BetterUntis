@@ -6,6 +6,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.sapuseven.untis.ui.navigation.AppRoutes
+import com.sapuseven.untis.ui.pages.infocenter.fragments.InfoCenterAbsences
 import com.sapuseven.untis.ui.pages.infocenter.fragments.InfoCenterEvents
 import com.sapuseven.untis.ui.pages.infocenter.fragments.InfoCenterMessages
 
@@ -53,7 +54,8 @@ fun NavGraphBuilder.infoCenterNav(
         popEnterTransition = { slideIntoContainer(slideDirection()) },
         popExitTransition = { slideOutOfContainer(slideDirection()) }
     ) {
-        //InfoCenterEvents()
+		val absences = viewModel.absences.collectAsState()
+        InfoCenterAbsences(absences.value)
     }
 
     composable<AppRoutes.InfoCenter.OfficeHours>(
