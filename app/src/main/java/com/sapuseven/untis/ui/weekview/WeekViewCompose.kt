@@ -74,6 +74,8 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.roundToInt
 
 data class Event<T>(
@@ -96,19 +98,22 @@ data class Event<T>(
 fun <T> WeekViewEvent(
 	event: Event<T>,
 	currentTime: LocalDateTime = LocalDateTime.now(),
+	outerPadding: Dp = 2.dp,
+	innerPadding: Dp = 2.dp,
 	modifier: Modifier = Modifier,
 	onClick: (() -> Unit)? = null,
 ) {
 	Box(
 		modifier = modifier
 			.fillMaxSize()
-			.padding(2.dp) // Outer padding
+			.padding(outerPadding)
 			.clip(RoundedCornerShape(4.dp))
 			.drawBehind {
 				drawVerticalSplitRect(
 					event.pastColor,
 					event.color,
-					size = Size(size.width, size.height),
+					topLeft = Offset(-outerPadding.toPx(), -outerPadding.toPx()),
+					size = Size(size.width + outerPadding.toPx() * 2, size.height + outerPadding.toPx() * 2),
 					division = ((currentTime.seconds() - event.start.seconds()).toFloat()
 						/ (event.end.seconds() - event.start.seconds()).toFloat())
 						.coerceIn(0f, 1f)
@@ -117,7 +122,7 @@ fun <T> WeekViewEvent(
 			.ifNotNull(onClick) {
 				clickable(onClick = it)
 			}
-			.padding(horizontal = 2.dp) // Inner padding
+			.padding(horizontal = innerPadding)
 	) {
 		Text(
 			text = event.top.asAnnotatedString(),
@@ -575,15 +580,15 @@ fun <T> WeekViewContent(
 			) / 60f * hourHeight.toPx() + endTimeOffset).roundToInt()
 		)
 		val width = constraints.maxWidth + dividerWidth.toInt()
-		val dayWidth = width / numDays
+		val dayWidth = width.toFloat() / numDays
 		val placeablesWithEvents = measureables.map { measurable ->
 			val event = measurable.parentData as Event<*>
 			val eventDurationMinutes = ChronoUnit.MINUTES.between(event.start, event.end)
 			val eventHeight = ((eventDurationMinutes / 60f) * hourHeight.toPx()).roundToInt()
 			val placeable = measurable.measure(
 				constraints.copy(
-					minWidth = dayWidth / event.numSimultaneous,
-					maxWidth = dayWidth / event.numSimultaneous,
+					minWidth = (dayWidth / event.numSimultaneous).toInt(),
+					maxWidth = (dayWidth / event.numSimultaneous).toInt(),
 					minHeight = eventHeight,
 					maxHeight = eventHeight
 				)
