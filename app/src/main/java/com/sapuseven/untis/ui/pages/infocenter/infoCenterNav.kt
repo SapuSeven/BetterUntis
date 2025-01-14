@@ -9,6 +9,7 @@ import com.sapuseven.untis.ui.navigation.AppRoutes
 import com.sapuseven.untis.ui.pages.infocenter.fragments.InfoCenterAbsences
 import com.sapuseven.untis.ui.pages.infocenter.fragments.InfoCenterEvents
 import com.sapuseven.untis.ui.pages.infocenter.fragments.InfoCenterMessages
+import com.sapuseven.untis.ui.pages.infocenter.fragments.InfoCenterOfficeHours
 
 fun NavGraphBuilder.infoCenterNav(
     viewModel: InfoCenterViewModel
@@ -64,6 +65,7 @@ fun NavGraphBuilder.infoCenterNav(
         popEnterTransition = { slideIntoContainer(slideDirection()) },
         popExitTransition = { slideOutOfContainer(slideDirection()) }
     ) {
-        //InfoCenterEvents()
+		val officeHours = viewModel.officeHours.collectAsState()
+        InfoCenterOfficeHours(officeHours.value)
     }
 }

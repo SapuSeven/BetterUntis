@@ -3,6 +3,7 @@ package com.sapuseven.untis.modules
 import com.sapuseven.untis.api.client.AbsenceApi
 import com.sapuseven.untis.api.client.ClassRegApi
 import com.sapuseven.untis.api.client.MessagesApi
+import com.sapuseven.untis.api.client.OfficeHoursApi
 import com.sapuseven.untis.api.client.SchoolSearchApi
 import com.sapuseven.untis.api.client.TimetableApi
 import com.sapuseven.untis.api.client.UserDataApi
@@ -27,4 +28,6 @@ object ApiClientModule {
 	fun provideClassRegApi(): ClassRegApi = ClassRegApi(CIO)
 	@Provides
 	fun provideAbsenceApi(): AbsenceApi = AbsenceApi(CIO)
+	@Provides
+	fun provideOfficeHoursApi(): OfficeHoursApi = OfficeHoursApi(CIO)
 }

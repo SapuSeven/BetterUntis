@@ -1,12 +1,14 @@
 package com.sapuseven.untis.ui.pages.infocenter
 
 import androidx.lifecycle.viewModelScope
+import com.sapuseven.untis.api.client.OfficeHoursApi
 import com.sapuseven.untis.api.model.untis.MessageOfDay
 import com.sapuseven.untis.api.model.untis.absence.StudentAbsence
 import com.sapuseven.untis.api.model.untis.classreg.Exam
 import com.sapuseven.untis.api.model.untis.classreg.HomeWork
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.enumeration.Right
+import com.sapuseven.untis.api.model.untis.timetable.OfficeHour
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.repository.InfoCenterRepository
 import com.sapuseven.untis.data.repository.MasterDataRepository
@@ -49,6 +51,9 @@ class InfoCenterViewModel @Inject constructor(
 	private val _absences = MutableStateFlow<Result<List<StudentAbsence>>?>(null)
 	val absences: StateFlow<Result<List<StudentAbsence>>?> = _absences
 
+	private val _officeHours = MutableStateFlow<Result<List<OfficeHour>>?>(null)
+	val officeHours: StateFlow<Result<List<OfficeHour>>?> = _officeHours
+
 	val shouldShowAbsences: Boolean = Right.R_MY_ABSENCES in currentUser.userData.rights
 	val shouldShowAbsencesAdd: Boolean = Right.W_OWN_ABSENCE in currentUser.userData.rights
 	val shouldShowAbsencesAddReason: Boolean = Right.W_OWN_ABSENCEREASON in currentUser.userData.rights
@@ -66,6 +71,7 @@ class InfoCenterViewModel @Inject constructor(
 				async { loadExams() },
 				async { loadHomework() },
 				async { loadAbsences() },
+				async { loadOfficeHours() },
 			).awaitAll()
 		}
 	}
@@ -128,6 +134,19 @@ class InfoCenterViewModel @Inject constructor(
 				additionalKey = currentUser
 			)
 			.collectToStateResult(_absences)
+	}
+
+	private suspend fun loadOfficeHours() {
+		if (!shouldShowOfficeHours) return
+
+		infoCenterRepository.officeHoursSource()
+			.get(
+				InfoCenterRepository.OfficeHoursParams(-1, LocalDate.now()),
+				FromCache.CACHED_THEN_LOAD,
+				maxAge = 60 * 60 * 1000, /* 1h */
+				additionalKey = currentUser
+			)
+			.collectToStateResult(_officeHours)
 	}
 }
 

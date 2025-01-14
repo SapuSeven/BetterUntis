@@ -1,4 +1,4 @@
-/*package com.sapuseven.untis.models.untis.response
+package com.sapuseven.untis.api.model.response
 
 import com.sapuseven.untis.api.model.untis.timetable.OfficeHour
 import kotlinx.serialization.Serializable
@@ -12,4 +12,3 @@ data class OfficeHoursResponse(
 data class OfficeHoursResult(
 		val officeHours: List<OfficeHour>
 )
-*/
