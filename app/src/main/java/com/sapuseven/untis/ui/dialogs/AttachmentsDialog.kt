@@ -17,7 +17,6 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.model.untis.Attachment
 

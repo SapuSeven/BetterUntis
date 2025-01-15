@@ -87,36 +87,6 @@ fun InfoCenter(
 				.padding(innerPadding)
 				.fillMaxSize()
 		) {
-			// Initially load all items
-			/*LaunchedEffect(Unit) {
-				if (state.messages.value == null)
-					coroutineScope.launch {
-						state.loadMessages()/*?.also {
-											preferences["preference_last_messages_count"] = it.size
-											preferences["preference_last_messages_date"] =
-												SimpleDateFormat(
-													"dd-MM-yyyy",
-													Locale.US
-												).format(Calendar.getInstance().time)
-										}*/
-					}
-
-				if (state.events.value == null)
-					coroutineScope.launch {
-						state.loadEvents()
-					}
-
-				if (state.absences.value == null)
-					coroutineScope.launch {
-						state.loadAbsences()
-					}
-
-				if (state.officeHours.value == null)
-					coroutineScope.launch {
-						state.loadOfficeHours()
-					}
-			}*/
-
 			CompositionLocalProvider(LocalMasterDataRepository provides viewModel.masterDataRepository) {
 				Box(
 					modifier = Modifier
