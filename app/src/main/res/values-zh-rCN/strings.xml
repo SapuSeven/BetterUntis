@@ -265,7 +265,6 @@
     <string name="all_dialog_crash_title">找到了崩溃记录</string>
     <string name="preference_timetable_colors_reset_button_positive">重置</string>
     <string name="preference_theme_pixel">像素</string>
-    <string name="infocenter_absence_unknown_reason">原因不明</string>
     <string name="infocenter_messages_attachments">附件</string>
     <string name="logindatainput_skip_school_id">跳过学校ID解析</string>
     <string name="logindatainput_skip_app_secret">跳过应用程序秘密解析</string>

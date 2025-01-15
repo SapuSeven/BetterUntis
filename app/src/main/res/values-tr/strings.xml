@@ -54,7 +54,6 @@
     <string name="elementpicker_hint_search_rooms">Oda ara…</string>
     <string name="elementpicker_hint_search_classes">Sınıf ara…</string>
     <string name="elementpicker_hint_search">Arama yap…</string>
-    <string name="infocenter_absence_unknown_reason">Bilinmeyen neden</string>
     <string name="infocenter_timeformat_sameday">%2$s - %4$s,%1$s</string>
     <string name="infocenter_timeformat">%1$s, %2$s - %3$s, %4$s</string>
     <string name="infocenter_officehours_empty">Ofis saati yok</string>

@@ -22,6 +22,7 @@ import kotlin.time.measureTime
 
 interface MasterDataRepository {
 	val currentUser: User?
+	val currentUserData: UserWithData?
 
 	fun getShortName(id: Long, type: ElementType?): String
 
@@ -40,6 +41,7 @@ interface MasterDataRepository {
 
 class DefaultMasterDataRepository : MasterDataRepository {
 	override val currentUser: User? = null
+	override val currentUserData: UserWithData? = null
 
 	override fun getShortName(id: Long, type: ElementType?): String = "$type:$id"
 
@@ -59,22 +61,24 @@ class DefaultMasterDataRepository : MasterDataRepository {
 class UntisMasterDataRepository @Inject constructor(
 	private val userDao: UserDao,
 	private val userScopeManager: UserScopeManager,
-): MasterDataRepository {
+) : MasterDataRepository {
 	override val currentUser: User? = userScopeManager.userOptional
 
-	private var userWithData: UserWithData? = null
+	private var _currentUserData: UserWithData? = null
+	override val currentUserData: UserWithData?
+		get() = _currentUserData
 
 	private val allClasses: Map<Long, KlasseEntity> by lazy {
-		(userWithData?.klassen ?: emptyList()).filter { it.active }.sortedBy { it.name }.associateBy { it.id }
+		(_currentUserData?.klassen ?: emptyList()).filter { it.active }.sortedBy { it.name }.associateBy { it.id }
 	}
 	private val allTeachers: Map<Long, TeacherEntity> by lazy {
-		(userWithData?.teachers ?: emptyList()).filter { it.active }.sortedBy { it.name }.associateBy { it.id }
+		(_currentUserData?.teachers ?: emptyList()).filter { it.active }.sortedBy { it.name }.associateBy { it.id }
 	}
 	private val allSubjects: Map<Long, SubjectEntity> by lazy {
-		(userWithData?.subjects ?: emptyList()).filter { it.active }.sortedBy { it.name }.associateBy { it.id }
+		(_currentUserData?.subjects ?: emptyList()).filter { it.active }.sortedBy { it.name }.associateBy { it.id }
 	}
 	private val allRooms: Map<Long, RoomEntity> by lazy {
-		(userWithData?.rooms ?: emptyList()).filter { it.active }.sortedBy { it.name }.associateBy { it.id }
+		(_currentUserData?.rooms ?: emptyList()).filter { it.active }.sortedBy { it.name }.associateBy { it.id }
 	}
 
 	init {
@@ -82,7 +86,7 @@ class UntisMasterDataRepository @Inject constructor(
 		measureTime {
 			// We need to run blocking to prevent a race condition
 			runBlocking(Dispatchers.IO) {
-				userWithData = userDao.getByIdWithData(userScopeManager.user.id)
+				_currentUserData = userDao.getByIdWithData(userScopeManager.user.id)
 			}
 		}.let {
 			Log.d("Performance", "MasterDataRepository init took $it")
@@ -125,7 +129,7 @@ class UntisMasterDataRepository @Inject constructor(
 
 	override fun isAllowed(periodElement: PeriodElement) = isAllowed(periodElement.id, periodElement.type)
 
-	override fun currentSchoolYear(currentDate: LocalDate): SchoolYearEntity? = userWithData?.schoolYears?.find {
+	override fun currentSchoolYear(currentDate: LocalDate): SchoolYearEntity? = _currentUserData?.schoolYears?.find {
 		currentDate.isAfter(it.startDate) && currentDate.isBefore(it.endDate)
 	}
 }

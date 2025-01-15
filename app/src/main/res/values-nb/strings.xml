@@ -267,7 +267,6 @@
     <string name="widget_configuration">Miniprogramsoppsett</string>
     <string name="preference_timetable_colors_reset_button_positive">Tilbakestill</string>
     <string name="preference_theme_pixel">Piksel</string>
-    <string name="infocenter_absence_unknown_reason">Ukjent grunn</string>
     <string name="infocenter_messages_attachments">Vedlegg</string>
     <string name="logindatainput_skip_app_secret">Hopp over programhemmeligehtsutledelse</string>
     <string name="logindatainput_error_invalid_url">Ugyldig nettadresse.</string>

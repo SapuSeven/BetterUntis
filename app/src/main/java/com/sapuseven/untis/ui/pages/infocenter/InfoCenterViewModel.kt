@@ -44,6 +44,8 @@ class InfoCenterViewModel @Inject constructor(
 		masterDataRepository.currentSchoolYear()
 	}
 
+	val excuseStatuses = masterDataRepository.currentUserData?.excuseStatuses ?: emptyList()
+
 	private val _messages = MutableStateFlow<Result<List<MessageOfDay>>?>(null)
 	val messages: StateFlow<Result<List<MessageOfDay>>?> = _messages
 

@@ -125,7 +125,7 @@
     <string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
     <string name="infocenter_absence_excused">Entschuldigt</string>
     <string name="infocenter_absence_unexcused">Unentschuldigt</string>
-    <string name="infocenter_absence_unknown_reason">Unbekannter Grund</string>
+    <string name="infocenter_absence_reason_unknown">Unbekannt</string>
     <string name="elementpicker_hint_search">Suchen…</string>
     <string name="elementpicker_hint_search_classes">Klassen durchsuchen…</string>
     <string name="elementpicker_hint_search_teachers">Lehrer durchsuchen…</string>

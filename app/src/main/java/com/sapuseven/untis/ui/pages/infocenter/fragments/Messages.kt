@@ -30,8 +30,7 @@ fun InfoCenterMessages(messages: Result<List<MessageOfDay>>?) {
 	var attachmentsDialog by remember { mutableStateOf<List<Attachment>?>(null) }
 
 	LazyColumn(
-		horizontalAlignment = Alignment.CenterHorizontally,
-		modifier = Modifier.fillMaxSize()
+		horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()
 	) {
 		itemList(
 			itemResult = messages,
@@ -41,34 +40,28 @@ fun InfoCenterMessages(messages: Result<List<MessageOfDay>>?) {
 	}
 
 	attachmentsDialog?.let { attachments ->
-		AttachmentsDialog(
-			attachments = attachments,
-			onDismiss = { attachmentsDialog = null }
-		)
+		AttachmentsDialog(attachments = attachments, onDismiss = { attachmentsDialog = null })
 	}
 }
 
 @Composable
 private fun MessageItem(
-	item: MessageOfDay,
-	onShowAttachments: (List<Attachment>) -> Unit
+	item: MessageOfDay, onShowAttachments: (List<Attachment>) -> Unit
 ) {
 	val textColor = MaterialTheme.colorScheme.onSurfaceVariant
+	val textContent = @Composable {
+		AndroidView(factory = { context ->
+			TextView(context).apply {
+				setTextColor(textColor.toArgb())
+			}
+		}, update = {
+			it.text = HtmlCompat.fromHtml(item.body, HtmlCompat.FROM_HTML_MODE_COMPACT)
+		})
+	}
 
 	ListItem(
-		headlineContent = { Text(item.subject) },
-		supportingContent = {
-			AndroidView(
-				factory = { context ->
-					TextView(context).apply {
-						setTextColor(textColor.toArgb())
-					}
-				},
-				update = {
-					it.text = HtmlCompat.fromHtml(item.body, HtmlCompat.FROM_HTML_MODE_COMPACT)
-				}
-			)
-		},
+		headlineContent = { if (item.subject.isNotBlank()) Text(item.subject) else textContent() },
+		supportingContent = { if (item.subject.isNotBlank()) textContent() },
 		trailingContent = if (item.attachments.isNotEmpty()) {
 			{
 				IconButton(onClick = {

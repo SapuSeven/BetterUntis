@@ -65,7 +65,6 @@
     <string name="all_lesson_details">Детали урока</string>
     <string name="all_failed">неудача</string>
     <string name="main_last_refreshed_never">никогда</string>
-    <string name="infocenter_absence_unknown_reason">Неизвестная причина</string>
     <string name="infocenter_messages_attachments">Вложения</string>
     <string name="preference_info_contributors_desc">Список участников</string>
     <string name="errors_crash_message">Извините за это.</string>

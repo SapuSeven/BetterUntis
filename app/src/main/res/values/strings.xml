@@ -78,23 +78,27 @@
     <string name="homeworks_due_time">due %1$s</string>
     <string name="homeworks_due_time_format">EEE, dd. MMM</string>
     <string name="infocenter_absence_excused">Excused</string>
+	<string name="infocenter_absence_excused_status">Excused: %1$s</string>
     <string name="infocenter_absence_unexcused">Unexcused</string>
-    <string name="infocenter_absence_unknown_reason">Unknown reason</string>
+    <string name="infocenter_absence_unexcused_status">Unexcused: %1$s</string>
+	<string name="infocenter_absence_reason">Reason: %1$s</string>
+    <string name="infocenter_absence_reason_unknown">Unknown</string>
     <string name="infocenter_absences_empty">No absences</string>
-    <string name="infocenter_exams_empty">No exams</string>
-    <string name="infocenter_homework_empty">No homework</string>
-    <string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
-    <string name="infocenter_messages_attachments">Attachments</string>
-    <string name="infocenter_messages_empty">No messages</string>
-    <string name="infocenter_officehours_empty">No office hours</string>
-    <string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
-    <string name="infocenter_timeformat_sameday">%2$s - %4$s, %1$s</string>
+	<string name="infocenter_absences_timerange">%1$s - %2$s</string>
     <string name="infocenter_absences_filter_only_unexcused">Show unexcused only</string>
     <string name="infocenter_absences_filter_sort">Sort order</string>
     <string name="infocenter_absences_filter_oldest_first">Oldest first</string>
     <string name="infocenter_absences_filter_newest_first">Newest first</string>
     <string name="infocenter_absences_filter_time_ranges">Time ranges</string>
     <string name="infocenter_absences_filter">Filter absences</string>
+	<string name="infocenter_exams_empty">No exams</string>
+	<string name="infocenter_homework_empty">No homework</string>
+	<string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
+	<string name="infocenter_messages_attachments">Attachments</string>
+	<string name="infocenter_messages_empty">No messages</string>
+	<string name="infocenter_officehours_empty">No office hours</string>
+	<string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
+	<string name="infocenter_timeformat_sameday">%2$s - %4$s, %1$s</string>
     <string name="library_appcompat" translatable="false">Android AppCompat Library V7</string>
     <string name="library_code_scanner" translatable="false">CodeScanner</string>
     <string name="library_colorpicker_compat" translatable="false">ColorPicker Compat</string>
