@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class Excuse(
 	val id: Long,
 	val excuseStatusId: Long,
+	val text: String?,
 	val number: Long,
-	val date: Date,
-	val text: String?
+	val date: Date? = null
 )

@@ -15,5 +15,8 @@ data class StudentAbsence(
 	val excuse: Excuse?,
 	val absenceReasonId: Long,
 	val absenceReason: String,
-	val text: String
+	val text: String,
+	val manualNotificationStatus: String? = null, // observed: "NOT_NOTIFIED",
+	val autoNotificationStatus: String? = null, // observed: "NO_AUTO_PARENT_NOTIFICATION_AND_NO_ATTEMPT",
+	val studentOfAge: Boolean? = null, // observed: false
 )

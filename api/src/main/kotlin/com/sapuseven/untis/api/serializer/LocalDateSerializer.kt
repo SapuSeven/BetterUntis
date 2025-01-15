@@ -6,8 +6,11 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 object LocalDateSerializer : KSerializer<LocalDate> {
 	private val format = DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -22,6 +25,10 @@ object LocalDateSerializer : KSerializer<LocalDate> {
 
 	override fun deserialize(decoder: Decoder): LocalDate {
 		val string = decoder.decodeString()
-		return LocalDate.parse(string, format)
+		return try {
+			LocalDate.parse(string, format)
+		} catch (e: DateTimeParseException) {
+			Instant.ofEpochMilli(0).atZone(ZoneId.systemDefault()).toLocalDate()
+		}
 	}
 }
