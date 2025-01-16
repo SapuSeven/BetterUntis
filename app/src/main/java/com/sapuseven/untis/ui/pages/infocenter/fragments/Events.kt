@@ -1,8 +1,11 @@
 package com.sapuseven.untis.ui.pages.infocenter.fragments
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -10,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.model.untis.classreg.Exam
@@ -22,41 +26,64 @@ import java.time.format.FormatStyle
 
 
 @Composable
-fun InfoCenterEvents(
-	exams: Result<List<Exam>>?,
-	homework: Result<List<HomeWork>>?
-) {
-	LazyColumn(
-		horizontalAlignment = Alignment.CenterHorizontally,
-		modifier = Modifier.fillMaxSize()
-	) {
-		item {
-			Text(
-				text = "Exams",
-				style = MaterialTheme.typography.labelLarge,
-				modifier = Modifier.padding(bottom = 8.dp)
-			)
+fun InfoCenterEvents(uiState: EventsUiState) {
+	Crossfade(targetState = uiState, label = "InfoCenter Events Content") { state ->
+		when (state) {
+			EventsUiState.Loading -> InfoCenterLoading()
+			is EventsUiState.Success -> {
+				LazyColumn(
+					horizontalAlignment = Alignment.CenterHorizontally,
+					modifier = Modifier.fillMaxSize()
+				) {
+					item {
+						Text(
+							text = stringResource(R.string.infocenter_exams),
+							style = MaterialTheme.typography.labelLarge,
+							modifier = Modifier.padding(bottom = 8.dp)
+						)
+					}
+
+					state.exams.fold(
+						onSuccess = {
+							if (state.isExamsEmpty) item {
+								Text(
+									text = stringResource(R.string.infocenter_exams_empty),
+									textAlign = TextAlign.Center,
+									modifier = Modifier.fillMaxWidth()
+								)
+							} else {
+								items(it) { item -> ExamItem(item) }
+							}
+						},
+						onFailure = { item { InfoCenterError(it) } }
+					)
+
+					item {
+						Text(
+							text = stringResource(R.string.infocenter_homework),
+							style = MaterialTheme.typography.labelLarge,
+							modifier = Modifier.padding(top = 24.dp, bottom = 8.dp)
+						)
+					}
+
+					state.homework.fold(
+						onSuccess = {
+							if (state.isHomeworkEmpty) item {
+								Text(
+									text = stringResource(R.string.infocenter_homework_empty),
+									textAlign = TextAlign.Center,
+									modifier = Modifier.fillMaxWidth()
+								)
+							}
+							else {
+								items(it) { item -> HomeworkItem(item) }
+							}
+						},
+						onFailure = { item { InfoCenterError(it) } }
+					)
+				}
+			}
 		}
-
-		itemList(
-			itemResult = exams,
-			itemRenderer = { ExamItem(it) },
-			itemsEmptyMessage = R.string.infocenter_exams_empty
-		)
-
-		item {
-			Text(
-				text = "Homework",
-				style = MaterialTheme.typography.labelLarge,
-				modifier = Modifier.padding(top = 24.dp, bottom = 8.dp)
-			)
-		}
-
-		itemList(
-			itemResult = homework,
-			itemRenderer = { HomeworkItem(it) },
-			itemsEmptyMessage = R.string.infocenter_homework_empty
-		)
 	}
 }
 
@@ -115,4 +142,18 @@ private fun formatExamTime(startDateTime: LocalDateTime, endDateTime: LocalDateT
 		endDateTime.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)),
 		endDateTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
 	)
+}
+
+sealed interface EventsUiState {
+	data object Loading : EventsUiState
+
+	data class Success(
+		val exams: Result<List<Exam>>,
+		val homework: Result<List<HomeWork>>
+	) : EventsUiState {
+		constructor(exams: List<Exam>, homework: List<HomeWork>) : this(Result.success(exams), Result.success(homework))
+
+		val isExamsEmpty: Boolean get() = exams.getOrDefault(emptyList()).isEmpty()
+		val isHomeworkEmpty: Boolean get() = homework.getOrDefault(emptyList()).isEmpty()
+	}
 }

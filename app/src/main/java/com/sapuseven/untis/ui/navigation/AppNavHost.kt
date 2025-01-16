@@ -28,6 +28,7 @@ import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.ui.pages.infocenter.InfoCenter
 import com.sapuseven.untis.ui.pages.login.Login
 import com.sapuseven.untis.ui.pages.login.datainput.LoginDataInput
+import com.sapuseven.untis.ui.pages.roomfinder.RoomFinder
 import com.sapuseven.untis.ui.pages.settings.SettingsNav
 import com.sapuseven.untis.ui.pages.splash.Splash
 import com.sapuseven.untis.ui.pages.timetable.Timetable
@@ -152,6 +153,23 @@ fun AppNavHost(
 			},
 		) {
 			InfoCenter()
+		}
+
+		composable<AppRoutes.RoomFinder>(
+			enterTransition = {
+				slideInVertically() { it / 2 } + fadeIn()
+			},
+			exitTransition = {
+				slideOutVertically() { it / 2 } + fadeOut()
+			},
+			popEnterTransition = {
+				slideInVertically() { it / 2 } + fadeIn()
+			},
+			popExitTransition = {
+				slideOutVertically() { it / 2 } + fadeOut()
+			},
+		) {
+			RoomFinder()
 		}
 
 		navigation<AppRoutes.Settings>(startDestination = AppRoutes.Settings.Categories) {

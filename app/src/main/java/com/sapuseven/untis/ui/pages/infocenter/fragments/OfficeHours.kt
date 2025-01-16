@@ -1,13 +1,17 @@
 package com.sapuseven.untis.ui.pages.infocenter.fragments
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.model.untis.timetable.OfficeHour
 import java.time.LocalDateTime
@@ -15,15 +19,33 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 @Composable
-fun InfoCenterOfficeHours(officeHours: Result<List<OfficeHour>>?) {
-	LazyColumn(
-		horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()
-	) {
-		itemList(
-			itemResult = officeHours,
-			itemRenderer = { OfficeHourItem(it) },
-			itemsEmptyMessage = R.string.infocenter_absences_empty,
-		)
+fun InfoCenterOfficeHours(uiState: OfficeHoursUiState) {
+	Crossfade(targetState = uiState, label = "InfoCenter Office Hours Content") { state ->
+		when (state) {
+			OfficeHoursUiState.Loading -> InfoCenterLoading()
+			is OfficeHoursUiState.Success -> {
+				state.officeHours.fold(
+					onSuccess = {
+						if (state.isEmpty) {
+							Text(
+								text = stringResource(R.string.infocenter_officehours_empty),
+								textAlign = TextAlign.Center,
+								modifier = Modifier.fillMaxWidth()
+							)
+						} else {
+							LazyColumn(
+								horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()
+							) {
+								items(it) {
+									OfficeHourItem(it)
+								}
+							}
+						}
+					},
+					onFailure = { InfoCenterError(it) }
+				)
+			}
+		}
 	}
 }
 
@@ -63,4 +85,14 @@ private fun formatOfficeHourTime(
 		endDateTime.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)),
 		endDateTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
 	)
+}
+
+sealed interface OfficeHoursUiState {
+	data object Loading : OfficeHoursUiState
+
+	data class Success(val officeHours: Result<List<OfficeHour>>) : OfficeHoursUiState {
+		constructor(officeHours: List<OfficeHour>) : this(Result.success(officeHours))
+
+		val isEmpty: Boolean get() = officeHours.getOrDefault(emptyList()).isEmpty()
+	}
 }

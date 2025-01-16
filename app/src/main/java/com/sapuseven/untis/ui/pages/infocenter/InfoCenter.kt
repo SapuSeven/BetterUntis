@@ -16,8 +16,10 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -42,6 +44,8 @@ fun InfoCenter(
 	bottomNavController: NavHostController = rememberNavController(),
 	viewModel: InfoCenterViewModel = hiltViewModel()
 ) {
+	var absenceFilterDialog by rememberSaveable { mutableStateOf(false) }
+
 	val currentRoute by bottomNavController.currentBackStackEntryAsState()
 
 	fun <T : Any> isCurrentRoute(route: T) = currentRoute?.destination?.route == route::class.qualifiedName
@@ -73,7 +77,7 @@ fun InfoCenter(
 				actions = {
 					if (isCurrentRoute(AppRoutes.InfoCenter.Absences)) {
 						IconButton(
-							onClick = { viewModel.onAbsenceFilterShow() }
+							onClick = { absenceFilterDialog = true }
 						) {
 							Icon(painter = painterResource(id = R.drawable.all_filter), contentDescription = null)
 						}
@@ -156,15 +160,13 @@ fun InfoCenter(
 		}
 	}
 
-	val showAbsenceFilter = viewModel.showAbsenceFilter.collectAsState()
 	AnimatedVisibility(
-		visible = showAbsenceFilter.value,
+		visible = absenceFilterDialog,
 		enter = fullscreenDialogAnimationEnter(),
 		exit = fullscreenDialogAnimationExit()
 	) {
 		AbsenceFilterDialog(viewModel.userSettingsRepository) {
-			viewModel.onAbsenceFilterDismiss()
+			absenceFilterDialog = false
 		}
 	}
 }
-

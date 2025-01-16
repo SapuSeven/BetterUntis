@@ -1,14 +1,18 @@
 package com.sapuseven.untis.ui.pages.infocenter.fragments
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.model.untis.absence.StudentAbsence
 import com.sapuseven.untis.data.database.entities.ExcuseStatusEntity
@@ -16,15 +20,33 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 @Composable
-fun InfoCenterAbsences(absences: Result<List<StudentAbsence>>?, excuseStatuses: List<ExcuseStatusEntity>) {
-	LazyColumn(
-		horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()
-	) {
-		itemList(
-			itemResult = absences,
-			itemRenderer = { AbsenceItem(it, excuseStatuses) },
-			itemsEmptyMessage = R.string.infocenter_absences_empty,
-		)
+fun InfoCenterAbsences(uiState: AbsencesUiState) {
+	Crossfade(targetState = uiState, label = "InfoCenter Absences Content") { state ->
+		when (state) {
+			AbsencesUiState.Loading -> InfoCenterLoading()
+			is AbsencesUiState.Success -> {
+				state.absences.fold(
+					onSuccess = {
+						if (state.isEmpty) {
+							Text(
+								text = stringResource(R.string.infocenter_absences_empty),
+								textAlign = TextAlign.Center,
+								modifier = Modifier.fillMaxWidth()
+							)
+						} else {
+							LazyColumn(
+								horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()
+							) {
+								items(it) {
+									AbsenceItem(it, state.excuseStatuses)
+								}
+							}
+						}
+					},
+					onFailure = { InfoCenterError(it) }
+				)
+			}
+		}
 	}
 }
 
@@ -79,4 +101,16 @@ private fun AbsenceItem(item: StudentAbsence, excuseStatuses: List<ExcuseStatusE
 			}
 		}
 	)
+}
+
+sealed interface AbsencesUiState {
+	data object Loading : AbsencesUiState
+
+	data class Success(
+		val absences: Result<List<StudentAbsence>>,
+		val excuseStatuses: List<ExcuseStatusEntity>
+	) : AbsencesUiState {
+
+		val isEmpty: Boolean get() = absences.getOrDefault(emptyList()).isEmpty()
+	}
 }

@@ -1,8 +1,11 @@
 package com.sapuseven.untis.ui.pages.infocenter.fragments
 
 import android.widget.TextView
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -18,25 +21,48 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.model.untis.Attachment
 import com.sapuseven.untis.api.model.untis.MessageOfDay
 import com.sapuseven.untis.ui.dialogs.AttachmentsDialog
+import com.sapuseven.untis.ui.pages.infocenter.ErrorPreviewParameterProvider
+import com.sapuseven.untis.ui.pages.infocenter.InfoCenterPreviewParameterProvider
 
 @Composable
-fun InfoCenterMessages(messages: Result<List<MessageOfDay>>?) {
+fun InfoCenterMessages(uiState: MessagesUiState) {
 	var attachmentsDialog by remember { mutableStateOf<List<Attachment>?>(null) }
 
-	LazyColumn(
-		horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()
-	) {
-		itemList(
-			itemResult = messages,
-			itemRenderer = { MessageItem(it) { attachments -> attachmentsDialog = attachments } },
-			itemsEmptyMessage = R.string.infocenter_messages_empty,
-		)
+	Crossfade(targetState = uiState, label = "InfoCenter Messages Content") { state ->
+		when (state) {
+			MessagesUiState.Loading -> InfoCenterLoading()
+			is MessagesUiState.Success -> {
+				state.messages.fold(
+					onSuccess = {
+						if (state.isEmpty) {
+							Text(
+								text = stringResource(R.string.infocenter_messages_empty),
+								textAlign = TextAlign.Center,
+								modifier = Modifier.fillMaxWidth()
+							)
+						} else {
+							LazyColumn(
+								horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()
+							) {
+								items(it) {
+									MessageItem(it) { attachments -> attachmentsDialog = attachments }
+								}
+							}
+						}
+					},
+					onFailure = { InfoCenterError(it) }
+				)
+			}
+		}
 	}
 
 	attachmentsDialog?.let { attachments ->
@@ -46,7 +72,8 @@ fun InfoCenterMessages(messages: Result<List<MessageOfDay>>?) {
 
 @Composable
 private fun MessageItem(
-	item: MessageOfDay, onShowAttachments: (List<Attachment>) -> Unit
+	item: MessageOfDay,
+	onShowAttachments: (List<Attachment>) -> Unit
 ) {
 	val textColor = MaterialTheme.colorScheme.onSurfaceVariant
 	val textContent = @Composable {
@@ -74,5 +101,45 @@ private fun MessageItem(
 				}
 			}
 		} else null
+	)
+}
+
+sealed interface MessagesUiState {
+	data object Loading : MessagesUiState
+
+	data class Success(val messages: Result<List<MessageOfDay>>) : MessagesUiState {
+		constructor(messages: List<MessageOfDay>) : this(Result.success(messages))
+
+		val isEmpty: Boolean get() = messages.getOrDefault(emptyList()).isEmpty()
+	}
+}
+
+@Preview
+@Composable
+private fun InfoCenterMessagesLoadingPreview() {
+	InfoCenterMessages(
+		uiState = MessagesUiState.Loading
+	)
+}
+
+@Preview
+@Composable
+private fun InfoCenterMessagesErrorPreview(
+	@PreviewParameter(ErrorPreviewParameterProvider::class)
+	error: Throwable,
+) {
+	InfoCenterMessages(
+		uiState = MessagesUiState.Success(Result.failure(error))
+	)
+}
+
+@Preview
+@Composable
+private fun InfoCenterMessagesContentPreview(
+	@PreviewParameter(InfoCenterPreviewParameterProvider::class)
+	messages: List<MessageOfDay>,
+) {
+	InfoCenterMessages(
+		uiState = MessagesUiState.Success(Result.success(messages))
 	)
 }

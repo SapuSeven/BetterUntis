@@ -1,7 +1,8 @@
 package com.sapuseven.untis.ui.pages.infocenter
 
 import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -34,8 +35,8 @@ fun NavGraphBuilder.infoCenterNav(
         popEnterTransition = { slideIntoContainer(slideDirection()) },
         popExitTransition = { slideOutOfContainer(slideDirection()) }
     ) {
-		val messages = viewModel.messages.collectAsState()
-        InfoCenterMessages(messages.value)
+		val messagesState by viewModel.messagesState.collectAsStateWithLifecycle()
+        InfoCenterMessages(messagesState)
     }
 
     composable<AppRoutes.InfoCenter.Events>(
@@ -44,9 +45,8 @@ fun NavGraphBuilder.infoCenterNav(
         popEnterTransition = { slideIntoContainer(slideDirection()) },
         popExitTransition = { slideOutOfContainer(slideDirection()) }
     ) {
-		val exams = viewModel.exams.collectAsState()
-		val homework = viewModel.homework.collectAsState()
-        InfoCenterEvents(exams.value, homework.value)
+		val eventsState by viewModel.eventsState.collectAsStateWithLifecycle()
+        InfoCenterEvents(eventsState)
     }
 
     composable<AppRoutes.InfoCenter.Absences>(
@@ -55,8 +55,8 @@ fun NavGraphBuilder.infoCenterNav(
         popEnterTransition = { slideIntoContainer(slideDirection()) },
         popExitTransition = { slideOutOfContainer(slideDirection()) }
     ) {
-		val absences = viewModel.absences.collectAsState()
-        InfoCenterAbsences(absences.value, viewModel.excuseStatuses)
+		val absencesState by viewModel.absencesState.collectAsStateWithLifecycle()
+        InfoCenterAbsences(absencesState)
     }
 
     composable<AppRoutes.InfoCenter.OfficeHours>(
@@ -65,7 +65,7 @@ fun NavGraphBuilder.infoCenterNav(
         popEnterTransition = { slideIntoContainer(slideDirection()) },
         popExitTransition = { slideOutOfContainer(slideDirection()) }
     ) {
-		val officeHours = viewModel.officeHours.collectAsState()
-        InfoCenterOfficeHours(officeHours.value)
+		val officeHoursState by viewModel.officeHoursState.collectAsStateWithLifecycle()
+        InfoCenterOfficeHours(officeHoursState)
     }
 }
