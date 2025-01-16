@@ -155,22 +155,6 @@
     <string name="preference_notifications_first_lesson">第一次课前通知</string>
     <string name="preference_dark_theme_oled_desc">OLED屏可用</string>
     <string name="preference_background_past">已过日期背景</string>
-    <plurals name="roomfinder_item_desc">
-        <item quantity="one">该教室可使用%d 小时。</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="main_time_diff_days">
-        <item quantity="one">%d 天前</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="main_time_diff_hours">
-        <item quantity="one">%d 小时前</item>
-        <item quantity="other"/>
-    </plurals>
-    <plurals name="main_time_diff_minutes">
-        <item quantity="one">%d 分钟前</item>
-        <item quantity="other"/>
-    </plurals>
     <string name="loading_failed">加载失败</string>
     <string name="loading">加载中</string>
     <string name="errors_report">请提交以下错误以帮助完善软件：</string>
