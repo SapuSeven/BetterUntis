@@ -45,6 +45,7 @@ import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.data.databases.entities.User
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
+import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.models.github.GithubUser
 import com.sapuseven.untis.preferences.*
 import com.sapuseven.untis.receivers.AutoMuteReceiver
@@ -628,6 +629,20 @@ class SettingsActivity : BaseComposeActivity() {
 													)
 												},
 												dataStore = dataStorePreferences.timetableRange
+											)
+
+											ElementPickerPreference(
+												title = { Text(stringResource(id = R.string.maindrawer_hide_subjects))},
+												icon = {
+													Icon(
+														painter = painterResource(id = R.drawable.all_hide_subjects),
+														contentDescription = null
+													)
+												},
+												type = TimetableDatabaseInterface.Type.SUBJECT,
+												multiSelect = true,
+												dataStore = dataStorePreferences.timetableHiddenElements,
+												timetableDatabaseInterface = timetableDatabaseInterface,
 											)
 
 											/*SwitchPreference(

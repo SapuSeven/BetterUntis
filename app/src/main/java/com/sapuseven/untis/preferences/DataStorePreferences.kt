@@ -244,7 +244,12 @@ val BaseComposeActivity.dataStorePreferences: DataStorePreferences
 				currentUserId(),
 				"infocenter_absences_timerange",
 				defaultValue = "current_schoolyear"
-			)
+			),
+			timetableHiddenElements = this.stringDataStore(
+				currentUserId(),
+				"timetable_hidden_elements",
+				defaultValue = ""
+			),
 		)
 	}
 
@@ -300,5 +305,6 @@ class DataStorePreferences(
 	val schoolBackground: UntisPreferenceDataStore<Set<String>>,
 	val infocenterAbsencesOnlyUnexcused: UntisPreferenceDataStore<Boolean>,
 	val infocenterAbsencesSortReverse: UntisPreferenceDataStore<Boolean>,
-	val infocenterAbsencesTimeRange: UntisPreferenceDataStore<String>
+	val infocenterAbsencesTimeRange: UntisPreferenceDataStore<String>,
+	val timetableHiddenElements: UntisPreferenceDataStore<String>,
 )

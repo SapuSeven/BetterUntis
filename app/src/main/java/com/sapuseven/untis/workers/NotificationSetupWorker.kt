@@ -23,6 +23,7 @@ import com.sapuseven.untis.data.timetable.TimegridItem
 import com.sapuseven.untis.helpers.DateTimeUtils
 import com.sapuseven.untis.helpers.config.booleanDataStore
 import com.sapuseven.untis.helpers.config.intDataStore
+import com.sapuseven.untis.helpers.config.stringDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.receivers.NotificationReceiver
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_BOOLEAN_CLEAR
@@ -39,6 +40,7 @@ import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_NEXT_SUBJECT_LONG
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_NEXT_TEACHER
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_NEXT_TEACHER_LONG
+import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import com.sapuseven.untis.workers.DailyWorker.Companion.WORKER_DATA_USER_ID
 import org.joda.time.DateTime
 import org.joda.time.LocalDateTime
@@ -115,8 +117,21 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 					"preference_notifications_in_multiple"
 				).getValue()
 
-				val preparedItems = timetable.items.filter { !it.periodData.isCancelled() }
-					.sortedBy { it.startDateTime }.merged().zipWithNext()
+				val hiddenSubjects = decodeStoredTimetableValue(
+					applicationContext.stringDataStore(
+						user.id,
+						"timetable_hidden_elements"
+					).getValue()
+				).orEmpty()
+
+				val preparedItems = timetable.items
+					.filterNot { it.periodData.isCancelled() }
+					.filterNot { item ->
+						item.periodData.subjects.isNotEmpty() && hiddenSubjects.containsAll(item.periodData.subjects)
+					}
+					.sortedBy { it.startDateTime }
+					.merged()
+					.zipWithNext()
 
 				if (preparedItems.isEmpty()) {
 					Log.d(LOG_TAG, "No notifications to schedule")
