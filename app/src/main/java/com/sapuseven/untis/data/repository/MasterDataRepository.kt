@@ -6,7 +6,6 @@ import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.data.database.entities.KlasseEntity
 import com.sapuseven.untis.data.database.entities.RoomEntity
-import com.sapuseven.untis.data.database.entities.SchoolYearEntity
 import com.sapuseven.untis.data.database.entities.SubjectEntity
 import com.sapuseven.untis.data.database.entities.TeacherEntity
 import com.sapuseven.untis.data.database.entities.User
@@ -16,7 +15,6 @@ import com.sapuseven.untis.models.PeriodItem.Companion.ELEMENT_NAME_UNKNOWN
 import com.sapuseven.untis.scope.UserScopeManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import java.time.LocalDate
 import javax.inject.Inject
 import kotlin.time.measureTime
 
@@ -35,8 +33,6 @@ interface MasterDataRepository {
 	fun isAllowed(id: Long, type: ElementType?): Boolean
 
 	fun isAllowed(periodElement: PeriodElement): Boolean
-
-	fun currentSchoolYear(currentDate: LocalDate = LocalDate.now()): SchoolYearEntity?
 }
 
 class DefaultMasterDataRepository : MasterDataRepository {
@@ -54,8 +50,6 @@ class DefaultMasterDataRepository : MasterDataRepository {
 	override fun isAllowed(id: Long, type: ElementType?): Boolean = true
 
 	override fun isAllowed(periodElement: PeriodElement): Boolean = true
-
-	override fun currentSchoolYear(currentDate: LocalDate): SchoolYearEntity? = null
 }
 
 class UntisMasterDataRepository @Inject constructor(
@@ -128,10 +122,6 @@ class UntisMasterDataRepository @Inject constructor(
 	}
 
 	override fun isAllowed(periodElement: PeriodElement) = isAllowed(periodElement.id, periodElement.type)
-
-	override fun currentSchoolYear(currentDate: LocalDate): SchoolYearEntity? = _currentUserData?.schoolYears?.find {
-		currentDate.isAfter(it.startDate) && currentDate.isBefore(it.endDate)
-	}
 }
 
 val LocalMasterDataRepository = compositionLocalOf<MasterDataRepository> { DefaultMasterDataRepository() }

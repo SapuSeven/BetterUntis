@@ -91,8 +91,6 @@ sealed interface OfficeHoursUiState {
 	data object Loading : OfficeHoursUiState
 
 	data class Success(val officeHours: Result<List<OfficeHour>>) : OfficeHoursUiState {
-		constructor(officeHours: List<OfficeHour>) : this(Result.success(officeHours))
-
 		val isEmpty: Boolean get() = officeHours.getOrDefault(emptyList()).isEmpty()
 	}
 }

@@ -108,8 +108,6 @@ sealed interface MessagesUiState {
 	data object Loading : MessagesUiState
 
 	data class Success(val messages: Result<List<MessageOfDay>>) : MessagesUiState {
-		constructor(messages: List<MessageOfDay>) : this(Result.success(messages))
-
 		val isEmpty: Boolean get() = messages.getOrDefault(emptyList()).isEmpty()
 	}
 }
