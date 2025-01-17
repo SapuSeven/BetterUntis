@@ -28,21 +28,21 @@ import java.time.format.FormatStyle
 @Composable
 fun InfoCenterEvents(uiState: EventsUiState) {
 	Crossfade(targetState = uiState, label = "InfoCenter Events Content") { state ->
-		when (state) {
-			EventsUiState.Loading -> InfoCenterLoading()
-			is EventsUiState.Success -> {
-				LazyColumn(
-					horizontalAlignment = Alignment.CenterHorizontally,
-					modifier = Modifier.fillMaxSize()
-				) {
-					item {
-						Text(
-							text = stringResource(R.string.infocenter_exams),
-							style = MaterialTheme.typography.labelLarge,
-							modifier = Modifier.padding(bottom = 8.dp)
-						)
-					}
+		LazyColumn(
+			horizontalAlignment = Alignment.CenterHorizontally,
+			modifier = Modifier.fillMaxSize()
+		) {
+			item {
+				Text(
+					text = stringResource(R.string.infocenter_exams),
+					style = MaterialTheme.typography.labelLarge,
+					modifier = Modifier.padding(bottom = 8.dp)
+				)
+			}
 
+			when (state) {
+				EventsUiState.Loading -> item { InfoCenterLoading() }
+				is EventsUiState.Success -> {
 					state.exams.fold(
 						onSuccess = {
 							if (state.isExamsEmpty) item {
@@ -57,15 +57,20 @@ fun InfoCenterEvents(uiState: EventsUiState) {
 						},
 						onFailure = { item { InfoCenterError(it) } }
 					)
+				}
+			}
 
-					item {
-						Text(
-							text = stringResource(R.string.infocenter_homework),
-							style = MaterialTheme.typography.labelLarge,
-							modifier = Modifier.padding(top = 24.dp, bottom = 8.dp)
-						)
-					}
+			item {
+				Text(
+					text = stringResource(R.string.infocenter_homework),
+					style = MaterialTheme.typography.labelLarge,
+					modifier = Modifier.padding(top = 24.dp, bottom = 8.dp)
+				)
+			}
 
+			when (state) {
+				EventsUiState.Loading -> item { InfoCenterLoading() }
+				is EventsUiState.Success -> {
 					state.homework.fold(
 						onSuccess = {
 							if (state.isHomeworkEmpty) item {

@@ -1,9 +1,9 @@
 import com.google.protobuf.gradle.id
 import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.io.FileInputStream
 import java.util.Date
 import java.util.Properties
-import java.io.FileInputStream
 
 plugins {
 	alias(libs.plugins.agp.application)
@@ -24,7 +24,7 @@ fun generateVersionCode(): Int {
 	return (Date().time / 1000 / 60).toInt()
 }
 
-val gmsImplementation by configurations.creating
+val gmsImplementation: Configuration by configurations.creating
 
 android {
 	compileSdk = 35
@@ -223,8 +223,9 @@ dependencies {
 	implementation(libs.androidx.transition.ktx)
 	implementation(libs.andrew0000.cache)
 	implementation(libs.sapuseven.protostore)
+	implementation(libs.fornewid.placeholder.material3)
 
-    gmsImplementation(libs.gms.code.scanner)
+	gmsImplementation(libs.gms.code.scanner)
 
 	coreLibraryDesugaring(libs.desugar.jdk.libs)
 
