@@ -224,8 +224,7 @@
     <string name="menu_infocenter_officehours">Radno vrijeme</string>
     <string name="menu_infocenter_messagesofday">Poruke</string>
     <string name="nav_all_timetables">Rasporedi sati</string>
-    <string name="errors_github_attach_file_message">Priloži komprimirane datoteke zapisa ovog problema.
-\nSpremljene su u „%1$s”</string>
+    <string name="errors_github_attach_file_message">Priloži komprimirane datoteke zapisa ovog problema.\nSpremljene su u `%1$s`</string>
     <string name="activity_title_settings">Postavke</string>
     <string name="activity_title_messenger">Razgovori</string>
     <string name="activity_title_info_center">Centar informacija</string>
