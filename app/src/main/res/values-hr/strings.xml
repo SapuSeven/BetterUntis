@@ -235,7 +235,7 @@
     <string name="all_dialog_error_message">ID zahtjeva: %1$d\nKod greške: %2$d\nPoruka greške: %3$s</string>
     <string name="all_dialog_error_title">Podaci greške</string>
     <string name="all_dialog_datepicker_button_today">Danas</string>
-    <string name="all_dialog_absences_not_checked">Neopravdani izostanci.</string>
+    <string name="all_dialog_absences_not_checked">Izostanci nisu provjereni.</string>
     <string name="all_dialog_absences_checked">Izostanci su provjereni.</string>
     <string name="all_lessontopic_none">(Bez teme)</string>
     <string name="all_lessontopic">Tema nastave</string>
