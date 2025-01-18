@@ -238,7 +238,7 @@
     <string name="all_dialog_error_title">Podaci greške</string>
     <string name="all_dialog_datepicker_button_today">Danas</string>
     <string name="all_dialog_absences_not_checked">Neopravdani izostanci.</string>
-    <string name="all_dialog_absences_checked">Opravdani izostanci.</string>
+    <string name="all_dialog_absences_checked">Izostanci su provjereni.</string>
     <string name="all_lessontopic_none">(Bez teme)</string>
     <string name="all_lessontopic">Tema nastave</string>
     <string name="all_lesson_exam">%1$s (test!)</string>
