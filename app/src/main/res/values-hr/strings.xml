@@ -86,7 +86,7 @@
     <string name="preference_timetable_colors_reset">Obnovi boje</string>
     <string name="preference_timetable_centered_lesson_info">Centriraj podatke nastave</string>
     <string name="preference_timetable_bold_lesson_name">Podebljaj ime nastave</string>
-    <string name="preference_timetable_background_irregular_desc">Računaj nastavu s drugačijom pozadinom kao izvanrednu</string>
+    <string name="preference_timetable_background_irregular_desc">Računaj nastave s drugačijom pozadinom kao izvanredne</string>
     <string name="preference_timetable_background_irregular">Uzmi u obzir pozadinu elementa</string>
     <string name="preference_theme_untis">Izvorni Untis program</string>
     <string name="preference_theme_stock">Standardno</string>
