@@ -9,9 +9,9 @@
         <item quantity="other">%1$d doprinosa</item>
     </plurals>
     <plurals name="roomfinder_item_desc">
-        <item quantity="one">Ova je soba trenutačno slobodna.</item>
-        <item quantity="few">Ova je soba još %d sata slobodna.</item>
-        <item quantity="other">Ova je soba još %d sati slobodna.</item>
+        <item quantity="one">Ova je prostorija trenutačno slobodna.</item>
+        <item quantity="few">Ova je prostorija još %d sata slobodna.</item>
+        <item quantity="other">Ova je prostorija još %d sati slobodna.</item>
     </plurals>
     <plurals name="main_time_diff_days">
         <item quantity="one">prije jedan dan</item>
@@ -154,8 +154,7 @@
     <string name="infocenter_events_exam_name_long">%1$s – %2$s</string>
     <string name="infocenter_events_empty">Nema događaja</string>
     <string name="infocenter_absences_empty">Nema izostanaka</string>
-    <string name="roomfinder_no_rooms">Nema prostorija.
-\nDodirni + za dodavanje prostorije!</string>
+    <string name="roomfinder_no_rooms">Nema prostorija.\nDodirni + za dodavanje prostorije!</string>
     <string name="roomfinder_loading_data">Učitavanje podataka …</string>
     <string name="roomfinder_item_desc_occupied">Ova je prostorija zauzeta.</string>
     <string name="roomfinder_image_previous_hour">prethodni sat</string>
@@ -230,23 +229,20 @@
     <string name="menu_infocenter_officehours">Radno vrijeme</string>
     <string name="menu_infocenter_messagesofday">Poruke</string>
     <string name="nav_all_timetables">Rasporedi sati</string>
-    <string name="errors_github_attach_file_message">Priloži komprimirane datoteke zapisa ovog problema.
-\nSpremljene su u „%1$s”</string>
+    <string name="errors_github_attach_file_message">Priloži komprimirane datoteke zapisa ovog problema.\nSpremljene su u `%1$s`</string>
     <string name="activity_title_settings">Postavke</string>
     <string name="activity_title_messenger">Razgovori</string>
     <string name="activity_title_info_center">Centar informacija</string>
-    <string name="activity_title_free_rooms">Slobodne sobe</string>
+    <string name="activity_title_free_rooms">Slobodne prostorije</string>
     <string name="activity_title_errors">Greške</string>
     <string name="all_hint_tap_to_edit">(Dodirni za uređivanje)</string>
     <string name="all_dialog_crash_copied">Zapis prekida programa kopiran je u međuspremnik.</string>
     <string name="all_dialog_crash_title">Pronađen je zapis prekida programa</string>
-    <string name="all_dialog_error_message">ID oznaka zahtjeva: %1$d
-\nKod greške: %2$d
-\nPoruka greške: %3$s</string>
+    <string name="all_dialog_error_message">ID zahtjeva: %1$d\nKod greške: %2$d\nPoruka greške: %3$s</string>
     <string name="all_dialog_error_title">Podaci greške</string>
     <string name="all_dialog_datepicker_button_today">Danas</string>
-    <string name="all_dialog_absences_not_checked">Neopravdani izostanci.</string>
-    <string name="all_dialog_absences_checked">Opravdani izostanci.</string>
+    <string name="all_dialog_absences_not_checked">Izostanci nisu provjereni.</string>
+    <string name="all_dialog_absences_checked">Izostanci su provjereni.</string>
     <string name="all_lessontopic_none">(Bez teme)</string>
     <string name="all_lessontopic">Tema nastave</string>
     <string name="all_lesson_exam">%1$s (test!)</string>
@@ -285,17 +281,17 @@
     <string name="preference_background_regular">Redovna nastava</string>
     <string name="preference_background_past">Pozadina prošlih dana</string>
     <string name="preference_background_irregular_past">Prošla izvanredna nastava</string>
-    <string name="preference_background_irregular">Izvanredna nastava</string>
+    <string name="preference_background_irregular">Izvanredne nastave</string>
     <string name="preference_background_future">Pozadina budućih dana</string>
-    <string name="preference_background_exam_past">Prošla nastava s testovima</string>
-    <string name="preference_background_exam">Nastava s testovima</string>
-    <string name="preference_background_cancelled_past">Prošla otkazana nastava</string>
-    <string name="preference_background_cancelled">Otkazana nastava</string>
+    <string name="preference_background_exam_past">Prošle nastave s testovima</string>
+    <string name="preference_background_exam">Nastave s testovima</string>
+    <string name="preference_background_cancelled_past">Prošle otkazane nastave</string>
+    <string name="preference_background_cancelled">Otkazane nastave</string>
     <string name="preference_automute_enable_summary">Automatski uključuje način „Ne smetaj” tijekom nastave</string>
     <string name="preference_automute_enable">Aktiviraj automatsko isključivanje zvuka</string>
     <string name="preference_automute_cancelled_lessons">Također iskjluči zvuk u otkazanoj nastavi</string>
     <string name="preference_dark_theme_auto">Koristi temu sustava</string>
-    <string name="infocenter_absences_filter_only_unexcused">Pokaži samo neispričane</string>
+    <string name="infocenter_absences_filter_only_unexcused">Pokaži samo neopravdane</string>
     <string name="infocenter_absences_filter_oldest_first">Najprije najstarije</string>
     <string name="infocenter_absences_filter_sort">Redoslijed</string>
     <string name="infocenter_absences_filter_newest_first">Najprije najnovije</string>
@@ -310,8 +306,8 @@
     <string name="all_homework">Domaća zadaća</string>
     <string name="all_lessontopic_edit">Uredi temu nastave</string>
     <string name="errors_button_report">Prijavi sve</string>
-    <string name="infocenter_absence_excused">Ispričano</string>
-    <string name="infocenter_absence_unexcused">Neispričano</string>
+    <string name="infocenter_absence_excused">Opravdano</string>
+    <string name="infocenter_absence_unexcused">Neopravdano</string>
     <string name="mainactivitydrawer_profile_edit">Uredi profile</string>
     <string name="preference_info_license">Licenca</string>
     <string name="preference_info_privacy">Eksterni sadržaj</string>
@@ -322,8 +318,7 @@
     <string name="errors_button_dismiss">Odbaci sve</string>
     <string name="infocenter_absences_filter_time_ranges">Vremenski raspon</string>
     <string name="preference_automute_mute_priority">Nemoj dopustiti da prioritetni događaji ignoriraju automatsko isključivanje zvuka</string>
-    <string name="settings_dialog_url_open_text">BetterUntis nije mogao pronaći program koji može otvarati poveznice.
-\nProvjeri imaš li instaliran web preglednik ili otvori poveznicu na jednom drugom uređaju:</string>
+    <string name="settings_dialog_url_open_text">BetterUntis nije mogao pronaći program koji može otvarati poveznice.\nProvjeri imaš li instaliran web preglednik ili otvori poveznicu na jednom drugom uređaju:</string>
     <string name="widget_disclaimer_text">Funkcija widgeta se još uvijek nalazi u fazi razvoja i možda neće ispravno raditi na svim uređajima.</string>
     <string name="logindatainput_dialog_qrcodeinvalid_title">Nevažeći QR kod</string>
     <string name="maindrawer_bookmarks_add">Dodaj raspored sati</string>
@@ -361,9 +356,7 @@
     <string name="preference_reports_breadcrumbs">Šalji detaljizirane izvještaje o greškama</string>
     <string name="preference_reports_breadcrumbs_desc">Uključi dodatne informacije o tome što se dogodilo prije nego što je došlo do greške.</string>
     <string name="settings_dialog_url_open_title">Nije pronađen kompatibilni program</string>
-    <string name="preference_reports_info_desc">Ove postavke pomažu pri poboljšanju programa.
-\nNikoji osobni podaci se ne prikupljaju.
-\nZa primjenu promjena, program se mora ponovo pokrenuti.</string>
+    <string name="preference_reports_info_desc">Ove postavke pomažu pri poboljšanju programa.\nOsobni podaci se ne prikupljaju.\nZa primjenu promjena, program se mora ponovo pokrenuti.</string>
     <string name="main_dialog_reports_save">Spremi</string>
     <string name="main_dialog_reports_title">Izvještavanje grešaka</string>
     <string name="infocenter_absences_list_seven_days">Pokaži zadnjih 7 dana</string>
@@ -377,4 +370,8 @@
     <string name="all_personal_abbr">Osobno</string>
     <string name="preference_category_app_language">Jezik aplikacije</string>
     <string name="preference_app_language">Jezik aplikacije</string>
+    <string name="all_start_time">Vrijeme početka</string>
+    <string name="all_open_datepicker">Otvori birač datuma</string>
+    <string name="all_timepicker_select">Odaberi vrijeme</string>
+    <string name="all_end_time">Vrijeme završetka</string>
 </resources>
