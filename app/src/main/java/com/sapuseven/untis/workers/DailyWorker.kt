@@ -1,11 +1,10 @@
 package com.sapuseven.untis.workers
 
 import android.content.Context
-import android.util.Log
-import androidx.work.*
-import com.sapuseven.untis.data.database.UserDatabase
-import com.sapuseven.untis.helpers.config.booleanDataStore
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
+import androidx.work.WorkerParameters
 import org.joda.time.LocalDateTime
 import org.joda.time.Seconds
 import java.util.concurrent.TimeUnit
@@ -42,7 +41,7 @@ class DailyWorker(context: Context, params: WorkerParameters) :
 	}
 
 	override suspend fun doWork(): Result {
-		val userDatabase = UserDatabase.getInstance(applicationContext)
+		/*val userDatabase = UserDatabase.getInstance(applicationContext)
 
 		val workManager = WorkManager.getInstance(applicationContext)
 
@@ -79,7 +78,7 @@ class DailyWorker(context: Context, params: WorkerParameters) :
 			}
 		}
 
-		WidgetUpdateWorker.enqueue(workManager)
+		WidgetUpdateWorker.enqueue(workManager)*/
 
 		enqueueNext(applicationContext)
 		return Result.success()

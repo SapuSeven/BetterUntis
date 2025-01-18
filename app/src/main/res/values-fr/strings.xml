@@ -163,7 +163,6 @@
     <string name="roomfinder_image_availability_indicator">Indicateur de disponibilité des salles</string>
     <string name="roomfinder_delete_item">Supprimer l’élément</string>
     <string name="roomfinder_current_hour_time">%1$s – %2$s</string>
-    <string name="roomfinder_current_hour">%1$s, cours de %2$d.</string>
     <string name="errormessagedictionary_no_right">Aucun droit pour l’emploi du temps</string>
     <string name="errormessagedictionary_user_locked">Utilisateur bloqué !</string>
     <string name="errormessagedictionary_invalid_time_settings">Date ou heure invalide !</string>

@@ -6,9 +6,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.Serializer
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
-import androidx.datastore.dataStore
 import androidx.datastore.dataStoreFile
-import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.protobuf.InvalidProtocolBufferException
 import com.sapuseven.untis.data.settings.model.Settings
 import dagger.Module
@@ -28,8 +26,8 @@ private const val DATA_STORE_FILE_NAME = "settings.pb"
 @InstallIn(SingletonComponent::class)
 @Module
 object DataStoreModule {
-	@Singleton
 	@Provides
+	@Singleton
 	fun provideProtoDataStore(@ApplicationContext appContext: Context): DataStore<Settings> {
 		return DataStoreFactory.create(
 			serializer = UserSettingsSerializer,

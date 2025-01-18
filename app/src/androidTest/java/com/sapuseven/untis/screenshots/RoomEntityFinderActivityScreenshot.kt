@@ -9,7 +9,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.activities.RoomFinder
 import com.sapuseven.untis.activities.RoomFinderState
-import com.sapuseven.untis.data.database.RoomFinderDatabase
+import com.sapuseven.untis.data.database.RoomFinderDatabaseLegacy
 import com.sapuseven.untis.data.database.LegacyUserDatabase
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.mocks.MOCK_USER_ID
@@ -93,7 +93,7 @@ class RoomEntityFinderActivityScreenshot {
 	}
 }
 
-fun mockRoomFinderDatabase(): RoomFinderDatabase = object : RoomFinderDatabase {
+fun mockRoomFinderDatabase(): RoomFinderDatabaseLegacy = object : RoomFinderDatabaseLegacy {
 	val roomList = mutableListOf(
 		RoomFinderItem(
 			1,

@@ -4,7 +4,7 @@ import android.provider.BaseColumns
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-val MIGRATIONS_LEGACY = listOf(
+val MIGRATIONS_USER_LEGACY = listOf(
 	object : Migration(1, 2) {
 		override fun migrate(db: SupportSQLiteDatabase) {
 			db.execSQL("ALTER TABLE ${UserDatabaseLegacyContract.Users.TABLE_NAME} RENAME TO ${UserDatabaseLegacyContract.Users.TABLE_NAME}_v1")
@@ -101,7 +101,7 @@ val MIGRATIONS_LEGACY = listOf(
 	}
 )
 
-val MIGRATION_7_8 = object : Migration(7, 8) {
+val MIGRATION_USER_7_8 = object : Migration(7, 8) {
 	fun SupportSQLiteDatabase.createIndices(tableName: String) {
 		execSQL("CREATE INDEX IF NOT EXISTS `index_${tableName}_id` ON `${tableName}` (`id`)")
 		execSQL("CREATE INDEX IF NOT EXISTS `index_${tableName}_userId` ON `${tableName}` (`userId`)")

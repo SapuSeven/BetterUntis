@@ -319,7 +319,7 @@
     <string name="preferences_timetable">Timetable</string>
     <string name="preferences_theme_color">Theme color</string>
     <string name="preferences_theme_color_system">System theme color</string>
-    <string name="roomfinder_current_hour">%1$s, %2$d. Lesson</string>
+    <string name="roomfinder_current_hour">%1$s, Lesson %2$s</string>
     <string name="roomfinder_current_hour_time">%1$s - %2$s</string>
     <string name="roomfinder_delete_item">Delete item</string>
     <string name="roomfinder_dialog_itemdelete_text">Are you sure you want to remove this room from the list?</string>
@@ -330,6 +330,8 @@
     <string name="roomfinder_image_next_hour">next hour</string>
     <string name="roomfinder_image_previous_hour">previous hour</string>
     <string name="roomfinder_item_desc_occupied">This Room is occupied.</string>
+    <string name="roomfinder_item_desc_free_day">This Room is free for the rest of the day.</string>
+    <string name="roomfinder_item_desc_free_week">This Room is free for the rest of the week.</string>
     <string name="roomfinder_loading_data">Loading data…</string>
     <string name="roomfinder_no_rooms">No rooms to display.\nTap + to add one!</string>
     <string name="settings_recommend_hide">Don\'t show again</string>

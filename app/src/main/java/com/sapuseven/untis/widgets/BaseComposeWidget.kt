@@ -3,7 +3,6 @@ package com.sapuseven.untis.widgets
 import android.content.Context
 import android.os.Build
 import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -11,28 +10,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.glance.GlanceId
-import androidx.glance.GlanceModifier
 import androidx.glance.LocalContext
 import androidx.glance.appwidget.GlanceAppWidget
-import androidx.glance.appwidget.action.actionRunCallback
-import androidx.glance.appwidget.appWidgetBackground
-import androidx.glance.appwidget.background
-import androidx.glance.color.ColorProvider
-import androidx.glance.currentState
-import androidx.glance.layout.*
-import androidx.glance.text.Text
 import com.sapuseven.compose.protostore.ui.preferences.materialColors
-import com.sapuseven.untis.R
-import com.sapuseven.untis.data.database.UserDatabase
 import com.sapuseven.untis.helpers.config.intDataStore
 import com.sapuseven.untis.ui.theme.generateColorScheme
 import com.sapuseven.untis.ui.widgets.WidgetListItemModel
-import com.sapuseven.untis.ui.widgets.WidgetListView
-import com.sapuseven.untis.ui.widgets.WidgetListViewHeader
 import kotlinx.coroutines.runBlocking
 
 open class BaseComposeWidget : GlanceAppWidget() {
@@ -85,7 +69,7 @@ open class BaseComposeWidget : GlanceAppWidget() {
 	}
 
 	@Composable
-	/*override */fun Content() {
+	/*override fun Content() {
 		val prefs = currentState<Preferences>()
 		val userId = prefs[longPreferencesKey(PREFERENCE_KEY_LONG_USER)] ?: -1
 		elementId = prefs[intPreferencesKey(PREFERENCE_KEY_INT_ELEMENT_ID)] ?: -1
@@ -143,7 +127,7 @@ open class BaseComposeWidget : GlanceAppWidget() {
 				}
 			}
 		}
-	}
+	}*/
 
 	fun setData(data: List<WidgetListItemModel>) {
 		items = data

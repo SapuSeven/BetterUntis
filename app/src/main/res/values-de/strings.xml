@@ -106,7 +106,7 @@
     <string name="errormessagedictionary_invalid_time_settings">Zeit und/oder Datum sind falsch eingestellt!</string>
     <string name="errormessagedictionary_user_locked">Benutzer gesperrt!</string>
     <string name="errormessagedictionary_no_right">Keine Berechtigung für den Stundenplan</string>
-    <string name="roomfinder_current_hour">%1$s, %2$d. Stunde</string>
+    <string name="roomfinder_current_hour">%1$s, Stunde %2$s</string>
     <string name="roomfinder_current_hour_time">%1$s - %2$s</string>
     <string name="roomfinder_delete_item">Raum löschen</string>
     <string name="roomfinder_image_availability_indicator">Freier-Raum-Anzeige</string>

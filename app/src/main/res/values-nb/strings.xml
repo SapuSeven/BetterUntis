@@ -88,7 +88,6 @@
     <string name="errormessagedictionary_invalid_time_settings">Ugyldige innstillinger for dato og/eller klokkeslett!</string>
     <string name="errormessagedictionary_user_locked">Brukeren er låst!</string>
     <string name="errormessagedictionary_no_right">Utilstrekkelige rettigheter for timeplan</string>
-    <string name="roomfinder_current_hour">%1$s, %2$d. Leksjon</string>
     <string name="roomfinder_current_hour_time">%1$s - %2$s</string>
     <string name="roomfinder_delete_item">Slett element</string>
     <string name="roomfinder_image_availability_indicator">Tilgjengelighetsindikator for rom</string>

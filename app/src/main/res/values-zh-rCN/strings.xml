@@ -94,7 +94,6 @@
     <string name="errormessagedictionary_invalid_time_settings">日期或时间设置无效！</string>
     <string name="errormessagedictionary_user_locked">用户已锁定！</string>
     <string name="errormessagedictionary_no_right">无权查看课程表</string>
-    <string name="roomfinder_current_hour">%1$s, %2$d. 课程</string>
     <string name="roomfinder_delete_item">删除此项</string>
     <string name="roomfinder_image_availability_indicator">可用教室标识</string>
     <string name="roomfinder_item_desc_occupied">此教室被占。</string>

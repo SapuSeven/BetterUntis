@@ -12,22 +12,30 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.ktor.client.engine.cio.CIO
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object ApiClientModule {
 	@Provides
+	@Singleton
 	fun provideSchoolSearchApi(): SchoolSearchApi = SchoolSearchApi(CIO)
 	@Provides
+	@Singleton
 	fun provideUserDataApi(): UserDataApi = UserDataApi(CIO)
 	@Provides
+	@Singleton
 	fun provideTimetableApi(): TimetableApi = TimetableApi(CIO)
 	@Provides
+	@Singleton
 	fun provideMessagesApi(): MessagesApi = MessagesApi(CIO)
 	@Provides
+	@Singleton
 	fun provideClassRegApi(): ClassRegApi = ClassRegApi(CIO)
 	@Provides
+	@Singleton
 	fun provideAbsenceApi(): AbsenceApi = AbsenceApi(CIO)
 	@Provides
+	@Singleton
 	fun provideOfficeHoursApi(): OfficeHoursApi = OfficeHoursApi(CIO)
 }

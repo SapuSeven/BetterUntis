@@ -40,7 +40,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowCompat
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.lifecycle.DEFAULT_ARGS_KEY
@@ -55,11 +54,11 @@ import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.helpers.config.globalDataStore
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.preferences.dataStorePreferences
-import com.sapuseven.untis.ui.pages.ActivityEvents
-import com.sapuseven.untis.ui.pages.ActivityViewModel
 import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.material.scheme.Scheme
+import com.sapuseven.untis.ui.pages.ActivityEvents
+import com.sapuseven.untis.ui.pages.ActivityViewModel
 import com.sapuseven.untis.ui.theme.generateColorScheme
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -69,7 +68,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 abstract class BaseComposeActivity : ComponentActivity() {
 	internal var user by mutableStateOf<User?>(null)
@@ -101,15 +99,15 @@ abstract class BaseComposeActivity : ComponentActivity() {
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
-		userDatabase = UserDatabase.getInstance(applicationContext)
+		super.onCreate(savedInstanceState)
+		/*userDatabase = UserDatabase.getInstance(applicationContext)
 
 		runBlocking { // Not ideal, but works well enough
 			loadInitialUser()
 		}
 
-		super.onCreate(savedInstanceState)
 
-		WindowCompat.setDecorFitsSystemWindows(window, false)
+		WindowCompat.setDecorFitsSystemWindows(window, false)*/
 	}
 
 	@Composable

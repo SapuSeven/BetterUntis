@@ -19,7 +19,6 @@
     <string name="roomfinder_dialog_itemdelete_text">Ziur zaude gela hau zerrendatik kendu nahi duzula\?</string>
     <string name="roomfinder_delete_item">Ezabatu elementua</string>
     <string name="roomfinder_current_hour_time">%1$s - %2$s</string>
-    <string name="roomfinder_current_hour">%1$s,%2$d. Eskola</string>
     <string name="errormessagedictionary_user_locked">Erabiltzailea blokeatuta!</string>
     <string name="errormessagedictionary_too_many_results">Emaitza gehiegi</string>
     <string name="errormessagedictionary_server_webuntis_not_installed">Zehaztutako zerbitzariak ez du WebUntis instalatuta!</string>

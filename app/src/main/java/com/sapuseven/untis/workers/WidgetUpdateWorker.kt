@@ -1,32 +1,9 @@
 package com.sapuseven.untis.workers
 
 import android.content.Context
-import android.util.Log
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.unit.dp
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.longPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.glance.GlanceModifier
-import androidx.glance.appwidget.GlanceAppWidgetManager
-import androidx.glance.appwidget.state.getAppWidgetState
-import androidx.glance.background
-import androidx.glance.layout.*
-import androidx.glance.text.Text
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.sapuseven.untis.api.model.untis.enumeration.ElementType
-import com.sapuseven.untis.data.database.UserDatabase
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.ui.widgets.WidgetListItemModel
-import com.sapuseven.untis.widgets.BaseComposeWidget.Companion.PREFERENCE_KEY_INT_ELEMENT_ID
-import com.sapuseven.untis.widgets.BaseComposeWidget.Companion.PREFERENCE_KEY_LONG_USER
-import com.sapuseven.untis.widgets.BaseComposeWidget.Companion.PREFERENCE_KEY_STRING_ELEMENT_TYPE
-import com.sapuseven.untis.widgets.TimetableWidget
-import com.sapuseven.untis.widgets.toGlanceTextStyle
-import org.joda.time.format.DateTimeFormat
 
 /**
  * This worker loads the data for widgets.
@@ -47,7 +24,7 @@ class WidgetUpdateWorker(context: Context, params: WorkerParameters) :
 	}
 
 	override suspend fun doWork(): Result {
-		val userDatabase = UserDatabase.getInstance(applicationContext)
+		/*val userDatabase = UserDatabase.getInstance(applicationContext)
 
 		val timeFormatter = DateTimeFormat.forPattern("HH:mm")
 
@@ -138,7 +115,7 @@ class WidgetUpdateWorker(context: Context, params: WorkerParameters) :
 						Log.e(LOG_TAG, "Timetable loading error", e)
 					}
 				}*/
-			}
+			}*/
 
 		return Result.success()
 	}

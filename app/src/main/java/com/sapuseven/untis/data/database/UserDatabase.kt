@@ -1,6 +1,5 @@
 package com.sapuseven.untis.data.database
 
-import android.content.Context
 import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -54,31 +53,12 @@ import java.time.format.DateTimeFormatter
 		AutoMigration(from = 9, to = 10)
 	]
 )
-@TypeConverters(Converters::class)
+@TypeConverters(UserConverters::class)
 abstract class UserDatabase : RoomDatabase() {
 	abstract fun userDao(): UserDao
-
-	companion object {
-		@Volatile
-		private var instance: UserDatabase? = null
-
-		fun getInstance(context: Context): UserDatabase =
-			instance ?: synchronized(this) {
-				instance ?: androidx.room.Room.databaseBuilder(
-					context,
-					UserDatabase::class.java, "userdata.db"
-				)
-					.addMigrations(
-						*MIGRATIONS_LEGACY.toTypedArray(),
-						MIGRATION_7_8,
-					)
-					.build()
-					.also { instance = it }
-			}
-	}
 }
 
-internal class Converters {
+internal class UserConverters {
 	private inline fun <reified T> encode(value: T?): String? =
 		value?.let { Json.encodeToString<T>(it) }
 

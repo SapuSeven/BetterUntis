@@ -72,7 +72,6 @@
     <string name="roomfinder_dialog_itemdelete_text">Bu odayı listeden çıkarmak istediğinizden emin misiniz\?</string>
     <string name="roomfinder_delete_item">Öğeyi sil</string>
     <string name="roomfinder_current_hour_time">%1$s - %2$s</string>
-    <string name="roomfinder_current_hour">%1$s,%2$d. Ders</string>
     <string name="errormessagedictionary_user_locked">Kullanıcı kilitli!</string>
     <string name="errormessagedictionary_too_many_results">Çok fazla sonuç</string>
     <string name="errormessagedictionary_server_webuntis_not_installed">Belirtilen Sunucuda WebUntis yüklü değil!</string>
