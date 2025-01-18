@@ -374,4 +374,5 @@
     <string name="all_open_datepicker">Otvori birač datuma</string>
     <string name="all_timepicker_select">Odaberi vrijeme</string>
     <string name="all_start_time">Vrijeme početka</string>
+    <string name="all_end_time">Vrijeme završetka</string>
 </resources>
