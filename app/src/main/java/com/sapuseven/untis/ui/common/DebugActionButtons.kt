@@ -30,7 +30,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.timetable.PeriodData
 import com.sapuseven.untis.models.PeriodItem
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString

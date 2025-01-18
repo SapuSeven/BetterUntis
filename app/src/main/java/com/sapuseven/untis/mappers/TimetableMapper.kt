@@ -268,18 +268,17 @@ class TimetableMapper @AssistedInject constructor(
 			else leftover.add(item)
 		}
 
-		val newItems = mutableListOf<Event<PeriodItem>>()
-		newItems.addAll(leftover) // Add items that didn't fit inside the timegrid. These will always be single lessons.
-		itemGrid.forEach { unitsOfDay ->
-			unitsOfDay.forEachIndexed { unitIndex, items ->
-				items.forEach {
+		val newItems = itemGrid.flatMap { unitsOfDay ->
+			unitsOfDay.flatMapIndexed { unitIndex, items ->
+				items.onEach {
 					var i = 1
 					while (unitIndex + i < unitsOfDay.size && it.mergeWith(unitsOfDay[unitIndex + i])) i++
 				}
-
-				newItems.addAll(items)
 			}
-		}
+		}.toMutableList()
+
+		newItems.addAll(leftover) // Add items that didn't fit inside the timegrid. These will always be single lessons.
+
 		return newItems
 	}
 
