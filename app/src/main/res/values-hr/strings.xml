@@ -277,7 +277,7 @@
     <string name="preference_background_irregular_past">Prošla izvanredna nastava</string>
     <string name="preference_background_irregular">Izvanredna nastava</string>
     <string name="preference_background_future">Pozadina budućih dana</string>
-    <string name="preference_background_exam_past">Prošla nastava s testovima</string>
+    <string name="preference_background_exam_past">Prošle nastave s testovima</string>
     <string name="preference_background_exam">Nastave s testovima</string>
     <string name="preference_background_cancelled_past">Prošle otkazane nastave</string>
     <string name="preference_background_cancelled">Otkazane nastave</string>
