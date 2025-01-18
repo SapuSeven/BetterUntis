@@ -97,7 +97,7 @@
     <string name="preference_theme_cyan">Cijan</string>
     <string name="preference_theme_blue">Plava</string>
     <string name="preference_theme">Odaberi temu</string>
-    <string name="preference_schoolcolors_regular">Za redovnu nastavu</string>
+    <string name="preference_schoolcolors_regular">Za redovne nastave</string>
     <string name="preference_schoolcolors_irregular">Za izvanredne nastave</string>
     <string name="preference_schoolcolors_exam">Za nastave s testovima</string>
     <string name="preference_schoolcolors_cancelled">Za otkazane nastave</string>
