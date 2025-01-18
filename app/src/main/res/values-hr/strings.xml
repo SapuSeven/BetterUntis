@@ -65,7 +65,7 @@
     <string name="preference_week_display_length_summary">Postavi na 0 za prikaz tjedna</string>
     <string name="preference_week_display_length">Dani za prikaz</string>
     <string name="preference_week_custom_range">Prilagođen raspon tjedna</string>
-    <string name="preference_use_theme_background_desc">Ovo vrijedi samo za redovnu nastavu</string>
+    <string name="preference_use_theme_background_desc">Ovo vrijedi samo za redovne nastave</string>
     <string name="preference_use_theme_background">Koristi boju teme</string>
     <string name="preference_timetable_substitutions_irregular_desc">Tretiraj nastave sa zamjenama kao izvanredne</string>
     <string name="preference_timetable_substitutions_irregular">Otkrij izvanredne nastave</string>
@@ -86,7 +86,7 @@
     <string name="preference_timetable_colors_reset">Obnovi boje</string>
     <string name="preference_timetable_centered_lesson_info">Centriraj podatke nastave</string>
     <string name="preference_timetable_bold_lesson_name">Podebljaj ime nastave</string>
-    <string name="preference_timetable_background_irregular_desc">Računaj nastave s drugačijom pozadinom kao izvanredne</string>
+    <string name="preference_timetable_background_irregular_desc">Tretiraj nastave s drugačijom pozadinom kao izvanredne</string>
     <string name="preference_timetable_background_irregular">Uzmi u obzir pozadinu elementa</string>
     <string name="preference_theme_untis">Izvorni Untis program</string>
     <string name="preference_theme_stock">Standardno</string>
@@ -105,7 +105,7 @@
     <string name="preference_notifications_visibility_short">Kratko ime</string>
     <string name="preference_notifications_visibility_long">Dugačko ime</string>
     <string name="preference_notifications_visibility_hidden">Skriveno</string>
-    <string name="preference_notifications_multiple_desc">Obavijesti će se pokazati u pauzama između višesatnih nastava</string>
+    <string name="preference_notifications_multiple_desc">Obavijesti će se pokazati u pauzama tijekom višesatnih nastava</string>
     <string name="preference_notifications_multiple">Aktiviraj u višesatnoj nastavi</string>
     <string name="preference_notifications_first_lesson_time_unit">min prije prvog sata</string>
     <string name="preference_notifications_first_lesson_time">Vrijeme obavještavanja</string>
