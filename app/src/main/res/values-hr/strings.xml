@@ -296,7 +296,7 @@
     <string name="all_dialog_absences_save">Pošalji provjeru izostanaka</string>
     <string name="all_edit">Uredi</string>
     <string name="all_exit">Izađi</string>
-    <string name="all_exam">Ispit</string>
+    <string name="all_exam">Test</string>
     <string name="all_homework">Domaća zadaća</string>
     <string name="all_lessontopic_edit">Uredi temu nastave</string>
     <string name="errors_button_report">Prijavi sve</string>
@@ -375,4 +375,9 @@
     <string name="infocenter_absence_reason">Razlog: %1$s</string>
     <string name="infocenter_absence_reason_unknown">Nepoznato</string>
     <string name="infocenter_absences_timerange">%1$s – %2$s</string>
+    <string name="infocenter_exams">Testovi</string>
+    <string name="infocenter_homework_empty">Bez domaćih zadaća</string>
+    <string name="infocenter_exams_empty">Bez testova</string>
+    <string name="infocenter_homework">Domaća zadaća</string>
+    <string name="preference_timetable_colors_reset_desc">Ovo će ih uskladiti s bojom tvoje aktivne teme.</string>
 </resources>
