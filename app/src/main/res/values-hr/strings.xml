@@ -99,7 +99,7 @@
     <string name="preference_theme">Odaberi temu</string>
     <string name="preference_schoolcolors_regular">Za redovnu nastavu</string>
     <string name="preference_schoolcolors_irregular">Za izvanrednu nastavu</string>
-    <string name="preference_schoolcolors_exam">Za nastavu s testovima</string>
+    <string name="preference_schoolcolors_exam">Za nastave s testovima</string>
     <string name="preference_schoolcolors_cancelled">Za otkazane nastave</string>
     <string name="preference_school_background_desc">Neke škole šalju vlastite boje pozadine</string>
     <string name="preference_school_background">Koristi boje tvoje škole</string>
