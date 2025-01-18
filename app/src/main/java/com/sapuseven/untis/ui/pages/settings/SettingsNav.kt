@@ -2,6 +2,10 @@ package com.sapuseven.untis.ui.pages.settings
 
 import android.os.Build
 import android.widget.Toast
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -35,14 +39,26 @@ import com.sapuseven.compose.protostore.ui.preferences.WeekRangePreference
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.preferences.PreferenceScreen
+import com.sapuseven.untis.ui.common.disabled
 import com.sapuseven.untis.ui.navigation.AppRoutes
 import com.sapuseven.untis.ui.preferences.ElementPickerPreference
 import io.sentry.Sentry
+import soup.compose.material.motion.animation.materialSharedAxisXIn
+import soup.compose.material.motion.animation.materialSharedAxisXOut
 
 fun NavGraphBuilder.SettingsNav(
 	navController: NavHostController
 ) {
-	composable<AppRoutes.Settings.Categories> {
+	composable<AppRoutes.Settings.Categories>(
+		enterTransition = {
+			slideInHorizontally() { it / 2 } + fadeIn()
+		},
+		exitTransition = { materialSharedAxisXOut(true, 30) },
+		popEnterTransition = { materialSharedAxisXIn(false, 30) },
+		popExitTransition = {
+			slideOutHorizontally() { it / 2 } + fadeOut()
+		},
+	) {
 		SettingsScreen(navController = navController, title = null) {
 			PreferenceScreen(
 				key = AppRoutes.Settings.General,
@@ -792,7 +808,7 @@ onValueChange = { timetableRangeIndexReset = it }
 			PreferenceGroup(stringResource(id = R.string.preference_category_notifications_visible_fields)) {
 				ListPreference(
 					title = { Text(stringResource(R.string.all_subjects)) },
-					supportingContent = { value, _ -> Text(value.second) },
+					supportingContent = { value, enabled -> Text(value.second, modifier = Modifier.disabled(!enabled)) },
 					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.all_subject),
@@ -809,7 +825,7 @@ onValueChange = { timetableRangeIndexReset = it }
 
 				ListPreference(
 					title = { Text(stringResource(R.string.all_rooms)) },
-					supportingContent = { value, _ -> Text(value.second) },
+					supportingContent = { value, enabled -> Text(value.second, modifier = Modifier.disabled(!enabled)) },
 					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.all_rooms),
@@ -826,7 +842,7 @@ onValueChange = { timetableRangeIndexReset = it }
 
 				ListPreference(
 					title = { Text(stringResource(R.string.all_teachers)) },
-					supportingContent = { value, _ -> Text(value.second) },
+					supportingContent = { value, enabled -> Text(value.second, modifier = Modifier.disabled(!enabled)) },
 					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.all_teachers),
@@ -843,7 +859,7 @@ onValueChange = { timetableRangeIndexReset = it }
 
 				ListPreference(
 					title = { Text(stringResource(R.string.all_classes)) },
-					supportingContent = { value, _ -> Text(value.second) },
+					supportingContent = { value, enabled -> Text(value.second, modifier = Modifier.disabled(!enabled)) },
 					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.all_classes),

@@ -224,6 +224,7 @@ dependencies {
 	implementation(libs.andrew0000.cache)
 	implementation(libs.sapuseven.protostore)
 	implementation(libs.fornewid.placeholder.material3)
+	implementation(libs.fornewid.material.motion.compose.core)
 
 	gmsImplementation(libs.gms.code.scanner)
 

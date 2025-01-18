@@ -41,6 +41,7 @@ ksp = "2.1.0-1.0.29"
 ktor = "2.3.5"
 mannodermaus-android-junit5 = "1.10.0.0"
 material = "1.12.0"
+material-motion-compose-core-version = "2.0.1"
 mikepenz-aboutlibraries = "10.5.2"
 mockito = "4.6.1"
 mockk = "1.13.4"
@@ -94,6 +95,7 @@ colormath = { module = "com.github.ajalt.colormath:colormath", version.ref = "co
 dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref="dagger"}
 desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar-jdk" }
 error_prone_annotations = { module = "com.google.errorprone:error_prone_annotations", version.ref = "error_prone_annotations" }
+fornewid-material-motion-compose-core = { module = "io.github.fornewid:material-motion-compose-core", version.ref = "material-motion-compose-core-version" }
 fuel = { module = "com.github.kittinunf.fuel:fuel", version.ref = "fuel" }
 fuel-coroutines = { module = "com.github.kittinunf.fuel:fuel-coroutines", version.ref = "fuel" }
 fuel-serialization = { module = "com.github.kittinunf.fuel:fuel-kotlinx-serialization", version.ref = "fuel" }

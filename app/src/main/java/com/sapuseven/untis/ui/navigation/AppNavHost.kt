@@ -9,14 +9,8 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -32,7 +26,8 @@ import com.sapuseven.untis.ui.pages.roomfinder.RoomFinder
 import com.sapuseven.untis.ui.pages.settings.SettingsNav
 import com.sapuseven.untis.ui.pages.splash.Splash
 import com.sapuseven.untis.ui.pages.timetable.Timetable
-import kotlinx.coroutines.flow.Flow
+import soup.compose.material.motion.animation.materialSharedAxisXIn
+import soup.compose.material.motion.animation.materialSharedAxisXOut
 import kotlin.reflect.typeOf
 
 @Composable
@@ -172,24 +167,14 @@ fun AppNavHost(
 			RoomFinder()
 		}
 
-		navigation<AppRoutes.Settings>(startDestination = AppRoutes.Settings.Categories) {
+		navigation<AppRoutes.Settings>(
+			startDestination = AppRoutes.Settings.Categories,
+			enterTransition = { materialSharedAxisXIn(true, 30) },
+			exitTransition = { materialSharedAxisXOut(false, 30) },
+			popEnterTransition = { materialSharedAxisXIn(true, 30) },
+			popExitTransition = { materialSharedAxisXOut(false, 30) }
+		) {
 			SettingsNav(navController = navController)
 		}
 	}
-}
-
-@Composable
-fun <T> Flow<T>.asLifecycleAwareState(lifecycleOwner: LifecycleOwner, initialState: T) =
-	lifecycleAwareState(lifecycleOwner, this, initialState)
-
-@Composable
-fun <T> lifecycleAwareState(
-	lifecycleOwner: LifecycleOwner,
-	flow: Flow<T>,
-	initialState: T
-): State<T> {
-	val lifecycleAwareStateFlow = remember(flow, lifecycleOwner) {
-		flow.flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-	}
-	return lifecycleAwareStateFlow.collectAsState(initialState)
 }
