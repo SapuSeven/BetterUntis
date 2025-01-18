@@ -9,9 +9,9 @@
         <item quantity="other">%1$d doprinosa</item>
     </plurals>
     <plurals name="roomfinder_item_desc">
-        <item quantity="one">Ova je soba trenutačno slobodna.</item>
-        <item quantity="few">Ova je soba još %d sata slobodna.</item>
-        <item quantity="other">Ova je soba još %d sati slobodna.</item>
+        <item quantity="one">Ova je prostorija trenutačno slobodna.</item>
+        <item quantity="few">Ova je prostorija još %d sata slobodna.</item>
+        <item quantity="other">Ova je prostorija još %d sati slobodna.</item>
     </plurals>
     <plurals name="main_time_diff_days">
         <item quantity="one">prije jedan dan</item>
@@ -371,4 +371,8 @@
     <string name="all_api_error_generic">API greška: %1$s</string>
     <string name="infocenter_absence_excused_status">Opravdano: %1$s</string>
     <string name="infocenter_absence_unexcused_status">Nepravdano: %1$s</string>
+    <string name="all_dialog_absences_save_detailed">Pošalji detaljiziran razlog izostanka</string>
+    <string name="infocenter_absence_reason">Razlog: %1$s</string>
+    <string name="infocenter_absence_reason_unknown">Nepoznato</string>
+    <string name="infocenter_absences_timerange">%1$s – %2$s</string>
 </resources>
