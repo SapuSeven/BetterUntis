@@ -300,7 +300,7 @@
     <string name="all_homework">Domaća zadaća</string>
     <string name="all_lessontopic_edit">Uredi temu nastave</string>
     <string name="errors_button_report">Prijavi sve</string>
-    <string name="infocenter_absence_excused">Ispričano</string>
+    <string name="infocenter_absence_excused">Opravdano</string>
     <string name="infocenter_absence_unexcused">Neispričano</string>
     <string name="mainactivitydrawer_profile_edit">Uredi profile</string>
     <string name="preference_info_license">Licenca</string>
