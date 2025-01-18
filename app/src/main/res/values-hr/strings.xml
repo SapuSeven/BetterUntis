@@ -279,7 +279,7 @@
     <string name="preference_background_future">Pozadina budućih dana</string>
     <string name="preference_background_exam_past">Prošla nastava s testovima</string>
     <string name="preference_background_exam">Nastava s testovima</string>
-    <string name="preference_background_cancelled_past">Prošla otkazana nastava</string>
+    <string name="preference_background_cancelled_past">Prošle otkazane nastave</string>
     <string name="preference_background_cancelled">Otkazane nastave</string>
     <string name="preference_automute_enable_summary">Automatski uključuje način „Ne smetaj” tijekom nastave</string>
     <string name="preference_automute_enable">Aktiviraj automatsko isključivanje zvuka</string>
