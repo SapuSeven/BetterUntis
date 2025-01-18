@@ -281,7 +281,7 @@
     <string name="preference_background_exam">Nastave s testovima</string>
     <string name="preference_background_cancelled_past">Prošle otkazane nastave</string>
     <string name="preference_background_cancelled">Otkazane nastave</string>
-    <string name="preference_automute_enable_summary">Automatski uključuje način „Ne smetaj” tijekom nastave</string>
+    <string name="preference_automute_enable_summary">Automatski uključuje način „Ne smetaj” tijekom nastava</string>
     <string name="preference_automute_enable">Aktiviraj automatsko isključivanje zvuka</string>
     <string name="preference_automute_cancelled_lessons">Također iskjluči zvuk u otkazanim nastavama</string>
     <string name="preference_dark_theme_auto">Koristi temu sustava</string>
