@@ -365,7 +365,13 @@
     <string name="infocenter_absences_list_schoolyear">Aktuelles Schuljahr</string>
     <string name="all_timepicker_select">Zeit auswählen</string>
     <string name="all_start_time">Startzeit</string>
-	  <string name="all_end_time">Endzeit</string>
+    <string name="all_end_time">Endzeit</string>
     <string name="preference_app_language">App-Sprache</string>
-	  <string name="preference_category_app_language">App-Sprache</string>
+    <string name="preference_category_app_language">App-Sprache</string>
+    <string name="infocenter_absences_timerange">%1$s - %2$s</string>
+    <string name="infocenter_absence_unexcused_status">Unentschuldigt: %1$s</string>
+    <string name="infocenter_absence_reason">Grund: %1$s</string>
+    <string name="infocenter_homework">Hausaufgaben</string>
+    <string name="infocenter_homework_empty">Keine Hausaufgaben</string>
+    <string name="infocenter_absence_excused_status">Entschuldigt: %1$s</string>
 </resources>
