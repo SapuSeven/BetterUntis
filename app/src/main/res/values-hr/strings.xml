@@ -67,7 +67,7 @@
     <string name="preference_week_custom_range">Prilagođen raspon tjedna</string>
     <string name="preference_use_theme_background_desc">Ovo vrijedi samo za redovnu nastavu</string>
     <string name="preference_use_theme_background">Koristi boju teme</string>
-    <string name="preference_timetable_substitutions_irregular_desc">Računaj nastavu sa zamjenama kao izvanrednu</string>
+    <string name="preference_timetable_substitutions_irregular_desc">Tretiraj nastave sa zamjenama kao izvanredne</string>
     <string name="preference_timetable_substitutions_irregular">Otkrij izvanredne nastave</string>
     <string name="preference_timetable_range_index_reset">Obnovi numeriranje nastave</string>
     <string name="preference_timetable_range_desc">%1$d do %2$d</string>
