@@ -130,7 +130,7 @@ class TimetableViewModel @AssistedInject constructor(
 					_personalElement.value = currentUser.userData.elemType?.let {
 						PeriodElement(it, currentUser.userData.elemId)
 					}
-					_needsPersonalTimetable.emit(_personalElement.value == null)
+					_needsPersonalTimetable.emit(requestedElement == null && _personalElement.value == null)
 				}
 				_hourList.value = buildHourList(
 					user = currentUser,
