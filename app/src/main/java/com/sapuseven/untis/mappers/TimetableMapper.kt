@@ -2,7 +2,6 @@ package com.sapuseven.untis.mappers
 
 import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.ColorUtils
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
@@ -22,7 +21,7 @@ import java.time.DayOfWeek
 import java.time.temporal.ChronoUnit
 
 class TimetableMapper @AssistedInject constructor(
-    private val settingsRepositoryFactory: UserSettingsRepository.Factory,
+    settingsRepositoryFactory: UserSettingsRepository.Factory,
     private val masterDataRepository: MasterDataRepository,
     private val userScopeManager: UserScopeManager,
     @Assisted private val colorScheme: ColorScheme,
@@ -34,12 +33,7 @@ class TimetableMapper @AssistedInject constructor(
 		fun create(colorScheme: ColorScheme): TimetableMapper
 	}
 
-	private data class Preferences(
-		var hideCancelled: Boolean,
-		var substitutionsIrregular: Boolean,
-	)
-
-	public suspend fun mapTimetablePeriodsToWeekViewEvents(
+	suspend fun mapTimetablePeriodsToWeekViewEvents(
 		items: List<Period>,
 		contextType: ElementType
 	): List<Event<PeriodItem>> {
@@ -59,7 +53,7 @@ class TimetableMapper @AssistedInject constructor(
 		}
 	}
 
-	public suspend fun colorWeekViewTimetableEvents(
+	suspend fun colorWeekViewTimetableEvents(
 		events: List<Event<PeriodItem>>
 	): List<Event<PeriodItem>> {
 		waitForSettings().apply {
@@ -74,82 +68,6 @@ class TimetableMapper @AssistedInject constructor(
 				Color(backgroundIrregularPast),
 				schoolBackgroundList
 			)
-		}
-	}
-
-	public suspend fun color(event: Event<PeriodItem>) {
-		waitForSettings().apply {
-			return event.color(
-				Color(backgroundRegular),
-				Color(backgroundRegularPast),
-				Color(backgroundExam),
-				Color(backgroundExamPast),
-				Color(backgroundCancelled),
-				Color(backgroundCancelledPast),
-				Color(backgroundIrregular),
-				Color(backgroundIrregularPast),
-				schoolBackgroundList
-			)
-		}
-	}
-
-	private suspend fun Event<PeriodItem>.color(
-		regularColor: Color,
-		regularPastColor: Color,
-		examColor: Color,
-		examPastColor: Color,
-		cancelledColor: Color,
-		cancelledPastColor: Color,
-		irregularColor: Color,
-		irregularPastColor: Color,
-		useDefault: List<String>
-	) {
-		data?.let {
-			val defaultColor =
-				Color(android.graphics.Color.parseColor(data.originalPeriod.backColor))
-			val defaultTextColor =
-				Color(android.graphics.Color.parseColor(data.originalPeriod.foreColor))
-
-			color = when {
-				data.isExam() -> if (useDefault.contains("exam")) defaultColor else examColor
-				data.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor else cancelledColor
-				data.isIrregular() -> if (useDefault.contains("irregular")) defaultColor else irregularColor
-				else -> if (useDefault.contains("regular")) defaultColor else regularColor
-			}
-
-			pastColor = when {
-				data.isExam() -> if (useDefault.contains("exam")) defaultColor.darken(
-					0.25f
-				) else examPastColor
-
-				data.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor.darken(
-					0.25f
-				) else cancelledPastColor
-
-				data.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(
-					0.25f
-				) else irregularPastColor
-
-				else -> if (useDefault.contains("regular")) defaultColor.darken(0.25f) else regularPastColor
-			}
-
-			textColor = when {
-				data.isExam() -> if (useDefault.contains("exam")) defaultTextColor else colorOn(
-					examColor
-				)
-
-				data.isCancelled() -> if (useDefault.contains("cancelled")) defaultTextColor else colorOn(
-					cancelledColor
-				)
-
-				data.isIrregular() -> if (useDefault.contains("irregular")) defaultTextColor else colorOn(
-					irregularColor
-				)
-
-				else -> if (useDefault.contains("regular")) defaultTextColor else colorOn(
-					regularColor
-				)
-			}
 		}
 	}
 
@@ -282,7 +200,7 @@ class TimetableMapper @AssistedInject constructor(
 		return newItems
 	}
 
-	private suspend fun List<Event<PeriodItem>>.copyWithColor(
+	private fun List<Event<PeriodItem>>.copyWithColor(
 		regularColor: Color,
 		regularPastColor: Color,
 		examColor: Color,
@@ -306,7 +224,7 @@ class TimetableMapper @AssistedInject constructor(
 		)
 	}
 
-	private suspend fun Event<PeriodItem>.copyWithColor(
+	private fun Event<PeriodItem>.copyWithColor(
 		regularColor: Color,
 		regularPastColor: Color,
 		examColor: Color,
@@ -317,9 +235,14 @@ class TimetableMapper @AssistedInject constructor(
 		irregularPastColor: Color,
 		useDefault: List<String>
 	): Event<PeriodItem> = data?.let {
-		val defaultColor = Color(android.graphics.Color.parseColor(data.originalPeriod.backColor))
-		val defaultTextColor =
-			Color(android.graphics.Color.parseColor(data.originalPeriod.foreColor))
+		val subjectEntity = masterDataRepository.currentUserData?.subjects?.find { it.id == data.subjects.firstOrNull()?.id }
+
+		val defaultColor = Color(android.graphics.Color.parseColor(
+			subjectEntity?.backColor ?: data.originalPeriod.backColor)
+		)
+		val defaultTextColor = Color(android.graphics.Color.parseColor(
+			subjectEntity?.foreColor ?: data.originalPeriod.foreColor)
+		)
 
 		copy(
 			color = when {
@@ -329,37 +252,28 @@ class TimetableMapper @AssistedInject constructor(
 				else -> if (useDefault.contains("regular")) defaultColor else regularColor
 			},
 			pastColor = when {
-				data.isExam() -> if (useDefault.contains("exam")) defaultColor.darken(0.25f) else examPastColor
-				data.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor.darken(0.25f) else cancelledPastColor
-				data.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.darken(0.25f) else irregularPastColor
-				else -> if (useDefault.contains("regular")) defaultColor.darken(0.25f) else regularPastColor
+				data.isExam() -> if (useDefault.contains("exam")) defaultColor.copy(alpha = .7f) else examPastColor
+				data.isCancelled() -> if (useDefault.contains("cancelled")) defaultColor.copy(alpha = .7f) else cancelledPastColor
+				data.isIrregular() -> if (useDefault.contains("irregular")) defaultColor.copy(alpha = .7f) else irregularPastColor
+				else -> if (useDefault.contains("regular")) defaultColor.copy(alpha = .7f) else regularPastColor
 			},
 			textColor = when {
 				data.isExam() -> if (useDefault.contains("exam")) defaultTextColor else colorOn(examColor)
-				data.isCancelled() -> if (useDefault.contains("cancelled")) defaultTextColor else colorOn(
-					cancelledColor
-				)
-
-				data.isIrregular() -> if (useDefault.contains("irregular")) defaultTextColor else colorOn(
-					irregularColor
-				)
-
+				data.isCancelled() -> if (useDefault.contains("cancelled")) defaultTextColor else colorOn(cancelledColor)
+				data.isIrregular() -> if (useDefault.contains("irregular")) defaultTextColor else colorOn(irregularColor)
 				else -> if (useDefault.contains("regular")) defaultTextColor else colorOn(regularColor)
 			}
 		)
 	} ?: this
 
-	private fun Color.darken(ratio: Float) = lerp(this, Color.Black, ratio)
-
 	private fun colorOn(color: Color): Color {
-		return /*when (color.copy(alpha = 1f)) {
-		colorScheme.primary -> colorScheme.onPrimary
-		colorScheme.secondary -> colorScheme.onSecondary
-		colorScheme.tertiary -> colorScheme.onTertiary
-		else ->*/ if (ColorUtils.calculateLuminance(color.toArgb()) < 0.5) Color.White else Color.Black
-		//}.copy(alpha = color.alpha)
+		return when (color.copy(alpha = 1f)) {
+			colorScheme.primary -> colorScheme.onPrimary
+			colorScheme.secondary -> colorScheme.onSecondary
+			colorScheme.tertiary -> colorScheme.onTertiary
+			else -> if (ColorUtils.calculateLuminance(color.toArgb()) < 0.5) Color.White else Color.Black
+		}.copy(alpha = color.alpha)
 	}
-
 
 	private fun Event<PeriodItem>.mergeWith(items: MutableList<Event<PeriodItem>>): Boolean {
 		if (data == null) return false // cannot merge items without period data
