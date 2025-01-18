@@ -373,4 +373,5 @@
     <string name="preference_app_language">Jezik aplikacije</string>
     <string name="all_open_datepicker">Otvori birač datuma</string>
     <string name="all_timepicker_select">Odaberi vrijeme</string>
+    <string name="all_start_time">Vrijeme početka</string>
 </resources>
