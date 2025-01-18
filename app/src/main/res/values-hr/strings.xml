@@ -274,7 +274,7 @@
     <string name="preference_category_general_behaviour">Ponašanje</string>
     <string name="preference_category_general_automute">Automatsko isključivanje zvuka</string>
     <string name="preference_background_regular_past">Prošla redovna nastava</string>
-    <string name="preference_background_regular">Redovna nastava</string>
+    <string name="preference_background_regular">Redovne nastave</string>
     <string name="preference_background_past">Pozadina prošlih dana</string>
     <string name="preference_background_irregular_past">Prošle izvanredne nastave</string>
     <string name="preference_background_irregular">Izvanredne nastave</string>
