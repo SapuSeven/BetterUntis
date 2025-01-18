@@ -227,7 +227,7 @@
     <string name="activity_title_settings">Postavke</string>
     <string name="activity_title_messenger">Razgovori</string>
     <string name="activity_title_info_center">Centar informacija</string>
-    <string name="activity_title_free_rooms">Slobodne sobe</string>
+    <string name="activity_title_free_rooms">Slobodne prostorije</string>
     <string name="activity_title_errors">Greške</string>
     <string name="all_hint_tap_to_edit">(Dodirni za uređivanje)</string>
     <string name="all_dialog_crash_copied">Zapis prekida programa kopiran je u međuspremnik.</string>
