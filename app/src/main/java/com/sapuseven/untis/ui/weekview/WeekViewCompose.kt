@@ -3,6 +3,11 @@ package com.sapuseven.untis.ui.weekview
 import android.text.format.DateFormat
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculateCentroid
+import androidx.compose.foundation.gestures.calculateCentroidSize
+import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -33,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +56,9 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -63,6 +72,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastAny
+import androidx.compose.ui.util.fastForEach
 import com.sapuseven.untis.R
 import com.sapuseven.untis.ui.common.ifNotNull
 import com.sapuseven.untis.ui.dialogs.DatePickerDialog
@@ -75,6 +86,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 data class Event<T>(
@@ -507,6 +519,48 @@ fun DrawScope.weekViewIndicator(
 		)
 }
 
+suspend fun PointerInputScope.detectZoomGesture(
+	onGesture: (centroid: Offset, zoom: Float) -> Unit
+) {
+	awaitEachGesture {
+		var zoom = 1f
+		var pastTouchSlop = false
+		val touchSlop = viewConfiguration.touchSlop
+
+		awaitFirstDown(requireUnconsumed = false)
+		do {
+			val event = awaitPointerEvent()
+			val canceled = event.changes.fastAny { it.isConsumed }
+			if (!canceled) {
+				val zoomChange = event.calculateZoom()
+
+				if (!pastTouchSlop) {
+					zoom *= zoomChange
+
+					val centroidSize = event.calculateCentroidSize(useCurrent = false)
+					val zoomMotion = abs(1 - zoom) * centroidSize
+
+					if (zoomMotion > touchSlop) {
+						pastTouchSlop = true
+					}
+				}
+
+				if (pastTouchSlop) {
+					val centroid = event.calculateCentroid(useCurrent = false)
+					if (zoomChange != 1f) {
+						onGesture(centroid, zoomChange)
+					}
+					event.changes.fastForEach {
+						if (it.positionChanged()) {
+							it.consume()
+						}
+					}
+				}
+			}
+		} while (!canceled && event.changes.fastAny { it.pressed })
+	}
+}
+
 @Composable
 fun <T> WeekViewContent(
 	events: List<Event<T>>,
@@ -648,6 +702,8 @@ fun <T> WeekViewCompose(
 	var headerHeight by remember { mutableIntStateOf(0) }
 	var contentHeight by remember { mutableIntStateOf(0) }
 
+	var scale by remember { mutableFloatStateOf(1f) }
+
 	val startPage = Int.MAX_VALUE / 2
 	val pagerState = rememberPagerState(initialPage = startPage) { Int.MAX_VALUE }
 	val numDays = 5
@@ -718,7 +774,7 @@ fun <T> WeekViewCompose(
 			WeekViewSidebar(
 				startTime = startTimeWithOffset,
 				endTime = endTimeWithOffset,
-				hourHeight = hourHeight,
+				hourHeight = hourHeight * scale,
 				hourList = hourList,
 				modifier = Modifier
 					.onGloballyPositioned { sidebarWidth = it.size.width }
@@ -786,7 +842,7 @@ fun <T> WeekViewCompose(
 							startTime = startTimeWithOffset,
 							endTime = endTimeWithOffset,
 							endTimeOffset = endTimeOffset,
-							hourHeight = hourHeight,
+							hourHeight = hourHeight * scale,
 							hourList = hourList,
 							dividerWidth = dividerWidth,
 							dividerColor = colorScheme.dividerColor,
@@ -796,6 +852,24 @@ fun <T> WeekViewCompose(
 							modifier = Modifier
 								.fillMaxHeight()
 								.onGloballyPositioned { contentHeight = it.size.height }
+								.pointerInput(Unit) {
+									detectZoomGesture { centroid, zoom ->
+										val oldScale = scale
+										// Constrain min/max zoom
+										scale = (scale * zoom).coerceIn(0.75f..2f)
+
+										// Don't move scroll position if no effective zoom occurred
+										val actualZoom = scale / oldScale
+										val scrollY = verticalScrollState.value * actualZoom
+
+										// Center zooming around gesture origin
+										val scrollOffset = (zoom - 1) * (scrollY - centroid.y)
+
+										scope.launch {
+											verticalScrollState.scrollTo(scrollY.roundToInt() - scrollOffset.roundToInt())
+										}
+									}
+								}
 								.verticalScroll(verticalScrollState)
 						)
 					}
