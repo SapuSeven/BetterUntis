@@ -375,7 +375,6 @@
     <string name="infocenter_absence_excused_status">Entschuldigt (%1$s)</string>
     <string name="all_dialog_absences_save_detailed">Detaillierte Abwesenheitskontrolle absenden</string>
     <string name="all_api_error_generic">Schnittstellen-Fehler: %1$s</string>
-    <string name="all_open_datepicker"></string>
     <string name="preference_timetable_range_index_reset_desc">Stundennamen immer mit 1 beginnen</string>
     <string name="roomfinder_item_desc_free_day">Dieser Raum ist den restlichen Tag frei.</string>
     <string name="roomfinder_item_desc_free_week">Dieser Raum ist die restliche Woche frei.</string>
