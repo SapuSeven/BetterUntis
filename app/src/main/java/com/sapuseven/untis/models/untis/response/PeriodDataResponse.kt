@@ -42,6 +42,6 @@ data class UntisPeriodData(
 		val homeWorks: List<UntisHomework>?,
 		val seatingPlan: UnknownObject?,
 		val classRoles: List<UnknownObject>?,
-		val channel: UnknownObject?,
+		val channel: UnknownObject? = null,
 		val can: List<String>
 )
