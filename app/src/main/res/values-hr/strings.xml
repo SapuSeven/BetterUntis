@@ -159,6 +159,7 @@
     <string name="roomfinder_dialog_itemdelete_text">Stvarno želiš ukloniti ovu prostoriju iz popisa\?</string>
     <string name="roomfinder_delete_item">Izbriši prostoriju</string>
     <string name="roomfinder_current_hour_time">%1$s – %2$s</string>
+    <string name="roomfinder_current_hour">%1$s, %2$d. sat</string>
     <string name="errormessagedictionary_user_locked">Korisnik zaključan!</string>
     <string name="errormessagedictionary_too_many_results">Previše rezultata</string>
     <string name="errormessagedictionary_server_webuntis_not_installed">Na određenom poslužitelju WebUntis nije instaliran!</string>
