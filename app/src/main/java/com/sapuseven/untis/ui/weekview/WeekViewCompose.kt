@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
@@ -335,6 +336,7 @@ fun CompactSidebarLabelPreview() {
 @Composable
 fun WeekViewSidebar(
 	startTime: LocalTime,
+	endTime: LocalTime,
 	hourHeight: Dp,
 	modifier: Modifier = Modifier,
 	hourList: List<WeekViewHour>,
@@ -342,6 +344,7 @@ fun WeekViewSidebar(
 ) {
 	Box(
 		modifier = modifier
+			.height(hourHeight * (Duration.between(startTime, endTime).toMinutes() / 60f))
 			.width(IntrinsicSize.Max)
 	) {
 		hourList.forEach { hour ->
@@ -353,7 +356,7 @@ fun WeekViewSidebar(
 
 			Box(
 				modifier = Modifier
-					.padding(top = topOffset)
+					.offset(y = topOffset)
 					.height(height)
 					.fillMaxWidth()
 			) {
@@ -367,7 +370,8 @@ fun WeekViewSidebar(
 @Composable
 fun WeekViewSidebarPreview() {
 	WeekViewSidebar(
-		startTime = LocalTime.of(9, 45),
+		startTime = LocalTime.of(9, 30),
+		endTime = LocalTime.of(13, 45),
 		hourHeight = 72.dp,
 		hourList = (1..4).map {
 			WeekViewHour(
@@ -666,13 +670,29 @@ fun <T> WeekViewCompose(
 		}
 	}
 
+	val latestEventTime by remember(events) {
+		derivedStateOf {
+			// TODO: Not efficient for large amounts of events
+			events.values.flatten().maxByOrNull { it.end.toLocalTime() }?.end?.toLocalTime()
+		}
+	}
+
 	val startTimeOffsetMinutes by animateIntAsState(
 		Duration.between(earliestEventTime ?: startTime, startTime).toMinutes().coerceAtLeast(0).toInt(),
 		label = "startTimeOffsetMinutes"
 	)
 
+	val endTimeOffsetMinutes by animateIntAsState(
+		Duration.between(endTime, latestEventTime ?: endTime).toMinutes().coerceAtLeast(0).toInt(),
+		label = "endTimeOffsetMinutes"
+	)
+
 	val startTimeWithOffset = remember(startTime, startTimeOffsetMinutes) {
 		startTime.minusMinutes(startTimeOffsetMinutes.toLong())
+	}
+
+	val endTimeWithOffset = remember(endTime, endTimeOffsetMinutes) {
+		endTime.plusMinutes(endTimeOffsetMinutes.toLong())
 	}
 
 	Row(modifier = modifier) {
@@ -697,6 +717,7 @@ fun <T> WeekViewCompose(
 
 			WeekViewSidebar(
 				startTime = startTimeWithOffset,
+				endTime = endTimeWithOffset,
 				hourHeight = hourHeight,
 				hourList = hourList,
 				modifier = Modifier
@@ -763,7 +784,7 @@ fun <T> WeekViewCompose(
 							startDate = visibleStartDate,
 							numDays = numDays,
 							startTime = startTimeWithOffset,
-							endTime = endTime,
+							endTime = endTimeWithOffset,
 							endTimeOffset = endTimeOffset,
 							hourHeight = hourHeight,
 							hourList = hourList,
