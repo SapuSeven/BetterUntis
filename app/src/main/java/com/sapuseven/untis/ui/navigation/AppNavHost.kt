@@ -23,7 +23,7 @@ import com.sapuseven.untis.ui.pages.infocenter.InfoCenter
 import com.sapuseven.untis.ui.pages.login.Login
 import com.sapuseven.untis.ui.pages.login.datainput.LoginDataInput
 import com.sapuseven.untis.ui.pages.roomfinder.RoomFinder
-import com.sapuseven.untis.ui.pages.settings.SettingsNav
+import com.sapuseven.untis.ui.pages.settings.settingsNav
 import com.sapuseven.untis.ui.pages.splash.Splash
 import com.sapuseven.untis.ui.pages.timetable.Timetable
 import soup.compose.material.motion.animation.materialSharedAxisXIn
@@ -170,11 +170,11 @@ fun AppNavHost(
 		navigation<AppRoutes.Settings>(
 			startDestination = AppRoutes.Settings.Categories,
 			enterTransition = { materialSharedAxisXIn(true, 30) },
-			exitTransition = { materialSharedAxisXOut(false, 30) },
-			popEnterTransition = { materialSharedAxisXIn(true, 30) },
+			exitTransition = { materialSharedAxisXOut(true, 30) },
+			popEnterTransition = { materialSharedAxisXIn(false, 30) },
 			popExitTransition = { materialSharedAxisXOut(false, 30) }
 		) {
-			SettingsNav(navController = navController)
+			settingsNav(navController = navController)
 		}
 	}
 }

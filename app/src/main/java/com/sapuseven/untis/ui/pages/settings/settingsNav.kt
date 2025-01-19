@@ -28,7 +28,6 @@ import androidx.navigation.toRoute
 import com.google.accompanist.flowlayout.MainAxisAlignment
 import com.sapuseven.compose.protostore.ui.preferences.ColorPreference
 import com.sapuseven.compose.protostore.ui.preferences.ConfirmDialogPreference
-import com.sapuseven.compose.protostore.ui.preferences.InputPreference
 import com.sapuseven.compose.protostore.ui.preferences.ListPreference
 import com.sapuseven.compose.protostore.ui.preferences.MultiSelectListPreference
 import com.sapuseven.compose.protostore.ui.preferences.NumericInputPreference
@@ -47,7 +46,7 @@ import io.sentry.Sentry
 import soup.compose.material.motion.animation.materialSharedAxisXIn
 import soup.compose.material.motion.animation.materialSharedAxisXOut
 
-fun NavGraphBuilder.SettingsNav(
+fun NavGraphBuilder.settingsNav(
 	navController: NavHostController
 ) {
 	composable<AppRoutes.Settings.Categories>(
@@ -887,6 +886,10 @@ fun NavGraphBuilder.SettingsNav(
 			}
 		}
 	}
+
+	/* Not supported. Will probably be removed completely in the future.
+	 * Proxy settings are redundant since the API URL can be customized.
+	 * "Always refresh" is also not needed anymore due to smarter caching.
 	composable<AppRoutes.Settings.Connectivity> {
 		SettingsScreen(
 			navController = navController,
@@ -927,9 +930,8 @@ fun NavGraphBuilder.SettingsNav(
 					}
 				)
 			}
-
 		}
-	}
+	}*/
 
 	composable<AppRoutes.Settings.About> {
 		SettingsScreen(
