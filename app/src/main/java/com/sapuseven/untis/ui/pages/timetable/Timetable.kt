@@ -31,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -41,7 +40,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
-import com.sapuseven.untis.ui.pages.timetable.details.TimetableItemDetailsDialog
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.AppScaffold
@@ -53,6 +51,7 @@ import com.sapuseven.untis.ui.dialogs.FeedbackDialog
 import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
+import com.sapuseven.untis.ui.pages.timetable.details.TimetableItemDetailsDialog
 import com.sapuseven.untis.ui.weekview.WeekViewCompose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -129,13 +128,8 @@ fun Timetable(
 					.padding(innerPadding)
 					.fillMaxSize()
 			) {
-				val density = LocalDensity.current
 				val insets = insetsPaddingValues()
-				val navBarHeight = remember {
-					with(density) {
-						(insets.calculateBottomPadding() + 48.dp).toPx()
-					}
-				}
+				val navBarHeight = remember { insets.calculateBottomPadding() + 48.dp }
 
 				FeedbackDialog(
 					visible = viewModel.feedbackDialog,

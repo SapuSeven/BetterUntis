@@ -158,7 +158,6 @@
     <string name="preference_timetable_item_corner_radius">Elementuaren ertzeko erradioa</string>
     <string name="preference_timetable_hide_timestamps_desc">Ezkutatu ordutegiaren ondoko denbora-zigiluak</string>
     <string name="preference_timetable_hide_timestamps">Ezkutatu denbora-zigiluak</string>
-    <string name="preference_timetable_hide_cancelled_desc">Ezarpen hau aldatu ondoren ordutegia berriro kargatu behar duzu</string>
     <string name="preference_timetable_hide_cancelled">Ezkutatu bertan behera utzitako eskolak</string>
     <string name="preference_timetable_colors_reset_button_positive">Berrezarri</string>
     <string name="preference_timetable_colors_reset">Berrezarri koloreak</string>

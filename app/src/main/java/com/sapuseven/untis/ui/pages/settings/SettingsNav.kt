@@ -1,5 +1,7 @@
 package com.sapuseven.untis.ui.pages.settings
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.widget.Toast
 import androidx.compose.animation.fadeIn
@@ -35,7 +37,6 @@ import com.sapuseven.compose.protostore.ui.preferences.PreferenceGroup
 import com.sapuseven.compose.protostore.ui.preferences.RangeInputPreference
 import com.sapuseven.compose.protostore.ui.preferences.SliderPreference
 import com.sapuseven.compose.protostore.ui.preferences.SwitchPreference
-import com.sapuseven.compose.protostore.ui.preferences.WeekRangePreference
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.preferences.PreferenceScreen
@@ -138,7 +139,8 @@ fun NavGraphBuilder.SettingsNav(
 			navController = navController,
 			title = stringResource(id = R.string.preferences_general)
 		) { viewModel ->
-			PreferenceGroup(stringResource(id = R.string.preference_category_general_behaviour)) {
+			/* PreferenceGroup(stringResource(id = R.string.preference_category_general_behaviour)) {
+				// Not supported, not planned. May be reconsidered if there is demand for this feature.
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_double_tap_to_exit)) },
 					settingsRepository = viewModel.repository,
@@ -146,31 +148,17 @@ fun NavGraphBuilder.SettingsNav(
 					onValueChange = { exitConfirmation = it }
 				)
 
+				// Not supported. May be reconsidered if there is demand for this feature.
+				// Could be implemented by setting flingBehavior on the WeekView HorizontalPager
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_flinging_enable)) },
 					settingsRepository = viewModel.repository,
 					value = { it.flingEnable },
 					onValueChange = { flingEnable = it }
 				)
-			}
+			}*/
 
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-				PreferenceGroup(stringResource(id = R.string.preference_category_app_language)) {
-					val packageName = LocalContext.current.packageName
-					Preference(
-						title = { Text(text = stringResource(id = R.string.preference_app_language)) },
-						onClick = {
-							/*TODO languageSettingsLauncher.launch(
-								Intent(
-									android.provider.Settings.ACTION_APP_LOCALE_SETTINGS,
-									Uri.parse("package:$packageName")
-								)
-							)*/
-						}
-					)
-				}
-			}
-
+			/* Not supported yet
 			PreferenceGroup(stringResource(R.string.preference_category_general_week_display)) {
 				WeekRangePreference(
 					title = { Text(stringResource(R.string.preference_week_custom_range)) },
@@ -201,7 +189,7 @@ fun NavGraphBuilder.SettingsNav(
 					value = { it.weekCustomLength },
 					onValueChange = { weekCustomLength = it }
 				)
-			}
+			}*/
 
 			PreferenceGroup(stringResource(id = R.string.preference_category_general_automute)) {
 				SwitchPreference(
@@ -292,6 +280,20 @@ fun NavGraphBuilder.SettingsNav(
 					)
 				}
 			}
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+				val packageName = LocalContext.current.packageName
+				val context = LocalContext.current
+				Preference(
+					title = { Text(text = stringResource(id = R.string.preference_app_language)) },
+					onClick = {
+						context.startActivity(Intent(
+							android.provider.Settings.ACTION_APP_LOCALE_SETTINGS,
+							Uri.parse("package:$packageName")
+						))
+					}
+				)
+			}
 		}
 	}
 	composable<AppRoutes.Settings.Styling> {
@@ -305,7 +307,8 @@ fun NavGraphBuilder.SettingsNav(
 					showAlphaSlider = true,
 					settingsRepository = viewModel.repository,
 					value = { it.backgroundFuture },
-					onValueChange = { backgroundFuture = it }
+					onValueChange = { backgroundFuture = it },
+					defaultValueLabel = stringResource(R.string.preferences_default_color)
 				)
 
 				ColorPreference(
@@ -313,14 +316,16 @@ fun NavGraphBuilder.SettingsNav(
 					showAlphaSlider = true,
 					settingsRepository = viewModel.repository,
 					value = { it.backgroundPast },
-					onValueChange = { backgroundPast = it }
+					onValueChange = { backgroundPast = it },
+					defaultValueLabel = stringResource(R.string.preferences_default_color)
 				)
 
 				ColorPreference(
 					title = { Text(stringResource(R.string.preference_marker)) },
 					settingsRepository = viewModel.repository,
 					value = { it.marker },
-					onValueChange = { marker = it }
+					onValueChange = { marker = it },
+					defaultValueLabel = stringResource(R.string.preferences_default_color)
 				)
 			}
 
@@ -545,7 +550,6 @@ fun NavGraphBuilder.SettingsNav(
 
 			SwitchPreference(
 				title = { Text(stringResource(R.string.preference_timetable_hide_cancelled)) },
-				summary = { Text(stringResource(R.string.preference_timetable_hide_cancelled_desc)) },
 				leadingContent = {
 					Icon(
 						painter = painterResource(id = R.drawable.settings_hide_cancelled),
@@ -571,6 +575,7 @@ fun NavGraphBuilder.SettingsNav(
 				onValueChange = { timetableSubstitutionsIrregular = it }
 			)
 
+			/* Not supported due to reliability issues
 			SwitchPreference(
 				title = { Text(stringResource(R.string.preference_timetable_background_irregular)) },
 				summary = { Text(stringResource(R.string.preference_timetable_background_irregular_desc)) },
@@ -584,7 +589,7 @@ fun NavGraphBuilder.SettingsNav(
 				settingsRepository = viewModel.repository,
 				value = { it.timetableBackgroundIrregular },
 				onValueChange = { timetableBackgroundIrregular = it }
-			)
+			)*/
 
 			PreferenceGroup(stringResource(id = R.string.preference_category_display_options)) {
 				RangeInputPreference(
@@ -600,13 +605,19 @@ fun NavGraphBuilder.SettingsNav(
 					onValueChange = { timetableRange = it }
 				)
 
-				/*SwitchPreference(
+				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_timetable_range_index_reset)) },
-					enabledCondition = { it.timetableRange },
+					summary = { Text(stringResource(R.string.preference_timetable_range_index_reset_desc)) },
+					leadingContent = {
+						Icon(
+							painter = painterResource(id = R.drawable.settings_timetable_range_reset),
+							contentDescription = null
+						)
+					},
 					settingsRepository = viewModel.repository,
-value = { it.timetableRangeIndexReset },
-onValueChange = { timetableRangeIndexReset = it }
-				)*/
+					value = { it.timetableRangeIndexReset },
+					onValueChange = { timetableRangeIndexReset = it }
+				)
 
 				/*SwitchPreference
 				enabled = false,

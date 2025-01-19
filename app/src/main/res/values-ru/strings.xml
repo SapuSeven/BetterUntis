@@ -171,7 +171,6 @@
     <string name="preference_timetable_lesson_name_font_size">Размер шрифта названий уроков</string>
     <string name="preference_timetable_hide_timestamps">Скрыть временные метки</string>
     <string name="preference_info_privacy">Внешнее содержимое</string>
-    <string name="preference_timetable_hide_cancelled_desc">После изменения этой настройки вам придётся обновить расписание</string>
     <string name="preference_connectivity_proxy_about">Об этой функции</string>
     <string name="preference_notifications_first_lesson_desc">Отображать уведомление перед началом занятий</string>
     <string name="logindatainput_skip_app_secret">Пропустить получение секрета приложения</string>

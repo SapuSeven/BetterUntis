@@ -1,6 +1,7 @@
 package com.sapuseven.untis.domain
 
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.api.model.untis.enumeration.PeriodState
 import com.sapuseven.untis.api.model.untis.timetable.Period
 import com.sapuseven.untis.data.database.entities.RoomEntity
 import com.sapuseven.untis.data.database.entities.RoomFinderDao
@@ -81,9 +82,10 @@ class GetRoomFinderItemsUseCase @Inject constructor(
 		return user.timeGrid.days.flatMap { day ->
 			day.units.map { unit ->
 				periods.any { period ->
-					period.startDateTime.dayOfWeek == day.day &&
-							unit.endTime.isAfter(period.startDateTime.toLocalTime()) &&
-							unit.startTime.isBefore(period.endDateTime.toLocalTime())
+					!period.`is`(PeriodState.CANCELLED) &&
+						period.startDateTime.dayOfWeek == day.day &&
+						unit.endTime.isAfter(period.startDateTime.toLocalTime()) &&
+						unit.startTime.isBefore(period.endDateTime.toLocalTime())
 				}
 			}
 		}

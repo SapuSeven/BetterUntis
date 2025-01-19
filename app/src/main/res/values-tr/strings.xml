@@ -154,7 +154,6 @@
     <string name="all_subjects">Konular</string>
     <string name="preference_timetable_hide_timestamps_desc">Zaman çizelgesinin yanındaki zaman bilgilerini gizle</string>
     <string name="preference_timetable_hide_timestamps">Zaman bilgisini gizle</string>
-    <string name="preference_timetable_hide_cancelled_desc">Bu ayarı değiştirdikten sonra zaman çizelgesini yeniden yüklemeniz gerekir</string>
     <string name="preference_timetable_hide_cancelled">İptal edilen dersleri gizle</string>
     <string name="preference_timetable_colors_reset_button_positive">Sıfırla</string>
     <string name="preference_timetable_colors_reset">Renkleri sıfırla</string>

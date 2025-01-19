@@ -179,7 +179,6 @@
     <string name="preference_timetable_centered_lesson_info">Sentrer leksjonsinformasjon</string>
     <string name="preference_timetable_colors_reset">Tilbakestill farger</string>
     <string name="preference_timetable_hide_cancelled">Skjul kansellerte leksjoner</string>
-    <string name="preference_timetable_hide_cancelled_desc">Du må laste inn timeplanen på nytt etter at du har endret denne innstillingen</string>
     <string name="preference_timetable_item_corner_radius">Radius for hjørner på element</string>
     <string name="preference_timetable_item_padding">Indre margin på element</string>
     <string name="preference_timetable_item_padding_overlap">Indre margin for overlappende elementer</string>

@@ -289,8 +289,7 @@
     <string name="preference_timetable_colors_reset_desc">This will match them to your active theme color.</string>
     <string name="preference_timetable_colors_reset_button_positive">Reset</string>
     <string name="preference_timetable_hide_cancelled">Hide cancelled lessons</string>
-    <string name="preference_timetable_hide_cancelled_desc">You need to reload the timetable after you change this setting</string>
-    <string name="preference_timetable_hide_timestamps">Hide timestamps</string>
+	<string name="preference_timetable_hide_timestamps">Hide timestamps</string>
     <string name="preference_timetable_hide_timestamps_desc">Hide the timestamps next to the timetable</string>
     <string name="preference_timetable_item_corner_radius">Item corner radius</string>
     <string name="preference_timetable_item_padding">Item padding</string>
@@ -401,4 +400,6 @@
     <string name="all_end_time">End time</string>
     <string name="preference_category_app_language">App Language</string>
     <string name="preference_app_language">App language</string>
+    <string name="preferences_default_color">Default color</string>
+	<string name="preference_timetable_range_index_reset_desc">Ensure hour labels always start at 1</string>
 </resources>

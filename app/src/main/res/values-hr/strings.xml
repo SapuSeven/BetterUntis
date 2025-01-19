@@ -81,7 +81,6 @@
     <string name="preference_timetable_item_corner_radius">Radijus kuta elementa</string>
     <string name="preference_timetable_hide_timestamps_desc">Sakrij vremenske oznake pored rasporeda sati</string>
     <string name="preference_timetable_hide_timestamps">Sakrij vremenske oznake</string>
-    <string name="preference_timetable_hide_cancelled_desc">Nakon mijenjanja ove postavke moraš ponovo učitati raspored sati</string>
     <string name="preference_timetable_hide_cancelled">Sakrij otkazane nastave</string>
     <string name="preference_timetable_colors_reset_button_positive">Obnovi</string>
     <string name="preference_timetable_colors_reset">Obnovi boje</string>

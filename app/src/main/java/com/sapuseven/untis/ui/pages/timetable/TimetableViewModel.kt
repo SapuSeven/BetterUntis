@@ -245,6 +245,7 @@ class TimetableViewModel @AssistedInject constructor(
 		return groupedEvents.mapValues { it.value.toList() }
 	}
 
+	// TODO: Extract to usecase
 	private fun buildHourList(
 		user: User, range: Pair<Int, Int>?, rangeIndexReset: Boolean
 	): List<WeekViewHour> {
@@ -255,9 +256,10 @@ class TimetableViewModel @AssistedInject constructor(
 			if (range?.let { index < it.first - 1 || index >= it.second } == true) return@forEachIndexed
 
 			// If label is empty, fill it according to preferences
-			val label = hour.label.ifEmpty {
-				if (rangeIndexReset) (index + 1).toString()
-				else ((range?.first ?: 1) + index).toString()
+			val label = if (rangeIndexReset) {
+			    (index + 2 - (range?.first ?: 1)).toString()
+			} else {
+			    hour.label.ifEmpty { (index + 1).toString() }
 			}
 
 			hourList.add(WeekViewHour(hour.startTime, hour.endTime, label))
