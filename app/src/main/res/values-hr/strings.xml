@@ -356,7 +356,7 @@
     <string name="preference_reports_breadcrumbs">Šalji detaljizirane izvještaje o greškama</string>
     <string name="preference_reports_breadcrumbs_desc">Uključi dodatne informacije o tome što se dogodilo prije nego što je došlo do greške.</string>
     <string name="settings_dialog_url_open_title">Nije pronađen kompatibilni program</string>
-    <string name="preference_reports_info_desc">Ove postavke pomažu pri poboljšanju programa.\nOsobni podaci se ne prikupljaju.\nZa primjenu promjena, program se mora ponovo pokrenuti.</string>
+    <string name="preference_reports_info_desc">Ove postavke pomažu poboljšati program. \nOsobni podaci se ne prikupljaju. \nZa primjenu promjena se program mora ponovo pokrenuti.</string>
     <string name="main_dialog_reports_save">Spremi</string>
     <string name="main_dialog_reports_title">Izvještavanje grešaka</string>
     <string name="infocenter_absences_list_seven_days">Pokaži zadnjih 7 dana</string>
