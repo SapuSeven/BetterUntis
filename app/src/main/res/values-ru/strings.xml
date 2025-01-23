@@ -361,4 +361,10 @@
         <item quantity="many">%d дней назад</item>
         <item quantity="other">%d дней назад</item>
     </plurals>
+    <plurals name="roomfinder_item_desc">
+        <item quantity="one">Эта комната бесплатна прямо сейчас.</item>
+        <item quantity="few">Эта комната свободна в течение %d часов.</item>
+        <item quantity="many">Эта комната свободна в течение %d часов.</item>
+        <item quantity="other">Эта комната свободна в течение %d часов.</item>
+    </plurals>
 </resources>
