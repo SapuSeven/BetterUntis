@@ -376,4 +376,5 @@
     <string name="preference_category_reports">Отчеты об ошибках</string>
     <string name="preference_reports_info">Об отчетах об ошибках</string>
     <string name="preference_reports_breadcrumbs">Отправляйте подробную информацию об ошибках</string>
+    <string name="main_dialog_reports_info_2">Вы всегда можете изменить эти значения позже в настройках приложения.</string>
 </resources>
