@@ -232,7 +232,7 @@
     <string name="notifications_text_message_separator">"/ "</string>
     <string name="all_anonymous">Аноним</string>
     <string name="preference_category_notifications_visible_fields">Отображаемые поля</string>
-    <string name="login_please_log_in">Выберите способ авторизации:</string>
+    <string name="login_please_log_in">Выберите один из следующих вариантов входа в систему:</string>
     <string name="notifications_text_message_teachers">Учитель: %1$s</string>
     <string name="preference_category_general_week_display">Настройки отображения недель</string>
     <string name="preference_category_styling_colors">Цвета</string>
