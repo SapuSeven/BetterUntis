@@ -134,7 +134,7 @@
     <string name="errormessagedictionary_invalid_school">Указанная школа не существует!</string>
     <string name="errors_button_dismiss">Отклонить все</string>
     <string name="main_dialog_delete_bookmark">Вы точно хотите удалить эту закладку\?</string>
-    <string name="main_dialog_delete_profile_message">Вы точно хотите удалить свой профиль пользователя %1$s в школе %2$s\?</string>
+    <string name="main_dialog_delete_profile_message">Вы уверены, что хотите удалить свой профиль пользователя %1$s в школе %2$s?</string>
     <string name="mainactivitydrawer_profile_edit">Редактировать профили</string>
     <string name="main_time_diff_just_now">только что</string>
     <string name="preference_notifications_visibility_long">Длинное имя</string>
