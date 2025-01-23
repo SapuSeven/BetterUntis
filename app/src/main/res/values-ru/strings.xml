@@ -288,4 +288,5 @@
     <string name="preference_marker">Индикатор времени</string>
     <string name="preference_school_background_desc">Некоторые школы присылают свои собственные цвета фона</string>
     <string name="preference_theme_untis">Оригинальное приложение Untis-App</string>
+    <string name="preference_timetable_background_irregular">Рассмотрение истории вопроса</string>
 </resources>
