@@ -330,7 +330,7 @@
     <string name="settings_recommend_title">Порекомендовать BetterUnits</string>
     <string name="roomfinder_item_desc_free_week">До конца недели эта комната свободна.</string>
     <string name="settings_dialog_url_open_text">BetterUntis не смог найти приложение, способное открывать ссылки.\nУбедитесь, что у вас установлен веб-браузер, или откройте ссылку на другом устройстве:</string>
-    <string name="widget_configuration">Конфигурация объекта</string>
+    <string name="widget_configuration">Конфигурация виджета</string>
     <string name="widget_daily_messages">Ежедневные сообщения</string>
     <string name="widget_select_profile">Пожалуйста, выберите профиль для виджета</string>
     <string name="widget_timetable">Расписание</string>
@@ -339,4 +339,5 @@
     <string name="all_datepicker_select">Дата выбора</string>
     <string name="all_datepicker_month_next">Следующий месяц</string>
     <string name="all_datepicker_month_previous">Предыдущий месяц</string>
+    <string name="all_reload">Перезагрузка</string>
 </resources>
