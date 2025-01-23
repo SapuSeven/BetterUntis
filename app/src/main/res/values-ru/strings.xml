@@ -335,4 +335,5 @@
     <string name="widget_select_profile">Пожалуйста, выберите профиль для виджета</string>
     <string name="widget_timetable">Расписание</string>
     <string name="widget_timetable_empty">Расписание на сегодня отсутствует</string>
+    <string name="widget_timetable_link">Ссылка на расписание</string>
 </resources>
