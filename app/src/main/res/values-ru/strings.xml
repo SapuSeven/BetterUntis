@@ -316,4 +316,6 @@
     <string name="roomfinder_dialog_itemdelete_title">Удалить %1$s</string>
     <string name="roomfinder_error">Ошибка загрузки данных.</string>
     <string name="roomfinder_error_details">Ошибка: %1$s.</string>
+    <string name="roomfinder_current_hour">%1$s, Урок %2$s</string>
+    <string name="roomfinder_image_availability_indicator">Индикатор доступности кабинета</string>
 </resources>
