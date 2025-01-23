@@ -355,4 +355,10 @@
         <item quantity="many">%d часов назад</item>
         <item quantity="other">%d часов назад</item>
     </plurals>
+    <plurals name="main_time_diff_days">
+        <item quantity="one">день назад</item>
+        <item quantity="few">%d дня назад</item>
+        <item quantity="many">%d дней назад</item>
+        <item quantity="other">%d дней назад</item>
+    </plurals>
 </resources>
