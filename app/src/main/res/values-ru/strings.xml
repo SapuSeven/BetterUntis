@@ -332,4 +332,5 @@
     <string name="settings_dialog_url_open_text">BetterUntis не смог найти приложение, способное открывать ссылки.\nУбедитесь, что у вас установлен веб-браузер, или откройте ссылку на другом устройстве:</string>
     <string name="widget_configuration">Конфигурация объекта</string>
     <string name="widget_daily_messages">Ежедневные сообщения</string>
+    <string name="widget_select_profile">Пожалуйста, выберите профиль для виджета</string>
 </resources>
