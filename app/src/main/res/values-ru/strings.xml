@@ -333,4 +333,5 @@
     <string name="widget_configuration">Конфигурация объекта</string>
     <string name="widget_daily_messages">Ежедневные сообщения</string>
     <string name="widget_select_profile">Пожалуйста, выберите профиль для виджета</string>
+    <string name="widget_timetable">Расписание</string>
 </resources>
