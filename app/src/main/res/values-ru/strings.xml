@@ -246,4 +246,5 @@
     <string name="all_subjects">Предметы</string>
     <string name="infocenter_absences_filter_oldest_first">Старее</string>
     <string name="all_personal_abbr">Перс.</string>
+    <string name="all_absences">Отсутствие</string>
 </resources>
