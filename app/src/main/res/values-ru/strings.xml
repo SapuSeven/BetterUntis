@@ -118,8 +118,7 @@
 \nОписание ошибки: %3$s</string>
     <string name="login_no_results">Результатов нет</string>
     <string name="logindatainput_data_loaded">Данные загружены.</string>
-    <string name="errors_github_attach_file_message">Пожалуйста, прикрепите сжатые логи.
-\nОни сохранены в \"%1$s\".</string>
+    <string name="errors_github_attach_file_message">Пожалуйста, прикрепите сжатые файлы журнала к этому вопросу.\nОни были сохранены по адресу `%1$s`</string>
     <string name="logindatainput_title_edit">Редактировать профиль</string>
     <string name="logindatainput_title_add">Добавить профиль</string>
     <string name="main_dialog_update_profile_message">С недавним обновлением приложения было изменено хранение данных пользователя. Для продолжения использования, пожалуйста, обновите свой профиль.</string>
