@@ -287,4 +287,5 @@
     <string name="preference_flinging_enable">Включить зажим</string>
     <string name="preference_marker">Индикатор времени</string>
     <string name="preference_school_background_desc">Некоторые школы присылают свои собственные цвета фона</string>
+    <string name="preference_theme_untis">Оригинальное приложение Untis-App</string>
 </resources>
