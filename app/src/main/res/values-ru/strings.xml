@@ -343,4 +343,10 @@
     <string name="widget_disclaimer_title">Бета-функция</string>
     <string name="widget_disclaimer_text">Работа над функцией виджетов еще не завершена, и она может работать корректно не на всех устройствах.</string>
     <string name="login_demo">Попробуй!</string>
+    <plurals name="main_time_diff_minutes">
+        <item quantity="one">минуту назад</item>
+        <item quantity="few">%d минуты назад</item>
+        <item quantity="many">%d минут назад</item>
+        <item quantity="other">%d минут назад</item>
+    </plurals>
 </resources>
