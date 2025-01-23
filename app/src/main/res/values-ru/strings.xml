@@ -222,7 +222,7 @@
     <string name="preference_category_styling_themes">Тема</string>
     <string name="preference_category_general_behaviour">Поведение</string>
     <string name="errormessagedictionary_server_webuntis_not_installed">На указанном сервере отсутствует WebUnits!</string>
-    <string name="errors_report">Помогите улучшить приложение, сообщив о следующих ошибках:</string>
+    <string name="errors_report">Пожалуйста, помогите исправить приложение, сообщив об ошибках ниже:</string>
     <string name="infocenter_absences_filter_time_ranges">Диапазоны времени</string>
     <string name="infocenter_absences_filter_newest_first">Новее</string>
     <string name="notifications_channel_backgrounderrors">Фоновые ошибки</string>
