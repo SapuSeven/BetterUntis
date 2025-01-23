@@ -326,4 +326,6 @@
     <string name="settings_recommend_message">Если вам нравится BetterUntis, расскажите об этом друзьям!</string>
     <string name="settings_recommend_share">Поделиться</string>
     <string name="settings_recommend_text">Попробуй BetterUnits - отличная альтернатива Units Mobile! Скачай с %1$s</string>
+    <string name="roomfinder_item_desc_free_day">Эта комната свободна до конца дня.</string>
+    <string name="settings_recommend_title">Порекомендовать BetterUnits</string>
 </resources>
