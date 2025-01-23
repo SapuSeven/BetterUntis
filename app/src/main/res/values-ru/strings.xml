@@ -296,4 +296,5 @@
     <string name="preference_timetable_substitutions_irregular_desc">Рассматривайте уроки с заменами как нерегулярные</string>
     <string name="preference_use_theme_background">Использовать цвета темы</string>
     <string name="preference_use_theme_background_desc">Это относится только к обычным урокам</string>
+    <string name="preference_week_custom_range">Пользовательский диапазон недель</string>
 </resources>
