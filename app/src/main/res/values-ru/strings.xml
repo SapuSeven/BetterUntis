@@ -223,7 +223,7 @@
     <string name="preference_category_general_behaviour">Поведение</string>
     <string name="errormessagedictionary_server_webuntis_not_installed">На указанном сервере отсутствует WebUnits!</string>
     <string name="errors_report">Пожалуйста, помогите исправить приложение, сообщив об ошибках ниже:</string>
-    <string name="infocenter_absences_filter_time_ranges">Диапазоны времени</string>
+    <string name="infocenter_absences_filter_time_ranges">Временные диапазоны</string>
     <string name="infocenter_absences_filter_newest_first">Самый новый первый</string>
     <string name="notifications_channel_backgrounderrors">Фоновые ошибки</string>
     <string name="all_personal">Персональное</string>
@@ -263,4 +263,9 @@
     <string name="infocenter_absences_timerange">%1$s - %2$s</string>
     <string name="infocenter_absences_filter_only_unexcused">Показать только неиспользованные</string>
     <string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
+    <string name="infocenter_absences_filter">Отсутствие фильтра</string>
+    <string name="infocenter_exams">Экзамены</string>
+    <string name="infocenter_exams_empty">Без экзаменов</string>
+    <string name="infocenter_homework">Домашнее задание</string>
+    <string name="infocenter_homework_empty">Без домашних заданий</string>
 </resources>
