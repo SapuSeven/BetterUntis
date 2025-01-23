@@ -342,4 +342,5 @@
     <string name="all_reload">Перезагрузка</string>
     <string name="widget_disclaimer_title">Бета-функция</string>
     <string name="widget_disclaimer_text">Работа над функцией виджетов еще не завершена, и она может работать корректно не на всех устройствах.</string>
+    <string name="login_demo">Попробуй!</string>
 </resources>
