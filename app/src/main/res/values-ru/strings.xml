@@ -386,4 +386,5 @@
     <string name="all_timepicker_select">Выбрать время</string>
     <string name="all_start_time">Время начала</string>
     <string name="all_end_time">Время окончания</string>
+    <string name="preference_category_app_language">Язык Приложений</string>
 </resources>
