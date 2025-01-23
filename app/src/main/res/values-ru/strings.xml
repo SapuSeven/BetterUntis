@@ -368,4 +368,5 @@
         <item quantity="other">Эта комната свободна в течение %d часов.</item>
     </plurals>
     <string name="mainactivitydrawer_profile_edit_hint">Нажмите на профиль для редактирования</string>
+    <string name="all_lesson_online">Проводится онлайн</string>
 </resources>
