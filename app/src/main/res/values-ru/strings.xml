@@ -184,7 +184,7 @@
     <string name="preference_double_tap_to_exit">Нажмите 2 раза, чтобы выйти</string>
     <string name="preference_dark_theme_on">Всегда</string>
     <string name="preference_dark_theme">Тёмная тема</string>
-    <string name="preference_notifications_visibility_hidden">Скрыты</string>
+    <string name="preference_notifications_visibility_hidden">Скрытый</string>
     <string name="maindrawer_bookmarks_add">Добавить расписание</string>
     <string name="preference_info_privacy_policy">Политика конфиденциальности</string>
     <string name="preference_notifications_first_lesson_time">Время уведомления</string>
