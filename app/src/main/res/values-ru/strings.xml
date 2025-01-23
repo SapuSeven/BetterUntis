@@ -377,4 +377,5 @@
     <string name="preference_reports_info">Об отчетах об ошибках</string>
     <string name="preference_reports_breadcrumbs">Отправляйте подробную информацию об ошибках</string>
     <string name="main_dialog_reports_info_2">Вы всегда можете изменить эти значения позже в настройках приложения.</string>
+    <string name="main_dialog_reports_info_1">BetterUntis использует Sentry для сбора информации о сбоях и других ошибках.</string>
 </resources>
