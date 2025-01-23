@@ -306,4 +306,5 @@
     <string name="preferences_general">Общий</string>
     <string name="preferences_info">Об</string>
     <string name="preferences_notifications">Уведомления</string>
+    <string name="preferences_styling">Тема</string>
 </resources>
