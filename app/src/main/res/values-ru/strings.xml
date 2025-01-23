@@ -372,4 +372,5 @@
     <string name="all_open_link">Открыть ссылку</string>
     <string name="preference_dialog_permission_alarms_title">Необходимо разрешение</string>
     <string name="preference_dialog_permission_alarms_text">Эта функция требует дополнительных разрешений. Пожалуйста, разрешите BetterUntis доступ для планирования точных будильников.</string>
+    <string name="all_dialog_open_settings">Открыть настройки</string>
 </resources>
