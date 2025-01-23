@@ -172,7 +172,7 @@
     <string name="preference_info_privacy">Внешнее содержимое</string>
     <string name="preference_connectivity_proxy_about">Об этой функции</string>
     <string name="preference_notifications_first_lesson_desc">Отображать уведомление перед началом занятий</string>
-    <string name="logindatainput_skip_app_secret">Пропустить получение секрета приложения</string>
+    <string name="logindatainput_skip_app_secret">Пропустить секретное разрешение приложения</string>
     <string name="preference_notifications_visibility_short">Короткое имя</string>
     <string name="logindatainput_error_field_empty">Поле не может быть пустым!</string>
     <string name="preference_timetable_bold_lesson_name">Название урока жирным</string>
