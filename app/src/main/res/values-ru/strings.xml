@@ -304,4 +304,5 @@
     <string name="preference_week_snap_to_days_summary">вместо недель</string>
     <string name="preferences_connectivity">Подключение</string>
     <string name="preferences_general">Общий</string>
+    <string name="preferences_info">Об</string>
 </resources>
