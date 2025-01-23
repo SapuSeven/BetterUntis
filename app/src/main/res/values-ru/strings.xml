@@ -387,4 +387,7 @@
     <string name="all_start_time">Время начала</string>
     <string name="all_end_time">Время окончания</string>
     <string name="preference_category_app_language">Язык Приложений</string>
+    <string name="preference_app_language">Язык Приложений</string>
+    <string name="preferences_default_color">Цвет по умолчанию</string>
+    <string name="preference_timetable_range_index_reset_desc">Убедитесь, что часовые метки всегда начинаются с 1</string>
 </resources>
