@@ -374,4 +374,5 @@
     <string name="preference_dialog_permission_alarms_text">Эта функция требует дополнительных разрешений. Пожалуйста, разрешите BetterUntis доступ для планирования точных будильников.</string>
     <string name="all_dialog_open_settings">Открыть настройки</string>
     <string name="preference_category_reports">Отчеты об ошибках</string>
+    <string name="preference_reports_info">Об отчетах об ошибках</string>
 </resources>
