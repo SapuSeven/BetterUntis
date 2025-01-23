@@ -367,4 +367,5 @@
         <item quantity="many">Эта комната свободна в течение %d часов.</item>
         <item quantity="other">Эта комната свободна в течение %d часов.</item>
     </plurals>
+    <string name="mainactivitydrawer_profile_edit_hint">Нажмите на профиль для редактирования</string>
 </resources>
