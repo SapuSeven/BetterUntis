@@ -273,4 +273,5 @@
     <string name="menu_infocenter_absences">Отсутствие</string>
     <string name="menu_infocenter_officehours">Часы работы</string>
     <string name="notifications_channel_breakinfo">Информация о перерыве</string>
+    <string name="notifications_channel_breakinfo_desc">Показывает информацию о текущем перерыве и следующем уроке</string>
 </resources>
