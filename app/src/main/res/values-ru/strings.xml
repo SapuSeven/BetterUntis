@@ -319,4 +319,5 @@
     <string name="roomfinder_current_hour">%1$s, Урок %2$s</string>
     <string name="roomfinder_image_availability_indicator">Индикатор доступности кабинета</string>
     <string name="roomfinder_image_next_hour">следующий час</string>
+    <string name="roomfinder_image_previous_hour">предыдущий час</string>
 </resources>
