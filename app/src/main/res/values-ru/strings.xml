@@ -297,4 +297,6 @@
     <string name="preference_use_theme_background">Использовать цвета темы</string>
     <string name="preference_use_theme_background_desc">Это относится только к обычным урокам</string>
     <string name="preference_week_custom_range">Пользовательский диапазон недель</string>
+    <string name="preference_timetable_range_desc">Часы с %1$d по %2$d</string>
+    <string name="preference_week_display_length">Дни для отображения</string>
 </resources>
