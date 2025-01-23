@@ -253,4 +253,5 @@
     <string name="all_api_error_generic">Ошибка API: %1$s</string>
     <string name="errormessagedictionary_invalid_time_settings">Неверные настройки даты и/или времени!</string>
     <string name="homeworks_due_time_format">EEE, dd. MMM</string>
+    <string name="infocenter_absence_excused">Простите</string>
 </resources>
