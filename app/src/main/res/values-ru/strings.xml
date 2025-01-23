@@ -238,7 +238,7 @@
     <string name="preference_category_styling_colors">Цвета</string>
     <string name="preference_category_connectivity_proxy">Прокси WebUnits</string>
     <string name="main_drawer_open">Открыть панель навигации</string>
-    <string name="preference_category_display_options">Настройки отображения</string>
+    <string name="preference_category_display_options">Опции отображения</string>
     <string name="notifications_text_message_rooms">Кабинет: %1$s</string>
     <string name="app_desc">Альтернативное мобильное приложение для расписания Units.</string>
     <string name="preference_automute_enable_summary">Включать режим не беспокоить автоматически во время занятий</string>
