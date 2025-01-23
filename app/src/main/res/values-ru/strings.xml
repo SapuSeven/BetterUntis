@@ -280,4 +280,5 @@
     <string name="preference_automute_mute_priority">Не разрешайте приоритетным событиям игнорировать отключение звука</string>
     <string name="preference_background_cancelled">Отмененные уроки</string>
     <string name="preference_background_past">Фон прошлого дня</string>
+    <string name="preference_background_regular">Регулярные уроки</string>
 </resources>
