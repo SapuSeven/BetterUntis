@@ -385,4 +385,5 @@
     <string name="all_open_datepicker">Открыть средство выбора даты</string>
     <string name="all_timepicker_select">Выбрать время</string>
     <string name="all_start_time">Время начала</string>
+    <string name="all_end_time">Время окончания</string>
 </resources>
