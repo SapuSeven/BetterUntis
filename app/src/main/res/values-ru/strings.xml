@@ -337,4 +337,5 @@
     <string name="widget_timetable_empty">Расписание на сегодня отсутствует</string>
     <string name="widget_timetable_link">Ссылка на расписание</string>
     <string name="all_datepicker_select">Дата выбора</string>
+    <string name="all_datepicker_month_next">Следующий месяц</string>
 </resources>
