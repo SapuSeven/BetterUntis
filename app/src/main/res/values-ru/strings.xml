@@ -248,4 +248,5 @@
     <string name="all_personal_abbr">Перс.</string>
     <string name="all_absences">Отсутствие</string>
     <string name="all_dialog_absences_checked">Проверка отсутствия.</string>
+    <string name="all_dialog_absences_not_checked">Отсутствие не проверено.</string>
 </resources>
