@@ -294,4 +294,5 @@
     <string name="preference_timetable_item_padding_overlap">Перекрывающаяся подложка элементов</string>
     <string name="preference_timetable_substitutions_irregular">Обнаружение нерегулярных уроков</string>
     <string name="preference_timetable_substitutions_irregular_desc">Рассматривайте уроки с заменами как нерегулярные</string>
+    <string name="preference_use_theme_background">Использовать цвета темы</string>
 </resources>
