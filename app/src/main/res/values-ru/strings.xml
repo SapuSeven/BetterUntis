@@ -289,4 +289,5 @@
     <string name="preference_school_background_desc">Некоторые школы присылают свои собственные цвета фона</string>
     <string name="preference_theme_untis">Оригинальное приложение Untis-App</string>
     <string name="preference_timetable_background_irregular">Рассмотрение истории вопроса</string>
+    <string name="preference_timetable_background_irregular_desc">Относитесь к урокам с разным уровнем подготовки как к нерегулярным</string>
 </resources>
