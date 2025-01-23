@@ -290,4 +290,6 @@
     <string name="preference_theme_untis">Оригинальное приложение Untis-App</string>
     <string name="preference_timetable_background_irregular">Рассмотрение истории вопроса</string>
     <string name="preference_timetable_background_irregular_desc">Относитесь к урокам с разным уровнем подготовки как к нерегулярным</string>
+    <string name="preference_timetable_colors_reset_desc">Это позволит подобрать их к цвету вашей активной темы.</string>
+    <string name="preference_timetable_item_padding_overlap">Перекрывающаяся подложка элементов</string>
 </resources>
