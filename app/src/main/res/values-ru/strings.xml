@@ -249,4 +249,7 @@
     <string name="all_absences">Отсутствие</string>
     <string name="all_dialog_absences_checked">Проверка отсутствия.</string>
     <string name="all_dialog_absences_not_checked">Отсутствие не проверено.</string>
+    <string name="all_dialog_absences_save">Подать заявку на проверку отсутствия</string>
+    <string name="all_dialog_absences_save_detailed">Предоставьте подробную информацию об отсутствии</string>
+    <string name="all_api_error_generic">Ошибка API: %1$s</string>
 </resources>
