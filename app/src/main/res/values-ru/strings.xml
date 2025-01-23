@@ -308,4 +308,5 @@
     <string name="preferences_notifications">Уведомления</string>
     <string name="preferences_styling">Тема</string>
     <string name="preferences_timetable">Расписание</string>
+    <string name="preferences_theme_color">Цвет темы</string>
 </resources>
