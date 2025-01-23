@@ -243,7 +243,7 @@
     <string name="app_desc">Альтернативное мобильное приложение для расписания Units.</string>
     <string name="preference_automute_enable_summary">Включать режим не беспокоить автоматически во время занятий</string>
     <string name="all_subjects">Предметы</string>
-    <string name="infocenter_absences_filter_oldest_first">Старее</string>
+    <string name="infocenter_absences_filter_oldest_first">Самый старый первый</string>
     <string name="all_personal_abbr">Перс.</string>
     <string name="all_absences">Отсутствие</string>
     <string name="all_dialog_absences_checked">Проверка отсутствия.</string>
