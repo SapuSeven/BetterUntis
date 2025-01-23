@@ -148,7 +148,7 @@
     <string name="preference_info_github">Репозиторий GitHub</string>
     <string name="logindatainput_aquiring_schoolid">Загрузка школы…</string>
     <string name="activity_title_free_rooms">Свободные комнаты</string>
-    <string name="logindatainput_skip_school_id">Пропустить получение ID школы</string>
+    <string name="logindatainput_skip_school_id">Пропустить разрешение на получение школьного удостоверения личности</string>
     <string name="preference_connectivity_refresh_in_background">Всегда обновлять расписание</string>
     <string name="preference_schoolcolors_irregular">Для непостоянных уроков</string>
     <string name="activity_title_messenger">Мессенджер</string>
