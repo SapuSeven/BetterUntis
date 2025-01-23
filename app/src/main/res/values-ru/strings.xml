@@ -330,4 +330,5 @@
     <string name="settings_recommend_title">Порекомендовать BetterUnits</string>
     <string name="roomfinder_item_desc_free_week">До конца недели эта комната свободна.</string>
     <string name="settings_dialog_url_open_text">BetterUntis не смог найти приложение, способное открывать ссылки.\nУбедитесь, что у вас установлен веб-браузер, или откройте ссылку на другом устройстве:</string>
+    <string name="widget_configuration">Конфигурация объекта</string>
 </resources>
