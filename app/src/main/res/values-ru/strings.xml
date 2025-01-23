@@ -324,4 +324,5 @@
     <string name="roomfinder_no_rooms">Нет комнат для отображения.\nНажмите +, чтобы добавить одну!</string>
     <string name="settings_recommend_hide">Не показывать снова</string>
     <string name="settings_recommend_message">Если вам нравится BetterUntis, расскажите об этом друзьям!</string>
+    <string name="settings_recommend_share">Поделиться</string>
 </resources>
