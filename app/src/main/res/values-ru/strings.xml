@@ -381,4 +381,5 @@
     <string name="preference_reports_info_desc">Эти настройки применяются ко всем профилям и помогают улучшить работу приложения.\nНикакая личная информация не собирается.\nДля вступления изменений в силу требуется перезапуск приложения.</string>
     <string name="main_dialog_reports_title">Отчеты об ошибках</string>
     <string name="preference_reports_breadcrumbs_desc">Включите дополнительную информацию о том, что произошло до возникновения ошибки.</string>
+    <string name="infocenter_absences_list_schoolyear">Текущий учебный год</string>
 </resources>
