@@ -340,4 +340,5 @@
     <string name="all_datepicker_month_next">Следующий месяц</string>
     <string name="all_datepicker_month_previous">Предыдущий месяц</string>
     <string name="all_reload">Перезагрузка</string>
+    <string name="widget_disclaimer_title">Бета-функция</string>
 </resources>
