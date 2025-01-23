@@ -268,4 +268,5 @@
     <string name="infocenter_exams_empty">Без экзаменов</string>
     <string name="infocenter_homework">Домашнее задание</string>
     <string name="infocenter_homework_empty">Без домашних заданий</string>
+    <string name="logindatainput_aquiring_app_secret">Приобретение секретного приложения …</string>
 </resources>
