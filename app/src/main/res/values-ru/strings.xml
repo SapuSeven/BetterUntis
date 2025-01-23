@@ -270,4 +270,5 @@
     <string name="infocenter_homework_empty">Без домашних заданий</string>
     <string name="logindatainput_aquiring_app_secret">Приобретение секретного приложения …</string>
     <string name="main_anonymous_login_info_text">Для анонимных профилей необходимо настроить персональное расписание.</string>
+    <string name="menu_infocenter_absences">Отсутствие</string>
 </resources>
