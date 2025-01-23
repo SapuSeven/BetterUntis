@@ -276,4 +276,5 @@
     <string name="notifications_channel_breakinfo_desc">Показывает информацию о текущем перерыве и следующем уроке</string>
     <string name="notifications_text_error_message">Сегодня вы не получите никаких уведомлений.</string>
     <string name="preference_automute_cancelled_lessons">Также отключите звук в отмененных уроках</string>
+    <string name="preference_automute_minimum_break_length_summary">Не отключайте устройство во время перерывов, длительность которых меньше указанной (в минутах)</string>
 </resources>
