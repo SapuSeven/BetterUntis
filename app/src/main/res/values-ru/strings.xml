@@ -312,4 +312,5 @@
     <string name="preferences_theme_color_system">Системный цвет темы</string>
     <string name="roomfinder_current_hour_time">%1$s - %2$s</string>
     <string name="roomfinder_delete_item">Удалить элемент</string>
+    <string name="roomfinder_dialog_itemdelete_text">Вы уверены, что хотите удалить эту комнату из списка?</string>
 </resources>
