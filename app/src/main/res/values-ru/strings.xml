@@ -284,4 +284,5 @@
     <string name="preference_background_regular_past">Прошедшие регулярные занятия</string>
     <string name="preference_category_general_automute">Автоматическое отключение звука</string>
     <string name="preference_connectivity_proxy_host">Хост прокси-сервера</string>
+    <string name="preference_flinging_enable">Включить зажим</string>
 </resources>
