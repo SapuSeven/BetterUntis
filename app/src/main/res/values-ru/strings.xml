@@ -315,4 +315,5 @@
     <string name="roomfinder_dialog_itemdelete_text">Вы уверены, что хотите удалить эту комнату из списка?</string>
     <string name="roomfinder_dialog_itemdelete_title">Удалить %1$s</string>
     <string name="roomfinder_error">Ошибка загрузки данных.</string>
+    <string name="roomfinder_error_details">Ошибка: %1$s.</string>
 </resources>
