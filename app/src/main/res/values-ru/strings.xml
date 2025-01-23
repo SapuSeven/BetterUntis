@@ -338,4 +338,5 @@
     <string name="widget_timetable_link">Ссылка на расписание</string>
     <string name="all_datepicker_select">Дата выбора</string>
     <string name="all_datepicker_month_next">Следующий месяц</string>
+    <string name="all_datepicker_month_previous">Предыдущий месяц</string>
 </resources>
