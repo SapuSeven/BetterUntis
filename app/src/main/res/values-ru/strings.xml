@@ -260,4 +260,7 @@
     <string name="infocenter_absence_reason_unknown">Неизвестный</string>
     <string name="infocenter_absence_excused_status">Оправдано (%1$s)</string>
     <string name="infocenter_absence_unexcused_status">Несвоевременно (%1$s)</string>
+    <string name="infocenter_absences_timerange">%1$s - %2$s</string>
+    <string name="infocenter_absences_filter_only_unexcused">Показать только неиспользованные</string>
+    <string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
 </resources>
