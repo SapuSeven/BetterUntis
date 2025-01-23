@@ -180,7 +180,7 @@
     <string name="preference_notifications_clear">Очистить все уведомления</string>
     <string name="logindatainput_error_invalid_url">Неправильный URL!</string>
     <string name="preference_info_privacy_desc">Соавторы загружаются с GitHub. Для получения подробностей, ознакомьтесь с их политикой конфиденциальности.</string>
-    <string name="logindatainput_dialog_qrcodeinvalid_text">Этот QR-код в некорректном формате или не поддерживается BetterUnits.</string>
+    <string name="logindatainput_dialog_qrcodeinvalid_text">Отсканированный QR-код либо имеет неправильный формат, либо не поддерживается BetterUntis.</string>
     <string name="preference_double_tap_to_exit">Нажмите 2 раза, чтобы выйти</string>
     <string name="preference_dark_theme_on">Всегда</string>
     <string name="preference_dark_theme">Тёмная тема</string>
