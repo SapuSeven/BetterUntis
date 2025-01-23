@@ -210,7 +210,7 @@
     <string name="preference_timetable_item_text_light">Элементы расписания белым</string>
     <string name="preference_info_app_version">Версия приложения</string>
     <string name="preference_automute_enable">Автозаглушение</string>
-    <string name="infocenter_absences_filter_sort">Упорядочивание</string>
+    <string name="infocenter_absences_filter_sort">Порядок сортировки</string>
     <string name="all_report">Жалоба</string>
     <string name="notifications_text_message_classes">Класс: %1$s</string>
     <string name="all_dialog_crash_title">Найден отчёт о вылете</string>
