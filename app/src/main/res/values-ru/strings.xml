@@ -282,4 +282,5 @@
     <string name="preference_background_past">Фон прошлого дня</string>
     <string name="preference_background_regular">Регулярные уроки</string>
     <string name="preference_background_regular_past">Прошедшие регулярные занятия</string>
+    <string name="preference_category_general_automute">Автоматическое отключение звука</string>
 </resources>
