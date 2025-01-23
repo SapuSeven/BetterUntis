@@ -384,4 +384,5 @@
     <string name="infocenter_absences_list_schoolyear">Текущий учебный год</string>
     <string name="all_open_datepicker">Открыть средство выбора даты</string>
     <string name="all_timepicker_select">Выбрать время</string>
+    <string name="all_start_time">Время начала</string>
 </resources>
