@@ -292,4 +292,5 @@
     <string name="preference_timetable_background_irregular_desc">Относитесь к урокам с разным уровнем подготовки как к нерегулярным</string>
     <string name="preference_timetable_colors_reset_desc">Это позволит подобрать их к цвету вашей активной темы.</string>
     <string name="preference_timetable_item_padding_overlap">Перекрывающаяся подложка элементов</string>
+    <string name="preference_timetable_substitutions_irregular">Обнаружение нерегулярных уроков</string>
 </resources>
