@@ -88,7 +88,7 @@
     <string name="preference_timetable_bold_lesson_name">Podebljaj ime nastave</string>
     <string name="preference_timetable_background_irregular_desc">Tretiraj nastave s drugačijom pozadinom kao izvanredne</string>
     <string name="preference_timetable_background_irregular">Uzmi u obzir pozadinu elementa</string>
-    <string name="preference_theme_untis">Izvorni Untis program</string>
+    <string name="preference_theme_untis">Izvorna Untis aplikacija</string>
     <string name="preference_theme_stock">Standardno</string>
     <string name="preference_theme_pixel">Piksel</string>
     <string name="preference_theme_pink">Ružičasta</string>
