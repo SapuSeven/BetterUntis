@@ -174,7 +174,7 @@
     <string name="logindatainput_title_edit">Uredi profil</string>
     <string name="logindatainput_title_add">Dodaj profil</string>
     <string name="logindatainput_skip_school_id">Preskoči upisivanje ID oznake škole</string>
-    <string name="logindatainput_skip_app_secret">Preskoči upisivanje tajne programa</string>
+    <string name="logindatainput_skip_app_secret">Preskoči upisivanje tajne aplikacije</string>
     <string name="logindatainput_show_advanced">Prikaži napredne postavke</string>
     <string name="logindatainput_school">Ime ili ID oznaka škole</string>
     <string name="logindatainput_login">Prijava</string>
