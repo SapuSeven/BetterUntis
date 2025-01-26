@@ -263,7 +263,7 @@
     <string name="all_subjects">Predmeti</string>
     <string name="all_personal">Osobno</string>
     <string name="all_failed">neuspjelo</string>
-    <string name="all_success">uspjelo</string>
+    <string name="all_success">uspjeh</string>
     <string name="app_desc">Alternativni mobitelski klijent za Untisov sustav rasporeda sati.</string>
     <string name="preference_category_styling_themes">Tema</string>
     <string name="preference_category_styling_colors">Boje</string>
