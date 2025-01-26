@@ -349,7 +349,7 @@
     <string name="preference_reports_breadcrumbs">Šalji detaljizirane izvještaje o greškama</string>
     <string name="preference_reports_breadcrumbs_desc">Uključi dodatne informacije o tome što se dogodilo prije nego što je došlo do greške.</string>
     <string name="settings_dialog_url_open_title">Nije pronađena kompatibilni aplikacija</string>
-    <string name="preference_reports_info_desc">Ove se postavke odnose na sve profile i pomažu poboljšati program. \nOsobni podaci se ne prikupljaju. \nZa primjenu promjena se program mora ponovo pokrenuti.</string>
+    <string name="preference_reports_info_desc">Ove se postavke odnose na sve profile i pomažu poboljšati aplikaciju. \nOsobni podaci se ne prikupljaju. \nZa primjenu promjena se aplikacija mora ponovo pokrenuti.</string>
     <string name="main_dialog_reports_save">Spremi</string>
     <string name="main_dialog_reports_title">Izvještavanje grešaka</string>
     <string name="infocenter_absences_list_seven_days">Pokaži zadnjih 7 dana</string>
@@ -358,7 +358,7 @@
     <string name="infocenter_absences_list_ninety_days">Pokaži zadnjih 90 dana</string>
     <string name="infocenter_absences_list_schoolyear">Aktualna školska godina</string>
     <string name="main_dialog_reports_info_2">Ove vrijednosti možeš kasnije promijeniti u postavkama aplikacije.</string>
-    <string name="main_dialog_reports_info_1">BetterUntis koristi Sentry za prikupljanje informacija o prekidima rada programa i o drugim greškama.</string>
+    <string name="main_dialog_reports_info_1">BetterUntis koristi Sentry za prikupljanje informacija o prekidima rada aplikacije i drugim greškama.</string>
     <string name="elementpicker_timetable_select">Odaberi raspored sati</string>
     <string name="all_personal_abbr">Osobno</string>
     <string name="preference_category_app_language">Jezik aplikacije</string>
