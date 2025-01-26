@@ -212,7 +212,7 @@
     <string name="main_dialog_itemdetails_image_infos">Info</string>
     <string name="main_dialog_itemdetails_error_not_found">Element nije pronađen</string>
     <string name="main_dialog_update_profile_button">Aktualiziraj profil</string>
-    <string name="main_dialog_update_profile_message">Nedavno aktualiziranje programa promijenilo je način spremanja korisničkih podataka. Za daljnje korištenje programa aktualiziraj tvoj trenutačni profil.</string>
+    <string name="main_dialog_update_profile_message">Nedavno aktualiziranje aplikacije promijenilo je način spremanja korisničkih podataka. Za daljnje korištenje aplikacije aktualiziraj tvoj trenutačni profil.</string>
     <string name="main_dialog_update_profile_title">Potrebno je aktualizirati profil</string>
     <string name="main_dialog_delete_profile_message">Stvarno želiš izbrisati tvoj profil s korisnikom %1$s u školi %2$s\?</string>
     <string name="main_dialog_delete_profile_title">Izbrisati profil\?</string>
