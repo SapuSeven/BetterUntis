@@ -124,7 +124,7 @@
     <string name="preference_info_app_version_desc">Verzija %1$s (%2$d)</string>
     <string name="preference_info_app_version">Verzija aplikacije</string>
     <string name="preference_flinging_enable">Aktiviraj brzo kretanje</string>
-    <string name="preference_double_tap_to_exit">Za zatvaranje programa dodirni dvaput</string>
+    <string name="preference_double_tap_to_exit">Za zatvaranje aplikacije dodirni dvaput</string>
     <string name="preference_dialog_colors_reset_title">Obnoviti boje\?</string>
     <string name="preference_dialog_colors_reset_text">Ovo će vratiti sve gornje boje na standardne vrijednosti.</string>
     <string name="preference_dark_theme_on">Uvijek uključeno</string>
