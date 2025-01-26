@@ -36,7 +36,7 @@
     <string name="widget_configuration">Konfiguracija programčića</string>
     <string name="loading_failed">Neuspjelo učitavanje</string>
     <string name="loading">Učitavanje</string>
-    <string name="errors_report">Pomogni popraviti program prijavljivanjem donjih grešaka:</string>
+    <string name="errors_report">Pomogni popraviti aplikaciju prijavljivanjem donjih grešaka:</string>
     <string name="errors_crash_message">Žao nam je.</string>
     <string name="errors_crash_title">Čini se da je BetterUntis prekinuo rad.</string>
     <string name="homeworks_due_time_format">EEE, dd. MMM</string>
