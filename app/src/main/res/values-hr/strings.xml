@@ -199,7 +199,7 @@
     <string name="login_welcome">BetterUntis dobrodošlica!</string>
     <string name="login_scan_code">Snimi QR-kod</string>
     <string name="main_time_diff_just_now">upravo sada</string>
-    <string name="main_press_back_double">Za zatvaranje programa dvaput pritisni gumb NATRAG</string>
+    <string name="main_press_back_double">Za zatvaranje aplikacije dvaput pritisni gumb NATRAG</string>
     <string name="main_drawer_image_logo">BetterUntis logotip</string>
     <string name="main_drawer_close">Zatvori navigaciju</string>
     <string name="main_drawer_open">Otvori navigaciju</string>
