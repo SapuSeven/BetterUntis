@@ -313,7 +313,7 @@
     <string name="errors_button_dismiss">Odbaci sve</string>
     <string name="infocenter_absences_filter_time_ranges">Vremenski raspon</string>
     <string name="preference_automute_mute_priority">Nemoj dopustiti da prioritetni događaji ignoriraju automatsko isključivanje zvuka</string>
-    <string name="settings_dialog_url_open_text">BetterUntis nije mogao pronaći program koji može otvarati poveznice.\nProvjeri imaš li instaliran web preglednik ili otvori poveznicu na jednom drugom uređaju:</string>
+    <string name="settings_dialog_url_open_text">BetterUntis nije mogao pronaći aplikaciju koja može otvarati poveznice.\nProvjeri imaš li instaliran web preglednik ili otvori poveznicu na jednom drugom uređaju:</string>
     <string name="widget_disclaimer_text">Funkcija widgeta se još uvijek nalazi u fazi razvoja i možda neće ispravno raditi na svim uređajima.</string>
     <string name="logindatainput_dialog_qrcodeinvalid_title">Nevažeći QR kod</string>
     <string name="maindrawer_bookmarks_add">Dodaj raspored sati</string>
@@ -348,7 +348,7 @@
     <string name="all_lesson_online">Održava se online</string>
     <string name="preference_reports_breadcrumbs">Šalji detaljizirane izvještaje o greškama</string>
     <string name="preference_reports_breadcrumbs_desc">Uključi dodatne informacije o tome što se dogodilo prije nego što je došlo do greške.</string>
-    <string name="settings_dialog_url_open_title">Nije pronađen kompatibilni program</string>
+    <string name="settings_dialog_url_open_title">Nije pronađena kompatibilni aplikacija</string>
     <string name="preference_reports_info_desc">Ove se postavke odnose na sve profile i pomažu poboljšati program. \nOsobni podaci se ne prikupljaju. \nZa primjenu promjena se program mora ponovo pokrenuti.</string>
     <string name="main_dialog_reports_save">Spremi</string>
     <string name="main_dialog_reports_title">Izvještavanje grešaka</string>
@@ -357,7 +357,7 @@
     <string name="infocenter_absences_list_thirty_days">Pokaži zadnjih 30 dana</string>
     <string name="infocenter_absences_list_ninety_days">Pokaži zadnjih 90 dana</string>
     <string name="infocenter_absences_list_schoolyear">Aktualna školska godina</string>
-    <string name="main_dialog_reports_info_2">Ove vrijednosti možeš kasnije promijeniti u postavkama programa.</string>
+    <string name="main_dialog_reports_info_2">Ove vrijednosti možeš kasnije promijeniti u postavkama aplikacije.</string>
     <string name="main_dialog_reports_info_1">BetterUntis koristi Sentry za prikupljanje informacija o prekidima rada programa i o drugim greškama.</string>
     <string name="elementpicker_timetable_select">Odaberi raspored sati</string>
     <string name="all_personal_abbr">Osobno</string>
