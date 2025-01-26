@@ -188,7 +188,7 @@
     <string name="logindatainput_data_loaded">Podaci su učitani.</string>
     <string name="logindatainput_connecting">Povezivanje …</string>
     <string name="logindatainput_aquiring_schoolid">Učitavanje škole …</string>
-    <string name="logindatainput_aquiring_app_secret">Preuzimanje tajne programa …</string>
+    <string name="logindatainput_aquiring_app_secret">Nabavljanje tajne aplikacije …</string>
     <string name="logindatainput_api_url">Untis API putanja</string>
     <string name="logindatainput_anonymous_login">Anonimna prijava</string>
     <string name="logindatainput_adding_user_unknown_error">Dogodila se nepoznata greška prilikom dodavanja korisnika.</string>
