@@ -212,6 +212,8 @@ dependencies {
 	implementation(libs.kotlinx.serialization.cbor)
 	implementation(libs.kotlinx.serialization.json)
 	implementation(libs.ktor.client.cio)
+	implementation(libs.ktor.client.content.negotiation)
+	implementation(libs.ktor.serialization)
 	implementation(libs.material)
 	implementation(libs.material.theme.adapter)
 	implementation(libs.mikepenz.aboutlibraries.compose)

@@ -1,6 +1,7 @@
 package com.sapuseven.untis.modules
 
 import com.sapuseven.untis.api.client.AbsenceApi
+import com.sapuseven.untis.api.client.ApiClient.Companion.DEFAULT_JSON
 import com.sapuseven.untis.api.client.ClassRegApi
 import com.sapuseven.untis.api.client.MessagesApi
 import com.sapuseven.untis.api.client.OfficeHoursApi
@@ -11,7 +12,13 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.HttpClientEngineFactory
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.http.ContentType
+import io.ktor.serialization.kotlinx.json.json
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -19,23 +26,43 @@ import javax.inject.Singleton
 object ApiClientModule {
 	@Provides
 	@Singleton
-	fun provideSchoolSearchApi(): SchoolSearchApi = SchoolSearchApi(CIO)
+	fun provideHttpClientEngineFactory(): HttpClientEngineFactory<*> = CIO
+
 	@Provides
 	@Singleton
-	fun provideUserDataApi(): UserDataApi = UserDataApi(CIO)
+	@Named("json")
+	fun provideJsonHttpClient(httpClientEngineFactory: HttpClientEngineFactory<*>): HttpClient =
+		HttpClient(httpClientEngineFactory.create()) {
+			install(ContentNegotiation) {
+				json(DEFAULT_JSON, contentType = ContentType.Application.Json)
+			}
+		}
+
 	@Provides
 	@Singleton
-	fun provideTimetableApi(): TimetableApi = TimetableApi(CIO)
+	fun provideSchoolSearchApi(engineFactory: HttpClientEngineFactory<*>): SchoolSearchApi = SchoolSearchApi(engineFactory)
+
 	@Provides
 	@Singleton
-	fun provideMessagesApi(): MessagesApi = MessagesApi(CIO)
+	fun provideUserDataApi(engineFactory: HttpClientEngineFactory<*>): UserDataApi = UserDataApi(engineFactory)
+
 	@Provides
 	@Singleton
-	fun provideClassRegApi(): ClassRegApi = ClassRegApi(CIO)
+	fun provideTimetableApi(engineFactory: HttpClientEngineFactory<*>): TimetableApi = TimetableApi(engineFactory)
+
 	@Provides
 	@Singleton
-	fun provideAbsenceApi(): AbsenceApi = AbsenceApi(CIO)
+	fun provideMessagesApi(engineFactory: HttpClientEngineFactory<*>): MessagesApi = MessagesApi(engineFactory)
+
 	@Provides
 	@Singleton
-	fun provideOfficeHoursApi(): OfficeHoursApi = OfficeHoursApi(CIO)
+	fun provideClassRegApi(engineFactory: HttpClientEngineFactory<*>): ClassRegApi = ClassRegApi(engineFactory)
+
+	@Provides
+	@Singleton
+	fun provideAbsenceApi(engineFactory: HttpClientEngineFactory<*>): AbsenceApi = AbsenceApi(engineFactory)
+
+	@Provides
+	@Singleton
+	fun provideOfficeHoursApi(engineFactory: HttpClientEngineFactory<*>): OfficeHoursApi = OfficeHoursApi(engineFactory)
 }

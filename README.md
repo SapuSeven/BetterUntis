@@ -62,7 +62,7 @@ Package structure overview:
 - `data`: Data layer
   - `cache`: Caching-related code
   - `database`: Room database and DAOs
-  - `model`: (Not used yet) Data models
+  - `model`: Data/domain layer models
   - `repository`: Repositories for accessing data in a domain-specific way
   - `settings`: _To be removed_
   - `timetable`: _To be removed_

@@ -8,24 +8,41 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.google.accompanist.flowlayout.MainAxisAlignment
 import com.sapuseven.compose.protostore.ui.preferences.ColorPreference
 import com.sapuseven.compose.protostore.ui.preferences.ConfirmDialogPreference
 import com.sapuseven.compose.protostore.ui.preferences.ListPreference
@@ -38,8 +55,12 @@ import com.sapuseven.compose.protostore.ui.preferences.SliderPreference
 import com.sapuseven.compose.protostore.ui.preferences.SwitchPreference
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
+import com.sapuseven.untis.data.model.github.GitHubApi.URL_GITHUB_PRIVACY_POLICY
+import com.sapuseven.untis.data.model.github.GitHubApi.URL_GITHUB_REPOSITORY
 import com.sapuseven.untis.preferences.PreferenceScreen
+import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.disabled
+import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.navigation.AppRoutes
 import com.sapuseven.untis.ui.preferences.ElementPickerPreference
 import io.sentry.Sentry
@@ -47,6 +68,7 @@ import soup.compose.material.motion.animation.materialSharedAxisXIn
 import soup.compose.material.motion.animation.materialSharedAxisXOut
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 fun NavGraphBuilder.settingsNav(
 	navController: NavHostController
 ) {
@@ -103,18 +125,6 @@ fun NavGraphBuilder.settingsNav(
 				icon = {
 					Icon(
 						painter = painterResource(id = R.drawable.settings_notifications),
-						contentDescription = null
-					)
-				},
-				navController = navController
-			)
-
-			PreferenceScreen(
-				key = AppRoutes.Settings.Connectivity,
-				title = { Text(stringResource(id = R.string.preferences_connectivity)) },
-				icon = {
-					Icon(
-						painter = painterResource(id = R.drawable.settings_connectivity),
 						contentDescription = null
 					)
 				},
@@ -287,10 +297,12 @@ fun NavGraphBuilder.settingsNav(
 				Preference(
 					title = { Text(text = stringResource(id = R.string.preference_app_language)) },
 					onClick = {
-						context.startActivity(Intent(
-							android.provider.Settings.ACTION_APP_LOCALE_SETTINGS,
-							Uri.parse("package:$packageName")
-						))
+						context.startActivity(
+							Intent(
+								android.provider.Settings.ACTION_APP_LOCALE_SETTINGS,
+								Uri.parse("package:$packageName")
+							)
+						)
 					}
 				)
 			}
@@ -846,7 +858,12 @@ fun NavGraphBuilder.settingsNav(
 			PreferenceGroup(stringResource(id = R.string.preference_category_notifications_visible_fields)) {
 				ListPreference(
 					title = { Text(stringResource(R.string.all_subjects)) },
-					supportingContent = { value, enabled -> Text(value.second, modifier = Modifier.disabled(!enabled)) },
+					supportingContent = { value, enabled ->
+						Text(
+							value.second,
+							modifier = Modifier.disabled(!enabled)
+						)
+					},
 					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.all_subject),
@@ -863,7 +880,12 @@ fun NavGraphBuilder.settingsNav(
 
 				ListPreference(
 					title = { Text(stringResource(R.string.all_rooms)) },
-					supportingContent = { value, enabled -> Text(value.second, modifier = Modifier.disabled(!enabled)) },
+					supportingContent = { value, enabled ->
+						Text(
+							value.second,
+							modifier = Modifier.disabled(!enabled)
+						)
+					},
 					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.all_rooms),
@@ -880,7 +902,12 @@ fun NavGraphBuilder.settingsNav(
 
 				ListPreference(
 					title = { Text(stringResource(R.string.all_teachers)) },
-					supportingContent = { value, enabled -> Text(value.second, modifier = Modifier.disabled(!enabled)) },
+					supportingContent = { value, enabled ->
+						Text(
+							value.second,
+							modifier = Modifier.disabled(!enabled)
+						)
+					},
 					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.all_teachers),
@@ -897,7 +924,12 @@ fun NavGraphBuilder.settingsNav(
 
 				ListPreference(
 					title = { Text(stringResource(R.string.all_classes)) },
-					supportingContent = { value, enabled -> Text(value.second, modifier = Modifier.disabled(!enabled)) },
+					supportingContent = { value, enabled ->
+						Text(
+							value.second,
+							modifier = Modifier.disabled(!enabled)
+						)
+					},
 					leadingContent = {
 						Icon(
 							painter = painterResource(R.drawable.all_classes),
@@ -915,57 +947,13 @@ fun NavGraphBuilder.settingsNav(
 		}
 	}
 
-	/* Not supported. Will probably be removed completely in the future.
-	 * Proxy settings are redundant since the API URL can be customized.
-	 * "Always refresh" is also not needed anymore due to smarter caching.
-	composable<AppRoutes.Settings.Connectivity> {
-		SettingsScreen(
-			navController = navController,
-			title = stringResource(id = R.string.preferences_connectivity)
-		) { viewModel ->
-			SwitchPreference(
-				title = { Text(stringResource(R.string.preference_connectivity_refresh_in_background)) },
-				summary = { Text(stringResource(R.string.preference_connectivity_refresh_in_background_desc)) },
-				settingsRepository = viewModel.repository,
-				value = { it.connectivityRefreshInBackground },
-				onValueChange = { connectivityRefreshInBackground = it }
-			)
-
-			PreferenceGroup(stringResource(id = R.string.preference_category_connectivity_proxy)) {
-				InputPreference(
-					title = { Text(stringResource(R.string.preference_connectivity_proxy_host)) },
-					leadingContent = {
-						Icon(
-							painter = painterResource(R.drawable.settings_connectivity_proxy),
-							contentDescription = null
-						)
-					},
-					settingsRepository = viewModel.repository,
-					value = { it.proxyHost },
-					onValueChange = { proxyHost = it }
-				)
-
-				Preference(
-					title = { Text(stringResource(R.string.preference_connectivity_proxy_about)) },
-					onClick = {
-						//openUrl(URL_WIKI_PROXY)
-					},
-					leadingContent = {
-						Icon(
-							painter = painterResource(R.drawable.settings_info),
-							contentDescription = null
-						)
-					}
-				)
-			}
-		}
-	}*/
-
 	composable<AppRoutes.Settings.About> {
 		SettingsScreen(
 			navController = navController,
 			title = stringResource(id = R.string.preferences_info)
 		) { viewModel ->
+			val uriHandler = LocalUriHandler.current
+
 			Preference(
 				title = { Text(stringResource(R.string.app_name)) },
 				summary = {
@@ -978,7 +966,7 @@ fun NavGraphBuilder.settingsNav(
 					)
 				},
 				onClick = {
-					//openUrl("$URL_GITHUB_REPOSITORY/releases")
+					uriHandler.openUri("$URL_GITHUB_REPOSITORY/releases")
 				},
 				leadingContent = {
 					Icon(
@@ -989,7 +977,7 @@ fun NavGraphBuilder.settingsNav(
 			)
 
 			PreferenceGroup(stringResource(id = R.string.preference_info_general)) {
-				val openDialog = remember { mutableStateOf(false) }
+				val externalSourceDialog = remember { mutableStateOf(false) }
 
 				Preference(
 					title = { Text(stringResource(R.string.preference_info_github)) },
@@ -997,7 +985,7 @@ fun NavGraphBuilder.settingsNav(
 						//Text(URL_GITHUB_REPOSITORY)
 					},
 					onClick = {
-						//openUrl(URL_GITHUB_REPOSITORY)
+						uriHandler.openUri(URL_GITHUB_REPOSITORY)
 					},
 					leadingContent = {
 						Icon(
@@ -1011,7 +999,7 @@ fun NavGraphBuilder.settingsNav(
 					title = { Text(stringResource(R.string.preference_info_license)) },
 					summary = { Text(stringResource(R.string.preference_info_license_desc)) },
 					onClick = {
-						//openUrl("$URL_GITHUB_REPOSITORY/blob/master/LICENSE")
+						uriHandler.openUri("$URL_GITHUB_REPOSITORY/blob/master/LICENSE")
 					},
 					leadingContent = {
 						Icon(
@@ -1025,7 +1013,7 @@ fun NavGraphBuilder.settingsNav(
 					title = { Text(stringResource(R.string.preference_info_contributors)) },
 					summary = { Text(stringResource(R.string.preference_info_contributors_desc)) },
 					onClick = {
-						//openDialog.value = true
+						externalSourceDialog.value = true
 					},
 					leadingContent = {
 						Icon(
@@ -1035,40 +1023,45 @@ fun NavGraphBuilder.settingsNav(
 					}
 				)
 
-				if (openDialog.value) {
+				if (externalSourceDialog.value) {
 					AlertDialog(
 						onDismissRequest = {
-							openDialog.value = false
+							externalSourceDialog.value = false
 						},
 						confirmButton = {
-							// TODO Migrate to Material FlowRow?
-							com.google.accompanist.flowlayout.FlowRow(
-								modifier = Modifier.padding(all = 8.dp),
-								mainAxisAlignment = MainAxisAlignment.End,
-								mainAxisSpacing = 8.dp
+							FlowRow(
+								horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+								verticalArrangement = Arrangement.spacedBy(8.dp),
+								modifier = Modifier
+									.fillMaxWidth()
 							) {
 								TextButton(
 									onClick = {
-										openDialog.value = false
-										//openUrl("https://docs.github.com/en/github/site-policy/github-privacy-statement")
+										uriHandler.openUri(URL_GITHUB_PRIVACY_POLICY)
 									}
 								) {
 									Text(text = stringResource(id = R.string.preference_info_privacy_policy))
 								}
-								TextButton(
-									onClick = {
-										openDialog.value = false
-									}
+
+								Row(
+									horizontalArrangement = Arrangement.spacedBy(8.dp)
 								) {
-									Text(text = stringResource(id = R.string.all_cancel))
-								}
-								TextButton(
-									onClick = {
-										openDialog.value = false
-										navController.navigate("contributors")
+									TextButton(
+										onClick = {
+											externalSourceDialog.value = false
+										}
+									) {
+										Text(text = stringResource(id = R.string.all_cancel))
 									}
-								) {
-									Text(text = stringResource(id = R.string.all_ok))
+
+									TextButton(
+										onClick = {
+											externalSourceDialog.value = false
+											navController.navigate(AppRoutes.Settings.About.Contributors)
+										}
+									) {
+										Text(text = stringResource(id = R.string.all_ok))
+									}
 								}
 							}
 						},
@@ -1119,55 +1112,50 @@ fun NavGraphBuilder.settingsNav(
 		colors = colors
 	)*/
 	}
+
 	composable<AppRoutes.Settings.About.Contributors> {
-		SettingsScreen(
-			navController = navController,
-			title = stringResource(id = R.string.preference_info_contributors)
-		) {}
+		val uriHandler = LocalUriHandler.current
+		val colorScheme = MaterialTheme.colorScheme
+		val viewModel = hiltViewModel<SettingsScreenViewModel, SettingsScreenViewModel.Factory>(creationCallback = { factory -> factory.create(colorScheme) }     )
 
-		/*var userList by remember { mutableStateOf(listOf<GithubUser>()) }
-		val error = remember { mutableStateOf(true) }
-		var loadingText by remember { mutableStateOf(getString(R.string.loading)) }
+		val contributors = viewModel.contributors.collectAsStateWithLifecycle()
+		val contributorsError = viewModel.contributorsError.collectAsStateWithLifecycle()
 
-		LaunchedEffect(Unit) {
-			scope.launch {
-				"$URL_GITHUB_REPOSITORY_API/contributors"
-					.httpGet()
-					.awaitStringResult()
-					.fold({ data ->
-						userList = getJSON().decodeFromString(data)
-						error.value = false
-					}, {
-						loadingText = getString(R.string.loading_failed)
-						error.value = true
-					})
+		AppScaffold(
+			topBar = {
+				CenterAlignedTopAppBar(
+					title = {
+						Text(stringResource(id = R.string.preference_info_contributors))
+					},
+					navigationIcon = {
+						IconButton(onClick = { navController.navigateUp() }) {
+							Icon(
+								imageVector = Icons.Outlined.ArrowBack,
+								contentDescription = stringResource(id = R.string.all_back)
+							)
+						}
+					}
+				)
+			}
+		) { innerPadding ->
+			LazyColumn(
+				modifier = Modifier
+					.padding(innerPadding)
+					.fillMaxSize(),
+				contentPadding = insetsPaddingValues()
+			) {
+				items(if (contributors.value.isEmpty()) 20 else contributors.value.size) {
+					val user = contributors.value.getOrNull(it)
+					Contributor(
+						githubUser = user,
+						onClick = user?.htmlUrl?.let {{ uriHandler.openUri(it) }}
+					)
+				}
 			}
 		}
 
-		if (!error.value) {
-			LazyColumn(
-				modifier = Modifier
-					.fillMaxHeight(),
-				contentPadding = insetsPaddingValues()
-			) {
-				this.items(userList) {
-					Contributor(
-						githubUser = it,
-						onClick = { openUrl(it.html_url) })
-				}
-			}
-		} else {
-			ListItem(
-				headlineContent = {
-					Text(loadingText)
-				},
-				leadingContent = {
-					Icon(
-						painter = painterResource(id = R.drawable.settings_about_contributor),
-						contentDescription = ""
-					)
-				}
-			)
-		}*/
+		LaunchedEffect(Unit) {
+			viewModel.loadContributors()
+		}
 	}
 }
