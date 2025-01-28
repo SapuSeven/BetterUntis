@@ -49,8 +49,8 @@ As this changes virtually every part of the app, here's a list tracking all migr
     - [x] Teacher features
 - [x] Preferences
   - [x] Theme management
-- [ ] Room finder
-- [ ] Info center
+- [x] Room finder
+- [x] Info center
 - [ ] Widget
 - [ ] Notifications
 
