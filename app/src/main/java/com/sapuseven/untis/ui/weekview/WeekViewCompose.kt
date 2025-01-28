@@ -75,8 +75,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import com.sapuseven.untis.R
+import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.common.ifNotNull
 import com.sapuseven.untis.ui.dialogs.DatePickerDialog
+import com.sapuseven.untis.ui.functional.useDebounce
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.Duration
@@ -126,7 +128,7 @@ fun <T> WeekViewEvent(
 					topLeft = Offset(-outerPadding.toPx(), -outerPadding.toPx()),
 					size = Size(size.width + outerPadding.toPx() * 2, size.height + outerPadding.toPx() * 2),
 					division = ((currentTime.seconds() - event.start.seconds()).toFloat()
-						/ (event.end.seconds() - event.start.seconds()).toFloat())
+							/ (event.end.seconds() - event.start.seconds()).toFloat())
 						.coerceIn(0f, 1f)
 				)
 			}
@@ -356,7 +358,11 @@ fun WeekViewSidebar(
 ) {
 	Box(
 		modifier = modifier
-			.height(hourHeight * (Duration.between(startTime, endTime).toMinutes() / 60f))
+			.height(
+				hourHeight * (Duration
+					.between(startTime, endTime)
+					.toMinutes() / 60f)
+			)
 			.width(IntrinsicSize.Max)
 	) {
 		hourList.forEach { hour ->
@@ -675,6 +681,7 @@ fun <T> WeekViewCompose(
 	onPageChange: suspend (pageIndex: Int) -> Unit,
 	onReload: suspend (pageIndex: Int) -> Unit,
 	onItemClick: (Pair<List<Event<T>>, Int>) -> Unit,
+	onZoom: suspend (zoomLevel: Float) -> Unit = {},
 	currentTime: LocalDateTime = LocalDateTime.now(),
 	modifier: Modifier = Modifier,
 	eventContent: @Composable (event: Event<T>) -> Unit = { event ->
@@ -688,6 +695,8 @@ fun <T> WeekViewCompose(
 			})
 	},
 	startDate: LocalDate = LocalDate.now(),
+	enableZoomGesture: Boolean = true,
+	initialScale: Float = 1f,
 	hourHeight: Dp = 72.dp,
 	hourList: List<WeekViewHour> = emptyList(),
 	colorScheme: WeekViewColorScheme = WeekViewColorScheme.default(),
@@ -697,12 +706,13 @@ fun <T> WeekViewCompose(
 	endTimeOffset: Dp = 0.dp,
 	overlayContent: @Composable ((startPadding: Dp) -> Unit)? = null
 ) {
+	val scope = rememberCoroutineScope()
 	val verticalScrollState = rememberScrollState()
 	var sidebarWidth by remember { mutableIntStateOf(0) }
 	var headerHeight by remember { mutableIntStateOf(0) }
 	var contentHeight by remember { mutableIntStateOf(0) }
 
-	var scale by remember { mutableFloatStateOf(1f) }
+	var scale by remember { mutableFloatStateOf(initialScale) }
 
 	val startPage = Int.MAX_VALUE / 2
 	val pagerState = rememberPagerState(initialPage = startPage) { Int.MAX_VALUE }
@@ -717,6 +727,10 @@ fun <T> WeekViewCompose(
 		jumpToDate?.let {
 			pagerState.scrollToPage((startPage + pageIndexForDate(it)).toInt())
 		}
+	}
+
+	scale.useDebounce {
+		scope.launch { onZoom(it) }
 	}
 
 	val earliestEventTime by remember(events) {
@@ -806,7 +820,6 @@ fun <T> WeekViewCompose(
 				if (hourList.isNotEmpty()) {
 					var isRefreshing by remember { mutableStateOf(false) }
 					val pullRefreshState = rememberWeekViewPullToRefreshState()
-					val scope = rememberCoroutineScope()
 					val onRefresh: () -> Unit = {
 						isRefreshing = true
 						scope.launch {
@@ -852,21 +865,23 @@ fun <T> WeekViewCompose(
 							modifier = Modifier
 								.fillMaxHeight()
 								.onGloballyPositioned { contentHeight = it.size.height }
-								.pointerInput(Unit) {
-									detectZoomGesture { centroid, zoom ->
-										val oldScale = scale
-										// Constrain min/max zoom
-										scale = (scale * zoom).coerceIn(0.75f..2f)
+								.conditional(enableZoomGesture) {
+									pointerInput(Unit) {
+										detectZoomGesture { centroid, zoom ->
+											val oldScale = scale
+											// Constrain min/max zoom
+											scale = (scale * zoom).coerceIn(0.75f..2f)
 
-										// Don't move scroll position if no effective zoom occurred
-										val actualZoom = scale / oldScale
-										val scrollY = verticalScrollState.value * actualZoom
+											// Don't move scroll position if no effective zoom occurred
+											val actualZoom = scale / oldScale
+											val scrollY = verticalScrollState.value * actualZoom
 
-										// Center zooming around gesture origin
-										val scrollOffset = (zoom - 1) * (scrollY - centroid.y)
+											// Center zooming around gesture origin
+											val scrollOffset = (zoom - 1) * (scrollY - centroid.y)
 
-										scope.launch {
-											verticalScrollState.scrollTo(scrollY.roundToInt() - scrollOffset.roundToInt())
+											scope.launch {
+												verticalScrollState.scrollTo(scrollY.roundToInt() - scrollOffset.roundToInt())
+											}
 										}
 									}
 								}

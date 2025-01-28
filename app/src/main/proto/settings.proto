@@ -43,6 +43,8 @@ message UserSettings {
   bool timetableBoldLessonName = 36;
   int32 timetableLessonNameFontSize = 37;
   int32 timetableLessonInfoFontSize = 38;
+  bool timetableZoomEnabled = 54;
+  float timetableZoomLevel = 55;
   bool notificationsEnable = 39;
   bool notificationsInMultiple = 40;
   bool notificationsBeforeFirst = 41;

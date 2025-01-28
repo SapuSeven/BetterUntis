@@ -71,6 +71,8 @@ class UserSettingsRepository @AssistedInject constructor(
 		timetableBoldLessonName = true
 		timetableLessonNameFontSize = 14 // TODO Use Material typography values?
 		timetableLessonInfoFontSize = 10 // TODO Use Material typography values?
+		timetableZoomEnabled = true
+		timetableZoomLevel = 1.0f
 
 		notificationsInMultiple = false
 		notificationsBeforeFirstTime = 30

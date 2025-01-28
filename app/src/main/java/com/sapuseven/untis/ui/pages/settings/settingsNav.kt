@@ -45,6 +45,7 @@ import com.sapuseven.untis.ui.preferences.ElementPickerPreference
 import io.sentry.Sentry
 import soup.compose.material.motion.animation.materialSharedAxisXIn
 import soup.compose.material.motion.animation.materialSharedAxisXOut
+import kotlin.math.roundToInt
 
 fun NavGraphBuilder.settingsNav(
 	navController: NavHostController
@@ -572,6 +573,33 @@ fun NavGraphBuilder.settingsNav(
 				settingsRepository = viewModel.repository,
 				value = { it.timetableSubstitutionsIrregular },
 				onValueChange = { timetableSubstitutionsIrregular = it }
+			)
+
+			SwitchPreference(
+				title = { Text(stringResource(R.string.preference_timetable_zoom_gesture)) },
+				leadingContent = {
+					Icon(
+						painter = painterResource(id = R.drawable.settings_zoom_gesture),
+						contentDescription = null
+					)
+				},
+				settingsRepository = viewModel.repository,
+				value = { it.timetableZoomEnabled },
+				onValueChange = { timetableZoomEnabled = it }
+			)
+
+			NumericInputPreference(
+				title = { Text(stringResource(R.string.preference_timetable_zoom_level)) },
+				leadingContent = {
+					Icon(
+						painter = painterResource(R.drawable.settings_zoom_level),
+						contentDescription = null
+					)
+				},
+				unit = "%",
+				settingsRepository = viewModel.repository,
+				value = { (it.timetableZoomLevel * 100).roundToInt().coerceIn(75, 200) },
+				onValueChange = { timetableZoomLevel = it.coerceIn(75, 200) / 100f }
 			)
 
 			/* Not supported due to reliability issues

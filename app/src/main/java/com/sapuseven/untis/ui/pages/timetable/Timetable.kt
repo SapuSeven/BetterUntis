@@ -77,6 +77,8 @@ fun Timetable(
 	val events by viewModel.events.collectAsState()
 	val lastRefresh by viewModel.lastRefresh.collectAsState()
 	val weekViewColorScheme by viewModel.weekViewColorScheme.collectAsState()
+	val weekViewScale by viewModel.weekViewScale.collectAsState()
+	val weekViewZoomEnabled by viewModel.weekViewZoomEnabled.collectAsState()
 
 	TimetableDrawer(
 		drawerState = drawerState,
@@ -158,10 +160,15 @@ fun Timetable(
 					onItemClick = { itemsWithIndex ->
 						viewModel.onItemClick(itemsWithIndex)
 					},
+					onZoom = { zoomLevel ->
+						viewModel.onZoom(zoomLevel)
+					},
 					currentTime = currentTime,
 					startTime = hourList.firstOrNull()?.startTime ?: LocalTime.MIDNIGHT,
 					endTime = hourList.lastOrNull()?.endTime ?: LocalTime.MIDNIGHT,
 					endTimeOffset = navBarHeight,
+					initialScale = weekViewScale,
+					enableZoomGesture = weekViewZoomEnabled,
 					hourHeight = /*state.weekViewPreferences.hourHeight ?:*/ 72.dp,
 					hourList = hourList,
 					//dividerWidth = viewModel.weekViewPreferences.dividerWidth,
