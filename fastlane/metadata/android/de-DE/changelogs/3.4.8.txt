@@ -1,1 +1,1 @@
-- Fehler behoben
+- Verschiedene kleine Fehler behoben

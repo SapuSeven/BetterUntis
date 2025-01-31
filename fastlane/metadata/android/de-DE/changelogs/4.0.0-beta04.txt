@@ -1,0 +1,4 @@
+- Fehler behoben: Benachrichtigungen werden nicht gelöscht
+- Fehler behoben: Abstürze in verschiedenen Fällen
+- Verbesserte Netzwerkkommunikation
+- Verbesserte Fehlereinmeldung
