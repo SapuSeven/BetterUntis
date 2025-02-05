@@ -36,7 +36,6 @@ message UserSettings {
   bool timetableBackgroundIrregular = 29;
   string timetableRange = 30;
   bool timetableRangeIndexReset = 31;
-  int32 timetableItemPaddingOverlap = 32;
   int32 timetableItemPadding = 33;
   int32 timetableItemCornerRadius = 34;
   bool timetableCenteredLessonInfo = 35;

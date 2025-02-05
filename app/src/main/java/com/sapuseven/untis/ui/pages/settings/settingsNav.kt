@@ -674,20 +674,6 @@ fun NavGraphBuilder.settingsNav(
 
 			PreferenceGroup(stringResource(id = R.string.preference_category_timetable_item_appearance)) {
 				NumericInputPreference(
-					title = { Text(stringResource(R.string.preference_timetable_item_padding_overlap)) },
-					leadingContent = {
-						Icon(
-							painter = painterResource(R.drawable.settings_timetable_padding),
-							contentDescription = null
-						)
-					},
-					unit = "dp",
-					settingsRepository = viewModel.repository,
-					value = { it.timetableItemPaddingOverlap },
-					onValueChange = { timetableItemPaddingOverlap = it }
-				)
-
-				NumericInputPreference(
 					title = { Text(stringResource(R.string.preference_timetable_item_padding)) },
 					leadingContent = {
 						Icon(

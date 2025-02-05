@@ -18,10 +18,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.Typography
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,6 +53,7 @@ import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.pages.timetable.details.TimetableItemDetailsDialog
 import com.sapuseven.untis.ui.weekview.WeekViewCompose
+import com.sapuseven.untis.ui.weekview.WeekViewStyle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -63,8 +64,9 @@ import java.time.ZoneId
 @Composable
 fun Timetable(
 	colorScheme: ColorScheme = MaterialTheme.colorScheme,
+	typography: Typography = MaterialTheme.typography,
 	viewModel: TimetableViewModel = hiltViewModel<TimetableViewModel, TimetableViewModel.Factory>(
-		creationCallback = { factory -> factory.create(colorScheme) }
+		creationCallback = { factory -> factory.create(colorScheme, typography) }
 	)
 ) {
 	val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -72,13 +74,14 @@ fun Timetable(
 	val user = viewModel.currentUser
 	val users by viewModel.allUsersState.collectAsStateWithLifecycle()
 
-	val needsPersonalTimetable by viewModel.needsPersonalTimetable.collectAsState()
-	val hourList by viewModel.hourList.collectAsState()
-	val events by viewModel.events.collectAsState()
-	val lastRefresh by viewModel.lastRefresh.collectAsState()
-	val weekViewColorScheme by viewModel.weekViewColorScheme.collectAsState()
-	val weekViewScale by viewModel.weekViewScale.collectAsState()
-	val weekViewZoomEnabled by viewModel.weekViewZoomEnabled.collectAsState()
+	val needsPersonalTimetable by viewModel.needsPersonalTimetable.collectAsStateWithLifecycle()
+	val hourList by viewModel.hourList.collectAsStateWithLifecycle()
+	val events by viewModel.events.collectAsStateWithLifecycle()
+	val lastRefresh by viewModel.lastRefresh.collectAsStateWithLifecycle()
+	val weekViewColorScheme by viewModel.weekViewColorScheme.collectAsStateWithLifecycle()
+	val weekViewScale by viewModel.weekViewScale.collectAsStateWithLifecycle()
+	val weekViewZoomEnabled by viewModel.weekViewZoomEnabled.collectAsStateWithLifecycle()
+	val weekViewEventStyle by viewModel.weekViewEventStyle.collectAsStateWithLifecycle()
 
 	TimetableDrawer(
 		drawerState = drawerState,
@@ -149,97 +152,99 @@ fun Timetable(
 					}
 				}
 
-				WeekViewCompose(
-					events = events,
-					onPageChange = { pageOffset ->
-						viewModel.onPageChange(pageOffset)
-					},
-					onReload = { pageOffset ->
-						viewModel.onPageReload(pageOffset)
-					},
-					onItemClick = { itemsWithIndex ->
-						viewModel.onItemClick(itemsWithIndex)
-					},
-					onZoom = { zoomLevel ->
-						viewModel.onZoom(zoomLevel)
-					},
-					currentTime = currentTime,
-					startTime = hourList.firstOrNull()?.startTime ?: LocalTime.MIDNIGHT,
-					endTime = hourList.lastOrNull()?.endTime ?: LocalTime.MIDNIGHT,
-					endTimeOffset = navBarHeight,
-					initialScale = weekViewScale,
-					enableZoomGesture = weekViewZoomEnabled,
-					hourHeight = /*state.weekViewPreferences.hourHeight ?:*/ 72.dp,
-					hourList = hourList,
-					//dividerWidth = viewModel.weekViewPreferences.dividerWidth,
-					colorScheme = weekViewColorScheme,
-					modifier = Modifier
-						.fillMaxSize()
-						.disabled(disabled = needsPersonalTimetable)
-				) { startPadding ->
-					// Feedback button
-					IconButton(
+				WeekViewStyle(weekViewEventStyle) {
+					WeekViewCompose(
+						events = events,
+						onPageChange = { pageOffset ->
+							viewModel.onPageChange(pageOffset)
+						},
+						onReload = { pageOffset ->
+							viewModel.onPageReload(pageOffset)
+						},
+						onItemClick = { itemsWithIndex ->
+							viewModel.onItemClick(itemsWithIndex)
+						},
+						onZoom = { zoomLevel ->
+							viewModel.onZoom(zoomLevel)
+						},
+						currentTime = currentTime,
+						startTime = hourList.firstOrNull()?.startTime ?: LocalTime.MIDNIGHT,
+						endTime = hourList.lastOrNull()?.endTime ?: LocalTime.MIDNIGHT,
+						endTimeOffset = navBarHeight,
+						initialScale = weekViewScale,
+						enableZoomGesture = weekViewZoomEnabled,
+						hourHeight = /*state.weekViewPreferences.hourHeight ?:*/ 72.dp,
+						hourList = hourList,
+						//dividerWidth = viewModel.weekViewPreferences.dividerWidth,
+						colorScheme = weekViewColorScheme,
 						modifier = Modifier
-							.align(Alignment.BottomEnd)
-							.padding(end = 8.dp)
-							.bottomInsets(),
-						onClick = {
-							viewModel.showFeedback()
-						}
-					) {
-						Icon(
-							painter = painterResource(R.drawable.all_feedback),
-							contentDescription = "Give feedback"
-						)
-					}
-
-					// Loading indicator
-					if (viewModel.loading)
-						CircularProgressIndicator(
+							.fillMaxSize()
+							.disabled(disabled = needsPersonalTimetable)
+					) { startPadding ->
+						// Feedback button
+						IconButton(
 							modifier = Modifier
 								.align(Alignment.BottomEnd)
-								.padding(8.dp)
-								.bottomInsets()
-						)
-
-					// Custom personal timetable hint
-					if (needsPersonalTimetable) {
-						Column(
-							verticalArrangement = Arrangement.Center,
-							horizontalAlignment = Alignment.CenterHorizontally,
-							modifier = Modifier
-								.fillMaxSize()
+								.padding(end = 8.dp)
+								.bottomInsets(),
+							onClick = {
+								viewModel.showFeedback()
+							}
 						) {
-							Text(
-								text = stringResource(id = R.string.main_anonymous_login_info_text),
-								textAlign = TextAlign.Center,
+							Icon(
+								painter = painterResource(R.drawable.all_feedback),
+								contentDescription = "Give feedback"
+							)
+						}
+
+						// Loading indicator
+						if (viewModel.loading)
+							CircularProgressIndicator(
 								modifier = Modifier
-									.padding(horizontal = 32.dp)
+									.align(Alignment.BottomEnd)
+									.padding(8.dp)
+									.bottomInsets()
 							)
 
-							Button(
-								onClick = viewModel.onAnonymousSettingsClick,
+						// Custom personal timetable hint
+						if (needsPersonalTimetable) {
+							Column(
+								verticalArrangement = Arrangement.Center,
+								horizontalAlignment = Alignment.CenterHorizontally,
 								modifier = Modifier
-									.padding(top = 16.dp)
+									.fillMaxSize()
 							) {
-								Text(text = stringResource(id = R.string.main_go_to_settings))
+								Text(
+									text = stringResource(id = R.string.main_anonymous_login_info_text),
+									textAlign = TextAlign.Center,
+									modifier = Modifier
+										.padding(horizontal = 32.dp)
+								)
+
+								Button(
+									onClick = viewModel.onAnonymousSettingsClick,
+									modifier = Modifier
+										.padding(top = 16.dp)
+								) {
+									Text(text = stringResource(id = R.string.main_go_to_settings))
+								}
 							}
+						} else {
+							// Last refresh text
+							Text(
+								text = stringResource(
+									id = R.string.main_last_refreshed,
+									formatTimeDiffMillis(lastRefresh?.let {
+										currentTime.atZone(ZoneId.systemDefault()).toInstant()
+											.toEpochMilli() - it.toEpochMilli()
+									})
+								),
+								modifier = Modifier
+									.align(Alignment.BottomStart)
+									.padding(start = startPadding + 8.dp, bottom = 8.dp)
+									.bottomInsets()
+							)
 						}
-					} else {
-						// Last refresh text
-						Text(
-							text = stringResource(
-								id = R.string.main_last_refreshed,
-								formatTimeDiffMillis(lastRefresh?.let {
-									currentTime.atZone(ZoneId.systemDefault()).toInstant()
-										.toEpochMilli() - it.toEpochMilli()
-								})
-							),
-							modifier = Modifier
-								.align(Alignment.BottomStart)
-								.padding(start = startPadding + 8.dp, bottom = 8.dp)
-								.bottomInsets()
-						)
 					}
 				}
 			}
