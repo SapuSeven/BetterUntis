@@ -373,5 +373,5 @@
     <string name="all_end_time">Endzeit</string>
     <string name="preference_app_language">App-Sprache</string>
     <string name="preference_category_app_language">App-Sprache</string>
-    <string name="all_open_datepicker">Datum</string>
+    <string name="all_open_datepicker">Datum auswählen</string>
 </resources>
