@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,6 +48,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.sapuseven.compose.protostore.ui.preferences.ColorPreference
 import com.sapuseven.compose.protostore.ui.preferences.ConfirmDialogPreference
 import com.sapuseven.compose.protostore.ui.preferences.ListPreference
@@ -1094,30 +1095,6 @@ fun NavGraphBuilder.settingsNav(
 			}
 		}
 	}
-	composable<AppRoutes.Settings.About.Libraries> {
-		SettingsScreen(
-			navController = navController,
-			title = stringResource(id = R.string.preference_info_libraries)
-		) {}
-
-		/*val colors = libraryColors(
-		backgroundColor = colorScheme!!.background,
-		contentColor = colorScheme!!.onBackground,
-		badgeBackgroundColor = colorScheme!!.primary,
-		badgeContentColor = colorScheme!!.onPrimary
-	)
-	/*
-	* The about libraries (android library from mikepenz)
-	* use a custom library file stored in R.raw.about_libs.
-	* To modify the shown libraries edit the JSON file
-	* about_libs.json
-	*/
-	LibrariesContainer(
-		Modifier.fillMaxSize(),
-		contentPadding = insetsPaddingValues(),
-		colors = colors
-	)*/
-	}
 
 	composable<AppRoutes.Settings.About.Contributors> {
 		val uriHandler = LocalUriHandler.current
@@ -1136,7 +1113,7 @@ fun NavGraphBuilder.settingsNav(
 					navigationIcon = {
 						IconButton(onClick = { navController.navigateUp() }) {
 							Icon(
-								imageVector = Icons.Outlined.ArrowBack,
+								imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
 								contentDescription = stringResource(id = R.string.all_back)
 							)
 						}
@@ -1191,6 +1168,33 @@ fun NavGraphBuilder.settingsNav(
 
 		LaunchedEffect(Unit) {
 			viewModel.loadContributors()
+		}
+	}
+
+	composable<AppRoutes.Settings.About.Libraries> {
+		AppScaffold(
+			topBar = {
+				CenterAlignedTopAppBar(
+					title = {
+						Text(stringResource(id = R.string.preference_info_libraries))
+					},
+					navigationIcon = {
+						IconButton(onClick = { navController.navigateUp() }) {
+							Icon(
+								imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+								contentDescription = stringResource(id = R.string.all_back)
+							)
+						}
+					}
+				)
+			}
+		) { innerPadding ->
+			LibrariesContainer(
+				Modifier
+					.padding(innerPadding)
+					.fillMaxSize(),
+				contentPadding = insetsPaddingValues(),
+			)
 		}
 	}
 }
