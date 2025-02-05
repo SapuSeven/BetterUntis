@@ -49,20 +49,21 @@ As this changes virtually every part of the app, here's a list tracking all migr
     - [x] Teacher features
 - [x] Preferences
   - [x] Theme management
-- [ ] Room finder
-- [ ] Info center
+- [x] Room finder
+- [x] Info center
 - [ ] Widget
 - [ ] Notifications
+- [ ] Auto-Mute
 
 Package structure overview:
 
 - `activities`: Entry points for the app
 - `annotations`: Custom annotations
-- `components`: Reusable components for DI - _needs evaultion_
+- `components`: Reusable components for DI - _needs evaluation_
 - `data`: Data layer
   - `cache`: Caching-related code
   - `database`: Room database and DAOs
-  - `model`: (Not used yet) Data models
+  - `model`: Data/domain layer models
   - `repository`: Repositories for accessing data in a domain-specific way
   - `settings`: _To be removed_
   - `timetable`: _To be removed_
@@ -109,15 +110,8 @@ In any case, any larger changes will need to wait until this version is released
 - Class management features for teachers (Absence checking, lesson topic editing, ...)
 
 ## Available languages
-- English
-- German
 
-_Since v3.3.0:_
-- Chinese (Simplified)
-- French
-- Norwegian Bokmål
-
-_This list may not be up-to-date. Please look at "Translating" below to check the current translation status._
+[![Translation status](https://hosted.weblate.org/widget/betteruntis/translations/multi-auto.svg)](https://hosted.weblate.org/engage/betteruntis/)
 
 ## Project Git Structure
 I established a simple system to manage this Git repository.

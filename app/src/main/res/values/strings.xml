@@ -256,7 +256,7 @@
     <string name="preference_info_privacy_policy">Privacy Policy</string>
     <string name="preference_marker">Time indicator</string>
     <string name="preference_notifications_clear">Clear all notifications</string>
-    <string name="preference_notifications_enable">Enable notifications</string>
+    <string name="preference_notifications_enable">Enable break notifications</string>
     <string name="preference_notifications_enable_desc">Displays a notification with information about the next lesson during breaks</string>
     <string name="preference_notifications_first_lesson">Notification before first lesson</string>
     <string name="preference_notifications_first_lesson_desc">Show a notification right before school starts</string>
@@ -402,4 +402,13 @@
     <string name="preference_app_language">App language</string>
     <string name="preferences_default_color">Default color</string>
 	<string name="preference_timetable_range_index_reset_desc">Ensure hour labels always start at 1</string>
+    <string name="preference_timetable_zoom_gesture">Enable zoom gesture</string>
+	<string name="preference_timetable_zoom_level">Timetable zoom level</string>
+    <string name="preference_info_contributors_error">Error loading contributors from GitHub.</string>
+	<string name="preference_category_notifications_break">Break notifications</string>
+	<string name="all_warning">Warning</string>
+	<string name="preference_notifications_exact_alarms_unavailable">Exact notifications are unavailable</string>
+	<string name="preference_notifications_exact_alarms_unavailable_desc">To ensure all notifications are delivered at the correct time, please grant %1$s permission to schedule exact alarms.\nTap to go to settings.</string>
+	<string name="preference_notifications_unavailable">Notifications are unavailable</string>
+	<string name="preference_notifications_unavailable_desc">To enable notifications, please grant %1$s permission to send notifications.\nTap to go to settings.</string>
 </resources>

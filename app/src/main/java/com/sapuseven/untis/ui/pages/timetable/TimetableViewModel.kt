@@ -3,10 +3,13 @@ package com.sapuseven.untis.ui.pages.timetable
 import android.content.Context
 import android.util.Log
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -34,6 +37,7 @@ import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
 import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import com.sapuseven.untis.ui.weekview.Event
 import com.sapuseven.untis.ui.weekview.WeekViewColorScheme
+import com.sapuseven.untis.ui.weekview.WeekViewEventStyle
 import com.sapuseven.untis.ui.weekview.WeekViewHour
 import com.sapuseven.untis.ui.weekview.startDateForPageIndex
 import crocodile8.universal_cache.CachedSourceResult
@@ -59,21 +63,22 @@ import java.time.LocalDate
 
 @HiltViewModel(assistedFactory = TimetableViewModel.Factory::class)
 class TimetableViewModel @AssistedInject constructor(
-    private val navigator: AppNavigator,
-    internal val userManager: UserManager,
-    private val userScopeManager: UserScopeManager,
-    private val userDao: UserDao,
-    internal val timetableRepository: TimetableRepository,
-    internal val masterDataRepository: MasterDataRepository,
-    internal val globalSettingsRepository: GlobalSettingsRepository,
-    @Assisted private val colorScheme: ColorScheme,
-    userSettingsRepositoryFactory: UserSettingsRepository.Factory,
-    timetableMapperFactory: TimetableMapper.Factory,
-    savedStateHandle: SavedStateHandle,
+	private val navigator: AppNavigator,
+	internal val userManager: UserManager,
+	private val userScopeManager: UserScopeManager,
+	private val userDao: UserDao,
+	internal val timetableRepository: TimetableRepository,
+	internal val masterDataRepository: MasterDataRepository,
+	internal val globalSettingsRepository: GlobalSettingsRepository,
+	@Assisted private val colorScheme: ColorScheme,
+	@Assisted private val typography: Typography,
+	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
+	timetableMapperFactory: TimetableMapper.Factory,
+	savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 	@AssistedFactory
 	interface Factory {
-		fun create(colorScheme: ColorScheme): TimetableViewModel
+		fun create(colorScheme: ColorScheme, typography: Typography): TimetableViewModel
 	}
 
 	private val timetableMapper = timetableMapperFactory.create(colorScheme)
@@ -105,8 +110,17 @@ class TimetableViewModel @AssistedInject constructor(
 	private val _lastRefresh = MutableStateFlow<Instant?>(null)
 	val lastRefresh: StateFlow<Instant?> = _lastRefresh
 
-	private val _weekViewColorScheme = MutableStateFlow<WeekViewColorScheme>(WeekViewColorScheme.default(colorScheme))
+	private val _weekViewColorScheme = MutableStateFlow(WeekViewColorScheme.default(colorScheme))
 	val weekViewColorScheme: StateFlow<WeekViewColorScheme> = _weekViewColorScheme
+
+	private val _weekViewScale = MutableStateFlow(1f)
+	val weekViewScale: StateFlow<Float> = _weekViewScale
+
+	private val _weekViewZoomEnabled = MutableStateFlow(true)
+	val weekViewZoomEnabled: StateFlow<Boolean> = _weekViewZoomEnabled
+
+	private val _weekViewEventStyle = MutableStateFlow(WeekViewEventStyle.default(typography))
+	val weekViewEventStyle: StateFlow<WeekViewEventStyle> = _weekViewEventStyle
 
 	private var currentPage = 0
 
@@ -143,6 +157,18 @@ class TimetableViewModel @AssistedInject constructor(
 					futureBackgroundColor = Color(userSettings.backgroundFuture),
 					indicatorColor = Color(userSettings.marker),
 				)
+				_weekViewEventStyle.value = WeekViewEventStyle(
+					padding = userSettings.timetableItemPadding,
+					cornerRadius = userSettings.timetableItemCornerRadius,
+					lessonNameStyle = typography.bodyLarge.copy(
+						fontSize = userSettings.timetableLessonNameFontSize.sp,
+						fontWeight = if (userSettings.timetableBoldLessonName) FontWeight.Bold else FontWeight.Normal
+					),
+					lessonInfoStyle = typography.bodySmall.copy(fontSize = userSettings.timetableLessonInfoFontSize.sp),
+					lessonInfoCentered = userSettings.timetableCenteredLessonInfo,
+				)
+				_weekViewScale.value = userSettings.timetableZoomLevel
+				_weekViewZoomEnabled.value = userSettings.timetableZoomEnabled
 			}
 		}
 	}
@@ -177,7 +203,8 @@ class TimetableViewModel @AssistedInject constructor(
 						.collect { result ->
 							val events =
 								timetableMapper.mapTimetablePeriodsToWeekViewEvents(result.value, ElementType.STUDENT)
-							val refreshTimestamp = result.originTimeStamp?.let { Instant.ofEpochMilli(it) } ?: Instant.now()
+							val refreshTimestamp =
+								result.originTimeStamp?.let { Instant.ofEpochMilli(it) } ?: Instant.now()
 							emitEvents(mapOf(startDate to timetableMapper.colorWeekViewTimetableEvents(events)))
 							if (targetPage == pageOffset)
 								_lastRefresh.emit(refreshTimestamp)
@@ -202,6 +229,10 @@ class TimetableViewModel @AssistedInject constructor(
 
 	fun onItemClick(itemsWithIndex: Pair<List<Event<PeriodItem>>, Int>) {
 		timetableItemDetailsDialog = itemsWithIndex
+	}
+
+	suspend fun onZoom(zoomLevel: Float) {
+		userSettingsRepository.updateSettings { timetableZoomLevel = zoomLevel }
 	}
 
 	private suspend fun loadEvents(startDate: LocalDate, fromCache: FromCache): Flow<CachedSourceResult<List<Period>>> {
@@ -257,9 +288,9 @@ class TimetableViewModel @AssistedInject constructor(
 
 			// If label is empty, fill it according to preferences
 			val label = if (rangeIndexReset) {
-			    (index + 2 - (range?.first ?: 1)).toString()
+				(index + 2 - (range?.first ?: 1)).toString()
 			} else {
-			    hour.label.ifEmpty { (index + 1).toString() }
+				hour.label.ifEmpty { (index + 1).toString() }
 			}
 
 			hourList.add(WeekViewHour(hour.startTime, hour.endTime, label))

@@ -9,6 +9,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import java.io.File
+import java.time.Clock
 import javax.inject.Named
 
 @Module
@@ -19,6 +20,9 @@ object ConfigurationModule {
 	fun provideCacheDir(
 		@ApplicationContext appContext: Context,
 	): File = appContext.cacheDir
+
+	@Provides
+	fun provideClock(): Clock = Clock.systemDefaultZone()
 
 	@Provides
 	fun provideTimeProvider(): TimeProvider = SystemTimeProvider

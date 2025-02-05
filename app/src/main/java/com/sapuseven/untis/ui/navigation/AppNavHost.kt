@@ -169,10 +169,10 @@ fun AppNavHost(
 
 		navigation<AppRoutes.Settings>(
 			startDestination = AppRoutes.Settings.Categories,
-			enterTransition = { materialSharedAxisXIn(true, 30) },
-			exitTransition = { materialSharedAxisXOut(true, 30) },
-			popEnterTransition = { materialSharedAxisXIn(false, 30) },
-			popExitTransition = { materialSharedAxisXOut(false, 30) }
+			enterTransition = { materialSharedAxisXIn(true, 100) },
+			exitTransition = { materialSharedAxisXOut(true, 100) },
+			popEnterTransition = { materialSharedAxisXIn(false, 100) },
+			popExitTransition = { materialSharedAxisXOut(false, 100) }
 		) {
 			settingsNav(navController = navController)
 		}

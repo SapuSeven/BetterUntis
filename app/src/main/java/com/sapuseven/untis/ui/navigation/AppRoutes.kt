@@ -72,9 +72,6 @@ object AppRoutes {
 		data object Notifications
 
 		@Serializable
-		data object Connectivity
-
-		@Serializable
 		data object About {
 
 			@Serializable

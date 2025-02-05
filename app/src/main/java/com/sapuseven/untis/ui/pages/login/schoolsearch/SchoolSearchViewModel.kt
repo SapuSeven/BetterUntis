@@ -12,7 +12,6 @@ import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -21,10 +20,9 @@ import javax.inject.Inject
 @OptIn(FlowPreview::class)
 @HiltViewModel
 class SchoolSearchViewModel @Inject constructor(
-	val schoolSearchApi: SchoolSearchApi,
+	private val schoolSearchApi: SchoolSearchApi,
 ) : ViewModel() {
-	private val _schoolSearchText = MutableStateFlow<String>("")
-	val schoolSearchText: StateFlow<String> = _schoolSearchText
+	private val _schoolSearchText = MutableStateFlow("")
 
 	var schoolSearchItems by mutableStateOf<List<SchoolInfo>>(emptyList())
 		private set
@@ -49,7 +47,7 @@ class SchoolSearchViewModel @Inject constructor(
 		}
 	}
 
-	suspend fun searchSchools(input: String) {
+	private suspend fun searchSchools(input: String) {
 		if (input.isEmpty()) return
 
 		schoolSearchError = null

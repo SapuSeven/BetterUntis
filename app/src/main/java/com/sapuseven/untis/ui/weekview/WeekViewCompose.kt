@@ -66,7 +66,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
@@ -75,8 +74,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import com.sapuseven.untis.R
+import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.common.ifNotNull
 import com.sapuseven.untis.ui.dialogs.DatePickerDialog
+import com.sapuseven.untis.ui.functional.useDebounce
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.Duration
@@ -109,16 +110,18 @@ data class Event<T>(
 fun <T> WeekViewEvent(
 	event: Event<T>,
 	currentTime: LocalDateTime = LocalDateTime.now(),
-	outerPadding: Dp = 2.dp,
 	innerPadding: Dp = 2.dp,
 	modifier: Modifier = Modifier,
 	onClick: (() -> Unit)? = null,
 ) {
+	val eventStyle = LocalWeekViewEventStyle.current
+	val outerPadding = eventStyle.padding.dp
+
 	Box(
 		modifier = modifier
 			.fillMaxSize()
 			.padding(outerPadding)
-			.clip(RoundedCornerShape(4.dp))
+			.clip(RoundedCornerShape(eventStyle.cornerRadius.dp))
 			.drawBehind {
 				drawVerticalSplitRect(
 					event.pastColor,
@@ -137,16 +140,18 @@ fun <T> WeekViewEvent(
 	) {
 		Text(
 			text = event.top.asAnnotatedString(),
-			style = MaterialTheme.typography.bodySmall,
-			textAlign = TextAlign.Start,
+			style = eventStyle.lessonInfoStyle,
+			textAlign = if (eventStyle.lessonInfoCentered) TextAlign.Center else TextAlign.Start,
 			maxLines = 1,
 			color = event.textColor,
-			modifier = Modifier.align(Alignment.TopStart)
+			modifier = Modifier
+				.fillMaxWidth()
+				.align(Alignment.TopCenter)
 		)
 
 		Text(
 			text = event.title.asAnnotatedString(),
-			style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+			style = eventStyle.lessonNameStyle,
 			textAlign = TextAlign.Center,
 			maxLines = 1,
 			color = event.textColor,
@@ -155,11 +160,13 @@ fun <T> WeekViewEvent(
 
 		Text(
 			text = event.bottom.asAnnotatedString(),
-			style = MaterialTheme.typography.bodySmall,
-			textAlign = TextAlign.End,
+			style = eventStyle.lessonInfoStyle,
+			textAlign = if (eventStyle.lessonInfoCentered) TextAlign.Center else TextAlign.End,
 			maxLines = 1,
 			color = event.textColor,
-			modifier = Modifier.align(Alignment.BottomEnd)
+			modifier = Modifier
+				.fillMaxWidth()
+				.align(Alignment.BottomCenter)
 		)
 	}
 }
@@ -173,19 +180,49 @@ private fun LocalDateTime.seconds() = atZone(ZoneId.systemDefault()).toEpochSeco
 @Preview(showBackground = true)
 @Composable
 fun EventPreview() {
-	WeekViewEvent(
-		event = Event<Nothing>(
-			title = "Test",
-			color = MaterialTheme.colorScheme.primary,
-			pastColor = MaterialTheme.colorScheme.primary,
-			textColor = MaterialTheme.colorScheme.onPrimary,
-			start = LocalDateTime.parse("2021-05-18T09:00:00"),
-			end = LocalDateTime.parse("2021-05-18T11:00:00"),
-			top = "This is a",
-			bottom = "event"
-		),
-		modifier = Modifier.sizeIn(maxHeight = 64.dp, maxWidth = 72.dp)
-	)
+	WeekViewStyle {
+		WeekViewEvent(
+			event = Event<Nothing>(
+				title = "Test",
+				color = MaterialTheme.colorScheme.primary,
+				pastColor = MaterialTheme.colorScheme.primary,
+				textColor = MaterialTheme.colorScheme.onPrimary,
+				start = LocalDateTime.parse("2021-05-18T09:00:00"),
+				end = LocalDateTime.parse("2021-05-18T11:00:00"),
+				top = "This is a",
+				bottom = "event"
+			),
+			modifier = Modifier.sizeIn(maxHeight = 64.dp, maxWidth = 72.dp)
+		)
+	}
+}
+
+@Preview(showBackground = true)
+@Composable
+fun EventStyledPreview() {
+	WeekViewStyle(
+		weekViewEventStyle = WeekViewEventStyle(
+			padding = 4,
+			cornerRadius = 8,
+			lessonNameStyle = MaterialTheme.typography.bodyLarge,
+			lessonInfoStyle = MaterialTheme.typography.bodySmall,
+			lessonInfoCentered = true,
+		)
+	) {
+		WeekViewEvent(
+			event = Event<Nothing>(
+				title = "Styled",
+				color = MaterialTheme.colorScheme.primary,
+				pastColor = MaterialTheme.colorScheme.primary,
+				textColor = MaterialTheme.colorScheme.onPrimary,
+				start = LocalDateTime.parse("2021-05-18T09:00:00"),
+				end = LocalDateTime.parse("2021-05-18T11:00:00"),
+				top = "This is a",
+				bottom = "event"
+			),
+			modifier = Modifier.sizeIn(maxHeight = 64.dp, maxWidth = 72.dp)
+		)
+	}
 }
 
 private class EventDataModifier(
@@ -282,8 +319,8 @@ fun WeekViewSidebarLabel(
 	hour: WeekViewHour,
 	modifier: Modifier = Modifier,
 ) {
-	val timeFormat =
-		if (DateFormat.is24HourFormat(LocalContext.current)) timeFormat24h else timeFormat12h
+	val eventStyle = LocalWeekViewEventStyle.current
+	val timeFormat = if (DateFormat.is24HourFormat(LocalContext.current)) timeFormat24h else timeFormat12h
 
 	Box(
 		modifier = modifier
@@ -292,7 +329,7 @@ fun WeekViewSidebarLabel(
 	) {
 		Text(
 			text = timeFormat.format(hour.startTime),
-			style = MaterialTheme.typography.bodySmall,
+			style = eventStyle.lessonInfoStyle,
 			maxLines = 1,
 			color = MaterialTheme.colorScheme.onSurfaceVariant,
 			modifier = Modifier
@@ -301,7 +338,7 @@ fun WeekViewSidebarLabel(
 		)
 		Text(
 			text = hour.label,
-			style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+			style = eventStyle.lessonNameStyle,
 			maxLines = 1,
 			color = MaterialTheme.colorScheme.onSurface,
 			modifier = Modifier
@@ -309,7 +346,7 @@ fun WeekViewSidebarLabel(
 		)
 		Text(
 			text = timeFormat.format(hour.endTime),
-			style = MaterialTheme.typography.bodySmall,
+			style = eventStyle.lessonInfoStyle,
 			maxLines = 1,
 			color = MaterialTheme.colorScheme.onSurfaceVariant,
 			modifier = Modifier
@@ -322,27 +359,31 @@ fun WeekViewSidebarLabel(
 @Preview(showBackground = true)
 @Composable
 fun BasicSidebarLabelPreview() {
-	WeekViewSidebarLabel(
-		hour = WeekViewHour(
-			LocalTime.of(9, 45),
-			LocalTime.of(10, 30),
-			"1"
-		),
-		Modifier.sizeIn(maxHeight = 64.dp, maxWidth = 72.dp)
-	)
+	WeekViewStyle {
+		WeekViewSidebarLabel(
+			hour = WeekViewHour(
+				LocalTime.of(9, 45),
+				LocalTime.of(10, 30),
+				"1"
+			),
+			Modifier.sizeIn(maxHeight = 64.dp, maxWidth = 72.dp)
+		)
+	}
 }
 
 @Preview(showBackground = true)
 @Composable
 fun CompactSidebarLabelPreview() {
-	WeekViewSidebarLabel(
-		hour = WeekViewHour(
-			LocalTime.of(9, 45),
-			LocalTime.of(10, 30),
-			"1"
-		),
-		Modifier.sizeIn(maxHeight = 48.dp, maxWidth = 68.dp)
-	)
+	WeekViewStyle {
+		WeekViewSidebarLabel(
+			hour = WeekViewHour(
+				LocalTime.of(9, 45),
+				LocalTime.of(10, 30),
+				"1"
+			),
+			Modifier.sizeIn(maxHeight = 48.dp, maxWidth = 68.dp)
+		)
+	}
 }
 
 @Composable
@@ -356,7 +397,11 @@ fun WeekViewSidebar(
 ) {
 	Box(
 		modifier = modifier
-			.height(hourHeight * (Duration.between(startTime, endTime).toMinutes() / 60f))
+			.height(
+				hourHeight * (Duration
+					.between(startTime, endTime)
+					.toMinutes() / 60f)
+			)
 			.width(IntrinsicSize.Max)
 	) {
 		hourList.forEach { hour ->
@@ -381,18 +426,20 @@ fun WeekViewSidebar(
 @Preview(showBackground = true)
 @Composable
 fun WeekViewSidebarPreview() {
-	WeekViewSidebar(
-		startTime = LocalTime.of(9, 30),
-		endTime = LocalTime.of(13, 45),
-		hourHeight = 72.dp,
-		hourList = (1..4).map {
-			WeekViewHour(
-				LocalTime.of(it + 8, 45),
-				LocalTime.of(it + 9, 30),
-				it.toString()
-			)
-		}
-	)
+	WeekViewStyle {
+		WeekViewSidebar(
+			startTime = LocalTime.of(9, 30),
+			endTime = LocalTime.of(13, 45),
+			hourHeight = 72.dp,
+			hourList = (1..4).map {
+				WeekViewHour(
+					LocalTime.of(it + 8, 45),
+					LocalTime.of(it + 9, 30),
+					it.toString()
+				)
+			}
+		)
+	}
 }
 
 fun DrawScope.weekViewContentGrid(
@@ -675,6 +722,7 @@ fun <T> WeekViewCompose(
 	onPageChange: suspend (pageIndex: Int) -> Unit,
 	onReload: suspend (pageIndex: Int) -> Unit,
 	onItemClick: (Pair<List<Event<T>>, Int>) -> Unit,
+	onZoom: suspend (zoomLevel: Float) -> Unit = {},
 	currentTime: LocalDateTime = LocalDateTime.now(),
 	modifier: Modifier = Modifier,
 	eventContent: @Composable (event: Event<T>) -> Unit = { event ->
@@ -688,6 +736,8 @@ fun <T> WeekViewCompose(
 			})
 	},
 	startDate: LocalDate = LocalDate.now(),
+	enableZoomGesture: Boolean = true,
+	initialScale: Float = 1f,
 	hourHeight: Dp = 72.dp,
 	hourList: List<WeekViewHour> = emptyList(),
 	colorScheme: WeekViewColorScheme = WeekViewColorScheme.default(),
@@ -697,12 +747,13 @@ fun <T> WeekViewCompose(
 	endTimeOffset: Dp = 0.dp,
 	overlayContent: @Composable ((startPadding: Dp) -> Unit)? = null
 ) {
+	val scope = rememberCoroutineScope()
 	val verticalScrollState = rememberScrollState()
 	var sidebarWidth by remember { mutableIntStateOf(0) }
 	var headerHeight by remember { mutableIntStateOf(0) }
 	var contentHeight by remember { mutableIntStateOf(0) }
 
-	var scale by remember { mutableFloatStateOf(1f) }
+	var scale by remember { mutableFloatStateOf(initialScale) }
 
 	val startPage = Int.MAX_VALUE / 2
 	val pagerState = rememberPagerState(initialPage = startPage) { Int.MAX_VALUE }
@@ -717,6 +768,10 @@ fun <T> WeekViewCompose(
 		jumpToDate?.let {
 			pagerState.scrollToPage((startPage + pageIndexForDate(it)).toInt())
 		}
+	}
+
+	scale.useDebounce {
+		scope.launch { onZoom(it) }
 	}
 
 	val earliestEventTime by remember(events) {
@@ -806,7 +861,6 @@ fun <T> WeekViewCompose(
 				if (hourList.isNotEmpty()) {
 					var isRefreshing by remember { mutableStateOf(false) }
 					val pullRefreshState = rememberWeekViewPullToRefreshState()
-					val scope = rememberCoroutineScope()
 					val onRefresh: () -> Unit = {
 						isRefreshing = true
 						scope.launch {
@@ -852,21 +906,23 @@ fun <T> WeekViewCompose(
 							modifier = Modifier
 								.fillMaxHeight()
 								.onGloballyPositioned { contentHeight = it.size.height }
-								.pointerInput(Unit) {
-									detectZoomGesture { centroid, zoom ->
-										val oldScale = scale
-										// Constrain min/max zoom
-										scale = (scale * zoom).coerceIn(0.75f..2f)
+								.conditional(enableZoomGesture) {
+									pointerInput(Unit) {
+										detectZoomGesture { centroid, zoom ->
+											val oldScale = scale
+											// Constrain min/max zoom
+											scale = (scale * zoom).coerceIn(0.75f..2f)
 
-										// Don't move scroll position if no effective zoom occurred
-										val actualZoom = scale / oldScale
-										val scrollY = verticalScrollState.value * actualZoom
+											// Don't move scroll position if no effective zoom occurred
+											val actualZoom = scale / oldScale
+											val scrollY = verticalScrollState.value * actualZoom
 
-										// Center zooming around gesture origin
-										val scrollOffset = (zoom - 1) * (scrollY - centroid.y)
+											// Center zooming around gesture origin
+											val scrollOffset = (zoom - 1) * (scrollY - centroid.y)
 
-										scope.launch {
-											verticalScrollState.scrollTo(scrollY.roundToInt() - scrollOffset.roundToInt())
+											scope.launch {
+												verticalScrollState.scrollTo(scrollY.roundToInt() - scrollOffset.roundToInt())
+											}
 										}
 									}
 								}

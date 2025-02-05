@@ -65,12 +65,14 @@ class UserSettingsRepository @AssistedInject constructor(
 		darkTheme = "auto"
 
 		timetableSubstitutionsIrregular = true
-		timetableItemPaddingOverlap = 4
-		timetableItemPadding = 4
+		timetableItemPadding = 2
 		timetableItemCornerRadius = 4
+		timetableCenteredLessonInfo = false
 		timetableBoldLessonName = true
-		timetableLessonNameFontSize = 14 // TODO Use Material typography values?
-		timetableLessonInfoFontSize = 10 // TODO Use Material typography values?
+		timetableLessonNameFontSize = 16 // TODO Use Material typography values?
+		timetableLessonInfoFontSize = 12 // TODO Use Material typography values?
+		timetableZoomEnabled = true
+		timetableZoomLevel = 1.0f
 
 		notificationsInMultiple = false
 		notificationsBeforeFirstTime = 30

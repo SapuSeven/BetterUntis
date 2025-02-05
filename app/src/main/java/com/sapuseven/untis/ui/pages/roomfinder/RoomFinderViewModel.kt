@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.Clock
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -29,6 +30,7 @@ import javax.inject.Inject
 class RoomFinderViewModel @Inject constructor(
 	private val roomFinderDao: RoomFinderDao,
 	private val navigator: AppNavigator,
+	clock: Clock,
 	getRoomFinderItems: GetRoomFinderItemsUseCase,
 	userScopeManager: UserScopeManager,
 	userDao: UserDao
@@ -36,7 +38,7 @@ class RoomFinderViewModel @Inject constructor(
 	val user = userScopeManager.user
 	val elementPicker = ElementPicker(user, userDao)
 
-	private val currentDateTime = LocalDateTime.of(2025, 1, 20, 13, 0)
+	private val currentDateTime = LocalDateTime.now(clock)
 
 	private val _hourList =
 		userScopeManager.user.timeGrid.days.flatMap { day -> day.units.map { unit -> RoomFinderHour(day, unit) } }

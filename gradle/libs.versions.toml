@@ -42,7 +42,7 @@ ktor = "2.3.5"
 mannodermaus-android-junit5 = "1.10.0.0"
 material = "1.12.0"
 material-motion-compose-core-version = "2.0.1"
-mikepenz-aboutlibraries = "10.5.2"
+mikepenz-aboutlibraries = "11.4.0"
 mockito = "4.6.1"
 mockk = "1.13.4"
 openapi = "7.0.1"
@@ -60,6 +60,7 @@ ui-tooling-preview-android = "1.7.6"
 accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }
 accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanist" }
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 andrew0000-cache = { module = "io.github.andrew0000:universal-cache", version.ref = "universal-cache" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
@@ -120,7 +121,7 @@ ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-serialization = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 material-theme-adapter = { module = "com.google.android.material:compose-theme-adapter", version.ref = "compose-theme-adapter" }
-mikepenz-aboutlibraries-compose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "mikepenz-aboutlibraries" }
+mikepenz-aboutlibraries-compose = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "mikepenz-aboutlibraries" }
 mikepenz-aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "mikepenz-aboutlibraries" }
 mock = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
