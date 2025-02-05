@@ -192,7 +192,7 @@
     <string name="preference_info_privacy_policy">Datenschutz-Bestimmungen</string>
     <string name="preference_marker">Zeitanzeige</string>
     <string name="preference_notifications_clear">Alle Benachrichtigungen löschen</string>
-    <string name="preference_notifications_enable">Benachrichtigungen aktivieren</string>
+    <string name="preference_notifications_enable">Pausenbenachrichtigungen aktivieren</string>
     <string name="preference_notifications_enable_desc">Zeigt während Pausen eine Benachrichtigung mit Infos zur nächsten Stunde an</string>
     <string name="preference_notifications_first_lesson">Benachrichtigung vor der ersten Stunde</string>
     <string name="preference_notifications_first_lesson_desc">Zeigt eine zusätzliche Benachrichtigung vor Beginn der ersten Stunde an</string>
@@ -378,4 +378,17 @@
     <string name="roomfinder_item_desc_free_day">Dieser Raum ist den restlichen Tag frei.</string>
     <string name="roomfinder_item_desc_free_week">Dieser Raum ist die restliche Woche frei.</string>
     <string name="preferences_default_color">Standardfarbe</string>
+    <string name="infocenter_exams">Prüfungen</string>
+    <string name="infocenter_exams_empty">Keine Prüfungen</string>
+    <string name="preference_timetable_colors_reset_desc">Die Farben werden auf das Systemdesign zurückgesetzt.</string>
+    <string name="preference_info_contributors_error">Fehler beim Laden der Mitwirkenden von GitHub.</string>
+    <string name="preference_category_notifications_break">Pausenbenachrichtigungen</string>
+    <string name="preference_notifications_exact_alarms_unavailable">Exakte Benachrichtigungen sind nicht verfügbar</string>
+    <string name="preference_notifications_unavailable">Benachrichtigungen sind nicht verfügbar</string>
+    <string name="preference_notifications_unavailable_desc">Um Benachrichtigungen zu aktivieren muss die Berechtigung zum Senden von Benachrichtigungen für %1$s erteilt werden.\nTippen, um die Einstellungen zu öffnen.</string>
+    <string name="preference_timetable_zoom_gesture">Zoom-Geste aktivieren</string>
+    <string name="preference_timetable_zoom_level">Zoomstufe des Stundenplans</string>
+    <string name="all_warning">Warnung</string>
+    <string name="preference_notifications_exact_alarms_unavailable_desc">Um sicherzustellen, dass alle Benachrichtigungen zur richtigen Zeit zugestellt werden, muss die Berechtigung zum Einrichten von Wecker und Erinnerungen für %1$s erteilt werden.\nTippen, um die Einstellungen zu öffnen.</string>
+    <string name="all_open_datepicker">Datum auswählen</string>
 </resources>
