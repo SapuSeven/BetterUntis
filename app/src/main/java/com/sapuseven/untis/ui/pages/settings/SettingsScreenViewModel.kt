@@ -64,6 +64,12 @@ class SettingsScreenViewModel @AssistedInject constructor(
 	}
 
 	suspend fun loadContributors() {
-		_contributors.value = httpClient.get("$URL_GITHUB_REPOSITORY_API/contributors").body<List<GitHubUser>>()
+		_contributorsError.value = null
+
+		try {
+			_contributors.value = httpClient.get("$URL_GITHUB_REPOSITORY_API/contributors").body()
+		} catch (e: Exception) {
+			_contributorsError.value = e
+		}
 	}
 }

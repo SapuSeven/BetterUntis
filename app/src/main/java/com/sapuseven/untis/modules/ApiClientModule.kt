@@ -36,6 +36,7 @@ object ApiClientModule {
 			install(ContentNegotiation) {
 				json(DEFAULT_JSON, contentType = ContentType.Application.Json)
 			}
+			expectSuccess = true
 		}
 
 	@Provides

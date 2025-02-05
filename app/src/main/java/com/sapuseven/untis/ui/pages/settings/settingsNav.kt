@@ -4,11 +4,15 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -27,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -59,6 +64,7 @@ import com.sapuseven.untis.data.model.github.GitHubApi.URL_GITHUB_PRIVACY_POLICY
 import com.sapuseven.untis.data.model.github.GitHubApi.URL_GITHUB_REPOSITORY
 import com.sapuseven.untis.preferences.PreferenceScreen
 import com.sapuseven.untis.ui.common.AppScaffold
+import com.sapuseven.untis.ui.common.MessageBubble
 import com.sapuseven.untis.ui.common.disabled
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.navigation.AppRoutes
@@ -1118,8 +1124,8 @@ fun NavGraphBuilder.settingsNav(
 		val colorScheme = MaterialTheme.colorScheme
 		val viewModel = hiltViewModel<SettingsScreenViewModel, SettingsScreenViewModel.Factory>(creationCallback = { factory -> factory.create(colorScheme) }     )
 
-		val contributors = viewModel.contributors.collectAsStateWithLifecycle()
-		val contributorsError = viewModel.contributorsError.collectAsStateWithLifecycle()
+		val contributors by viewModel.contributors.collectAsStateWithLifecycle()
+		val contributorsError by viewModel.contributorsError.collectAsStateWithLifecycle()
 
 		AppScaffold(
 			topBar = {
@@ -1138,17 +1144,46 @@ fun NavGraphBuilder.settingsNav(
 				)
 			}
 		) { innerPadding ->
-			LazyColumn(
+			Box(
 				modifier = Modifier
 					.padding(innerPadding)
-					.fillMaxSize(),
-				contentPadding = insetsPaddingValues()
 			) {
-				items(if (contributors.value.isEmpty()) 20 else contributors.value.size) {
-					val user = contributors.value.getOrNull(it)
-					Contributor(
-						githubUser = user,
-						onClick = user?.htmlUrl?.let {{ uriHandler.openUri(it) }}
+				AnimatedVisibility(
+					contributorsError == null,
+					enter = fadeIn(),
+					exit = fadeOut()
+				) {
+					LazyColumn(
+						modifier = Modifier.fillMaxSize(),
+						contentPadding = insetsPaddingValues()
+					) {
+						items(if (contributors.isEmpty()) 20 else contributors.size) {
+							val user = contributors.getOrNull(it)
+							Contributor(
+								githubUser = user,
+								onClick = user?.htmlUrl?.let {{ uriHandler.openUri(it) }}
+							)
+						}
+					}
+				}
+
+				AnimatedVisibility(
+					contributorsError != null,
+					enter = fadeIn() + expandVertically(),
+					exit = shrinkVertically() + fadeOut()
+				) {
+					MessageBubble(
+						modifier = Modifier
+							.fillMaxWidth()
+							.padding(horizontal = 16.dp, vertical = 8.dp),
+						icon = {
+							Icon(
+								painter = painterResource(id = R.drawable.all_error),
+								contentDescription = stringResource(id = R.string.all_error)
+							)
+						},
+						messageText = R.string.preference_info_contributors_error,
+						messageTextRaw = contributorsError?.localizedMessage
 					)
 				}
 			}

@@ -404,4 +404,5 @@
 	<string name="preference_timetable_range_index_reset_desc">Ensure hour labels always start at 1</string>
     <string name="preference_timetable_zoom_gesture">Enable zoom gesture</string>
 	<string name="preference_timetable_zoom_level">Timetable zoom level</string>
+    <string name="preference_info_contributors_error">Error loading contributors from GitHub.</string>
 </resources>
