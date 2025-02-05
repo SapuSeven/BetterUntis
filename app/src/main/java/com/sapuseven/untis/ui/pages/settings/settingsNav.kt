@@ -765,19 +765,22 @@ fun NavGraphBuilder.settingsNav(
 			navController = navController,
 			title = stringResource(id = R.string.preferences_notifications)
 		) { viewModel ->
-			SwitchPreference(
-				title = { Text(stringResource(R.string.preference_notifications_enable)) },
-				summary = { Text(stringResource(R.string.preference_notifications_enable_desc)) },
-				/*leadingContent = {
+			PreferenceGroup(
+				title = stringResource(R.string.preference_category_notifications_break)
+			) {
+				SwitchPreference(
+					title = { Text(stringResource(R.string.preference_notifications_enable)) },
+					summary = { Text(stringResource(R.string.preference_notifications_enable_desc)) },
+					/*leadingContent = {
 					Icon(
 						painter = painterResource(R.drawable.settings_notifications_active),
 						contentDescription = null
 					)
 				},*/
-				settingsRepository = viewModel.repository,
-				value = { it.notificationsEnable },
-				onValueChange = {
-					/*TODO if (it) {
+					settingsRepository = viewModel.repository,
+					value = { it.notificationsEnable },
+					onValueChange = {
+						/*TODO if (it) {
 						if (!canScheduleExactAlarms()) {
 							dialogScheduleExactAlarms = true
 							false
@@ -795,58 +798,46 @@ fun NavGraphBuilder.settingsNav(
 						clearNotifications()
 						false
 					}*/
-					notificationsEnable = it
-				}
-			)
+						notificationsEnable = it
+					}
+				)
 
-			SwitchPreference(
-				title = { Text(stringResource(R.string.preference_notifications_multiple)) },
-				summary = { Text(stringResource(R.string.preference_notifications_multiple_desc)) },
-				enabledCondition = { it.notificationsEnable },
-				settingsRepository = viewModel.repository,
-				value = { it.notificationsInMultiple },
-				onValueChange = {
-					//enqueueNotificationSetup(user)
-					notificationsInMultiple = it
-				}
-			)
+				SwitchPreference(
+					title = { Text(stringResource(R.string.preference_notifications_multiple)) },
+					summary = { Text(stringResource(R.string.preference_notifications_multiple_desc)) },
+					enabledCondition = { it.notificationsEnable },
+					settingsRepository = viewModel.repository,
+					value = { it.notificationsInMultiple },
+					onValueChange = {
+						//enqueueNotificationSetup(user)
+						notificationsInMultiple = it
+					}
+				)
 
-			SwitchPreference(
-				title = { Text(stringResource(R.string.preference_notifications_first_lesson)) },
-				summary = { Text(stringResource(R.string.preference_notifications_first_lesson_desc)) },
-				enabledCondition = { it.notificationsEnable },
-				settingsRepository = viewModel.repository,
-				value = { it.notificationsBeforeFirst },
-				onValueChange = {
-					//enqueueNotificationSetup(user)
-					notificationsBeforeFirst = it
-				}
-			)
+				SwitchPreference(
+					title = { Text(stringResource(R.string.preference_notifications_first_lesson)) },
+					summary = { Text(stringResource(R.string.preference_notifications_first_lesson_desc)) },
+					enabledCondition = { it.notificationsEnable },
+					settingsRepository = viewModel.repository,
+					value = { it.notificationsBeforeFirst },
+					onValueChange = {
+						//enqueueNotificationSetup(user)
+						notificationsBeforeFirst = it
+					}
+				)
 
-			NumericInputPreference(
-				title = { Text(stringResource(R.string.preference_notifications_first_lesson_time)) },
-				unit = stringResource(R.string.preference_notifications_first_lesson_time_unit),
-				enabledCondition = { it.notificationsBeforeFirst },
-				settingsRepository = viewModel.repository,
-				value = { it.notificationsBeforeFirstTime },
-				onValueChange = {
-					//enqueueNotificationSetup(user)
-					notificationsBeforeFirstTime = it
-				}
-			)
-
-			Preference(
-				title = { Text(stringResource(R.string.preference_notifications_clear)) },
-				onClick = {
-					//clearNotifications()
-				},
-				leadingContent = {
-					Icon(
-						painter = painterResource(R.drawable.settings_notifications_clear_all),
-						contentDescription = null
-					)
-				}
-			)
+				NumericInputPreference(
+					title = { Text(stringResource(R.string.preference_notifications_first_lesson_time)) },
+					unit = stringResource(R.string.preference_notifications_first_lesson_time_unit),
+					enabledCondition = { it.notificationsBeforeFirst },
+					settingsRepository = viewModel.repository,
+					value = { it.notificationsBeforeFirstTime },
+					onValueChange = {
+						//enqueueNotificationSetup(user)
+						notificationsBeforeFirstTime = it
+					}
+				)
+			}
 
 			PreferenceGroup(stringResource(id = R.string.preference_category_notifications_visible_fields)) {
 				ListPreference(
@@ -937,6 +928,18 @@ fun NavGraphBuilder.settingsNav(
 					onValueChange = { notificationsVisibilityClasses = it }
 				)
 			}
+			Preference(
+				title = { Text(stringResource(R.string.preference_notifications_clear)) },
+				onClick = {
+					//clearNotifications()
+				},
+				leadingContent = {
+					Icon(
+						painter = painterResource(R.drawable.settings_notifications_clear_all),
+						contentDescription = null
+					)
+				}
+			)
 		}
 	}
 
