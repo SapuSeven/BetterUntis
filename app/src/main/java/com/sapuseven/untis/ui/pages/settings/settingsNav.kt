@@ -1,9 +1,15 @@
 package com.sapuseven.untis.ui.pages.settings
 
+import android.app.AlarmManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -11,6 +17,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -30,11 +37,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -75,6 +86,7 @@ import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.navigation.AppRoutes
 import com.sapuseven.untis.ui.preferences.ElementPickerPreference
 import io.sentry.Sentry
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import soup.compose.material.motion.animation.materialSharedAxisXIn
 import soup.compose.material.motion.animation.materialSharedAxisXOut
@@ -770,6 +782,11 @@ fun NavGraphBuilder.settingsNav(
 			navController = navController,
 			title = stringResource(id = R.string.preferences_notifications)
 		) { viewModel ->
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+				val visible by viewModel.repository.getSettings().map { it.notificationsEnable }.collectAsState(initial = false)
+				ScheduleExactAlarmInfoMessage(visible = visible)
+			}
+
 			PreferenceGroup(
 				title = stringResource(R.string.preference_category_notifications_break)
 			) {
@@ -1213,5 +1230,42 @@ fun NavGraphBuilder.settingsNav(
 				contentPadding = insetsPaddingValues(),
 			)
 		}
+	}
+}
+
+@RequiresApi(Build.VERSION_CODES.S)
+@Composable
+fun ScheduleExactAlarmInfoMessage(
+	context: Context = LocalContext.current,
+	alarmManager: AlarmManager? = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager,
+	visible: Boolean = true
+) {
+	var canScheduleExactAlarms by rememberSaveable { mutableStateOf(alarmManager?.canScheduleExactAlarms() == true) }
+
+	val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+		canScheduleExactAlarms = alarmManager?.canScheduleExactAlarms() == true
+	}
+
+	AnimatedVisibility(
+		visible = visible && !canScheduleExactAlarms,
+		enter = fadeIn() + expandVertically(),
+		exit = shrinkVertically() + fadeOut()
+	) {
+		MessageBubble(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(horizontal = 16.dp, vertical = 8.dp)
+				.clickable {
+					launcher.launch(Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM))
+				},
+			icon = {
+				Icon(
+					painter = painterResource(id = R.drawable.all_warning),
+					contentDescription = stringResource(id = R.string.all_warning)
+				)
+			},
+			messageText = R.string.preference_notifications_exact_alarms_unavailable,
+			messageTextRaw = stringResource(R.string.preference_notifications_exact_alarms_unavailable_desc, stringResource(R.string.app_name))
+		)
 	}
 }
