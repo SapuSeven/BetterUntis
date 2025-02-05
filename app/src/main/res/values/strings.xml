@@ -409,4 +409,6 @@
 	<string name="all_warning">Warning</string>
 	<string name="preference_notifications_exact_alarms_unavailable">Exact notifications are unavailable</string>
 	<string name="preference_notifications_exact_alarms_unavailable_desc">To ensure all notifications are delivered at the correct time, please grant %1$s permission to schedule exact alarms.\nTap to go to settings.</string>
+	<string name="preference_notifications_unavailable">Notifications are unavailable</string>
+	<string name="preference_notifications_unavailable_desc">To enable notifications, please grant %1$s permission to send notifications.\nTap to go to settings.</string>
 </resources>

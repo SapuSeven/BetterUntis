@@ -1,5 +1,7 @@
 package com.sapuseven.untis.ui.pages.settings.fragments
 
+import android.app.NotificationManager
+import android.content.Context
 import android.os.Build
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -7,8 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
@@ -22,7 +28,6 @@ import com.sapuseven.compose.protostore.ui.preferences.PreferenceGroup
 import com.sapuseven.compose.protostore.ui.preferences.SwitchPreference
 import com.sapuseven.untis.R
 import com.sapuseven.untis.ui.common.disabled
-import com.sapuseven.untis.ui.pages.settings.ScheduleExactAlarmInfoMessage
 import com.sapuseven.untis.ui.pages.settings.SettingsScreenViewModel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -30,26 +35,36 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
+	val scope = rememberCoroutineScope()
+	val context = LocalContext.current
+
+	var notificationsMessageVisible by rememberSaveable { mutableStateOf(false) }
+
+	val notificationPermissionsState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+		rememberPermissionState(android.Manifest.permission.POST_NOTIFICATIONS) {
+			notificationsMessageVisible = !it
+
+			scope.launch {
+				viewModel.repository.updateSettings {
+					notificationsEnable = it
+				}
+			}
+		}
+	else null
+
 	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
 		val visible by viewModel.repository.getSettings().map { it.notificationsEnable }.collectAsState(initial = false)
 		ScheduleExactAlarmInfoMessage(visible = visible)
 	}
 
+	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+		val notificationsEnabled by viewModel.repository.getSettings().map { it.notificationsEnable }.collectAsState(initial = false)
+		NotificationsInfoMessage(visible = !notificationsEnabled && notificationsMessageVisible)
+	}
+
 	PreferenceGroup(
 		title = stringResource(R.string.preference_category_notifications_break)
 	) {
-		val scope = rememberCoroutineScope()
-
-		val notificationPermissionsState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-			rememberPermissionState(android.Manifest.permission.POST_NOTIFICATIONS) {
-				scope.launch {
-					viewModel.repository.updateSettings {
-						notificationsEnable = true
-					}
-				}
-			}
-		else null
-
 		// TODO: This is used to make sure that the setting will match the permission status. Not sure if there is a better way to do this.
 		LaunchedEffect(Unit) {
 			notificationPermissionsState?.let {
@@ -61,16 +76,6 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 			}
 		}
 
-		//val alarmManager = LocalContext.current.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
-		/*listOfNotNull(
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && alarmManager?.canScheduleExactAlarms() != true)
-				android.Manifest.permission.SCHEDULE_EXACT_ALARM
-			else null,
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-
-			else null
-		)*/
-
 		SwitchPreference(
 			title = { Text(stringResource(R.string.preference_notifications_enable)) },
 			summary = { Text(stringResource(R.string.preference_notifications_enable_desc)) },
@@ -80,6 +85,7 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 				notificationsEnable = if (it) {
 					if (notificationPermissionsState?.status?.isGranted != false) {
 						//enqueueNotificationSetup()
+						notificationsMessageVisible = false
 						true
 					} else {
 						notificationPermissionsState.launchPermissionRequest()
@@ -221,7 +227,7 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 	Preference(
 		title = { Text(stringResource(R.string.preference_notifications_clear)) },
 		onClick = {
-			//clearNotifications()
+			(context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager)?.cancelAll()
 		},
 		leadingContent = {
 			Icon(
