@@ -34,6 +34,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -48,6 +49,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.sapuseven.compose.protostore.ui.preferences.ColorPreference
 import com.sapuseven.compose.protostore.ui.preferences.ConfirmDialogPreference
@@ -71,11 +75,12 @@ import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.navigation.AppRoutes
 import com.sapuseven.untis.ui.preferences.ElementPickerPreference
 import io.sentry.Sentry
+import kotlinx.coroutines.launch
 import soup.compose.material.motion.animation.materialSharedAxisXIn
 import soup.compose.material.motion.animation.materialSharedAxisXOut
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 fun NavGraphBuilder.settingsNav(
 	navController: NavHostController
 ) {
@@ -768,37 +773,57 @@ fun NavGraphBuilder.settingsNav(
 			PreferenceGroup(
 				title = stringResource(R.string.preference_category_notifications_break)
 			) {
+				val scope = rememberCoroutineScope()
+
+				val notificationPermissionsState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+					rememberPermissionState(android.Manifest.permission.POST_NOTIFICATIONS) {
+						scope.launch {
+							viewModel.repository.updateSettings {
+								notificationsEnable = true
+							}
+						}
+					}
+				else null
+
+				// TODO: This is used to make sure that the setting will match the permission status. Not sure if there is a better way to do this.
+				LaunchedEffect(Unit) {
+					notificationPermissionsState?.let {
+						if (!it.status.isGranted) {
+							viewModel.repository.updateSettings {
+								notificationsEnable = false
+							}
+						}
+					}
+				}
+
+				//val alarmManager = LocalContext.current.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
+				/*listOfNotNull(
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && alarmManager?.canScheduleExactAlarms() != true)
+						android.Manifest.permission.SCHEDULE_EXACT_ALARM
+					else null,
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+
+					else null
+				)*/
+
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_notifications_enable)) },
 					summary = { Text(stringResource(R.string.preference_notifications_enable_desc)) },
-					/*leadingContent = {
-					Icon(
-						painter = painterResource(R.drawable.settings_notifications_active),
-						contentDescription = null
-					)
-				},*/
 					settingsRepository = viewModel.repository,
 					value = { it.notificationsEnable },
 					onValueChange = {
-						/*TODO if (it) {
-						if (!canScheduleExactAlarms()) {
-							dialogScheduleExactAlarms = true
-							false
-						} else if (!canPostNotifications()) {
-							// TODO: This may not be backwards compatible
-							requestNotificationPermissionLauncher.launch(
-								Manifest.permission.POST_NOTIFICATIONS
-							)
-							false
+						notificationsEnable = if (it) {
+							if (notificationPermissionsState?.status?.isGranted != false) {
+								//enqueueNotificationSetup()
+								true
+							} else {
+								notificationPermissionsState.launchPermissionRequest()
+								false
+							}
 						} else {
-							enqueueNotificationSetup(user)
-							true
+							//clearNotifications()
+							false
 						}
-					} else {
-						clearNotifications()
-						false
-					}*/
-						notificationsEnable = it
 					}
 				)
 
@@ -809,7 +834,7 @@ fun NavGraphBuilder.settingsNav(
 					settingsRepository = viewModel.repository,
 					value = { it.notificationsInMultiple },
 					onValueChange = {
-						//enqueueNotificationSetup(user)
+						//enqueueNotificationSetup()
 						notificationsInMultiple = it
 					}
 				)
@@ -821,7 +846,7 @@ fun NavGraphBuilder.settingsNav(
 					settingsRepository = viewModel.repository,
 					value = { it.notificationsBeforeFirst },
 					onValueChange = {
-						//enqueueNotificationSetup(user)
+						//enqueueNotificationSetup()
 						notificationsBeforeFirst = it
 					}
 				)
@@ -829,11 +854,11 @@ fun NavGraphBuilder.settingsNav(
 				NumericInputPreference(
 					title = { Text(stringResource(R.string.preference_notifications_first_lesson_time)) },
 					unit = stringResource(R.string.preference_notifications_first_lesson_time_unit),
-					enabledCondition = { it.notificationsBeforeFirst },
+					enabledCondition = { it.notificationsEnable && it.notificationsBeforeFirst },
 					settingsRepository = viewModel.repository,
 					value = { it.notificationsBeforeFirstTime },
 					onValueChange = {
-						//enqueueNotificationSetup(user)
+						//enqueueNotificationSetup()
 						notificationsBeforeFirstTime = it
 					}
 				)
@@ -1088,7 +1113,10 @@ fun NavGraphBuilder.settingsNav(
 	composable<AppRoutes.Settings.About.Contributors> {
 		val uriHandler = LocalUriHandler.current
 		val colorScheme = MaterialTheme.colorScheme
-		val viewModel = hiltViewModel<SettingsScreenViewModel, SettingsScreenViewModel.Factory>(creationCallback = { factory -> factory.create(colorScheme) }     )
+		val viewModel =
+			hiltViewModel<SettingsScreenViewModel, SettingsScreenViewModel.Factory>(creationCallback = { factory ->
+				factory.create(colorScheme)
+			})
 
 		val contributors by viewModel.contributors.collectAsStateWithLifecycle()
 		val contributorsError by viewModel.contributorsError.collectAsStateWithLifecycle()
@@ -1127,7 +1155,7 @@ fun NavGraphBuilder.settingsNav(
 							val user = contributors.getOrNull(it)
 							Contributor(
 								githubUser = user,
-								onClick = user?.htmlUrl?.let {{ uriHandler.openUri(it) }}
+								onClick = user?.htmlUrl?.let { { uriHandler.openUri(it) } }
 							)
 						}
 					}
