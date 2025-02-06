@@ -12,7 +12,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.sapuseven.untis.R
-import com.sapuseven.untis.preferences.PreferenceScreen
 import com.sapuseven.untis.ui.navigation.AppRoutes
 import com.sapuseven.untis.ui.pages.settings.fragments.SettingsCategoryAbout
 import com.sapuseven.untis.ui.pages.settings.fragments.SettingsCategoryAboutContributors

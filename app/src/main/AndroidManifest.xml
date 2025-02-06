@@ -36,6 +36,19 @@
 		<meta-data android:name="com.google.mlkit.vision.DEPENDENCIES" android:value="barcode_ui"/>
 
 		<activity
+			android:name=".activities.MainActivity"
+			android:windowSoftInputMode="adjustResize"
+			android:launchMode="singleTop"
+			android:exported="true">
+
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+
+		<activity
 			android:name=".activities.ShortcutConfigureActivity"
 			android:icon="@mipmap/ic_shortcut"
 			android:label="@string/widget_timetable_link"
@@ -58,19 +71,6 @@
 		</activity>
 
 		<activity
-			android:name=".activities.MainActivity"
-			android:windowSoftInputMode="adjustResize"
-			android:launchMode="singleTop"
-			android:exported="true">
-
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-		</activity>
-
-		<activity
 			android:name=".activities.AutoMuteConfigurationActivity"
 			android:exported="true">
 			<intent-filter>
@@ -79,9 +79,7 @@
 			</intent-filter>
 		</activity>
 
-		<activity
-			android:name="com.journeyapps.barcodescanner.CaptureActivity"
-			tools:replace="screenOrientation" />
+		<activity android:name="com.journeyapps.barcodescanner.CaptureActivity" />
 
 		<receiver android:name=".receivers.NotificationReceiver" />
 

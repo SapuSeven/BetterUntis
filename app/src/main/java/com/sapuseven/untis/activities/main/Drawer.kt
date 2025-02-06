@@ -1,7 +1,6 @@
 package com.sapuseven.untis.activities.main
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -22,7 +21,6 @@ import com.sapuseven.untis.ui.models.NavItemTimetable
 import com.sapuseven.untis.ui.navigation.AppRoutes
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DrawerItems(
 	isMessengerAvailable: Boolean = false,
@@ -61,7 +59,7 @@ fun DrawerItems(
 		)
 	}
 
-	var navItemsNavigation = listOf(
+	val navItemsNavigation = listOf(
 		NavItemNavigation(
 			icon = painterResource(id = R.drawable.all_infocenter),
 			label = stringResource(id = R.string.activity_title_info_center),

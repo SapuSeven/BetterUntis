@@ -1,20 +1,11 @@
 package com.sapuseven.untis.receivers
 
-import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.MainActivity
-import com.sapuseven.untis.helpers.config.booleanDataStore
-import com.sapuseven.untis.helpers.config.stringDataStore
-import com.sapuseven.untis.workers.NotificationSetupWorker.Companion.CHANNEL_ID_BREAKINFO
 import kotlinx.coroutines.runBlocking
-import org.joda.time.LocalDateTime
 
 class NotificationReceiver : BroadcastReceiver() {
 	companion object {
@@ -40,8 +31,10 @@ class NotificationReceiver : BroadcastReceiver() {
 
 	override fun onReceive(context: Context, intent: Intent) = runBlocking {
 		Log.d(LOG_TAG, "NotificationReceiver received")
+		return@runBlocking
 
-		if (intent.getBooleanExtra(EXTRA_BOOLEAN_CLEAR, false)) {
+		// TODO
+		/*if (intent.getBooleanExtra(EXTRA_BOOLEAN_CLEAR, false)) {
 			Log.d(
 				LOG_TAG,
 				"Attempting to cancel notification #${intent.getIntExtra(EXTRA_INT_ID, -1)}"
@@ -128,7 +121,7 @@ class NotificationReceiver : BroadcastReceiver() {
 				notify(intent.getIntExtra(EXTRA_INT_ID, -1), builder.build())
 			}
 			Log.d(LOG_TAG, "Notification delivered: $title")
-		}
+		}*/
 	}
 
 	private fun buildMessage(

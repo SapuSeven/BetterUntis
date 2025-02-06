@@ -11,7 +11,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.SAVED_STATE_INTENT_DATA
 import com.sapuseven.untis.api.client.SchoolSearchApi
 import com.sapuseven.untis.api.client.UserDataApi
 import com.sapuseven.untis.api.exception.UntisApiException
@@ -133,7 +132,7 @@ class LoginDataInputViewModel @Inject constructor(
 		}
 
 		try {
-			loadFromAppLinkData(savedStateHandle.get<String>(SAVED_STATE_INTENT_DATA))
+			// TODO loadFromAppLinkData(savedStateHandle.get<String>(SAVED_STATE_INTENT_DATA))
 		} catch (e: Exception) {
 			// TODO handle correctly
 			showQrCodeErrorDialog = true

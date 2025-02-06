@@ -1,23 +1,16 @@
 package com.sapuseven.untis.widgets
 
 import android.content.Context
-import android.os.Build
 import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.glance.GlanceId
 import androidx.glance.LocalContext
 import androidx.glance.appwidget.GlanceAppWidget
-import com.sapuseven.compose.protostore.ui.preferences.materialColors
-import com.sapuseven.untis.helpers.config.intDataStore
-import com.sapuseven.untis.ui.theme.generateColorScheme
 import com.sapuseven.untis.ui.widgets.WidgetListItemModel
-import kotlinx.coroutines.runBlocking
 
 open class BaseComposeWidget : GlanceAppWidget() {
 	companion object {
@@ -37,7 +30,8 @@ open class BaseComposeWidget : GlanceAppWidget() {
 	) {
 		val context = LocalContext.current
 
-		val themeColorPref = context.intDataStore(
+		// TODO
+		/*val themeColorPref = context.intDataStore(
 			userId,
 			"preference_theme_color",
 			defaultValue = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
@@ -65,7 +59,7 @@ open class BaseComposeWidget : GlanceAppWidget() {
 				darkTheme = false,
 				false // Ignore for now
 			)
-		)
+		)*/
 	}
 
 	@Composable

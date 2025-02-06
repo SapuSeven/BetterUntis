@@ -16,31 +16,9 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
-import com.sapuseven.untis.api.model.untis.enumeration.ElementType
-import com.sapuseven.untis.data.database.UserDatabase
 import com.sapuseven.untis.data.database.entities.User
-import com.sapuseven.untis.helpers.DateTimeUtils
-import com.sapuseven.untis.helpers.config.booleanDataStore
-import com.sapuseven.untis.helpers.config.intDataStore
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.receivers.NotificationReceiver
-import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_BOOLEAN_CLEAR
-import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_BOOLEAN_FIRST
-import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_INT_BREAK_END_TIME
-import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_INT_ID
-import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_LONG_USER_ID
-import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_BREAK_END_TIME
-import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_NEXT_CLASS
-import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_NEXT_CLASS_LONG
-import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_NEXT_ROOM
-import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_NEXT_ROOM_LONG
-import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_NEXT_SUBJECT
-import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_NEXT_SUBJECT_LONG
-import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_NEXT_TEACHER
-import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_NEXT_TEACHER_LONG
-import com.sapuseven.untis.workers.DailyWorker.Companion.WORKER_DATA_USER_ID
 import org.joda.time.DateTime
-import org.joda.time.LocalDateTime
 
 /**
  * This worker schedules all break info notifications for the day.

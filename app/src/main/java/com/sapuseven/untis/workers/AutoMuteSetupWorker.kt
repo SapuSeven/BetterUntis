@@ -1,28 +1,13 @@
 package com.sapuseven.untis.workers
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
-import android.content.Context.ALARM_SERVICE
-import android.content.Intent
 import android.util.Log
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.sapuseven.untis.api.model.untis.enumeration.ElementType
-import com.sapuseven.untis.data.database.UserDatabase
 import com.sapuseven.untis.data.database.entities.User
-import com.sapuseven.untis.helpers.config.booleanDataStore
-import com.sapuseven.untis.helpers.config.intDataStore
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.receivers.AutoMuteReceiver
-import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_BOOLEAN_MUTE
-import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_INT_ID
-import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_LONG_USER_ID
-import com.sapuseven.untis.workers.DailyWorker.Companion.WORKER_DATA_USER_ID
-import org.joda.time.LocalDateTime
+
 
 class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 	TimetableDependantWorker(context, params) {

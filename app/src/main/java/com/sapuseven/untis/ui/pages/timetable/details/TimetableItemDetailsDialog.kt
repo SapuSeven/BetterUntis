@@ -59,7 +59,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.BaseComposeActivity
 import com.sapuseven.untis.api.model.untis.Attachment
 import com.sapuseven.untis.api.model.untis.Person
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
@@ -413,7 +412,7 @@ private fun TimetableItemDetailsDialogPage(
 				ListItem(
 					headlineContent = {
 						ClickableUrlText(homeWork.text) {
-							BaseComposeActivity.openUrl(context, it)
+							uriHandler.openUri(it)
 						}
 					},
 					supportingContent = {

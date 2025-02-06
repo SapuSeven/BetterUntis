@@ -1,13 +1,9 @@
 package com.sapuseven.untis.receivers
 
-import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.media.AudioManager
-import android.os.Build
 import android.util.Log
-import com.sapuseven.untis.helpers.config.booleanDataStore
 import kotlinx.coroutines.runBlocking
 
 class AutoMuteReceiver : BroadcastReceiver() {
@@ -25,8 +21,10 @@ class AutoMuteReceiver : BroadcastReceiver() {
 			"AutoMuteReceiver",
 			"AutoMuteReceiver received, mute = ${intent.getBooleanExtra(EXTRA_BOOLEAN_MUTE, false)}"
 		)
+		return@runBlocking
 
-		val automuteEnable = context.booleanDataStore(
+		// TODO
+		/*val automuteEnable = context.booleanDataStore(
 			intent.getLongExtra(EXTRA_LONG_USER_ID, -1),
 			"preference_automute_enable"
 		).getValue()
@@ -91,6 +89,6 @@ class AutoMuteReceiver : BroadcastReceiver() {
 			}
 
 			editor.apply()
-		}
+		}*/
 	}
 }

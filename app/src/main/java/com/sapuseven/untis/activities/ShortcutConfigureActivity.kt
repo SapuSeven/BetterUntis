@@ -2,32 +2,21 @@ package com.sapuseven.untis.activities
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.core.content.pm.ShortcutInfoCompat
-import androidx.core.content.pm.ShortcutManagerCompat.createShortcutResultIntent
-import androidx.core.graphics.drawable.IconCompat
-import com.sapuseven.untis.R
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.ui.common.ProfileSelectorAction
-import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 
-class ShortcutConfigureActivity : BaseComposeActivity() {
+// TODO
+class ShortcutConfigureActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setResult(RESULT_CANCELED)
 
-		val users = userDatabase.userDao().getAll()
+		//val users = userDatabase.userDao().getAll()
 
 		setContent {
-			AppTheme {
+			/*AppTheme {
 				var selectedUserId by rememberSaveable {
 					mutableStateOf(users.firstOrNull()?.id ?: -1)
 				}
@@ -64,7 +53,7 @@ class ShortcutConfigureActivity : BaseComposeActivity() {
 						}
 					)
 				}
-			}
+			}*/
 		}
 	}
 

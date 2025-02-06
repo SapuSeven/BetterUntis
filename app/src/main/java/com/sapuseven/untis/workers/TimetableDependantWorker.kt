@@ -1,25 +1,11 @@
 package com.sapuseven.untis.workers
 
-import android.app.AlarmManager
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
-import androidx.activity.ComponentActivity
-import androidx.room.Room
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.sapuseven.untis.api.model.untis.enumeration.ElementType
-import com.sapuseven.untis.data.database.UserDatabase
 import com.sapuseven.untis.data.database.entities.User
-import com.sapuseven.untis.helpers.config.booleanDataStore
-import com.sapuseven.untis.helpers.config.stringDataStore
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.helpers.timetable.TimetableLoader
-import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.completeWith
-import org.joda.time.LocalDate
-import java.lang.ref.WeakReference
 
 /*
  * This class provides base functions to load timetables for the current day.
@@ -33,7 +19,8 @@ abstract class TimetableDependantWorker(
 			user: User,
 			context: Context
 		): Pair<Int, String>? {
-			val customPersonalTimetable = decodeStoredTimetableValue(
+			return null;// TODO
+			/*val customPersonalTimetable = decodeStoredTimetableValue(
 				context.stringDataStore(
 					user.id,
 					"preference_timetable_personal_timetable",
@@ -41,8 +28,7 @@ abstract class TimetableDependantWorker(
 				).getValue()
 			)
 
-			return null;// TODO
-			/*val elemId = customPersonalTimetable?.id ?: user.userData.elemId
+			val elemId = customPersonalTimetable?.id ?: user.userData.elemId
 			val elemType = customPersonalTimetable?.type ?: user.userData.elemType ?: ElementType.SUBJECT
 
 			return if (ElementType.values()
@@ -107,13 +93,13 @@ abstract class TimetableDependantWorker(
 	}
 
 	internal suspend fun disablePreference(key: String) {
-		Room.databaseBuilder(
+		/*Room.databaseBuilder(
 			applicationContext,
 			UserDatabase::class.java, "users"
 		).build().userDao().getAll().map { it.id }.forEach { userId ->
 			val pref = applicationContext.booleanDataStore(userId, key)
 			pref.saveValue(false)
-		}
+		}*/
 	}
 }
 
@@ -122,7 +108,7 @@ abstract class TimetableDependantWorker(
  * After this operation, every time period only has a single lesson containing all subjects, teachers, rooms and classes.
  */
 //internal fun List<TimegridItem>.merged(): List<TimegridItem> = this.groupBy { it.startDateTime }
-	//.map { it.value.reduce { item1, item2 -> item1.mergeValuesWith(item2); item1 } }
+//.map { it.value.reduce { item1, item2 -> item1.mergeValuesWith(item2); item1 } }
 
 /**
  * Creates a copy of a zipped list with the very last element duplicated into a new Pair whose second element is null.
