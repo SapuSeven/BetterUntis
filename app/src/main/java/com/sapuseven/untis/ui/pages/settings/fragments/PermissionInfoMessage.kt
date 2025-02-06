@@ -75,14 +75,16 @@ private fun PermissionInfoMessage(
 @Composable
 fun ScheduleExactAlarmInfoMessage(
 	alarmManager: AlarmManager? = LocalContext.current.getSystemService(Context.ALARM_SERVICE) as? AlarmManager,
-	visible: Boolean = true
+	visible: Boolean = true,
+	@StringRes primaryText: Int?,
+	secondaryText: String
 ) {
 	PermissionInfoMessage(
 		currentPermissionState = { alarmManager?.canScheduleExactAlarms() == true },
 		requestPermissionIntent = Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM),
 		visible = visible,
-		primaryText = R.string.preference_notifications_exact_alarms_unavailable,
-		secondaryText = stringResource(R.string.preference_notifications_exact_alarms_unavailable_desc, stringResource(R.string.app_name))
+		primaryText = primaryText,
+		secondaryText = secondaryText
 	)
 }
 

@@ -9,6 +9,7 @@ import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.data.model.github.GitHubApi.URL_GITHUB_REPOSITORY_API
 import com.sapuseven.untis.data.model.github.GitHubUser
 import com.sapuseven.untis.scope.UserScopeManager
+import com.sapuseven.untis.services.AutoMuteService
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -27,6 +28,7 @@ class SettingsScreenViewModel @AssistedInject constructor(
 	globalSettingsRepository: GlobalSettingsRepository,
 	private val userScopeManager: UserScopeManager,
 	private val userDao: UserDao,
+	val autoMuteService: AutoMuteService,
 	@Named("json") private val httpClient: HttpClient,
 	val savedStateHandle: SavedStateHandle,
 	@Assisted val colorScheme: ColorScheme,

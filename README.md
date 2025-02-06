@@ -74,7 +74,7 @@ Package structure overview:
 - `preferences`: _To be removed_
 - `receivers`: Broadcast receivers
 - `scope`: Custom DI scopes - _needs evaluation_
-- `services`: _To be removed_
+- `services`: Generic app services
 - `ui`: UI layer
   - `activities`: Contains every main page in a sub-package. _to be renamed ("pages"?)_
   - `animations`: Custom animation implementations

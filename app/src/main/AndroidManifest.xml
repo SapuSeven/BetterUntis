@@ -70,6 +70,15 @@
 		</activity>
 
 		<activity
+			android:name=".activities.ZenRuleConfigurationActivity"
+			android:exported="true">
+			<intent-filter>
+				<action android:name="android.app.action.AUTOMATIC_ZEN_RULE" />
+				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+		</activity>
+
+		<activity
 			android:name=".activities.LoginActivity"
 			android:windowSoftInputMode="adjustResize"
 			android:launchMode="singleTop" />

@@ -54,7 +54,11 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 
 	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
 		val visible by viewModel.repository.getSettings().map { it.notificationsEnable }.collectAsState(initial = false)
-		ScheduleExactAlarmInfoMessage(visible = visible)
+		ScheduleExactAlarmInfoMessage(
+			visible = visible,
+			primaryText = R.string.preference_notifications_exact_alarms_unavailable,
+			secondaryText = stringResource(R.string.preference_notifications_exact_alarms_unavailable_desc, stringResource(R.string.app_name))
+		)
 	}
 
 	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

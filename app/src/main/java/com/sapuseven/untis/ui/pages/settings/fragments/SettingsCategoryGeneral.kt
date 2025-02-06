@@ -3,10 +3,17 @@ package com.sapuseven.untis.ui.pages.settings.fragments
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -18,6 +25,8 @@ import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.ui.pages.settings.SettingsScreenViewModel
 import io.sentry.Sentry
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsCategoryGeneral(viewModel: SettingsScreenViewModel) {
@@ -37,8 +46,7 @@ fun SettingsCategoryGeneral(viewModel: SettingsScreenViewModel) {
 		settingsRepository = viewModel.repository,
 		value = { it.flingEnable },
 		onValueChange = { flingEnable = it }
-	)
-}*/
+	)*/
 
 	/* Not supported yet
 	PreferenceGroup(stringResource(R.string.preference_category_general_week_display)) {
@@ -73,57 +81,88 @@ fun SettingsCategoryGeneral(viewModel: SettingsScreenViewModel) {
 		)
 	}*/
 
-	PreferenceGroup(stringResource(id = R.string.preference_category_general_automute)) {
-		SwitchPreference(
-			title = { Text(stringResource(R.string.preference_automute_enable)) },
-			summary = { Text(stringResource(R.string.preference_automute_enable_summary)) },
-			settingsRepository = viewModel.repository,
-			value = { it.automuteEnable },
-			onValueChange = {
-				automuteEnable = it
-				/*TODO if (it) {
-					if (requestAutoMutePermission(
-							autoMuteSettingsLauncher
-						)
-					) {
-						AutoMuteSetupWorker.enqueue(
-							WorkManager.getInstance(this@SettingsActivity),
-							user
-						)
-						true
-					} else false
-				} else {
-					disableAutoMute()
-					false
-				}*/
-			}
+	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+		val visible by viewModel.repository.getSettings().map { it.automuteEnable }.collectAsState(initial = false)
+		ScheduleExactAlarmInfoMessage(
+			visible = visible,
+			primaryText = R.string.preference_automute_exact_alarms_unavailable,
+			secondaryText = stringResource(
+				R.string.preference_automute_exact_alarms_unavailable_desc,
+				stringResource(R.string.app_name)
+			)
 		)
-		SwitchPreference(
-			title = { Text(stringResource(R.string.preference_automute_cancelled_lessons)) },
-			enabledCondition = { it.automuteEnable },
-			settingsRepository = viewModel.repository,
-			value = { it.automuteCancelledLessons },
-			onValueChange = { automuteCancelledLessons = it }
-		)
-		SwitchPreference(
-			title = { Text(stringResource(R.string.preference_automute_mute_priority)) },
-			enabledCondition = { it.automuteEnable },
-			settingsRepository = viewModel.repository,
-			value = { it.automuteMutePriority },
-			onValueChange = { automuteMutePriority = it }
-		)
+	}
 
-		SliderPreference(
-			valueRange = 0f..20f,
-			steps = 19,
-			title = { Text(stringResource(R.string.preference_automute_minimum_break_length)) },
-			summary = { Text(stringResource(R.string.preference_automute_minimum_break_length_summary)) },
-			showSeekBarValue = true,
-			enabledCondition = { it.automuteEnable },
-			settingsRepository = viewModel.repository,
-			value = { it.automuteMinimumBreakLength },
-			onValueChange = { automuteMinimumBreakLength = it }
-		)
+	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+		PreferenceGroup(stringResource(id = R.string.preference_category_general_automute)) {
+			val scope = rememberCoroutineScope()
+
+			val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+				if (viewModel.autoMuteService.isPermissionGranted()) {
+					scope.launch {
+						viewModel.repository.updateSettings {
+							automuteEnable = true
+						}
+						viewModel.autoMuteService.autoMuteEnable()
+					}
+				}
+			}
+
+			LaunchedEffect(Unit) {
+				viewModel.repository.updateSettings {
+					automuteEnable = viewModel.autoMuteService.isAutoMuteEnabled()
+				}
+			}
+
+			SwitchPreference(
+				title = { Text(stringResource(R.string.preference_automute_enable)) },
+				summary = { Text(stringResource(R.string.preference_automute_enable_summary)) },
+				settingsRepository = viewModel.repository,
+				value = { it.automuteEnable },
+				onValueChange = {
+					if (it) {
+						if (viewModel.autoMuteService.isPermissionGranted()) {
+							viewModel.autoMuteService.autoMuteEnable()
+							viewModel.autoMuteService.autoMuteStateOn()
+							automuteEnable = true
+						} else {
+							launcher.launch(Intent(ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
+							automuteEnable = false
+						}
+					} else {
+						viewModel.autoMuteService.autoMuteStateOff()
+						viewModel.autoMuteService.autoMuteDisable()
+						automuteEnable = false
+					}
+				}
+			)
+			SwitchPreference(
+				title = { Text(stringResource(R.string.preference_automute_cancelled_lessons)) },
+				enabledCondition = { it.automuteEnable },
+				settingsRepository = viewModel.repository,
+				value = { it.automuteCancelledLessons },
+				onValueChange = { automuteCancelledLessons = it }
+			)
+			SwitchPreference(
+				title = { Text(stringResource(R.string.preference_automute_mute_priority)) },
+				enabledCondition = { it.automuteEnable },
+				settingsRepository = viewModel.repository,
+				value = { it.automuteMutePriority },
+				onValueChange = { automuteMutePriority = it }
+			)
+
+			SliderPreference(
+				valueRange = 0f..20f,
+				steps = 19,
+				title = { Text(stringResource(R.string.preference_automute_minimum_break_length)) },
+				summary = { Text(stringResource(R.string.preference_automute_minimum_break_length_summary)) },
+				showSeekBarValue = true,
+				enabledCondition = { it.automuteEnable },
+				settingsRepository = viewModel.repository,
+				value = { it.automuteMinimumBreakLength },
+				onValueChange = { automuteMinimumBreakLength = it }
+			)
+		}
 	}
 
 	PreferenceGroup(stringResource(R.string.preference_category_reports)) {
