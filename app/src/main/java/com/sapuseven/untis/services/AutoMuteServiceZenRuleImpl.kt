@@ -9,8 +9,9 @@ import android.os.Build
 import android.service.notification.Condition
 import androidx.annotation.RequiresApi
 import com.sapuseven.untis.BuildConfig
-import com.sapuseven.untis.activities.ZenRuleConfigurationActivity
-import com.sapuseven.untis.scope.UserScopeManager
+import com.sapuseven.untis.activities.AutoMuteConfigurationActivity
+import com.sapuseven.untis.data.database.entities.User
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 /**
@@ -27,32 +28,41 @@ import javax.inject.Inject
 // TODO: Use string resources
 @RequiresApi(Build.VERSION_CODES.Q)
 class AutoMuteServiceZenRuleImpl @Inject constructor(
-	private val context: Context,
+	@ApplicationContext private val context: Context,
 	private val notificationManager: NotificationManager,
-	userScopeManager: UserScopeManager,
 ) : AutoMuteService {
-	private val user = userScopeManager.user
-
-	private val conditionUri = Uri.Builder()
-		.scheme(Condition.SCHEME)
-		.authority(BuildConfig.APPLICATION_ID)
-		.appendPath("automute")
-		.appendQueryParameter("userId", user.id.toString())
-		.build();
-
+	private lateinit var conditionUri: Uri
 	private lateinit var ruleId: String
+	private lateinit var user: User
 
-	init {
-		// Load existing rule, remove duplicates (if any)
-		notificationManager.automaticZenRules.filter {
-			it.value.conditionId == conditionUri
-		}.keys.forEachIndexed { index, key ->
-			if (index == 0) {
-				ruleId = key
-			} else {
-				notificationManager.removeAutomaticZenRule(key)
+	fun setUser(user: User) {
+		this.user = user
+
+		conditionUri = Uri.Builder()
+			.scheme(Condition.SCHEME)
+			.authority(BuildConfig.APPLICATION_ID)
+			.appendPath("automute")
+			.appendQueryParameter("userId", user.id.toString())
+			.build();
+
+		try {
+			// Load existing rule, remove duplicates (if any)
+			notificationManager.automaticZenRules.filter {
+				it.value.conditionId == conditionUri
+			}.keys.forEachIndexed { index, key ->
+				if (index == 0) {
+					ruleId = key
+				} else {
+					notificationManager.removeAutomaticZenRule(key)
+				}
 			}
+		} catch (e: SecurityException) {
+			// Permission was revoked
 		}
+	}
+
+	fun getRule(ruleId: String?): AutomaticZenRule? {
+		return ruleId?.let { notificationManager.getAutomaticZenRule(it) }
 	}
 
 	override fun isPermissionGranted(): Boolean =
@@ -65,7 +75,7 @@ class AutoMuteServiceZenRuleImpl @Inject constructor(
 		val rule = AutomaticZenRule(
 			"School - ${user.getDisplayedName(context)}",
 			null,
-			ComponentName(context, ZenRuleConfigurationActivity::class.java),
+			ComponentName(context, AutoMuteConfigurationActivity::class.java),
 			conditionUri,
 			null,
 			NotificationManager.INTERRUPTION_FILTER_PRIORITY,
@@ -81,12 +91,11 @@ class AutoMuteServiceZenRuleImpl @Inject constructor(
 
 	override fun autoMuteDisable() {
 		if (this::ruleId.isInitialized) {
-			notificationManager.updateAutomaticZenRule(
-				ruleId,
-				notificationManager.getAutomaticZenRule(ruleId).apply {
-					isEnabled = false
-				}
-			)
+			notificationManager.getAutomaticZenRule(ruleId)?.apply {
+				isEnabled = false
+			}?.let {
+				notificationManager.updateAutomaticZenRule(ruleId, it)
+			}
 		}
 	}
 

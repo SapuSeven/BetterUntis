@@ -1,7 +1,6 @@
 package com.sapuseven.untis.activities.main
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -15,7 +14,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.RoomFinderActivity
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.ui.models.NavItemNavigation

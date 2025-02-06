@@ -70,7 +70,7 @@
 		</activity>
 
 		<activity
-			android:name=".activities.ZenRuleConfigurationActivity"
+			android:name=".activities.AutoMuteConfigurationActivity"
 			android:exported="true">
 			<intent-filter>
 				<action android:name="android.app.action.AUTOMATIC_ZEN_RULE" />

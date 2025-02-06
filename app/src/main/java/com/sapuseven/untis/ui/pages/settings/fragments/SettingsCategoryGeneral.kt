@@ -1,5 +1,6 @@
 package com.sapuseven.untis.ui.pages.settings.fragments
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -19,15 +20,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.sapuseven.compose.protostore.ui.preferences.Preference
 import com.sapuseven.compose.protostore.ui.preferences.PreferenceGroup
-import com.sapuseven.compose.protostore.ui.preferences.SliderPreference
 import com.sapuseven.compose.protostore.ui.preferences.SwitchPreference
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
+import com.sapuseven.untis.activities.AutoMuteConfigurationActivity
+import com.sapuseven.untis.services.AutoMuteServiceZenRuleImpl
 import com.sapuseven.untis.ui.pages.settings.SettingsScreenViewModel
 import io.sentry.Sentry
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
+@SuppressLint("InlinedApi")
 @Composable
 fun SettingsCategoryGeneral(viewModel: SettingsScreenViewModel) {
 	/* PreferenceGroup(stringResource(id = R.string.preference_category_general_behaviour)) {
@@ -93,75 +96,66 @@ fun SettingsCategoryGeneral(viewModel: SettingsScreenViewModel) {
 		)
 	}
 
-	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-		PreferenceGroup(stringResource(id = R.string.preference_category_general_automute)) {
-			val scope = rememberCoroutineScope()
-
-			val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-				if (viewModel.autoMuteService.isPermissionGranted()) {
-					scope.launch {
-						viewModel.repository.updateSettings {
-							automuteEnable = true
+	when (viewModel.autoMuteService) {
+		is AutoMuteServiceZenRuleImpl -> {
+			PreferenceGroup(stringResource(id = R.string.preference_category_general_automute)) {
+				val context = LocalContext.current
+				val scope = rememberCoroutineScope()
+				val permissionLauncher =
+					rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+						if (viewModel.autoMuteService.isPermissionGranted()) {
+							scope.launch {
+								viewModel.repository.updateSettings {
+									automuteEnable = true
+								}
+								viewModel.autoMuteService.autoMuteEnable()
+							}
 						}
-						viewModel.autoMuteService.autoMuteEnable()
+					}
+
+				LaunchedEffect(Unit) {
+					viewModel.repository.updateSettings {
+						automuteEnable = viewModel.autoMuteService.isAutoMuteEnabled()
 					}
 				}
-			}
 
-			LaunchedEffect(Unit) {
-				viewModel.repository.updateSettings {
-					automuteEnable = viewModel.autoMuteService.isAutoMuteEnabled()
-				}
-			}
-
-			SwitchPreference(
-				title = { Text(stringResource(R.string.preference_automute_enable)) },
-				summary = { Text(stringResource(R.string.preference_automute_enable_summary)) },
-				settingsRepository = viewModel.repository,
-				value = { it.automuteEnable },
-				onValueChange = {
-					if (it) {
-						if (viewModel.autoMuteService.isPermissionGranted()) {
-							viewModel.autoMuteService.autoMuteEnable()
-							viewModel.autoMuteService.autoMuteStateOn()
-							automuteEnable = true
+				SwitchPreference(
+					title = { Text(stringResource(R.string.preference_automute_enable)) },
+					summary = { Text(stringResource(R.string.preference_automute_enable_summary)) },
+					settingsRepository = viewModel.repository,
+					value = { it.automuteEnable },
+					onValueChange = {
+						if (it) {
+							if (viewModel.autoMuteService.isPermissionGranted()) {
+								viewModel.autoMuteService.autoMuteEnable()
+								automuteEnable = true
+							} else {
+								permissionLauncher.launch(Intent(ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
+								automuteEnable = false
+							}
 						} else {
-							launcher.launch(Intent(ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
+							viewModel.autoMuteService.autoMuteDisable()
 							automuteEnable = false
 						}
-					} else {
-						viewModel.autoMuteService.autoMuteStateOff()
-						viewModel.autoMuteService.autoMuteDisable()
-						automuteEnable = false
 					}
-				}
-			)
-			SwitchPreference(
-				title = { Text(stringResource(R.string.preference_automute_cancelled_lessons)) },
-				enabledCondition = { it.automuteEnable },
-				settingsRepository = viewModel.repository,
-				value = { it.automuteCancelledLessons },
-				onValueChange = { automuteCancelledLessons = it }
-			)
-			SwitchPreference(
-				title = { Text(stringResource(R.string.preference_automute_mute_priority)) },
-				enabledCondition = { it.automuteEnable },
-				settingsRepository = viewModel.repository,
-				value = { it.automuteMutePriority },
-				onValueChange = { automuteMutePriority = it }
-			)
+				)
 
-			SliderPreference(
-				valueRange = 0f..20f,
-				steps = 19,
-				title = { Text(stringResource(R.string.preference_automute_minimum_break_length)) },
-				summary = { Text(stringResource(R.string.preference_automute_minimum_break_length_summary)) },
-				showSeekBarValue = true,
-				enabledCondition = { it.automuteEnable },
-				settingsRepository = viewModel.repository,
-				value = { it.automuteMinimumBreakLength },
-				onValueChange = { automuteMinimumBreakLength = it }
-			)
+				Preference(
+					title = { Text("Auto-mute preferences") },
+					trailingContent = {
+						Icon(
+							painter = painterResource(R.drawable.settings_external),
+							contentDescription = null
+						)
+					},
+					onClick = {
+						context.startActivity(Intent(context, AutoMuteConfigurationActivity::class.java))
+					}
+				)
+			}
+		}
+		else -> {
+			// Auto-Mute is not supported on this device - hide the category
 		}
 	}
 

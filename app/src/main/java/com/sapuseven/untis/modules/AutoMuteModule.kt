@@ -2,8 +2,9 @@ package com.sapuseven.untis.modules
 
 import android.app.NotificationManager
 import android.content.Context
-import com.sapuseven.untis.scope.UserScopeManager
+import android.os.Build
 import com.sapuseven.untis.services.AutoMuteService
+import com.sapuseven.untis.services.AutoMuteServiceStub
 import com.sapuseven.untis.services.AutoMuteServiceZenRuleImpl
 import dagger.Module
 import dagger.Provides
@@ -16,17 +17,17 @@ import dagger.hilt.components.SingletonComponent
 object AutoMuteModule {
 	@Provides
 	fun provideAutoMuteService(
-		@ApplicationContext context: Context,
-		userScopeManager: UserScopeManager
+		@ApplicationContext context: Context
 	): AutoMuteService {
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-			return AutoMuteServiceZenRuleImpl(
+		return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			AutoMuteServiceZenRuleImpl(
 				context,
-				context.getSystemService(NotificationManager::class.java) as NotificationManager,
-				userScopeManager
+				context.getSystemService(NotificationManager::class.java) as NotificationManager
 			)
-		} else {
+		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			throw NotImplementedError("AutoMuteServiceDirectImpl is not implemented")
+		} else {
+			AutoMuteServiceStub()
 		}
 	}
 }

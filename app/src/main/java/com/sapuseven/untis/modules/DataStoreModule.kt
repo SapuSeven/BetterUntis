@@ -7,7 +7,7 @@ import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.Serializer
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.dataStoreFile
-import androidx.datastore.preferences.protobuf.InvalidProtocolBufferException
+import com.google.protobuf.InvalidProtocolBufferException
 import com.sapuseven.untis.data.settings.model.Settings
 import dagger.Module
 import dagger.Provides

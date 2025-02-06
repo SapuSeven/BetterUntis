@@ -1,5 +1,6 @@
 package com.sapuseven.untis.ui.pages.settings
 
+import android.annotation.SuppressLint
 import androidx.compose.material3.ColorScheme
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -10,6 +11,7 @@ import com.sapuseven.untis.data.model.github.GitHubApi.URL_GITHUB_REPOSITORY_API
 import com.sapuseven.untis.data.model.github.GitHubUser
 import com.sapuseven.untis.scope.UserScopeManager
 import com.sapuseven.untis.services.AutoMuteService
+import com.sapuseven.untis.services.AutoMuteServiceZenRuleImpl
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -22,6 +24,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Named
 
+@SuppressLint("NewApi")
 @HiltViewModel(assistedFactory = SettingsScreenViewModel.Factory::class)
 class SettingsScreenViewModel @AssistedInject constructor(
 	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
@@ -36,6 +39,12 @@ class SettingsScreenViewModel @AssistedInject constructor(
 	@AssistedFactory
 	interface Factory {
 		fun create(colorScheme: ColorScheme): SettingsScreenViewModel
+	}
+
+	init {
+		if (autoMuteService is AutoMuteServiceZenRuleImpl) {
+			autoMuteService.setUser(userScopeManager.user)
+		}
 	}
 
 	val repository = userSettingsRepositoryFactory.create(colorScheme)
