@@ -3,7 +3,6 @@ package com.sapuseven.untis.services
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.ActivityResultRegistry
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -16,7 +15,6 @@ import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import com.sapuseven.untis.R
-import dagger.hilt.android.qualifiers.ActivityContext
 import javax.inject.Inject
 
 
@@ -44,14 +42,13 @@ class CodeScanServiceImpl @Inject constructor(
 
 		val googleApiAvailability = GoogleApiAvailability.getInstance()
 		val status = googleApiAvailability.isGooglePlayServicesAvailable(context)
-		/*if (status == ConnectionResult.SUCCESS) scanCodeMlKit()
-		else*/ scanCodeFallback()
+		if (status == ConnectionResult.SUCCESS) scanCodeMlKit()
+		else scanCodeFallback()
 	}
 
 	private fun scanCodeMlKit() {
 		Log.d(CodeScanService::class.java.simpleName, "Using ML Kit")
-		val options =
-			GmsBarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_QR_CODE).build()
+		val options = GmsBarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_QR_CODE).build()
 
 		GmsBarcodeScanning.getClient(context, options).startScan().addOnSuccessListener { barcode ->
 			barcode.rawValue?.let { url -> onSuccess?.invoke(Uri.parse(url)) }

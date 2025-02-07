@@ -57,7 +57,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sapuseven.untis.R
-import com.sapuseven.untis.ui.pages.login.schoolsearch.SchoolSearch
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.LabeledCheckbox
 import com.sapuseven.untis.ui.common.LabeledSwitch
@@ -66,6 +65,7 @@ import com.sapuseven.untis.ui.common.SmallCircularProgressIndicator
 import com.sapuseven.untis.ui.common.autofill
 import com.sapuseven.untis.ui.common.ifNotNull
 import com.sapuseven.untis.ui.functional.bottomInsets
+import com.sapuseven.untis.ui.pages.login.schoolsearch.SchoolSearch
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
@@ -125,6 +125,14 @@ fun LoginDataInput(
 							else
 								stringResource(id = R.string.logindatainput_title_add)
 						)
+					},
+					actions = {
+						IconButton(onClick = { viewModel.onCodeScanClick() }) {
+							Icon(
+								painter = painterResource(id = R.drawable.login_scan_code),
+								contentDescription = stringResource(id = R.string.login_scan_code)
+							)
+						}
 					},
 					navigationIcon = {
 						IconButton(onClick = {

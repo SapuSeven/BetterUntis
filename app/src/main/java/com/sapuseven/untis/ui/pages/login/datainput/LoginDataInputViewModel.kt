@@ -24,6 +24,7 @@ import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.ErrorMessageDictionary.ERROR_CODE_TOO_MANY_RESULTS
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
+import com.sapuseven.untis.services.CodeScanService
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
 import com.sapuseven.untis.ui.pages.ActivityViewModel
@@ -45,6 +46,7 @@ class LoginDataInputViewModel @Inject constructor(
 	private val userDataApi: UserDataApi,
 	private val navigator: AppNavigator,
 	private val userManager: UserManager,
+	private val codeScanService: CodeScanService,
 	savedStateHandle: SavedStateHandle
 ) : ActivityViewModel() {
 	private val args = savedStateHandle.toRoute<AppRoutes.LoginDataInput>()
@@ -132,7 +134,7 @@ class LoginDataInputViewModel @Inject constructor(
 		}
 
 		try {
-			// TODO loadFromAppLinkData(savedStateHandle.get<String>(SAVED_STATE_INTENT_DATA))
+			args.autoLoginData?.let { loadFromData(it) }
 		} catch (e: Exception) {
 			// TODO handle correctly
 			showQrCodeErrorDialog = true
@@ -148,10 +150,9 @@ class LoginDataInputViewModel @Inject constructor(
 		}
 	}
 
-	private fun loadFromAppLinkData(appLinkDataString: String?) {
-		if (appLinkDataString == null) return
-
-		val appLinkData = Uri.parse(appLinkDataString)
+	private fun loadFromData(data: String?) {
+		if (data == null) return
+		val appLinkData = Uri.parse(data)
 
 		if (appLinkData?.isHierarchical == true && appLinkData.scheme == "untis" && appLinkData.host == "setschool") {
 			// Untis-native values
@@ -163,14 +164,14 @@ class LoginDataInputViewModel @Inject constructor(
 			loginData.anonymous.value = appLinkData.getBooleanQueryParameter("anonymous", false)
 			loginData.proxyUrl.value = appLinkData.getQueryParameter("proxyUrl") ?: ""
 			loginData.apiUrl.value = appLinkData.getQueryParameter("apiUrl")
-			loginData.skipAppSecret.value =
-				appLinkData.getBooleanQueryParameter("skipAppSecret", false)
+			loginData.skipAppSecret.value = appLinkData.getBooleanQueryParameter("skipAppSecret", false)
 
-			advanced =
-				loginData.proxyUrl.value?.isNotEmpty() == true || loginData.apiUrl.value?.isNotEmpty() == true
+			advanced = loginData.proxyUrl.value?.isNotEmpty() == true || loginData.apiUrl.value?.isNotEmpty() == true
 		} else {
 			showQrCodeErrorDialog = true
 		}
+
+		loadData()
 	}
 
 	private fun loadData() = viewModelScope.launch {
@@ -322,6 +323,12 @@ class LoginDataInputViewModel @Inject constructor(
 
 	fun onQrCodeErrorDialogDismiss() {
 		showQrCodeErrorDialog = false
+	}
+
+	fun onCodeScanClick() {
+		codeScanService.scanCode {
+			loadFromData(it.toString())
+		}
 	}
 
 	fun selectSchool(it: SchoolInfo) {

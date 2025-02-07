@@ -32,7 +32,8 @@ object AppRoutes {
 		val demoLogin: Boolean = false,
 		val profileUpdate: Boolean = false,
 		val schoolInfoSerialized: String? = null,
-		val userId: Long = -1
+		val userId: Long = -1,
+		val autoLoginData: String? = null
 	)
 
 	@Serializable
