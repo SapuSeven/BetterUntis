@@ -1,19 +1,43 @@
 package com.sapuseven.untis.ui.common
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sapuseven.compose.protostore.ui.preferences.SwitchPreference
+import com.sapuseven.compose.protostore.ui.utils.LocalListItemColors
 import com.sapuseven.untis.R
-import com.sapuseven.untis.ui.pages.settings.GlobalSettingsRepository
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
+import com.sapuseven.untis.ui.pages.settings.GlobalSettingsRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -89,17 +113,31 @@ fun ReportsInfoBottomSheet(
 					modifier = Modifier
 						.padding(vertical = 16.dp)
 				) {
-					Divider()
+					CompositionLocalProvider(
+						LocalListItemColors provides ListItemDefaults.colors(
+							containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+						)
+					) {
+						HorizontalDivider()
 
-					SwitchPreference(
-						title = { Text(stringResource(R.string.preference_reports_breadcrumbs)) },
-						summary = { Text(stringResource(R.string.preference_reports_breadcrumbs_desc)) },
-						settingsRepository = repository,
-						value = { it.errorReportingEnableBreadcrumbs },
-						onValueChange = { errorReportingEnableBreadcrumbs = it }
-					)
+						SwitchPreference(
+							title = { Text(stringResource(R.string.preference_reports_enable)) },
+							settingsRepository = repository,
+							value = { it.errorReportingEnable },
+							onValueChange = { errorReportingEnable = it }
+						)
 
-					Divider()
+						SwitchPreference(
+							title = { Text(stringResource(R.string.preference_reports_breadcrumbs)) },
+							summary = { Text(stringResource(R.string.preference_reports_breadcrumbs_desc)) },
+							settingsRepository = repository,
+							value = { it.errorReportingEnableBreadcrumbs },
+							onValueChange = { errorReportingEnableBreadcrumbs = it },
+							enabledCondition = { it.errorReportingEnable }
+						)
+
+						HorizontalDivider()
+					}
 				}
 
 				Text(

@@ -413,4 +413,5 @@
 	<string name="preference_notifications_unavailable_desc">To enable notifications, please grant %1$s permission to send notifications.\nTap to go to settings.</string>
 	<string name="preference_automute_exact_alarms_unavailable">Exact auto-mute is unavailable</string>
 	<string name="preference_automute_exact_alarms_unavailable_desc">To ensure auto-mute is toggled at the correct time, please grant %1$s permission to schedule exact alarms.\nTap to go to settings.</string>
+    <string name="preference_reports_enable">Enable automatic error reporting</string>
 </resources>

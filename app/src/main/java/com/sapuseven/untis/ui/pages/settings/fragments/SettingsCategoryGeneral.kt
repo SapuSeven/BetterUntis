@@ -172,11 +172,19 @@ fun SettingsCategoryGeneral(viewModel: SettingsScreenViewModel) {
 		)
 
 		SwitchPreference(
+			title = { Text(stringResource(R.string.preference_reports_enable)) },
+			settingsRepository = viewModel.globalRepository,
+			value = { it.errorReportingEnable },
+			onValueChange = { errorReportingEnable = it }
+		)
+
+		SwitchPreference(
 			title = { Text(stringResource(R.string.preference_reports_breadcrumbs)) },
 			summary = { Text(stringResource(R.string.preference_reports_breadcrumbs_desc)) },
 			settingsRepository = viewModel.globalRepository,
 			value = { it.errorReportingEnableBreadcrumbs },
-			onValueChange = { errorReportingEnableBreadcrumbs = it }
+			onValueChange = { errorReportingEnableBreadcrumbs = it },
+			enabledCondition = { it.errorReportingEnable }
 		)
 
 		if (BuildConfig.DEBUG) {
