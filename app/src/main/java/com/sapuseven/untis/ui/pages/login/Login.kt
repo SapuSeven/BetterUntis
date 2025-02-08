@@ -1,6 +1,7 @@
 package com.sapuseven.untis.ui.pages.login
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,6 +35,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.journeyapps.barcodescanner.ScanContract
 import com.sapuseven.untis.R
 import com.sapuseven.untis.ui.pages.login.schoolsearch.SchoolSearch
 import com.sapuseven.untis.ui.common.AppScaffold
@@ -45,6 +47,7 @@ fun Login(
 	viewModel: LoginViewModel = hiltViewModel()
 ) {
 	val focusManager = LocalFocusManager.current
+	viewModel.setCodeScanLauncher(rememberLauncherForActivityResult(ScanContract()) { viewModel.codeScanResultHandler(it.contents) })
 
 	LaunchedEffect(Unit) {
 		viewModel.events.collectLatest { event ->

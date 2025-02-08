@@ -3,6 +3,7 @@ package com.sapuseven.untis.ui.pages.login.datainput
 import android.net.Uri
 import android.util.Log
 import android.util.Patterns
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,6 +11,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.journeyapps.barcodescanner.ScanIntentResult
+import com.journeyapps.barcodescanner.ScanOptions
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.client.SchoolSearchApi
 import com.sapuseven.untis.api.client.UserDataApi
@@ -36,9 +39,6 @@ import javax.inject.Inject
 
 const val DEMO_API_URL = "https://api.sapuseven.com/untis/testing"
 
-// TODO: Things to check:
-//       - respect proxy host
-//       - bookmarks
 @HiltViewModel
 class LoginDataInputViewModel @Inject constructor(
 	private val userDao: UserDao,
@@ -91,12 +91,6 @@ class LoginDataInputViewModel @Inject constructor(
 		loginData.username.value?.isNotEmpty() ?: false || (loginData.anonymous.value == true)
 	}
 
-	val proxyUrlValid = derivedStateOf {
-		loginData.proxyUrl.value?.let {
-			it.isEmpty() || Patterns.WEB_URL.matcher(it).matches()
-		} ?: true
-	}
-
 	val apiUrlValid = derivedStateOf {
 		loginData.apiUrl.value?.let {
 			it.isEmpty() || Patterns.WEB_URL.matcher(it).matches()
@@ -107,11 +101,19 @@ class LoginDataInputViewModel @Inject constructor(
 		getJSON().decodeFromString<SchoolInfo>(it)
 	}
 
+	val codeScanResultHandler: (String?) -> Unit = {
+		try {
+			it?.let { loadFromData(it) }
+		} catch (e: Exception) {
+			showQrCodeErrorDialog = true
+		}
+	}
+
 	init {
 		viewModelScope.launch(Dispatchers.IO) {
 			existingUserId?.let { userDao.getById(it) }?.let {
 				loginData.loadFromUser(it)
-				advanced = loginData.proxyUrl.value?.isNotEmpty() == true || loginData.apiUrl.value?.isNotEmpty() == true
+				advanced = loginData.apiUrl.value?.isNotEmpty() == true
 			}
 		}
 
@@ -133,17 +135,16 @@ class LoginDataInputViewModel @Inject constructor(
 			loadData()
 		}
 
-		try {
-			args.autoLoginData?.let { loadFromData(it) }
-		} catch (e: Exception) {
-			// TODO handle correctly
-			showQrCodeErrorDialog = true
-		}
+		codeScanResultHandler(args.autoLoginData)
+	}
+
+	fun setCodeScanLauncher(launcher: ManagedActivityResultLauncher<ScanOptions, ScanIntentResult>) {
+		codeScanService.setLauncher(launcher)
 	}
 
 	fun onLoginClick() {
 		validate = true
-		if (schoolIdValid.value && usernameValid.value && proxyUrlValid.value && apiUrlValid.value) {
+		if (schoolIdValid.value && usernameValid.value && apiUrlValid.value) {
 			errorText = null
 			errorTextRaw = null
 			loadData()
@@ -162,16 +163,15 @@ class LoginDataInputViewModel @Inject constructor(
 
 			// Custom values
 			loginData.anonymous.value = appLinkData.getBooleanQueryParameter("anonymous", false)
-			loginData.proxyUrl.value = appLinkData.getQueryParameter("proxyUrl") ?: ""
 			loginData.apiUrl.value = appLinkData.getQueryParameter("apiUrl")
 			loginData.skipAppSecret.value = appLinkData.getBooleanQueryParameter("skipAppSecret", false)
 
-			advanced = loginData.proxyUrl.value?.isNotEmpty() == true || loginData.apiUrl.value?.isNotEmpty() == true
+			advanced = loginData.apiUrl.value?.isNotEmpty() == true
+
+			loadData()
 		} else {
 			showQrCodeErrorDialog = true
 		}
-
-		loadData()
 	}
 
 	private fun loadData() = viewModelScope.launch {
@@ -326,9 +326,7 @@ class LoginDataInputViewModel @Inject constructor(
 	}
 
 	fun onCodeScanClick() {
-		codeScanService.scanCode {
-			loadFromData(it.toString())
-		}
+		codeScanService.scanCode(codeScanResultHandler)
 	}
 
 	fun selectSchool(it: SchoolInfo) {
@@ -348,7 +346,6 @@ class LoginDataInputViewModel @Inject constructor(
 		val anonymous = mutableStateOf(initialAnonymous)
 		val username = mutableStateOf(initialUsername)
 		val password = mutableStateOf<String?>(null)
-		val proxyUrl = mutableStateOf<String?>(null)
 		val apiUrl = mutableStateOf(initialApiUrl)
 		val skipAppSecret = mutableStateOf<Boolean?>(null)
 		var storedPassword: String? = null

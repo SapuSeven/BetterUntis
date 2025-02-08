@@ -1,6 +1,7 @@
 package com.sapuseven.untis.ui.pages.login.datainput
 
 import android.content.res.Configuration
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -56,6 +57,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.journeyapps.barcodescanner.ScanContract
 import com.sapuseven.untis.R
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.LabeledCheckbox
@@ -73,6 +75,8 @@ import kotlinx.coroutines.launch
 fun LoginDataInput(
 	viewModel: LoginDataInputViewModel = hiltViewModel()
 ) {
+	viewModel.setCodeScanLauncher(rememberLauncherForActivityResult(ScanContract()) { viewModel.codeScanResultHandler(it.contents) })
+
 	if (viewModel.showProfileUpdate)
 		Surface {
 			Column(

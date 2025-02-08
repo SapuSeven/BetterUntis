@@ -1,10 +1,11 @@
 package com.sapuseven.untis.services
 
 import android.net.Uri
-import androidx.activity.result.ActivityResultRegistry
+import androidx.activity.compose.ManagedActivityResultLauncher
+import com.journeyapps.barcodescanner.ScanIntentResult
+import com.journeyapps.barcodescanner.ScanOptions
 
 interface CodeScanService {
-	fun setResultRegistry(registry: ActivityResultRegistry);
-
-	fun scanCode(onSuccess: (Uri) -> Unit);
+	fun setLauncher(launcher: ManagedActivityResultLauncher<ScanOptions, ScanIntentResult>)
+	fun scanCode(onSuccess: (String?) -> Unit)
 }

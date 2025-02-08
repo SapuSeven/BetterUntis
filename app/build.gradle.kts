@@ -221,7 +221,7 @@ dependencies {
 	implementation(libs.mikepenz.aboutlibraries.core)
 	implementation(libs.sentry.android)
 	implementation(libs.sentry.compose.android)
-	implementation(libs.xzing)
+	implementation(libs.zxing)
 	implementation(libs.protobuf.javalite)
 	implementation(libs.androidx.transition.ktx)
 	implementation(libs.andrew0000.cache)

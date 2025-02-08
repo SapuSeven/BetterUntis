@@ -30,7 +30,7 @@ fuel = "2.3.1"
 gms = "16.1.0"
 hamcrest = "2.2"
 joda-time = "2.10.14"
-journeyapps-xzing = "4.3.0"
+journeyapps-zxing = "4.3.0"
 junit = "5.9.3"
 junit-ktx = "1.2.1"
 junit4 = "4.13.2"
@@ -130,7 +130,7 @@ protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.
 sapuseven-protostore = { module = "com.sapuseven.compose:protostore", version.ref = "protostore" }
 sentry-android = { module = "io.sentry:sentry-android", version.ref = "sentry" }
 sentry-compose-android = { module = "io.sentry:sentry-compose-android", version.ref = "sentry" }
-xzing = { module = "com.journeyapps:zxing-android-embedded", version.ref = "journeyapps-xzing" }
+zxing = { module = "com.journeyapps:zxing-android-embedded", version.ref = "journeyapps-zxing" }
 androidx-ui-tooling-preview-android = { group = "androidx.compose.ui", name = "ui-tooling-preview-android", version.ref = "ui-tooling-preview-android" }
 
 [plugins]
