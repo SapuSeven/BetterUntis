@@ -115,7 +115,7 @@
     <string name="preference_notifications_first_lesson_desc">Pokaži obavijest neposredno prije početka nastave</string>
     <string name="preference_notifications_first_lesson">Obavijest prije prvog sata</string>
     <string name="preference_notifications_enable_desc">Prikazuje obavijest s podacima o sljedećem satu nastave tijekom pauza</string>
-    <string name="preference_notifications_enable">Aktiviraj obavijesti</string>
+    <string name="preference_notifications_enable">Aktiviraj obavijesti za pauze</string>
     <string name="preference_notifications_clear">Izbriši sve obavijesti</string>
     <string name="preference_marker">Indikator vremena</string>
     <string name="preference_info_libraries_desc">Popis svih korištenih biblioteka</string>
@@ -289,7 +289,7 @@
     <string name="preference_background_cancelled">Otkazane nastave</string>
     <string name="preference_automute_enable_summary">Automatski uključuje način „Ne smetaj” tijekom nastava</string>
     <string name="preference_automute_enable">Aktiviraj automatsko isključivanje zvuka</string>
-    <string name="preference_automute_cancelled_lessons">Također iskjluči zvuk u otkazanim nastavama</string>
+    <string name="preference_automute_cancelled_lessons">Također isključi zvuk u otkazanim nastavama</string>
     <string name="preference_dark_theme_auto">Koristi temu sustava</string>
     <string name="infocenter_absences_filter_only_unexcused">Pokaži samo neopravdane</string>
     <string name="infocenter_absences_filter_oldest_first">Najprije najstarije</string>
