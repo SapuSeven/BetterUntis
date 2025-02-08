@@ -189,7 +189,7 @@
     <string name="preference_info_license">Lizenz</string>
     <string name="preference_info_privacy">Externe Inhalte</string>
     <string name="preference_info_privacy_desc">Mitwirkende werden von GitHub geladen. Lesen Sie deren Datenschutzrichtlinie für weitere Informationen.</string>
-    <string name="preference_info_privacy_policy">Datenschutz-Bestimmungen</string>
+    <string name="preference_info_privacy_policy">Datenschutzbestimmungen</string>
     <string name="preference_marker">Zeitanzeige</string>
     <string name="preference_notifications_clear">Alle Benachrichtigungen löschen</string>
     <string name="preference_notifications_enable">Pausenbenachrichtigungen aktivieren</string>
@@ -272,8 +272,7 @@
     <string name="loading">Wird geladen</string>
     <string name="loading_failed">Ladevorgang fehlgeschlagen</string>
     <string name="settings_dialog_url_open_title">Keine kompatible App gefunden</string>
-    <string name="settings_dialog_url_open_text">BetterUntis konnte keine App finden, die mit dem Öffnen von Links umgehen kann.
-\nBitte stelle sicher, dass du einen Webbrowser installiert hast oder öffne den Link auf einem anderen Gerät:</string>
+    <string name="settings_dialog_url_open_text">BetterUntis konnte keine App finden, die mit dem Öffnen von Links umgehen kann.\nBitte stelle sicher, dass du einen Webbrowser installiert hast oder öffne den Link auf einem anderen Gerät:</string>
     <string name="widget_configuration">Widget-Konfiguration</string>
     <string name="widget_timetable">Stundenplan</string>
     <string name="widget_timetable_empty">Kein Stundenplan für heute verfügbar</string>
@@ -349,9 +348,7 @@
     <string name="infocenter_absences_filter_time_ranges">Zeitraum</string>
     <string name="preference_reports_breadcrumbs">Detaillierte Fehlerberichte senden</string>
     <string name="preference_category_reports">Fehlerberichte</string>
-    <string name="preference_reports_info_desc">Diese Einstellungen betreffen alle Profile und helfen dabei, die App zu verbessern.
-\nPersönliche Daten werden nie gesammelt.
-\nÄnderungen benötigen einen App-Neustart, um wirksam zu werden.</string>
+    <string name="preference_reports_info_desc">Diese Einstellungen betreffen alle Profile und helfen dabei, die App zu verbessern.\nPersönliche Daten werden nie gesammelt.\nÄnderungen benötigen einen App-Neustart, um wirksam zu werden.</string>
     <string name="preference_reports_breadcrumbs_desc">Beinhaltet zusätzliche Informationen darüber, was passiert ist, bevor ein Fehler aufgetreten ist.</string>
     <string name="main_dialog_reports_info_2">Du kannst diese Werte jederzeit in den App-Einstellungen ändern.</string>
     <string name="main_dialog_reports_title">Fehlerberichte</string>
@@ -391,4 +388,7 @@
     <string name="all_warning">Warnung</string>
     <string name="preference_notifications_exact_alarms_unavailable_desc">Um sicherzustellen, dass alle Benachrichtigungen zur richtigen Zeit zugestellt werden, muss die Berechtigung zum Einrichten von Wecker und Erinnerungen für %1$s erteilt werden.\nTippen, um die Einstellungen zu öffnen.</string>
     <string name="all_open_datepicker">Datum auswählen</string>
+    <string name="preference_automute_exact_alarms_unavailable">Exaktes automatisches Stummschalten ist nicht verfügbar</string>
+    <string name="preference_automute_exact_alarms_unavailable_desc">Um sicherzustellen, dass die automatische Stummschaltung zur richtigen Zeit aktiviert wird, muss die Berechtigung zum Einrichten von Wecker und Erinnerungen für %1$s erteilt werden.\nTippen, um die Einstellungen zu öffnen.</string>
+    <string name="preference_reports_enable">Automatische Fehlerberichterstattung aktivieren</string>
 </resources>
