@@ -2,7 +2,7 @@
 <resources>
     <string name="app_desc">Eine alternative App für das Untis-Stundenplansystem.</string>
     <string name="all_success">erfolgreich</string>
-    <string name="all_exam">Klausur</string>
+    <string name="all_exam">Prüfung</string>
     <string name="all_exit">Verlassen</string>
     <string name="all_failed">fehlgeschlagen</string>
     <string name="all_personal">Persönlich</string>
