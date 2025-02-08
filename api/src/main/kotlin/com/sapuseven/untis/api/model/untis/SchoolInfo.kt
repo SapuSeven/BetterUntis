@@ -11,6 +11,7 @@ data class SchoolInfo(
 	var displayName: String,
 	var loginName: String,
 	var schoolId: Long,
+	var tenantId: String? = null, // Note: This value seems to sometimes be present in the response, but missing in the Untis Mobile sources. Observed: same value as `schoolId`
 	var serverUrl: String,
 	var mobileServiceUrl: String?
 )

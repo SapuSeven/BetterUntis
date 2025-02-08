@@ -15,6 +15,6 @@ data class RoomFinderItem(
 	val states: List<Boolean>
 ) {
 	fun freeHoursAt(hourIndex: Int): Int {
-    return states.drop(hourIndex).takeWhile { !it }.count()
-}
+	    return states.drop(hourIndex).takeWhile { !it }.count()
+	}
 }
