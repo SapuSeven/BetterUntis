@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
@@ -46,5 +48,12 @@ fun loadScreenshot(file: String): Bitmap {
 }
 
 @Composable
-fun WithScreenshot(content: @Composable BoxScope.() -> Unit) =
-	Box(modifier = Modifier.testTag(TAG_SCREENSHOT).consumeWindowInsets(WindowInsets.systemBars), content = content)
+fun WithScreenshot(content: @Composable BoxScope.() -> Unit) = with(LocalDensity.current) {
+	Box(
+		modifier = Modifier
+			.size(1080.toDp(), 1920.toDp())
+			.testTag(TAG_SCREENSHOT)
+			.consumeWindowInsets(WindowInsets.systemBars),
+		content = content
+	)
+}
