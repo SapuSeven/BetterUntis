@@ -245,7 +245,7 @@ class LoginDataInputViewModel @Inject constructor(
 		}
 
 		userDao.deleteUserData(userId)
-		userDao.insertUserData(userId, masterData)
+		userDao.insertMasterData(userId, masterData)
 		return userId
 	}
 

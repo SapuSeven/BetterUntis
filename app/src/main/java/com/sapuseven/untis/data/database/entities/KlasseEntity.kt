@@ -5,7 +5,6 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import com.sapuseven.untis.api.model.untis.masterdata.Klasse
 import com.sapuseven.untis.data.database.Mapper
-import kotlinx.serialization.Transient
 import java.time.LocalDate
 
 @Entity(
@@ -20,18 +19,18 @@ import java.time.LocalDate
 	)]
 )
 data class KlasseEntity(
-	val id: Long = 0,
-	val userId: Long = -1,
-	val name: String = "",
+	override val id: Long = 0,
+	override val userId: Long = -1,
+	override val name: String = "",
 	val longName: String = "",
 	val departmentId: Long = 0,
 	val startDate: LocalDate? = null,
 	val endDate: LocalDate? = null,
-	val foreColor: String? = "",
-	val backColor: String? = "",
-	val active: Boolean = false,
+	override val foreColor: String? = "",
+	override val backColor: String? = "",
+	override val active: Boolean = false,
 	val displayable: Boolean = false
-) : Comparable<String> {
+) : ElementEntity(), Comparable<String> {
 	companion object : Mapper<Klasse, KlasseEntity> {
 		override fun map(from: Klasse, userId: Long) = KlasseEntity(
 			id = from.id,

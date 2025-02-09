@@ -5,8 +5,6 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import com.sapuseven.untis.api.model.untis.masterdata.Subject
 import com.sapuseven.untis.data.database.Mapper
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 @Entity(
 	tableName = "Subject",
@@ -20,16 +18,16 @@ import kotlinx.serialization.Transient
 	)]
 )
 data class SubjectEntity(
-	val id: Long = 0,
-	val userId: Long = -1,
-	val name: String = "",
+	override val id: Long = 0,
+	override val userId: Long = -1,
+	override val name: String = "",
 	val longName: String = "",
 	val departmentIds: List<Long> = emptyList(),
-	val foreColor: String? = null,
-	val backColor: String? = null,
-	val active: Boolean = false,
+	override val foreColor: String? = null,
+	override val backColor: String? = null,
+	override val active: Boolean = false,
 	val displayAllowed: Boolean = false
-) : Comparable<String> {
+) : ElementEntity(), Comparable<String> {
 	companion object : Mapper<Subject, SubjectEntity> {
 		override fun map(from: Subject, userId: Long) = SubjectEntity(
 			id = from.id,

@@ -16,7 +16,7 @@ import kotlinx.serialization.json.Json
 open class UserDataApi(
 	engineFactory: HttpClientEngineFactory<*>,
 	config: ((HttpClientConfig<*>) -> Unit)? = null,
-	jsonBlock: Json = ApiClient.DEFAULT_JSON
+	jsonBlock: Json = DEFAULT_JSON
 ) : ApiClient(
 	httpClientEngineFactory = engineFactory,
 	httpClientConfig = config,
@@ -28,7 +28,7 @@ open class UserDataApi(
 		password: String
 	): String {
 		val body = RequestData(
-			method = ApiClient.METHOD_GET_APP_SHARED_SECRET,
+			method = METHOD_GET_APP_SHARED_SECRET,
 			params = listOf(AppSharedSecretParams(user, password))
 		)
 
@@ -43,7 +43,7 @@ open class UserDataApi(
 		key: String?
 	): UserDataResult {
 		val body = RequestData(
-			method = ApiClient.METHOD_GET_USER_DATA,
+			method = METHOD_GET_USER_DATA,
 			params = listOf(UserDataParams(auth = Auth(user, key)))
 		)
 

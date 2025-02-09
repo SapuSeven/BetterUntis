@@ -13,6 +13,7 @@ import androidx.room.Query
 import androidx.room.Relation
 import androidx.room.Transaction
 import androidx.room.Update
+import androidx.room.Upsert
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.model.untis.MasterData
 import com.sapuseven.untis.api.model.untis.Settings
@@ -109,6 +110,10 @@ interface UserDao {
 	@Query("SELECT * FROM user WHERE id LIKE :userId")
 	suspend fun getByIdWithData(userId: Long): UserWithData?
 
+	@Transaction
+	@Query("SELECT * FROM user WHERE id LIKE :userId")
+	fun getByIdWithDataFlow(userId: Long): Flow<UserWithData?>
+
 	@Insert
 	suspend fun insert(user: User): Long
 
@@ -151,8 +156,47 @@ interface UserDao {
 	@Insert
 	suspend fun insertSchoolYears(schoolYears: List<SchoolYearEntity>)
 
+	@Upsert
+	suspend fun upsertAbsenceReasons(absenceReasons: List<AbsenceReasonEntity>)
+
+	@Upsert
+	suspend fun upsertDepartments(departments: List<DepartmentEntity>)
+
+	@Upsert
+	suspend fun upsertDuties(duties: List<DutyEntity>)
+
+	@Upsert
+	suspend fun upsertEventReasons(eventReasons: List<EventReasonEntity>)
+
+	@Upsert
+	suspend fun upsertEventReasonGroups(eventReasonGroups: List<EventReasonGroupEntity>)
+
+	@Upsert
+	suspend fun upsertExcuseStatuses(excuseStatuses: List<ExcuseStatusEntity>)
+
+	@Upsert
+	suspend fun upsertHolidays(holidays: List<HolidayEntity>)
+
+	@Upsert
+	suspend fun upsertKlassen(klassen: List<KlasseEntity>)
+
+	@Upsert
+	suspend fun upsertRooms(rooms: List<RoomEntity>)
+
+	@Upsert
+	suspend fun upsertSubjects(subjects: List<SubjectEntity>)
+
+	@Upsert
+	suspend fun upsertTeachers(teachers: List<TeacherEntity>)
+
+	@Upsert
+	suspend fun upsertTeachingMethods(teachingMethods: List<TeachingMethodEntity>)
+
+	@Upsert
+	suspend fun upsertSchoolYears(schoolYears: List<SchoolYearEntity>)
+
 	@Transaction
-	suspend fun insertUserData(userId: Long, masterData: MasterData) {
+	suspend fun insertMasterData(userId: Long, masterData: MasterData) {
 		insertAbsenceReasons(masterData.absenceReasons.orEmpty().map { AbsenceReasonEntity.map(it, userId) })
 		insertDepartments(masterData.departments.orEmpty().map { DepartmentEntity.map(it, userId) })
 		insertDuties(masterData.duties.orEmpty().map { DutyEntity.map(it, userId) })
@@ -166,7 +210,29 @@ interface UserDao {
 		insertTeachers(masterData.teachers.map { TeacherEntity.map(it, userId) })
 		insertTeachingMethods(masterData.teachingMethods.orEmpty().map { TeachingMethodEntity.map(it, userId) })
 		insertSchoolYears(masterData.schoolyears.orEmpty().map { SchoolYearEntity.map(it, userId) })
+		updateMasterDataTimestamp(userId, masterData.timeStamp)
 	}
+
+	@Transaction
+	suspend fun upsertMasterData(userId: Long, masterData: MasterData) {
+		upsertAbsenceReasons(masterData.absenceReasons.orEmpty().map { AbsenceReasonEntity.map(it, userId) })
+		upsertDepartments(masterData.departments.orEmpty().map { DepartmentEntity.map(it, userId) })
+		upsertDuties(masterData.duties.orEmpty().map { DutyEntity.map(it, userId) })
+		upsertEventReasons(masterData.eventReasons.orEmpty().map { EventReasonEntity.map(it, userId) })
+		upsertEventReasonGroups(masterData.eventReasonGroups.orEmpty().map { EventReasonGroupEntity.map(it, userId) })
+		upsertExcuseStatuses(masterData.excuseStatuses.orEmpty().map { ExcuseStatusEntity.map(it, userId) })
+		upsertHolidays(masterData.holidays.orEmpty().map { HolidayEntity.map(it, userId) })
+		upsertKlassen(masterData.klassen.map { KlasseEntity.map(it, userId) })
+		upsertRooms(masterData.rooms.map { RoomEntity.map(it, userId) })
+		upsertSubjects(masterData.subjects.map { SubjectEntity.map(it, userId) })
+		upsertTeachers(masterData.teachers.map { TeacherEntity.map(it, userId) })
+		upsertTeachingMethods(masterData.teachingMethods.orEmpty().map { TeachingMethodEntity.map(it, userId) })
+		upsertSchoolYears(masterData.schoolyears.orEmpty().map { SchoolYearEntity.map(it, userId) })
+		updateMasterDataTimestamp(userId, masterData.timeStamp)
+	}
+
+	@Query("UPDATE user SET masterDataTimestamp = :timestamp WHERE id = :userId")
+	suspend fun updateMasterDataTimestamp(userId: Long, timestamp: Long)
 
 	@Update
 	suspend fun update(user: User)

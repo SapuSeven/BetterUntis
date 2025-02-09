@@ -19,19 +19,19 @@ import java.time.LocalDate
 	)]
 )
 data class TeacherEntity(
-	val id: Long = 0,
-	val userId: Long = -1,
-	val name: String = "",
+	override val id: Long = 0,
+	override val userId: Long = -1,
+	override val name: String = "",
 	val firstName: String = "",
 	val lastName: String = "",
 	val departmentIds: List<Long> = emptyList(),
-	val foreColor: String? = null,
-	val backColor: String? = null,
+	override val foreColor: String? = null,
+	override val backColor: String? = null,
 	val entryDate: LocalDate? = null,
 	val exitDate: LocalDate? = null,
-	val active: Boolean = false,
+	override val active: Boolean = false,
 	val displayAllowed: Boolean = false
-) : Comparable<String> {
+) : ElementEntity(), Comparable<String> {
 	companion object : Mapper<Teacher, TeacherEntity> {
 		override fun map(from: Teacher, userId: Long) = TeacherEntity(
 			id = from.id,

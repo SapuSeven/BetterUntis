@@ -5,10 +5,11 @@ import com.sapuseven.untis.api.model.response.PeriodDataResult
 import com.sapuseven.untis.api.model.untis.absence.StudentAbsence
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.Period
+import com.sapuseven.untis.data.cache.CachedSource
 import com.sapuseven.untis.data.cache.DiskCache
 import com.sapuseven.untis.data.database.entities.User
+import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.scope.UserScopeManager
-import com.sapuseven.untis.data.cache.CachedSource
 import crocodile8.universal_cache.time.TimeProvider
 import kotlinx.serialization.serializer
 import java.io.File
@@ -43,6 +44,7 @@ class UntisTimetableRepository @Inject constructor(
 	private val api: TimetableApi,
 	@Named("cacheDir") private val cacheDir: File,
 	private val timeProvider: TimeProvider,
+	private val userDao: UserDao,
 	userScopeManager: UserScopeManager
 ) : TimetableRepository {
 	private val user: User = userScopeManager.user
@@ -50,7 +52,7 @@ class UntisTimetableRepository @Inject constructor(
 	override fun timetableSource(): CachedSource<TimetableRepository.TimetableParams, List<Period>> {
 		return CachedSource(
 			source = { params ->
-				api.getTimetable(
+				val timetableResponse = api.getTimetable(
 					id = params.elementId,
 					type = params.elementType,
 					startDate = params.startDate,
@@ -59,7 +61,9 @@ class UntisTimetableRepository @Inject constructor(
 					apiUrl = user.apiUrl,
 					user = user.user,
 					key = user.key
-				).timetable.periods
+				)
+				userDao.upsertMasterData(user.id, timetableResponse.masterData)
+				return@CachedSource timetableResponse.timetable.periods
 			},
 			cache = DiskCache(File(cacheDir, "timetable"), serializer()),
 			timeProvider = timeProvider

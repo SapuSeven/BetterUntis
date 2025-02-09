@@ -28,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -292,7 +291,6 @@ fun Timetable(
 	}
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun formatTimeDiffMillis(diff: Long?): String {
 	val MINUTE_MILLIS: Int = 60 * 1000
