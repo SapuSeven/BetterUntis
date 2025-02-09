@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -37,7 +38,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
@@ -109,7 +109,7 @@ fun Timetable(
 						}
 					},
 					actions = {
-						if (BuildConfig.DEBUG)
+						if (viewModel.isDebug)
 							DebugDesclaimerAction()
 
 						ProfileSelectorAction(
@@ -140,13 +140,13 @@ fun Timetable(
 					onDismiss = { viewModel.feedbackDialog = false }
 				)
 
-				var currentTime by remember { mutableStateOf(LocalDateTime.now()) }
+				var currentTime by remember { mutableStateOf(LocalDateTime.now(viewModel.clock)) }
 
 				LaunchedEffect(Unit) {
 					while (true) {
 						// Refresh the weekview (and last refresh text) periodically
 						// This could probably be increased to 1 minute, but 10 seconds seems fine
-						currentTime = LocalDateTime.now()
+						currentTime = LocalDateTime.now(viewModel.clock)
 						delay(10_000)
 					}
 				}
@@ -200,6 +200,7 @@ fun Timetable(
 						if (viewModel.loading)
 							CircularProgressIndicator(
 								modifier = Modifier
+									.testTag("loading")
 									.align(Alignment.BottomEnd)
 									.padding(8.dp)
 									.bottomInsets()

@@ -1,6 +1,8 @@
 package com.sapuseven.untis.modules
 
 import android.content.Context
+import com.sapuseven.untis.components.ApplicationBuildConfigFieldsProvider
+import com.sapuseven.untis.components.BuildConfigFieldsProvider
 import crocodile8.universal_cache.time.SystemTimeProvider
 import crocodile8.universal_cache.time.TimeProvider
 import dagger.Module
@@ -26,4 +28,7 @@ object ConfigurationModule {
 
 	@Provides
 	fun provideTimeProvider(): TimeProvider = SystemTimeProvider
+
+	@Provides
+	fun provideBuildConfigFieldsProvider(): BuildConfigFieldsProvider = ApplicationBuildConfigFieldsProvider()
 }

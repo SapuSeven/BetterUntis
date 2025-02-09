@@ -22,12 +22,16 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import javax.inject.Inject
 
-class GetRoomFinderItemsUseCase @Inject constructor(
+interface GetRoomFinderItemsUseCase {
+	operator fun invoke(): Flow<List<RoomFinderItem>>
+}
+
+class GetRoomFinderItemsUseCaseImpl @Inject constructor(
 	private val roomFinderDao: RoomFinderDao,
 	private val timetableRepository: TimetableRepository,
 	masterDataRepository: MasterDataRepository,
 	userScopeManager: UserScopeManager
-) {
+) : GetRoomFinderItemsUseCase {
 	private val user: User = userScopeManager.user
 	private val rooms = masterDataRepository.currentUserData?.rooms ?: emptyList()
 
@@ -38,7 +42,7 @@ class GetRoomFinderItemsUseCase @Inject constructor(
 	private val roomData: MutableMap<RoomEntity, List<Boolean>> = mutableMapOf()
 
 	@OptIn(ExperimentalCoroutinesApi::class)
-	operator fun invoke(): Flow<List<RoomFinderItem>> = roomFinderDao.getAllByUserId(user.id)
+	override operator fun invoke(): Flow<List<RoomFinderItem>> = roomFinderDao.getAllByUserId(user.id)
 		.mapNotNull { roomFinderEntities ->
 			roomFinderEntities?.mapNotNull { roomFinderEntity ->
 				rooms.find { it.id == roomFinderEntity.id }

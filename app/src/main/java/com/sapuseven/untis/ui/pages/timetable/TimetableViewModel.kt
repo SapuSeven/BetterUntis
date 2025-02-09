@@ -15,12 +15,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.sapuseven.compose.protostore.ui.preferences.convertRangeToPair
-import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.exception.UntisApiException
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.Period
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
+import com.sapuseven.untis.components.BuildConfigFieldsProvider
 import com.sapuseven.untis.components.ElementPicker
 import com.sapuseven.untis.components.UserManager
 import com.sapuseven.untis.data.database.entities.User
@@ -58,6 +58,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
 
@@ -70,8 +71,10 @@ class TimetableViewModel @AssistedInject constructor(
 	internal val timetableRepository: TimetableRepository,
 	internal val masterDataRepository: MasterDataRepository,
 	internal val globalSettingsRepository: GlobalSettingsRepository,
+	internal val clock: Clock,
 	@Assisted private val colorScheme: ColorScheme,
 	@Assisted private val typography: Typography,
+	buildConfigFieldsProvider: BuildConfigFieldsProvider,
 	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
 	timetableMapperFactory: TimetableMapper.Factory,
 	savedStateHandle: SavedStateHandle,
@@ -95,6 +98,8 @@ class TimetableViewModel @AssistedInject constructor(
 
 	val currentUser: User = userScopeManager.user
 	val allUsersState: StateFlow<List<User>> = userManager.allUsersState
+
+	val isDebug = buildConfigFieldsProvider.get().isDebug
 
 	private val _personalElement = MutableStateFlow<PeriodElement?>(null)
 
@@ -311,7 +316,7 @@ class TimetableViewModel @AssistedInject constructor(
 		if (it == _personalElement.value) null // Use Profile name for personal timetable
 		else masterDataRepository.getLongName(it)
 	}
-		?: (currentUser.getDisplayedName(context) + (if (BuildConfig.DEBUG) " (${currentUser.id})" else ""))
+		?: (currentUser.getDisplayedName(context) + (if (isDebug) " (${currentUser.id})" else ""))
 
 	fun showElement(element: PeriodElement?) {
 		navigator.navigate(AppRoutes.Timetable(element))

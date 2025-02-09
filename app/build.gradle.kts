@@ -41,7 +41,7 @@ android {
 		versionCode = generateVersionCode()
 		versionName = "5.0.0-beta01"
 		vectorDrawables.useSupportLibrary = true
-		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+		testInstrumentationRunner = "com.sapuseven.untis.HiltTestRunner"
 
 		buildConfigField("String", "SENTRY_DSN", "\"https://d3b77222abce4fcfa74fda2185e0f8dc@o1136770.ingest.sentry.io/6188900\"")
 
@@ -236,6 +236,7 @@ dependencies {
 	ksp(libs.androidx.room.compiler)
 	ksp(libs.dagger.compiler)
 	ksp(libs.hilt.compiler)
+	kspTest(libs.hilt.compiler)
 
 	testImplementation(libs.junit.jupiter.api)
 	testImplementation(libs.junit.jupiter.params)
@@ -249,7 +250,9 @@ dependencies {
 	testImplementation(libs.hamcrest.library)
 
 	androidTestImplementation(libs.androidx.test)
+	androidTestImplementation(libs.androidx.test.runner)
 	androidTestImplementation(libs.androidx.compose.ui.test)
+	androidTestImplementation(libs.hilt.android.testing)
 	debugImplementation(libs.androidx.compose.ui.test.manifest)
 
 	implementation(project(":api"))

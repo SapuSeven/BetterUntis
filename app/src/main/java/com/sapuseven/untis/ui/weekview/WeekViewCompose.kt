@@ -242,10 +242,9 @@ private val timeFormat24h = DateTimeFormatter.ofPattern("H:mm")
 fun WeekViewHeaderDay(
 	day: LocalDate,
 	modifier: Modifier = Modifier,
+	isToday: Boolean = false,
 	onClick: ((day: LocalDate) -> Unit)? = null
 ) {
-	val isToday = LocalDate.now().equals(day)
-
 	Column(
 		modifier = Modifier
 			.padding(2.dp)
@@ -288,9 +287,10 @@ fun WeekViewHeaderDayPreview() {
 @Composable
 fun WeekViewHeader(
 	startDate: LocalDate,
+	currentDate: LocalDate,
 	numDays: Int,
 	modifier: Modifier = Modifier,
-	dayHeader: @Composable (day: LocalDate) -> Unit = { WeekViewHeaderDay(day = it) },
+	dayHeader: @Composable (day: LocalDate) -> Unit = { WeekViewHeaderDay(day = it, isToday = currentDate == it) },
 ) {
 	Row(
 		modifier = modifier
@@ -309,6 +309,7 @@ fun WeekViewHeader(
 fun WeekViewHeaderPreview() {
 	WeekViewHeader(
 		startDate = LocalDate.now(),
+		currentDate = LocalDate.now().plusDays(1),
 		numDays = 5,
 		modifier = Modifier.sizeIn(maxWidth = 360.dp)
 	)
@@ -853,6 +854,7 @@ fun <T> WeekViewCompose(
 			Column {
 				WeekViewHeader(
 					startDate = visibleStartDate,
+					currentDate = currentTime.toLocalDate(),
 					numDays = numDays,
 					modifier = Modifier
 						.onGloballyPositioned { headerHeight = it.size.height }

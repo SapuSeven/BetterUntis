@@ -53,7 +53,6 @@ sentry = "6.33.1"
 sentry-gradle = "3.4.2"
 transition-ktx = "1.5.1"
 universal-cache = "1.1.7"
-ui-tooling-preview-android = "1.7.6"
 
 
 [libraries]
@@ -89,6 +88,7 @@ androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidx-room" }
 androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "androidx-swiperefreshlayout" }
 androidx-test = { module = "androidx.test:core", version.ref = "androidx-test" }
+androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidx-test" }
 androidx-transition-ktx = { module = "androidx.transition:transition-ktx", version.ref = "transition-ktx" }
 androidx-work = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-work" }
 coil = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
@@ -104,6 +104,7 @@ gms-code-scanner = { module = "com.google.android.gms:play-services-code-scanner
 hamcrest = { module = "org.hamcrest:hamcrest", version.ref = "hamcrest" }
 hamcrest-library = { module = "org.hamcrest:hamcrest-library", version.ref = "hamcrest" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "dagger" }
+hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "dagger" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "dagger" }
 joda-time = { module = "joda-time:joda-time", version.ref = "joda-time" }
 junit = { module = "junit:junit", version.ref = "junit4" }
@@ -131,7 +132,6 @@ sapuseven-protostore = { module = "com.sapuseven.compose:protostore", version.re
 sentry-android = { module = "io.sentry:sentry-android", version.ref = "sentry" }
 sentry-compose-android = { module = "io.sentry:sentry-compose-android", version.ref = "sentry" }
 zxing = { module = "com.journeyapps:zxing-android-embedded", version.ref = "journeyapps-zxing" }
-androidx-ui-tooling-preview-android = { group = "androidx.compose.ui", name = "ui-tooling-preview-android", version.ref = "ui-tooling-preview-android" }
 
 [plugins]
 # Main

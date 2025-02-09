@@ -7,17 +7,24 @@ import dagger.hilt.EntryPoints
 import javax.inject.Inject
 import javax.inject.Singleton
 
+interface UserScopeManager {
+	val user: User
+	val userOptional: User?
+
+	fun handleUserChange(user: User);
+}
+
 @Singleton
-class UserScopeManager @Inject constructor(
+class UserScopeManagerImpl @Inject constructor(
 	private var userComponentBuilder: UserComponent.Builder
-) {
+): UserScopeManager {
 	private var component: UserComponent? = null
 	private var entryPoint: UserComponentEntryPoint? = null
 
-	val user: User
+	override val user: User
 		get() = userOptional!!
 
-	val userOptional: User?
+	override val userOptional: User?
 		get() = entryPoint?.getUser()
 
 	/**
@@ -44,7 +51,7 @@ class UserScopeManager @Inject constructor(
 	/**
 	 * Handle user change by recreating the user-scoped component.
 	 */
-	fun handleUserChange(user: User) {
+	override fun handleUserChange(user: User) {
 		clearUserComponent()
 		getUserComponent(user)
 	}
