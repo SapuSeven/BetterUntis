@@ -5,73 +5,50 @@ import android.content.Context
 import android.os.Build
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.sapuseven.untis.api.model.untis.timetable.Period
+import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.data.database.entities.User
+import com.sapuseven.untis.data.repository.TimetableRepository
+import com.sapuseven.untis.data.settings.model.UserSettings
+import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
+import crocodile8.universal_cache.FromCache
+import kotlinx.coroutines.flow.last
+import java.time.LocalDate
 
 /*
  * This class provides base functions to load timetables for the current day.
  */
 abstract class TimetableDependantWorker(
 	context: Context,
-	params: WorkerParameters
+	params: WorkerParameters,
+	private val timetableRepository: TimetableRepository
 ) : CoroutineWorker(context, params) {
 	companion object {
-		suspend fun loadPersonalTimetableElement(
-			user: User,
-			context: Context
-		): Pair<Int, String>? {
-			return null;// TODO
-			/*val customPersonalTimetable = decodeStoredTimetableValue(
-				context.stringDataStore(
-					user.id,
-					"preference_timetable_personal_timetable",
-					defaultValue = ""
-				).getValue()
-			)
-
-			val elemId = customPersonalTimetable?.id ?: user.userData.elemId
-			val elemType = customPersonalTimetable?.type ?: user.userData.elemType ?: ElementType.SUBJECT
-
-			return if (ElementType.values()
-					.find { it.name == elemType } == null
-			)
-				null // Anonymous / no custom personal timetable
-			else
-				elemId to elemType*/
+		fun getPersonalTimetableElement(user: User, userSettings: UserSettings): PeriodElement? {
+			return userSettings.timetablePersonalTimetable?.let { decodeStoredTimetableValue(it) }
+				?: user.userData.getPeriodElement()
 		}
 	}
 
-	/*protected suspend fun loadTimetable(
+	protected suspend fun loadTimetable(
 		user: User,
-		timetableDatabaseInterface: TimetableDatabaseInterface,
-		timetableElement: Pair<Int, String>,
-		skipCache: Boolean = false
-	): TimetableLoader.TimetableItems {
-		val proxyHost = applicationContext.stringDataStore(
-			user.id,
-			"preference_connectivity_proxy_host",
-			defaultValue = ""
-		).getValue()
+		element: PeriodElement,
+		fromCache: FromCache
+	): List<Period> {
+		val currentDate = LocalDate.now()
 
-		val currentDate = UntisDate.fromLocalDate(LocalDate.now())
-
-		val target = TimetableLoader.TimetableLoaderTarget(
-			currentDate,
-			currentDate,
-			timetableElement.first,
-			timetableElement.second
-		)
-
-		return CompletableDeferred<TimetableLoader.TimetableItems>().apply {
-			TimetableLoader(
-				context = WeakReference(applicationContext),
-				user = user,
-				timetableDatabaseInterface = timetableDatabaseInterface
-			).loadAsync(target, proxyHost, loadFromCache = !skipCache, loadFromServer = skipCache) {
-				completeWith(kotlin.Result.success(it))
-			}
-			completeWith(kotlin.Result.failure(Exception("Timetable loading failed")))
-		}.await()
-	}*/
+		return timetableRepository.timetableSource().get(
+			params = TimetableRepository.TimetableParams(
+				element.id,
+				element.type,
+				currentDate,
+				currentDate,
+			),
+			fromCache = fromCache,
+			maxAge = 60 * 60 * 1000,
+			additionalKey = user.id
+		).last()
+	}
 
 	internal fun canAutoMute(): Boolean {
 		val notificationManager =

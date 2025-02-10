@@ -191,6 +191,7 @@ dependencies {
 	implementation(libs.androidx.fragment)
 	implementation(libs.androidx.glance)
 	implementation(libs.androidx.hilt.navigation.compose)
+	implementation(libs.androidx.hilt.work)
 	implementation(libs.androidx.lifecycle)
 	implementation(libs.androidx.lifecycle.compose)
 	implementation(libs.androidx.navigation.compose)

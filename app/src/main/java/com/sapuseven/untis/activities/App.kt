@@ -2,6 +2,7 @@ package com.sapuseven.untis.activities
 
 import android.app.Application
 import android.util.Log
+import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -22,6 +23,8 @@ import javax.inject.Inject
 @HiltAndroidApp
 class App : Application(), Configuration.Provider {
 	@Inject lateinit var globalSettingsRepository: GlobalSettingsRepository;
+
+	@Inject lateinit var workerFactory: HiltWorkerFactory;
 
 	private val ioScope: CoroutineScope = CoroutineScope(Dispatchers.IO + Job())
 
@@ -48,5 +51,6 @@ class App : Application(), Configuration.Provider {
 	override val workManagerConfiguration: Configuration
 		get() = Configuration.Builder()
 			.setMinimumLoggingLevel(Log.VERBOSE)
+			.setWorkerFactory(workerFactory)
 			.build()
 }

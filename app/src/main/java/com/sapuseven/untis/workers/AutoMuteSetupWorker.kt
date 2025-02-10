@@ -2,29 +2,43 @@ package com.sapuseven.untis.workers
 
 import android.content.Context
 import android.util.Log
-import androidx.work.Data
+import androidx.hilt.work.HiltWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.sapuseven.untis.data.database.entities.User
+import com.sapuseven.untis.data.database.entities.UserDao
+import com.sapuseven.untis.data.repository.TimetableRepository
+import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 
-
-class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
-	TimetableDependantWorker(context, params) {
+/**
+ * This worker schedules all auto-mute events for the day.
+ */
+@HiltWorker
+class AutoMuteSetupWorker @AssistedInject constructor(
+	@Assisted context: Context,
+	@Assisted params: WorkerParameters,
+	timetableRepository: TimetableRepository,
+	private val userDao: UserDao,
+	private val settingsRepository: UserSettingsRepository,
+) : TimetableDependantWorker(context, params, timetableRepository) {
 	companion object {
 		private const val LOG_TAG = "AutoMuteSetup"
 		private const val TAG_AUTO_MUTE_SETUP_WORK = "AutoMuteSetupWork"
+		private const val WORKER_DATA_USER_ID = "UserId"
 
 		fun enqueue(workManager: WorkManager, user: User) {
-			val data: Data = Data.Builder().run {
-				//put(WORKER_DATA_USER_ID, user.id)
-				build()
-			}
-
 			workManager.enqueue(
 				OneTimeWorkRequestBuilder<AutoMuteSetupWorker>()
 					.addTag(TAG_AUTO_MUTE_SETUP_WORK)
-					.setInputData(data)
+					.setInputData(
+						workDataOf(
+							WORKER_DATA_USER_ID to user.id
+						)
+					)
 					.build()
 			)
 		}

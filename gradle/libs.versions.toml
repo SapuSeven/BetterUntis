@@ -9,7 +9,7 @@ androidx-constraintlayout = "2.2.0"
 androidx-datastore = "1.1.1"
 androidx-fragment = "1.8.5"
 androidx-glance = "1.1.1"
-androidx-hilt-navigation = "1.2.0"
+androidx-hilt = "1.2.0"
 androidx-lifecycle = "2.8.7"
 androidx-navigation = "2.8.5"
 androidx-preference = "1.2.1"
@@ -48,7 +48,7 @@ mockk = "1.13.4"
 openapi = "7.0.1"
 placeholder-material3 = "2.0.0"
 protobuf-javalite = "4.28.0"
-protostore = "0.1.1"
+protostore = "0.1.2"
 sentry = "6.33.1"
 sentry-gradle = "3.4.2"
 transition-ktx = "1.5.1"
@@ -76,7 +76,8 @@ androidx-datastore = { module = "androidx.datastore:datastore-preferences", vers
 androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso-core" }
 androidx-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "androidx-fragment" }
 androidx-glance = { module = "androidx.glance:glance-appwidget", version.ref = "androidx-glance" }
-androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "androidx-hilt-navigation" }
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "androidx-hilt" }
+androidx-hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "androidx-hilt" }
 androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junit-ktx" }
 androidx-lifecycle = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
