@@ -10,13 +10,14 @@ import com.sapuseven.untis.api.model.untis.enumeration.PeriodState
 import com.sapuseven.untis.api.model.untis.timetable.Period
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.data.repository.MasterDataRepository
+import com.sapuseven.untis.ui.weekview.Event
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 @Serializable
 class PeriodItem(
-    @Transient private var masterDataRepository: MasterDataRepository? = null,
-    var originalPeriod: Period
+	@Transient private var masterDataRepository: MasterDataRepository? = null,
+	var originalPeriod: Period
 ) {
 	val classes = HashSet<PeriodElement>()
 	val teachers = HashSet<PeriodElement>()
@@ -92,3 +93,15 @@ class PeriodItem(
 
 	fun isExam(): Boolean = originalPeriod.`is`.contains(PeriodState.EXAM)
 }
+
+fun PeriodItem.mergeValuesWith(item: PeriodItem) {
+	apply {
+		classes.addAll(item.classes)
+		teachers.addAll(item.teachers)
+		subjects.addAll(item.subjects)
+		rooms.addAll(item.rooms)
+	}
+}
+
+fun PeriodItem.equalsIgnoreTime(secondItem: PeriodItem) =
+	originalPeriod.equalsIgnoreTime(secondItem.originalPeriod)

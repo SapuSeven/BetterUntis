@@ -1,13 +1,32 @@
 package com.sapuseven.untis.receivers
 
+import android.Manifest
+import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.util.Log
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.sapuseven.untis.R
+import com.sapuseven.untis.activities.MainActivity
+import com.sapuseven.untis.data.settings.model.UserSettings
+import com.sapuseven.untis.ui.pages.settings.GlobalSettingsRepository
+import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
+import com.sapuseven.untis.workers.NotificationSetupWorker.Companion.CHANNEL_ID_BREAKINFO
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import java.time.LocalTime
+import javax.inject.Inject
 
-class NotificationReceiver : BroadcastReceiver() {
+@AndroidEntryPoint
+class NotificationReceiver @Inject constructor(
+	val settingsRepository: UserSettingsRepository
+) : BroadcastReceiver() {
 	companion object {
 		private const val LOG_TAG = "NotificationReceiver"
 
@@ -18,23 +37,23 @@ class NotificationReceiver : BroadcastReceiver() {
 		const val EXTRA_LONG_USER_ID = "com.sapuseven.untis.notifications.userId"
 		const val EXTRA_STRING_BREAK_END_TIME = "com.sapuseven.untis.notifications.breakEndTime"
 		const val EXTRA_STRING_NEXT_SUBJECT = "com.sapuseven.untis.notifications.nextSubject"
-		const val EXTRA_STRING_NEXT_SUBJECT_LONG =
-			"com.sapuseven.untis.notifications.nextSubjectLong"
+		const val EXTRA_STRING_NEXT_SUBJECT_LONG = "com.sapuseven.untis.notifications.nextSubjectLong"
 		const val EXTRA_STRING_NEXT_ROOM = "com.sapuseven.untis.notifications.nextRoom"
 		const val EXTRA_STRING_NEXT_ROOM_LONG = "com.sapuseven.untis.notifications.nextRoomLong"
 		const val EXTRA_STRING_NEXT_TEACHER = "com.sapuseven.untis.notifications.nextTeacher"
-		const val EXTRA_STRING_NEXT_TEACHER_LONG =
-			"com.sapuseven.untis.notifications.nextTeacherLong"
+		const val EXTRA_STRING_NEXT_TEACHER_LONG = "com.sapuseven.untis.notifications.nextTeacherLong"
 		const val EXTRA_STRING_NEXT_CLASS = "com.sapuseven.untis.notifications.nextClass"
 		const val EXTRA_STRING_NEXT_CLASS_LONG = "com.sapuseven.untis.notifications.nextClassLong"
 	}
 
 	override fun onReceive(context: Context, intent: Intent) = runBlocking {
 		Log.d(LOG_TAG, "NotificationReceiver received")
-		return@runBlocking
 
-		// TODO
-		/*if (intent.getBooleanExtra(EXTRA_BOOLEAN_CLEAR, false)) {
+		val userId = intent.getLongExtra(EXTRA_LONG_USER_ID, -1)
+		val settings = settingsRepository.getAllSettings().first()
+		val userSettings = settings.userSettingsMap.getOrDefault(userId, settingsRepository.getSettingsDefaults())
+
+		if (intent.getBooleanExtra(EXTRA_BOOLEAN_CLEAR, false)) {
 			Log.d(
 				LOG_TAG,
 				"Attempting to cancel notification #${intent.getIntExtra(EXTRA_INT_ID, -1)}"
@@ -43,17 +62,10 @@ class NotificationReceiver : BroadcastReceiver() {
 				cancel(intent.getIntExtra(EXTRA_INT_ID, -1))
 			}
 		} else {
-			val notificationsEnable = context.booleanDataStore(
-				intent.getLongExtra(EXTRA_LONG_USER_ID, -1),
-				"preference_notifications_enable"
-			).getValue()
+			if (!userSettings.notificationsEnable) return@runBlocking // Notifications disabled
 
-			if (!notificationsEnable) return@runBlocking // Notifications disabled
-
-			if (LocalDateTime.now().millisOfDay >= intent.getIntExtra(
-					EXTRA_INT_BREAK_END_TIME,
-					0
-				)
+			if (LocalTime.ofSecondOfDay(intent.getIntExtra(EXTRA_INT_BREAK_END_TIME, 0).toLong())
+					.isBefore(LocalTime.now())
 			) return@runBlocking // Break is already over
 
 			val pendingIntent = PendingIntent.getActivity(
@@ -61,24 +73,7 @@ class NotificationReceiver : BroadcastReceiver() {
 				0,
 				Intent(context, MainActivity::class.java),
 				FLAG_IMMUTABLE
-			) // TODO: Pass extra to show personal timetable
-
-			val visibilitySubjects = context.stringDataStore(
-				intent.getLongExtra(EXTRA_LONG_USER_ID, -1),
-				"preference_notifications_visibility_subjects"
-			).getValue()
-			val visibilityRooms = context.stringDataStore(
-				intent.getLongExtra(EXTRA_LONG_USER_ID, -1),
-				"preference_notifications_visibility_rooms"
-			).getValue()
-			val visibilityTeachers = context.stringDataStore(
-				intent.getLongExtra(EXTRA_LONG_USER_ID, -1),
-				"preference_notifications_visibility_teachers"
-			).getValue()
-			val visibilityClasses = context.stringDataStore(
-				intent.getLongExtra(EXTRA_LONG_USER_ID, -1),
-				"preference_notifications_visibility_classes"
-			).getValue()
+			) // TODO: Ensure that the appropriate profile is shown
 
 			val title = context.getString(
 				if (intent.getBooleanExtra(
@@ -92,19 +87,19 @@ class NotificationReceiver : BroadcastReceiver() {
 				null,
 				intent,
 				context.getString(R.string.notifications_text_message_separator),
-				visibilitySubjects,
-				visibilityRooms,
-				visibilityTeachers,
-				visibilityClasses
+				userSettings.notificationsVisibilitySubjects,
+				userSettings.notificationsVisibilityRooms,
+				userSettings.notificationsVisibilityTeachers,
+				userSettings.notificationsVisibilityClasses
 			)
 			val longMessage = buildMessage(
 				context,
 				intent,
 				"\n",
-				visibilitySubjects,
-				visibilityRooms,
-				visibilityTeachers,
-				visibilityClasses
+				userSettings.notificationsVisibilitySubjects,
+				userSettings.notificationsVisibilityRooms,
+				userSettings.notificationsVisibilityTeachers,
+				userSettings.notificationsVisibilityClasses
 			)
 
 			val builder = NotificationCompat.Builder(context, CHANNEL_ID_BREAKINFO)
@@ -118,10 +113,18 @@ class NotificationReceiver : BroadcastReceiver() {
 				.setCategory(NotificationCompat.CATEGORY_STATUS)
 
 			with(NotificationManagerCompat.from(context)) {
+				if (ActivityCompat.checkSelfPermission(
+						context,
+						Manifest.permission.POST_NOTIFICATIONS
+					) != PackageManager.PERMISSION_GRANTED
+				) {
+					Log.e(LOG_TAG, "Notification permission not granted!")
+					return@runBlocking
+				}
 				notify(intent.getIntExtra(EXTRA_INT_ID, -1), builder.build())
 			}
 			Log.d(LOG_TAG, "Notification delivered: $title")
-		}*/
+		}
 	}
 
 	private fun buildMessage(
@@ -140,11 +143,13 @@ class NotificationReceiver : BroadcastReceiver() {
 					intent.getStringExtra(EXTRA_STRING_NEXT_SUBJECT)
 				)
 					?: intent.getStringExtra(EXTRA_STRING_NEXT_SUBJECT)
+
 				"long" -> context?.getString(
 					R.string.notifications_text_message_subjects,
 					intent.getStringExtra(EXTRA_STRING_NEXT_SUBJECT_LONG)
 				)
 					?: intent.getStringExtra(EXTRA_STRING_NEXT_SUBJECT_LONG)
+
 				else -> null
 			},
 		if (intent.getStringExtra(EXTRA_STRING_NEXT_ROOM)?.isBlank() != false) null else
@@ -154,11 +159,13 @@ class NotificationReceiver : BroadcastReceiver() {
 					intent.getStringExtra(EXTRA_STRING_NEXT_ROOM)
 				)
 					?: intent.getStringExtra(EXTRA_STRING_NEXT_ROOM)
+
 				"long" -> context?.getString(
 					R.string.notifications_text_message_rooms,
 					intent.getStringExtra(EXTRA_STRING_NEXT_ROOM_LONG)
 				)
 					?: intent.getStringExtra(EXTRA_STRING_NEXT_ROOM_LONG)
+
 				else -> null
 			},
 		if (intent.getStringExtra(EXTRA_STRING_NEXT_TEACHER)?.isBlank() != false) null else
@@ -168,11 +175,13 @@ class NotificationReceiver : BroadcastReceiver() {
 					intent.getStringExtra(EXTRA_STRING_NEXT_TEACHER)
 				)
 					?: intent.getStringExtra(EXTRA_STRING_NEXT_TEACHER)
+
 				"long" -> context?.getString(
 					R.string.notifications_text_message_teachers,
 					intent.getStringExtra(EXTRA_STRING_NEXT_TEACHER_LONG)
 				)
 					?: intent.getStringExtra(EXTRA_STRING_NEXT_TEACHER_LONG)
+
 				else -> null
 			},
 		if (intent.getStringExtra(EXTRA_STRING_NEXT_CLASS)?.isBlank() != false) null else
@@ -182,11 +191,13 @@ class NotificationReceiver : BroadcastReceiver() {
 					intent.getStringExtra(EXTRA_STRING_NEXT_CLASS)
 				)
 					?: intent.getStringExtra(EXTRA_STRING_NEXT_CLASS)
+
 				"long" -> context?.getString(
 					R.string.notifications_text_message_classes,
 					intent.getStringExtra(EXTRA_STRING_NEXT_CLASS_LONG)
 				)
 					?: intent.getStringExtra(EXTRA_STRING_NEXT_CLASS_LONG)
+
 				else -> null
 			}
 	).joinToString(separator)

@@ -9,6 +9,7 @@ import com.sapuseven.untis.api.model.untis.masterdata.timegrid.Day
 import com.sapuseven.untis.api.model.untis.timetable.Period
 import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.models.PeriodItem
+import com.sapuseven.untis.models.equalsIgnoreTime
 import com.sapuseven.untis.scope.UserScopeManager
 import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
 import com.sapuseven.untis.ui.weekview.Event
@@ -287,7 +288,7 @@ class TimetableMapper @AssistedInject constructor(
 
 			if (candidate.start.dayOfYear != start.dayOfYear) return@forEachIndexed
 
-			if (this.equalsIgnoreTime(candidate)) {
+			if (this.data.equalsIgnoreTime(candidate.data)) {
 				end = candidate.end
 				data.originalPeriod.endDateTime = candidate.data.originalPeriod.endDateTime
 				items.removeAt(i)
@@ -296,18 +297,4 @@ class TimetableMapper @AssistedInject constructor(
 		}
 		return false
 	}
-
-	private fun Event<PeriodItem>.mergeValuesWith(item: Event<PeriodItem>) {
-		item.data?.let { data ->
-			this.data?.apply {
-				classes.addAll(data.classes)
-				teachers.addAll(data.teachers)
-				subjects.addAll(data.subjects)
-				rooms.addAll(data.rooms)
-			}
-		}
-	}
-
-	private fun Event<PeriodItem>.equalsIgnoreTime(secondItem: Event<PeriodItem>) =
-		secondItem.data?.originalPeriod?.let { data?.originalPeriod?.equalsIgnoreTime(it) } == true
 }
