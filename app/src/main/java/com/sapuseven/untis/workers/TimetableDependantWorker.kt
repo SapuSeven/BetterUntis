@@ -2,8 +2,8 @@ package com.sapuseven.untis.workers
 
 import android.app.AlarmManager
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
-import android.content.Context.ALARM_SERVICE
 import android.content.Context.NOTIFICATION_SERVICE
 import android.os.Build
 import androidx.work.CoroutineWorker
@@ -20,9 +20,12 @@ import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import crocodile8.universal_cache.FromCache
 import kotlinx.coroutines.flow.last
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 /*
- * This class provides base functions to load timetables for the current day.
+ * This class provides base functions to load timetables for the current day
+ * and process its items.
  */
 abstract class TimetableDependantWorker(
 	context: Context,
@@ -67,16 +70,6 @@ abstract class TimetableDependantWorker(
 		return (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || notificationManager.areNotificationsEnabled())
 	}
 
-	internal suspend fun disablePreference(key: String) {
-		/*Room.databaseBuilder(
-			applicationContext,
-			UserDatabase::class.java, "users"
-		).build().userDao().getAll().map { it.id }.forEach { userId ->
-			val pref = applicationContext.booleanDataStore(userId, key)
-			pref.saveValue(false)
-		}*/
-	}
-
 	/**
 	 * Merges all values from contemporaneous lessons.
 	 * After this operation, every time period only has a single lesson containing all subjects, teachers, rooms and classes.
@@ -92,4 +85,21 @@ abstract class TimetableDependantWorker(
 	internal fun <E> List<Pair<E?, E?>>.withLast(): List<Pair<E?, E?>> =
 		if (this.isEmpty()) this
 		else this.toMutableList().apply { add(Pair(this.last().second, null)) }.toList()
+}
+
+internal fun AlarmManager.setBest(time: LocalDateTime, pendingIntent: PendingIntent) {
+	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && canScheduleExactAlarms()) {
+		setExact(
+			AlarmManager.RTC_WAKEUP,
+			time.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
+			pendingIntent
+		)
+	} else {
+		setWindow(
+			AlarmManager.RTC_WAKEUP,
+			time.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
+			600_000, // 10 minutes
+			pendingIntent
+		)
+	}
 }

@@ -119,8 +119,11 @@ class NotificationSetupWorker @AssistedInject constructor(
 					FromCache.ONLY
 				)
 
-				val preparedItems = timetable.filter { !it.`is`(PeriodState.CANCELLED) }
-					.sortedBy { it.startDateTime }.merged().zipWithNext()
+				val preparedItems = timetable
+					.sortedBy { it.startDateTime }
+					.merged()
+					.filter { !it.isCancelled() }
+					.zipWithNext()
 
 				if (preparedItems.isEmpty()) {
 					Log.d(LOG_TAG, "No notifications to schedule")
@@ -318,22 +321,5 @@ class NotificationSetupWorker @AssistedInject constructor(
 				notificationManager.createNotificationChannel(it)
 			}
 		}
-	}
-}
-
-private fun AlarmManager.setBest(time: LocalDateTime, pendingIntent: PendingIntent) {
-	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && canScheduleExactAlarms()) {
-		setExact(
-			AlarmManager.RTC_WAKEUP,
-			time.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
-			pendingIntent
-		)
-	} else {
-		setWindow(
-			AlarmManager.RTC_WAKEUP,
-			time.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
-			600_000, // 10 minutes
-			pendingIntent
-		)
 	}
 }
