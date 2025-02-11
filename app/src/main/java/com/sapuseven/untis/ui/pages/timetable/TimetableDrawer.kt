@@ -44,8 +44,7 @@ import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.components.ElementPicker
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
-import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreenNew
-import kotlinx.coroutines.async
+import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
@@ -246,7 +245,7 @@ fun TimetableDrawer(
 		enter = fullscreenDialogAnimationEnter(),
 		exit = fullscreenDialogAnimationExit()
 	) {
-		ElementPickerDialogFullscreenNew(
+		ElementPickerDialogFullscreen(
 			title = { /*TODO*/ },
 			elementPicker = elementPicker,
 			onDismiss = { showElementPicker = null },

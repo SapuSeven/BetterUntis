@@ -47,7 +47,7 @@ import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.SmallCircularProgressIndicator
-import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreenNew
+import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
 import com.sapuseven.untis.ui.functional.bottomInsets
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -144,7 +144,7 @@ fun RoomFinder(
 		enter = fullscreenDialogAnimationEnter(),
 		exit = fullscreenDialogAnimationExit()
 	) {
-		ElementPickerDialogFullscreenNew(
+		ElementPickerDialogFullscreen(
 			title = { Text(stringResource(id = R.string.all_add)) }, // TODO: Proper string resource
 			multiSelect = true,
 			hideTypeSelection = true,

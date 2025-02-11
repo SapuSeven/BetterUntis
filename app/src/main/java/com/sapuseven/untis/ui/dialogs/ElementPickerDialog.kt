@@ -67,7 +67,7 @@ import com.sapuseven.untis.ui.functional.insetsPaddingValues
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ElementPickerDialogFullscreenNew(
+fun ElementPickerDialogFullscreen(
 	elementPicker: ElementPicker,
 	title: @Composable () -> Unit,
 	initialType: ElementType? = null,
@@ -193,7 +193,7 @@ fun ElementPickerDialogFullscreenNew(
 				.fillMaxSize()
 		) {
 			//Text(text = "${elements.get(ElementType.ROOM)?.size ?: "?"} rooms")
-			ElementPickerElementsNew(
+			ElementPickerElements(
 				elementPicker = elementPicker,
 				selectedType = selectedType,
 				multiSelect = multiSelect,
@@ -220,7 +220,7 @@ fun ElementPickerDialogFullscreenNew(
 }
 
 @Composable
-fun ElementPickerDialogNew(
+fun ElementPickerDialog(
 	elementPicker: ElementPicker,
 	title: (@Composable () -> Unit)?,
 	initialType: ElementType? = null,
@@ -259,7 +259,7 @@ fun ElementPickerDialogNew(
 					}
 				}
 
-				ElementPickerElementsNew(
+				ElementPickerElements(
 					elementPicker = elementPicker,
 					selectedType = selectedType,
 					onDismiss = onDismiss,
@@ -285,7 +285,7 @@ fun ElementPickerDialogNew(
 }
 
 @Composable
-fun ElementPickerElementsNew(
+fun ElementPickerElements(
 	elementPicker: ElementPicker,
 	selectedType: ElementType?,
 	multiSelect: Boolean = false,
