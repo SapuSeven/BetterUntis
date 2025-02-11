@@ -25,8 +25,10 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class NotificationReceiver @Inject constructor(
-	val settingsRepository: UserSettingsRepository
+	userSettingsRepositoryFactory: UserSettingsRepository.Factory
 ) : BroadcastReceiver() {
+	val settingsRepository = userSettingsRepositoryFactory.create()
+
 	companion object {
 		private const val LOG_TAG = "NotificationReceiver"
 

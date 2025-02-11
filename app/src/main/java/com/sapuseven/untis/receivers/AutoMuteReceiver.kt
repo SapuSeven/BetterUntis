@@ -4,9 +4,19 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.sapuseven.untis.services.AutoMuteService
+import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
-class AutoMuteReceiver : BroadcastReceiver() {
+@AndroidEntryPoint
+class AutoMuteReceiver @Inject constructor(
+	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
+	private val autoMuteService: AutoMuteService
+) : BroadcastReceiver() {
+	val settingsRepository = userSettingsRepositoryFactory.create()
+
 	companion object {
 		const val EXTRA_BOOLEAN_MUTE = "com.sapuseven.untis.automute.mute"
 		const val EXTRA_INT_ID = "com.sapuseven.untis.automute.id"
@@ -21,23 +31,8 @@ class AutoMuteReceiver : BroadcastReceiver() {
 			"AutoMuteReceiver",
 			"AutoMuteReceiver received, mute = ${intent.getBooleanExtra(EXTRA_BOOLEAN_MUTE, false)}"
 		)
-		return@runBlocking
-
-		// TODO
-		/*val automuteEnable = context.booleanDataStore(
-			intent.getLongExtra(EXTRA_LONG_USER_ID, -1),
-			"preference_automute_enable"
-		).getValue()
-
-		val automutePriority = context.booleanDataStore(
-			intent.getLongExtra(EXTRA_LONG_USER_ID, -1),
-			"preference_automute_mute_priority"
-		).getValue()
 
 		if (intent.hasExtra(EXTRA_BOOLEAN_MUTE)) {
-			val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
-			val editor = prefs.edit()
-
 			if (intent.getBooleanExtra(EXTRA_BOOLEAN_MUTE, false)) {
 				// Mute
 				if (!automuteEnable) return@runBlocking
@@ -89,6 +84,6 @@ class AutoMuteReceiver : BroadcastReceiver() {
 			}
 
 			editor.apply()
-		}*/
+		}
 	}
 }

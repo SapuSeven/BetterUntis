@@ -24,7 +24,7 @@ class GetAbsencesUseCase @Inject constructor(
 ) {
 	private val user: User = userScopeManager.user
 	private val userSettingsRepository =
-		userSettingsRepositoryFactory.create(darkColorScheme()) // Color scheme doesn't matter here
+		userSettingsRepositoryFactory.create()
 	private val currentSchoolYear =
 		getCurrentSchoolYear() ?: SchoolYearEntity(startDate = LocalDate.now(), endDate = LocalDate.now())
 

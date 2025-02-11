@@ -43,7 +43,7 @@ class InfoCenterViewModel @Inject constructor(
 
 	private val excuseStatuses = masterDataRepository.currentUserData?.excuseStatuses ?: emptyList()
 
-	val userSettingsRepository = userSettingsRepositoryFactory.create(darkColorScheme()) // Color scheme doesn't matter here
+	val userSettingsRepository = userSettingsRepositoryFactory.create()
 
 	val shouldShowAbsences: Boolean = Right.R_MY_ABSENCES in currentUser.userData.rights
 	val shouldShowAbsencesAdd: Boolean = Right.W_OWN_ABSENCE in currentUser.userData.rights

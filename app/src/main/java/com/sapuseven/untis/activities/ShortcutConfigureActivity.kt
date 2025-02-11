@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 
 // TODO
 class ShortcutConfigureActivity : ComponentActivity() {
@@ -58,7 +57,7 @@ class ShortcutConfigureActivity : ComponentActivity() {
 	}
 
 	private fun setupShortcut(
-		timetableDatabaseInterface: TimetableDatabaseInterface,
+		//timetableDatabaseInterface: TimetableDatabaseInterface,
 		userId: Long,
 		element: PeriodElement?
 	) {

@@ -35,11 +35,13 @@ import java.time.LocalDateTime
 class AutoMuteSetupWorker @AssistedInject constructor(
 	@Assisted context: Context,
 	@Assisted params: WorkerParameters,
+	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
 	timetableRepository: TimetableRepository,
-	masterDataRepository: MasterDataRepository,
+	private val masterDataRepository: MasterDataRepository,
 	private val userDao: UserDao,
-	private val settingsRepository: UserSettingsRepository,
-) : TimetableDependantWorker(context, params, timetableRepository, masterDataRepository) {
+) : TimetableDependantWorker(context, params, timetableRepository) {
+	val settingsRepository = userSettingsRepositoryFactory.create()
+
 	companion object {
 		private const val LOG_TAG = "AutoMuteSetup"
 		private const val TAG_AUTO_MUTE_SETUP_WORK = "AutoMuteSetupWork"
@@ -85,7 +87,7 @@ class AutoMuteSetupWorker @AssistedInject constructor(
 					FromCache.ONLY
 				)
 
-				timetable.merged().sortedBy { it.originalPeriod.startDateTime }.zipWithNext().withLast()
+				timetable.merged(masterDataRepository).sortedBy { it.originalPeriod.startDateTime }.zipWithNext().withLast()
 					.forEach {
 						it.first?.let { item ->
 							val alarmManager =

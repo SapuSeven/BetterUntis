@@ -28,7 +28,7 @@ class AutoMuteSettingsViewModel @Inject constructor(
 	private val _user = MutableStateFlow<User?>(null)
 	val user: StateFlow<User?> = _user
 
-	val repository = userSettingsRepositoryFactory.create(lightColorScheme() /* doesn't matter */)
+	val repository = userSettingsRepositoryFactory.create()
 
 	init {
 		if (autoMuteService is AutoMuteServiceZenRuleImpl) {

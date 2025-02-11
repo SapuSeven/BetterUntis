@@ -61,12 +61,14 @@ import java.time.ZoneId
 class NotificationSetupWorker @AssistedInject constructor(
 	@Assisted context: Context,
 	@Assisted params: WorkerParameters,
+	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
 	timetableRepository: TimetableRepository,
-	masterDataRepository: MasterDataRepository,
+	private val masterDataRepository: MasterDataRepository,
 	private val clock: Clock,
 	private val userDao: UserDao,
-	private val settingsRepository: UserSettingsRepository,
-) : TimetableDependantWorker(context, params, timetableRepository, masterDataRepository) {
+) : TimetableDependantWorker(context, params, timetableRepository) {
+	val settingsRepository = userSettingsRepositoryFactory.create()
+
 	companion object {
 		private const val LOG_TAG = "NotificationSetup"
 		private const val TAG_NOTIFICATION_SETUP_WORK = "NotificationSetupWork"
@@ -121,7 +123,7 @@ class NotificationSetupWorker @AssistedInject constructor(
 
 				val preparedItems = timetable
 					.sortedBy { it.startDateTime }
-					.merged()
+					.merged(masterDataRepository)
 					.filter { !it.isCancelled() }
 					.zipWithNext()
 

@@ -31,7 +31,6 @@ abstract class TimetableDependantWorker(
 	context: Context,
 	params: WorkerParameters,
 	private val timetableRepository: TimetableRepository,
-	private val masterDataRepository: MasterDataRepository
 ) : CoroutineWorker(context, params) {
 	companion object {
 		fun getPersonalTimetableElement(user: User, userSettings: UserSettings): PeriodElement? {
@@ -74,7 +73,7 @@ abstract class TimetableDependantWorker(
 	 * Merges all values from contemporaneous lessons.
 	 * After this operation, every time period only has a single lesson containing all subjects, teachers, rooms and classes.
 	 */
-	internal fun List<Period>.merged(): List<PeriodItem> = this
+	internal fun List<Period>.merged(masterDataRepository: MasterDataRepository): List<PeriodItem> = this
 		.map { PeriodItem(masterDataRepository, it) }
 		.groupBy { it.originalPeriod.startDateTime }
 		.map { it.value.reduce { item1, item2 -> item1.mergeValuesWith(item2); item1 } }

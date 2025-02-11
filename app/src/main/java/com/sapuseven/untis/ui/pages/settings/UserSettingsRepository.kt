@@ -2,6 +2,7 @@ package com.sapuseven.untis.ui.pages.settings
 
 import android.util.Log
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.datastore.core.DataStore
@@ -22,7 +23,7 @@ class UserSettingsRepository @AssistedInject constructor(
 ) {
 	@AssistedFactory
 	interface Factory {
-		fun create(colorScheme: ColorScheme): UserSettingsRepository
+		fun create(colorScheme: ColorScheme = lightColorScheme()): UserSettingsRepository
 	}
 
 	private val userId = userScopeManager.userOptional?.id
