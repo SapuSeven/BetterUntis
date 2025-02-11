@@ -51,9 +51,10 @@ As this changes virtually every part of the app, here's a list tracking all migr
   - [x] Theme management
 - [x] Room finder
 - [x] Info center
-- [ ] Widget
-- [ ] Notifications
-- [ ] Auto-Mute
+- [ ] Widget/Shortcut
+- [x] Notifications _(needs testing)_
+- [x] Auto-Mute _(needs testing)_
+- [ ] Bookmarks
 
 Package structure overview:
 
