@@ -11,7 +11,7 @@ message UserSettings {
   float weekCustomLength = 5;
   bool automuteEnable = 6;
   bool automuteCancelledLessons = 7;
-  bool automuteMutePriority = 8;
+  bool automuteAllowPriority = 56;
   float automuteMinimumBreakLength = 9;
   bool timetableItemTextLight = 10;
   int32 backgroundFuture = 11;

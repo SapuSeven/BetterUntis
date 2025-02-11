@@ -1,15 +1,24 @@
 package com.sapuseven.untis.workers
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.sapuseven.untis.data.repository.TimetableRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 
 /**
  * This worker loads the data for widgets.
  */
-class WidgetUpdateWorker(context: Context, params: WorkerParameters) :
-	TimetableDependantWorker(context, params) {
+@HiltWorker
+class WidgetUpdateWorker @AssistedInject constructor(
+	@Assisted context: Context,
+	@Assisted params: WorkerParameters,
+	timetableRepository: TimetableRepository,
+) :
+	TimetableDependantWorker(context, params, timetableRepository) {
 	companion object {
 		private const val LOG_TAG = "WidgetUpdate"
 		private const val TAG_WIDGET_UPDATE_WORK = "WidgetUpdateWork"

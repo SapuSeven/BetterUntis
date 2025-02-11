@@ -12,7 +12,7 @@ import com.sapuseven.untis.data.database.entities.SubjectEntity
 import com.sapuseven.untis.data.database.entities.TeacherEntity
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
-import com.sapuseven.untis.data.timetable.PeriodData.Companion.ELEMENT_NAME_UNKNOWN
+import com.sapuseven.untis.models.PeriodItem.Companion.ELEMENT_NAME_UNKNOWN
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

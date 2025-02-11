@@ -129,12 +129,14 @@ fun AutoMuteSettings(
 				onValueChange = { automuteCancelledLessons = it }
 			)
 
-			SwitchPreference(
-				title = { Text(stringResource(R.string.preference_automute_mute_priority)) },
+			// TODO: Currently not implemented in the new zen-rule based implementation.
+			//  Needs to be reconsidered
+			/*SwitchPreference(
+				title = { Text(stringResource(R.string.preference_automute_allow_priority)) },
 				settingsRepository = viewModel.repository,
-				value = { it.automuteMutePriority },
-				onValueChange = { automuteMutePriority = it }
-			)
+				value = { it.automuteAllowPriority },
+				onValueChange = { automuteAllowPriority = it }
+			)*/
 
 			SliderPreference(
 				valueRange = 0f..20f,

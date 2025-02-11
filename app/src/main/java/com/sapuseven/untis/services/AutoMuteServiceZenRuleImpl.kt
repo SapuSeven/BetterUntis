@@ -9,6 +9,7 @@ import android.os.Build
 import android.service.notification.Condition
 import androidx.annotation.RequiresApi
 import com.sapuseven.untis.BuildConfig
+import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.AutoMuteConfigurationActivity
 import com.sapuseven.untis.data.database.entities.User
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -25,7 +26,6 @@ import javax.inject.Inject
  * When Auto-Mute is enabled for multiple users, each user will have their own schedule
  * and Zen mode will be enabled if any of them are active.
  */
-// TODO: Use string resources
 @RequiresApi(Build.VERSION_CODES.Q)
 class AutoMuteServiceZenRuleImpl @Inject constructor(
 	@ApplicationContext private val context: Context,
@@ -73,7 +73,7 @@ class AutoMuteServiceZenRuleImpl @Inject constructor(
 
 	override fun autoMuteEnable() {
 		val rule = AutomaticZenRule(
-			"School - ${user.getDisplayedName(context)}",
+			context.getString(R.string.automute_zen_rule_name, user.getDisplayedName(context)),
 			null,
 			ComponentName(context, AutoMuteConfigurationActivity::class.java),
 			conditionUri,

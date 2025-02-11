@@ -3,7 +3,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.components.ElementPicker
-import com.sapuseven.untis.data.timetable.PeriodData.Companion.ELEMENT_NAME_UNKNOWN
+import com.sapuseven.untis.models.PeriodItem.Companion.ELEMENT_NAME_UNKNOWN
 
 @Composable
 fun ElementItem(

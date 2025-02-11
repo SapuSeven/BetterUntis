@@ -15,7 +15,6 @@ import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.components.ElementPicker
 import com.sapuseven.untis.helpers.SerializationUtils
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialogNew
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

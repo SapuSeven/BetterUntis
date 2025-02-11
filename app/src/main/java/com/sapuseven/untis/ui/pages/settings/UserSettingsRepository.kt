@@ -46,7 +46,6 @@ class UserSettingsRepository @AssistedInject constructor(
 
 	override fun getSettingsDefaults(): UserSettings = UserSettings.newBuilder().apply {
 		automuteCancelledLessons = true
-		automuteMutePriority = true
 		automuteMinimumBreakLength = 5.0f
 		// todo detailed errors
 

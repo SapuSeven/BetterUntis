@@ -205,6 +205,7 @@
     <string name="preference_automute_minimum_break_length">Minimum break length</string>
     <string name="preference_automute_minimum_break_length_summary">Don\'t unmute the device during breaks shorter than the specified length (in minutes)</string>
     <string name="preference_automute_mute_priority">Don\'t allow priority events to ignore aute-mute</string>
+    <string name="preference_automute_allow_priority">Allow priority events to ignore aute-mute</string>
     <string name="preference_background_cancelled">Cancelled lessons</string>
     <string name="preference_background_cancelled_past">Past cancelled lessons</string>
     <string name="preference_background_exam">Lessons with tests</string>
@@ -414,4 +415,5 @@
 	<string name="preference_automute_exact_alarms_unavailable">Exact auto-mute is unavailable</string>
 	<string name="preference_automute_exact_alarms_unavailable_desc">To ensure auto-mute is toggled at the correct time, please grant %1$s permission to schedule exact alarms.\nTap to go to settings.</string>
     <string name="preference_reports_enable">Enable automatic error reporting</string>
+    <string name="automute_zen_rule_name">School - %1$s</string>
 </resources>
