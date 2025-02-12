@@ -19,7 +19,6 @@ import com.sapuseven.untis.api.model.untis.MasterData
 import com.sapuseven.untis.api.model.untis.Settings
 import com.sapuseven.untis.api.model.untis.UserData
 import com.sapuseven.untis.api.model.untis.masterdata.TimeGrid
-import com.sapuseven.untis.models.TimetableBookmark
 import kotlinx.coroutines.flow.Flow
 
 @Entity
@@ -36,8 +35,6 @@ data class User(
 	val userData: UserData,
 	val settings: Settings? = null,
 	val created: Long? = null,
-	@Deprecated("Do not use - Will be removed in favor of UserSettingsRepository")
-	var bookmarks: Set<TimetableBookmark>
 ) {
 	fun getDisplayedName(context: Context): String {
 		return when {

@@ -1,6 +1,8 @@
 package com.sapuseven.untis.data.database
 
 import android.provider.BaseColumns
+import androidx.room.DeleteColumn
+import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
@@ -180,3 +182,11 @@ val MIGRATION_USER_7_8 = object : Migration(7, 8) {
 		db.createIndices("SchoolYear")
 	}
 }
+
+@DeleteColumn.Entries(
+	DeleteColumn(
+		tableName = "User",
+		columnName = "bookmarks"
+	)
+)
+class MigrationSpec10to11 : AutoMigrationSpec

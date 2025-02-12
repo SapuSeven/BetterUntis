@@ -232,7 +232,6 @@ class LoginDataInputViewModel @Inject constructor(
 			userData.masterData.timeStamp,
 			userData.userData,
 			userData.settings,
-			bookmarks = emptySet()//bookmarks
 		)
 		return user
 	}

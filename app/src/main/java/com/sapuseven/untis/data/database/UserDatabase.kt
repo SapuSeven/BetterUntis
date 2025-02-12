@@ -23,7 +23,6 @@ import com.sapuseven.untis.data.database.entities.TeacherEntity
 import com.sapuseven.untis.data.database.entities.TeachingMethodEntity
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
-import com.sapuseven.untis.models.TimetableBookmark
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.time.LocalDate
@@ -31,7 +30,7 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 @Database(
-	version = 10,
+	version = 11,
 	entities = [
 		User::class,
 		AbsenceReasonEntity::class,
@@ -50,7 +49,8 @@ import java.time.format.DateTimeFormatter
 	],
 	autoMigrations = [
 		AutoMigration(from = 8, to = 9),
-		AutoMigration(from = 9, to = 10)
+		AutoMigration(from = 9, to = 10),
+		AutoMigration(from = 10, to = 11, spec = MigrationSpec10to11::class)
 	]
 )
 @TypeConverters(UserConverters::class)
@@ -82,12 +82,6 @@ internal class UserConverters {
 
 	@TypeConverter
 	fun decodeUntisSettings(string: String?): Settings? = decode(string)
-
-	@TypeConverter
-	fun encodeTimetableBookmarkSet(timetableBookmarks: Set<TimetableBookmark>?): String? = encode(timetableBookmarks)
-
-	@TypeConverter
-	fun decodeTimetableBookmarkSet(string: String?): Set<TimetableBookmark>? = decode(string)
 
 	@TypeConverter
 	fun encodeLongList(intList: List<Long>?): String? = encode(intList)
