@@ -14,8 +14,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
@@ -24,7 +24,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.MainActivity
 import com.sapuseven.untis.activities.main.DrawerItems
@@ -42,13 +42,14 @@ import com.sapuseven.untis.activities.main.DrawerText
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.components.ElementPicker
+import com.sapuseven.untis.data.settings.model.TimetableElement
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
+import com.sapuseven.untis.ui.preferences.toPeriodElement
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimetableDrawer(
 	viewModel: TimetableDrawerViewModel = hiltViewModel(),
@@ -102,10 +103,6 @@ fun TimetableDrawer(
 			}
 	}*/
 
-	LaunchedEffect(displayedElement) {
-		viewModel.displayedElement = displayedElement
-	}
-
 	BackHandler(enabled = drawerState.isOpen) {
 		scope.launch {
 			drawerState.close()
@@ -134,7 +131,7 @@ fun TimetableDrawer(
 						)
 					},
 					label = { Text(stringResource(id = R.string.all_personal_timetable)) },
-					selected = viewModel.personalTimetableDisplayed,
+					selected = displayedElement == null,
 					onClick = {
 						scope.launch {
 							drawerState.close()
@@ -144,24 +141,20 @@ fun TimetableDrawer(
 					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 				)
 
-				var isBookmarkSelected = false
-				/*user?.bookmarks?.forEach { bookmark ->
-					val isDisplayed = false/*state.displayedElement.value?.let {
-						it.id == bookmark.elementId && it.type == bookmark.elementType
-					} == true*/
-					isBookmarkSelected = isBookmarkSelected || isDisplayed
-
+				val bookmarks by viewModel.bookmarks.collectAsStateWithLifecycle()
+				var isBookmarkSelected = bookmarks.mapNotNull(TimetableElement::toPeriodElement).any { bookmark ->
+					displayedElement?.equals(bookmark) == true
+				}
+				bookmarks.mapNotNull(TimetableElement::toPeriodElement).forEach { bookmark ->
 					NavigationDrawerItem(
 						icon = {
 							Icon(
 								painter = painterResource(
-									id = when (TimetableDatabaseInterface.Type.valueOf(
-										bookmark.elementType
-									)) {
-										TimetableDatabaseInterface.Type.CLASS -> R.drawable.all_classes
-										TimetableDatabaseInterface.Type.TEACHER -> R.drawable.all_teachers
-										TimetableDatabaseInterface.Type.SUBJECT -> R.drawable.all_subject
-										TimetableDatabaseInterface.Type.ROOM -> R.drawable.all_rooms
+									id = when (bookmark.type) {
+										ElementType.CLASS -> R.drawable.all_classes
+										ElementType.TEACHER -> R.drawable.all_teachers
+										ElementType.SUBJECT -> R.drawable.all_subject
+										ElementType.ROOM -> R.drawable.all_rooms
 										else -> R.drawable.all_prefs_personal
 									}
 								),
@@ -178,25 +171,17 @@ fun TimetableDrawer(
 								) //TODO: Extract String resource
 							}
 						},
-						label = { Text(text = bookmark.displayName) },
-						selected = isDisplayed,
+						label = { Text(text = viewModel.getBookmarkDisplayName(bookmark)) },
+						selected = displayedElement?.equals(bookmark) == true,
 						onClick = {
 							scope.launch {
-								drawerState.close()
-								/*todoval items = state.timetableDatabaseInterface.getElements(
-									TimetableDatabaseInterface.Type.valueOf(bookmark.elementType)
-								)
-								val item = items.find {
-									it.id == bookmark.elementId && it.type == bookmark.elementType
-								}
-								onShowTimetable(
-									item to state.timetableDatabaseInterface.getLongName(item!!)
-								)*/
+								scope.launch { drawerState.close() }
+								viewModel.onBookmarkClick(bookmark);
 							}
 						},
 						modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 					)
-				}*/
+				}
 
 				NavigationDrawerItem(
 					icon = {
@@ -208,10 +193,7 @@ fun TimetableDrawer(
 					label = { Text(stringResource(id = R.string.maindrawer_bookmarks_add)) },
 					selected = false,
 					onClick = {
-						scope.launch {
-							drawerState.close()
-							bookmarksElementPicker = ElementType.CLASS
-						}
+						bookmarksElementPicker = ElementType.CLASS
 					},
 					modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 				)
@@ -220,7 +202,7 @@ fun TimetableDrawer(
 
 				DrawerItems(
 					isMessengerAvailable = false,//todo state.isMessengerAvailable(),
-					disableTypeSelection = viewModel.personalTimetableDisplayed || isBookmarkSelected,
+					disableTypeSelection = displayedElement == null || isBookmarkSelected,
 					displayedElement = displayedElement,
 					onTimetableClick = { item ->
 						scope.launch { drawerState.close() }
@@ -260,6 +242,25 @@ fun TimetableDrawer(
 		)
 	}
 
+	AnimatedVisibility(
+		visible = bookmarksElementPicker != null,
+		enter = fullscreenDialogAnimationEnter(),
+		exit = fullscreenDialogAnimationExit()
+	) {
+		ElementPickerDialogFullscreen(
+			title = { /*TODO*/ },
+			elementPicker = elementPicker,
+			hideTypeSelectionPersonal = true,
+			onDismiss = { bookmarksElementPicker = null },
+			onSelect = { item ->
+				item?.let {
+					viewModel.addBookmark(it)
+				}
+			},
+			initialType = bookmarksElementPicker
+		)
+	}
+
 	viewModel.bookmarkDeleteDialog?.let { bookmark ->
 		AlertDialog(
 			text = { Text(stringResource(id = R.string.main_dialog_delete_bookmark)) },
@@ -267,7 +268,7 @@ fun TimetableDrawer(
 			confirmButton = {
 				TextButton(
 					onClick = {
-						viewModel.deleteBookmark(bookmark)
+						viewModel.removeBookmark(bookmark)
 					}) {
 					Text(stringResource(id = R.string.all_delete))
 				}

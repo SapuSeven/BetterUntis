@@ -7,30 +7,46 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
-import com.sapuseven.untis.data.database.entities.UserDao
-import com.sapuseven.untis.models.TimetableBookmark
+import com.sapuseven.untis.data.repository.MasterDataRepository
+import com.sapuseven.untis.data.settings.model.TimetableElement
 import com.sapuseven.untis.ui.models.NavItemNavigation
 import com.sapuseven.untis.ui.models.NavItemShortcut
 import com.sapuseven.untis.ui.navigation.AppNavigator
+import com.sapuseven.untis.ui.navigation.AppRoutes
+import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
+import com.sapuseven.untis.ui.preferences.toTimetableElement
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class TimetableDrawerViewModel @Inject constructor(
-	private val userDao: UserDao,
+	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
 	private val navigator: AppNavigator,
+	private val masterDataRepository: MasterDataRepository,
 ) : ViewModel() {
-	var displayedElement by mutableStateOf<PeriodElement?>(null)
-
-	val personalTimetableDisplayed
-		get() = displayedElement == null
-
 	var enableDrawerGestures: Boolean = true
 		private set
 
-	var bookmarkDeleteDialog by mutableStateOf<TimetableBookmark?>(null)
+	var bookmarkDeleteDialog by mutableStateOf<PeriodElement?>(null)
 		private set
+
+	private val userSettingsRepository = userSettingsRepositoryFactory.create()
+
+	private val _bookmarks = MutableStateFlow<List<TimetableElement>>(emptyList())
+	val bookmarks: StateFlow<List<TimetableElement>> = _bookmarks
+
+	init {
+		viewModelScope.launch {
+			userSettingsRepository.getSettings().collect {
+				_bookmarks.value = it.bookmarksList
+			}
+		}
+	}
 
 	fun onNavigationItemClick(item: NavItemNavigation) {
 		navigator.navigate(item.route)
@@ -87,43 +103,38 @@ class TimetableDrawerViewModel @Inject constructor(
 		}*/
 	}
 
-	fun createBookmark(item: PeriodElement): Boolean {
-		/*val newBookmark = TimetableBookmark(
-			elementId = item.id,
-			elementType = TimetableDatabaseInterface.Type.valueOf(item.type).name,
-			displayName = timetableDatabaseInterface.getLongName(item)
-		)
-
-		if (user.bookmarks.contains(newBookmark))
-			Toast
-				.makeText(
-					contextActivity,
-					"Bookmark already exists",
-					Toast.LENGTH_LONG
-				) // TODO: Extract string resource
-				.show()
-		else {
-			user.bookmarks = user.bookmarks.plus(newBookmark)
-			userDatabase.userDao().update(user)
-			return true
-		}*/
-
-		return false
+	fun onBookmarkClick(bookmark: PeriodElement) {
+		navigator.navigate(AppRoutes.Timetable(bookmark.type, bookmark.id))
 	}
 
-	fun deleteBookmark(bookmark: TimetableBookmark) {
-		/*user.value?.let { user ->
-			user.bookmarks = user.bookmarks.minus(bookmark)
-			userDao.update(user)
-		}*/
+	fun addBookmark(item: PeriodElement) = viewModelScope.launch {
+		userSettingsRepository.updateSettings {
+			if (!bookmarksList.any { it.matches(item) }) {
+				addBookmarks(item.toTimetableElement())
+			}
+		}
+	}
+
+	fun removeBookmark(bookmark: PeriodElement) = viewModelScope.launch {
+		userSettingsRepository.updateSettings {
+			removeBookmarks(bookmarksList.indexOfFirst { it.matches(bookmark) })
+		}
 		dismissBookmarkDeleteDialog()
 	}
 
-	fun showBookmarkDeleteDialog(bookmark: TimetableBookmark) {
+	fun showBookmarkDeleteDialog(bookmark: PeriodElement) {
 		bookmarkDeleteDialog = bookmark
 	}
 
 	fun dismissBookmarkDeleteDialog() {
 		bookmarkDeleteDialog = null
 	}
+
+	fun getBookmarkDisplayName(bookmark: PeriodElement): String {
+		return masterDataRepository.getLongName(bookmark)
+	}
+}
+
+private fun TimetableElement.matches(bookmark: PeriodElement): Boolean {
+	return elementType == bookmark.type.id && elementId == bookmark.id
 }

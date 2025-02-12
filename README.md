@@ -54,7 +54,7 @@ As this changes virtually every part of the app, here's a list tracking all migr
 - [ ] Widget/Shortcut
 - [x] Notifications _(needs testing)_
 - [x] Auto-Mute _(needs testing)_
-- [ ] Bookmarks
+- [x] Bookmarks
 
 Package structure overview:
 

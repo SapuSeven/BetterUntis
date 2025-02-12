@@ -36,6 +36,7 @@ data class User(
 	val userData: UserData,
 	val settings: Settings? = null,
 	val created: Long? = null,
+	@Deprecated("Do not use - Will be removed in favor of UserSettingsRepository")
 	var bookmarks: Set<TimetableBookmark>
 ) {
 	fun getDisplayedName(context: Context): String {
