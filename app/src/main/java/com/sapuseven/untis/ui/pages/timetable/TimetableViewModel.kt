@@ -34,7 +34,7 @@ import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
 import com.sapuseven.untis.ui.pages.settings.GlobalSettingsRepository
 import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
-import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
+import com.sapuseven.untis.ui.preferences.toPeriodElement
 import com.sapuseven.untis.ui.weekview.Event
 import com.sapuseven.untis.ui.weekview.WeekViewColorScheme
 import com.sapuseven.untis.ui.weekview.WeekViewEventStyle
@@ -141,7 +141,7 @@ class TimetableViewModel @AssistedInject constructor(
 		viewModelScope.launch {
 			userSettingsRepository.getSettings().collect { userSettings ->
 				// All properties that are based on preferences are set here
-				decodeStoredTimetableValue(userSettings.timetablePersonalTimetable)?.let {
+				userSettings.timetablePersonalTimetable?.toPeriodElement()?.let {
 					_personalElement.value = it
 					_needsPersonalTimetable.emit(false)
 					//_currentElement.update { prev -> prev ?: it } // Update only if null

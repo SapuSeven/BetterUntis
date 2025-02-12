@@ -29,7 +29,7 @@ message UserSettings {
   int32 themeColor = 22;
   string darkTheme = 23;
   bool darkThemeOled = 24;
-  string timetablePersonalTimetable = 25;
+  TimetableElement timetablePersonalTimetable = 25;
   bool timetableHideTimeStamps = 26;
   bool timetableHideCancelled = 27;
   bool timetableSubstitutionsIrregular = 28;
@@ -58,6 +58,7 @@ message UserSettings {
   bool infocenterAbsencesOnlyUnexcused = 50;
   bool infocenterAbsencesSortReverse = 51;
   string infocenterAbsencesTimeRange = 52;
+  repeated TimetableElement bookmarks = 57;
 }
 
 message GlobalSettings {
@@ -71,4 +72,9 @@ message Settings {
   int64 activeUser = 1;
   map<int64, UserSettings> userSettings = 2;
   GlobalSettings globalSettings = 3;
+}
+
+message TimetableElement {
+  int64 elementId = 1;
+  int32 elementType = 2;
 }

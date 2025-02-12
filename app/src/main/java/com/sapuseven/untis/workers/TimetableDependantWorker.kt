@@ -16,7 +16,7 @@ import com.sapuseven.untis.data.repository.TimetableRepository
 import com.sapuseven.untis.data.settings.model.UserSettings
 import com.sapuseven.untis.models.PeriodItem
 import com.sapuseven.untis.models.mergeValuesWith
-import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
+import com.sapuseven.untis.ui.preferences.toPeriodElement
 import crocodile8.universal_cache.FromCache
 import kotlinx.coroutines.flow.last
 import java.time.LocalDate
@@ -34,7 +34,7 @@ abstract class TimetableDependantWorker(
 ) : CoroutineWorker(context, params) {
 	companion object {
 		fun getPersonalTimetableElement(user: User, userSettings: UserSettings): PeriodElement? {
-			return userSettings.timetablePersonalTimetable?.let { decodeStoredTimetableValue(it) }
+			return userSettings.timetablePersonalTimetable?.toPeriodElement()
 				?: user.userData.getPeriodElement()
 		}
 	}

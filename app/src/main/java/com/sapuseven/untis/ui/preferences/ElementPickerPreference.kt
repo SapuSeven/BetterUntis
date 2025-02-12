@@ -14,11 +14,10 @@ import com.sapuseven.compose.protostore.ui.preferences.Preference
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.components.ElementPicker
-import com.sapuseven.untis.helpers.SerializationUtils
+import com.sapuseven.untis.data.settings.model.TimetableElement
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
 
 @Composable
 fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ElementPickerPreference(
@@ -26,11 +25,11 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ElementPickerPrefe
 	summary: (@Composable () -> Unit)? = null,
 	leadingContent: (@Composable () -> Unit)? = null,
 	settingsRepository: SettingsRepository<Model, ModelBuilder>,
-	value: (Model) -> String,
+	value: (Model) -> TimetableElement,
 	scope: CoroutineScope = rememberCoroutineScope(),
 	enabledCondition: (Model) -> Boolean = { true },
 	highlight: Boolean = false,
-	onValueChange: (ModelBuilder.(value: String) -> Unit)? = null,
+	onValueChange: (ModelBuilder.(value: TimetableElement) -> Unit)? = null,
 	elementPicker: ElementPicker
 ) {
 	var selectedType: ElementType? by remember { mutableStateOf(null) }
@@ -40,11 +39,9 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ElementPickerPrefe
 		title = title,
 		summary = summary,
 		supportingContent = { currentValue, _ ->
-			if (currentValue.isNotEmpty()) {
-				decodeStoredTimetableValue(currentValue)?.let {
-					ElementItem(it, elementPicker) { shortName, _, _ ->
-						Text(shortName)
-					}
+			currentValue.toPeriodElement()?.let {
+				ElementItem(it, elementPicker) { shortName, _, _ ->
+					Text(shortName)
 				}
 			}
 		},
@@ -55,7 +52,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ElementPickerPrefe
 		enabledCondition = enabledCondition,
 		highlight = highlight,
 		onClick = {
-			selectedType = decodeStoredTimetableValue(value(settingsRepository.getSettingsDefaults()))?.type
+			selectedType = value(settingsRepository.getSettingsDefaults()).toPeriodElement()?.type
 			showDialog = true;
 		}
 	)
@@ -73,7 +70,8 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ElementPickerPrefe
 					settingsRepository.updateSettings {
 						onValueChange?.invoke(
 							this,
-							element?.let { encodeStoredTimetableValue(it) } ?: "")
+							element?.toTimetableElement() ?: TimetableElement.getDefaultInstance()
+						)
 					}
 				}
 			},
@@ -81,11 +79,11 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ElementPickerPrefe
 		)
 }
 
-fun encodeStoredTimetableValue(value: PeriodElement): String =
-	SerializationUtils.getJSON().encodeToString(value)
+fun TimetableElement.toPeriodElement(): PeriodElement? =
+	ElementType.entries.firstOrNull { it.id == elementType }?.let { PeriodElement(it, elementId) }
 
-fun decodeStoredTimetableValue(value: String): PeriodElement? = try {
-	SerializationUtils.getJSON().decodeFromString(value)
-} catch (e: Throwable) {
-	null
-}
+fun PeriodElement.toTimetableElement(): TimetableElement =
+	TimetableElement.newBuilder().apply {
+		elementId = id
+		elementType = type.id
+	}.build()
