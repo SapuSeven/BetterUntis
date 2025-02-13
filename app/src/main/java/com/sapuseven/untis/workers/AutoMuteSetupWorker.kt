@@ -17,6 +17,7 @@ import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.data.repository.TimetableRepository
+import com.sapuseven.untis.mappers.TimetableMapper
 import com.sapuseven.untis.receivers.AutoMuteReceiver
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_BOOLEAN_MUTE
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_INT_ID
@@ -36,11 +37,13 @@ class AutoMuteSetupWorker @AssistedInject constructor(
 	@Assisted context: Context,
 	@Assisted params: WorkerParameters,
 	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
+	timetableMapperFactory: TimetableMapper.Factory,
 	timetableRepository: TimetableRepository,
 	private val masterDataRepository: MasterDataRepository,
 	private val userDao: UserDao,
 ) : TimetableDependantWorker(context, params, timetableRepository) {
 	val settingsRepository = userSettingsRepositoryFactory.create()
+	val timetableMapper = timetableMapperFactory.create()
 
 	companion object {
 		private const val LOG_TAG = "AutoMuteSetup"
@@ -81,11 +84,11 @@ class AutoMuteSetupWorker @AssistedInject constructor(
 				val personalTimetable = getPersonalTimetableElement(user, userSettings)
 					?: return@let // Anonymous and no custom personal timetable
 
-				val timetable = loadTimetable(
+				val timetable = timetableMapper.preparePeriods(loadTimetable(
 					user,
 					personalTimetable,
 					FromCache.ONLY
-				)
+				), !userSettings.automuteCancelledLessons)
 
 				timetable.merged(masterDataRepository).sortedBy { it.originalPeriod.startDateTime }.zipWithNext().withLast()
 					.forEach {

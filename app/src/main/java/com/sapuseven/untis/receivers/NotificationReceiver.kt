@@ -13,8 +13,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.MainActivity
-import com.sapuseven.untis.data.settings.model.UserSettings
-import com.sapuseven.untis.ui.pages.settings.GlobalSettingsRepository
 import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
 import com.sapuseven.untis.workers.NotificationSetupWorker.Companion.CHANNEL_ID_BREAKINFO
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,10 +22,9 @@ import java.time.LocalTime
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class NotificationReceiver @Inject constructor(
-	userSettingsRepositoryFactory: UserSettingsRepository.Factory
-) : BroadcastReceiver() {
-	val settingsRepository = userSettingsRepositoryFactory.create()
+class NotificationReceiver : BroadcastReceiver() {
+	@Inject
+	lateinit var userSettingsRepositoryFactory: UserSettingsRepository.Factory
 
 	companion object {
 		private const val LOG_TAG = "NotificationReceiver"
@@ -52,6 +49,7 @@ class NotificationReceiver @Inject constructor(
 		Log.d(LOG_TAG, "NotificationReceiver received")
 
 		val userId = intent.getLongExtra(EXTRA_LONG_USER_ID, -1)
+		val settingsRepository = userSettingsRepositoryFactory.create()
 		val settings = settingsRepository.getAllSettings().first()
 		val userSettings = settings.userSettingsMap.getOrDefault(userId, settingsRepository.getSettingsDefaults())
 

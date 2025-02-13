@@ -1,15 +1,16 @@
 package com.sapuseven.untis.mappers
 
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.ColorUtils
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.api.model.untis.enumeration.PeriodState
 import com.sapuseven.untis.api.model.untis.masterdata.timegrid.Day
 import com.sapuseven.untis.api.model.untis.timetable.Period
 import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.models.PeriodItem
-import com.sapuseven.untis.models.equalsIgnoreTime
 import com.sapuseven.untis.scope.UserScopeManager
 import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
 import com.sapuseven.untis.ui.weekview.Event
@@ -22,34 +23,47 @@ import java.time.DayOfWeek
 import java.time.temporal.ChronoUnit
 
 class TimetableMapper @AssistedInject constructor(
-    settingsRepositoryFactory: UserSettingsRepository.Factory,
-    private val masterDataRepository: MasterDataRepository,
-    private val userScopeManager: UserScopeManager,
-    @Assisted private val colorScheme: ColorScheme,
+	settingsRepositoryFactory: UserSettingsRepository.Factory,
+	private val masterDataRepository: MasterDataRepository,
+	private val userScopeManager: UserScopeManager,
+	@Assisted private val colorScheme: ColorScheme?,
 ) {
-	private val settings = settingsRepositoryFactory.create(colorScheme).getSettings()
+	private val settings = settingsRepositoryFactory.create(colorScheme ?: lightColorScheme()).getSettings()
 
 	@AssistedFactory
 	interface Factory {
-		fun create(colorScheme: ColorScheme): TimetableMapper
+		fun create(colorScheme: ColorScheme? = null): TimetableMapper
 	}
+
+	/**
+	 * Prepares periods for further processing or displaying.
+	 *
+	 * This function filters out items that should be hidden and merges multi-hour periods.
+	 *
+	 * @param items List of items that should be prepared
+	 * @param hideCancelled Whether cancelled items should be removed
+	 * @return A list of prepared items
+	 */
+	fun preparePeriods(
+		items: List<Period>,
+		hideCancelled: Boolean
+	): List<Period> = items
+		.filterPeriods(hideCancelled)
+		.mergePeriods(userScopeManager.user.timeGrid.days)
 
 	suspend fun mapTimetablePeriodsToWeekViewEvents(
 		items: List<Period>,
 		contextType: ElementType
 	): List<Event<PeriodItem>> {
+		assertColorScheme()
 		waitForSettings().apply {
-			return items
+			return preparePeriods(items, timetableHideCancelled)
 				.mapToEvents(
 					contextType
 				)
-				.filterEvents(
-					timetableHideCancelled,
+				.prepareEvents(
 					timetableSubstitutionsIrregular,
 					timetableBackgroundIrregular
-				)
-				.mergeEvents(
-					userScopeManager.user.timeGrid.days
 				)
 		}
 	}
@@ -57,6 +71,7 @@ class TimetableMapper @AssistedInject constructor(
 	suspend fun colorWeekViewTimetableEvents(
 		events: List<Event<PeriodItem>>
 	): List<Event<PeriodItem>> {
+		assertColorScheme()
 		waitForSettings().apply {
 			return events.copyWithColor(
 				Color(backgroundRegular),
@@ -71,6 +86,8 @@ class TimetableMapper @AssistedInject constructor(
 			)
 		}
 	}
+
+	private fun assertColorScheme() = assert(colorScheme != null) { "A colorScheme needs to be provided to the factory in order to use this function" }
 
 	private suspend fun waitForSettings() = settings.filterNotNull().first()
 
@@ -123,21 +140,31 @@ class TimetableMapper @AssistedInject constructor(
 	/**
 	 * Prepares the items for the timetable.
 	 *
-	 * This function filters out items that should be hidden, marks items with substitutions as irregular
+	 * This function filters out items that should be hidden
 	 *
-	 * @param items List of items that should be prepared
 	 * @param hideCancelled Whether cancelled items should be removed
+	 * @return A list of prepared items
+	 */
+	private fun List<Period>.filterPeriods(
+		hideCancelled: Boolean,
+	): List<Period> = mapNotNull { item ->
+		if (hideCancelled && item.`is`(PeriodState.CANCELLED)) return@mapNotNull null
+		item
+	}
+
+	/**
+	 * Prepares the items for the timetable.
+	 *
+	 * This function marks items as irregular when they match certain rules
+	 *
 	 * @param substitutionsIrregular Whether items with substitutions should be marked as irregular
 	 * @param backgroundIrregular Whether irregular items should have a different background color
 	 * @return A list of prepared items
 	 */
-	private suspend fun List<Event<PeriodItem>>.filterEvents(
-		hideCancelled: Boolean,
+	private fun List<Event<PeriodItem>>.prepareEvents(
 		substitutionsIrregular: Boolean,
 		backgroundIrregular: Boolean
 	): List<Event<PeriodItem>> = mapNotNull { item ->
-		if (hideCancelled && item.data?.isCancelled() == true) return@mapNotNull null
-
 		if (substitutionsIrregular) {
 			item.data?.apply {
 				forceIrregular =
@@ -151,10 +178,10 @@ class TimetableMapper @AssistedInject constructor(
 		item
 	}
 
-	private fun List<Event<PeriodItem>>.mergeEvents(days: List<Day>): List<Event<PeriodItem>> {
-		val itemGrid: Array<Array<MutableList<Event<PeriodItem>>>> =
+	private fun List<Period>.mergePeriods(days: List<Day>): List<Period> {
+		val itemGrid: Array<Array<MutableList<Period>>> =
 			Array(days.size) { Array(days.maxByOrNull { it.units.size }!!.units.size) { mutableListOf() } }
-		val leftover: MutableList<Event<PeriodItem>> = mutableListOf()
+		val leftover: MutableList<Period> = mutableListOf()
 
 		// TODO: Check if the day from the Untis API is always an english string
 		val firstDayOfWeek =
@@ -162,10 +189,8 @@ class TimetableMapper @AssistedInject constructor(
 
 		// Put all items into a two dimensional array depending on day and hour
 		forEach { item ->
-			if (item.data == null) return@forEach // cannot merge items without period data
-
-			val startDateTime = item.data.originalPeriod.startDateTime
-			val endDateTime = item.data.originalPeriod.endDateTime
+			val startDateTime = item.startDateTime
+			val endDateTime = item.endDateTime
 
 			val day = endDateTime.dayOfWeek.value - firstDayOfWeek.value
 
@@ -236,13 +261,18 @@ class TimetableMapper @AssistedInject constructor(
 		irregularPastColor: Color,
 		useDefault: List<String>
 	): Event<PeriodItem> = data?.let {
-		val subjectEntity = masterDataRepository.currentUserData?.subjects?.find { it.id == data.subjects.firstOrNull()?.id }
+		val subjectEntity =
+			masterDataRepository.currentUserData?.subjects?.find { it.id == data.subjects.firstOrNull()?.id }
 
-		val defaultColor = Color(android.graphics.Color.parseColor(
-			subjectEntity?.backColor ?: data.originalPeriod.backColor)
+		val defaultColor = Color(
+			android.graphics.Color.parseColor(
+				subjectEntity?.backColor ?: data.originalPeriod.backColor
+			)
 		)
-		val defaultTextColor = Color(android.graphics.Color.parseColor(
-			subjectEntity?.foreColor ?: data.originalPeriod.foreColor)
+		val defaultTextColor = Color(
+			android.graphics.Color.parseColor(
+				subjectEntity?.foreColor ?: data.originalPeriod.foreColor
+			)
 		)
 
 		copy(
@@ -269,28 +299,23 @@ class TimetableMapper @AssistedInject constructor(
 
 	private fun colorOn(color: Color): Color {
 		return when (color.copy(alpha = 1f)) {
-			colorScheme.primary -> colorScheme.onPrimary
-			colorScheme.secondary -> colorScheme.onSecondary
-			colorScheme.tertiary -> colorScheme.onTertiary
+			colorScheme?.primary -> colorScheme.onPrimary
+			colorScheme?.secondary -> colorScheme.onSecondary
+			colorScheme?.tertiary -> colorScheme.onTertiary
 			else -> if (ColorUtils.calculateLuminance(color.toArgb()) < 0.5) Color.White else Color.Black
 		}.copy(alpha = color.alpha)
 	}
 
-	private fun Event<PeriodItem>.mergeWith(items: MutableList<Event<PeriodItem>>): Boolean {
-		if (data == null) return false // cannot merge items without period data
-
+	private fun Period.mergeWith(items: MutableList<Period>): Boolean {
 		items.toList().forEachIndexed { i, _ ->
 			if (i >= items.size) return@forEachIndexed // Needed because the number of elements can change
 
 			val candidate = items[i]
 
-			if (candidate.data == null) return@forEachIndexed // cannot merge items without period data
+			if (candidate.startDateTime.dayOfYear != startDateTime.dayOfYear) return@forEachIndexed
 
-			if (candidate.start.dayOfYear != start.dayOfYear) return@forEachIndexed
-
-			if (this.data.equalsIgnoreTime(candidate.data)) {
-				end = candidate.end
-				data.originalPeriod.endDateTime = candidate.data.originalPeriod.endDateTime
+			if (this.equalsIgnoreTime(candidate)) {
+				endDateTime = candidate.endDateTime
 				items.removeAt(i)
 				return true
 			}

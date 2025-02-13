@@ -1,6 +1,5 @@
 package com.sapuseven.untis.workers
 
-import android.Manifest
 import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -9,11 +8,8 @@ import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
 import android.content.Context.ALARM_SERVICE
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -22,15 +18,14 @@ import androidx.work.workDataOf
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
-import com.sapuseven.untis.api.model.untis.enumeration.PeriodState
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.data.repository.TimetableRepository
+import com.sapuseven.untis.mappers.TimetableMapper
 import com.sapuseven.untis.models.PeriodItem
 import com.sapuseven.untis.models.equalsIgnoreTime
 import com.sapuseven.untis.receivers.NotificationReceiver
-import com.sapuseven.untis.receivers.NotificationReceiver.Companion
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_BOOLEAN_CLEAR
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_BOOLEAN_FIRST
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_INT_BREAK_END_TIME
@@ -52,7 +47,8 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
 import java.time.Clock
 import java.time.LocalDateTime
-import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 /**
  * This worker schedules all break info notifications for the day.
@@ -62,12 +58,14 @@ class NotificationSetupWorker @AssistedInject constructor(
 	@Assisted context: Context,
 	@Assisted params: WorkerParameters,
 	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
+	timetableMapperFactory: TimetableMapper.Factory,
 	timetableRepository: TimetableRepository,
 	private val masterDataRepository: MasterDataRepository,
 	private val clock: Clock,
 	private val userDao: UserDao,
 ) : TimetableDependantWorker(context, params, timetableRepository) {
 	val settingsRepository = userSettingsRepositoryFactory.create()
+	val timetableMapper = timetableMapperFactory.create()
 
 	companion object {
 		private const val LOG_TAG = "NotificationSetup"
@@ -115,11 +113,11 @@ class NotificationSetupWorker @AssistedInject constructor(
 				val personalTimetable = getPersonalTimetableElement(user, userSettings)
 					?: return@let // Anonymous and no custom personal timetable
 
-				val timetable = loadTimetable(
+				val timetable = timetableMapper.preparePeriods(loadTimetable(
 					user,
 					personalTimetable,
 					FromCache.ONLY
-				)
+				), false)
 
 				val preparedItems = timetable
 					.sortedBy { it.startDateTime }
@@ -180,7 +178,7 @@ class NotificationSetupWorker @AssistedInject constructor(
 				return Result.failure()
 			}
 
-			Log.e(LOG_TAG, "Scheduled $scheduledNotifications notifications for today.")
+			Log.d(LOG_TAG, "Scheduled $scheduledNotifications notifications for today.")
 		}
 
 		return Result.success()
@@ -196,6 +194,7 @@ class NotificationSetupWorker @AssistedInject constructor(
 		val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
 		val id = notificationTime.toLocalTime().second // generate a unique id
 
+		// TODO: Include state (cancelled, irregular etc)
 		val intent = Intent(context, NotificationReceiver::class.java)
 			.putExtra(EXTRA_INT_ID, id)
 			.putExtra(EXTRA_LONG_USER_ID, userId)
@@ -205,7 +204,7 @@ class NotificationSetupWorker @AssistedInject constructor(
 			)
 			.putExtra(
 				EXTRA_STRING_BREAK_END_TIME,
-				notificationEndPeriodItem.originalPeriod.startDateTime.toString()
+				notificationEndPeriodItem.originalPeriod.startDateTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
 			)
 			.putExtra(
 				EXTRA_STRING_NEXT_SUBJECT,

@@ -235,6 +235,7 @@ dependencies {
 	coreLibraryDesugaring(libs.desugar.jdk.libs)
 
 	ksp(libs.androidx.room.compiler)
+	ksp(libs.androidx.hilt.compiler)
 	ksp(libs.dagger.compiler)
 	ksp(libs.hilt.compiler)
 	kspTest(libs.hilt.compiler)

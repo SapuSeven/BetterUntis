@@ -15,12 +15,13 @@ import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AutoMuteReceiver @Inject constructor(
-	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
-	private val userDao: UserDao,
-	private val autoMuteService: AutoMuteService
-) : BroadcastReceiver() {
-	val settingsRepository = userSettingsRepositoryFactory.create()
+class AutoMuteReceiver : BroadcastReceiver() {
+	@Inject
+	lateinit var userSettingsRepositoryFactory: UserSettingsRepository.Factory
+	@Inject
+	lateinit var userDao: UserDao
+	@Inject
+	lateinit var autoMuteService: AutoMuteService
 
 	companion object {
 		const val EXTRA_BOOLEAN_MUTE = "com.sapuseven.untis.automute.mute"
@@ -35,11 +36,12 @@ class AutoMuteReceiver @Inject constructor(
 		)
 
 		val userId = intent.getLongExtra(EXTRA_LONG_USER_ID, -1)
+		val settingsRepository = userSettingsRepositoryFactory.create()
 		val settings = settingsRepository.getAllSettings().first()
 		val userSettings = settings.userSettingsMap.getOrDefault(userId, settingsRepository.getSettingsDefaults())
 
 		if (autoMuteService is AutoMuteServiceZenRuleImpl && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-			userDao.getByIdAsync(userId)?.let { autoMuteService.setUser(it) }
+			userDao.getByIdAsync(userId)?.let { (autoMuteService as AutoMuteServiceZenRuleImpl).setUser(it) }
 		}
 
 		if (intent.hasExtra(EXTRA_BOOLEAN_MUTE)) {
