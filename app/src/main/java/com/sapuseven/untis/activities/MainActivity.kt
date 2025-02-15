@@ -9,11 +9,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,13 +26,17 @@ import com.sapuseven.untis.components.UserState
 import com.sapuseven.untis.helpers.AppTheme
 import com.sapuseven.untis.helpers.ThemeMode
 import com.sapuseven.untis.scope.UserScopeManager
+import com.sapuseven.untis.ui.common.ReportsInfoBottomSheet
 import com.sapuseven.untis.ui.navigation.AppNavHost
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
+import com.sapuseven.untis.ui.pages.settings.GlobalSettingsRepository
 import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -39,6 +46,9 @@ class MainActivity : ComponentActivity() {
 
 		const val EXTRA_STRING_PERIOD_ELEMENT = "com.sapuseven.untis.activities.main.element"
 	}
+
+	@Inject
+	lateinit var globalSettingsRepository: GlobalSettingsRepository
 
 	@Inject
 	lateinit var userSettingsRepositoryFactory: UserSettingsRepository.Factory
@@ -52,6 +62,7 @@ class MainActivity : ComponentActivity() {
 	@Inject
 	lateinit var userScopeManager: UserScopeManager
 
+	@OptIn(ExperimentalMaterial3Api::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		enableEdgeToEdge()
 		super.onCreate(savedInstanceState)
@@ -65,6 +76,7 @@ class MainActivity : ComponentActivity() {
 		}
 
 		setContent {
+			val scope = rememberCoroutineScope()
 			val userSettingsRepository = userSettingsRepositoryFactory.create(MaterialTheme.colorScheme)
 
 			val darkTheme by userSettingsRepository.getSettings().map {
@@ -82,6 +94,17 @@ class MainActivity : ComponentActivity() {
 			val themeColor by userSettingsRepository.getSettings().map {
 				if (it.customThemeColor) Color(it.themeColor) else null
 			}.collectAsState(null)
+
+			val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+			LaunchedEffect(globalSettingsRepository) {
+				scope.launch {
+					globalSettingsRepository.getSettings().first().let {
+						if (!it.errorReportingSet) {
+							bottomSheetState.show()
+						}
+					}
+				}
+			}
 
 			AppTheme(darkTheme, darkThemeOled, themeColor) {
 				Surface(
@@ -109,6 +132,8 @@ class MainActivity : ComponentActivity() {
 								navigator = appNavigator,
 								startDestination = AppRoutes.Timetable()
 							)
+
+							ReportsInfoBottomSheet(globalSettingsRepository, bottomSheetState)
 
 							// Re-create the view when the user changes
 							LaunchedEffect(Unit) {

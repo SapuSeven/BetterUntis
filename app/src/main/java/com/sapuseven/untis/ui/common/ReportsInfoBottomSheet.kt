@@ -17,12 +17,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -38,32 +37,19 @@ import com.sapuseven.compose.protostore.ui.utils.LocalListItemColors
 import com.sapuseven.untis.R
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.pages.settings.GlobalSettingsRepository
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportsInfoBottomSheet(
-	repository: GlobalSettingsRepository
+	repository: GlobalSettingsRepository,
+	sheetState: SheetState
 ) {
 	val scope = rememberCoroutineScope()
-	var bottomSheetVisible by rememberSaveable { mutableStateOf(false) }
-	val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 	var saveEnabled by rememberSaveable { mutableStateOf(true) }
 
-	LaunchedEffect(Unit) {
-		scope.launch {
-			repository.getSettings().first().let { it ->
-				if (!it.errorReportingSet) {
-					bottomSheetVisible = true
-					sheetState.show()
-				}
-			}
-		}
-	}
-
-	if (bottomSheetVisible) {
+	if (sheetState.isVisible) {
 		Box(
 			modifier = Modifier.fillMaxSize()
 		) {
@@ -71,7 +57,6 @@ fun ReportsInfoBottomSheet(
 				onDismissRequest = {
 					scope.launch {
 						sheetState.hide()
-						bottomSheetVisible = false
 					}
 				},
 				sheetState = sheetState,
@@ -80,8 +65,8 @@ fun ReportsInfoBottomSheet(
 					verticalAlignment = Alignment.CenterVertically,
 					horizontalArrangement = Arrangement.SpaceBetween,
 					modifier = Modifier
-						.fillMaxWidth()
-						.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
 				) {
 					Text(
 						text = stringResource(R.string.main_dialog_reports_title),
@@ -91,8 +76,8 @@ fun ReportsInfoBottomSheet(
 					Icon(
 						painter = painterResource(id = R.drawable.all_reports_image),
 						modifier = Modifier
-							.size(72.dp)
-							.padding(start = 16.dp, end = 8.dp),
+                            .size(72.dp)
+                            .padding(start = 16.dp, end = 8.dp),
 						contentDescription = null
 					)
 				}
@@ -149,8 +134,8 @@ fun ReportsInfoBottomSheet(
 				Row(
 					horizontalArrangement = Arrangement.End,
 					modifier = Modifier
-						.fillMaxWidth()
-						.padding(16.dp)
+                        .fillMaxWidth()
+                        .padding(16.dp)
 				) {
 					Button(
 						enabled = saveEnabled,
@@ -161,10 +146,6 @@ fun ReportsInfoBottomSheet(
 									errorReportingSet = true
 								}
 								sheetState.hide()
-							}.invokeOnCompletion {
-								if (!sheetState.isVisible) {
-									bottomSheetVisible = false
-								}
 							}
 						}
 					) {
@@ -176,10 +157,10 @@ fun ReportsInfoBottomSheet(
 			// Workaround for the modal bottom sheet not covering the nav bar
 			Box(
 				modifier = Modifier
-					.background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
-					.fillMaxWidth()
-					.height(insetsPaddingValues().calculateBottomPadding())
-					.align(Alignment.BottomCenter)
+                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
+                    .fillMaxWidth()
+                    .height(insetsPaddingValues().calculateBottomPadding())
+                    .align(Alignment.BottomCenter)
 			) {}
 		}
 	}

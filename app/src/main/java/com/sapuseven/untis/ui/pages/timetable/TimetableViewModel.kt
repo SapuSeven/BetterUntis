@@ -319,6 +319,7 @@ class TimetableViewModel @AssistedInject constructor(
 		?: (currentUser.getDisplayedName(context) + (if (isDebug) " (${currentUser.id})" else ""))
 
 	fun showElement(element: PeriodElement?) {
-		navigator.navigate(AppRoutes.Timetable(element))
+		if (requestedElement != element)
+			navigator.navigate(AppRoutes.Timetable(element))
 	}
 }

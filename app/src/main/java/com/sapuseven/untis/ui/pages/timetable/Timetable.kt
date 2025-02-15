@@ -44,7 +44,6 @@ import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.DebugDesclaimerAction
 import com.sapuseven.untis.ui.common.ProfileSelectorAction
-import com.sapuseven.untis.ui.common.ReportsInfoBottomSheet
 import com.sapuseven.untis.ui.common.disabled
 import com.sapuseven.untis.ui.dialogs.FeedbackDialog
 import com.sapuseven.untis.ui.dialogs.ProfileManagementDialog
@@ -248,8 +247,6 @@ fun Timetable(
 					}
 				}
 			}
-
-			ReportsInfoBottomSheet(viewModel.globalSettingsRepository)
 		}
 	}
 
