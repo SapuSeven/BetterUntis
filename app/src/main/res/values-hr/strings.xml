@@ -28,7 +28,6 @@
         <item quantity="few">prije %d minute</item>
         <item quantity="other">prije %d minuta</item>
     </plurals>
-    <string name="widget_timetable_link">Poveznica rasporeda sati</string>
     <string name="widget_select_profile">Odaberi profil za programčić</string>
     <string name="widget_daily_messages">Dnevne poruke</string>
     <string name="widget_timetable_empty">Nema rasporeda sati za danas</string>

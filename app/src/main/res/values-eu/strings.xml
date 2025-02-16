@@ -117,7 +117,6 @@
         <item quantity="one">duela minutu bat</item>
         <item quantity="other">duela %d minutu</item>
     </plurals>
-    <string name="widget_timetable_link">Ordutegiaren esteka</string>
     <string name="widget_daily_messages">Eguneroko mezuak</string>
     <string name="widget_timetable_empty">Ez dago gaurko ordutegirik erabilgarri</string>
     <string name="widget_timetable">Ordutegia</string>

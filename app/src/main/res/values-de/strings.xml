@@ -279,7 +279,6 @@
     <string name="widget_timetable_empty">Kein Stundenplan für heute verfügbar</string>
     <string name="widget_daily_messages">Tagesnachrichten</string>
     <string name="widget_select_profile">Bitte wähle ein Profil für das Widget aus</string>
-    <string name="widget_timetable_link">Stundenplanlink</string>
     <plurals name="main_time_diff_minutes">
         <item quantity="one">vor einer Minute</item>
         <item quantity="other">vor %d Minuten</item>

@@ -12,6 +12,7 @@
     <string name="all_cancel">Cancel</string>
     <string name="all_classes">Classes</string>
     <string name="all_close">Close</string>
+    <string name="all_save">Save</string>
     <string name="all_contact_email" translatable="false">betteruntis@sapuseven.com</string>
     <string name="all_delete">Delete</string>
     <string name="all_dialog_absences_checked">Absences checked.</string>
@@ -346,7 +347,7 @@
     <string name="widget_select_profile">Please select a profile for the widget</string>
     <string name="widget_timetable">Timetable</string>
     <string name="widget_timetable_empty">No timetable available for today</string>
-    <string name="widget_timetable_link">Timetable Link</string>
+    <string name="widget_timetable_link">Create shortcut to…</string>
     <string name="all_datepicker_select">Select date</string>
     <string name="all_datepicker_month_next">Next month</string>
     <string name="all_datepicker_month_previous">Previous month</string>

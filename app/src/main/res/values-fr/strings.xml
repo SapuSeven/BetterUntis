@@ -270,8 +270,7 @@
         <item quantity="one">%1$d contribution</item>
         <item quantity="other">%1$d contributions</item>
     </plurals>
-    <string name="widget_timetable_link">Lien calendrier</string>
-    <string name="widget_select_profile">Veuillez choisir un profil pour le widget</string>
+	<string name="widget_select_profile">Veuillez choisir un profil pour le widget</string>
     <string name="widget_daily_messages">Messages quotidiens</string>
     <string name="widget_timetable_empty">Aucun calendrier disponible pour aujourd\'hui</string>
     <string name="widget_timetable">Calendrier</string>

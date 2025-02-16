@@ -1,6 +1,5 @@
 package com.sapuseven.untis.components
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
@@ -17,8 +16,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+// TODO: Migrate to using masterDataRepository
 class ElementPicker(
-	private val user: User,
+	private val userId: Long,
 	private val userDao: UserDao,
 ) {
 	private val _allClasses = MutableLiveData<Map<Long, KlasseEntity>>()
@@ -33,14 +33,15 @@ class ElementPicker(
 	private val _allRooms = MutableLiveData<Map<Long, RoomEntity>>()
 	val allRooms: LiveData<Map<Long, RoomEntity>> by this::_allRooms
 
+	constructor(user: User, userDao: UserDao) : this(user.id, userDao)
+
 	init {
 		loadElements()
 	}
 
-	fun loadElements() {
-		Log.d("ElementPicker", "loading elements")
+	private fun loadElements() {
 		CoroutineScope(Dispatchers.IO).launch {
-			userDao.getByIdWithData(user.id)?.let {
+			userDao.getByIdWithData(userId)?.let {
 				_allClasses.postValue(it.klassen.toList().filter { it.active }
 					.sortedBy { it.name }.associateBy { it.id })
 				_allTeachers.postValue(it.teachers.toList().filter { it.active }
@@ -60,7 +61,7 @@ class ElementPicker(
 		ElementType.ROOM,
 	).associateWith { getPeriodElements(it) }
 
-	fun getShortName(id: Long, type: ElementType?): String {
+	private fun getShortName(id: Long, type: ElementType?): String {
 		return when (type) {
 			ElementType.CLASS -> _allClasses.value?.get(id)?.name
 			ElementType.TEACHER -> _allTeachers.value?.get(id)?.name
@@ -88,8 +89,7 @@ class ElementPicker(
 		return getLongName(periodElement.id, periodElement.type)
 	}
 
-	fun isAllowed(id: Long, type: ElementType?): Boolean {
-		return true
+	private fun isAllowed(id: Long, type: ElementType?): Boolean {
 		return when (type) {
 			ElementType.CLASS -> _allClasses.value?.get(id)?.displayable
 			ElementType.TEACHER -> _allTeachers.value?.get(id)?.displayAllowed

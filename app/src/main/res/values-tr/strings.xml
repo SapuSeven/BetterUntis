@@ -243,7 +243,6 @@
     <string name="widget_timetable_empty">Bugün için ders programı bulunamadı</string>
     <string name="widget_daily_messages">Günlük Bildirimler</string>
     <string name="widget_select_profile">Lütfen widget için bir profil seç</string>
-    <string name="widget_timetable_link">Ders Programı Linki</string>
     <plurals name="main_time_diff_hours">
         <item quantity="one">Bir saat önce</item>
         <item quantity="other">%d saat önce</item>

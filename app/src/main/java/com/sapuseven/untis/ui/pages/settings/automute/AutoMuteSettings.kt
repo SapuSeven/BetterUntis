@@ -1,5 +1,6 @@
 package com.sapuseven.untis.ui.pages.settings.automute
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS
@@ -18,8 +19,10 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -28,6 +31,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -47,8 +51,12 @@ fun AutoMuteSettings(
 ) {
 	AppScaffold(
 		topBar = {
-			CenterAlignedTopAppBar(
-				title = {},
+			LargeTopAppBar(
+				title = {
+					Text(
+						text = stringResource(R.string.preference_category_general_automute)
+					)
+				},
 				navigationIcon = {
 					IconButton(onClick = onNavigateBack) {
 						Icon(
@@ -68,11 +76,6 @@ fun AutoMuteSettings(
 				.fillMaxSize()
 				.verticalScroll(rememberScrollState())
 		) {
-			Text(
-				text = stringResource(R.string.preference_category_general_automute),
-				style = MaterialTheme.typography.headlineLarge,
-				modifier = Modifier.padding(start = 16.dp, top = 32.dp)
-			)
 			user?.let {
 				Text(
 					text = it.getDisplayedName(),
@@ -150,4 +153,11 @@ fun AutoMuteSettings(
 			)
 		}
 	}
+}
+
+@Preview
+@Composable
+@SuppressLint("NewApi")
+fun AutoMuteSettingsPreview() {
+	AutoMuteSettings()
 }

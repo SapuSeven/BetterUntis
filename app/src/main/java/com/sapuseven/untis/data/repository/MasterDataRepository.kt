@@ -25,34 +25,27 @@ interface MasterDataRepository {
 	val currentUser: User?
 	val currentUserData: UserWithData?
 
-	fun getShortName(id: Long, type: ElementType?): String
+	fun getShortName(id: Long, type: ElementType? = null, default: String = ELEMENT_NAME_UNKNOWN): String
+	fun getShortName(periodElement: PeriodElement, default: String = ELEMENT_NAME_UNKNOWN): String
 
-	fun getShortName(periodElement: PeriodElement): String
+	fun getLongName(id: Long, type: ElementType, default: String = ELEMENT_NAME_UNKNOWN): String
+	fun getLongName(periodElement: PeriodElement, default: String = ELEMENT_NAME_UNKNOWN): String
 
-	fun getLongName(id: Long, type: ElementType): String
-
-	fun getLongName(periodElement: PeriodElement): String
-
-	fun isAllowed(id: Long, type: ElementType?): Boolean
-
-	fun isAllowed(periodElement: PeriodElement): Boolean
-}
+	fun isAllowed(id: Long, type: ElementType? = null): Boolean
+	fun isAllowed(periodElement: PeriodElement): Boolean}
 
 @Singleton
 class DefaultMasterDataRepository : MasterDataRepository {
 	override val currentUser: User? = null
 	override val currentUserData: UserWithData? = null
 
-	override fun getShortName(id: Long, type: ElementType?): String = "$type:$id"
+	override fun getShortName(id: Long, type: ElementType?, default: String): String = "$type:$id"
+	override fun getShortName(periodElement: PeriodElement, default: String) = getShortName(periodElement.id, periodElement.type, default)
 
-	override fun getShortName(periodElement: PeriodElement) = getShortName(periodElement.id, periodElement.type)
-
-	override fun getLongName(id: Long, type: ElementType): String = "$type:$id"
-
-	override fun getLongName(periodElement: PeriodElement) = getLongName(periodElement.id, periodElement.type)
+	override fun getLongName(id: Long, type: ElementType, default: String): String = "$type:$id"
+	override fun getLongName(periodElement: PeriodElement, default: String) = getLongName(periodElement.id, periodElement.type)
 
 	override fun isAllowed(id: Long, type: ElementType?): Boolean = true
-
 	override fun isAllowed(periodElement: PeriodElement): Boolean = true
 }
 
@@ -97,29 +90,29 @@ class UntisMasterDataRepository @Inject constructor(
 	private fun <T : ElementEntity> prepareElements(elements: List<T>) =
 		elements.filter { it.active }.sortedBy { it.name }.associateBy { it.id }
 
-	override fun getShortName(id: Long, type: ElementType?): String {
+	override fun getShortName(id: Long, type: ElementType?, default: String): String {
 		return when (type) {
 			ElementType.CLASS -> allClasses.value[id]?.name
 			ElementType.TEACHER -> allTeachers.value[id]?.name
 			ElementType.SUBJECT -> allSubjects.value[id]?.name
 			ElementType.ROOM -> allRooms.value[id]?.name
 			else -> null
-		} ?: ELEMENT_NAME_UNKNOWN
+		} ?: default
 	}
 
-	override fun getShortName(periodElement: PeriodElement) = getShortName(periodElement.id, periodElement.type)
+	override fun getShortName(periodElement: PeriodElement, default: String) = getShortName(periodElement.id, periodElement.type, default)
 
-	override fun getLongName(id: Long, type: ElementType): String {
+	override fun getLongName(id: Long, type: ElementType, default: String): String {
 		return when (type) {
 			ElementType.CLASS -> allClasses.value[id]?.longName
 			ElementType.TEACHER -> allTeachers.value[id]?.run { "$firstName $lastName" }
 			ElementType.SUBJECT -> allSubjects.value[id]?.longName
 			ElementType.ROOM -> allRooms.value[id]?.longName
 			else -> null
-		} ?: ELEMENT_NAME_UNKNOWN
+		} ?: default
 	}
 
-	override fun getLongName(periodElement: PeriodElement) = getLongName(periodElement.id, periodElement.type)
+	override fun getLongName(periodElement: PeriodElement, default: String) = getLongName(periodElement.id, periodElement.type, default)
 
 	override fun isAllowed(id: Long, type: ElementType?): Boolean {
 		return when (type) {

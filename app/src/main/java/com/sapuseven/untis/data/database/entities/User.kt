@@ -89,7 +89,10 @@ interface UserDao {
 	@Query("SELECT * FROM user")
 	fun getAllFlow(): Flow<List<User>>
 
-	@Deprecated("Should be migrated to getAllFlow()")
+	@Query("SELECT * FROM user")
+	suspend fun getAllAsync(): List<User>
+
+	@Deprecated("Should be migrated to getAllAsync() or getAllFlow()")
 	@Query("SELECT * FROM user")
 	fun getAll(): List<User>
 
