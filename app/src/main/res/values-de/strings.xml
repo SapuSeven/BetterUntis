@@ -391,4 +391,8 @@
     <string name="preference_automute_exact_alarms_unavailable">Exaktes automatisches Stummschalten ist nicht verfügbar</string>
     <string name="preference_automute_exact_alarms_unavailable_desc">Um sicherzustellen, dass die automatische Stummschaltung zur richtigen Zeit aktiviert wird, muss die Berechtigung zum Einrichten von Wecker und Erinnerungen für %1$s erteilt werden.\nTippen, um die Einstellungen zu öffnen.</string>
     <string name="preference_reports_enable">Automatische Fehlerberichterstattung aktivieren</string>
+    <string name="all_save">Speichern</string>
+    <string name="preference_automute_allow_priority">Prioritätstermine dürfen die automatische Stummschaltung ignorieren</string>
+    <string name="widget_timetable_link">Verknüpfung erstellen für…</string>
+    <string name="automute_zen_rule_name">Schule - %1$s</string>
 </resources>
