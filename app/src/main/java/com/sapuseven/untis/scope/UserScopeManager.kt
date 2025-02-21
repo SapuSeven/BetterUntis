@@ -4,14 +4,17 @@ import com.sapuseven.untis.components.UserComponent
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.modules.UserComponentEntryPoint
 import dagger.hilt.EntryPoints
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
 interface UserScopeManager {
 	val user: User
 	val userOptional: User?
+	val userFlow: StateFlow<User?>
 
-	fun handleUserChange(user: User);
+	suspend fun handleUserChange(user: User);
 }
 
 @Singleton
@@ -27,16 +30,19 @@ class UserScopeManagerImpl @Inject constructor(
 	override val userOptional: User?
 		get() = entryPoint?.getUser()
 
+	override val userFlow = MutableStateFlow<User?>(null)
+
 	/**
 	 * Get or create the UserComponent for the given user.
 	 */
-	private fun getUserComponent(user: User) {
+	private suspend fun getUserComponent(user: User) {
 		userComponentBuilder
 			.user(user)
 			.build()
 			.also {
 				component = it
 				entryPoint = EntryPoints.get(it, UserComponentEntryPoint::class.java)
+				userFlow.emit(user)
 			}
 	}
 
@@ -51,7 +57,7 @@ class UserScopeManagerImpl @Inject constructor(
 	/**
 	 * Handle user change by recreating the user-scoped component.
 	 */
-	override fun handleUserChange(user: User) {
+	override suspend fun handleUserChange(user: User) {
 		clearUserComponent()
 		getUserComponent(user)
 	}

@@ -1,6 +1,5 @@
 package com.sapuseven.untis.data.repository
 
-import android.util.Log
 import androidx.compose.runtime.compositionLocalOf
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
@@ -16,7 +15,10 @@ import com.sapuseven.untis.models.PeriodItem.Companion.ELEMENT_NAME_UNKNOWN
 import com.sapuseven.untis.scope.UserScopeManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -32,7 +34,8 @@ interface MasterDataRepository {
 	fun getLongName(periodElement: PeriodElement, default: String = ELEMENT_NAME_UNKNOWN): String
 
 	fun isAllowed(id: Long, type: ElementType? = null): Boolean
-	fun isAllowed(periodElement: PeriodElement): Boolean}
+	fun isAllowed(periodElement: PeriodElement): Boolean
+}
 
 @Singleton
 class DefaultMasterDataRepository : MasterDataRepository {
@@ -40,15 +43,18 @@ class DefaultMasterDataRepository : MasterDataRepository {
 	override val currentUserData: UserWithData? = null
 
 	override fun getShortName(id: Long, type: ElementType?, default: String): String = "$type:$id"
-	override fun getShortName(periodElement: PeriodElement, default: String) = getShortName(periodElement.id, periodElement.type, default)
+	override fun getShortName(periodElement: PeriodElement, default: String) =
+		getShortName(periodElement.id, periodElement.type, default)
 
 	override fun getLongName(id: Long, type: ElementType, default: String): String = "$type:$id"
-	override fun getLongName(periodElement: PeriodElement, default: String) = getLongName(periodElement.id, periodElement.type)
+	override fun getLongName(periodElement: PeriodElement, default: String) =
+		getLongName(periodElement.id, periodElement.type)
 
 	override fun isAllowed(id: Long, type: ElementType?): Boolean = true
 	override fun isAllowed(periodElement: PeriodElement): Boolean = true
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Singleton
 class UntisMasterDataRepository @Inject constructor(
 	private val userDao: UserDao,
@@ -66,16 +72,16 @@ class UntisMasterDataRepository @Inject constructor(
 	private val allRooms = MutableStateFlow<Map<Long, RoomEntity>>(emptyMap())
 
 	init {
-		Log.d("Performance", "MasterDataRepository init start")
 		CoroutineScope(Dispatchers.IO).launch {
-			userDao.getByIdWithDataFlow(userScopeManager.user.id)
-				.collect { userData ->
-					_currentUserData.value = userData
-					allClasses.value = userData?.let { prepareElements(it.klassen) } ?: emptyMap()
-					allTeachers.value = userData?.let { prepareElements(it.teachers) } ?: emptyMap()
-					allSubjects.value = userData?.let { prepareElements(it.subjects) } ?: emptyMap()
-					allRooms.value = userData?.let { prepareElements(it.rooms) } ?: emptyMap()
-				}
+			userScopeManager.userFlow.filterNotNull().flatMapLatest {
+				userDao.getByIdWithDataFlow(userScopeManager.user.id)
+			}.collect { userData ->
+				_currentUserData.value = userData
+				allClasses.value = userData?.let { prepareElements(it.klassen) } ?: emptyMap()
+				allTeachers.value = userData?.let { prepareElements(it.teachers) } ?: emptyMap()
+				allSubjects.value = userData?.let { prepareElements(it.subjects) } ?: emptyMap()
+				allRooms.value = userData?.let { prepareElements(it.rooms) } ?: emptyMap()
+			}
 		}
 
 		// May need to implement this if there's any issues with missing data on app start
@@ -100,7 +106,8 @@ class UntisMasterDataRepository @Inject constructor(
 		} ?: default
 	}
 
-	override fun getShortName(periodElement: PeriodElement, default: String) = getShortName(periodElement.id, periodElement.type, default)
+	override fun getShortName(periodElement: PeriodElement, default: String) =
+		getShortName(periodElement.id, periodElement.type, default)
 
 	override fun getLongName(id: Long, type: ElementType, default: String): String {
 		return when (type) {
@@ -112,7 +119,8 @@ class UntisMasterDataRepository @Inject constructor(
 		} ?: default
 	}
 
-	override fun getLongName(periodElement: PeriodElement, default: String) = getLongName(periodElement.id, periodElement.type, default)
+	override fun getLongName(periodElement: PeriodElement, default: String) =
+		getLongName(periodElement.id, periodElement.type, default)
 
 	override fun isAllowed(id: Long, type: ElementType?): Boolean {
 		return when (type) {

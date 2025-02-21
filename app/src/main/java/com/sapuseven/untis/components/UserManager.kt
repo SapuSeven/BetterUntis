@@ -43,8 +43,8 @@ class UserManager @Inject constructor(
 
 	fun switchUser(user: User) {
 		_userState.value = UserState.User(user)
-		recreateUserScopedComponents(user)
 		CoroutineScope(Dispatchers.IO).launch {
+			recreateUserScopedComponents(user)
 			userSettings.updateData { currentSettings ->
 				currentSettings.toBuilder()
 					.setActiveUser(user.id)
@@ -71,7 +71,7 @@ class UserManager @Inject constructor(
 			val remainingUsers = userDao.getAll()
 			val currentState = _userState.value
 			if (currentState is UserState.User && currentState.user == user) {
-				if (remainingUsers.isNullOrEmpty()) {
+				if (remainingUsers.isEmpty()) {
 					_userState.value = UserState.NoUsers
 				} else {
 					_userState.value = UserState.User(remainingUsers.first())
@@ -80,7 +80,7 @@ class UserManager @Inject constructor(
 		}
 	}
 
-	private fun recreateUserScopedComponents(user: User) {
+	private suspend fun recreateUserScopedComponents(user: User) {
 		userScopeManager.handleUserChange(user)
 	}
 }
