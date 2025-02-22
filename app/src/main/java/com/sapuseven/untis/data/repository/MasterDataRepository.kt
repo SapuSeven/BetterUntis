@@ -83,14 +83,6 @@ class UntisMasterDataRepository @Inject constructor(
 				allRooms.value = userData?.let { prepareElements(it.rooms) } ?: emptyMap()
 			}
 		}
-
-		// May need to implement this if there's any issues with missing data on app start
-		// If performance becomes an issue, consider implementing Dagger Producers or similar asynchronous dependency initialization
-		/*measureTime {
-			//wait for first
-		}.let {
-			Log.d("Performance", "MasterDataRepository init took $it")
-		}*/
 	}
 
 	private fun <T : ElementEntity> prepareElements(elements: List<T>) =

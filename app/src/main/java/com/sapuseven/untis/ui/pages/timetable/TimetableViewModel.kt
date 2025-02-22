@@ -30,6 +30,7 @@ import com.sapuseven.untis.data.repository.TimetableRepository
 import com.sapuseven.untis.mappers.TimetableMapper
 import com.sapuseven.untis.models.PeriodItem
 import com.sapuseven.untis.scope.UserScopeManager
+import com.sapuseven.untis.services.WeekLogicService
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
 import com.sapuseven.untis.ui.pages.settings.GlobalSettingsRepository
@@ -72,6 +73,7 @@ class TimetableViewModel @AssistedInject constructor(
 	internal val masterDataRepository: MasterDataRepository,
 	internal val globalSettingsRepository: GlobalSettingsRepository,
 	internal val clock: Clock,
+	internal val weekLogicService: WeekLogicService,
 	@Assisted private val colorScheme: ColorScheme,
 	@Assisted private val typography: Typography,
 	buildConfigFieldsProvider: BuildConfigFieldsProvider,

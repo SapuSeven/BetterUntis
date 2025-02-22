@@ -74,12 +74,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import com.sapuseven.untis.R
+import com.sapuseven.untis.services.WeekLogicService
 import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.common.ifNotNull
 import com.sapuseven.untis.ui.dialogs.DatePickerDialog
 import com.sapuseven.untis.ui.functional.useDebounce
 import kotlinx.coroutines.launch
-import java.time.DayOfWeek
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -558,7 +558,7 @@ fun DrawScope.weekViewIndicator(
 	) / 60f * hourHeight.toPx()
 	val startDayIndex = ChronoUnit.DAYS.between(startDate, currentTime.toLocalDate())
 
-	if (startDayIndex in 0..numDays && yPos in 0f..size.height)
+	if (startDayIndex in 0..<numDays && yPos in 0f..size.height)
 		drawLine(
 			color = indicatorColor,
 			start = Offset(startDayIndex * dayWidth, yPos),
@@ -720,6 +720,7 @@ fun <T> WeekViewContent(
 @Composable
 fun <T> WeekViewCompose(
 	events: Map<LocalDate, List<Event<T>>>,
+	weekLogicService: WeekLogicService,
 	onPageChange: suspend (pageIndex: Int) -> Unit,
 	onReload: suspend (pageIndex: Int) -> Unit,
 	onItemClick: (Pair<List<Event<T>>, Int>) -> Unit,
@@ -736,7 +737,6 @@ fun <T> WeekViewCompose(
 				)
 			})
 	},
-	startDate: LocalDate = LocalDate.now(),
 	enableZoomGesture: Boolean = true,
 	initialScale: Float = 1f,
 	hourHeight: Dp = 72.dp,
@@ -847,9 +847,7 @@ fun <T> WeekViewCompose(
 
 		HorizontalPager(state = pagerState) { index ->
 			val pageOffset = index - startPage
-			// TODO: This needs to be more flexible, e.g. skip to next week on weekends. Also make sure that the "current week" logic is consistent across the app
-			val visibleStartDate =
-				startDate.with(DayOfWeek.MONDAY).plusWeeks(pageOffset.toLong()) // 1 = Monday, 7 = Sunday
+			val visibleStartDate = weekLogicService.currentWeekStartDate().plusWeeks(pageOffset.toLong()) // 1 = Monday, 7 = Sunday
 
 			Column {
 				WeekViewHeader(

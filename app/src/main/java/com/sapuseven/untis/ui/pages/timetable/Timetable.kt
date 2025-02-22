@@ -153,6 +153,7 @@ fun Timetable(
 				WeekViewStyle(weekViewEventStyle) {
 					WeekViewCompose(
 						events = events,
+						weekLogicService = viewModel.weekLogicService,
 						onPageChange = { pageOffset ->
 							viewModel.onPageChange(pageOffset)
 						},

@@ -10,6 +10,7 @@ import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.data.repository.TimetableRepository
 import com.sapuseven.untis.models.RoomFinderItem
 import com.sapuseven.untis.scope.UserScopeManager
+import com.sapuseven.untis.services.WeekLogicService
 import crocodile8.universal_cache.FromCache
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -29,6 +30,7 @@ interface GetRoomFinderItemsUseCase {
 class GetRoomFinderItemsUseCaseImpl @Inject constructor(
 	private val roomFinderDao: RoomFinderDao,
 	private val timetableRepository: TimetableRepository,
+	private val weekLogicService: WeekLogicService,
 	masterDataRepository: MasterDataRepository,
 	userScopeManager: UserScopeManager
 ) : GetRoomFinderItemsUseCase {
@@ -68,7 +70,7 @@ class GetRoomFinderItemsUseCaseImpl @Inject constructor(
 	}
 
 	private fun fetchRoomStates(room: RoomEntity): Flow<List<Boolean>> {
-		val startDate = LocalDate.now().with(DayOfWeek.MONDAY) // TODO
+		val startDate = weekLogicService.currentWeekStartDate()
 
 		return timetableRepository.timetableSource().get(
 			params = TimetableRepository.TimetableParams(
