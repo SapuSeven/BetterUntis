@@ -23,6 +23,6 @@ fun Application.initSentry(
 			}
 		}
 	} else {
-		Log.i("Sentry", "Sentry is not enabled")
+		Log.i("Sentry", "Sentry is disabled")
 	}
 }

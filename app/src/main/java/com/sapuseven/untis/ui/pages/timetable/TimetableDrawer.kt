@@ -201,16 +201,11 @@ fun TimetableDrawer(
 				DrawerText(stringResource(id = R.string.nav_all_timetables))
 
 				DrawerItems(
-					isMessengerAvailable = false,//todo state.isMessengerAvailable(),
 					disableTypeSelection = displayedElement == null || isBookmarkSelected,
 					displayedElement = displayedElement,
 					onTimetableClick = { item ->
 						scope.launch { drawerState.close() }
 						showElementPicker = item.elementType
-					},
-					onShortcutClick = { item ->
-						scope.launch { drawerState.close() }
-						viewModel.onShortcutItemClick(item, shortcutLauncher)
 					},
 					onNavigationClick = { item ->
 						scope.launch { drawerState.close() }

@@ -5,11 +5,11 @@ import com.sapuseven.untis.api.model.response.PeriodDataResult
 import com.sapuseven.untis.api.model.untis.absence.StudentAbsence
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.Period
-import com.sapuseven.untis.data.cache.CachedSource
 import com.sapuseven.untis.data.cache.DiskCache
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.scope.UserScopeManager
+import crocodile8.universal_cache.CachedSource
 import crocodile8.universal_cache.time.TimeProvider
 import kotlinx.serialization.serializer
 import java.io.File

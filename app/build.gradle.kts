@@ -206,7 +206,6 @@ dependencies {
 	implementation(libs.fuel)
 	implementation(libs.fuel.coroutines)
 	implementation(libs.fuel.serialization)
-	implementation(libs.joda.time)
 	implementation(libs.hilt.android)
 	implementation(libs.hilt.compiler)
 	implementation(libs.kotlin.reflect)

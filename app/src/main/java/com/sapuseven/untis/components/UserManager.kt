@@ -64,18 +64,16 @@ class UserManager @Inject constructor(
 		}
 	}
 
-	fun deleteUser(user: User) {
-		CoroutineScope(Dispatchers.IO).launch {
-			userDao.delete(user)
+	suspend fun deleteUser(user: User) {
+		userDao.delete(user)
 
-			val remainingUsers = userDao.getAll()
-			val currentState = _userState.value
-			if (currentState is UserState.User && currentState.user == user) {
-				if (remainingUsers.isEmpty()) {
-					_userState.value = UserState.NoUsers
-				} else {
-					_userState.value = UserState.User(remainingUsers.first())
-				}
+		val remainingUsers = userDao.getAllAsync()
+		val currentState = _userState.value
+		if (currentState is UserState.User && currentState.user == user) {
+			if (remainingUsers.isEmpty()) {
+				_userState.value = UserState.NoUsers
+			} else {
+				_userState.value = UserState.User(remainingUsers.first())
 			}
 		}
 	}

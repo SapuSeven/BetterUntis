@@ -8,15 +8,15 @@ import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import androidx.work.WorkerParameters
 import com.sapuseven.untis.data.database.entities.UserDao
-import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.data.repository.TimetableRepository
 import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
 import crocodile8.universal_cache.FromCache
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
-import org.joda.time.LocalDateTime
-import org.joda.time.Seconds
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 
 /**
@@ -37,15 +37,15 @@ class DailyWorker @AssistedInject constructor(
 		const val TAG_DAILY_WORK = "DailyWork"
 
 		private fun nextWorkRequest(hourOfDay: Int = 2): WorkRequest {
-			val currentTime = LocalDateTime.now()
-			var dueTime = currentTime.withMillisOfDay(hourOfDay * 60 * 60 * 1000)
+			val currentDateTime = LocalDateTime.now()
+			var dueDateTime = LocalDate.now().atTime(hourOfDay, 0)
 
-			if (dueTime <= currentTime)
-				dueTime = dueTime.plusDays(1)
+			if (currentDateTime.isAfter(dueDateTime))
+				dueDateTime = dueDateTime.plusDays(1)
 
 			return OneTimeWorkRequestBuilder<DailyWorker>()
 				.setInitialDelay(
-					Seconds.secondsBetween(currentTime, dueTime).seconds.toLong(),
+					ChronoUnit.SECONDS.between(currentDateTime, dueDateTime),
 					TimeUnit.SECONDS
 				)
 				.addTag(TAG_DAILY_WORK)

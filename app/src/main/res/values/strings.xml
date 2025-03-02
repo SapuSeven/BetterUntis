@@ -108,7 +108,6 @@
     <string name="library_constraintlayout" translatable="false">Android ConstraintLayout</string>
     <string name="library_fuel" translatable="false">Fuel</string>
     <string name="library_fuel_coroutines" translatable="false">Fuel Coroutines</string>
-    <string name="library_joda_time" translatable="false">Joda Time</string>
     <string name="library_junit" translatable="false">JUnit</string>
     <string name="library_kotlin_reflect" translatable="false">Kotlin Reflection</string>
     <string name="library_kotlin_stdlib" translatable="false">Kotlin Standard Library</string>
