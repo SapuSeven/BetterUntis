@@ -10,8 +10,8 @@ Schütze deine Privatsphäre durch Proxy-Server-Unterstützung.
 
 Lass dir über Benachrichtigungen Details zur nächsten Stunde anzeigen.
 
-Weitere Funktionen beinhalten einen Raum-Finder,
-mit dem du freie Räume in deiner Schule finden kannst,
+Weitere Funktionen beinhalten eine Raum-Suche,
+mit der du freie Räume in deiner Schule finden kannst,
 und das Info-Center, um Abwesenheiten, Tests und mehr im Auge behalten zu können.
 
 Genieße eine schnelle und flüssige Erfahrung mit BetterUntis.

@@ -2,4 +2,4 @@
 - Fehlerhafte Überprüfung von automatisch befüllten Login-Daten behoben
 - Behebung weiterer kleiner Fehler und Abstürze
 - Upgrade des QR-Code-Scanners: ML Kit (sofern verfügbar)
-- Unterstützung für Login ohne Passwort
+- Unterstützung für Anmeldung ohne Passwort
