@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+option java_package = "com.sapuseven.untis.data.settings.model";
+option java_multiple_files = true;
+
+message UserSettings {
+  bool exitConfirmation = 1;
+  bool flingEnable = 2;
+  bool weekSnapToDays = 3;
+  repeated string weekCustomRange = 4;
+  float weekCustomLength = 5;
+  bool automuteEnable = 6;
+  bool automuteCancelledLessons = 7;
+  bool automuteAllowPriority = 56;
+  float automuteMinimumBreakLength = 9;
+  bool timetableItemTextLight = 10;
+  int32 backgroundFuture = 11;
+  int32 backgroundPast = 12;
+  int32 marker = 13;
+  int32 backgroundRegular = 14;
+  int32 backgroundRegularPast = 15;
+  int32 backgroundExam = 16;
+  int32 backgroundExamPast = 17;
+  int32 backgroundIrregular = 18;
+  int32 backgroundIrregularPast = 19;
+  int32 backgroundCancelled = 20;
+  int32 backgroundCancelledPast = 21;
+  bool customThemeColor = 53;
+  int32 themeColor = 22;
+  string darkTheme = 23;
+  bool darkThemeOled = 24;
+  TimetableElement timetablePersonalTimetable = 25;
+  bool timetableHideTimeStamps = 26;
+  bool timetableHideCancelled = 27;
+  bool timetableSubstitutionsIrregular = 28;
+  bool timetableBackgroundIrregular = 29;
+  string timetableRange = 30;
+  bool timetableRangeIndexReset = 31;
+  int32 timetableItemPadding = 33;
+  int32 timetableItemCornerRadius = 34;
+  bool timetableCenteredLessonInfo = 35;
+  bool timetableBoldLessonName = 36;
+  int32 timetableLessonNameFontSize = 37;
+  int32 timetableLessonInfoFontSize = 38;
+  bool timetableZoomEnabled = 54;
+  float timetableZoomLevel = 55;
+  bool notificationsEnable = 39;
+  bool notificationsInMultiple = 40;
+  bool notificationsBeforeFirst = 41;
+  int32 notificationsBeforeFirstTime = 42;
+  string notificationsVisibilitySubjects = 43;
+  string notificationsVisibilityRooms = 44;
+  string notificationsVisibilityTeachers = 45;
+  string notificationsVisibilityClasses = 46;
+  bool connectivityRefreshInBackground = 47;
+  string proxyHost = 48;
+  repeated string schoolBackground = 49;
+  bool infocenterAbsencesOnlyUnexcused = 50;
+  bool infocenterAbsencesSortReverse = 51;
+  string infocenterAbsencesTimeRange = 52;
+  repeated TimetableElement bookmarks = 57;
+}
+
+message GlobalSettings {
+  bool initialized = 1;
+  bool errorReportingSet = 2;
+  bool errorReportingEnable = 3;
+  bool errorReportingEnableBreadcrumbs = 4;
+}
+
+message Settings {
+  int64 activeUser = 1;
+  map<int64, UserSettings> userSettings = 2;
+  GlobalSettings globalSettings = 3;
+}
+
+message TimetableElement {
+  int64 elementId = 1;
+  int32 elementType = 2;
+}

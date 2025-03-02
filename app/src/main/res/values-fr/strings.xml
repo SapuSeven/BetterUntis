@@ -42,8 +42,6 @@
     <string name="preference_week_snap_to_days">Défilement journalier</string>
     <string name="preference_week_display_length_summary">Définir à 0 pour utiliser la longueur de la semaine</string>
     <string name="preference_week_display_length">Jours à afficher</string>
-    <string name="preference_week_custom_range_summary_short">%1$s</string>
-    <string name="preference_week_custom_range_summary">%1$s à %2$s</string>
     <string name="preference_week_custom_range">Personnaliser la semaine</string>
     <string name="preference_use_theme_background_desc">Ceci s’applique uniquement aux cours réguliers</string>
     <string name="preference_use_theme_background">Utiliser les couleurs du thème</string>
@@ -63,7 +61,6 @@
     <string name="preference_timetable_item_corner_radius">Rayon d’angle de l’élément</string>
     <string name="preference_timetable_hide_timestamps_desc">Cacher l’horodatage à côté de l’emploi du temps</string>
     <string name="preference_timetable_hide_timestamps">Cacher l’horodatage</string>
-    <string name="preference_timetable_hide_cancelled_desc">Vous devez recharger l’emploi du temps après avoir changer ce paramètre</string>
     <string name="preference_timetable_hide_cancelled">Cacher les cours annulés</string>
     <string name="preference_timetable_colors_reset">Réinitialiser les couleurs</string>
     <string name="preference_timetable_centered_lesson_info">Centrer les infos du cours</string>
@@ -150,7 +147,6 @@
     <string name="elementpicker_hint_search">Recherche…</string>
     <string name="infocenter_events_exam_name_long">%1$s – %2$s</string>
     <string name="infocenter_absences_empty">Aucune absence</string>
-    <string name="infocenter_events_empty">Aucun évènement</string>
     <string name="infocenter_messages_empty">Aucun message</string>
     <string name="infocenter_officehours_empty">Aucune heure de permanence</string>
     <string name="infocenter_timeformat_sameday">%2$s – %4$s, %1$s</string>
@@ -166,7 +162,6 @@
     <string name="roomfinder_image_availability_indicator">Indicateur de disponibilité des salles</string>
     <string name="roomfinder_delete_item">Supprimer l’élément</string>
     <string name="roomfinder_current_hour_time">%1$s – %2$s</string>
-    <string name="roomfinder_current_hour">%1$s, cours de %2$d.</string>
     <string name="errormessagedictionary_no_right">Aucun droit pour l’emploi du temps</string>
     <string name="errormessagedictionary_user_locked">Utilisateur bloqué !</string>
     <string name="errormessagedictionary_invalid_time_settings">Date ou heure invalide !</string>
@@ -275,15 +270,13 @@
         <item quantity="one">%1$d contribution</item>
         <item quantity="other">%1$d contributions</item>
     </plurals>
-    <string name="widget_timetable_link">Lien calendrier</string>
-    <string name="widget_select_profile">Veuillez choisir un profil pour le widget</string>
+	<string name="widget_select_profile">Veuillez choisir un profil pour le widget</string>
     <string name="widget_daily_messages">Messages quotidiens</string>
     <string name="widget_timetable_empty">Aucun calendrier disponible pour aujourd\'hui</string>
     <string name="widget_timetable">Calendrier</string>
     <string name="widget_configuration">Configuration du widget</string>
     <string name="preference_timetable_colors_reset_button_positive">Réinitialiser</string>
     <string name="preference_theme_pixel">Pixel</string>
-    <string name="infocenter_absence_unknown_reason">Raison inconnue</string>
     <string name="infocenter_messages_attachments">Pièces jointes</string>
     <string name="logindatainput_skip_school_id">Passer la résolution de l\'identifiant de l\'école</string>
     <string name="main_dialog_itemdetails_timeformat">%1$s - %2$s</string>
@@ -347,8 +340,6 @@
     <string name="login_demo">Essayez-le !</string>
     <string name="all_lesson_online">Se déroulant en ligne</string>
     <string name="all_open_link">Ouvrir le lien</string>
-    <string name="preference_range_from">de</string>
-    <string name="preference_range_to">à</string>
     <string name="preference_dialog_permission_alarms_text">Cette fonction nécessite des autorisations supplémentaires. Veuillez autoriser BetterUntis à programmer des alarmes exactes.</string>
     <string name="preference_reports_info_desc">Ces paramètres permettent d\'améliorer l\'application.
 \nAucune information personnelle n\'est jamais collectée.

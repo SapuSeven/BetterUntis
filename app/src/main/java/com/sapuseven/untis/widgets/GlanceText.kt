@@ -5,11 +5,11 @@ import androidx.glance.text.*
 import androidx.glance.unit.ColorProvider
 
 internal fun androidx.compose.ui.text.TextStyle.toGlanceTextStyle(
-	color: ColorProvider? = ColorProvider(this.color),
+	color: ColorProvider = ColorProvider(this.color),
 	fontSize: TextUnit? = this.fontSize,
 	fontWeight: FontWeight? = this.fontWeight?.toGlanceFontWeight(),
 	fontStyle: FontStyle? = this.fontStyle?.toGlanceFontStyle(),
-	textAlign: TextAlign? = this.textAlign?.toGlanceTextAlign(),
+	textAlign: TextAlign = this.textAlign.toGlanceTextAlign(),
 	textDecoration: TextDecoration? = this.textDecoration?.toGlanceTextDecoration()
 ): TextStyle =
 	run {

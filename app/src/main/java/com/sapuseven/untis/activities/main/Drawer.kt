@@ -1,90 +1,72 @@
 package com.sapuseven.untis.activities.main
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.R
-import com.sapuseven.untis.activities.InfoCenterActivity
-import com.sapuseven.untis.activities.RoomFinderActivity
-import com.sapuseven.untis.activities.SettingsActivity
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import com.sapuseven.untis.ui.models.NavItemShortcut
-import com.sapuseven.untis.ui.models.NavItemTimetable
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
+import com.sapuseven.untis.ui.navigation.AppRoutes
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DrawerItems(
-	isMessengerAvailable: Boolean = false,
 	disableTypeSelection: Boolean = false,
 	displayedElement: PeriodElement? = null,
 	onTimetableClick: (item: NavItemTimetable) -> Unit,
-	onShortcutClick: (item: NavItemShortcut) -> Unit,
+	onNavigationClick: (item: NavItemNavigation) -> Unit,
 ) {
 	val navItemsElementTypes = listOf(
 		NavItemTimetable(
-			id = 1,
 			icon = painterResource(id = R.drawable.all_classes),
 			label = stringResource(id = R.string.all_classes),
-			elementType = TimetableDatabaseInterface.Type.CLASS
+			elementType = ElementType.CLASS
 		),
 		NavItemTimetable(
-			id = 2,
 			icon = painterResource(id = R.drawable.all_teachers),
 			label = stringResource(id = R.string.all_teachers),
-			elementType = TimetableDatabaseInterface.Type.TEACHER
+			elementType = ElementType.TEACHER
 		),
 		NavItemTimetable(
-			id = 3,
 			icon = painterResource(id = R.drawable.all_rooms),
 			label = stringResource(id = R.string.all_rooms),
-			elementType = TimetableDatabaseInterface.Type.ROOM
+			elementType = ElementType.ROOM
 		),
 	)
 
-	var navItemsShortcuts = listOf(
-		NavItemShortcut(
-			id = 1,
+	val navItemsNavigation = listOf(
+		NavItemNavigation(
 			icon = painterResource(id = R.drawable.all_infocenter),
 			label = stringResource(id = R.string.activity_title_info_center),
-			InfoCenterActivity::class.java
+			route = AppRoutes.InfoCenter
 		),
-		NavItemShortcut(
-			id = 2,
+		NavItemNavigation(
 			icon = painterResource(id = R.drawable.all_search_rooms),
 			label = stringResource(id = R.string.activity_title_free_rooms),
-			RoomFinderActivity::class.java
+			route = AppRoutes.RoomFinder
 		),
-		NavItemShortcut(
-			id = 4,
+		NavItemNavigation(
 			icon = painterResource(id = R.drawable.all_settings),
 			label = stringResource(id = R.string.activity_title_settings),
-			SettingsActivity::class.java
+			route = AppRoutes.Settings
 		)
 	)
-	if (isMessengerAvailable) {
-		navItemsShortcuts = navItemsShortcuts.plus(
-			NavItemShortcut(
-				id = 3,
-				icon = painterResource(id = R.drawable.all_messenger),
-				label = stringResource(id = R.string.activity_title_messenger),
-				null
-			)
-		).sortedBy {
-			it.id
-		}
-	}
 
 	navItemsElementTypes.forEach { item ->
 		NavigationDrawerItem(
 			icon = { Icon(item.icon, contentDescription = null) },
 			label = { Text(item.label) },
-			selected = !disableTypeSelection && item.elementType.name == displayedElement?.type,
+			selected = !disableTypeSelection && item.elementType == displayedElement?.type,
 			onClick = { onTimetableClick(item) },
 			modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 		)
@@ -92,12 +74,12 @@ fun DrawerItems(
 
 	DrawerDivider()
 
-	navItemsShortcuts.forEach { item ->
+	navItemsNavigation.forEach { item ->
 		NavigationDrawerItem(
 			icon = { Icon(item.icon, contentDescription = null) },
 			label = { Text(item.label) },
 			selected = false,
-			onClick = { onShortcutClick(item) },
+			onClick = { onNavigationClick(item) },
 			modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 		)
 	}
@@ -105,7 +87,7 @@ fun DrawerItems(
 
 @Composable
 fun DrawerDivider() {
-	Divider(
+	HorizontalDivider(
 		color = MaterialTheme.colorScheme.outline,
 		modifier = Modifier.padding(vertical = 8.dp)
 	)
@@ -119,3 +101,20 @@ fun DrawerText(text: String) {
 		modifier = Modifier.padding(start = 28.dp, top = 16.dp, bottom = 8.dp)
 	)
 }
+
+open class NavItem(
+	open val icon: Painter,
+	open val label: String
+)
+
+data class NavItemTimetable(
+	override val icon: Painter,
+	override val label: String,
+	val elementType: ElementType
+) : NavItem(icon, label)
+
+data class NavItemNavigation(
+	override val icon: Painter,
+	override val label: String,
+	val route: Any
+) : NavItem(icon, label)

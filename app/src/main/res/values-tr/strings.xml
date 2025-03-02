@@ -54,14 +54,12 @@
     <string name="elementpicker_hint_search_rooms">Oda ara…</string>
     <string name="elementpicker_hint_search_classes">Sınıf ara…</string>
     <string name="elementpicker_hint_search">Arama yap…</string>
-    <string name="infocenter_absence_unknown_reason">Bilinmeyen neden</string>
     <string name="infocenter_timeformat_sameday">%2$s - %4$s,%1$s</string>
     <string name="infocenter_timeformat">%1$s, %2$s - %3$s, %4$s</string>
     <string name="infocenter_officehours_empty">Ofis saati yok</string>
     <string name="infocenter_messages_empty">Mesaj yok</string>
     <string name="infocenter_messages_attachments">Ekler</string>
     <string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
-    <string name="infocenter_events_empty">Etkinlik yok</string>
     <string name="infocenter_absences_empty">Devamsızlık yok</string>
     <string name="roomfinder_no_rooms">Görüntülenebilecek bir oda yok.
 \nYeni bir tane eklemek için +\'ya basın!</string>
@@ -74,7 +72,6 @@
     <string name="roomfinder_dialog_itemdelete_text">Bu odayı listeden çıkarmak istediğinizden emin misiniz\?</string>
     <string name="roomfinder_delete_item">Öğeyi sil</string>
     <string name="roomfinder_current_hour_time">%1$s - %2$s</string>
-    <string name="roomfinder_current_hour">%1$s,%2$d. Ders</string>
     <string name="errormessagedictionary_user_locked">Kullanıcı kilitli!</string>
     <string name="errormessagedictionary_too_many_results">Çok fazla sonuç</string>
     <string name="errormessagedictionary_server_webuntis_not_installed">Belirtilen Sunucuda WebUntis yüklü değil!</string>
@@ -157,7 +154,6 @@
     <string name="all_subjects">Konular</string>
     <string name="preference_timetable_hide_timestamps_desc">Zaman çizelgesinin yanındaki zaman bilgilerini gizle</string>
     <string name="preference_timetable_hide_timestamps">Zaman bilgisini gizle</string>
-    <string name="preference_timetable_hide_cancelled_desc">Bu ayarı değiştirdikten sonra zaman çizelgesini yeniden yüklemeniz gerekir</string>
     <string name="preference_timetable_hide_cancelled">İptal edilen dersleri gizle</string>
     <string name="preference_timetable_colors_reset_button_positive">Sıfırla</string>
     <string name="preference_timetable_colors_reset">Renkleri sıfırla</string>
@@ -247,7 +243,6 @@
     <string name="widget_timetable_empty">Bugün için ders programı bulunamadı</string>
     <string name="widget_daily_messages">Günlük Bildirimler</string>
     <string name="widget_select_profile">Lütfen widget için bir profil seç</string>
-    <string name="widget_timetable_link">Ders Programı Linki</string>
     <plurals name="main_time_diff_hours">
         <item quantity="one">Bir saat önce</item>
         <item quantity="other">%d saat önce</item>
@@ -269,7 +264,6 @@
     <string name="preference_timetable_bold_lesson_name">Kalın ders adı</string>
     <string name="preference_timetable_range">Gösterilecek dersler</string>
     <string name="preference_timetable_item_text_light">Beyaz ders yazısı</string>
-    <string name="preference_week_custom_range_summary_short">%1$s</string>
     <string name="preference_timetable_item_padding_overlap">Üst üste olan dersler arası mesafe</string>
     <string name="errors_report">Uygulamayı düzeltmeye yardım etmek için lütfen aşağıdaki hataları bildir:</string>
     <plurals name="main_time_diff_minutes">

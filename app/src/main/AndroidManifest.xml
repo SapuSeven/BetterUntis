@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-	xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools">
 
+	<uses-feature
+		android:name="android.hardware.camera"
+		android:required="false" />
+
 	<uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
-	<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+	<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.CAMERA" />
 	<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
@@ -15,102 +18,42 @@
 		<intent>
 			<action android:name="android.intent.action.VIEW" />
 			<category android:name="android.intent.category.BROWSABLE" />
-			<data android:scheme="https" android:host="*" />
+			<data
+				android:host="*"
+				android:scheme="https" />
 		</intent>
 	</queries>
 
 	<application
 		android:name=".activities.App"
 		android:allowBackup="true"
+		android:dataExtractionRules="@xml/data_extraction_rules"
+		android:enableOnBackInvokedCallback="true"
 		android:fullBackupContent="@xml/backup_descriptor"
+		android:hardwareAccelerated="true"
 		android:icon="@mipmap/ic_launcher"
 		android:label="@string/app_name"
 		android:roundIcon="@mipmap/ic_launcher_round"
 		android:supportsRtl="true"
-		android:theme="@style/AppTheme"
-		android:enableOnBackInvokedCallback="true">
+		android:theme="@style/Theme.Material3.DayNight">
 
-		<meta-data android:name="io.sentry.auto-init" android:value="false" />
-		<meta-data android:name="com.google.mlkit.vision.DEPENDENCIES" android:value="barcode_ui"/>
-
-		<activity
-			android:name=".activities.ShortcutConfigureActivity"
-			android:icon="@mipmap/ic_shortcut"
-			android:label="@string/widget_timetable_link"
-			android:exported="true">
-
-			<intent-filter>
-				<category android:name="android.intent.category.DEFAULT" />
-				<action android:name="android.intent.action.CREATE_SHORTCUT" />
-			</intent-filter>
-		</activity>
-
-		<activity
-			android:name=".activities.ElementPickerWidgetConfigureActivity"
-			android:label="@string/widget_configuration"
-			android:exported="true">
-
-			<intent-filter>
-				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
-			</intent-filter>
-		</activity>
+		<meta-data
+			android:name="io.sentry.auto-init"
+			android:value="false" />
+		<meta-data
+			android:name="com.google.mlkit.vision.DEPENDENCIES"
+			android:value="barcode_ui" />
 
 		<activity
 			android:name=".activities.MainActivity"
+			android:exported="true"
 			android:launchMode="singleTop"
-			android:exported="true">
+			android:windowSoftInputMode="adjustResize">
 
 			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-
 				<category android:name="android.intent.category.LAUNCHER" />
+				<action android:name="android.intent.action.MAIN" />
 			</intent-filter>
-		</activity>
-
-		<activity
-			android:name=".activities.LoginActivity"
-			android:windowSoftInputMode="adjustResize"
-			android:launchMode="singleTop" />
-
-		<activity
-			android:name=".activities.ScanCodeActivity"
-			android:label="@string/login_scan_code"
-			android:parentActivityName=".activities.LoginActivity">
-
-			<meta-data
-				android:name="android.support.PARENT_ACTIVITY"
-				android:value=".activities.LoginActivity" />
-		</activity>
-
-		<activity
-			android:name=".activities.RoomFinderActivity"
-			android:label="@string/activity_title_free_rooms"
-			android:parentActivityName=".activities.MainActivity">
-
-			<meta-data
-				android:name="android.support.PARENT_ACTIVITY"
-				android:value=".activities.MainActivity" />
-		</activity>
-
-		<activity
-			android:name=".activities.InfoCenterActivity"
-			android:label="@string/activity_title_info_center"
-			android:parentActivityName=".activities.MainActivity">
-
-			<meta-data
-				android:name="android.support.PARENT_ACTIVITY"
-				android:value=".activities.MainActivity" />
-		</activity>
-
-		<activity
-			android:name=".activities.LoginDataInputActivity"
-			android:parentActivityName=".activities.LoginActivity"
-			android:windowSoftInputMode="adjustResize"
-			android:exported="true">
-
-			<meta-data
-				android:name="android.support.PARENT_ACTIVITY"
-				android:value=".activities.LoginActivity" />
 
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
@@ -124,29 +67,53 @@
 			</intent-filter>
 		</activity>
 
+		<!-- TODO: Implement
 		<activity
-			android:name=".activities.SettingsActivity"
-			android:label="@string/activity_title_settings"
-			android:parentActivityName=".activities.MainActivity">
+			android:name=".activities.ShortcutConfigureActivity"
+			android:exported="true"
+			android:icon="@mipmap/ic_shortcut"
+			android:label="@string/widget_timetable_link">
 
-			<meta-data
-				android:name="android.support.PARENT_ACTIVITY"
-				android:value=".activities.MainActivity" />
+			<intent-filter>
+				<category android:name="android.intent.category.DEFAULT" />
+				<action android:name="android.intent.action.CREATE_SHORTCUT" />
+			</intent-filter>
+		</activity>
+
+		<activity
+			android:name=".activities.ElementPickerWidgetConfigureActivity"
+			android:exported="true"
+			android:label="@string/widget_configuration">
+
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+			</intent-filter>
+		</activity>-->
+
+		<activity
+			android:name=".activities.AutoMuteConfigurationActivity"
+			android:exported="true">
+			<intent-filter>
+				<action android:name="android.app.action.AUTOMATIC_ZEN_RULE" />
+				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
 		</activity>
 
 		<activity
 			android:name="com.journeyapps.barcodescanner.CaptureActivity"
-			android:screenOrientation="portrait"
-			tools:replace="screenOrientation" />
+			android:screenOrientation="fullSensor"
+			tools:replace="screenOrientation"
+			tools:ignore="DiscouragedApi" />
 
 		<receiver android:name=".receivers.NotificationReceiver" />
 
 		<receiver android:name=".receivers.AutoMuteReceiver" />
 
+		<!-- TODO: Implement
 		<receiver
 			android:name=".widgets.TimetableWidgetReceiver"
-			android:label="@string/widget_timetable"
-			android:exported="true">
+			android:exported="true"
+			android:label="@string/widget_timetable">
 
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -159,8 +126,8 @@
 
 		<receiver
 			android:name=".widgets.MessagesWidgetReceiver"
-			android:label="@string/widget_daily_messages"
-			android:exported="true">
+			android:exported="true"
+			android:label="@string/widget_daily_messages">
 
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -169,12 +136,11 @@
 			<meta-data
 				android:name="android.appwidget.provider"
 				android:resource="@xml/widget_info" />
-		</receiver>
+		</receiver>-->
 
 		<provider
 			android:name="androidx.startup.InitializationProvider"
 			android:authorities="${applicationId}.androidx-startup"
-			tools:node="remove">
-		</provider>
+			tools:node="remove"/>
 	</application>
 </manifest>

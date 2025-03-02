@@ -4,13 +4,11 @@
     <string name="elementpicker_hint_search_rooms">Bilatu gelak…</string>
     <string name="elementpicker_hint_search_classes">Bilatu klaseak…</string>
     <string name="elementpicker_hint_search">Bilatu…</string>
-    <string name="infocenter_absence_unknown_reason">Arrazoi ezezaguna</string>
     <string name="infocenter_timeformat_sameday">%2$s - %4$s, %1$s</string>
     <string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
     <string name="infocenter_messages_empty">Mezurik ez</string>
     <string name="infocenter_messages_attachments">Eranskinak</string>
     <string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
-    <string name="infocenter_events_empty">Gertaerarik ez</string>
     <string name="roomfinder_no_rooms">Ez dago gelarik erakusteko.
 \nUkitu + bat gehitzeko!</string>
     <string name="roomfinder_loading_data">Datuak kargatzen…</string>
@@ -21,7 +19,6 @@
     <string name="roomfinder_dialog_itemdelete_text">Ziur zaude gela hau zerrendatik kendu nahi duzula\?</string>
     <string name="roomfinder_delete_item">Ezabatu elementua</string>
     <string name="roomfinder_current_hour_time">%1$s - %2$s</string>
-    <string name="roomfinder_current_hour">%1$s,%2$d. Eskola</string>
     <string name="errormessagedictionary_user_locked">Erabiltzailea blokeatuta!</string>
     <string name="errormessagedictionary_too_many_results">Emaitza gehiegi</string>
     <string name="errormessagedictionary_server_webuntis_not_installed">Zehaztutako zerbitzariak ez du WebUntis instalatuta!</string>
@@ -120,7 +117,6 @@
         <item quantity="one">duela minutu bat</item>
         <item quantity="other">duela %d minutu</item>
     </plurals>
-    <string name="widget_timetable_link">Ordutegiaren esteka</string>
     <string name="widget_daily_messages">Eguneroko mezuak</string>
     <string name="widget_timetable_empty">Ez dago gaurko ordutegirik erabilgarri</string>
     <string name="widget_timetable">Ordutegia</string>
@@ -151,8 +147,6 @@
     <string name="preference_week_snap_to_days">Egokitu egunetara</string>
     <string name="preference_week_display_length_summary">Ezarri 0 astearen luzera erabiltzeko</string>
     <string name="preference_week_display_length">Bistaratzeko egunak</string>
-    <string name="preference_week_custom_range_summary_short">%1$s</string>
-    <string name="preference_week_custom_range_summary">%1$s - %2$s</string>
     <string name="preference_week_custom_range">Aste-tarte pertsonalizatua</string>
     <string name="preference_timetable_substitutions_irregular">Aurkitu ezohiko eskolak</string>
     <string name="preference_timetable_range">Bistaratzeko orduak</string>
@@ -163,7 +157,6 @@
     <string name="preference_timetable_item_corner_radius">Elementuaren ertzeko erradioa</string>
     <string name="preference_timetable_hide_timestamps_desc">Ezkutatu ordutegiaren ondoko denbora-zigiluak</string>
     <string name="preference_timetable_hide_timestamps">Ezkutatu denbora-zigiluak</string>
-    <string name="preference_timetable_hide_cancelled_desc">Ezarpen hau aldatu ondoren ordutegia berriro kargatu behar duzu</string>
     <string name="preference_timetable_hide_cancelled">Ezkutatu bertan behera utzitako eskolak</string>
     <string name="preference_timetable_colors_reset_button_positive">Berrezarri</string>
     <string name="preference_timetable_colors_reset">Berrezarri koloreak</string>

@@ -10,20 +10,21 @@ import android.content.Context.ALARM_SERVICE
 import android.content.Intent
 import android.os.Build
 import android.util.Log
-import androidx.room.Room
-import androidx.work.Data
+import androidx.hilt.work.HiltWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.data.databases.entities.User
-import com.sapuseven.untis.data.timetable.TimegridItem
-import com.sapuseven.untis.helpers.DateTimeUtils
-import com.sapuseven.untis.helpers.config.booleanDataStore
-import com.sapuseven.untis.helpers.config.intDataStore
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.data.database.entities.User
+import com.sapuseven.untis.data.database.entities.UserDao
+import com.sapuseven.untis.data.repository.MasterDataRepository
+import com.sapuseven.untis.data.repository.TimetableRepository
+import com.sapuseven.untis.mappers.TimetableMapper
+import com.sapuseven.untis.models.PeriodItem
+import com.sapuseven.untis.models.equalsIgnoreTime
 import com.sapuseven.untis.receivers.NotificationReceiver
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_BOOLEAN_CLEAR
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_BOOLEAN_FIRST
@@ -39,33 +40,51 @@ import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_NEXT_SUBJECT_LONG
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_NEXT_TEACHER
 import com.sapuseven.untis.receivers.NotificationReceiver.Companion.EXTRA_STRING_NEXT_TEACHER_LONG
-import com.sapuseven.untis.workers.DailyWorker.Companion.WORKER_DATA_USER_ID
-import org.joda.time.DateTime
-import org.joda.time.LocalDateTime
+import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
+import crocodile8.universal_cache.FromCache
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.first
+import java.time.Clock
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 /**
  * This worker schedules all break info notifications for the day.
  */
-class NotificationSetupWorker(context: Context, params: WorkerParameters) :
-	TimetableDependantWorker(context, params) {
+@HiltWorker
+class NotificationSetupWorker @AssistedInject constructor(
+	@Assisted context: Context,
+	@Assisted params: WorkerParameters,
+	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
+	timetableMapperFactory: TimetableMapper.Factory,
+	timetableRepository: TimetableRepository,
+	private val masterDataRepository: MasterDataRepository,
+	private val clock: Clock,
+	private val userDao: UserDao,
+) : TimetableDependantWorker(context, params, timetableRepository) {
+	val settingsRepository = userSettingsRepositoryFactory.create()
+	val timetableMapper = timetableMapperFactory.create()
+
 	companion object {
 		private const val LOG_TAG = "NotificationSetup"
 		private const val TAG_NOTIFICATION_SETUP_WORK = "NotificationSetupWork"
+		private const val WORKER_DATA_USER_ID = "UserId"
 
 		const val CHANNEL_ID_DEBUG = "notifications.debug"
 		const val CHANNEL_ID_BACKGROUNDERRORS = "notifications.backgrounderrors"
 		const val CHANNEL_ID_BREAKINFO = "notifications.breakinfo"
 
 		fun enqueue(workManager: WorkManager, user: User) {
-			val data: Data = Data.Builder().run {
-				put(WORKER_DATA_USER_ID, user.id)
-				build()
-			}
-
 			workManager.enqueue(
 				OneTimeWorkRequestBuilder<NotificationSetupWorker>()
 					.addTag(TAG_NOTIFICATION_SETUP_WORK)
-					.setInputData(data)
+					.setInputData(
+						workDataOf(
+							WORKER_DATA_USER_ID to user.id
+						)
+					)
 					.build()
 			)
 		}
@@ -76,47 +95,35 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 		return checkAlarmPermission() ?: scheduleNotifications()
 	}
 
-	private suspend fun checkAlarmPermission(): Result? {
-		if (canPostNotifications() && canScheduleExactAlarms()) return null
+	private fun checkAlarmPermission(): Result? {
+		if (!canPostNotifications()) return Result.failure()
 
-		disablePreference("preference_notifications_enable")
-		Log.w(LOG_TAG, "Schedule exact alarm permission revoked, disabling notifications")
-		return Result.failure()
+		return null
 	}
 
 	private suspend fun scheduleNotifications(): Result {
-		val userDatabase = UserDatabase.getInstance(applicationContext)
+		val userId = inputData.getLong(WORKER_DATA_USER_ID, -1)
+		val settings = settingsRepository.getAllSettings().first()
+		val userSettings = settings.userSettingsMap.getOrDefault(userId, settingsRepository.getSettingsDefaults())
 
-		userDatabase.userDao().getById(inputData.getLong(WORKER_DATA_USER_ID, -1))?.let { user ->
+		userDao.getByIdAsync(userId)?.let { user ->
 			var scheduledNotifications = 0
 
 			try {
-				val personalTimetable = loadPersonalTimetableElement(user, applicationContext)
-					?: return@let // Anonymous / no custom personal timetable
+				val personalTimetable = getPersonalTimetableElement(user, userSettings)
+					?: return@let // Anonymous and no custom personal timetable
 
-				val timetable = loadTimetable(
+				val timetable = timetableMapper.preparePeriods(loadTimetable(
 					user,
-					TimetableDatabaseInterface(userDatabase, user.id),
-					personalTimetable
-				)
+					personalTimetable,
+					FromCache.ONLY
+				), false)
 
-				val notificationsBeforeFirst = applicationContext.booleanDataStore(
-					user.id,
-					"preference_notifications_before_first"
-				).getValue()
-
-				val notificationsBeforeFirstTime = applicationContext.intDataStore(
-					user.id,
-					"preference_notifications_before_first_time"
-				).getValue()
-
-				val notificationsInMultiple = applicationContext.booleanDataStore(
-					user.id,
-					"preference_notifications_in_multiple"
-				).getValue()
-
-				val preparedItems = timetable.items.filter { !it.periodData.isCancelled() }
-					.sortedBy { it.startDateTime }.merged().zipWithNext()
+				val preparedItems = timetable
+					.sortedBy { it.startDateTime }
+					.merged(masterDataRepository)
+					.filter { !it.isCancelled() }
+					.zipWithNext()
 
 				if (preparedItems.isEmpty()) {
 					Log.d(LOG_TAG, "No notifications to schedule")
@@ -124,13 +131,13 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 				}
 
 				with(preparedItems.first().first) {
-					if (startDateTime.millisOfDay < LocalDateTime.now().millisOfDay) return@with
+					if (originalPeriod.startDateTime.isBefore(LocalDateTime.now(clock))) return@with
 
-					if (notificationsBeforeFirst && preparedItems.isNotEmpty()) {
+					if (userSettings.notificationsBeforeFirst && preparedItems.isNotEmpty()) {
 						scheduleNotification(
 							applicationContext,
 							user.id,
-							startDateTime.minusMinutes(notificationsBeforeFirstTime),
+							originalPeriod.startDateTime.minusMinutes(userSettings.notificationsBeforeFirstTime.toLong()),
 							this,
 							true
 						)
@@ -138,30 +145,30 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 					} else {
 						clearNotification(
 							applicationContext,
-							startDateTime.minusMinutes(notificationsBeforeFirstTime)
+							originalPeriod.startDateTime.minusMinutes(userSettings.notificationsBeforeFirstTime.toLong())
 						)
 					}
 				}
 
 				preparedItems.forEach { item ->
-					if (item.first.endDateTime == item.second.startDateTime)
+					if (item.first.originalPeriod.endDateTime == item.second.originalPeriod.startDateTime)
 						return@forEach // No break exists
 
-					if (item.first.equalsIgnoreTime(item.second) && !notificationsInMultiple) {
+					if (item.first.equalsIgnoreTime(item.second) && !userSettings.notificationsInMultiple) {
 						clearNotification(
 							applicationContext,
-							item.first.endDateTime
+							item.first.originalPeriod.endDateTime
 						)
 						return@forEach // multi-hour lesson
 					}
 
-					if (item.second.startDateTime.millisOfDay < LocalDateTime.now().millisOfDay)
+					if (item.second.originalPeriod.startDateTime.isBefore(LocalDateTime.now()))
 						return@forEach // lesson is in the past
 
 					scheduleNotification(
 						applicationContext,
 						user.id,
-						item.first.endDateTime,
+						item.first.originalPeriod.endDateTime,
 						item.second
 					)
 					scheduledNotifications++
@@ -170,6 +177,8 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 				Log.e(LOG_TAG, "Notifications couldn't be scheduled", e)
 				return Result.failure()
 			}
+
+			Log.d(LOG_TAG, "Scheduled $scheduledNotifications notifications for today.")
 		}
 
 		return Result.success()
@@ -178,66 +187,71 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 	private fun scheduleNotification(
 		context: Context,
 		userId: Long,
-		notificationTime: DateTime,
-		notificationEndLesson: TimegridItem,
+		notificationTime: LocalDateTime,
+		notificationEndPeriodItem: PeriodItem,
 		isFirst: Boolean = false
 	) {
 		val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
-		val id = notificationTime.millisOfDay / 1000 // generate a unique id
+		val id = notificationTime.toLocalTime().second // generate a unique id
 
+		// TODO: Include state (cancelled, irregular etc)
 		val intent = Intent(context, NotificationReceiver::class.java)
 			.putExtra(EXTRA_INT_ID, id)
 			.putExtra(EXTRA_LONG_USER_ID, userId)
-			.putExtra(EXTRA_INT_BREAK_END_TIME, notificationEndLesson.startDateTime.millisOfDay)
+			.putExtra(
+				EXTRA_INT_BREAK_END_TIME,
+				notificationEndPeriodItem.originalPeriod.startDateTime.toLocalTime().toSecondOfDay()
+			)
 			.putExtra(
 				EXTRA_STRING_BREAK_END_TIME,
-				notificationEndLesson.startDateTime.toString(DateTimeUtils.shortDisplayableTime())
+				notificationEndPeriodItem.originalPeriod.startDateTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
 			)
 			.putExtra(
 				EXTRA_STRING_NEXT_SUBJECT,
-				notificationEndLesson.periodData.getShort(TimetableDatabaseInterface.Type.SUBJECT)
+				notificationEndPeriodItem.getShort(ElementType.SUBJECT)
 			)
 			.putExtra(
 				EXTRA_STRING_NEXT_SUBJECT_LONG,
-				notificationEndLesson.periodData.getLong(TimetableDatabaseInterface.Type.SUBJECT)
+				notificationEndPeriodItem.getLong(ElementType.SUBJECT)
 			)
 			.putExtra(
 				EXTRA_STRING_NEXT_ROOM,
-				notificationEndLesson.periodData.getShort(TimetableDatabaseInterface.Type.ROOM)
+				notificationEndPeriodItem.getShort(ElementType.ROOM)
 			)
 			.putExtra(
 				EXTRA_STRING_NEXT_ROOM_LONG,
-				notificationEndLesson.periodData.getLong(TimetableDatabaseInterface.Type.ROOM)
+				notificationEndPeriodItem.getLong(ElementType.ROOM)
 			)
 			.putExtra(
 				EXTRA_STRING_NEXT_TEACHER,
-				notificationEndLesson.periodData.getShort(TimetableDatabaseInterface.Type.TEACHER)
+				notificationEndPeriodItem.getShort(ElementType.TEACHER)
 			)
 			.putExtra(
 				EXTRA_STRING_NEXT_TEACHER_LONG,
-				notificationEndLesson.periodData.getLong(TimetableDatabaseInterface.Type.TEACHER)
+				notificationEndPeriodItem.getLong(ElementType.TEACHER)
 			)
 			.putExtra(
 				EXTRA_STRING_NEXT_CLASS,
-				notificationEndLesson.periodData.getShort(TimetableDatabaseInterface.Type.CLASS)
+				notificationEndPeriodItem.getShort(ElementType.CLASS)
 			)
 			.putExtra(
 				EXTRA_STRING_NEXT_CLASS_LONG,
-				notificationEndLesson.periodData.getLong(TimetableDatabaseInterface.Type.CLASS)
+				notificationEndPeriodItem.getLong(ElementType.CLASS)
 			)
 
 		if (isFirst) intent.putExtra(EXTRA_BOOLEAN_FIRST, true)
 
 		val pendingIntent = PendingIntent.getBroadcast(
 			context,
-			notificationTime.millisOfDay,
+			notificationTime.toLocalTime().toSecondOfDay(),
 			intent,
 			FLAG_IMMUTABLE
 		)
-		alarmManager.setExact(AlarmManager.RTC_WAKEUP, notificationTime.millis, pendingIntent)
+
+		alarmManager.setBest(notificationTime, pendingIntent)
 		Log.d(
 			LOG_TAG,
-			"${notificationEndLesson.periodData.getShort(TimetableDatabaseInterface.Type.SUBJECT)} scheduled for $notificationTime"
+			"${notificationEndPeriodItem.getShort(ElementType.SUBJECT)} scheduled for $notificationTime"
 		)
 
 		val deletingIntent = Intent(context, NotificationReceiver::class.java)
@@ -245,30 +259,29 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 			.putExtra(EXTRA_BOOLEAN_CLEAR, true)
 		val deletingPendingIntent = PendingIntent.getBroadcast(
 			context,
-			notificationTime.millisOfDay + 1, // Different id to previous intent
+			notificationTime.toLocalTime().toSecondOfDay() + 1, // Different id to previous intent
 			deletingIntent,
 			FLAG_IMMUTABLE
 		)
-		alarmManager.setExact(
-			AlarmManager.RTC_WAKEUP,
-			notificationEndLesson.startDateTime.millis,
+		alarmManager.setBest(
+			notificationEndPeriodItem.originalPeriod.startDateTime,
 			deletingPendingIntent
 		)
 		Log.d(
 			LOG_TAG,
-			"${notificationEndLesson.periodData.getShort(TimetableDatabaseInterface.Type.SUBJECT)} delete scheduled for ${notificationEndLesson.startDateTime}"
+			"${notificationEndPeriodItem.getShort(ElementType.SUBJECT)} delete scheduled for ${notificationEndPeriodItem.originalPeriod.startDateTime}"
 		)
 	}
 
 	private fun clearNotification(
 		context: Context,
-		notificationTime: DateTime,
+		notificationTime: LocalDateTime,
 	) {
 		(context.getSystemService(ALARM_SERVICE) as AlarmManager).run {
 			cancel(
 				PendingIntent.getBroadcast(
 					context,
-					notificationTime.millisOfDay,
+					notificationTime.toLocalTime().toSecondOfDay(),
 					Intent(context, NotificationReceiver::class.java),
 					FLAG_IMMUTABLE
 				)
@@ -296,16 +309,14 @@ class NotificationSetupWorker(context: Context, params: WorkerParameters) :
 					applicationContext.getString(R.string.notifications_channel_backgrounderrors),
 					NotificationManager.IMPORTANCE_MIN
 				).apply {
-					description =
-						applicationContext.getString(R.string.notifications_channel_backgrounderrors_desc)
+					description = applicationContext.getString(R.string.notifications_channel_backgrounderrors_desc)
 				},
 				NotificationChannel(
 					CHANNEL_ID_BREAKINFO,
 					applicationContext.getString(R.string.notifications_channel_breakinfo),
 					NotificationManager.IMPORTANCE_LOW
 				).apply {
-					description =
-						applicationContext.getString(R.string.notifications_channel_breakinfo_desc)
+					description = applicationContext.getString(R.string.notifications_channel_breakinfo_desc)
 				},
 			).forEach {
 				notificationManager.createNotificationChannel(it)

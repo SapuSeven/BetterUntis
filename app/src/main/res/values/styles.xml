@@ -1,8 +1,4 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-	<style name="AppTheme" parent="Theme.Material3.Light.NoActionBar">
-		<item name="android:windowBackground">?attr/colorSurface</item>
-	</style>
-
 	<style name="ThemeOverlay.MaterialAlertDialog.Rounded" parent="ThemeOverlay.Material3.MaterialAlertDialog">
 		<item name="alertDialogStyle">@style/MaterialAlertDialog.Rounded</item>
 		<item name="materialAlertDialogTitleTextStyle">
@@ -28,103 +24,6 @@
 		<item name="android:textColor">?android:attr/textColorPrimary</item>
 	</style>
 
-	<style name="AppTheme.NoActionBar">
-		<item name="windowActionBar">false</item>
-		<item name="windowNoTitle">true</item>
-	</style>
-
-	<style name="AppTheme.PopupOverlay" parent="ThemeOverlay.Material3.Light" />
-
-	<style name="AppTheme.Launcher">
-		<item name="android:windowBackground">@drawable/app_splash</item>
-		<item name="android:statusBarColor">@android:color/transparent</item>
-	</style>
-
-	<style name="AppTheme.Launcher.NoActionBar">
-		<item name="windowActionBar">false</item>
-		<item name="windowNoTitle">true</item>
-	</style>
-
-	<style name="AppTheme.ThemeUntis">
-		<item name="colorPrimary">@color/colorPrimaryThemeUntis</item>
-		<item name="colorPrimaryDark">@color/colorPrimaryDarkThemeUntis</item>
-		<item name="colorAccent">@color/colorAccentThemeUntis</item>
-		<item name="colorSecondary">@color/colorAccentThemeUntis</item>
-	</style>
-
-	<style name="AppTheme.ThemeBlue">
-		<item name="colorPrimary">@color/colorPrimaryThemeBlue</item>
-		<item name="colorPrimaryDark">@color/colorPrimaryDarkThemeBlue</item>
-		<item name="colorAccent">@color/colorAccentThemeBlue</item>
-		<item name="colorSecondary">@color/colorAccentThemeBlue</item>
-	</style>
-
-	<style name="AppTheme.ThemeGreen">
-		<item name="colorPrimary">@color/colorPrimaryThemeGreen</item>
-		<item name="colorPrimaryDark">@color/colorPrimaryDarkThemeGreen</item>
-		<item name="colorAccent">@color/colorAccentThemeGreen</item>
-		<item name="colorSecondary">@color/colorAccentThemeGreen</item>
-	</style>
-
-	<style name="AppTheme.ThemePink">
-		<item name="colorPrimary">@color/colorPrimaryThemePink</item>
-		<item name="colorPrimaryDark">@color/colorPrimaryDarkThemePink</item>
-		<item name="colorAccent">@color/colorAccentThemePink</item>
-		<item name="colorSecondary">@color/colorAccentThemePink</item>
-	</style>
-
-	<style name="AppTheme.ThemeCyan">
-		<item name="colorPrimary">@color/colorPrimaryThemeCyan</item>
-		<item name="colorPrimaryDark">@color/colorPrimaryDarkThemeCyan</item>
-		<item name="colorAccent">@color/colorAccentThemeCyan</item>
-		<item name="colorSecondary">@color/colorAccentThemeCyan</item>
-	</style>
-
-	<style name="AppTheme.ThemePixel">
-		<item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
-		<item name="colorPrimary">@color/colorPrimaryThemePixel</item>
-		<item name="colorPrimaryDark">@color/appBarColorThemePixel</item>
-		<item name="colorAccent">@color/colorAccentThemePixel</item>
-		<item name="colorSecondary">@color/colorAccentThemePixel</item>
-		<item name="android:statusBarColor">@color/appBarColorThemePixel</item>
-		<item name="actionBarBackground">@color/appBarColorThemePixel</item>
-		<item name="actionBarTheme">@style/PixelActionBarTheme</item>
-	</style>
-
-	<style name="PixelActionBarTheme" parent="ThemeOverlay.Material3.ActionBar">
-		<item name="colorControlNormal">?android:attr/textColorSecondary</item>
-	</style>
-
-	<style name="AppTheme.ThemeUntis.NoActionBar">
-		<item name="windowActionBar">false</item>
-		<item name="windowNoTitle">true</item>
-	</style>
-
-	<style name="AppTheme.ThemeBlue.NoActionBar">
-		<item name="windowActionBar">false</item>
-		<item name="windowNoTitle">true</item>
-	</style>
-
-	<style name="AppTheme.ThemeGreen.NoActionBar">
-		<item name="windowActionBar">false</item>
-		<item name="windowNoTitle">true</item>
-	</style>
-
-	<style name="AppTheme.ThemePink.NoActionBar">
-		<item name="windowActionBar">false</item>
-		<item name="windowNoTitle">true</item>
-	</style>
-
-	<style name="AppTheme.ThemeCyan.NoActionBar">
-		<item name="windowActionBar">false</item>
-		<item name="windowNoTitle">true</item>
-	</style>
-
-	<style name="AppTheme.ThemePixel.NoActionBar">
-		<item name="windowActionBar">false</item>
-		<item name="windowNoTitle">true</item>
-	</style>
-
 	<style name="WindowFadeTransition">
 		<item name="android:windowEnterAnimation">@android:anim/fade_in</item>
 		<item name="android:windowExitAnimation">@android:anim/fade_out</item>
@@ -146,12 +45,5 @@
 		<item name="android:focusable">true</item>
 		<item name="android:gravity">center</item>
 		<item name="android:tint">?android:attr/textColorPrimary</item>
-	</style>
-
-	<style name="FabStyle">
-		<item name="android:layout_margin">16dp</item>
-		<item name="android:backgroundTint">?attr/colorPrimary</item>
-		<item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
-		<item name="android:gravity">center</item>
 	</style>
 </resources>

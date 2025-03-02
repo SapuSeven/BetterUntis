@@ -1,33 +1,26 @@
 package com.sapuseven.untis.services
 
 import android.content.Context
-import android.net.Uri
+import android.util.Log
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.ActivityResultRegistry
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
-import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
 import com.sapuseven.untis.R
+import dagger.hilt.android.qualifiers.ActivityContext
+import javax.inject.Inject
 
-class CodeScanServiceImpl(
-	private val context: Context,
-	private val registry: ActivityResultRegistry
-) : CodeScanService, DefaultLifecycleObserver {
-	lateinit var scanCodeLauncher: ActivityResultLauncher<ScanOptions>
-	lateinit var onSuccess: (Uri) -> Unit
+class CodeScanServiceImpl @Inject constructor(
+	@ActivityContext val context: Context,
+) : CodeScanService {
+	private lateinit var scanCodeLauncher: ActivityResultLauncher<ScanOptions>
 
-	override fun onCreate(owner: LifecycleOwner) {
-		scanCodeLauncher = registry.register("scanCode", owner, ScanContract()) {
-			it.contents?.let { url ->
-				if (this::onSuccess.isInitialized) onSuccess(Uri.parse(url))
-			}
-		}
+	override fun setLauncher(launcher: ManagedActivityResultLauncher<ScanOptions, ScanIntentResult>) {
+		this.scanCodeLauncher = launcher
 	}
 
-	override fun scanCode(onSuccess: (Uri) -> Unit) {
-		this.onSuccess = onSuccess
-
+	override fun scanCode(onSuccess: (String?) -> Unit) {
+		Log.d(CodeScanService::class.java.simpleName, "Using fallback scanner")
 		val options = ScanOptions().apply {
 			setDesiredBarcodeFormats(ScanOptions.QR_CODE)
 			setBeepEnabled(false)

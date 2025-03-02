@@ -1,9 +1,8 @@
 package com.sapuseven.untis.models.untis
 
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
-import com.sapuseven.untis.models.UntisSchoolInfo
+import com.sapuseven.untis.api.model.UntisSchoolInfo
 import com.sapuseven.untis.models.untis.response.*
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
@@ -31,27 +30,29 @@ class ResponseTest {
 		assertThat(getJSON().encodeToString<SchoolSearchResponse>(SchoolSearchResponse(
 				result = SchoolSearchResult(
 						size = 2,
-						schools = listOf(UntisSchoolInfo(
-								server = "server 1",
-								useMobileServiceUrlAndroid = true,
-								useMobileServiceUrlIos = false,
-								address = "123",
-								displayName = "school display name 1",
-								loginName = "LOGIN_NAME",
-								schoolId = 123,
-								serverUrl = "http://",
-								mobileServiceUrl = "http://"
-						), UntisSchoolInfo(
-								server = "server 2",
-								useMobileServiceUrlAndroid = true,
-								useMobileServiceUrlIos = false,
-								address = "123",
-								displayName = "school display name 2",
-								loginName = "LOGIN_NAME",
-								schoolId = 123,
-								serverUrl = "http://",
-								mobileServiceUrl = "http://"
-						))
+						schools = listOf(
+                            com.sapuseven.untis.api.model.UntisSchoolInfo(
+                                server = "server 1",
+                                useMobileServiceUrlAndroid = true,
+                                useMobileServiceUrlIos = false,
+                                address = "123",
+                                displayName = "school display name 1",
+                                loginName = "LOGIN_NAME",
+                                schoolId = 123,
+                                serverUrl = "http://",
+                                mobileServiceUrl = "http://"
+                            ), com.sapuseven.untis.api.model.UntisSchoolInfo(
+                                server = "server 2",
+                                useMobileServiceUrlAndroid = true,
+                                useMobileServiceUrlIos = false,
+                                address = "123",
+                                displayName = "school display name 2",
+                                loginName = "LOGIN_NAME",
+                                schoolId = 123,
+                                serverUrl = "http://",
+                                mobileServiceUrl = "http://"
+                            )
+                        )
 				)
 		)), `is`("""{"id":null,"error":null,"jsonrpc":null,"result":{"size":2,"schools":[{"server":"server 1","useMobileServiceUrlAndroid":true,"useMobileServiceUrlIos":false,"address":"123","displayName":"school display name 1","loginName":"LOGIN_NAME","schoolId":123,"serverUrl":"http://","mobileServiceUrl":"http://"},{"server":"server 2","useMobileServiceUrlAndroid":true,"useMobileServiceUrlIos":false,"address":"123","displayName":"school display name 2","loginName":"LOGIN_NAME","schoolId":123,"serverUrl":"http://","mobileServiceUrl":"http://"}]}}"""))
 	}
@@ -100,28 +101,32 @@ class ResponseTest {
 		assertThat(schoolSearchResponse2.id, `is`("id"))
 		assertThat(schoolSearchResponse2.jsonrpc, `is`("2.0"))
 		assertThat(schoolSearchResponse2.result!!.size, `is`(2))
-		assertThat(schoolSearchResponse2.result!!.schools[0], `is`(UntisSchoolInfo(
-				server = "server 1",
-				useMobileServiceUrlAndroid = true,
-				useMobileServiceUrlIos = false,
-				address = "123",
-				displayName = "school display name 1",
-				loginName = "LOGIN_NAME",
-				schoolId = 123,
-				serverUrl = "http://",
-				mobileServiceUrl = "http://"
-		)))
-		assertThat(schoolSearchResponse2.result!!.schools[1], `is`(UntisSchoolInfo(
-				server = "server 2",
-				useMobileServiceUrlAndroid = true,
-				useMobileServiceUrlIos = false,
-				address = "123",
-				displayName = "school display name 2",
-				loginName = "LOGIN_NAME",
-				schoolId = 123,
-				serverUrl = "http://",
-				mobileServiceUrl = "http://"
-		)))
+		assertThat(schoolSearchResponse2.result!!.schools[0], `is`(
+            com.sapuseven.untis.api.model.UntisSchoolInfo(
+                server = "server 1",
+                useMobileServiceUrlAndroid = true,
+                useMobileServiceUrlIos = false,
+                address = "123",
+                displayName = "school display name 1",
+                loginName = "LOGIN_NAME",
+                schoolId = 123,
+                serverUrl = "http://",
+                mobileServiceUrl = "http://"
+            )
+        ))
+		assertThat(schoolSearchResponse2.result!!.schools[1], `is`(
+            com.sapuseven.untis.api.model.UntisSchoolInfo(
+                server = "server 2",
+                useMobileServiceUrlAndroid = true,
+                useMobileServiceUrlIos = false,
+                address = "123",
+                displayName = "school display name 2",
+                loginName = "LOGIN_NAME",
+                schoolId = 123,
+                serverUrl = "http://",
+                mobileServiceUrl = "http://"
+            )
+        ))
 		assertThat(schoolSearchResponse2.error, nullValue())
 	}
 

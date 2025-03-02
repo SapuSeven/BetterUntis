@@ -7,39 +7,59 @@ import android.content.Context
 import android.content.Context.ALARM_SERVICE
 import android.content.Intent
 import android.util.Log
-import androidx.room.Room
-import androidx.work.Data
+import androidx.hilt.work.HiltWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.data.databases.entities.User
-import com.sapuseven.untis.helpers.config.booleanDataStore
-import com.sapuseven.untis.helpers.config.intDataStore
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
+import androidx.work.workDataOf
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.data.database.entities.User
+import com.sapuseven.untis.data.database.entities.UserDao
+import com.sapuseven.untis.data.repository.MasterDataRepository
+import com.sapuseven.untis.data.repository.TimetableRepository
+import com.sapuseven.untis.mappers.TimetableMapper
 import com.sapuseven.untis.receivers.AutoMuteReceiver
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_BOOLEAN_MUTE
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_INT_ID
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_LONG_USER_ID
-import com.sapuseven.untis.workers.DailyWorker.Companion.WORKER_DATA_USER_ID
-import org.joda.time.LocalDateTime
+import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
+import crocodile8.universal_cache.FromCache
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.first
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
-class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
-	TimetableDependantWorker(context, params) {
+/**
+ * This worker schedules all auto-mute events for the day.
+ */
+@HiltWorker
+class AutoMuteSetupWorker @AssistedInject constructor(
+	@Assisted context: Context,
+	@Assisted params: WorkerParameters,
+	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
+	timetableMapperFactory: TimetableMapper.Factory,
+	timetableRepository: TimetableRepository,
+	private val masterDataRepository: MasterDataRepository,
+	private val userDao: UserDao,
+) : TimetableDependantWorker(context, params, timetableRepository) {
+	val settingsRepository = userSettingsRepositoryFactory.create()
+	val timetableMapper = timetableMapperFactory.create()
+
 	companion object {
 		private const val LOG_TAG = "AutoMuteSetup"
 		private const val TAG_AUTO_MUTE_SETUP_WORK = "AutoMuteSetupWork"
+		private const val WORKER_DATA_USER_ID = "UserId"
 
 		fun enqueue(workManager: WorkManager, user: User) {
-			val data: Data = Data.Builder().run {
-				put(WORKER_DATA_USER_ID, user.id)
-				build()
-			}
-
 			workManager.enqueue(
 				OneTimeWorkRequestBuilder<AutoMuteSetupWorker>()
 					.addTag(TAG_AUTO_MUTE_SETUP_WORK)
-					.setInputData(data)
+					.setInputData(
+						workDataOf(
+							WORKER_DATA_USER_ID to user.id
+						)
+					)
 					.build()
 			)
 		}
@@ -49,49 +69,39 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 		return checkAlarmPermission() ?: scheduleAutoMute()
 	}
 
-	private suspend fun checkAlarmPermission(): Result? {
-		if (canAutoMute() && canScheduleExactAlarms()) return null
+	private fun checkAlarmPermission(): Result? {
+		if (!canAutoMute()) return Result.failure()
 
-		disablePreference("preference_automute_enable")
-		Log.w(LOG_TAG, "Schedule exact alarm permission revoked, disabling auto mute")
-		return Result.failure()
+		return null
 	}
 
 	private suspend fun scheduleAutoMute(): Result {
-		val userDatabase = UserDatabase.getInstance(applicationContext)
+		val userId = inputData.getLong(WORKER_DATA_USER_ID, -1)
+		val settings = settingsRepository.getAllSettings().first()
+		val userSettings = settings.userSettingsMap.getOrDefault(userId, settingsRepository.getSettingsDefaults())
 
-		userDatabase.userDao().getById(inputData.getLong(WORKER_DATA_USER_ID, -1))?.let { user ->
+		userDao.getByIdAsync(userId)?.let { user ->
 			try {
-				val personalTimetable = loadPersonalTimetableElement(user, applicationContext)
-					?: return@let // Anonymous / no custom personal timetable
+				val personalTimetable = getPersonalTimetableElement(user, userSettings)
+					?: return@let // Anonymous and no custom personal timetable
 
-				val timetable = loadTimetable(
+				val timetable = timetableMapper.preparePeriods(loadTimetable(
 					user,
-					TimetableDatabaseInterface(userDatabase, user.id),
-					personalTimetable
-				)
+					personalTimetable,
+					FromCache.ONLY
+				), !userSettings.automuteCancelledLessons)
 
-				val automuteCancelledLessons = applicationContext.booleanDataStore(
-					user.id,
-					"preference_automute_cancelled_lessons"
-				).getValue()
-
-				val automuteMinimumBreakLength = applicationContext.intDataStore(
-					user.id,
-					"preference_automute_minimum_break_length"
-				).getValue()
-
-				timetable.items.merged().sortedBy { it.startDateTime }.zipWithNext().withLast()
+				timetable.merged(masterDataRepository).sortedBy { it.originalPeriod.startDateTime }.zipWithNext().withLast()
 					.forEach {
 						it.first?.let { item ->
 							val alarmManager =
 								applicationContext.getSystemService(ALARM_SERVICE) as AlarmManager
-							val id = item.startDateTime.millisOfDay / 1000
+							val id = item.originalPeriod.startDateTime.toLocalTime().toSecondOfDay()
 
-							if (item.endDateTime.millisOfDay <= LocalDateTime.now().millisOfDay)
+							if (item.originalPeriod.endDateTime.isBefore(LocalDateTime.now()))
 								return@forEach // lesson is in the past
 
-							if (item.periodData.isCancelled() && !automuteCancelledLessons)
+							if (item.isCancelled() && !userSettings.automuteCancelledLessons)
 								return@forEach // lesson is cancelled
 
 							val muteIntent =
@@ -101,25 +111,30 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 									.putExtra(EXTRA_BOOLEAN_MUTE, true)
 							val pendingMuteIntent = PendingIntent.getBroadcast(
 								applicationContext,
-								item.startDateTime.millisOfDay,
+								item.originalPeriod.startDateTime.toLocalTime().toSecondOfDay(),
 								muteIntent,
 								FLAG_IMMUTABLE
 							)
-							alarmManager.setExact(
-								AlarmManager.RTC_WAKEUP,
-								item.startDateTime.millis,
+							alarmManager.setBest(
+								item.originalPeriod.startDateTime,
 								pendingMuteIntent
 							)
 							Log.d(
 								LOG_TAG,
-								"${item.periodData.getShort(TimetableDatabaseInterface.Type.SUBJECT)} mute scheduled for ${item.startDateTime}"
+								"${item.getShort(ElementType.SUBJECT)} mute scheduled for ${item.originalPeriod.startDateTime}"
 							)
 
-							val minimumBreakLengthMillis = automuteMinimumBreakLength * 60 * 1000
-							if (it.second != null
-								&& it.second!!.startDateTime.millisOfDay - item.endDateTime.millisOfDay < minimumBreakLengthMillis
-							)
-								return@forEach // Break to next element is too short
+							val subsequentBreakLength = it.second?.let { subsequentPeriod ->
+								ChronoUnit.MINUTES.between(item.originalPeriod.endDateTime, subsequentPeriod.originalPeriod.startDateTime)
+							}
+							if (subsequentBreakLength != null && subsequentBreakLength < userSettings.automuteMinimumBreakLength) {
+								Log.d(
+									"AutoMuteSetup",
+									"${item.getShort(ElementType.SUBJECT)} unmute NOT scheduled for ${item.originalPeriod.endDateTime} - subsequent break too short (${subsequentBreakLength} min)"
+								)
+								return@forEach
+							}
+
 							val unmuteIntent =
 								Intent(applicationContext, AutoMuteReceiver::class.java)
 									.putExtra(EXTRA_INT_ID, id)
@@ -127,18 +142,17 @@ class AutoMuteSetupWorker(context: Context, params: WorkerParameters) :
 									.putExtra(EXTRA_BOOLEAN_MUTE, false)
 							val pendingUnmuteIntent = PendingIntent.getBroadcast(
 								applicationContext,
-								item.endDateTime.millisOfDay,
+								item.originalPeriod.endDateTime.toLocalTime().toSecondOfDay(),
 								unmuteIntent,
 								FLAG_IMMUTABLE
 							)
-							alarmManager.setExact(
-								AlarmManager.RTC_WAKEUP,
-								item.endDateTime.millis,
+							alarmManager.setBest(
+								item.originalPeriod.endDateTime,
 								pendingUnmuteIntent
 							)
 							Log.d(
 								"AutoMuteSetup",
-								"${item.periodData.getShort(TimetableDatabaseInterface.Type.SUBJECT)} unmute scheduled for ${item.endDateTime}"
+								"${item.getShort(ElementType.SUBJECT)} unmute scheduled for ${item.originalPeriod.endDateTime}"
 							)
 						}
 					}

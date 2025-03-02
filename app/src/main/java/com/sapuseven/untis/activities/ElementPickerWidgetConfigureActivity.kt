@@ -1,42 +1,12 @@
 package com.sapuseven.untis.activities
 
-import android.app.Activity
 import android.appwidget.AppWidgetManager
-import android.content.Intent
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.longPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.glance.appwidget.GlanceAppWidgetManager
-import androidx.glance.appwidget.state.updateAppWidgetState
-import androidx.work.WorkManager
-import com.sapuseven.untis.R
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.models.untis.timetable.PeriodElement
-import com.sapuseven.untis.ui.common.ProfileSelectorAction
-import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
-import com.sapuseven.untis.widgets.BaseComposeWidget
-import com.sapuseven.untis.widgets.BaseComposeWidget.Companion.PREFERENCE_KEY_INT_ELEMENT_ID
-import com.sapuseven.untis.widgets.BaseComposeWidget.Companion.PREFERENCE_KEY_LONG_USER
-import com.sapuseven.untis.widgets.BaseComposeWidget.Companion.PREFERENCE_KEY_STRING_ELEMENT_TYPE
-import com.sapuseven.untis.workers.TimetableDependantWorker
-import com.sapuseven.untis.workers.WidgetUpdateWorker
-import kotlinx.coroutines.runBlocking
 
-class ElementPickerWidgetConfigureActivity : BaseComposeActivity() {
+// TODO
+class ElementPickerWidgetConfigureActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setResult(RESULT_CANCELED)
@@ -51,10 +21,10 @@ class ElementPickerWidgetConfigureActivity : BaseComposeActivity() {
 			return
 		}
 
-		val users = userDatabase.userDao().getAll()
+		//val users = userDatabase.userDao().getAll()
 
 		setContent {
-			AppTheme(navBarInset = false) {
+			/*AppTheme(navBarInset = false) {
 				var selectedUserId by rememberSaveable {
 					mutableStateOf(users.firstOrNull()?.id ?: -1)
 				}
@@ -75,7 +45,7 @@ class ElementPickerWidgetConfigureActivity : BaseComposeActivity() {
 						timetableDatabaseInterface = timetableDatabaseInterface,
 						onDismiss = { finish() },
 						onSelect = { element ->
-							runBlocking {
+							/*runBlocking {
 								val user = userDatabase.userDao().getById(selectedUserId) ?: run {
 									setResult(Activity.RESULT_CANCELED)
 									finish()
@@ -117,7 +87,7 @@ class ElementPickerWidgetConfigureActivity : BaseComposeActivity() {
 								)
 								setResult(Activity.RESULT_OK, resultValue)
 								finish()
-							}
+							}*/
 						},
 						additionalActions = {
 							ProfileSelectorAction(
@@ -152,7 +122,7 @@ class ElementPickerWidgetConfigureActivity : BaseComposeActivity() {
 							}
 						)
 				}
-			}
+			}*/
 		}
 	}
 }

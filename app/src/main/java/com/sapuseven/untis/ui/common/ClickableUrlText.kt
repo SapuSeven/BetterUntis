@@ -1,7 +1,6 @@
 package com.sapuseven.untis.ui.common
 
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -14,7 +13,7 @@ import com.sapuseven.untis.helpers.TextUtils.annotateUrls
 fun ClickableUrlText(
 	text: String,
 	modifier: Modifier = Modifier,
-	style: TextStyle = TextStyle.Default.copy(LocalContentColor.current.copy(alpha = LocalContentAlpha.current)),
+	style: TextStyle = TextStyle.Default.copy(LocalContentColor.current),
 	softWrap: Boolean = true,
 	overflow: TextOverflow = TextOverflow.Clip,
 	maxLines: Int = Int.MAX_VALUE,

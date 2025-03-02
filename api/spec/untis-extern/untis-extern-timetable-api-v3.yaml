@@ -1,0 +1,1101 @@
+openapi: 3.0.3
+info:
+  title: WebUntis Timetable API Documentation
+  description: |
+    *WebUntis timetable API*
+    
+    Gets from WebUntis all data needed to display a timetable.
+    Can filter for by resource (student, teacher, room, class or lesson).
+    Can include all periods or only changed periods.
+    Includes current state and changes from the scheduling timetable.
+    
+    
+    How to get the data of the current timetable:
+    
+    Request data providing:
+    - a start and end date
+    - a filter criteria
+        - a resource id(s) for whom to view the timetable: student/teacher/room/class/lesson/period
+        - a timestamp for changes only
+    
+    
+    From the response:
+    1. Take all periods with PeriodStatusEnum values except CANCELLED.
+    2. For each of these periods take all resources with ResourceStatusEnum values of REGULAR and ADDED.
+    3. These resources are referenced by id in the periods.
+    4. Look up the resource in MasterDataDto.
+    5. Use displayName of the resource.
+    
+    Display the resulting data in a suitable format. 
+
+    Version history:
+    - v1    2022-05     stw         Initial version 
+    - v2    2023-02     stw         multiple ids as filter parameter / period as filter parameter / text fields in PeriodDto / deprecation of detailsUrl /
+                                    flag for online period / related period id for moved periods / period is modified when assigned students change
+    - v3    2023-07     stw         Error handling now identical to other Untis APIs
+
+  version: "2.0.0"
+  contact:
+    email: support@untis.at
+    name: Untis GmbH
+    url: https://www.untis.at
+
+tags:
+  - name: timetable
+
+paths:
+  /api/rest/extern/v1/timetable:
+    get:
+      summary: Retrieves a timetable (within the bounds of a single school year).
+      tags:
+        - timetable
+      operationId: getTimetable
+      parameters:
+        - $ref: "#/components/parameters/start"
+        - $ref: "#/components/parameters/end"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+        - $ref: "#/components/parameters/includeStudents"
+
+        # At least one of the following filter criteria is required: Changes only, Untis Id or External Id
+
+        # Changes only
+        - $ref: "#/components/parameters/dateLastModifiedAfter"
+
+        # Untis id
+
+        - name: lesson
+          description: WebUntis entity ID of a lesson.
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+
+        - name: class
+          description: WebUntis entity ID of a class.
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+
+        - name: room
+          description: WebUntis entity ID of a room.
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+
+        - name: student
+          description: WebUntis entity ID of a student.
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+
+        - name: teacher
+          description: WebUntis entity ID of a teacher.
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+
+        # External Id
+
+        - name: lesson_ext
+          description: External entity ID of a lesson.
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+
+        - name: class_ext
+          description: External entity ID of a class.
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+
+        - name: room_ext
+          description: External entity ID of a room.
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+
+        - name: student_ext
+          description: External entity ID of a student.
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+
+        - name: teacher_ext
+          description: External entity ID of a teacher.
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/TimetableDto"
+        "400":
+          description: Client error.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Server error.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/rest/extern/v2/timetable:
+    get:
+      summary: Retrieves a timetable (within the bounds of a single school year).
+      tags:
+        - timetable
+      operationId: getTimetableV2
+      parameters:
+        - $ref: "#/components/parameters/start"
+        - $ref: "#/components/parameters/end"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+        - $ref: "#/components/parameters/includeStudents"
+
+        # At least one of the following filter criteria is required: Changes only, Untis Id(s) or External Id(s)
+
+        # Changes only
+        - $ref: "#/components/parameters/dateLastModifiedAfter"
+
+        # Untis id
+        - $ref: "#/components/parameters/period"
+        - $ref: "#/components/parameters/lesson"
+        - $ref: "#/components/parameters/class"
+        - $ref: "#/components/parameters/room"
+        - $ref: "#/components/parameters/student"
+        - $ref: "#/components/parameters/teacher"
+
+        # External Id
+
+        # There is no period_ext
+
+        - $ref: "#/components/parameters/lesson_ext"
+        - $ref: "#/components/parameters/class_ext"
+        - $ref: "#/components/parameters/room_ext"
+        - $ref: "#/components/parameters/student_ext"
+        - $ref: "#/components/parameters/teacher_ext"
+
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/TimetableDto"
+        "400":
+          description: Client error.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Server error.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/rest/extern/v3/timetable:
+    get:
+      summary: Retrieves a timetable (within the bounds of a single school year).
+      tags:
+        - timetable
+      operationId: getTimetableV3
+      parameters:
+        - $ref: "#/components/parameters/start"
+        - $ref: "#/components/parameters/end"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+        - $ref: "#/components/parameters/includeStudents"
+
+        # At least one of the following filter criteria is required: Changes only, Untis Id(s) or External Id(s)
+
+        # Changes only
+        - $ref: "#/components/parameters/dateLastModifiedAfter"
+
+        # Untis id
+        - $ref: "#/components/parameters/period"
+        - $ref: "#/components/parameters/lesson"
+        - $ref: "#/components/parameters/class"
+        - $ref: "#/components/parameters/room"
+        - $ref: "#/components/parameters/student"
+        - $ref: "#/components/parameters/teacher"
+
+        # External Id
+
+        # There is no period_ext
+
+        - $ref: "#/components/parameters/lesson_ext"
+        - $ref: "#/components/parameters/class_ext"
+        - $ref: "#/components/parameters/room_ext"
+        - $ref: "#/components/parameters/student_ext"
+        - $ref: "#/components/parameters/teacher_ext"
+
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: "#/components/schemas/TimetableDto"
+        400:
+          $ref: 'schemas/error/bad-request-v1.yaml'
+        401:
+          $ref: 'schemas/error/unauthorized-v1.yaml'
+        403:
+          $ref: 'schemas/error/forbidden-v1.yaml'
+        404:
+          $ref: 'schemas/error/not-found-v1.yaml'
+        500:
+          $ref: 'schemas/error/internal-error-v1.yaml'
+
+components:
+
+  parameters:
+    start:
+      name: start
+      description:
+        Start of requested timetable in ISO 8601 format. Must be in the same school year as end.
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date-time
+        example: "2022-02-21T00:00:00"
+
+    end:
+      name: end
+      description: End of requested timetable in ISO 8601 format. Must be in the same school year as start.
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date-time
+        example: "2022-02-22T00:00:00"
+
+    limit:
+      name: limit
+      description: Pagination size. No limit = 0. Limit the number of periods that are returned, starting with the earliest period. Can be used to get the next N periods.
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 0
+        minimum: 0
+
+    offset:
+      name: offset
+      description: Pagination offset. Skip the first N results. First result = 1. No pagination = 0.
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 0
+        minimum: 0
+
+    includeStudents:
+      name: includeStudents
+      description: Include the students of a periods in the response.
+      in: query
+      required: false
+      schema:
+        type: boolean
+
+    dateLastModifiedAfter:
+      name: dateLastModifiedAfter
+      description: >
+        Return only periods changed since this timestamp in ISO 8601 format. 
+        Note: A change of student assignment to a studentgroup does not change the period.
+      in: query
+      required: false
+      schema:
+        type: string
+        format: date-time
+        example: "2022-02-22T00:00:00"
+
+    period:
+      name: period
+      description: WebUntis entity ID of a period
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+        uniqueItems: true
+        minItems: 0
+        maxItems: 50
+
+    lesson:
+      name: lesson
+      description: WebUntis entity ID of a lesson.
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+        uniqueItems: true
+        minItems: 0
+        maxItems: 50
+
+    class:
+      name: class
+      description: WebUntis entity ID of a class.
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+        uniqueItems: true
+        minItems: 0
+        maxItems: 50
+
+    room:
+      name: room
+      description: WebUntis entity ID of a room.
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+        uniqueItems: true
+        minItems: 0
+        maxItems: 50
+
+    student:
+      name: student
+      description: WebUntis entity ID of a student.
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+        uniqueItems: true
+        minItems: 0
+        maxItems: 50
+
+    teacher:
+      name: teacher
+      description: WebUntis entity ID of a teacher.
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+        uniqueItems: true
+        minItems: 0
+        maxItems: 50
+
+    lesson_ext:
+      name: lesson_ext
+      description: External entity ID of a lesson.
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          maxLength: 100
+        uniqueItems: true
+        minItems: 0
+        maxItems: 50
+
+    class_ext:
+      name: class_ext
+      description: External entity ID of a class.
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          maxLength: 100
+        uniqueItems: true
+        minItems: 0
+        maxItems: 50
+
+    room_ext:
+      name: room_ext
+      description: External entity ID of a room.
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          maxLength: 100
+        uniqueItems: true
+        minItems: 0
+        maxItems: 50
+
+    student_ext:
+      name: student_ext
+      description: External entity ID of a student.
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          maxLength: 100
+        uniqueItems: true
+        minItems: 0
+        maxItems: 50
+
+    teacher_ext:
+      name: teacher_ext
+      description: External entity ID of a teacher.
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          maxLength: 100
+        uniqueItems: true
+        minItems: 0
+        maxItems: 50
+
+  schemas:
+    Error:
+      description: Detailed error information (subset of RFC 7807).
+      type: object
+      required:
+        - title
+        - status
+      properties:
+        title:
+          description: A short, human-readable summary of the problem type.
+          type: string
+        status:
+          description: The HTTP status code.
+          type: integer
+        detail:
+          description: A human-readable explanation specific to this occurrence of the problem.
+          type: string
+
+    TimetableDto:
+      description: Timetable data (periods, timegrids, master data).
+      type: object
+      required:
+        - version
+        - headerData
+        - masterData
+        - timetableData
+      properties:
+        version:
+          description: Version of this timetable data format.
+          type: string
+          example: 1.12.0
+
+        headerData:
+          $ref: '#/components/schemas/HeaderDataDto'
+
+        masterData:
+          $ref: '#/components/schemas/MasterDataDto'
+
+        timetableData:
+          $ref: '#/components/schemas/TimetableDataDto'
+
+    HeaderDataDto:
+      description: Header data. Information about the content like school, filters, creation time etc.
+      type: object
+      required:
+        - created
+        - user
+        - school
+        - filter
+      properties:
+        created:
+          description: Timestamp in ISO 8601 format when this timetable data response was created.
+          type: string
+          format: date-time
+          example: "2022-02-18T07:45:00"
+
+        user:
+          description: Id of the WebUntis user who requested the timetable data.
+          type: string
+          maxLength: 128
+          example: "Meier"
+
+        school:
+          $ref: '#/components/schemas/SchoolDto'
+
+        schoolYearStart:
+          description: Timestamp in ISO 8601 format of beginning of school year.
+          type: string
+          format: date
+          example: "2022-09-01"
+
+        schoolYearEnd:
+          description: Timestamp in ISO 8601 format of end of school year.
+          type: string
+          format: date
+          example: "2023-06-30"
+
+        filter:
+          $ref: '#/components/schemas/FilterDto'
+
+    FilterDto:
+      description: Filter criterias. These are taken from the request.
+      type: object
+      required:
+        - start
+        - end
+        - limit
+        - offset
+      properties:
+        start:
+          description: Start of timetable periods.
+          type: string
+          format: date-time
+          example: "2022-02-21T00:00:00"
+
+        end:
+          description: End of timetable periods.
+          type: string
+          format: date-time
+          example: "2022-02-22T00:00:00"
+
+        limit:
+          description: Pagination size. No limit = 0. Limit the number of periods that are returned, starting with the earliest period. Can be used to get the next N periods.
+          type: integer
+          format: int32
+          example: "10"
+
+        offset:
+          description: Pagination offset. Skip the first N results. First result = 1. No pagination = 0.
+          type: integer
+          format: int32
+          example: "100"
+
+        filterByChanges:
+          $ref: '#/components/schemas/FilterByChangesDto'
+
+        filterByResource:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilterByResourceDto'
+
+    FilterByChangesDto:
+      description: Only include periods changed after modifiedSince.
+      type: object
+      required:
+        - dateLastModifiedAfter
+      properties:
+        dateLastModifiedAfter:
+          description: Only include periods changed after this timestamp in ISO 8601 format.
+          type: string
+          format: date-time
+
+        dateLastModifiedUntil:
+          description: Timestamp in ISO 8601 format of the latest modified property of the included periods.
+          type: string
+          format: date-time
+
+    FilterByResourceDto:
+      description: Filter data for teacher/room/student...
+      type: object
+      required:
+        - resourceType
+      properties:
+        resourceType:
+          $ref: '#/components/schemas/FilterResourceTypeEnum'
+
+        id:
+          description: WebUntis entity ID.
+          type: integer
+          format: int64
+          example: "123"
+
+        externKey:
+          description: External entity Id.
+          type: string
+          maxLength: 100
+
+    FilterResourceTypeEnum:
+      description: Resource type.
+      type: string
+      enum:
+        - CLASS
+        - ROOM
+        - STUDENT
+        - TEACHER
+        - LESSON
+        - PERIOD
+
+    SchoolDto:
+      description: Information about the school.
+      type: object
+      required:
+        - tenantId
+        - name
+      properties:
+        tenantId:
+          description: ID of the WebUntis Tenant.
+          type: string
+          example: "1004400"
+
+        name:
+          description: School name
+          type: string
+          maxLength: 255
+          example: "BG/BRG Stockerau"
+
+    MasterDataDto:
+      description: All masterdata objects used in the timetable.
+      type: object
+      properties:
+        classes:
+          description: All classes referenced in timetable periods.
+          type: array
+          items:
+            $ref: "#/components/schemas/ClassDto"
+          uniqueItems: true
+
+        departments:
+          description: All departments referenced in timetable periods.
+          type: array
+          items:
+            $ref: "#/components/schemas/DepartmentDto"
+          uniqueItems: true
+
+        rooms:
+          description: All rooms referenced in timetable periods.
+          type: array
+          items:
+            $ref: "#/components/schemas/RoomDto"
+          uniqueItems: true
+
+        studentGroups:
+          description: All student groups referenced in timetable periods.
+          type: array
+          items:
+            $ref: "#/components/schemas/StudentGroupDto"
+          uniqueItems: true
+
+        students:
+          description: All students referenced in timetable periods.
+          type: array
+          items:
+            $ref: "#/components/schemas/StudentDto"
+          uniqueItems: true
+
+        subjects:
+          description: All subjects referenced in timetable periods.
+          type: array
+          items:
+            $ref: "#/components/schemas/SubjectDto"
+          uniqueItems: true
+
+        teachers:
+          description: All teachers referenced in timetable periods.
+          type: array
+          items:
+            $ref: "#/components/schemas/TeacherDto"
+          uniqueItems: true
+
+    ClassDto:
+      description: Data for a class.
+      allOf:
+        - $ref: '#/components/schemas/MasterDataObjectDto'
+
+    DepartmentDto:
+      description: Data for a department.
+      allOf:
+        - $ref: '#/components/schemas/MasterDataObjectDto'
+
+    RoomDto:
+      description: Data for a room.
+      allOf:
+        - $ref: '#/components/schemas/MasterDataObjectDto'
+
+    StudentGroupDto:
+      description: Data for a student group.
+      allOf:
+        - $ref: '#/components/schemas/MasterDataObjectDto'
+
+    StudentDto:
+      description: Data for a student.
+      allOf:
+        - $ref: '#/components/schemas/MasterDataObjectDto'
+
+    SubjectDto:
+      description: Data for a subject.
+      allOf:
+        - $ref: '#/components/schemas/MasterDataObjectDto'
+
+    TeacherDto:
+      description: Data for a teacher.
+      allOf:
+        - $ref: '#/components/schemas/MasterDataObjectDto'
+
+    MasterDataObjectDto:
+      description: Base object for master data object.
+      type: object
+      required:
+        - discriminator    # OpenAPI discriminator
+        - id
+        - displayName
+      properties:
+        id:
+          description: WebUntis entity Id.
+          type: integer
+          format: int64
+          example: 1453
+
+        externKey:
+          description: External entity Id.
+          type: string
+          maxLength: 100
+
+        displayName:
+          description: Display name of the entity as configured in WebUntis.
+          type: string
+          maxLength: 255
+          example: "Math"
+
+        detailsUrl:
+          description: Deprecated.
+          type: string
+
+    TimetableDataDto:
+      description: The timegrids and periods of the requested timetable.
+      type: object
+      properties:
+        timeGrids:
+          description: Time grids referenced in timetable periods.
+          type: array
+          items:
+            $ref: "#/components/schemas/TimeGridDto"
+          uniqueItems: true
+
+        periods:
+          description: Periods of the timetable.
+          type: array
+          items:
+            $ref: "#/components/schemas/PeriodDto"
+          uniqueItems: true
+
+    TimeGridDto:
+      description: A timegrid.
+      type: object
+      required:
+        - id
+        - timeGridSlots
+      properties:
+        id:
+          description: WebUntis Timegrid Id.
+          type: integer
+          format: int64
+
+        timeGridSlots:
+          description: Time slots for regular periods for each day of the week.
+          type: array
+          items:
+            $ref: "#/components/schemas/TimeGridSlotDto"
+          uniqueItems: true
+
+    TimeGridSlotDto:
+      description: A timegrid slot.
+      type: object
+      required:
+        - day
+        - start
+        - end
+      properties:
+        day:
+          description: Weekday. 1=Monday, 7=Sunday
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 7
+
+        unitOfDay:
+          description: Incremental number of the timegrid slot per day.
+          type: integer
+          format: int32
+          minimum: 0
+
+        start:
+          description: Beginning of the slot.
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 2400
+
+        end:
+          description: End of the slot.
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 2400
+
+        name:
+          description: Name of the timegrid slot
+          type: string
+          maxLength: 255
+          example: "Morgenkreis"
+
+    PeriodDto:
+      description: A timetable period.
+      type: object
+      required:
+        - id
+        - modified
+        - start
+        - end
+        - type
+        - status
+      properties:
+        id:
+          description: WebUntis period Id.
+          type: integer
+          format: int64
+
+        lessonId:
+          description: WebUntis lesson Id.
+          type: integer
+          format: int64
+
+        lessonExternKey:
+          description: External entity Id.
+          type: string
+          maxLength: 100
+
+        lessonText:
+          description: Lesson title (DB field Lesson.name).
+          type: string
+          maxLength: 255
+
+        lessonInfo:
+          description: Booking purpose or if no booking then lesson description (DB field Lesson.text).
+          type: string
+
+        notesAll:
+          description: Period text (notes visible for students) or exam description.
+          type: string
+
+        substitutionText:
+          description: Substitution description.
+          type: string
+
+        modified:
+          description: Timestamp of last change in ISO 8601 format.
+          type: string
+          format: date-time
+          example: "2022-01-23T13:05:00"
+
+        start:
+          description: Timestamp of beginning of period in ISO 8601 format.
+          type: string
+          format: date-time
+          example: "2022-02-21T08:50:00"
+
+        end:
+          description: Timestamp of end of period in ISO 8601 format.
+          type: string
+          format: date-time
+          example: "2022-02-21T09:35:00"
+
+        type:
+          $ref: '#/components/schemas/PeriodTypeEnum'
+
+        status:
+          $ref: '#/components/schemas/PeriodStatusEnum'
+
+        relatedPeriod:
+          description: |
+            The id of a related period (e.g. other side of moved period). 
+            Periods are moved by cancelling and adding of a period.
+            Limitations:
+            - A period might not be in the result if a period is outside the requested date range.
+            - If a period is moved twice, there is only a relation between second and third period.
+          type: integer
+          format: int64
+
+        icons:
+          type: array
+          items:
+            $ref: "#/components/schemas/PeriodIconEnum"
+
+        timegridId:
+          description: The id of the corresponding time grid.
+          type: integer
+          format: int64
+
+        exam:
+          $ref: '#/components/schemas/ExamDto'
+
+        departments:
+          description: Departments of the period.
+          type: array
+          items:
+            $ref: '#/components/schemas/PeriodResourceDto'
+
+        classes:
+          description: Classes of the period.
+          type: array
+          items:
+            $ref: "#/components/schemas/PeriodResourceDto"
+
+        studentgroups:
+          description: Student groups of the period.
+          type: array
+          items:
+            $ref: "#/components/schemas/PeriodResourceDto"
+
+        students:
+          description: Students of the period.
+          type: array
+          items:
+            $ref: "#/components/schemas/PeriodResourceDto"
+
+        subjects:
+          description: Subjects of the period.
+          type: array
+          items:
+            $ref: "#/components/schemas/PeriodResourceDto"
+
+        rooms:
+          description: Rooms of the period.
+          type: array
+          items:
+            $ref: "#/components/schemas/PeriodResourceDto"
+
+        teachers:
+          description: Teachers of the period.
+          type: array
+          items:
+            $ref: "#/components/schemas/PeriodResourceDto"
+
+    ExamDto:
+      description: An exam.
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          description: WebUntis entity ID.
+          type: integer
+          format: int64
+
+        type:
+          description: Type of this specific exam.
+          type: string
+          maxLength: 30
+
+        name:
+          description: Name of this specific exam.
+          type: string
+          maxLength: 100
+
+    ResourceRefDto:
+      description: Reference to a MasterDataObjectDto.
+      type: object
+      required:
+        - discriminator    ## OpenAPI discriminator
+        - id
+      properties:
+        id:
+          description: WebUntis entity Id.
+          type: integer
+          format: int64
+
+    PeriodResourceDto:
+      description: Reference and status of a resource.
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/ResourceStatusEnum'
+      allOf:
+        - $ref: '#/components/schemas/ResourceRefDto'
+
+    PeriodTypeEnum:
+      description: Type of the period
+      type: string
+      enum:
+        - NORMAL_TEACHING_PERIOD
+        - ADDITIONAL_PERIOD
+        - STAND_BY_PERIOD
+        - OFFICE_HOUR
+        - EXAM
+        - BREAK_SUPERVISION
+        - EVENT
+        - MEETING
+
+    PeriodStatusEnum:
+      description: |
+        Status of the period:  
+        * REGULAR: The period matches the lesson from the scheduling timetable.  
+        * CANCELLED: The period was cancelled.  
+        * ADDED: The period is an additional period i.e. not part of the scheduling timetable.  
+        * CHANGED:The period has changes and does not match the lesson from the scheduling timetable.
+      type: string
+      enum:
+        - REGULAR
+        - CANCELLED
+        - ADDITIONAL
+        - CHANGED
+
+    ResourceStatusEnum:
+      description: |
+        Status of a resource:
+        * REGULAR: The resource is part of the lesson from the scheduling timetable.
+        * ADDED: The resource was added to the period.
+        * REMOVED: The resource was removed from th period.
+        Note: If change information is not available (E.g. for student) REGULAR is used.
+      type: string
+      enum:
+        - REGULAR
+        - ADDED
+        - REMOVED
+
+    PeriodIconEnum:
+      description: Attribute icons of a period.
+      type: string
+      enum:
+        - ONLINE

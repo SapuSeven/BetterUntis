@@ -21,12 +21,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.databases.entities.User
+import com.sapuseven.untis.data.database.entities.User
 
 @Composable
 fun ProfileSelectorAction(
 	users: List<User>,
-	currentSelectionId: Long, // TODO: Better to use a UserDatabase.User reference?
+	currentSelection: User? = null, // TODO: remove default and remove id below once not used anymore
+	currentSelectionId: Long? = null,
 	showProfileActions: Boolean = false,
 	hideIfSingleProfile: Boolean = false,
 	onSelectionChange: (User) -> Unit,
@@ -51,7 +52,7 @@ fun ProfileSelectorAction(
 			DropdownMenuItem(
 				text = { Text(it.getDisplayedName()) },
 				leadingIcon = {
-					if (currentSelectionId == it.id) {
+					if (currentSelection?.id == it.id) {
 						Icon(
 							Icons.Outlined.Check,
 							contentDescription = null

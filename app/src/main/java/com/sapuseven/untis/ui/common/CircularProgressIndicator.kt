@@ -10,8 +10,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SmallCircularProgressIndicator(
-	modifier: Modifier = Modifier,
-	color: Color = ProgressIndicatorDefaults.circularColor
+	color: Color = ProgressIndicatorDefaults.circularColor,
+	modifier: Modifier = Modifier
 ) {
 	CircularProgressIndicator(
 		color = color,

@@ -12,8 +12,8 @@ import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.MainAxisAlignment
 import com.sapuseven.untis.R
 import com.sapuseven.untis.ui.datepicker.DatePicker
-import org.joda.time.LocalDate
-import org.joda.time.format.DateTimeFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun DatePickerDialog(
@@ -46,7 +46,7 @@ fun DatePickerDialog(
 					)
 
 					Text(
-						text = selectedDay.value.toString(DateTimeFormat.forPattern("EE, MMM d")),
+						text = selectedDay.value.format(DateTimeFormatter.ofPattern("EE, MMM d")),
 						style = MaterialTheme.typography.headlineMedium,
 						color = MaterialTheme.colorScheme.onSurface,
 						modifier = Modifier.padding(top = 16.dp),

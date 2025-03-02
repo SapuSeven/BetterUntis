@@ -2,19 +2,47 @@ package com.sapuseven.untis.ui.dialogs
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
-import androidx.compose.material3.TextFieldDefaults.TextFieldDecorationBox
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -27,9 +55,11 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.asFlow
 import com.sapuseven.untis.R
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.models.untis.timetable.PeriodElement
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
+import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
+import com.sapuseven.untis.components.ElementPicker
 import com.sapuseven.untis.ui.common.AbbreviatedText
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.NavigationBarInset
@@ -39,28 +69,26 @@ import com.sapuseven.untis.ui.functional.insetsPaddingValues
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ElementPickerDialogFullscreen(
+	elementPicker: ElementPicker,
 	title: @Composable () -> Unit,
-	timetableDatabaseInterface: TimetableDatabaseInterface,
-	initialType: TimetableDatabaseInterface.Type? = null,
+	initialType: ElementType? = null,
 	multiSelect: Boolean = false,
 	hideTypeSelection: Boolean = false,
 	hideTypeSelectionPersonal: Boolean = false,
 	onDismiss: (success: Boolean) -> Unit = {},
 	onSelect: (selectedItem: PeriodElement?) -> Unit = {},
 	onMultiSelect: (selectedItems: List<PeriodElement>) -> Unit = {},
-	additionalActions: (@Composable () -> Unit) = {}
+	additionalActions: (@Composable () -> Unit) = {},
 ) {
 	var selectedType by remember { mutableStateOf(initialType) }
 	var showSearch by remember { mutableStateOf(false) }
 	var search by remember { mutableStateOf("") }
 
-	val items = remember(selectedType) {
-		mutableStateMapOf<PeriodElement, Boolean>().apply {
-			timetableDatabaseInterface.getElements(selectedType)
-				.associateWith { false }
-				.also {
-					putAll(it)
-				}
+	val items = remember { mutableStateMapOf<PeriodElement, Boolean>() }
+	LaunchedEffect(selectedType) {
+		items.clear()
+		elementPicker.getAllPeriodElements()[selectedType]?.asFlow()?.collect { periodElements ->
+			periodElements.associateWith { false }.let { items.putAll(it) }
 		}
 	}
 
@@ -70,7 +98,7 @@ fun ElementPickerDialogFullscreen(
 
 	AppScaffold(
 		topBar = {
-			CenterAlignedTopAppBar(
+			TopAppBar(
 				title = {
 					if (!showSearch)
 						title()
@@ -82,7 +110,7 @@ fun ElementPickerDialogFullscreen(
 							onValueChange = { search = it },
 							singleLine = true,
 							decorationBox = { innerTextField ->
-								TextFieldDecorationBox(
+								TextFieldDefaults.DecorationBox(
 									value = search,
 									innerTextField = innerTextField,
 									enabled = true,
@@ -91,9 +119,11 @@ fun ElementPickerDialogFullscreen(
 									interactionSource = remember { MutableInteractionSource() },
 									placeholder = { Text("Search") },
 									contentPadding = PaddingValues(horizontal = 0.dp),
-									colors = TextFieldDefaults.textFieldColors(
-										containerColor = Color.Transparent,
-										focusedIndicatorColor = Color.Transparent,
+									colors = TextFieldDefaults.colors(
+										focusedContainerColor = Color.Transparent,
+										unfocusedContainerColor = Color.Transparent,
+										errorContainerColor = Color.Transparent,
+										disabledContainerColor = Color.Transparent,
 										unfocusedIndicatorColor = Color.Transparent,
 										disabledIndicatorColor = Color.Transparent
 									)
@@ -163,8 +193,9 @@ fun ElementPickerDialogFullscreen(
 				.padding(innerPadding)
 				.fillMaxSize()
 		) {
+			//Text(text = "${elements.get(ElementType.ROOM)?.size ?: "?"} rooms")
 			ElementPickerElements(
-				timetableDatabaseInterface = timetableDatabaseInterface,
+				elementPicker = elementPicker,
 				selectedType = selectedType,
 				multiSelect = multiSelect,
 				onDismiss = onDismiss,
@@ -189,15 +220,11 @@ fun ElementPickerDialogFullscreen(
 	}
 }
 
-/**
- * A minimal dialog version of the element picker.
- * Missing features currently are: search, toolbar actions, multi select (due to missing confirm button), close button.
- */
 @Composable
 fun ElementPickerDialog(
+	elementPicker: ElementPicker,
 	title: (@Composable () -> Unit)?,
-	timetableDatabaseInterface: TimetableDatabaseInterface,
-	initialType: TimetableDatabaseInterface.Type? = null,
+	initialType: ElementType? = null,
 	hideTypeSelection: Boolean = false,
 	hideTypeSelectionPersonal: Boolean = false,
 	onDismiss: (success: Boolean) -> Unit = {},
@@ -205,13 +232,11 @@ fun ElementPickerDialog(
 ) {
 	var selectedType by remember { mutableStateOf(initialType) }
 
-	val items = remember(selectedType) {
-		mutableStateMapOf<PeriodElement, Boolean>().apply {
-			timetableDatabaseInterface.getElements(selectedType)
-				.associateWith { false }
-				.also {
-					putAll(it)
-				}
+	val items = remember { mutableStateMapOf<PeriodElement, Boolean>() }
+	LaunchedEffect(selectedType) {
+		items.clear()
+		elementPicker.getAllPeriodElements()[selectedType]?.asFlow()?.collect { periodElements ->
+			periodElements.associateWith { false }.let { items.putAll(it) }
 		}
 	}
 
@@ -236,7 +261,7 @@ fun ElementPickerDialog(
 				}
 
 				ElementPickerElements(
-					timetableDatabaseInterface = timetableDatabaseInterface,
+					elementPicker = elementPicker,
 					selectedType = selectedType,
 					onDismiss = onDismiss,
 					onSelect = onSelect,
@@ -262,8 +287,8 @@ fun ElementPickerDialog(
 
 @Composable
 fun ElementPickerElements(
-	timetableDatabaseInterface: TimetableDatabaseInterface,
-	selectedType: TimetableDatabaseInterface.Type?,
+	elementPicker: ElementPicker,
+	selectedType: ElementType?,
 	multiSelect: Boolean = false,
 	modifier: Modifier,
 	onDismiss: (success: Boolean) -> Unit = {},
@@ -287,8 +312,8 @@ fun ElementPickerElements(
 						.map {
 							object {
 								val element = it
-								val name = timetableDatabaseInterface.getShortName(it)
-								val enabled = timetableDatabaseInterface.isAllowed(it)
+								val name = elementPicker.getShortName(it)
+								val enabled = elementPicker.isAllowed(it)
 							}
 						}
 						.filter { it.name.contains(filter, true) }
@@ -355,9 +380,9 @@ fun ElementPickerElements(
 
 @Composable
 fun ElementPickerTypeSelection(
-	selectedType: TimetableDatabaseInterface.Type?,
+	selectedType: ElementType?,
 	hideTypeSelectionPersonal: Boolean = false,
-	onTypeChange: (TimetableDatabaseInterface.Type?) -> Unit,
+	onTypeChange: (ElementType?) -> Unit,
 	onDismiss: (success: Boolean) -> Unit = {},
 	onSelect: (selectedItem: PeriodElement?) -> Unit = {}
 ) {
@@ -370,10 +395,12 @@ fun ElementPickerTypeSelection(
 						contentDescription = null
 					)
 				},
-				label = { AbbreviatedText(
-					text = stringResource(id = R.string.all_personal),
-					abbreviatedText = stringResource(id = R.string.all_personal_abbr)
-				) },
+				label = {
+					AbbreviatedText(
+						text = stringResource(id = R.string.all_personal),
+						abbreviatedText = stringResource(id = R.string.all_personal_abbr)
+					)
+				},
 				selected = false,
 				onClick = {
 					onSelect(null)
@@ -389,8 +416,8 @@ fun ElementPickerTypeSelection(
 				)
 			},
 			label = { Text(stringResource(id = R.string.all_classes)) },
-			selected = selectedType == TimetableDatabaseInterface.Type.CLASS,
-			onClick = { onTypeChange(TimetableDatabaseInterface.Type.CLASS) }
+			selected = selectedType == ElementType.CLASS,
+			onClick = { onTypeChange(ElementType.CLASS) }
 		)
 		NavigationBarItem(
 			icon = {
@@ -400,8 +427,8 @@ fun ElementPickerTypeSelection(
 				)
 			},
 			label = { Text(stringResource(id = R.string.all_teachers)) },
-			selected = selectedType == TimetableDatabaseInterface.Type.TEACHER,
-			onClick = { onTypeChange(TimetableDatabaseInterface.Type.TEACHER) }
+			selected = selectedType == ElementType.TEACHER,
+			onClick = { onTypeChange(ElementType.TEACHER) }
 		)
 		NavigationBarItem(
 			icon = {
@@ -411,8 +438,8 @@ fun ElementPickerTypeSelection(
 				)
 			},
 			label = { Text(stringResource(id = R.string.all_rooms)) },
-			selected = selectedType == TimetableDatabaseInterface.Type.ROOM,
-			onClick = { onTypeChange(TimetableDatabaseInterface.Type.ROOM) }
+			selected = selectedType == ElementType.ROOM,
+			onClick = { onTypeChange(ElementType.ROOM) }
 		)
 	}
 }

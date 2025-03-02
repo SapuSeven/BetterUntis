@@ -12,11 +12,13 @@
     <string name="all_cancel">Cancel</string>
     <string name="all_classes">Classes</string>
     <string name="all_close">Close</string>
+    <string name="all_save">Save</string>
     <string name="all_contact_email" translatable="false">betteruntis@sapuseven.com</string>
     <string name="all_delete">Delete</string>
     <string name="all_dialog_absences_checked">Absences checked.</string>
     <string name="all_dialog_absences_not_checked">Absences not checked.</string>
     <string name="all_dialog_absences_save">Submit absence check</string>
+    <string name="all_dialog_absences_save_detailed">Submit detailed absence</string>
     <string name="all_dialog_crash_copied">Crash log copied to clipboard.</string>
     <string name="all_dialog_crash_title">Crash log found</string>
     <string name="all_dialog_datepicker_button_today">Today</string>
@@ -24,6 +26,7 @@
     <string name="all_dialog_error_title">Error information</string>
     <string name="all_edit">Edit</string>
     <string name="all_error">Error</string>
+    <string name="all_api_error_generic">API Error: %1$s</string>
     <string name="all_error_details">Error: %1$s</string>
     <string name="all_exam">Exam</string>
     <string name="all_exit">Exit</string>
@@ -76,29 +79,35 @@
     <string name="homeworks_due_time">due %1$s</string>
     <string name="homeworks_due_time_format">EEE, dd. MMM</string>
     <string name="infocenter_absence_excused">Excused</string>
+	<string name="infocenter_absence_excused_status">Excused (%1$s)</string>
     <string name="infocenter_absence_unexcused">Unexcused</string>
-    <string name="infocenter_absence_unknown_reason">Unknown reason</string>
+    <string name="infocenter_absence_unexcused_status">Unexcused (%1$s)</string>
+	<string name="infocenter_absence_reason">Reason: %1$s</string>
+    <string name="infocenter_absence_reason_unknown">Unknown</string>
     <string name="infocenter_absences_empty">No absences</string>
-    <string name="infocenter_events_empty">No events</string>
-    <string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
-    <string name="infocenter_messages_attachments">Attachments</string>
-    <string name="infocenter_messages_empty">No messages</string>
-    <string name="infocenter_officehours_empty">No office hours</string>
-    <string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
-    <string name="infocenter_timeformat_sameday">%2$s - %4$s, %1$s</string>
+	<string name="infocenter_absences_timerange">%1$s - %2$s</string>
     <string name="infocenter_absences_filter_only_unexcused">Show unexcused only</string>
     <string name="infocenter_absences_filter_sort">Sort order</string>
     <string name="infocenter_absences_filter_oldest_first">Oldest first</string>
     <string name="infocenter_absences_filter_newest_first">Newest first</string>
     <string name="infocenter_absences_filter_time_ranges">Time ranges</string>
     <string name="infocenter_absences_filter">Filter absences</string>
+	<string name="infocenter_exams">Exams</string>
+	<string name="infocenter_exams_empty">No exams</string>
+	<string name="infocenter_homework">Homework</string>
+	<string name="infocenter_homework_empty">No homework</string>
+	<string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
+	<string name="infocenter_messages_attachments">Attachments</string>
+	<string name="infocenter_messages_empty">No messages</string>
+	<string name="infocenter_officehours_empty">No office hours</string>
+	<string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
+	<string name="infocenter_timeformat_sameday">%2$s - %4$s, %1$s</string>
     <string name="library_appcompat" translatable="false">Android AppCompat Library V7</string>
     <string name="library_code_scanner" translatable="false">CodeScanner</string>
     <string name="library_colorpicker_compat" translatable="false">ColorPicker Compat</string>
     <string name="library_constraintlayout" translatable="false">Android ConstraintLayout</string>
     <string name="library_fuel" translatable="false">Fuel</string>
     <string name="library_fuel_coroutines" translatable="false">Fuel Coroutines</string>
-    <string name="library_joda_time" translatable="false">Joda Time</string>
     <string name="library_junit" translatable="false">JUnit</string>
     <string name="library_kotlin_reflect" translatable="false">Kotlin Reflection</string>
     <string name="library_kotlin_stdlib" translatable="false">Kotlin Standard Library</string>
@@ -196,6 +205,7 @@
     <string name="preference_automute_minimum_break_length">Minimum break length</string>
     <string name="preference_automute_minimum_break_length_summary">Don\'t unmute the device during breaks shorter than the specified length (in minutes)</string>
     <string name="preference_automute_mute_priority">Don\'t allow priority events to ignore aute-mute</string>
+    <string name="preference_automute_allow_priority">Allow priority events to ignore aute-mute</string>
     <string name="preference_background_cancelled">Cancelled lessons</string>
     <string name="preference_background_cancelled_past">Past cancelled lessons</string>
     <string name="preference_background_exam">Lessons with tests</string>
@@ -247,7 +257,7 @@
     <string name="preference_info_privacy_policy">Privacy Policy</string>
     <string name="preference_marker">Time indicator</string>
     <string name="preference_notifications_clear">Clear all notifications</string>
-    <string name="preference_notifications_enable">Enable notifications</string>
+    <string name="preference_notifications_enable">Enable break notifications</string>
     <string name="preference_notifications_enable_desc">Displays a notification with information about the next lesson during breaks</string>
     <string name="preference_notifications_first_lesson">Notification before first lesson</string>
     <string name="preference_notifications_first_lesson_desc">Show a notification right before school starts</string>
@@ -258,7 +268,7 @@
     <string name="preference_notifications_visibility_hidden">Hidden</string>
     <string name="preference_notifications_visibility_long">Long name</string>
     <string name="preference_notifications_visibility_short">Short name</string>
-    <string name="preference_school_background">Use colors provided from your school</string>
+    <string name="preference_school_background">Use school-provided subject colors</string>
     <string name="preference_school_background_desc">Some schools send their own background colors</string>
     <string name="preference_schoolcolors_cancelled">For cancelled lessons</string>
     <string name="preference_schoolcolors_exam">For lessons with tests</string>
@@ -276,11 +286,11 @@
     <string name="preference_timetable_background_irregular_desc">Treat lessons with different background as irregular</string>
     <string name="preference_timetable_bold_lesson_name">Bold lesson name</string>
     <string name="preference_timetable_centered_lesson_info">Center lesson infos</string>
-    <string name="preference_timetable_colors_reset">Reset colors</string>
+    <string name="preference_timetable_colors_reset">Reset item colors</string>
+    <string name="preference_timetable_colors_reset_desc">This will match them to your active theme color.</string>
     <string name="preference_timetable_colors_reset_button_positive">Reset</string>
     <string name="preference_timetable_hide_cancelled">Hide cancelled lessons</string>
-    <string name="preference_timetable_hide_cancelled_desc">You need to reload the timetable after you change this setting</string>
-    <string name="preference_timetable_hide_timestamps">Hide timestamps</string>
+	<string name="preference_timetable_hide_timestamps">Hide timestamps</string>
     <string name="preference_timetable_hide_timestamps_desc">Hide the timestamps next to the timetable</string>
     <string name="preference_timetable_item_corner_radius">Item corner radius</string>
     <string name="preference_timetable_item_padding">Item padding</string>
@@ -297,8 +307,6 @@
     <string name="preference_use_theme_background">Use theme colors</string>
     <string name="preference_use_theme_background_desc">This only applies to regular lessons</string>
     <string name="preference_week_custom_range">Custom week range</string>
-    <string name="preference_week_custom_range_summary">%1$s to %2$s</string>
-    <string name="preference_week_custom_range_summary_short">%1$s</string>
     <string name="preference_week_display_length">Days to display</string>
     <string name="preference_week_display_length_summary">Set to 0 to use week length</string>
     <string name="preference_week_snap_to_days">Snap to days</string>
@@ -311,7 +319,7 @@
     <string name="preferences_timetable">Timetable</string>
     <string name="preferences_theme_color">Theme color</string>
     <string name="preferences_theme_color_system">System theme color</string>
-    <string name="roomfinder_current_hour">%1$s, %2$d. Lesson</string>
+    <string name="roomfinder_current_hour">%1$s, Lesson %2$s</string>
     <string name="roomfinder_current_hour_time">%1$s - %2$s</string>
     <string name="roomfinder_delete_item">Delete item</string>
     <string name="roomfinder_dialog_itemdelete_text">Are you sure you want to remove this room from the list?</string>
@@ -322,6 +330,8 @@
     <string name="roomfinder_image_next_hour">next hour</string>
     <string name="roomfinder_image_previous_hour">previous hour</string>
     <string name="roomfinder_item_desc_occupied">This Room is occupied.</string>
+    <string name="roomfinder_item_desc_free_day">This Room is free for the rest of the day.</string>
+    <string name="roomfinder_item_desc_free_week">This Room is free for the rest of the week.</string>
     <string name="roomfinder_loading_data">Loading data…</string>
     <string name="roomfinder_no_rooms">No rooms to display.\nTap + to add one!</string>
     <string name="settings_recommend_hide">Don\'t show again</string>
@@ -336,7 +346,7 @@
     <string name="widget_select_profile">Please select a profile for the widget</string>
     <string name="widget_timetable">Timetable</string>
     <string name="widget_timetable_empty">No timetable available for today</string>
-    <string name="widget_timetable_link">Timetable Link</string>
+    <string name="widget_timetable_link">Create shortcut to…</string>
     <string name="all_datepicker_select">Select date</string>
     <string name="all_datepicker_month_next">Next month</string>
     <string name="all_datepicker_month_previous">Previous month</string>
@@ -368,16 +378,14 @@
     <string name="mainactivitydrawer_profile_edit_hint">Tap on a profile to edit</string>
     <string name="all_lesson_online">Taking place online</string>
     <string name="all_open_link">Open link</string>
-    <string name="preference_range_from">from</string>
-    <string name="preference_range_to">to</string>
     <string name="preference_dialog_permission_alarms_title">Permission needed</string>
     <string name="preference_dialog_permission_alarms_text">This feature requires additional permissions. Please allow BetterUntis access to schedule exact alarms.</string>
     <string name="all_dialog_open_settings">Open settings</string>
     <string name="preference_category_reports">Error Reporting</string>
     <string name="preference_reports_info">About error reporting</string>
-    <string name="preference_reports_info_desc">These settings help to improve the application.\nNo personal information is ever collected.\nChanges need an app restart to take effect.</string>
+    <string name="preference_reports_info_desc">These settings apply to all profiles and help to improve the application.\nNo personal information is ever collected.\nChanges need an app restart to take effect.</string>
     <string name="preference_reports_breadcrumbs">Send detailed errors</string>
-    <string name="preference_reports_breadcrumbs_desc">Include additional information about what happened before an error occured.</string>
+    <string name="preference_reports_breadcrumbs_desc">Include additional information about what happened before an error occurred.</string>
     <string name="main_dialog_reports_info_2">You can always change these values later in the app settings.</string>
     <string name="main_dialog_reports_info_1">BetterUntis uses Sentry to collect information about crashes and other errors.</string>
     <string name="main_dialog_reports_title">Error Reporting</string>
@@ -393,4 +401,19 @@
     <string name="all_end_time">End time</string>
     <string name="preference_category_app_language">App Language</string>
     <string name="preference_app_language">App language</string>
+    <string name="preferences_default_color">Default color</string>
+	<string name="preference_timetable_range_index_reset_desc">Ensure hour labels always start at 1</string>
+    <string name="preference_timetable_zoom_gesture">Enable zoom gesture</string>
+	<string name="preference_timetable_zoom_level">Timetable zoom level</string>
+    <string name="preference_info_contributors_error">Error loading contributors from GitHub.</string>
+	<string name="preference_category_notifications_break">Break notifications</string>
+	<string name="all_warning">Warning</string>
+	<string name="preference_notifications_exact_alarms_unavailable">Exact notifications are unavailable</string>
+	<string name="preference_notifications_exact_alarms_unavailable_desc">To ensure all notifications are delivered at the correct time, please grant %1$s permission to schedule exact alarms.\nTap to go to settings.</string>
+	<string name="preference_notifications_unavailable">Notifications are unavailable</string>
+	<string name="preference_notifications_unavailable_desc">To enable notifications, please grant %1$s permission to send notifications.\nTap to go to settings.</string>
+	<string name="preference_automute_exact_alarms_unavailable">Exact auto-mute is unavailable</string>
+	<string name="preference_automute_exact_alarms_unavailable_desc">To ensure auto-mute is toggled at the correct time, please grant %1$s permission to schedule exact alarms.\nTap to go to settings.</string>
+    <string name="preference_reports_enable">Enable automatic error reporting</string>
+    <string name="automute_zen_rule_name">School - %1$s</string>
 </resources>

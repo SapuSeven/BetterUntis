@@ -12,23 +12,23 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import com.sapuseven.untis.R
-import com.sapuseven.untis.models.untis.UntisAttachment
+import com.sapuseven.untis.api.model.untis.Attachment
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AttachmentsDialog(
-	attachments: List<UntisAttachment>,
+	attachments: List<Attachment>,
 	onDismiss: () -> Unit
 ) {
 	val uriHandler = LocalUriHandler.current
 
-	Dialog(onDismissRequest = onDismiss) {
+	BasicAlertDialog(onDismissRequest = onDismiss) {
 		Surface(
 			modifier = Modifier.padding(vertical = 24.dp),
 			shape = AlertDialogDefaults.shape,
@@ -51,6 +51,7 @@ fun AttachmentsDialog(
 				) {
 					items(attachments) {
 						ListItem(
+							colors = ListItemDefaults.colors(containerColor = Color.Transparent), // No idea why, but ListItem has the wrong background color otherwise
 							headlineContent = { Text(it.name) },
 							leadingContent = {
 								Icon(

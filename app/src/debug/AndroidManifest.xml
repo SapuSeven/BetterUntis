@@ -18,6 +18,6 @@
 
 	<application tools:ignore="MissingApplicationIcon">
 		<activity
-			android:name=".activities.BaseComposeActivity" />
+			android:name=".activities.MainActivity" />
 	</application>
 </manifest>

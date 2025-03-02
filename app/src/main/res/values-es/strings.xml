@@ -48,7 +48,6 @@
     <string name="errormessagedictionary_server_webuntis_not_installed">¡El servidor especificado no tiene instalado WebUntis!</string>
     <string name="errormessagedictionary_too_many_results">Demasiados resultados</string>
     <string name="infocenter_absences_empty">Sin ausencias</string>
-    <string name="infocenter_events_empty">Ningún evento</string>
     <string name="infocenter_messages_attachments">Adjuntos</string>
     <string name="infocenter_messages_empty">Sin mensajes</string>
     <string name="infocenter_officehours_empty">Sin horario de oficina</string>
@@ -113,7 +112,6 @@
     <string name="infocenter_absence_unexcused">Sin Justificar</string>
     <string name="infocenter_absence_excused">Justificada</string>
     <string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
-    <string name="infocenter_absence_unknown_reason">Causa desconocida</string>
     <string name="infocenter_timeformat_sameday">%2$s - %4$s, %1$s</string>
     <string name="infocenter_absences_filter_oldest_first">Primero el más antiguo</string>
 </resources>
