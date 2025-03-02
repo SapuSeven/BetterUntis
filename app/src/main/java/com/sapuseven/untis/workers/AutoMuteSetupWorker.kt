@@ -28,6 +28,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 /**
  * This worker schedules all auto-mute events for the day.
@@ -123,13 +124,17 @@ class AutoMuteSetupWorker @AssistedInject constructor(
 								"${item.getShort(ElementType.SUBJECT)} mute scheduled for ${item.originalPeriod.startDateTime}"
 							)
 
-							if (it.second != null && item.originalPeriod.endDateTime.isBefore(
-									it.second!!.originalPeriod.startDateTime.minusMinutes(
-										userSettings.automuteMinimumBreakLength.toLong()
-									)
+							val subsequentBreakLength = it.second?.let { subsequentPeriod ->
+								ChronoUnit.MINUTES.between(item.originalPeriod.endDateTime, subsequentPeriod.originalPeriod.startDateTime)
+							}
+							if (subsequentBreakLength != null && subsequentBreakLength < userSettings.automuteMinimumBreakLength) {
+								Log.d(
+									"AutoMuteSetup",
+									"${item.getShort(ElementType.SUBJECT)} unmute NOT scheduled for ${item.originalPeriod.endDateTime} - subsequent break too short (${subsequentBreakLength} min)"
 								)
-							)
-								return@forEach // Break to next element is too short
+								return@forEach
+							}
+
 							val unmuteIntent =
 								Intent(applicationContext, AutoMuteReceiver::class.java)
 									.putExtra(EXTRA_INT_ID, id)
