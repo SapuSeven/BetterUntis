@@ -111,7 +111,7 @@
     <string name="preference_notifications_first_lesson_desc">Pokaži obavijest neposredno prije početka nastave</string>
     <string name="preference_notifications_first_lesson">Obavijest prije prvog sata</string>
     <string name="preference_notifications_enable_desc">Prikazuje obavijest s podacima o sljedećem satu nastave tijekom pauza</string>
-    <string name="preference_notifications_enable">Aktiviraj obavijesti</string>
+    <string name="preference_notifications_enable">Aktiviraj obavijesti za pauze</string>
     <string name="preference_notifications_clear">Izbriši sve obavijesti</string>
     <string name="preference_marker">Indikator vremena</string>
     <string name="preference_info_libraries_desc">Popis svih korištenih biblioteka</string>
@@ -283,7 +283,7 @@
     <string name="preference_background_cancelled">Otkazane nastave</string>
     <string name="preference_automute_enable_summary">Automatski uključuje način „Ne smetaj” tijekom nastava</string>
     <string name="preference_automute_enable">Aktiviraj automatsko isključivanje zvuka</string>
-    <string name="preference_automute_cancelled_lessons">Također iskjluči zvuk u otkazanim nastavama</string>
+    <string name="preference_automute_cancelled_lessons">Također isključi zvuk u otkazanim nastavama</string>
     <string name="preference_dark_theme_auto">Koristi temu sustava</string>
     <string name="infocenter_absences_filter_only_unexcused">Pokaži samo neopravdane</string>
     <string name="infocenter_absences_filter_oldest_first">Najprije najstarije</string>
@@ -382,4 +382,16 @@
     <string name="roomfinder_item_desc_free_day">Ova je prostorija slobodna do kraja dana.</string>
     <string name="roomfinder_item_desc_free_week">Ova je prostorija slobodna do kraja tjedna.</string>
     <string name="preference_timetable_range_index_reset_desc">Osiguraj da oznake sata uvijek počinju s 1</string>
+    <string name="preference_automute_exact_alarms_unavailable">Točno automatsko isključivanje zvuka nije dostupno</string>
+    <string name="preference_automute_exact_alarms_unavailable_desc">Da bi se osiguralo pravovremeno uključivanje automatskog isključivanja zvuka, dozvoli da %1$s postavlja točne alarme.\nDodirni za otvaranje postavki.</string>
+    <string name="all_warning">Upozorenje</string>
+    <string name="preference_reports_enable">Aktiviraj automatsko sljanje izvještaja o greškama</string>
+    <string name="preference_timetable_zoom_gesture">Aktiviraj geste za zumiranje</string>
+    <string name="preference_timetable_zoom_level">Količina zumiranja rasporeda sati</string>
+    <string name="preference_info_contributors_error">Greška pri učitavanju doprinositelja s GitHub-a.</string>
+    <string name="preference_category_notifications_break">Obavijesti za pauze</string>
+    <string name="preference_notifications_exact_alarms_unavailable">Točne obavijesti nisu dostupne</string>
+    <string name="preference_notifications_exact_alarms_unavailable_desc">Da bi se osiguralo pravovremeno dobivanje obavijesti, dozvoli da %1$s postavlja točne alarme.\nDodirni za otvaranje postavki.</string>
+    <string name="preference_notifications_unavailable">Obavijesti nisu dostupne</string>
+    <string name="preference_notifications_unavailable_desc">Za aktiviranje obavijesti, dozvoli da %1$s šalje obavijesti.\nDodirni za otvaranje postavki.</string>
 </resources>
