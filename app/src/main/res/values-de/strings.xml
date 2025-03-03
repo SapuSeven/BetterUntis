@@ -218,7 +218,7 @@
     <string name="preference_timetable_background_irregular_desc">Kennzeichne Stunden mit einem anderen Hintergrund als irregulär</string>
     <string name="preference_timetable_bold_lesson_name">Fetter Stundenname</string>
     <string name="preference_timetable_centered_lesson_info">Stundeninfo zentrieren</string>
-    <string name="preference_timetable_colors_reset">Farben zurücksetzen</string>
+    <string name="preference_timetable_colors_reset">Stundenfarben zurücksetzen</string>
     <string name="preference_timetable_colors_reset_button_positive">Zurücksetzen</string>
     <string name="preference_timetable_hide_cancelled">Entfallene Stunden ausblenden</string>
     <string name="preference_timetable_hide_timestamps">Zeitstempel ausblenden</string>
@@ -235,7 +235,7 @@
     <string name="preference_timetable_range_index_reset">Stundennummerierung zurücksetzen</string>
     <string name="preference_timetable_substitutions_irregular">Irreguläre Stunden erkennen</string>
     <string name="preference_timetable_substitutions_irregular_desc">Vertretungsstunden als irregulär behandeln</string>
-    <string name="preference_school_background">Farben der Schule verwenden</string>
+    <string name="preference_school_background">Von der Schule zur Verfügung gestellten Designfarben verwenden</string>
     <string name="preference_school_background_desc">Manche Schulen senden eigene Hintergrundfarben</string>
     <string name="preference_use_theme_background">Designfarben verwenden</string>
     <string name="preference_use_theme_background_desc">Dies gilt nur für normale Stunden</string>
