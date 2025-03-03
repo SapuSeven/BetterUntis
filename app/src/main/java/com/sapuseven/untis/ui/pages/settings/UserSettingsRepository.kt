@@ -21,6 +21,49 @@ class UserSettingsRepository @AssistedInject constructor(
 ) : MultiUserSettingsRepository<Settings, Settings.Builder, UserSettings, UserSettings.Builder>(
 	dataStore
 ) {
+	companion object {
+		fun getSettingsDefaults(colorScheme: ColorScheme): UserSettings = UserSettings.newBuilder().apply {
+			automuteCancelledLessons = true
+			automuteMinimumBreakLength = 5.0f
+
+			backgroundFuture = Color.Transparent.toArgb()
+			backgroundPast = Color(0x40808080).toArgb()
+			marker = Color.White.toArgb()
+			backgroundRegular = colorScheme.primary.toArgb()
+			backgroundRegularPast = colorScheme.primary.copy(alpha = .7f).toArgb()
+			backgroundExam = colorScheme.error.toArgb()
+			backgroundExamPast = colorScheme.error.copy(alpha = .7f).toArgb()
+			backgroundIrregular = colorScheme.tertiary.toArgb()
+			backgroundIrregularPast = colorScheme.tertiary.copy(alpha = .7f).toArgb()
+			backgroundCancelled = colorScheme.secondary.toArgb()
+			backgroundCancelledPast = colorScheme.secondary.copy(alpha = .7f).toArgb()
+			themeColor = colorScheme.primary.toArgb()
+			darkTheme = "auto"
+
+			timetableSubstitutionsIrregular = true
+			timetableItemPadding = 2
+			timetableItemCornerRadius = 4
+			timetableCenteredLessonInfo = false
+			timetableBoldLessonName = true
+			timetableLessonNameFontSize = 16
+			timetableLessonInfoFontSize = 12
+			timetableZoomEnabled = true
+			timetableZoomLevel = 1.0f
+
+			notificationsInMultiple = false
+			notificationsBeforeFirstTime = 30
+
+			notificationsVisibilitySubjects = "long"
+			notificationsVisibilityRooms = "short"
+			notificationsVisibilityTeachers = "short"
+			notificationsVisibilityClasses = "short"
+
+			connectivityRefreshInBackground = true
+
+			infocenterAbsencesTimeRange = "current_schoolyear"
+		}.build()
+	}
+
 	@AssistedFactory
 	interface Factory {
 		fun create(colorScheme: ColorScheme = lightColorScheme()): UserSettingsRepository
@@ -44,46 +87,5 @@ class UserSettingsRepository @AssistedInject constructor(
 			.build()
 	}
 
-	override fun getSettingsDefaults(): UserSettings = UserSettings.newBuilder().apply {
-		automuteCancelledLessons = true
-		automuteMinimumBreakLength = 5.0f
-		// todo detailed errors
-
-		backgroundFuture = Color.Transparent.toArgb()
-		backgroundPast = Color(0x40808080).toArgb()
-		marker = Color.White.toArgb()
-		backgroundRegular = colorScheme.primary.toArgb()
-		backgroundRegularPast = colorScheme.primary.copy(alpha = .7f).toArgb()
-		backgroundExam = colorScheme.error.toArgb()
-		backgroundExamPast = colorScheme.error.copy(alpha = .7f).toArgb()
-		backgroundIrregular = colorScheme.tertiary.toArgb()
-		backgroundIrregularPast = colorScheme.tertiary.copy(alpha = .7f).toArgb()
-		backgroundCancelled = colorScheme.secondary.toArgb()
-		backgroundCancelledPast = colorScheme.secondary.copy(alpha = .7f).toArgb()
-		themeColor =
-			colorScheme.primary.toArgb() // TODO: This should always be the system theme color, not the current theme primary color
-		darkTheme = "auto"
-
-		timetableSubstitutionsIrregular = true
-		timetableItemPadding = 2
-		timetableItemCornerRadius = 4
-		timetableCenteredLessonInfo = false
-		timetableBoldLessonName = true
-		timetableLessonNameFontSize = 16 // TODO Use Material typography values?
-		timetableLessonInfoFontSize = 12 // TODO Use Material typography values?
-		timetableZoomEnabled = true
-		timetableZoomLevel = 1.0f
-
-		notificationsInMultiple = false
-		notificationsBeforeFirstTime = 30
-
-		notificationsVisibilitySubjects = "long"
-		notificationsVisibilityRooms = "short"
-		notificationsVisibilityTeachers = "short"
-		notificationsVisibilityClasses = "short"
-
-		connectivityRefreshInBackground = true
-
-		infocenterAbsencesTimeRange = "current_schoolyear"
-	}.build()
+	override fun getSettingsDefaults(): UserSettings = Companion.getSettingsDefaults(colorScheme)
 }

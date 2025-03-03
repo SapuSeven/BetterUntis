@@ -92,6 +92,10 @@ android {
 			applicationIdSuffix = ".debug"
 			versionNameSuffix = "-DEBUG"
 
+			kotlinOptions {
+				freeCompilerArgs = listOf("-Xdebug")
+			}
+
 			if (file("BetterUntis.jks").exists()) {
 				signingConfig = signingConfigs.getByName("debug")
 			}
