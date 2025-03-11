@@ -156,9 +156,9 @@
     <string name="preference_timetable_hide_timestamps">Zaman bilgisini gizle</string>
     <string name="preference_timetable_hide_cancelled">İptal edilen dersleri gizle</string>
     <string name="preference_timetable_colors_reset_button_positive">Sıfırla</string>
-    <string name="preference_timetable_colors_reset">Renkleri sıfırla</string>
+    <string name="preference_timetable_colors_reset">Nesne renklerini sıfırla</string>
     <string name="preference_timetable_centered_lesson_info">Merkez ders bilgisi</string>
-    <string name="preference_timetable_background_irregular_desc">Öğretmenlere erişiminiz yok ise bunu kullanın</string>
+    <string name="preference_timetable_background_irregular_desc">Farklı arka planı olan dersleri düzensiz kabul et</string>
     <string name="preference_theme_untis">Orjinal Untis Uygulaması</string>
     <string name="preference_theme_stock">Varsayılan</string>
     <string name="preference_theme_pixel">Piksel</string>
@@ -172,7 +172,7 @@
     <string name="preference_schoolcolors_exam">Test olan dersler için</string>
     <string name="preference_schoolcolors_cancelled">İptal edilen dersler için</string>
     <string name="preference_school_background_desc">Bazı okullar kendi arkaplan renklerini kullanır</string>
-    <string name="preference_school_background">Okulun kullandığı renkleri kullan</string>
+    <string name="preference_school_background">Okul tarafından verilen ders renklerini kullan</string>
     <string name="preference_notifications_visibility_short">Kısa isim</string>
     <string name="preference_notifications_visibility_long">Uzun isim</string>
     <string name="preference_notifications_visibility_hidden">Gizlenmiş</string>
@@ -222,7 +222,7 @@
     <string name="preferences_connectivity">Bağlantı</string>
     <string name="preferences_general">Genel</string>
     <string name="preferences_notifications">Bildirimler</string>
-    <string name="preferences_styling">Kişiselleştirme</string>
+    <string name="preferences_styling">Tema</string>
     <string name="preferences_timetable">Ders Programı</string>
     <string name="notifications_channel_breakinfo">Teneffüs bilgisi</string>
     <string name="notifications_text_error_title">Ders programı yüklenemedi</string>
@@ -251,7 +251,7 @@
         <item quantity="one">%1$d katkı</item>
         <item quantity="other">%1$d katkı</item>
     </plurals>
-    <string name="preference_timetable_item_corner_radius">Köşe yuvarlaklığı</string>
+    <string name="preference_timetable_item_corner_radius">Nesne köşe yuvarlaklığı</string>
     <string name="preference_timetable_item_padding">Dersler arasındaki mesafe</string>
     <string name="preference_use_theme_background">Tema renklerini kullan</string>
     <string name="notifications_channel_backgrounderrors_desc">Arkaplan görevlerinin hata mesajlarını gösterir</string>
@@ -262,9 +262,9 @@
     <string name="preference_timetable_personal_timetable">Kişiselleştirilmiş Ders Programı</string>
     <string name="preference_notifications_multiple">Çoklu saatli dersi etkinleştir</string>
     <string name="preference_timetable_bold_lesson_name">Kalın ders adı</string>
-    <string name="preference_timetable_range">Gösterilecek dersler</string>
-    <string name="preference_timetable_item_text_light">Beyaz ders yazısı</string>
-    <string name="preference_timetable_item_padding_overlap">Üst üste olan dersler arası mesafe</string>
+    <string name="preference_timetable_range">Gösterilecek saat aralığı</string>
+    <string name="preference_timetable_item_text_light">Zaman çizelgesi öğeleri için beyaz metin kullan</string>
+    <string name="preference_timetable_item_padding_overlap">Örtüşen öğe dolgusu</string>
     <string name="errors_report">Uygulamayı düzeltmeye yardım etmek için lütfen aşağıdaki hataları bildir:</string>
     <plurals name="main_time_diff_minutes">
         <item quantity="one">Bir dakika önce</item>
@@ -296,7 +296,7 @@
     <string name="logindatainput_aquiring_app_secret">Gizli uygulama edinme …</string>
     <string name="all_save">Kaydet</string>
     <string name="all_dialog_absences_save_detailed">Ayrıntılı devamsızlık gönderin</string>
-    <string name="all_api_error_generic">API Error: %1$s</string>
+    <string name="all_api_error_generic">API Hatası: %1$s</string>
     <string name="all_personal_abbr">Kişi.</string>
     <string name="infocenter_absence_excused_status">Mazeretli (%1$s)</string>
     <string name="infocenter_absence_unexcused_status">Mazeretsiz (%1$s)</string>
@@ -324,4 +324,26 @@
     <string name="infocenter_absences_filter_newest_first">Önce en yeni</string>
     <string name="infocenter_absences_filter_time_ranges">Zaman aralıkları</string>
     <string name="infocenter_absences_filter">Devamsızlıkları filtrele</string>
+    <string name="preference_timetable_background_irregular">Nesne arka planını göz önünde bulundur</string>
+    <string name="preference_week_display_length_summary">Hafta uzunluğunu kullanmak için 0 olarak ayarla</string>
+    <string name="preference_week_snap_to_days">Günlere geç</string>
+    <string name="preference_week_snap_to_days_summary">Haftalar yerine</string>
+    <string name="preferences_info">Hakkında</string>
+    <string name="preferences_theme_color">Tema rengi</string>
+    <string name="preferences_theme_color_system">Sistem tema rengi</string>
+    <string name="settings_recommend_hide">Bir daha gösterme</string>
+    <string name="settings_recommend_message">BetterUntis\'ten keyif alıyorsanız, arkadaşlarınıza da anlatın!</string>
+    <string name="settings_recommend_share">Paylaş</string>
+    <string name="settings_recommend_title">BetterUntis’i öner</string>
+    <string name="settings_dialog_url_open_title">Uyumlu uygulama bulunamadı</string>
+    <string name="roomfinder_error">Veri yüklenirken hata oluştu.</string>
+    <string name="settings_recommend_text">BetterUntis\'i deneyin - Untis Mobile\'a daha iyi bir alternatif! %1$s adresinden indirin</string>
+    <string name="preference_notifications_multiple_desc">Bildirimler bir saatten çok süren derslerin aralarında gösterilecek</string>
+    <string name="preference_timetable_colors_reset_desc">Bu eylem neticesinde etkin temas rengiyle eşlenirler.</string>
+    <string name="preference_week_custom_range">Özel hafta aralığı</string>
+    <string name="preference_timetable_substitutions_irregular_desc">Tekrarları olan dersleri düzensiz kabul et</string>
+    <string name="roomfinder_current_hour">%1$s, Ders %2$s</string>
+    <string name="roomfinder_error_details">Hata: %1$s.</string>
+    <string name="roomfinder_item_desc_free_day">Bu Alan günün geri kalanında boş.</string>
+    <string name="roomfinder_item_desc_free_week">Bu Alan haftanın geri kalanında boş.</string>
 </resources>
