@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -76,14 +78,22 @@ fun DebugDesclaimerAction() {
 	DebugInfoAction(
 		title = { Text("Debug information") }
 	) {
-		Text(
-			"You are running a debug build of the app.\n\n" +
-					"This means that the app is not optimized and you will see some additional settings and functions.\n" +
-					"It is only recommended to use this variant when developing or gathering information about specific issues.\n" +
-					"For normal daily use, you should switch to a stable release build of the app.\n\n" +
-					"Please remember that diagnostic data may include personal details, " +
-					"so it is your responsibility to check and obfuscate any gathered data before uploading."
-		)
+		Column(
+			verticalArrangement = Arrangement.spacedBy(8.dp),
+			modifier = Modifier.verticalScroll(rememberScrollState())
+		) {
+			Text(
+				"You are running a debug build of the app.\n\n" +
+						"This means that the app is not optimized and you will see some additional settings and functions.\n" +
+						"It is only recommended to use this variant when developing or gathering information about specific issues.\n" +
+						"For normal daily use, you should switch to a stable release build of the app.\n\n" +
+						"Please remember that diagnostic data may include personal details, " +
+						"so it is your responsibility to check and obfuscate any gathered data before uploading."
+			)
+			Text(style = MaterialTheme.typography.headlineMedium, text = "Debug Information")
+			Text(style = MaterialTheme.typography.headlineSmall, text = "ColorScheme")
+			RawText(item = MaterialTheme.colorScheme)
+		}
 	}
 }
 
