@@ -5,7 +5,6 @@ import android.os.Build
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -65,6 +64,13 @@ fun Scheme.toColorScheme(): ColorScheme =
 		outline = Color(outline),
 		outlineVariant = Color(outlineVariant),
 		scrim = Color(scrim),
+		surfaceBright = Color(surfaceBright),
+		surfaceDim = Color(surfaceDim),
+		surfaceContainer = Color(surfaceContainer),
+		surfaceContainerHigh = Color(surfaceContainerHigh),
+		surfaceContainerHighest = Color(surfaceContainerHighest),
+		surfaceContainerLow = Color(surfaceContainerLow),
+		surfaceContainerLowest = Color(surfaceContainerLowest),
 	)
 
 @Composable
@@ -105,4 +111,11 @@ fun ColorScheme.animated(): ColorScheme = copy(
 	outline = animateColor(outline),
 	outlineVariant = animateColor(outlineVariant),
 	scrim = animateColor(scrim),
+	surfaceBright = animateColor(surfaceBright),
+	surfaceDim = animateColor(surfaceDim),
+	surfaceContainer = animateColor(surfaceContainer),
+	surfaceContainerHigh = animateColor(surfaceContainerHigh),
+	surfaceContainerHighest = animateColor(surfaceContainerHighest),
+	surfaceContainerLow = animateColor(surfaceContainerLow),
+	surfaceContainerLowest = animateColor(surfaceContainerLowest),
 )

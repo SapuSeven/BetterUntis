@@ -54,6 +54,13 @@ public class Scheme {
   private int inverseSurface;
   private int inverseOnSurface;
   private int inversePrimary;
+  private int surfaceBright;
+  private int surfaceDim;
+  private int surfaceContainer;
+  private int surfaceContainerHigh;
+  private int surfaceContainerHighest;
+  private int surfaceContainerLow;
+  private int surfaceContainerLowest;
 
   public Scheme() {}
 
@@ -86,7 +93,14 @@ public class Scheme {
       int scrim,
       int inverseSurface,
       int inverseOnSurface,
-      int inversePrimary) {
+      int inversePrimary,
+      int surfaceBright,
+      int surfaceDim,
+      int surfaceContainer,
+      int surfaceContainerHigh,
+      int surfaceContainerHighest,
+      int surfaceContainerLow,
+      int surfaceContainerLowest) {
     super();
     this.primary = primary;
     this.onPrimary = onPrimary;
@@ -117,6 +131,13 @@ public class Scheme {
     this.inverseSurface = inverseSurface;
     this.inverseOnSurface = inverseOnSurface;
     this.inversePrimary = inversePrimary;
+    this.surfaceBright = surfaceBright;
+    this.surfaceDim = surfaceDim;
+    this.surfaceContainer = surfaceContainer;
+    this.surfaceContainerHigh = surfaceContainerHigh;
+    this.surfaceContainerHighest = surfaceContainerHighest;
+    this.surfaceContainerLow = surfaceContainerLow;
+    this.surfaceContainerLowest = surfaceContainerLowest;
   }
 
   public static Scheme light(int argb) {
@@ -165,7 +186,14 @@ public class Scheme {
         .withScrim(core.n1.tone(0))
         .withInverseSurface(core.n1.tone(20))
         .withInverseOnSurface(core.n1.tone(95))
-        .withInversePrimary(core.a1.tone(80));
+        .withInversePrimary(core.a1.tone(80))
+        .withSurfaceBright(core.n1.tone(98))
+        .withSurfaceDim(core.n1.tone(87))
+        .withSurfaceContainer(core.n1.tone(94))
+        .withSurfaceContainerHigh(core.n1.tone(92))
+        .withSurfaceContainerHighest(core.n1.tone(90))
+        .withSurfaceContainerLow(core.n1.tone(96))
+        .withSurfaceContainerLowest(core.n1.tone(100));
   }
 
   private static Scheme darkFromCorePalette(CorePalette core) {
@@ -198,7 +226,14 @@ public class Scheme {
         .withScrim(core.n1.tone(0))
         .withInverseSurface(core.n1.tone(90))
         .withInverseOnSurface(core.n1.tone(20))
-        .withInversePrimary(core.a1.tone(40));
+        .withInversePrimary(core.a1.tone(40))
+        .withSurfaceBright(core.n1.tone(24))
+        .withSurfaceDim(core.n1.tone(6))
+        .withSurfaceContainer(core.n1.tone(12))
+        .withSurfaceContainerHigh(core.n1.tone(17))
+        .withSurfaceContainerHighest(core.n1.tone(22))
+        .withSurfaceContainerLow(core.n1.tone(10))
+        .withSurfaceContainerLowest(core.n1.tone(4));
   }
 
   public int getPrimary() {
@@ -607,6 +642,104 @@ public class Scheme {
     return this;
   }
 
+  public int getSurfaceBright() {
+    return surfaceBright;
+  }
+
+  public void setSurfaceBright(int surfaceBright) {
+    this.surfaceBright = surfaceBright;
+  }
+
+  @CanIgnoreReturnValue
+  public Scheme withSurfaceBright(int surfaceBright) {
+    this.surfaceBright = surfaceBright;
+    return this;
+  }
+
+  public int getSurfaceDim() {
+    return surfaceDim;
+  }
+
+  public void setSurfaceDim(int surfaceDim) {
+    this.surfaceDim = surfaceDim;
+  }
+
+  @CanIgnoreReturnValue
+  public Scheme withSurfaceDim(int surfaceDim) {
+    this.surfaceDim = surfaceDim;
+    return this;
+  }
+
+  public int getSurfaceContainer() {
+    return surfaceContainer;
+  }
+
+  public void setSurfaceContainer(int surfaceContainer) {
+    this.surfaceContainer = surfaceContainer;
+  }
+
+  @CanIgnoreReturnValue
+  public Scheme withSurfaceContainer(int surfaceContainer) {
+    this.surfaceContainer = surfaceContainer;
+    return this;
+  }
+
+  public int getSurfaceContainerHigh() {
+    return surfaceContainerHigh;
+  }
+
+  public void setSurfaceContainerHigh(int surfaceContainerHigh) {
+    this.surfaceContainerHigh = surfaceContainerHigh;
+  }
+
+  @CanIgnoreReturnValue
+  public Scheme withSurfaceContainerHigh(int surfaceContainerHigh) {
+    this.surfaceContainerHigh = surfaceContainerHigh;
+    return this;
+  }
+
+  public int getSurfaceContainerHighest() {
+    return surfaceContainerHighest;
+  }
+
+  public void setSurfaceContainerHighest(int surfaceContainerHighest) {
+    this.surfaceContainerHighest = surfaceContainerHighest;
+  }
+
+  @CanIgnoreReturnValue
+  public Scheme withSurfaceContainerHighest(int surfaceContainerHighest) {
+    this.surfaceContainerHighest = surfaceContainerHighest;
+    return this;
+  }
+
+  public int getSurfaceContainerLow() {
+    return surfaceContainerLow;
+  }
+
+  public void setSurfaceContainerLow(int surfaceContainerLow) {
+    this.surfaceContainerLow = surfaceContainerLow;
+  }
+
+  @CanIgnoreReturnValue
+  public Scheme withSurfaceContainerLow(int surfaceContainerLow) {
+    this.surfaceContainerLow = surfaceContainerLow;
+    return this;
+  }
+
+  public int getSurfaceContainerLowest() {
+    return surfaceContainerLowest;
+  }
+
+  public void setSurfaceContainerLowest(int surfaceContainerLowest) {
+    this.surfaceContainerLowest = surfaceContainerLowest;
+  }
+
+  @CanIgnoreReturnValue
+  public Scheme withSurfaceContainerLowest(int surfaceContainerLowest) {
+    this.surfaceContainerLowest = surfaceContainerLowest;
+    return this;
+  }
+
   @Override
   public String toString() {
     return "Scheme{"
@@ -668,6 +801,20 @@ public class Scheme {
         + inverseOnSurface
         + ", inversePrimary="
         + inversePrimary
+        + ", surfaceBright="
+        + surfaceBright
+        + ", surfaceDim="
+        + surfaceDim
+        + ", surfaceContainer="
+        + surfaceContainer
+        + ", surfaceContainerHigh="
+        + surfaceContainerHigh
+        + ", surfaceContainerHighest="
+        + surfaceContainerHighest
+        + ", surfaceContainerLow="
+        + surfaceContainerLow
+        + ", surfaceContainerLowest="
+        + surfaceContainerLowest
         + '}';
   }
 
@@ -676,14 +823,12 @@ public class Scheme {
     if (this == object) {
       return true;
     }
-    if (!(object instanceof Scheme)) {
+    if (!(object instanceof Scheme scheme)) {
       return false;
     }
     if (!super.equals(object)) {
       return false;
     }
-
-    Scheme scheme = (Scheme) object;
 
     if (primary != scheme.primary) {
       return false;
@@ -772,6 +917,27 @@ public class Scheme {
     if (inversePrimary != scheme.inversePrimary) {
       return false;
     }
+    if (surfaceBright != scheme.surfaceBright) {
+      return false;
+    }
+    if (surfaceDim != scheme.surfaceDim) {
+      return false;
+    }
+    if (surfaceContainer != scheme.surfaceContainer) {
+      return false;
+    }
+    if (surfaceContainerHigh != scheme.surfaceContainerHigh) {
+      return false;
+    }
+    if (surfaceContainerHighest != scheme.surfaceContainerHighest) {
+      return false;
+    }
+    if (surfaceContainerLow != scheme.surfaceContainerLow) {
+      return false;
+    }
+    if (surfaceContainerLowest != scheme.surfaceContainerLowest) {
+      return false;
+    }
 
     return true;
   }
@@ -779,35 +945,42 @@ public class Scheme {
   @Override
   public int hashCode() {
     int result = super.hashCode();
-    result = 31 * result + primary;
-    result = 31 * result + onPrimary;
-    result = 31 * result + primaryContainer;
-    result = 31 * result + onPrimaryContainer;
-    result = 31 * result + secondary;
-    result = 31 * result + onSecondary;
-    result = 31 * result + secondaryContainer;
-    result = 31 * result + onSecondaryContainer;
-    result = 31 * result + tertiary;
-    result = 31 * result + onTertiary;
-    result = 31 * result + tertiaryContainer;
-    result = 31 * result + onTertiaryContainer;
-    result = 31 * result + error;
-    result = 31 * result + onError;
-    result = 31 * result + errorContainer;
-    result = 31 * result + onErrorContainer;
-    result = 31 * result + background;
-    result = 31 * result + onBackground;
-    result = 31 * result + surface;
-    result = 31 * result + onSurface;
-    result = 31 * result + surfaceVariant;
-    result = 31 * result + onSurfaceVariant;
-    result = 31 * result + outline;
-    result = 31 * result + outlineVariant;
-    result = 31 * result + shadow;
-    result = 31 * result + scrim;
-    result = 31 * result + inverseSurface;
-    result = 31 * result + inverseOnSurface;
-    result = 31 * result + inversePrimary;
+    result = 38 * result + primary;
+    result = 38 * result + onPrimary;
+    result = 38 * result + primaryContainer;
+    result = 38 * result + onPrimaryContainer;
+    result = 38 * result + secondary;
+    result = 38 * result + onSecondary;
+    result = 38 * result + secondaryContainer;
+    result = 38 * result + onSecondaryContainer;
+    result = 38 * result + tertiary;
+    result = 38 * result + onTertiary;
+    result = 38 * result + tertiaryContainer;
+    result = 38 * result + onTertiaryContainer;
+    result = 38 * result + error;
+    result = 38 * result + onError;
+    result = 38 * result + errorContainer;
+    result = 38 * result + onErrorContainer;
+    result = 38 * result + background;
+    result = 38 * result + onBackground;
+    result = 38 * result + surface;
+    result = 38 * result + onSurface;
+    result = 38 * result + surfaceVariant;
+    result = 38 * result + onSurfaceVariant;
+    result = 38 * result + outline;
+    result = 38 * result + outlineVariant;
+    result = 38 * result + shadow;
+    result = 38 * result + scrim;
+    result = 38 * result + inverseSurface;
+    result = 38 * result + inverseOnSurface;
+    result = 38 * result + inversePrimary;
+    result = 38 * result + surfaceBright;
+    result = 38 * result + surfaceDim;
+    result = 38 * result + surfaceContainer;
+    result = 38 * result + surfaceContainerHigh;
+    result = 38 * result + surfaceContainerHighest;
+    result = 38 * result + surfaceContainerLow;
+    result = 38 * result + surfaceContainerLowest;
     return result;
   }
 }
