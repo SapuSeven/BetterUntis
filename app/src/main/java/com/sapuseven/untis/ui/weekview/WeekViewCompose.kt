@@ -106,12 +106,20 @@ data class Event<T>(
 	var simultaneousEvents = mutableSetOf<Event<T>>()
 }
 
+data class Holiday(
+	var title: CharSequence,
+	var color: Color,
+	var textColor: Color,
+	var start: LocalDate,
+	var end: LocalDate,
+)
+
 @Composable
 fun <T> WeekViewEvent(
 	event: Event<T>,
+	modifier: Modifier = Modifier,
 	currentTime: LocalDateTime = LocalDateTime.now(),
 	innerPadding: Dp = 2.dp,
-	modifier: Modifier = Modifier,
 	onClick: (() -> Unit)? = null,
 ) {
 	val eventStyle = LocalWeekViewEventStyle.current
@@ -720,13 +728,14 @@ fun <T> WeekViewContent(
 @Composable
 fun <T> WeekViewCompose(
 	events: Map<LocalDate, List<Event<T>>>,
+	holidays: List<Holiday>,
 	weekLogicService: WeekLogicService,
 	onPageChange: suspend (pageIndex: Int) -> Unit,
 	onReload: suspend (pageIndex: Int) -> Unit,
 	onItemClick: (Pair<List<Event<T>>, Int>) -> Unit,
+	modifier: Modifier = Modifier,
 	onZoom: suspend (zoomLevel: Float) -> Unit = {},
 	currentTime: LocalDateTime = LocalDateTime.now(),
-	modifier: Modifier = Modifier,
 	eventContent: @Composable (event: Event<T>) -> Unit = { event ->
 		WeekViewEvent(
 			event = event,
@@ -870,6 +879,21 @@ fun <T> WeekViewCompose(
 						}
 					}
 
+					val holidayEvents = remember {
+						holidays.filter { holiday ->
+							visibleStartDate.isBefore(holiday.end) && visibleStartDate.plusDays(numDays.toLong()).isAfter(holiday.start)
+						}.map {
+							Event<T>(
+								title = it.title,
+								color = it.color,
+								pastColor = it.color,
+								textColor = it.textColor,
+								start = it.start.atStartOfDay(),
+								end = it.end.atTime(LocalTime.MAX),
+							)
+						}
+					}
+
 					Column(
 						modifier = Modifier
 							.pullToRefresh(
@@ -888,7 +912,7 @@ fun <T> WeekViewCompose(
 
 						WeekViewContent(
 							// Potential improvement: Map the event list by individual days to reduce the number of events passed to be rendered
-							events = events.getOrDefault(visibleStartDate, emptyList()),
+							events = events.getOrDefault(visibleStartDate, emptyList()) + holidayEvents,
 							eventContent = eventContent,
 							currentTime = currentTime,
 							startDate = visibleStartDate,

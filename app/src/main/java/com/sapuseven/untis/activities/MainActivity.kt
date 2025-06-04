@@ -76,6 +76,7 @@ class MainActivity : ComponentActivity() {
 		}
 
 		setContent {
+			// TODO: Sooo... this doesn't change the theme when the user is switched...
 			val scope = rememberCoroutineScope()
 			val userSettingsRepository = userSettingsRepositoryFactory.create(MaterialTheme.colorScheme)
 

@@ -75,6 +75,7 @@ fun Timetable(
 	val needsPersonalTimetable by viewModel.needsPersonalTimetable.collectAsStateWithLifecycle()
 	val hourList by viewModel.hourList.collectAsStateWithLifecycle()
 	val events by viewModel.events.collectAsStateWithLifecycle()
+	val holidays by viewModel.holidays.collectAsStateWithLifecycle()
 	val lastRefresh by viewModel.lastRefresh.collectAsStateWithLifecycle()
 	val weekViewColorScheme by viewModel.weekViewColorScheme.collectAsStateWithLifecycle()
 	val weekViewScale by viewModel.weekViewScale.collectAsStateWithLifecycle()
@@ -153,6 +154,7 @@ fun Timetable(
 				WeekViewStyle(weekViewEventStyle) {
 					WeekViewCompose(
 						events = events,
+						holidays = holidays,
 						weekLogicService = viewModel.weekLogicService,
 						onPageChange = { pageOffset ->
 							viewModel.onPageChange(pageOffset)

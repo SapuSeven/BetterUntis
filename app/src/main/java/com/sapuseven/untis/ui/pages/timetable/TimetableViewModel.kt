@@ -33,10 +33,10 @@ import com.sapuseven.untis.scope.UserScopeManager
 import com.sapuseven.untis.services.WeekLogicService
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
-import com.sapuseven.untis.ui.pages.settings.GlobalSettingsRepository
 import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
 import com.sapuseven.untis.ui.preferences.toPeriodElement
 import com.sapuseven.untis.ui.weekview.Event
+import com.sapuseven.untis.ui.weekview.Holiday
 import com.sapuseven.untis.ui.weekview.WeekViewColorScheme
 import com.sapuseven.untis.ui.weekview.WeekViewEventStyle
 import com.sapuseven.untis.ui.weekview.WeekViewHour
@@ -49,6 +49,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -71,7 +72,6 @@ class TimetableViewModel @AssistedInject constructor(
 	private val userDao: UserDao,
 	internal val timetableRepository: TimetableRepository,
 	internal val masterDataRepository: MasterDataRepository,
-	internal val globalSettingsRepository: GlobalSettingsRepository,
 	internal val clock: Clock,
 	internal val weekLogicService: WeekLogicService,
 	@Assisted private val colorScheme: ColorScheme,
@@ -113,6 +113,9 @@ class TimetableViewModel @AssistedInject constructor(
 
 	private val _events = MutableStateFlow<Map<LocalDate, List<Event<PeriodItem>>>>(emptyMap())
 	val events: StateFlow<Map<LocalDate, List<Event<PeriodItem>>>> = _events
+
+	private val _holidays = MutableStateFlow<List<Holiday>>(emptyList())
+	val holidays: StateFlow<List<Holiday>> = _holidays
 
 	private val _lastRefresh = MutableStateFlow<Instant?>(null)
 	val lastRefresh: StateFlow<Instant?> = _lastRefresh
@@ -178,6 +181,21 @@ class TimetableViewModel @AssistedInject constructor(
 				_weekViewZoomEnabled.value = userSettings.timetableZoomEnabled
 			}
 		}
+
+		viewModelScope.launch {
+			delay(1000) // TODO How can I get the currentUserData after it is initialized in masterDataRepository?
+			val holidays = (masterDataRepository.currentUserData?.holidays ?: emptyList())
+				.map { holiday ->
+						Holiday(
+							title = holiday.name,
+							color = Color(0xFFBB86FC),
+							textColor = Color.White,
+							start = holiday.startDate!!,
+							end = holiday.endDate!!,
+						)
+					}
+			_holidays.emit(holidays)
+		}
 	}
 
 	fun switchUser(user: User) {
@@ -207,15 +225,7 @@ class TimetableViewModel @AssistedInject constructor(
 						if (_events.value.contains(startDate)) FromCache.ONLY else FromCache.CACHED_THEN_LOAD
 					)
 						.catch(loadingExceptionHandler)
-						.collect { result ->
-							val events =
-								timetableMapper.mapTimetablePeriodsToWeekViewEvents(result.value, ElementType.STUDENT)
-							val refreshTimestamp =
-								result.originTimeStamp?.let { Instant.ofEpochMilli(it) } ?: Instant.now()
-							emitEvents(mapOf(startDate to timetableMapper.colorWeekViewTimetableEvents(events)))
-							if (targetPage == pageOffset)
-								_lastRefresh.emit(refreshTimestamp)
-						}
+						.collectEvents(startDate, targetPage == pageOffset)
 				}
 			}.awaitAll()
 			loading = false
@@ -226,12 +236,7 @@ class TimetableViewModel @AssistedInject constructor(
 		val startDate = startDateForPageIndex(pageOffset.toLong())
 		loadEvents(startDate, FromCache.NEVER)
 			.catch(loadingExceptionHandler)
-			.collect { result ->
-				val events = timetableMapper.mapTimetablePeriodsToWeekViewEvents(result.value, ElementType.STUDENT)
-				val refreshTimestamp = result.originTimeStamp?.let { Instant.ofEpochMilli(it) } ?: Instant.now()
-				emitEvents(mapOf(startDate to timetableMapper.colorWeekViewTimetableEvents(events)))
-				_lastRefresh.emit(refreshTimestamp)
-			}
+			.collectEvents(startDate)
 	}
 
 	fun onItemClick(itemsWithIndex: Pair<List<Event<PeriodItem>>, Int>) {
@@ -323,5 +328,16 @@ class TimetableViewModel @AssistedInject constructor(
 	fun showElement(element: PeriodElement?) {
 		if (requestedElement != element)
 			navigator.navigate(AppRoutes.Timetable(element))
+	}
+
+	private suspend fun Flow<CachedSourceResult<List<Period>>>.collectEvents(
+		startDate: LocalDate,
+		updateLastRefresh: Boolean = true
+	) = collect { result ->
+		val events = timetableMapper.mapTimetablePeriodsToWeekViewEvents(result.value, ElementType.STUDENT)
+		val refreshTimestamp = result.originTimeStamp?.let { Instant.ofEpochMilli(it) } ?: Instant.now()
+		emitEvents(mapOf(startDate to timetableMapper.colorWeekViewTimetableEvents(events)))
+		if (updateLastRefresh)
+			_lastRefresh.emit(refreshTimestamp)
 	}
 }
