@@ -45,7 +45,7 @@ fun MainAppContent(
 		return
 	}
 
-	// FIXME There is still one issue with this approach - since the colorScheme is injected into TimetableMapper
+	// FIXME There is still one big issue with this approach - since the colorScheme is injected into TimetableMapper
 	//  as soon as the Timetable ViewModel is created, and the settings take a while to load, the old colorScheme
 	//  is used for assisted injection.
 	//  Either find a way to dynamically update the colorScheme used for WeekView events,
