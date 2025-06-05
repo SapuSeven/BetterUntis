@@ -1,6 +1,7 @@
 package com.sapuseven.untis.ui.weekview
 
 import android.text.format.DateFormat
+import android.util.Log
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -44,6 +45,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -729,6 +731,7 @@ fun <T> WeekViewContent(
 fun <T> WeekViewCompose(
 	events: Map<LocalDate, List<Event<T>>>,
 	holidays: List<Holiday>,
+	loading: Boolean? = false,
 	weekLogicService: WeekLogicService,
 	onPageChange: suspend (pageIndex: Int) -> Unit,
 	onReload: suspend (pageIndex: Int) -> Unit,
@@ -759,7 +762,7 @@ fun <T> WeekViewCompose(
 ) {
 	val scope = rememberCoroutineScope()
 	val verticalScrollState = rememberScrollState()
-	var sidebarWidth by remember { mutableIntStateOf(0) }
+	var sidebarWidth by rememberSaveable { mutableIntStateOf(0) }
 	var headerHeight by remember { mutableIntStateOf(0) }
 	var contentHeight by remember { mutableIntStateOf(0) }
 
@@ -842,7 +845,11 @@ fun <T> WeekViewCompose(
 				hourHeight = hourHeight * scale,
 				hourList = hourList,
 				modifier = Modifier
-					.onGloballyPositioned { sidebarWidth = it.size.width }
+					.onGloballyPositioned {
+						Log.d("WeekViewCompose", "Sidebar width: ${it.size.width}")
+						if (it.size.width > 0)
+							sidebarWidth = it.size.width
+					}
 					.verticalScroll(verticalScrollState)
 					.padding(bottom = endTimeOffset)
 			)
@@ -904,7 +911,7 @@ fun <T> WeekViewCompose(
 							)
 					) {
 						WeekViewPullRefreshIndicator(
-							refreshing = isRefreshing,
+							refreshing = loading ?: isRefreshing,
 							state = pullRefreshState,
 							modifier = Modifier
 								.fillMaxWidth()
@@ -979,8 +986,16 @@ data class WeekViewColorScheme(
 	val indicatorColor: Color
 ) {
 	companion object {
-		@Composable
-		fun default(): WeekViewColorScheme = default(MaterialTheme.colorScheme)
+		//@Composable
+		//fun default(): WeekViewColorScheme = default(MaterialTheme.colorScheme)
+		fun default(): WeekViewColorScheme {
+			return WeekViewColorScheme(
+				dividerColor = Color.White,
+				pastBackgroundColor = Color(0x40808080),
+				futureBackgroundColor = Color.Transparent,
+				indicatorColor = Color.White
+			)
+		}
 
 		fun default(colorScheme: ColorScheme): WeekViewColorScheme {
 			return WeekViewColorScheme(

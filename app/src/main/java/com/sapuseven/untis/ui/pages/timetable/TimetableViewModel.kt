@@ -2,14 +2,10 @@ package com.sapuseven.untis.ui.pages.timetable
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.Typography
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -40,9 +36,6 @@ import com.sapuseven.untis.ui.weekview.WeekViewHour
 import com.sapuseven.untis.ui.weekview.startDateForPageIndex
 import crocodile8.universal_cache.CachedSourceResult
 import crocodile8.universal_cache.FromCache
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -55,33 +48,31 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
+import javax.inject.Inject
 
-@HiltViewModel(assistedFactory = TimetableViewModel.Factory::class)
-class TimetableViewModel @AssistedInject constructor(
+@HiltViewModel
+class TimetableViewModel @Inject constructor(
 	private val navigator: AppNavigator,
+	private val userSettingsRepository: UserSettingsRepository,
 	internal val userRepository: UserRepository,
 	internal val timetableRepository: TimetableRepository,
 	internal val masterDataRepository: MasterDataRepository,
 	internal val clock: Clock,
 	internal val weekLogicService: WeekLogicService,
-	@Assisted private val colorScheme: ColorScheme,
-	@Assisted private val typography: Typography,
+	//@Assisted internal val currentUser: User,
+	//@Assisted private val colorScheme: ColorScheme,
+	//@Assisted private val typography: Typography,
 	buildConfigFieldsProvider: BuildConfigFieldsProvider,
-	private val userSettingsRepository: UserSettingsRepository,
 	timetableMapperFactory: TimetableMapper.Factory,
 	savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-	@AssistedFactory
-	interface Factory {
-		fun create(colorScheme: ColorScheme, typography: Typography): TimetableViewModel
-	}
-
-	private val timetableMapper = timetableMapperFactory.create(colorScheme)
+	private val timetableMapper = timetableMapperFactory.create()
 
 	private val args = savedStateHandle.toRoute<AppRoutes.Timetable>()
 
@@ -114,7 +105,7 @@ class TimetableViewModel @AssistedInject constructor(
 	private val _lastRefresh = MutableStateFlow<Instant?>(null)
 	val lastRefresh: StateFlow<Instant?> = _lastRefresh
 
-	private val _weekViewColorScheme = MutableStateFlow(WeekViewColorScheme.default(colorScheme))
+	private val _weekViewColorScheme = MutableStateFlow(WeekViewColorScheme.default())
 	val weekViewColorScheme: StateFlow<WeekViewColorScheme> = _weekViewColorScheme
 
 	private val _weekViewScale = MutableStateFlow(1f)
@@ -123,8 +114,22 @@ class TimetableViewModel @AssistedInject constructor(
 	private val _weekViewZoomEnabled = MutableStateFlow(true)
 	val weekViewZoomEnabled: StateFlow<Boolean> = _weekViewZoomEnabled
 
-	private val _weekViewEventStyle = MutableStateFlow(WeekViewEventStyle.default(typography))
+	private val _weekViewEventStyle = MutableStateFlow(WeekViewEventStyle.default())
 	val weekViewEventStyle: StateFlow<WeekViewEventStyle> = _weekViewEventStyle
+
+	private val _userSettings = userSettingsRepository.getSettings()
+
+	private val _ready = combine(
+		_hourList,
+		_userSettings
+	) { hourList, userSettings ->
+		hourList.isNotEmpty()
+	}
+	val ready: StateFlow<Boolean> = _ready.stateIn(
+		scope = viewModelScope,
+		started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000),
+		initialValue = false
+	)
 
 	private var currentPage = 0
 
@@ -135,7 +140,7 @@ class TimetableViewModel @AssistedInject constructor(
 
 	init {
 		viewModelScope.launch {
-			userSettingsRepository.getSettings().collect { userSettings ->
+			_userSettings.collect { userSettings ->
 				// All properties that are based on preferences are set here
 				userSettings.timetablePersonalTimetable?.toPeriodElement()?.let {
 					_personalElement.value = it
@@ -152,7 +157,7 @@ class TimetableViewModel @AssistedInject constructor(
 					range = userSettings.timetableRange.convertRangeToPair(),
 					rangeIndexReset = userSettings.timetableRangeIndexReset
 				)
-				_weekViewColorScheme.value = WeekViewColorScheme(
+				/*_weekViewColorScheme.value = WeekViewColorScheme(
 					dividerColor = colorScheme.outline,
 					pastBackgroundColor = Color(userSettings.backgroundPast),
 					futureBackgroundColor = Color(userSettings.backgroundFuture),
@@ -167,14 +172,14 @@ class TimetableViewModel @AssistedInject constructor(
 					),
 					lessonInfoStyle = typography.bodySmall.copy(fontSize = userSettings.timetableLessonInfoFontSize.sp),
 					lessonInfoCentered = userSettings.timetableCenteredLessonInfo,
-				)
+				)*/
 				_weekViewScale.value = userSettings.timetableZoomLevel
 				_weekViewZoomEnabled.value = userSettings.timetableZoomEnabled
 			}
 		}
 
 		viewModelScope.launch {
-			delay(1000) // TODO How can I get the currentUserData after it is initialized in masterDataRepository?
+			delay(1000) // FIXME How can I get the currentUserData after it is initialized in masterDataRepository?
 			val holidays = (masterDataRepository.userData?.holidays ?: emptyList())
 				.map { holiday ->
 						Holiday(
@@ -318,7 +323,11 @@ class TimetableViewModel @AssistedInject constructor(
 
 	fun showElement(element: PeriodElement?) {
 		if (requestedElement != element)
-			navigator.navigate(AppRoutes.Timetable(element))
+			navigator.navigate(AppRoutes.Timetable(element)) {
+				if (element == null) {
+					popUpTo(0)
+				}
+			}
 	}
 
 	private suspend fun Flow<CachedSourceResult<List<Period>>>.collectEvents(

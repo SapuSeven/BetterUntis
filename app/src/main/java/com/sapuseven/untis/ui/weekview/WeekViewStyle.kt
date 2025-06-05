@@ -16,6 +16,14 @@ data class WeekViewEventStyle(
 	val lessonInfoCentered: Boolean,
 ) {
 	companion object {
+		fun default(): WeekViewEventStyle = WeekViewEventStyle(
+			padding = 2,
+			cornerRadius = 4,
+			lessonNameStyle = TextStyle.Default.copy(fontWeight = FontWeight.Bold),
+			lessonInfoStyle = TextStyle.Default,
+			lessonInfoCentered = false,
+		)
+
 		fun default(typography: Typography): WeekViewEventStyle = WeekViewEventStyle(
 			padding = 2,
 			cornerRadius = 4,
