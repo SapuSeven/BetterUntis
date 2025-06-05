@@ -7,7 +7,7 @@ import androidx.work.Configuration
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.sapuseven.untis.helpers.analytics.initSentry
-import com.sapuseven.untis.ui.pages.settings.GlobalSettingsRepository
+import com.sapuseven.untis.data.repository.GlobalSettingsRepository
 import com.sapuseven.untis.workers.DailyWorker
 import com.sapuseven.untis.workers.DailyWorker.Companion.TAG_DAILY_WORK
 import dagger.hilt.android.HiltAndroidApp

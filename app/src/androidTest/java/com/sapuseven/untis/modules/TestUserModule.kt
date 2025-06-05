@@ -22,7 +22,7 @@ import com.sapuseven.untis.data.database.entities.TeachingMethodEntity
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.data.database.entities.UserWithData
-import com.sapuseven.untis.scope.UserScopeManager
+import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.ui.pages.login.datainput.DEMO_API_URL
 import com.sapuseven.untis.utils.SCREENSHOT_PROFILE_NAME
 import dagger.Module

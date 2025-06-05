@@ -28,10 +28,10 @@ fun SettingsCategoryTimetable(viewModel: SettingsScreenViewModel) {
 				contentDescription = null
 			)
 		},
-		settingsRepository = viewModel.repository,
+		settingsRepository = viewModel.userSettingsRepository,
 		value = { it.timetablePersonalTimetable },
 		onValueChange = { timetablePersonalTimetable = it },
-		elementPicker = viewModel.elementPicker,
+		masterDataRepository = viewModel.masterDataRepository,
 		highlight = args.highlightTitle == R.string.preference_timetable_personal_timetable,
 	)
 
@@ -44,7 +44,7 @@ fun SettingsCategoryTimetable(viewModel: SettingsScreenViewModel) {
 				contentDescription = null
 			)
 		},
-		settingsRepository = viewModel.repository,
+		settingsRepository = viewModel.userSettingsRepository,
 		value = { it.timetableHideTimeStamps },
 		onValueChange = { timetableHideTimeStamps = it }
 	)
@@ -57,7 +57,7 @@ fun SettingsCategoryTimetable(viewModel: SettingsScreenViewModel) {
 				contentDescription = null
 			)
 		},
-		settingsRepository = viewModel.repository,
+		settingsRepository = viewModel.userSettingsRepository,
 		value = { it.timetableHideCancelled },
 		onValueChange = { timetableHideCancelled = it }
 	)
@@ -71,7 +71,7 @@ fun SettingsCategoryTimetable(viewModel: SettingsScreenViewModel) {
 				contentDescription = null
 			)
 		},
-		settingsRepository = viewModel.repository,
+		settingsRepository = viewModel.userSettingsRepository,
 		value = { it.timetableSubstitutionsIrregular },
 		onValueChange = { timetableSubstitutionsIrregular = it }
 	)
@@ -84,7 +84,7 @@ fun SettingsCategoryTimetable(viewModel: SettingsScreenViewModel) {
 				contentDescription = null
 			)
 		},
-		settingsRepository = viewModel.repository,
+		settingsRepository = viewModel.userSettingsRepository,
 		value = { it.timetableZoomEnabled },
 		onValueChange = { timetableZoomEnabled = it }
 	)
@@ -98,7 +98,7 @@ fun SettingsCategoryTimetable(viewModel: SettingsScreenViewModel) {
 			)
 		},
 		unit = "%",
-		settingsRepository = viewModel.repository,
+		settingsRepository = viewModel.userSettingsRepository,
 		value = { (it.timetableZoomLevel * 100).roundToInt().coerceIn(75, 200) },
 		onValueChange = { timetableZoomLevel = it.coerceIn(75, 200) / 100f }
 	)
@@ -128,7 +128,7 @@ fun SettingsCategoryTimetable(viewModel: SettingsScreenViewModel) {
 					contentDescription = null
 				)
 			},
-			settingsRepository = viewModel.repository,
+			settingsRepository = viewModel.userSettingsRepository,
 			value = { it.timetableRange },
 			onValueChange = { timetableRange = it }
 		)
@@ -142,7 +142,7 @@ fun SettingsCategoryTimetable(viewModel: SettingsScreenViewModel) {
 					contentDescription = null
 				)
 			},
-			settingsRepository = viewModel.repository,
+			settingsRepository = viewModel.userSettingsRepository,
 			value = { it.timetableRangeIndexReset },
 			onValueChange = { timetableRangeIndexReset = it }
 		)
@@ -164,7 +164,7 @@ fun SettingsCategoryTimetable(viewModel: SettingsScreenViewModel) {
 				)
 			},
 			unit = "dp",
-			settingsRepository = viewModel.repository,
+			settingsRepository = viewModel.userSettingsRepository,
 			value = { it.timetableItemPadding },
 			onValueChange = { timetableItemPadding = it }
 		)
@@ -178,7 +178,7 @@ fun SettingsCategoryTimetable(viewModel: SettingsScreenViewModel) {
 				)
 			},
 			unit = "dp",
-			settingsRepository = viewModel.repository,
+			settingsRepository = viewModel.userSettingsRepository,
 			value = { it.timetableItemCornerRadius },
 			onValueChange = { timetableItemCornerRadius = it }
 		)
@@ -193,7 +193,7 @@ fun SettingsCategoryTimetable(viewModel: SettingsScreenViewModel) {
 					contentDescription = null
 				)
 			},
-			settingsRepository = viewModel.repository,
+			settingsRepository = viewModel.userSettingsRepository,
 			value = { it.timetableCenteredLessonInfo },
 			onValueChange = { timetableCenteredLessonInfo = it }
 		)
@@ -206,7 +206,7 @@ fun SettingsCategoryTimetable(viewModel: SettingsScreenViewModel) {
 					contentDescription = null
 				)
 			},
-			settingsRepository = viewModel.repository,
+			settingsRepository = viewModel.userSettingsRepository,
 			value = { it.timetableBoldLessonName },
 			onValueChange = { timetableBoldLessonName = it }
 		)
@@ -220,7 +220,7 @@ fun SettingsCategoryTimetable(viewModel: SettingsScreenViewModel) {
 				)
 			},
 			unit = "sp",
-			settingsRepository = viewModel.repository,
+			settingsRepository = viewModel.userSettingsRepository,
 			value = { it.timetableLessonNameFontSize },
 			onValueChange = { timetableLessonNameFontSize = it }
 		)
@@ -234,7 +234,7 @@ fun SettingsCategoryTimetable(viewModel: SettingsScreenViewModel) {
 				)
 			},
 			unit = "sp",
-			settingsRepository = viewModel.repository,
+			settingsRepository = viewModel.userSettingsRepository,
 			value = { it.timetableLessonInfoFontSize },
 			onValueChange = { timetableLessonInfoFontSize = it }
 		)

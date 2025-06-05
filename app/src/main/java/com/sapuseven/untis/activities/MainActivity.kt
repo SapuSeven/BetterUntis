@@ -1,42 +1,20 @@
 package com.sapuseven.untis.activities
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import com.sapuseven.untis.components.UserManager
-import com.sapuseven.untis.components.UserState
-import com.sapuseven.untis.helpers.AppTheme
-import com.sapuseven.untis.helpers.ThemeMode
-import com.sapuseven.untis.scope.UserScopeManager
-import com.sapuseven.untis.ui.common.ReportsInfoBottomSheet
-import com.sapuseven.untis.ui.navigation.AppNavHost
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
-import com.sapuseven.untis.ui.pages.settings.GlobalSettingsRepository
-import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
+import com.sapuseven.untis.ui.pages.main.MainAppContent
+import com.sapuseven.untis.ui.pages.main.MainViewModel
+import com.sapuseven.untis.data.repository.GlobalSettingsRepository
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -51,23 +29,39 @@ class MainActivity : ComponentActivity() {
 	lateinit var globalSettingsRepository: GlobalSettingsRepository
 
 	@Inject
-	lateinit var userSettingsRepositoryFactory: UserSettingsRepository.Factory
-
-	@Inject
 	lateinit var appNavigator: AppNavigator
 
-	@Inject
-	lateinit var userManager: UserManager
-
-	@Inject
-	lateinit var userScopeManager: UserScopeManager
-
-	@OptIn(ExperimentalMaterial3Api::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		enableEdgeToEdge()
 		super.onCreate(savedInstanceState)
 
-		val action: String? = intent?.action
+		// Handle deep link (login data) BEFORE you setContent
+		handleIntent(intent)
+
+		setContent {
+			// ViewModel (or other injector) that exposes current userState + settings
+			val viewModel: MainViewModel = hiltViewModel()
+			val userState by viewModel.userState.collectAsState()
+			val currentIntentData by viewModel.pendingIntentData.collectAsState()
+
+			// If there was a “loginData” in the Intent, navigate once:
+			LaunchedEffect(currentIntentData) {
+				currentIntentData?.let { dataString ->
+					// send this into your NavController or AppNavigator
+					viewModel.consumeIntentData()
+					viewModel.appNavigator.navigate(AppRoutes.LoginDataInput(autoLoginData = dataString))
+				}
+			}
+
+			MainAppContent(
+				userState = userState,
+				globalSettingsRepository = globalSettingsRepository,
+				settingsFlow = viewModel.userSettingsFlow,
+				navigator = viewModel.appNavigator
+			)
+		}
+
+		/*val action: String? = intent?.action
 		val data: Uri? = intent?.data
 		when {
 			Intent.ACTION_VIEW == action && data?.host == "setschool" -> {
@@ -111,7 +105,7 @@ class MainActivity : ComponentActivity() {
 				Surface(
 					modifier = Modifier.fillMaxSize()
 				) {
-					val userState by userManager.userState.collectAsState()
+					val userState by userRepository.userState.collectAsState()
 
 					when (userState) {
 						is UserState.Loading -> Box(
@@ -149,6 +143,20 @@ class MainActivity : ComponentActivity() {
 						}
 					}
 				}
+			}
+		}*/
+	}
+
+
+	override fun onNewIntent(intent: Intent) {
+		super.onNewIntent(intent)
+		handleIntent(intent)
+	}
+
+	private fun handleIntent(intent: Intent) {
+		when {
+			Intent.ACTION_VIEW == intent.action && intent.data?.host == "setschool" -> {
+				appNavigator.navigate(AppRoutes.LoginDataInput(autoLoginData = intent.data.toString()))
 			}
 		}
 	}

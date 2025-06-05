@@ -20,20 +20,17 @@ import com.sapuseven.untis.api.exception.UntisApiException
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.Period
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
-import com.sapuseven.untis.components.BuildConfigFieldsProvider
-import com.sapuseven.untis.components.ElementPicker
-import com.sapuseven.untis.components.UserManager
 import com.sapuseven.untis.data.database.entities.User
-import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.data.repository.TimetableRepository
+import com.sapuseven.untis.data.repository.UserRepository
+import com.sapuseven.untis.data.repository.UserSettingsRepository
+import com.sapuseven.untis.helpers.BuildConfigFieldsProvider
 import com.sapuseven.untis.mappers.TimetableMapper
 import com.sapuseven.untis.models.PeriodItem
-import com.sapuseven.untis.scope.UserScopeManager
 import com.sapuseven.untis.services.WeekLogicService
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
-import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
 import com.sapuseven.untis.ui.preferences.toPeriodElement
 import com.sapuseven.untis.ui.weekview.Event
 import com.sapuseven.untis.ui.weekview.Holiday
@@ -67,9 +64,7 @@ import java.time.LocalDate
 @HiltViewModel(assistedFactory = TimetableViewModel.Factory::class)
 class TimetableViewModel @AssistedInject constructor(
 	private val navigator: AppNavigator,
-	internal val userManager: UserManager,
-	private val userScopeManager: UserScopeManager,
-	private val userDao: UserDao,
+	internal val userRepository: UserRepository,
 	internal val timetableRepository: TimetableRepository,
 	internal val masterDataRepository: MasterDataRepository,
 	internal val clock: Clock,
@@ -77,7 +72,7 @@ class TimetableViewModel @AssistedInject constructor(
 	@Assisted private val colorScheme: ColorScheme,
 	@Assisted private val typography: Typography,
 	buildConfigFieldsProvider: BuildConfigFieldsProvider,
-	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
+	private val userSettingsRepository: UserSettingsRepository,
 	timetableMapperFactory: TimetableMapper.Factory,
 	savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -87,7 +82,6 @@ class TimetableViewModel @AssistedInject constructor(
 	}
 
 	private val timetableMapper = timetableMapperFactory.create(colorScheme)
-	private val userSettingsRepository = userSettingsRepositoryFactory.create(colorScheme)
 
 	private val args = savedStateHandle.toRoute<AppRoutes.Timetable>()
 
@@ -98,8 +92,8 @@ class TimetableViewModel @AssistedInject constructor(
 	var feedbackDialog by mutableStateOf(false)
 	var loading by mutableStateOf(true)
 
-	val currentUser: User = userScopeManager.user
-	val allUsersState: StateFlow<List<User>> = userManager.allUsersState
+	val currentUser: User = userRepository.currentUser!!
+	val allUsersState: StateFlow<List<User>> = userRepository.allUsersState
 
 	val isDebug = buildConfigFieldsProvider.get().isDebug
 
@@ -133,9 +127,6 @@ class TimetableViewModel @AssistedInject constructor(
 	val weekViewEventStyle: StateFlow<WeekViewEventStyle> = _weekViewEventStyle
 
 	private var currentPage = 0
-
-	val elementPicker: ElementPicker
-		get() = ElementPicker(userScopeManager.user, userDao)
 
 	private val loadingExceptionHandler: suspend FlowCollector<*>.(Throwable) -> Unit = { throwable ->
 		val message = if (throwable is UntisApiException) "API error" else "other error"
@@ -184,7 +175,7 @@ class TimetableViewModel @AssistedInject constructor(
 
 		viewModelScope.launch {
 			delay(1000) // TODO How can I get the currentUserData after it is initialized in masterDataRepository?
-			val holidays = (masterDataRepository.currentUserData?.holidays ?: emptyList())
+			val holidays = (masterDataRepository.userData?.holidays ?: emptyList())
 				.map { holiday ->
 						Holiday(
 							title = holiday.name,
@@ -199,7 +190,7 @@ class TimetableViewModel @AssistedInject constructor(
 	}
 
 	fun switchUser(user: User) {
-		userManager.switchUser(user)
+		userRepository.switchUser(user)
 	}
 
 	fun editUser(user: User?) {

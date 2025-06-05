@@ -122,7 +122,7 @@ fun TimetableItemDetailsDialog(
 		val periods = periodItems.map { it.originalPeriod }.toSet()
 		Log.d("TimetableItemDetailsDlg", "Fetching period data for ${periods.map { it.id }}")
 		timetableRepository.periodDataSource()
-			.get(periods, FromCache.IF_FAILED, additionalKey = masterDataRepository.currentUser)
+			.get(periods, FromCache.IF_FAILED, additionalKey = masterDataRepository.user)
 			.catch {
 				//error = it
 			}

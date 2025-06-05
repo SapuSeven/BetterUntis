@@ -11,8 +11,6 @@ import com.sapuseven.untis.api.model.untis.classreg.HomeWork
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.OfficeHour
 import com.sapuseven.untis.data.cache.DiskCache
-import com.sapuseven.untis.data.database.entities.User
-import com.sapuseven.untis.scope.UserScopeManager
 import crocodile8.universal_cache.CachedSource
 import crocodile8.universal_cache.time.TimeProvider
 import kotlinx.serialization.serializer
@@ -53,17 +51,17 @@ interface InfoCenterRepository {
 }
 
 class UntisInfoCenterRepository @Inject constructor(
+	private val userRepository: UserRepository,
 	private val messagesApi: MessagesApi,
 	private val classRegApi: ClassRegApi,
 	private val absenceApi: AbsenceApi,
 	private val officeHoursApi: OfficeHoursApi,
 	@Named("cacheDir") private val cacheDir: File,
 	private val timeProvider: TimeProvider,
-	userScopeManager: UserScopeManager
 ) : InfoCenterRepository {
-	private val user: User = userScopeManager.user
 
 	override fun messagesOfDaySource(): CachedSource<LocalDate, List<MessageOfDay>> {
+		val user = userRepository.currentUser!!
 		return CachedSource(
 			source = { params ->
 				messagesApi.getMessagesOfDay(
@@ -79,6 +77,7 @@ class UntisInfoCenterRepository @Inject constructor(
 	}
 
 	override fun examsSource(): CachedSource<InfoCenterRepository.EventsParams, List<Exam>> {
+		val user = userRepository.currentUser!!
 		return CachedSource(
 			source = { params ->
 				classRegApi.getExams(
@@ -97,6 +96,7 @@ class UntisInfoCenterRepository @Inject constructor(
 	}
 
 	override fun homeworkSource(): CachedSource<InfoCenterRepository.EventsParams, List<HomeWork>> {
+		val user = userRepository.currentUser!!
 		return CachedSource(
 			source = { params ->
 				classRegApi.getHomework(
@@ -115,6 +115,7 @@ class UntisInfoCenterRepository @Inject constructor(
 	}
 
 	override fun absencesSource(): CachedSource<InfoCenterRepository.AbsencesParams, List<StudentAbsence>> {
+		val user = userRepository.currentUser!!
 		return CachedSource(
 			source = { params ->
 				absenceApi.getStudentAbsences(
@@ -133,6 +134,7 @@ class UntisInfoCenterRepository @Inject constructor(
 	}
 
 	override fun officeHoursSource(): CachedSource<InfoCenterRepository.OfficeHoursParams, List<OfficeHour>> {
+		val user = userRepository.currentUser!!
 		return CachedSource(
 			source = { params ->
 				officeHoursApi.getOfficeHours(

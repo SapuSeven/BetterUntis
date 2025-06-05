@@ -6,8 +6,6 @@ import androidx.room.Index
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.masterdata.EventReason
 import com.sapuseven.untis.data.database.Mapper
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 @Entity(
 	tableName = "EventReason",

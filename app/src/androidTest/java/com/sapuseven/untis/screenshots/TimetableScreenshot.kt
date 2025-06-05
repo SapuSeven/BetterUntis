@@ -13,6 +13,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.sapuseven.compose.protostore.ui.preferences.materialColors
 import com.sapuseven.untis.activities.MainActivity
 import com.sapuseven.untis.api.client.UserDataApi
+import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.data.settings.model.Settings
 import com.sapuseven.untis.modules.FakeUserModule.MOCK_USER_ID

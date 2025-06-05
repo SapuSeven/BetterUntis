@@ -21,7 +21,7 @@ import com.sapuseven.untis.api.model.response.UserDataResult
 import com.sapuseven.untis.api.model.untis.MasterData
 import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.api.model.untis.masterdata.TimeGrid
-import com.sapuseven.untis.components.UserManager
+import com.sapuseven.untis.data.repository.UserRepository
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
@@ -45,7 +45,7 @@ class LoginDataInputViewModel @Inject constructor(
 	private val schoolSearchApi: SchoolSearchApi,
 	private val userDataApi: UserDataApi,
 	private val navigator: AppNavigator,
-	private val userManager: UserManager,
+	private val userRepository: UserRepository,
 	private val codeScanService: CodeScanService,
 	savedStateHandle: SavedStateHandle
 ) : ActivityViewModel() {
@@ -192,7 +192,7 @@ class LoginDataInputViewModel @Inject constructor(
 
 			withContext(Dispatchers.IO) {
 				val userId = saveUser(user, userData.masterData)
-				userManager.switchUser(userId)
+				userRepository.switchUser(userId)
 				navigator.navigate(AppRoutes.Timetable()) {
 					popUpTo(0) // Pop all previous routes
 				}

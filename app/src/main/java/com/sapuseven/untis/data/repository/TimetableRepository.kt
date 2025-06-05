@@ -6,9 +6,7 @@ import com.sapuseven.untis.api.model.untis.absence.StudentAbsence
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.Period
 import com.sapuseven.untis.data.cache.DiskCache
-import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
-import com.sapuseven.untis.scope.UserScopeManager
 import crocodile8.universal_cache.CachedSource
 import crocodile8.universal_cache.time.TimeProvider
 import kotlinx.serialization.serializer
@@ -41,15 +39,14 @@ interface TimetableRepository {
 }
 
 class UntisTimetableRepository @Inject constructor(
+	private val userRepository: UserRepository,
 	private val api: TimetableApi,
 	@Named("cacheDir") private val cacheDir: File,
 	private val timeProvider: TimeProvider,
 	private val userDao: UserDao,
-	userScopeManager: UserScopeManager
 ) : TimetableRepository {
-	private val user: User = userScopeManager.user
-
 	override fun timetableSource(): CachedSource<TimetableRepository.TimetableParams, List<Period>> {
+		val user = userRepository.currentUser!!
 		return CachedSource(
 			source = { params ->
 				val timetableResponse = api.getTimetable(
@@ -71,6 +68,7 @@ class UntisTimetableRepository @Inject constructor(
 	}
 
 	override fun periodDataSource(): CachedSource<Set<Period>, PeriodDataResult> {
+		val user = userRepository.currentUser!!
 		return CachedSource(
 			source = { params ->
 				api.getPeriodData(
@@ -85,18 +83,22 @@ class UntisTimetableRepository @Inject constructor(
 		)
 	}
 
-	override suspend fun postLessonTopic(periodId: Long, lessonTopic: String) = runCatching {
-		api.postLessonTopic(
-			periodId = periodId,
-			lessonTopic = lessonTopic,
-			apiUrl = user.apiUrl,
-			user = user.user,
-			key = user.key
-		)
+	override suspend fun postLessonTopic(periodId: Long, lessonTopic: String): Result<Boolean> {
+		val user = userRepository.currentUser!!
+		return runCatching {
+			api.postLessonTopic(
+				periodId = periodId,
+				lessonTopic = lessonTopic,
+				apiUrl = user.apiUrl,
+				user = user.user,
+				key = user.key
+			)
+		}
 	}
 
-	override suspend fun postAbsence(periodId: Long, studentId: Long, startTime: LocalTime, endTime: LocalTime) =
-		runCatching {
+	override suspend fun postAbsence(periodId: Long, studentId: Long, startTime: LocalTime, endTime: LocalTime): Result<List<StudentAbsence>> {
+		val user = userRepository.currentUser!!
+		return runCatching {
 			api.postAbsence(
 				periodId = periodId,
 				studentId = studentId,
@@ -107,16 +109,23 @@ class UntisTimetableRepository @Inject constructor(
 				key = user.key
 			)
 		}
-
-	override suspend fun deleteAbsence(absenceId: Long) = runCatching {
-		api.deleteAbsence(
-			absenceId = absenceId, apiUrl = user.apiUrl, user = user.user, key = user.key
-		)
 	}
 
-	override suspend fun postAbsencesChecked(periodIds: Set<Long>) = runCatching {
-		api.postAbsencesChecked(
-			periodIds = periodIds, apiUrl = user.apiUrl, user = user.user, key = user.key
-		)
+	override suspend fun deleteAbsence(absenceId: Long): Result<Boolean> {
+		val user = userRepository.currentUser!!
+		return runCatching {
+			api.deleteAbsence(
+				absenceId = absenceId, apiUrl = user.apiUrl, user = user.user, key = user.key
+			)
+		}
+	}
+
+	override suspend fun postAbsencesChecked(periodIds: Set<Long>): Result<Unit> {
+		val user = userRepository.currentUser!!
+		return runCatching {
+			api.postAbsencesChecked(
+				periodIds = periodIds, apiUrl = user.apiUrl, user = user.user, key = user.key
+			)
+		}
 	}
 }

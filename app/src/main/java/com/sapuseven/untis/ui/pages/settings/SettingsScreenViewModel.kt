@@ -5,11 +5,12 @@ import androidx.compose.material3.ColorScheme
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sapuseven.untis.components.ElementPicker
-import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.data.model.github.GitHubApi.URL_GITHUB_REPOSITORY_API
 import com.sapuseven.untis.data.model.github.GitHubUser
-import com.sapuseven.untis.scope.UserScopeManager
+import com.sapuseven.untis.data.repository.GlobalSettingsRepository
+import com.sapuseven.untis.data.repository.MasterDataRepository
+import com.sapuseven.untis.data.repository.UserRepository
+import com.sapuseven.untis.data.repository.UserSettingsRepository
 import com.sapuseven.untis.services.AutoMuteService
 import com.sapuseven.untis.services.AutoMuteServiceZenRuleImpl
 import dagger.assisted.Assisted
@@ -27,10 +28,10 @@ import javax.inject.Named
 @SuppressLint("NewApi")
 @HiltViewModel(assistedFactory = SettingsScreenViewModel.Factory::class)
 class SettingsScreenViewModel @AssistedInject constructor(
-	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
+	val userSettingsRepository: UserSettingsRepository,
 	globalSettingsRepository: GlobalSettingsRepository,
-	private val userScopeManager: UserScopeManager,
-	private val userDao: UserDao,
+	internal val masterDataRepository: MasterDataRepository,
+	userRepository: UserRepository,
 	val autoMuteService: AutoMuteService,
 	@Named("json") private val httpClient: HttpClient,
 	val savedStateHandle: SavedStateHandle,
@@ -43,11 +44,10 @@ class SettingsScreenViewModel @AssistedInject constructor(
 
 	init {
 		if (autoMuteService is AutoMuteServiceZenRuleImpl) {
-			autoMuteService.setUser(userScopeManager.user)
+			autoMuteService.setUser(userRepository.currentUser!!)
 		}
 	}
 
-	val repository = userSettingsRepositoryFactory.create(colorScheme)
 	val globalRepository = globalSettingsRepository
 
 	private val _contributors = MutableStateFlow<List<GitHubUser>>(emptyList())
@@ -56,21 +56,16 @@ class SettingsScreenViewModel @AssistedInject constructor(
 	private val _contributorsError = MutableStateFlow<Throwable?>(null)
 	val contributorsError: StateFlow<Throwable?> = _contributorsError
 
-	val elementPicker: ElementPicker
-		get() = ElementPicker(userScopeManager.user, userDao)
-
 	fun resetColors() = viewModelScope.launch {
-		repository.getSettingsDefaults().let { defaults ->
-			repository.updateSettings {
-				backgroundRegular = defaults.backgroundRegular
-				backgroundRegularPast = defaults.backgroundRegularPast
-				backgroundExam = defaults.backgroundExam
-				backgroundExamPast = defaults.backgroundExamPast
-				backgroundIrregular = defaults.backgroundIrregular
-				backgroundIrregularPast = defaults.backgroundIrregularPast
-				backgroundCancelled = defaults.backgroundCancelled
-				backgroundCancelledPast = defaults.backgroundCancelledPast
-			}
+		userSettingsRepository.updateSettings {
+			clearBackgroundRegular()
+			clearBackgroundRegularPast()
+			clearBackgroundExam()
+			clearBackgroundExamPast()
+			clearBackgroundIrregular()
+			clearBackgroundIrregularPast()
+			clearBackgroundCancelled()
+			clearBackgroundCancelledPast()
 		}
 	}
 

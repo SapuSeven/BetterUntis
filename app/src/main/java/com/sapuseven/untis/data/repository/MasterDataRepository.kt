@@ -12,20 +12,27 @@ import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.data.database.entities.UserWithData
 import com.sapuseven.untis.models.PeriodItem.Companion.ELEMENT_NAME_UNKNOWN
-import com.sapuseven.untis.scope.UserScopeManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
 interface MasterDataRepository {
-	val currentUser: User?
-	val currentUserData: UserWithData?
+	val user: User?
+	val userData: UserWithData?
+
+	val allClasses: StateFlow<List<PeriodElement>>
+	val allTeachers: StateFlow<List<PeriodElement>>
+	val allSubjects: StateFlow<List<PeriodElement>>
+	val allRooms: StateFlow<List<PeriodElement>>
 
 	fun getShortName(id: Long, type: ElementType? = null, default: String = ELEMENT_NAME_UNKNOWN): String
 	fun getShortName(periodElement: PeriodElement, default: String = ELEMENT_NAME_UNKNOWN): String
@@ -39,48 +46,68 @@ interface MasterDataRepository {
 
 @Singleton
 class DefaultMasterDataRepository : MasterDataRepository {
-	override val currentUser: User? = null
-	override val currentUserData: UserWithData? = null
+	override val user: User? = null
+	override val userData: UserWithData? = null
+
+	override val allClasses: StateFlow<List<PeriodElement>> = MutableStateFlow(emptyList())
+	override val allTeachers: StateFlow<List<PeriodElement>> = MutableStateFlow(emptyList())
+	override val allSubjects: StateFlow<List<PeriodElement>> = MutableStateFlow(emptyList())
+	override val allRooms: StateFlow<List<PeriodElement>> = MutableStateFlow(emptyList())
 
 	override fun getShortName(id: Long, type: ElementType?, default: String): String = "$type:$id"
-	override fun getShortName(periodElement: PeriodElement, default: String) =
-		getShortName(periodElement.id, periodElement.type, default)
+	override fun getShortName(periodElement: PeriodElement, default: String) = getShortName(periodElement.id, periodElement.type, default)
 
 	override fun getLongName(id: Long, type: ElementType, default: String): String = "$type:$id"
-	override fun getLongName(periodElement: PeriodElement, default: String) =
-		getLongName(periodElement.id, periodElement.type)
+	override fun getLongName(periodElement: PeriodElement, default: String) = getLongName(periodElement.id, periodElement.type)
 
 	override fun isAllowed(id: Long, type: ElementType?): Boolean = true
 	override fun isAllowed(periodElement: PeriodElement): Boolean = true
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @Singleton
 class UntisMasterDataRepository @Inject constructor(
 	private val userDao: UserDao,
-	private val userScopeManager: UserScopeManager,
+	private val userRepository: UserRepository
 ) : MasterDataRepository {
-	override val currentUser: User? = userScopeManager.userOptional
+	private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO);
 
-	private var _currentUserData = MutableStateFlow<UserWithData?>(null)
-	override val currentUserData: UserWithData?
-		get() = _currentUserData.value
+	override val user: User?
+		get() = (userRepository.userState.value as? UserRepository.UserState.User)?.user
 
-	private val allClasses = MutableStateFlow<Map<Long, KlasseEntity>>(emptyMap())
-	private val allTeachers = MutableStateFlow<Map<Long, TeacherEntity>>(emptyMap())
-	private val allSubjects = MutableStateFlow<Map<Long, SubjectEntity>>(emptyMap())
-	private val allRooms = MutableStateFlow<Map<Long, RoomEntity>>(emptyMap())
+	private val _userData = MutableStateFlow<UserWithData?>(null)
+	override val userData: UserWithData?
+		get() = _userData.value
+
+	private val _allClasses = MutableStateFlow<Map<Long, KlasseEntity>>(emptyMap())
+	override val allClasses: StateFlow<List<PeriodElement>> = _allClasses.mapToPeriodElements(scope)
+
+	private val _allTeachers = MutableStateFlow<Map<Long, TeacherEntity>>(emptyMap())
+	override val allTeachers: StateFlow<List<PeriodElement>> = _allTeachers.mapToPeriodElements(scope)
+
+	private val _allSubjects = MutableStateFlow<Map<Long, SubjectEntity>>(emptyMap())
+	override val allSubjects: StateFlow<List<PeriodElement>> = _allSubjects.mapToPeriodElements(scope)
+
+	private val _allRooms = MutableStateFlow<Map<Long, RoomEntity>>(emptyMap())
+	override val allRooms: StateFlow<List<PeriodElement>> = _allRooms.mapToPeriodElements(scope)
 
 	init {
-		CoroutineScope(Dispatchers.IO).launch {
-			userScopeManager.userFlow.filterNotNull().flatMapLatest {
-				userDao.getByIdWithDataFlow(userScopeManager.user.id)
-			}.collect { userData ->
-				_currentUserData.value = userData
-				allClasses.value = userData?.let { prepareElements(it.klassen) } ?: emptyMap()
-				allTeachers.value = userData?.let { prepareElements(it.teachers) } ?: emptyMap()
-				allSubjects.value = userData?.let { prepareElements(it.subjects) } ?: emptyMap()
-				allRooms.value = userData?.let { prepareElements(it.rooms) } ?: emptyMap()
+		scope.launch {
+			userRepository.userState.collectLatest { userState ->
+				(userState as? UserRepository.UserState.User)?.user?.let { user ->
+					userDao.getByIdWithDataFlow(user.id).collectLatest { userData ->
+						_userData.value = userData
+						_allClasses.value = userData?.let { prepareElements(it.klassen) } ?: emptyMap()
+						_allTeachers.value = userData?.let { prepareElements(it.teachers) } ?: emptyMap()
+						_allSubjects.value = userData?.let { prepareElements(it.subjects) } ?: emptyMap()
+						_allRooms.value = userData?.let { prepareElements(it.rooms) } ?: emptyMap()
+					}
+				} ?: run {
+					_userData.value = null
+					_allClasses.value = emptyMap()
+					_allTeachers.value = emptyMap()
+					_allSubjects.value = emptyMap()
+					_allRooms.value = emptyMap()
+				}
 			}
 		}
 	}
@@ -90,10 +117,10 @@ class UntisMasterDataRepository @Inject constructor(
 
 	override fun getShortName(id: Long, type: ElementType?, default: String): String {
 		return when (type) {
-			ElementType.CLASS -> allClasses.value[id]?.name
-			ElementType.TEACHER -> allTeachers.value[id]?.name
-			ElementType.SUBJECT -> allSubjects.value[id]?.name
-			ElementType.ROOM -> allRooms.value[id]?.name
+			ElementType.CLASS -> _allClasses.value[id]?.name
+			ElementType.TEACHER -> _allTeachers.value[id]?.name
+			ElementType.SUBJECT -> _allSubjects.value[id]?.name
+			ElementType.ROOM -> _allRooms.value[id]?.name
 			else -> null
 		} ?: default
 	}
@@ -103,10 +130,10 @@ class UntisMasterDataRepository @Inject constructor(
 
 	override fun getLongName(id: Long, type: ElementType, default: String): String {
 		return when (type) {
-			ElementType.CLASS -> allClasses.value[id]?.longName
-			ElementType.TEACHER -> allTeachers.value[id]?.run { "$firstName $lastName" }
-			ElementType.SUBJECT -> allSubjects.value[id]?.longName
-			ElementType.ROOM -> allRooms.value[id]?.longName
+			ElementType.CLASS -> _allClasses.value[id]?.longName
+			ElementType.TEACHER -> _allTeachers.value[id]?.run { "$firstName $lastName" }
+			ElementType.SUBJECT -> _allSubjects.value[id]?.longName
+			ElementType.ROOM -> _allRooms.value[id]?.longName
 			else -> null
 		} ?: default
 	}
@@ -116,15 +143,23 @@ class UntisMasterDataRepository @Inject constructor(
 
 	override fun isAllowed(id: Long, type: ElementType?): Boolean {
 		return when (type) {
-			ElementType.CLASS -> allClasses.value[id]?.displayable
-			ElementType.TEACHER -> allTeachers.value[id]?.displayAllowed
-			ElementType.SUBJECT -> allSubjects.value[id]?.displayAllowed
-			ElementType.ROOM -> allRooms.value[id]?.displayAllowed
+			ElementType.CLASS -> _allClasses.value[id]?.displayable
+			ElementType.TEACHER -> _allTeachers.value[id]?.displayAllowed
+			ElementType.SUBJECT -> _allSubjects.value[id]?.displayAllowed
+			ElementType.ROOM -> _allRooms.value[id]?.displayAllowed
 			else -> null
 		} ?: false
 	}
 
 	override fun isAllowed(periodElement: PeriodElement) = isAllowed(periodElement.id, periodElement.type)
+}
+
+private fun <T : ElementEntity> StateFlow<Map<Long, T>>.mapToPeriodElements(scope: CoroutineScope): StateFlow<List<PeriodElement>> {
+	return this.map { it.values.map { PeriodElement(ElementType.CLASS, it.id) }}.stateIn(
+		scope = scope,
+		started = SharingStarted.WhileSubscribed(),
+		initialValue = emptyList()
+	)
 }
 
 val LocalMasterDataRepository = compositionLocalOf<MasterDataRepository> { DefaultMasterDataRepository() }

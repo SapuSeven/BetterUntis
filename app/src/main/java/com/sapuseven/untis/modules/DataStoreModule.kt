@@ -1,7 +1,6 @@
 package com.sapuseven.untis.modules
 
 import android.content.Context
-import android.content.res.Configuration
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.DataMigration
 import androidx.datastore.core.DataStore
@@ -12,12 +11,13 @@ import androidx.datastore.dataStoreFile
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.google.protobuf.InvalidProtocolBufferException
-import com.sapuseven.compose.protostore.ui.preferences.materialColors
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
+import com.sapuseven.untis.data.settings.model.AbsencesTimeRange
+import com.sapuseven.untis.data.settings.model.DarkTheme
+import com.sapuseven.untis.data.settings.model.NotificationVisibility
 import com.sapuseven.untis.data.settings.model.Settings
-import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
+import com.sapuseven.untis.data.settings.model.UserSettings
 import com.sapuseven.untis.ui.preferences.toTimetableElement
-import com.sapuseven.untis.ui.theme.generateColorScheme
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -77,9 +77,7 @@ private class OldPreferenceDataStoreMigration(val context: Context) : DataMigrat
 				valueTransform = { it.first.groupValues[2] to it.second }
 			).forEach { (userId, data) ->
 				//@formatter:off
-				val isDarkTheme = (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
-				val colorScheme = generateColorScheme(context, true, materialColors[0], isDarkTheme, false)
-				val userSettings = (currentData.userSettingsMap[userId] ?: UserSettingsRepository.getSettingsDefaults(colorScheme)).toBuilder()
+				val userSettings = (currentData.userSettingsMap[userId] ?: UserSettings.getDefaultInstance()).toBuilder()
 				data.forEach { (oldKey, value) ->
 					try {
 						when (oldKey) {
@@ -103,7 +101,7 @@ private class OldPreferenceDataStoreMigration(val context: Context) : DataMigrat
 							"background_cancelled" -> userSettings.backgroundCancelled = value as Int
 							"background_cancelled_past" -> userSettings.backgroundCancelledPast = value as Int
 							"theme_color" -> userSettings.themeColor = value as Int
-							"dark_theme" -> userSettings.darkTheme = value as String
+							"dark_theme" -> userSettings.darkTheme = mapEnumDarkTheme(value as String)
 							"dark_theme_oled" -> userSettings.darkThemeOled = value as Boolean
 							"timetable_personal_timetable" -> userSettings.timetablePersonalTimetable = Json.decodeFromString<PeriodElement>(value as String).toTimetableElement()
 							"timetable_hide_timestamps" -> userSettings.timetableHideTimeStamps = value as Boolean
@@ -122,16 +120,16 @@ private class OldPreferenceDataStoreMigration(val context: Context) : DataMigrat
 							"notifications_in_multiple" -> userSettings.notificationsInMultiple = value as Boolean
 							"notifications_before_first" -> userSettings.notificationsBeforeFirst = value as Boolean
 							"notifications_before_first_time" -> userSettings.notificationsBeforeFirstTime = value as Int
-							"notifications_visibility_subjects" -> userSettings.notificationsVisibilitySubjects = value as String
-							"notifications_visibility_rooms" -> userSettings.notificationsVisibilityRooms = value as String
-							"notifications_visibility_teachers" -> userSettings.notificationsVisibilityTeachers = value as String
-							"notifications_visibility_classes" -> userSettings.notificationsVisibilityClasses = value as String
+							"notifications_visibility_subjects" -> userSettings.notificationsVisibilitySubjects = mapEnumNotificationVisibility(value as String)
+							"notifications_visibility_rooms" -> userSettings.notificationsVisibilityRooms = mapEnumNotificationVisibility(value as String)
+							"notifications_visibility_teachers" -> userSettings.notificationsVisibilityTeachers = mapEnumNotificationVisibility(value as String)
+							"notifications_visibility_classes" -> userSettings.notificationsVisibilityClasses = mapEnumNotificationVisibility(value as String)
 							"connectivity_refresh_in_background" -> userSettings.connectivityRefreshInBackground = value as Boolean
 							"connectivity_proxy_host" -> userSettings.proxyHost = value as String
 							"school_background" -> userSettings.schoolBackgroundList.addAll((value as Set<*>).map { it.toString() })
 							"infocenter_absences_unexcused_only" -> userSettings.infocenterAbsencesOnlyUnexcused = value as Boolean
 							"infocenter_absences_sort" -> userSettings.infocenterAbsencesSortReverse = value as Boolean
-							"infocenter_absences_timerange" -> userSettings.infocenterAbsencesTimeRange = value as String
+							"infocenter_absences_timerange" -> userSettings.infocenterAbsencesTimeRange = mapEnumAbsenceTimeRange(value as String)
 						}
 					} catch (_: Exception) {
 						// Ignore all potential errors
@@ -143,6 +141,35 @@ private class OldPreferenceDataStoreMigration(val context: Context) : DataMigrat
 			}
 
 		return newDataBuilder.build()
+	}
+
+	private fun mapEnumNotificationVisibility(value: String): NotificationVisibility {
+		return when (value) {
+			"short" -> NotificationVisibility.SHORT
+			"long" -> NotificationVisibility.LONG
+			"hidden" -> NotificationVisibility.NONE
+			else -> NotificationVisibility.UNRECOGNIZED
+		}
+	}
+
+	private fun mapEnumAbsenceTimeRange(value: String): AbsencesTimeRange {
+		return when (value) {
+			"current_schoolyear" -> AbsencesTimeRange.CURRENT_SCHOOLYEAR
+			"seven_days" -> AbsencesTimeRange.SEVEN_DAYS
+			"fourteen_days" -> AbsencesTimeRange.FOURTEEN_DAYS
+			"thirty_days" -> AbsencesTimeRange.THIRTY_DAYS
+			"ninety_days" -> AbsencesTimeRange.NINETY_DAYS
+			else -> AbsencesTimeRange.UNRECOGNIZED
+		}
+	}
+
+	private fun mapEnumDarkTheme(value: String): DarkTheme {
+		return when (value) {
+			"auto" -> DarkTheme.AUTO
+			"on" -> DarkTheme.DARK
+			"off" -> DarkTheme.LIGHT
+			else -> DarkTheme.UNRECOGNIZED
+		}
 	}
 
 	override suspend fun cleanUp() {

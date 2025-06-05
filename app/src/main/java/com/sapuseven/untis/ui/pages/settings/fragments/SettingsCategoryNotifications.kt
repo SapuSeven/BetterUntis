@@ -27,6 +27,7 @@ import com.sapuseven.compose.protostore.ui.preferences.Preference
 import com.sapuseven.compose.protostore.ui.preferences.PreferenceGroup
 import com.sapuseven.compose.protostore.ui.preferences.SwitchPreference
 import com.sapuseven.untis.R
+import com.sapuseven.untis.data.settings.model.NotificationVisibility
 import com.sapuseven.untis.ui.common.disabled
 import com.sapuseven.untis.ui.pages.settings.SettingsScreenViewModel
 import kotlinx.coroutines.flow.map
@@ -45,7 +46,7 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 			notificationsMessageVisible = !it
 
 			scope.launch {
-				viewModel.repository.updateSettings {
+				viewModel.userSettingsRepository.updateSettings {
 					notificationsEnable = it
 				}
 			}
@@ -53,7 +54,7 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 	else null
 
 	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-		val visible by viewModel.repository.getSettings().map { it.notificationsEnable }.collectAsState(initial = false)
+		val visible by viewModel.userSettingsRepository.getSettings().map { it.notificationsEnable }.collectAsState(initial = false)
 		ScheduleExactAlarmInfoMessage(
 			visible = visible,
 			primaryText = R.string.preference_notifications_exact_alarms_unavailable,
@@ -62,7 +63,7 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 	}
 
 	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-		val notificationsEnabled by viewModel.repository.getSettings().map { it.notificationsEnable }.collectAsState(initial = false)
+		val notificationsEnabled by viewModel.userSettingsRepository.getSettings().map { it.notificationsEnable }.collectAsState(initial = false)
 		NotificationsInfoMessage(visible = !notificationsEnabled && notificationsMessageVisible)
 	}
 
@@ -73,7 +74,7 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 		LaunchedEffect(Unit) {
 			notificationPermissionsState?.let {
 				if (!it.status.isGranted) {
-					viewModel.repository.updateSettings {
+					viewModel.userSettingsRepository.updateSettings {
 						notificationsEnable = false
 					}
 				}
@@ -83,7 +84,7 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 		SwitchPreference(
 			title = { Text(stringResource(R.string.preference_notifications_enable)) },
 			summary = { Text(stringResource(R.string.preference_notifications_enable_desc)) },
-			settingsRepository = viewModel.repository,
+			settingsRepository = viewModel.userSettingsRepository,
 			value = { it.notificationsEnable },
 			onValueChange = {
 				notificationsEnable = if (it) {
@@ -106,7 +107,7 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 			title = { Text(stringResource(R.string.preference_notifications_multiple)) },
 			summary = { Text(stringResource(R.string.preference_notifications_multiple_desc)) },
 			enabledCondition = { it.notificationsEnable },
-			settingsRepository = viewModel.repository,
+			settingsRepository = viewModel.userSettingsRepository,
 			value = { it.notificationsInMultiple },
 			onValueChange = {
 				//enqueueNotificationSetup()
@@ -118,7 +119,7 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 			title = { Text(stringResource(R.string.preference_notifications_first_lesson)) },
 			summary = { Text(stringResource(R.string.preference_notifications_first_lesson_desc)) },
 			enabledCondition = { it.notificationsEnable },
-			settingsRepository = viewModel.repository,
+			settingsRepository = viewModel.userSettingsRepository,
 			value = { it.notificationsBeforeFirst },
 			onValueChange = {
 				//enqueueNotificationSetup()
@@ -130,7 +131,7 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 			title = { Text(stringResource(R.string.preference_notifications_first_lesson_time)) },
 			unit = stringResource(R.string.preference_notifications_first_lesson_time_unit),
 			enabledCondition = { it.notificationsEnable && it.notificationsBeforeFirst },
-			settingsRepository = viewModel.repository,
+			settingsRepository = viewModel.userSettingsRepository,
 			value = { it.notificationsBeforeFirstTime },
 			onValueChange = {
 				//enqueueNotificationSetup()
@@ -157,9 +158,9 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 			entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
 			entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
 			enabledCondition = { it.notificationsEnable },
-			settingsRepository = viewModel.repository,
-			value = { it.notificationsVisibilitySubjects },
-			onValueChange = { notificationsVisibilitySubjects = it }
+			settingsRepository = viewModel.userSettingsRepository,
+			value = { it.notificationsVisibilitySubjects.number.toString() },
+			onValueChange = { notificationsVisibilitySubjects = NotificationVisibility.forNumber(it.toInt()) }
 		)
 
 		ListPreference(
@@ -179,9 +180,9 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 			entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
 			entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
 			enabledCondition = { it.notificationsEnable },
-			settingsRepository = viewModel.repository,
-			value = { it.notificationsVisibilityRooms },
-			onValueChange = { notificationsVisibilityRooms = it }
+			settingsRepository = viewModel.userSettingsRepository,
+			value = { it.notificationsVisibilityRooms.number.toString() },
+			onValueChange = { notificationsVisibilityRooms = NotificationVisibility.forNumber(it.toInt()) }
 		)
 
 		ListPreference(
@@ -201,9 +202,9 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 			entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
 			entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
 			enabledCondition = { it.notificationsEnable },
-			settingsRepository = viewModel.repository,
-			value = { it.notificationsVisibilityTeachers },
-			onValueChange = { notificationsVisibilityTeachers = it }
+			settingsRepository = viewModel.userSettingsRepository,
+			value = { it.notificationsVisibilityTeachers.number.toString() },
+			onValueChange = { notificationsVisibilityTeachers = NotificationVisibility.forNumber(it.toInt()) }
 		)
 
 		ListPreference(
@@ -223,9 +224,9 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 			entries = stringArrayResource(id = R.array.preference_notifications_visibility_values),
 			entryLabels = stringArrayResource(id = R.array.preference_notifications_visibility),
 			enabledCondition = { it.notificationsEnable },
-			settingsRepository = viewModel.repository,
-			value = { it.notificationsVisibilityClasses },
-			onValueChange = { notificationsVisibilityClasses = it }
+			settingsRepository = viewModel.userSettingsRepository,
+			value = { it.notificationsVisibilityClasses.number.toString() },
+			onValueChange = { notificationsVisibilityClasses = NotificationVisibility.forNumber(it.toInt()) }
 		)
 	}
 	Preference(

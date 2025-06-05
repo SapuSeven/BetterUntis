@@ -84,7 +84,7 @@ fun Timetable(
 
 	TimetableDrawer(
 		drawerState = drawerState,
-		elementPicker = viewModel.elementPicker,
+		masterDataRepository = viewModel.masterDataRepository,
 		displayedElement = viewModel.requestedElement,
 		onElementPicked = {
 			viewModel.showElement(it)
@@ -281,7 +281,7 @@ fun Timetable(
 		exit = fullscreenDialogAnimationExit()
 	) {
 		ProfileManagementDialog(
-			userManager = viewModel.userManager,
+			userRepository = viewModel.userRepository,
 			onEdit = {
 				viewModel.editUser(it)
 			},

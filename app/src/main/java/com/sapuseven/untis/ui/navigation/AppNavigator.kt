@@ -1,6 +1,5 @@
 package com.sapuseven.untis.ui.navigation
 
-import androidx.navigation.NavOptions
 import androidx.navigation.NavOptionsBuilder
 import dagger.hilt.android.scopes.ActivityRetainedScoped
 import kotlinx.coroutines.channels.Channel

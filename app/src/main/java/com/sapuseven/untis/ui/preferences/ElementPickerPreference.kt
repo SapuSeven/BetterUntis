@@ -3,6 +3,8 @@ package com.sapuseven.untis.ui.preferences
 import ElementItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -13,10 +15,11 @@ import com.sapuseven.compose.protostore.data.SettingsRepository
 import com.sapuseven.compose.protostore.ui.preferences.Preference
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
-import com.sapuseven.untis.components.ElementPicker
+import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.data.settings.model.TimetableElement
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialog
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @Composable
@@ -30,9 +33,9 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ElementPickerPrefe
 	enabledCondition: (Model) -> Boolean = { true },
 	highlight: Boolean = false,
 	onValueChange: (ModelBuilder.(value: TimetableElement) -> Unit)? = null,
-	elementPicker: ElementPicker
+	masterDataRepository: MasterDataRepository
 ) {
-	var selectedType: ElementType? by remember { mutableStateOf(null) }
+	val selectedTypeState: State<ElementType?> = remember { settingsRepository.getSettings().map { value(it).toPeriodElement()?.type } }.collectAsState(initial = null)
 	var showDialog by remember { mutableStateOf(false) }
 
 	Preference(
@@ -40,7 +43,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ElementPickerPrefe
 		summary = summary,
 		supportingContent = { currentValue, _ ->
 			currentValue.toPeriodElement()?.let {
-				ElementItem(it, elementPicker) { shortName, _, _ ->
+				ElementItem(it, masterDataRepository) { shortName, _, _ ->
 					Text(shortName)
 				}
 			}
@@ -52,14 +55,13 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ElementPickerPrefe
 		enabledCondition = enabledCondition,
 		highlight = highlight,
 		onClick = {
-			selectedType = value(settingsRepository.getSettingsDefaults()).toPeriodElement()?.type
 			showDialog = true;
 		}
 	)
 
 	if (showDialog)
 		ElementPickerDialog(
-			elementPicker = elementPicker,
+			masterDataRepository = masterDataRepository,
 			title = title,
 			onDismiss = {
 				showDialog = false
@@ -75,7 +77,7 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ElementPickerPrefe
 					}
 				}
 			},
-			initialType = selectedType
+			initialType = selectedTypeState.value
 		)
 }
 

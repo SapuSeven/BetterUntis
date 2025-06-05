@@ -34,7 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sapuseven.untis.R
-import com.sapuseven.untis.components.UserManager
+import com.sapuseven.untis.data.repository.UserRepository
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
@@ -43,12 +43,12 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileManagementDialog(
-	userManager: UserManager,
+	userRepository: UserRepository,
 	onEdit: (user: User?) -> Unit,
 	onDismiss: () -> Unit
 ) {
 	var dismissed by remember { mutableStateOf(false) }
-	val users by userManager.allUsersState.collectAsStateWithLifecycle()
+	val users by userRepository.allUsersState.collectAsStateWithLifecycle()
 	val context = LocalContext.current
 	val scope = rememberCoroutineScope()
 
@@ -165,7 +165,7 @@ fun ProfileManagementDialog(
 					TextButton(
 						onClick = {
 							scope.launch {
-								userManager.deleteUser(user)
+								userRepository.deleteUser(user)
 								deleteDialog = null
 							}
 						}) {

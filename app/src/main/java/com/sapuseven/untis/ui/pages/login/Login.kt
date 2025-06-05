@@ -37,8 +37,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.journeyapps.barcodescanner.ScanContract
 import com.sapuseven.untis.R
-import com.sapuseven.untis.ui.pages.login.schoolsearch.SchoolSearch
 import com.sapuseven.untis.ui.common.AppScaffold
+import com.sapuseven.untis.ui.pages.login.schoolsearch.SchoolSearch
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -85,7 +85,7 @@ fun SettingsCategoryGeneral(viewModel: SettingsScreenViewModel) {
 	}*/
 
 	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-		val visible by viewModel.repository.getSettings().map { it.automuteEnable }.collectAsState(initial = false)
+		val visible by viewModel.userSettingsRepository.getSettings().map { it.automuteEnable }.collectAsState(initial = false)
 		ScheduleExactAlarmInfoMessage(
 			visible = visible,
 			primaryText = R.string.preference_automute_exact_alarms_unavailable,
@@ -105,7 +105,7 @@ fun SettingsCategoryGeneral(viewModel: SettingsScreenViewModel) {
 					rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
 						if (viewModel.autoMuteService.isPermissionGranted()) {
 							scope.launch {
-								viewModel.repository.updateSettings {
+								viewModel.userSettingsRepository.updateSettings {
 									automuteEnable = true
 								}
 								viewModel.autoMuteService.autoMuteEnable()
@@ -114,7 +114,7 @@ fun SettingsCategoryGeneral(viewModel: SettingsScreenViewModel) {
 					}
 
 				LaunchedEffect(Unit) {
-					viewModel.repository.updateSettings {
+					viewModel.userSettingsRepository.updateSettings {
 						automuteEnable = viewModel.autoMuteService.isAutoMuteEnabled()
 					}
 				}
@@ -122,7 +122,7 @@ fun SettingsCategoryGeneral(viewModel: SettingsScreenViewModel) {
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_automute_enable)) },
 					summary = { Text(stringResource(R.string.preference_automute_enable_summary)) },
-					settingsRepository = viewModel.repository,
+					settingsRepository = viewModel.userSettingsRepository,
 					value = { it.automuteEnable },
 					onValueChange = {
 						if (it) {

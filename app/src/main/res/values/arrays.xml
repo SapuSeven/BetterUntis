@@ -27,9 +27,9 @@
 	</string-array>
 
 	<string-array name="preference_dark_theme_values" translatable="false">
-		<item>auto</item>
-		<item>on</item>
-		<item>off</item>
+		<item>0</item>
+		<item>2</item>
+		<item>1</item>
 	</string-array>
 
 	<string-array name="preference_notifications_visibility">
@@ -39,9 +39,9 @@
 	</string-array>
 
 	<string-array name="preference_notifications_visibility_values" translatable="false">
-		<item>hidden</item>
-		<item>short</item>
-		<item>long</item>
+		<item>0</item>
+		<item>1</item>
+		<item>2</item>
 	</string-array>
 
 	<string-array name="preference_schoolcolors">
@@ -67,11 +67,11 @@
 	</string-array>
 
 	<string-array name="infocenter_absences_list_values" translatable="false">
-		<item>seven_days</item>
-		<item>fourteen_days</item>
-		<item>thirty_days</item>
-		<item>ninety_days</item>
-		<item>current_schoolyear</item>
+		<item>1</item>
+		<item>2</item>
+		<item>3</item>
+		<item>4</item>
+		<item>0</item>
 	</string-array>
 	
 </resources>

@@ -15,14 +15,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -89,7 +87,7 @@ fun AutoMuteSettings(
 				rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
 					if (viewModel.autoMuteService.isPermissionGranted()) {
 						scope.launch {
-							viewModel.repository.updateSettings {
+							viewModel.userSettingsRepository.updateSettings {
 								automuteEnable = true
 							}
 							viewModel.autoMuteService.autoMuteEnable()
@@ -103,7 +101,7 @@ fun AutoMuteSettings(
 			)) {
 				SwitchPreference(
 					title = { Text(stringResource(R.string.preference_automute_enable)) },
-					settingsRepository = viewModel.repository,
+					settingsRepository = viewModel.userSettingsRepository,
 					value = { it.automuteEnable },
 					onValueChange = {
 						if (it) {
@@ -127,7 +125,7 @@ fun AutoMuteSettings(
 
 			SwitchPreference(
 				title = { Text(stringResource(R.string.preference_automute_cancelled_lessons)) },
-				settingsRepository = viewModel.repository,
+				settingsRepository = viewModel.userSettingsRepository,
 				value = { it.automuteCancelledLessons },
 				onValueChange = { automuteCancelledLessons = it }
 			)
@@ -147,7 +145,7 @@ fun AutoMuteSettings(
 				title = { Text(stringResource(R.string.preference_automute_minimum_break_length)) },
 				summary = { Text(stringResource(R.string.preference_automute_minimum_break_length_summary)) },
 				showSeekBarValue = true,
-				settingsRepository = viewModel.repository,
+				settingsRepository = viewModel.userSettingsRepository,
 				value = { it.automuteMinimumBreakLength },
 				onValueChange = { automuteMinimumBreakLength = it }
 			)

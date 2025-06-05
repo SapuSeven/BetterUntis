@@ -1,4 +1,4 @@
-package com.sapuseven.untis.ui.pages.settings
+package com.sapuseven.untis.data.repository
 
 import androidx.datastore.core.DataStore
 import com.sapuseven.compose.protostore.data.MultiUserSettingsRepository
@@ -15,13 +15,8 @@ class GlobalSettingsRepository @Inject constructor(
 		if (dataStore.globalSettings.initialized)
 			dataStore.globalSettings
 		else
-			getSettingsDefaults()
+			GlobalSettings.getDefaultInstance()
 
 	override fun updateUserSettings(currentData: Settings, userSettings: GlobalSettings): Settings =
 		currentData.toBuilder().setGlobalSettings(userSettings.toBuilder().setInitialized(true).build()).build()
-
-	override fun getSettingsDefaults(): GlobalSettings = GlobalSettings.newBuilder().apply {
-		errorReportingEnable = true
-		errorReportingEnableBreadcrumbs = true
-	}.build()
 }

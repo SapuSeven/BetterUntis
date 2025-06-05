@@ -17,12 +17,12 @@ import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.data.repository.TimetableRepository
+import com.sapuseven.untis.data.repository.UserSettingsRepository
 import com.sapuseven.untis.mappers.TimetableMapper
 import com.sapuseven.untis.receivers.AutoMuteReceiver
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_BOOLEAN_MUTE
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_INT_ID
 import com.sapuseven.untis.receivers.AutoMuteReceiver.Companion.EXTRA_LONG_USER_ID
-import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
 import crocodile8.universal_cache.FromCache
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -37,13 +37,12 @@ import java.time.temporal.ChronoUnit
 class AutoMuteSetupWorker @AssistedInject constructor(
 	@Assisted context: Context,
 	@Assisted params: WorkerParameters,
-	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
+	private val userSettingsRepository: UserSettingsRepository,
 	timetableMapperFactory: TimetableMapper.Factory,
 	timetableRepository: TimetableRepository,
 	private val masterDataRepository: MasterDataRepository,
 	private val userDao: UserDao,
 ) : TimetableDependantWorker(context, params, timetableRepository) {
-	val settingsRepository = userSettingsRepositoryFactory.create()
 	val timetableMapper = timetableMapperFactory.create()
 
 	companion object {
@@ -77,8 +76,7 @@ class AutoMuteSetupWorker @AssistedInject constructor(
 
 	private suspend fun scheduleAutoMute(): Result {
 		val userId = inputData.getLong(WORKER_DATA_USER_ID, -1)
-		val settings = settingsRepository.getAllSettings().first()
-		val userSettings = settings.userSettingsMap.getOrDefault(userId, settingsRepository.getSettingsDefaults())
+		val userSettings = userSettingsRepository.getSettings(userId).first()
 
 		userDao.getByIdAsync(userId)?.let { user ->
 			try {

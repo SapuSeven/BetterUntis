@@ -1,10 +1,9 @@
-package com.sapuseven.untis.components
+package com.sapuseven.untis.data.repository
 
 import androidx.datastore.core.DataStore
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.data.settings.model.Settings
-import com.sapuseven.untis.scope.UserScopeManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,10 +16,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class UserManager @Inject constructor(
-	private val userScopeManager: UserScopeManager,
+class UserRepository @Inject constructor(
 	private val userDao: UserDao,
-	private val userSettings: DataStore<Settings>,
+	private val settingsDataStore: DataStore<Settings>,
 ) {
 	private val _userState = MutableStateFlow<UserState>(UserState.Loading)
 	val userState: StateFlow<UserState> = _userState
@@ -31,21 +29,23 @@ class UserManager @Inject constructor(
 		initialValue = emptyList()
 	)
 
+	val currentUser: User?
+		get() = (_userState.value as? UserState.User)?.user
+
 	init {
 		loadActiveUser()
 	}
 
 	private fun loadActiveUser() {
 		CoroutineScope(Dispatchers.IO).launch {
-			switchUser(userSettings.data.first().activeUser)
+			switchUser(settingsDataStore.data.first().activeUser)
 		}
 	}
 
 	fun switchUser(user: User) {
 		_userState.value = UserState.User(user)
 		CoroutineScope(Dispatchers.IO).launch {
-			recreateUserScopedComponents(user)
-			userSettings.updateData { currentSettings ->
+			settingsDataStore.updateData { currentSettings ->
 				currentSettings.toBuilder()
 					.setActiveUser(user.id)
 					.build()
@@ -78,13 +78,10 @@ class UserManager @Inject constructor(
 		}
 	}
 
-	private suspend fun recreateUserScopedComponents(user: User) {
-		userScopeManager.handleUserChange(user)
+	sealed class UserState {
+		data object Loading : UserState()
+		data object NoUsers : UserState()
+		data class User(val user: com.sapuseven.untis.data.database.entities.User) : UserState()
 	}
 }
 
-sealed class UserState {
-	data object Loading : UserState()
-	data object NoUsers : UserState()
-	data class User(val user: com.sapuseven.untis.data.database.entities.User) : UserState()
-}

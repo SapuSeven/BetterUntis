@@ -9,7 +9,7 @@ import androidx.work.WorkRequest
 import androidx.work.WorkerParameters
 import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.data.repository.TimetableRepository
-import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
+import com.sapuseven.untis.data.repository.UserSettingsRepository
 import crocodile8.universal_cache.FromCache
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -27,12 +27,10 @@ import java.util.concurrent.TimeUnit
 class DailyWorker @AssistedInject constructor(
 	@Assisted context: Context,
 	@Assisted params: WorkerParameters,
-	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
+	private val userSettingsRepository: UserSettingsRepository,
 	timetableRepository: TimetableRepository,
 	private val userDao: UserDao,
 ) : TimetableDependantWorker(context, params, timetableRepository) {
-	val settingsRepository = userSettingsRepositoryFactory.create()
-
 	companion object {
 		const val TAG_DAILY_WORK = "DailyWork"
 
@@ -60,9 +58,8 @@ class DailyWorker @AssistedInject constructor(
 	override suspend fun doWork(): Result {
 		val workManager = WorkManager.getInstance(applicationContext)
 
-		val settings = settingsRepository.getAllSettings().first()
 		userDao.getAllFlow().first().forEach { user ->
-			val userSettings = settings.userSettingsMap.getOrDefault(user.id, settingsRepository.getSettingsDefaults())
+			val userSettings = userSettingsRepository.getSettings(user.id).first()
 			val personalTimetable = getPersonalTimetableElement(user, userSettings)
 				?: return@forEach // Anonymous / no custom personal timetable
 

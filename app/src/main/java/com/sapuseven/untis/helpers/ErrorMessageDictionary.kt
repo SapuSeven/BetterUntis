@@ -1,17 +1,7 @@
 package com.sapuseven.untis.helpers
 
 import android.content.res.Resources
-import androidx.annotation.StringRes
 import com.sapuseven.untis.R
-import com.sapuseven.untis.helpers.ErrorMessageDictionary.ERROR_CODE_INVALID_CLIENT_TIME
-import com.sapuseven.untis.helpers.ErrorMessageDictionary.ERROR_CODE_INVALID_CREDENTIALS
-import com.sapuseven.untis.helpers.ErrorMessageDictionary.ERROR_CODE_INVALID_SCHOOLNAME
-import com.sapuseven.untis.helpers.ErrorMessageDictionary.ERROR_CODE_NO_PUBLIC_ACCESS_AVAILABLE
-import com.sapuseven.untis.helpers.ErrorMessageDictionary.ERROR_CODE_NO_RIGHT
-import com.sapuseven.untis.helpers.ErrorMessageDictionary.ERROR_CODE_NO_SERVER_FOUND
-import com.sapuseven.untis.helpers.ErrorMessageDictionary.ERROR_CODE_TOO_MANY_RESULTS
-import com.sapuseven.untis.helpers.ErrorMessageDictionary.ERROR_CODE_USER_LOCKED
-import com.sapuseven.untis.helpers.ErrorMessageDictionary.ERROR_CODE_WEBUNTIS_NOT_INSTALLED
 
 object ErrorMessageDictionary {
 	/* Original app used the following error codes at the time of writing (may change over time):

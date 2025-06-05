@@ -13,7 +13,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.MainActivity
-import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
+import com.sapuseven.untis.data.repository.UserSettingsRepository
+import com.sapuseven.untis.data.settings.model.NotificationVisibility
 import com.sapuseven.untis.workers.NotificationSetupWorker.Companion.CHANNEL_ID_BREAKINFO
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -24,7 +25,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class NotificationReceiver : BroadcastReceiver() {
 	@Inject
-	lateinit var userSettingsRepositoryFactory: UserSettingsRepository.Factory
+	lateinit var userSettingsRepository: UserSettingsRepository
 
 	companion object {
 		private const val LOG_TAG = "NotificationReceiver"
@@ -49,9 +50,7 @@ class NotificationReceiver : BroadcastReceiver() {
 		Log.d(LOG_TAG, "NotificationReceiver received")
 
 		val userId = intent.getLongExtra(EXTRA_LONG_USER_ID, -1)
-		val settingsRepository = userSettingsRepositoryFactory.create()
-		val settings = settingsRepository.getAllSettings().first()
-		val userSettings = settings.userSettingsMap.getOrDefault(userId, settingsRepository.getSettingsDefaults())
+		val userSettings = userSettingsRepository.getSettings(userId).first()
 
 		if (intent.getBooleanExtra(EXTRA_BOOLEAN_CLEAR, false)) {
 			Log.d(
@@ -131,20 +130,20 @@ class NotificationReceiver : BroadcastReceiver() {
 		context: Context?,
 		intent: Intent,
 		separator: String,
-		visibilitySubjects: String,
-		visibilityRooms: String,
-		visibilityTeachers: String,
-		visibilityClasses: String
+		visibilitySubjects: NotificationVisibility,
+		visibilityRooms: NotificationVisibility,
+		visibilityTeachers: NotificationVisibility,
+		visibilityClasses: NotificationVisibility
 	) = listOfNotNull(
 		if (intent.getStringExtra(EXTRA_STRING_NEXT_SUBJECT)?.isBlank() != false) null else
 			when (visibilitySubjects) {
-				"short" -> context?.getString(
+				NotificationVisibility.SHORT -> context?.getString(
 					R.string.notifications_text_message_subjects,
 					intent.getStringExtra(EXTRA_STRING_NEXT_SUBJECT)
 				)
 					?: intent.getStringExtra(EXTRA_STRING_NEXT_SUBJECT)
 
-				"long" -> context?.getString(
+				NotificationVisibility.LONG -> context?.getString(
 					R.string.notifications_text_message_subjects,
 					intent.getStringExtra(EXTRA_STRING_NEXT_SUBJECT_LONG)
 				)
@@ -154,13 +153,13 @@ class NotificationReceiver : BroadcastReceiver() {
 			},
 		if (intent.getStringExtra(EXTRA_STRING_NEXT_ROOM)?.isBlank() != false) null else
 			when (visibilityRooms) {
-				"short" -> context?.getString(
+				NotificationVisibility.SHORT -> context?.getString(
 					R.string.notifications_text_message_rooms,
 					intent.getStringExtra(EXTRA_STRING_NEXT_ROOM)
 				)
 					?: intent.getStringExtra(EXTRA_STRING_NEXT_ROOM)
 
-				"long" -> context?.getString(
+				NotificationVisibility.LONG -> context?.getString(
 					R.string.notifications_text_message_rooms,
 					intent.getStringExtra(EXTRA_STRING_NEXT_ROOM_LONG)
 				)
@@ -170,13 +169,13 @@ class NotificationReceiver : BroadcastReceiver() {
 			},
 		if (intent.getStringExtra(EXTRA_STRING_NEXT_TEACHER)?.isBlank() != false) null else
 			when (visibilityTeachers) {
-				"short" -> context?.getString(
+				NotificationVisibility.SHORT -> context?.getString(
 					R.string.notifications_text_message_teachers,
 					intent.getStringExtra(EXTRA_STRING_NEXT_TEACHER)
 				)
 					?: intent.getStringExtra(EXTRA_STRING_NEXT_TEACHER)
 
-				"long" -> context?.getString(
+				NotificationVisibility.LONG -> context?.getString(
 					R.string.notifications_text_message_teachers,
 					intent.getStringExtra(EXTRA_STRING_NEXT_TEACHER_LONG)
 				)
@@ -186,13 +185,13 @@ class NotificationReceiver : BroadcastReceiver() {
 			},
 		if (intent.getStringExtra(EXTRA_STRING_NEXT_CLASS)?.isBlank() != false) null else
 			when (visibilityClasses) {
-				"short" -> context?.getString(
+				NotificationVisibility.SHORT -> context?.getString(
 					R.string.notifications_text_message_classes,
 					intent.getStringExtra(EXTRA_STRING_NEXT_CLASS)
 				)
 					?: intent.getStringExtra(EXTRA_STRING_NEXT_CLASS)
 
-				"long" -> context?.getString(
+				NotificationVisibility.LONG -> context?.getString(
 					R.string.notifications_text_message_classes,
 					intent.getStringExtra(EXTRA_STRING_NEXT_CLASS_LONG)
 				)

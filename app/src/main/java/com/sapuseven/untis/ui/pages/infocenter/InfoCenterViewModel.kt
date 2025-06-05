@@ -1,23 +1,21 @@
 package com.sapuseven.untis.ui.pages.infocenter
 
-import androidx.compose.material3.darkColorScheme
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sapuseven.untis.api.model.untis.enumeration.Right
-import com.sapuseven.untis.data.database.entities.User
+import com.sapuseven.untis.data.repository.UserRepository
 import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.domain.GetAbsencesUseCase
 import com.sapuseven.untis.domain.GetExamsUseCase
 import com.sapuseven.untis.domain.GetHomeworkUseCase
 import com.sapuseven.untis.domain.GetMessagesUseCase
 import com.sapuseven.untis.domain.GetOfficeHoursUseCase
-import com.sapuseven.untis.scope.UserScopeManager
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.pages.infocenter.fragments.AbsencesUiState
 import com.sapuseven.untis.ui.pages.infocenter.fragments.EventsUiState
 import com.sapuseven.untis.ui.pages.infocenter.fragments.MessagesUiState
 import com.sapuseven.untis.ui.pages.infocenter.fragments.OfficeHoursUiState
-import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
+import com.sapuseven.untis.data.repository.UserSettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -29,27 +27,27 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InfoCenterViewModel @Inject constructor(
+	private val userRepository: UserRepository,
 	internal val masterDataRepository: MasterDataRepository,
 	private val navigator: AppNavigator,
-	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
+	internal val userSettingsRepository: UserSettingsRepository,
 	getMessages: GetMessagesUseCase,
 	getExams: GetExamsUseCase,
 	getHomework: GetHomeworkUseCase,
 	getAbsences: GetAbsencesUseCase,
 	getOfficeHours: GetOfficeHoursUseCase,
-	userScopeManager: UserScopeManager,
 ) : ViewModel() {
-	private val currentUser: User = userScopeManager.user
+	private val excuseStatuses = masterDataRepository.userData?.excuseStatuses ?: emptyList()
 
-	private val excuseStatuses = masterDataRepository.currentUserData?.excuseStatuses ?: emptyList()
+	val shouldShowAbsences: Boolean
+		get() = Right.R_MY_ABSENCES in userRepository.currentUser!!.userData.rights
+	val shouldShowAbsencesAdd: Boolean
+		get() = Right.W_OWN_ABSENCE in userRepository.currentUser!!.userData.rights
+	val shouldShowAbsencesAddReason: Boolean
+		get() = Right.W_OWN_ABSENCEREASON in userRepository.currentUser!!.userData.rights
 
-	val userSettingsRepository = userSettingsRepositoryFactory.create()
-
-	val shouldShowAbsences: Boolean = Right.R_MY_ABSENCES in currentUser.userData.rights
-	val shouldShowAbsencesAdd: Boolean = Right.W_OWN_ABSENCE in currentUser.userData.rights
-	val shouldShowAbsencesAddReason: Boolean = Right.W_OWN_ABSENCEREASON in currentUser.userData.rights
-
-	val shouldShowOfficeHours: Boolean = Right.R_OFFICEHOURS in currentUser.userData.rights
+	val shouldShowOfficeHours: Boolean
+		get()= Right.R_OFFICEHOURS in userRepository.currentUser!!.userData.rights
 
 	val messagesState: StateFlow<MessagesUiState> = getMessages()
 		.map(MessagesUiState::Success)

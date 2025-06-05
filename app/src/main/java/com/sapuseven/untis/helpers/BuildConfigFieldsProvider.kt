@@ -1,4 +1,4 @@
-package com.sapuseven.untis.components
+package com.sapuseven.untis.helpers
 
 import com.sapuseven.untis.BuildConfig
 

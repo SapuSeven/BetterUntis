@@ -6,9 +6,9 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import com.sapuseven.untis.data.database.entities.UserDao
+import com.sapuseven.untis.data.repository.UserSettingsRepository
 import com.sapuseven.untis.services.AutoMuteService
 import com.sapuseven.untis.services.AutoMuteServiceZenRuleImpl
-import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class AutoMuteReceiver : BroadcastReceiver() {
 	@Inject
-	lateinit var userSettingsRepositoryFactory: UserSettingsRepository.Factory
+	lateinit var userSettingsRepository: UserSettingsRepository
 	@Inject
 	lateinit var userDao: UserDao
 	@Inject
@@ -36,9 +36,7 @@ class AutoMuteReceiver : BroadcastReceiver() {
 		)
 
 		val userId = intent.getLongExtra(EXTRA_LONG_USER_ID, -1)
-		val settingsRepository = userSettingsRepositoryFactory.create()
-		val settings = settingsRepository.getAllSettings().first()
-		val userSettings = settings.userSettingsMap.getOrDefault(userId, settingsRepository.getSettingsDefaults())
+		val userSettings = userSettingsRepository.getSettings(userId).first()
 
 		if (autoMuteService is AutoMuteServiceZenRuleImpl && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 			userDao.getByIdAsync(userId)?.let { (autoMuteService as AutoMuteServiceZenRuleImpl).setUser(it) }

@@ -6,8 +6,6 @@ import androidx.room.Index
 import com.sapuseven.untis.api.model.untis.enumeration.DutyType
 import com.sapuseven.untis.api.model.untis.masterdata.Duty
 import com.sapuseven.untis.data.database.Mapper
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 @Entity(
 	tableName = "Duty",

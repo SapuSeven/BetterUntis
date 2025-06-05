@@ -10,7 +10,6 @@ import com.sapuseven.untis.api.model.untis.enumeration.PeriodState
 import com.sapuseven.untis.api.model.untis.timetable.Period
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.data.repository.MasterDataRepository
-import com.sapuseven.untis.ui.weekview.Event
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 

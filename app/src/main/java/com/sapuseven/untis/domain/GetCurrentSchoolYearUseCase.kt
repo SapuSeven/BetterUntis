@@ -9,7 +9,7 @@ class GetCurrentSchoolYearUseCase @Inject constructor(
 	private val masterDataRepository: MasterDataRepository
 ) {
 	operator fun invoke(currentDate: LocalDate = LocalDate.now()): SchoolYearEntity? {
-		return masterDataRepository.currentUserData?.schoolYears?.find {
+		return masterDataRepository.userData?.schoolYears?.find {
 			currentDate.isAfter(it.startDate) && currentDate.isBefore(it.endDate)
 		}
 	}

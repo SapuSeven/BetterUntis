@@ -1,7 +1,6 @@
 package com.sapuseven.untis.mappers
 
 import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.ColorUtils
@@ -10,9 +9,10 @@ import com.sapuseven.untis.api.model.untis.enumeration.PeriodState
 import com.sapuseven.untis.api.model.untis.masterdata.timegrid.Day
 import com.sapuseven.untis.api.model.untis.timetable.Period
 import com.sapuseven.untis.data.repository.MasterDataRepository
+import com.sapuseven.untis.data.repository.UserRepository
+import com.sapuseven.untis.data.repository.UserSettingsRepository
+import com.sapuseven.untis.data.repository.withDefault
 import com.sapuseven.untis.models.PeriodItem
-import com.sapuseven.untis.scope.UserScopeManager
-import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
 import com.sapuseven.untis.ui.weekview.Event
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -23,13 +23,11 @@ import java.time.DayOfWeek
 import java.time.temporal.ChronoUnit
 
 class TimetableMapper @AssistedInject constructor(
-	settingsRepositoryFactory: UserSettingsRepository.Factory,
+	private val userRepository: UserRepository,
+	private val userSettingsRepository: UserSettingsRepository,
 	private val masterDataRepository: MasterDataRepository,
-	private val userScopeManager: UserScopeManager,
 	@Assisted private val colorScheme: ColorScheme?,
 ) {
-	private val settings = settingsRepositoryFactory.create(colorScheme ?: lightColorScheme()).getSettings()
-
 	@AssistedFactory
 	interface Factory {
 		fun create(colorScheme: ColorScheme? = null): TimetableMapper
@@ -49,13 +47,12 @@ class TimetableMapper @AssistedInject constructor(
 		hideCancelled: Boolean
 	): List<Period> = items
 		.filterPeriods(hideCancelled)
-		.mergePeriods(userScopeManager.user.timeGrid.days)
+		.mergePeriods(userRepository.currentUser!!.timeGrid.days)
 
 	suspend fun mapTimetablePeriodsToWeekViewEvents(
 		items: List<Period>,
 		contextType: ElementType
 	): List<Event<PeriodItem>> {
-		assertColorScheme()
 		waitForSettings().apply {
 			return preparePeriods(items, timetableHideCancelled)
 				.mapToEvents(
@@ -70,26 +67,25 @@ class TimetableMapper @AssistedInject constructor(
 
 	suspend fun colorWeekViewTimetableEvents(
 		events: List<Event<PeriodItem>>
-	): List<Event<PeriodItem>> {
-		assertColorScheme()
-		waitForSettings().apply {
-			return events.copyWithColor(
-				Color(backgroundRegular),
-				Color(backgroundRegularPast),
-				Color(backgroundExam),
-				Color(backgroundExamPast),
-				Color(backgroundCancelled),
-				Color(backgroundCancelledPast),
-				Color(backgroundIrregular),
-				Color(backgroundIrregularPast),
-				schoolBackgroundList
-			)
-		}
-	}
+	): List<Event<PeriodItem>> = colorScheme?.let {
+			return waitForSettings().run {
+				val defaultColors = UserSettingsRepository.getDefaultColors(colorScheme)
+				events.copyWithColor(
+					Color(themeColor).withDefault(hasThemeColor(), defaultColors.themeColor),
+					Color(backgroundRegular).withDefault(hasBackgroundRegular(), defaultColors.backgroundRegular),
+					Color(backgroundRegularPast).withDefault(hasBackgroundRegularPast(), defaultColors.backgroundRegularPast),
+					Color(backgroundExam).withDefault(hasBackgroundExam(), defaultColors.backgroundExam),
+					Color(backgroundExamPast).withDefault(hasBackgroundExamPast(), defaultColors.backgroundExamPast),
+					Color(backgroundCancelled).withDefault(hasBackgroundCancelled(), defaultColors.backgroundCancelled),
+					Color(backgroundCancelledPast).withDefault(hasBackgroundCancelledPast(), defaultColors.backgroundCancelledPast),
+					Color(backgroundIrregular).withDefault(hasBackgroundIrregular(), defaultColors.backgroundIrregular),
+					Color(backgroundIrregularPast).withDefault(hasBackgroundIrregularPast(), defaultColors.backgroundIrregularPast),
+					schoolBackgroundList
+				)
+			}
+		} ?: events
 
-	private fun assertColorScheme() = assert(colorScheme != null) { "A colorScheme needs to be provided to the factory in order to use this function" }
-
-	private suspend fun waitForSettings() = settings.filterNotNull().first()
+	private suspend fun waitForSettings() = userSettingsRepository.getSettings().filterNotNull().first()
 
 	private fun List<Period>.mapToEvents(
 		contextType: ElementType,
@@ -227,6 +223,7 @@ class TimetableMapper @AssistedInject constructor(
 	}
 
 	private fun List<Event<PeriodItem>>.copyWithColor(
+		themeColor: Color,
 		regularColor: Color,
 		regularPastColor: Color,
 		examColor: Color,
@@ -238,6 +235,7 @@ class TimetableMapper @AssistedInject constructor(
 		useDefault: List<String>
 	): List<Event<PeriodItem>> = map {
 		it.copyWithColor(
+			themeColor,
 			regularColor,
 			regularPastColor,
 			examColor,
@@ -251,6 +249,7 @@ class TimetableMapper @AssistedInject constructor(
 	}
 
 	private fun Event<PeriodItem>.copyWithColor(
+		themeColor: Color,
 		regularColor: Color,
 		regularPastColor: Color,
 		examColor: Color,
@@ -262,7 +261,7 @@ class TimetableMapper @AssistedInject constructor(
 		useDefault: List<String>
 	): Event<PeriodItem> = data?.let {
 		val subjectEntity =
-			masterDataRepository.currentUserData?.subjects?.find { it.id == data.subjects.firstOrNull()?.id }
+			masterDataRepository.userData?.subjects?.find { it.id == data.subjects.firstOrNull()?.id }
 
 		val defaultColor = Color(
 			android.graphics.Color.parseColor(
@@ -298,10 +297,11 @@ class TimetableMapper @AssistedInject constructor(
 	} ?: this
 
 	private fun colorOn(color: Color): Color {
+		// TODO
 		return when (color.copy(alpha = 1f)) {
-			colorScheme?.primary -> colorScheme.onPrimary
+			/*colorScheme?.primary -> colorScheme.onPrimary
 			colorScheme?.secondary -> colorScheme.onSecondary
-			colorScheme?.tertiary -> colorScheme.onTertiary
+			colorScheme?.tertiary -> colorScheme.onTertiary*/
 			else -> if (ColorUtils.calculateLuminance(color.toArgb()) < 0.5) Color.White else Color.Black
 		}.copy(alpha = color.alpha)
 	}

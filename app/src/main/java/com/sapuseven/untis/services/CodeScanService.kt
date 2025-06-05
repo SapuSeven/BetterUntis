@@ -1,6 +1,5 @@
 package com.sapuseven.untis.services
 
-import android.net.Uri
 import androidx.activity.compose.ManagedActivityResultLauncher
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions

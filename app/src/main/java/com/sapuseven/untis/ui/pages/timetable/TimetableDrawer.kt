@@ -41,7 +41,7 @@ import com.sapuseven.untis.activities.main.DrawerItems
 import com.sapuseven.untis.activities.main.DrawerText
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
-import com.sapuseven.untis.components.ElementPicker
+import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.data.settings.model.TimetableElement
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
@@ -54,7 +54,7 @@ import kotlinx.serialization.json.Json
 fun TimetableDrawer(
 	viewModel: TimetableDrawerViewModel = hiltViewModel(),
 	drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
-	elementPicker: ElementPicker,
+	masterDataRepository: MasterDataRepository,
 	displayedElement: PeriodElement? = null,
 	onElementPicked: (PeriodElement?) -> Unit,
 	content: @Composable () -> Unit
@@ -224,7 +224,7 @@ fun TimetableDrawer(
 	) {
 		ElementPickerDialogFullscreen(
 			title = { /*TODO*/ },
-			elementPicker = elementPicker,
+			masterDataRepository = masterDataRepository,
 			onDismiss = { showElementPicker = null },
 			onSelect = { item ->
 				item?.let {
@@ -244,7 +244,7 @@ fun TimetableDrawer(
 	) {
 		ElementPickerDialogFullscreen(
 			title = { /*TODO*/ },
-			elementPicker = elementPicker,
+			masterDataRepository = masterDataRepository,
 			hideTypeSelectionPersonal = true,
 			onDismiss = { bookmarksElementPicker = null },
 			onSelect = { item ->

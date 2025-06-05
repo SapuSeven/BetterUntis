@@ -151,7 +151,7 @@ fun RoomFinder(
 			initialType = ElementType.ROOM,
 			onDismiss = { showElementPicker = false },
 			onMultiSelect = { viewModel.addRooms(it) },
-			elementPicker = viewModel.elementPicker
+			masterDataRepository = viewModel.masterDataRepository
 		)
 	}
 }

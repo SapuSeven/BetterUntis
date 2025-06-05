@@ -18,7 +18,6 @@ import androidx.core.content.pm.ShortcutManagerCompat.createShortcutResultIntent
 import androidx.core.graphics.drawable.IconCompat
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
-import com.sapuseven.untis.components.ElementPicker
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.data.repository.MasterDataRepository
@@ -79,8 +78,6 @@ class ShortcutConfigureActivity : ComponentActivity() {
 				val users = remember { mutableStateListOf<User>() }
 				var selectedUserId by rememberSaveable { mutableLongStateOf(-1L) }
 
-				val elementPicker = ElementPicker(selectedUserId, userDao)
-
 				LaunchedEffect(userDao) {
 					userDao.getAllFlow().collect {
 						users.clear()
@@ -89,7 +86,7 @@ class ShortcutConfigureActivity : ComponentActivity() {
 				}
 
 				ElementPickerDialogFullscreen(
-					elementPicker = elementPicker,
+					masterDataRepository = masterDataRepository,
 					title = { Text(stringResource(id = R.string.widget_timetable_link)) },
 					onDismiss = { finish() },
 					onSelect = { element ->

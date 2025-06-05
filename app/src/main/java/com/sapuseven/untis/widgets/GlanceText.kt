@@ -1,7 +1,11 @@
 package com.sapuseven.untis.widgets
 
 import androidx.compose.ui.unit.TextUnit
-import androidx.glance.text.*
+import androidx.glance.text.FontStyle
+import androidx.glance.text.FontWeight
+import androidx.glance.text.TextAlign
+import androidx.glance.text.TextDecoration
+import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 
 internal fun androidx.compose.ui.text.TextStyle.toGlanceTextStyle(

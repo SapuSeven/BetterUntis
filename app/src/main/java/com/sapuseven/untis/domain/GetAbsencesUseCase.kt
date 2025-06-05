@@ -1,12 +1,11 @@
 package com.sapuseven.untis.domain
 
-import androidx.compose.material3.darkColorScheme
 import com.sapuseven.untis.api.model.untis.absence.StudentAbsence
 import com.sapuseven.untis.data.database.entities.SchoolYearEntity
-import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.repository.InfoCenterRepository
-import com.sapuseven.untis.scope.UserScopeManager
-import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
+import com.sapuseven.untis.data.repository.UserRepository
+import com.sapuseven.untis.data.repository.UserSettingsRepository
+import com.sapuseven.untis.data.settings.model.AbsencesTimeRange
 import crocodile8.universal_cache.FromCache
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -17,14 +16,11 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 class GetAbsencesUseCase @Inject constructor(
+	private val userRepository: UserRepository,
 	private val infoCenterRepository: InfoCenterRepository,
-	getCurrentSchoolYear: GetCurrentSchoolYearUseCase,
-	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
-	userScopeManager: UserScopeManager
+	private val userSettingsRepository: UserSettingsRepository,
+	getCurrentSchoolYear: GetCurrentSchoolYearUseCase
 ) {
-	private val user: User = userScopeManager.user
-	private val userSettingsRepository =
-		userSettingsRepositoryFactory.create()
 	private val currentSchoolYear =
 		getCurrentSchoolYear() ?: SchoolYearEntity(startDate = LocalDate.now(), endDate = LocalDate.now())
 
@@ -36,10 +32,10 @@ class GetAbsencesUseCase @Inject constructor(
 	operator fun invoke(): Flow<Result<List<StudentAbsence>>> =
 		userSettingsRepository.getSettings().flatMapLatest { settings ->
 			val daysAgo: Long = when (settings.infocenterAbsencesTimeRange) {
-				"seven_days" -> 7
-				"fourteen_days" -> 14
-				"thirty_days" -> 30
-				"ninety_days" -> 90
+				AbsencesTimeRange.SEVEN_DAYS -> 7
+				AbsencesTimeRange.FOURTEEN_DAYS -> 14
+				AbsencesTimeRange.THIRTY_DAYS -> 30
+				AbsencesTimeRange.NINETY_DAYS -> 90
 				else -> 0
 			}
 
@@ -56,7 +52,7 @@ class GetAbsencesUseCase @Inject constructor(
 						timeRange.second,
 						includeExcused = !settings.infocenterAbsencesOnlyUnexcused,
 					),
-					FromCache.CACHED_THEN_LOAD, maxAge = ONE_HOUR, additionalKey = user.id
+					FromCache.CACHED_THEN_LOAD, maxAge = ONE_HOUR, additionalKey = userRepository.currentUser!!.id
 				)
 				.map {
 					if (settings.infocenterAbsencesSortReverse)

@@ -2,8 +2,8 @@ package com.sapuseven.untis.modules
 
 import android.content.Context
 import com.sapuseven.untis.BuildConfig
-import com.sapuseven.untis.components.BuildConfigFields
-import com.sapuseven.untis.components.BuildConfigFieldsProvider
+import com.sapuseven.untis.helpers.BuildConfigFields
+import com.sapuseven.untis.helpers.BuildConfigFieldsProvider
 import crocodile8.universal_cache.time.TimeProvider
 import dagger.Module
 import dagger.Provides

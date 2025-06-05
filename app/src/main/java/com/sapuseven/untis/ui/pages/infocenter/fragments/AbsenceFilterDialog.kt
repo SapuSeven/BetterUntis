@@ -25,7 +25,8 @@ import androidx.compose.ui.res.stringResource
 import com.sapuseven.compose.protostore.ui.preferences.ListPreference
 import com.sapuseven.compose.protostore.ui.preferences.SwitchPreference
 import com.sapuseven.untis.R
-import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
+import com.sapuseven.untis.data.repository.UserSettingsRepository
+import com.sapuseven.untis.data.settings.model.AbsencesTimeRange
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -88,8 +89,8 @@ fun AbsenceFilterDialog(
 					entries = stringArrayResource(id = R.array.infocenter_absences_list_values),
 					entryLabels = stringArrayResource(id = R.array.infocenter_absences_list),
 					settingsRepository = settingsRepository,
-					value = { it.infocenterAbsencesTimeRange },
-					onValueChange = { infocenterAbsencesTimeRange = it }
+					value = { it.infocenterAbsencesTimeRange.number.toString() },
+					onValueChange = { infocenterAbsencesTimeRange = AbsencesTimeRange.forNumber(it.toInt()) }
 				)
 			}
 		}

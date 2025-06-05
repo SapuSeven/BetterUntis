@@ -3,11 +3,8 @@ package com.sapuseven.untis.data.database.entities
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import com.sapuseven.untis.api.model.untis.masterdata.ExcuseStatus
 import com.sapuseven.untis.api.model.untis.masterdata.Holiday
 import com.sapuseven.untis.data.database.Mapper
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import java.time.LocalDate
 
 @Entity(

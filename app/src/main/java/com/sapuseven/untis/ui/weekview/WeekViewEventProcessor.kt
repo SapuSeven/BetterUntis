@@ -1,9 +1,9 @@
 package com.sapuseven.untis.ui.weekview
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import java.time.LocalDateTime
-import java.util.*
+import java.util.LinkedList
+import java.util.PriorityQueue
+import java.util.Queue
 
 
 private enum class EventType {

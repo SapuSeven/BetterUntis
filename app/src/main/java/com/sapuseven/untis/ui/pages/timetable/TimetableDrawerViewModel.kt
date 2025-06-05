@@ -8,10 +8,10 @@ import androidx.lifecycle.viewModelScope
 import com.sapuseven.untis.activities.main.NavItemNavigation
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.data.repository.MasterDataRepository
+import com.sapuseven.untis.data.repository.UserSettingsRepository
 import com.sapuseven.untis.data.settings.model.TimetableElement
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
-import com.sapuseven.untis.ui.pages.settings.UserSettingsRepository
 import com.sapuseven.untis.ui.preferences.toTimetableElement
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TimetableDrawerViewModel @Inject constructor(
-	userSettingsRepositoryFactory: UserSettingsRepository.Factory,
+	private val userSettingsRepository: UserSettingsRepository,
 	private val navigator: AppNavigator,
 	private val masterDataRepository: MasterDataRepository,
 ) : ViewModel() {
@@ -31,14 +31,13 @@ class TimetableDrawerViewModel @Inject constructor(
 	var bookmarkDeleteDialog by mutableStateOf<PeriodElement?>(null)
 		private set
 
-	private val userSettingsRepository = userSettingsRepositoryFactory.create()
-
 	private val _bookmarks = MutableStateFlow<List<TimetableElement>>(emptyList())
 	val bookmarks: StateFlow<List<TimetableElement>> = _bookmarks
 
 	init {
 		viewModelScope.launch {
 			userSettingsRepository.getSettings().collect {
+				it.themeColor
 				_bookmarks.value = it.bookmarksList
 			}
 		}

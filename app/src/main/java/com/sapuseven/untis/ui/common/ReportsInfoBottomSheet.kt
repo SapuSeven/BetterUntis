@@ -36,7 +36,7 @@ import com.sapuseven.compose.protostore.ui.preferences.SwitchPreference
 import com.sapuseven.compose.protostore.ui.utils.LocalListItemColors
 import com.sapuseven.untis.R
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
-import com.sapuseven.untis.ui.pages.settings.GlobalSettingsRepository
+import com.sapuseven.untis.data.repository.GlobalSettingsRepository
 import kotlinx.coroutines.launch
 
 
