@@ -176,7 +176,7 @@
     <string name="preference_notifications_visibility_short">Короткое имя</string>
     <string name="logindatainput_error_field_empty">Поле не может быть пустым!</string>
     <string name="preference_timetable_bold_lesson_name">Название урока жирным</string>
-    <string name="preference_notifications_enable">Уведомления</string>
+    <string name="preference_notifications_enable">Включить уведомления про перерыв</string>
     <string name="preference_notifications_clear">Очистить все уведомления</string>
     <string name="logindatainput_error_invalid_url">Неправильный URL!</string>
     <string name="preference_info_privacy_desc">Соавторы загружаются с GitHub. Для получения подробностей, ознакомьтесь с их политикой конфиденциальности.</string>
@@ -205,7 +205,7 @@
     <string name="preference_timetable_personal_timetable">Своё персональное расписание</string>
     <string name="preference_info_contributors">Соавторы</string>
     <string name="preference_dark_theme_off">Никогда</string>
-    <string name="preference_timetable_colors_reset">Сбросить цвета</string>
+    <string name="preference_timetable_colors_reset">Сбросить цвета пунктов</string>
     <string name="preference_theme">Выберите тему</string>
     <string name="preference_timetable_item_text_light">Элементы расписания белым</string>
     <string name="preference_info_app_version">Версия приложения</string>
@@ -229,7 +229,7 @@
     <string name="all_personal">Персональное</string>
     <string name="nav_all_timetables">Расписания</string>
     <string name="preference_category_styling_backgrounds">Цвета предметов</string>
-    <string name="notifications_text_message_separator">"/ "</string>
+    <string name="notifications_text_message_separator">/</string>
     <string name="all_anonymous">Аноним</string>
     <string name="preference_category_notifications_visible_fields">Отображаемые поля</string>
     <string name="login_please_log_in">Выберите один из следующих вариантов входа в систему:</string>
@@ -343,19 +343,19 @@
     <string name="widget_disclaimer_text">Работа над функцией виджетов еще не завершена, и она может работать корректно не на всех устройствах.</string>
     <string name="login_demo">Попробуй!</string>
     <plurals name="main_time_diff_minutes">
-        <item quantity="one">минуту назад</item>
+        <item quantity="one">%d минут назад</item>
         <item quantity="few">%d минуты назад</item>
         <item quantity="many">%d минут назад</item>
         <item quantity="other">%d минут назад</item>
     </plurals>
     <plurals name="main_time_diff_hours">
-        <item quantity="one">час назад</item>
+        <item quantity="one">%d час назад</item>
         <item quantity="few">%d часа назад</item>
         <item quantity="many">%d часов назад</item>
         <item quantity="other">%d часов назад</item>
     </plurals>
     <plurals name="main_time_diff_days">
-        <item quantity="one">день назад</item>
+        <item quantity="one">%d день назад</item>
         <item quantity="few">%d дня назад</item>
         <item quantity="many">%d дней назад</item>
         <item quantity="other">%d дней назад</item>
@@ -379,14 +379,20 @@
     <string name="main_dialog_reports_info_1">BetterUntis использует Sentry для сбора информации о сбоях и других ошибках.</string>
     <string name="preference_reports_info_desc">Эти настройки применяются ко всем профилям и помогают улучшить работу приложения.\nНикакая личная информация не собирается.\nДля вступления изменений в силу требуется перезапуск приложения.</string>
     <string name="main_dialog_reports_title">Отчеты об ошибках</string>
-    <string name="preference_reports_breadcrumbs_desc">Включите дополнительную информацию о том, что произошло до возникновения ошибки.</string>
+    <string name="preference_reports_breadcrumbs_desc">Включить дополнительную информацию о том, что произошло до возникновения ошибки.</string>
     <string name="infocenter_absences_list_schoolyear">Текущий учебный год</string>
     <string name="all_open_datepicker">Открыть средство выбора даты</string>
     <string name="all_timepicker_select">Выбрать время</string>
     <string name="all_start_time">Время начала</string>
     <string name="all_end_time">Время окончания</string>
-    <string name="preference_category_app_language">Язык Приложений</string>
-    <string name="preference_app_language">Язык Приложений</string>
+    <string name="preference_category_app_language">Язык приложения</string>
+    <string name="preference_app_language">Язык приложения</string>
     <string name="preferences_default_color">Цвет по умолчанию</string>
     <string name="preference_timetable_range_index_reset_desc">Убедитесь, что часовые метки всегда начинаются с 1</string>
+    <string name="all_warning">Внимание</string>
+    <string name="all_save">Сохранить</string>
+    <string name="preference_category_notifications_break">Уведомления про перерыв</string>
+    <string name="widget_timetable_link">Создать ярлык на…</string>
+    <string name="preference_automute_allow_priority">Разрешить важным событиям игнорировать отключение звука</string>
+    <string name="preference_timetable_zoom_gesture">Включить жест масштабирования</string>
 </resources>
