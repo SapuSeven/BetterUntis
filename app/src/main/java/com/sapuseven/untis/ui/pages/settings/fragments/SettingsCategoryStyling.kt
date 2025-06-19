@@ -15,15 +15,25 @@ import com.sapuseven.compose.protostore.ui.preferences.MultiSelectListPreference
 import com.sapuseven.compose.protostore.ui.preferences.PreferenceGroup
 import com.sapuseven.compose.protostore.ui.preferences.SwitchPreference
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.repository.UserSettingsRepository
 import com.sapuseven.untis.data.repository.withDefault
 import com.sapuseven.untis.data.settings.model.DarkTheme
 import com.sapuseven.untis.ui.pages.settings.SettingsScreenViewModel
+import com.sapuseven.untis.ui.weekview.EventColor
 
 @Composable
 fun SettingsCategoryStyling(viewModel: SettingsScreenViewModel) {
-	val defaultColors = UserSettingsRepository.getDefaultColors(MaterialTheme.colorScheme)
-	
+	// *past colors are currently disabled as an "experiment" to simplify color preferences
+
+	val defaultThemeColor = MaterialTheme.colorScheme.primary
+	val defaultBackgroundRegular = EventColor.ThemePrimary.color()
+	//val defaultBackgroundRegularPast = EventColor.ThemePrimary.pastColor()
+	val defaultBackgroundExam = EventColor.ThemeError.color()
+	//val defaultBackgroundExamPast = EventColor.ThemeError.pastColor()
+	val defaultBackgroundIrregular = EventColor.ThemeTertiary.color()
+	//val defaultBackgroundIrregularPast = EventColor.ThemeTertiary.pastColor()
+	val defaultBackgroundCancelled = EventColor.ThemeSecondary.color()
+	//val defaultBackgroundCancelledPast = EventColor.ThemeSecondary.pastColor()
+
 	PreferenceGroup(stringResource(id = R.string.preference_category_styling_colors)) {
 		ColorPreference(
 			title = { Text(stringResource(R.string.preference_background_future)) },
@@ -72,25 +82,25 @@ fun SettingsCategoryStyling(viewModel: SettingsScreenViewModel) {
 				!it.schoolBackgroundList.contains("regular")
 			},
 			settingsRepository = viewModel.userSettingsRepository,
-			value = { it.backgroundRegular.withDefault(it.hasBackgroundRegular(), defaultColors.backgroundRegular.toArgb()) },
+			value = { it.backgroundRegular.withDefault(it.hasBackgroundRegular(), defaultBackgroundRegular.toArgb()) },
 			onValueChange = { backgroundRegular = it ?: run { clearBackgroundRegular(); return@ColorPreference }  },
 			showAlphaSlider = true,
-			defaultColor = defaultColors.backgroundRegular,
+			defaultColor = defaultBackgroundRegular,
 			defaultColorLabel = stringResource(id = R.string.preferences_theme_color)
 		)
 
-		ColorPreference(
+		/*ColorPreference(
 			title = { Text(stringResource(R.string.preference_background_regular_past)) },
 			enabledCondition = {
 				!it.schoolBackgroundList.contains("regular")
 			},
 			settingsRepository = viewModel.userSettingsRepository,
-			value = { it.backgroundRegularPast.withDefault(it.hasBackgroundRegularPast(), defaultColors.backgroundRegularPast.toArgb()) },
+			value = { it.backgroundRegularPast.withDefault(it.hasBackgroundRegularPast(), defaultBackgroundRegularPast.toArgb()) },
 			onValueChange = { backgroundRegularPast = it ?: run { clearBackgroundRegularPast(); return@ColorPreference }  },
 			showAlphaSlider = true,
-			defaultColor = defaultColors.backgroundRegularPast,
+			defaultColor = defaultBackgroundRegularPast,
 			defaultColorLabel = stringResource(id = R.string.preferences_theme_color)
-		)
+		)*/
 
 		ColorPreference(
 			title = { Text(stringResource(R.string.preference_background_exam)) },
@@ -98,25 +108,25 @@ fun SettingsCategoryStyling(viewModel: SettingsScreenViewModel) {
 				!it.schoolBackgroundList.contains("exam")
 			},
 			settingsRepository = viewModel.userSettingsRepository,
-			value = { it.backgroundExam.withDefault(it.hasBackgroundExam(), defaultColors.backgroundExam.toArgb()) },
+			value = { it.backgroundExam.withDefault(it.hasBackgroundExam(), defaultBackgroundExam.toArgb()) },
 			onValueChange = { backgroundExam = it ?: run { clearBackgroundExam(); return@ColorPreference }  },
 			showAlphaSlider = true,
-			defaultColor = defaultColors.backgroundExam,
+			defaultColor = defaultBackgroundExam,
 			defaultColorLabel = stringResource(id = R.string.preferences_theme_color)
 		)
 
-		ColorPreference(
+		/*ColorPreference(
 			title = { Text(stringResource(R.string.preference_background_exam_past)) },
 			enabledCondition = {
 				!it.schoolBackgroundList.contains("exam")
 			},
 			settingsRepository = viewModel.userSettingsRepository,
-			value = { it.backgroundExamPast.withDefault(it.hasBackgroundExamPast(), defaultColors.backgroundExamPast.toArgb()) },
+			value = { it.backgroundExamPast.withDefault(it.hasBackgroundExamPast(), defaultBackgroundExamPast.toArgb()) },
 			onValueChange = { backgroundExamPast = it ?: run { clearBackgroundExamPast(); return@ColorPreference }  },
 			showAlphaSlider = true,
-			defaultColor = defaultColors.backgroundExamPast,
+			defaultColor = defaultBackgroundExamPast,
 			defaultColorLabel = stringResource(id = R.string.preferences_theme_color)
-		)
+		)*/
 
 		ColorPreference(
 			title = { Text(stringResource(R.string.preference_background_irregular)) },
@@ -124,25 +134,25 @@ fun SettingsCategoryStyling(viewModel: SettingsScreenViewModel) {
 				!it.schoolBackgroundList.contains("irregular")
 			},
 			settingsRepository = viewModel.userSettingsRepository,
-			value = { it.backgroundIrregular.withDefault(it.hasBackgroundIrregular(), defaultColors.backgroundIrregular.toArgb()) },
+			value = { it.backgroundIrregular.withDefault(it.hasBackgroundIrregular(), defaultBackgroundIrregular.toArgb()) },
 			onValueChange = { backgroundIrregular = it ?: run { clearBackgroundIrregular(); return@ColorPreference }  },
 			showAlphaSlider = true,
-			defaultColor = defaultColors.backgroundIrregular,
+			defaultColor = defaultBackgroundIrregular,
 			defaultColorLabel = stringResource(id = R.string.preferences_theme_color)
 		)
 
-		ColorPreference(
+		/*ColorPreference(
 			title = { Text(stringResource(R.string.preference_background_irregular_past)) },
 			enabledCondition = {
 				!it.schoolBackgroundList.contains("irregular")
 			},
 			settingsRepository = viewModel.userSettingsRepository,
-			value = { it.backgroundIrregularPast.withDefault(it.hasBackgroundIrregularPast(), defaultColors.backgroundIrregularPast.toArgb()) },
+			value = { it.backgroundIrregularPast.withDefault(it.hasBackgroundIrregularPast(), defaultBackgroundIrregularPast.toArgb()) },
 			onValueChange = { backgroundIrregularPast = it ?: run { clearBackgroundIrregularPast(); return@ColorPreference }  },
 			showAlphaSlider = true,
-			defaultColor = defaultColors.backgroundIrregularPast,
+			defaultColor = defaultBackgroundIrregularPast,
 			defaultColorLabel = stringResource(id = R.string.preferences_theme_color)
-		)
+		)*/
 
 		ColorPreference(
 			title = { Text(stringResource(R.string.preference_background_cancelled)) },
@@ -150,25 +160,25 @@ fun SettingsCategoryStyling(viewModel: SettingsScreenViewModel) {
 				!it.schoolBackgroundList.contains("cancelled")
 			},
 			settingsRepository = viewModel.userSettingsRepository,
-			value = { it.backgroundCancelled.withDefault(it.hasBackgroundCancelled(), defaultColors.backgroundCancelled.toArgb()) },
+			value = { it.backgroundCancelled.withDefault(it.hasBackgroundCancelled(), defaultBackgroundCancelled.toArgb()) },
 			onValueChange = { backgroundCancelled = it ?: run { clearBackgroundCancelled(); return@ColorPreference }  },
 			showAlphaSlider = true,
-			defaultColor = defaultColors.backgroundCancelled,
+			defaultColor = defaultBackgroundCancelled,
 			defaultColorLabel = stringResource(id = R.string.preferences_theme_color)
 		)
 
-		ColorPreference(
+		/*ColorPreference(
 			title = { Text(stringResource(R.string.preference_background_cancelled_past)) },
 			enabledCondition = {
 				!it.schoolBackgroundList.contains("cancelled")
 			},
 			settingsRepository = viewModel.userSettingsRepository,
-			value = { it.backgroundCancelledPast.withDefault(it.hasBackgroundCancelledPast(), defaultColors.backgroundCancelledPast.toArgb()) },
+			value = { it.backgroundCancelledPast.withDefault(it.hasBackgroundCancelledPast(), defaultBackgroundCancelledPast.toArgb()) },
 			onValueChange = { backgroundCancelledPast = it ?: run { clearBackgroundCancelledPast(); return@ColorPreference }  },
 			showAlphaSlider = true,
-			defaultColor = defaultColors.backgroundCancelledPast,
+			defaultColor = defaultBackgroundCancelledPast,
 			defaultColorLabel = stringResource(id = R.string.preferences_theme_color)
-		)
+		)*/
 
 		ConfirmDialogPreference(
 			title = { Text(stringResource(R.string.preference_timetable_colors_reset)) },
@@ -197,11 +207,11 @@ fun SettingsCategoryStyling(viewModel: SettingsScreenViewModel) {
 				)
 			},
 			settingsRepository = viewModel.userSettingsRepository,
-			value = { it.themeColor.withDefault(it.hasThemeColor(), defaultColors.themeColor.toArgb()) },
+			value = { it.themeColor.withDefault(it.hasThemeColor(), defaultThemeColor.toArgb()) },
 			onValueChange = {
 				themeColor = it ?: run { clearThemeColor(); return@ColorPreference }
 			},
-			defaultColor = defaultColors.themeColor,
+			defaultColor = defaultThemeColor,
 			defaultColorLabel = stringResource(id = R.string.preferences_theme_color_system)
 		)
 
