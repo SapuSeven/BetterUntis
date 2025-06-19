@@ -1,6 +1,5 @@
 package com.sapuseven.untis.mappers
 
-import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.toColorInt
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
@@ -15,26 +14,18 @@ import com.sapuseven.untis.helpers.BuildConfigFieldsProvider
 import com.sapuseven.untis.models.PeriodItem
 import com.sapuseven.untis.ui.weekview.Event
 import com.sapuseven.untis.ui.weekview.EventColor
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import java.time.DayOfWeek
 import java.time.temporal.ChronoUnit
+import javax.inject.Inject
 
-class TimetableMapper @AssistedInject constructor(
+class TimetableMapper @Inject constructor(
 	private val userRepository: UserRepository,
 	private val userSettingsRepository: UserSettingsRepository,
 	private val masterDataRepository: MasterDataRepository,
 	private val buildConfigFieldsProvider: BuildConfigFieldsProvider,
-	@Assisted private val colorScheme: ColorScheme?,
 ) {
-	@AssistedFactory
-	interface Factory {
-		fun create(colorScheme: ColorScheme? = null): TimetableMapper
-	}
-
 	/**
 	 * Prepares periods for further processing or displaying.
 	 *

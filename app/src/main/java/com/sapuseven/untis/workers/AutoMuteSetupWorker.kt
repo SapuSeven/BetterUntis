@@ -35,16 +35,14 @@ import java.time.temporal.ChronoUnit
  */
 @HiltWorker
 class AutoMuteSetupWorker @AssistedInject constructor(
-	@Assisted context: Context,
-	@Assisted params: WorkerParameters,
 	private val userSettingsRepository: UserSettingsRepository,
-	timetableMapperFactory: TimetableMapper.Factory,
-	timetableRepository: TimetableRepository,
+	private val timetableMapper: TimetableMapper,
 	private val masterDataRepository: MasterDataRepository,
 	private val userDao: UserDao,
+	@Assisted context: Context,
+	@Assisted params: WorkerParameters,
+	timetableRepository: TimetableRepository,
 ) : TimetableDependantWorker(context, params, timetableRepository) {
-	val timetableMapper = timetableMapperFactory.create()
-
 	companion object {
 		private const val LOG_TAG = "AutoMuteSetup"
 		private const val TAG_AUTO_MUTE_SETUP_WORK = "AutoMuteSetupWork"

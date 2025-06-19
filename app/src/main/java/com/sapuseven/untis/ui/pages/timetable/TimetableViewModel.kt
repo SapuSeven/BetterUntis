@@ -61,20 +61,15 @@ import javax.inject.Inject
 class TimetableViewModel @Inject constructor(
 	private val navigator: AppNavigator,
 	private val userSettingsRepository: UserSettingsRepository,
+	private val timetableMapper: TimetableMapper,
 	internal val userRepository: UserRepository,
 	internal val timetableRepository: TimetableRepository,
 	internal val masterDataRepository: MasterDataRepository,
 	internal val clock: Clock,
 	internal val weekLogicService: WeekLogicService,
-	//@Assisted internal val currentUser: User,
-	//@Assisted private val colorScheme: ColorScheme,
-	//@Assisted private val typography: Typography,
 	buildConfigFieldsProvider: BuildConfigFieldsProvider,
-	timetableMapperFactory: TimetableMapper.Factory,
 	savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-	private val timetableMapper = timetableMapperFactory.create()
-
 	private val args = savedStateHandle.toRoute<AppRoutes.Timetable>()
 
 	val requestedElement = args.getElement()

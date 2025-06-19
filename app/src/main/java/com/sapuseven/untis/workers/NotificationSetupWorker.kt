@@ -55,17 +55,15 @@ import java.time.format.FormatStyle
  */
 @HiltWorker
 class NotificationSetupWorker @AssistedInject constructor(
+	private val userSettingsRepository: UserSettingsRepository,
+	private val masterDataRepository: MasterDataRepository,
+	private val timetableMapper: TimetableMapper,
+	private val clock: Clock,
+	private val userDao: UserDao,
 	@Assisted context: Context,
 	@Assisted params: WorkerParameters,
 	timetableRepository: TimetableRepository,
-	timetableMapperFactory: TimetableMapper.Factory,
-	private val userSettingsRepository: UserSettingsRepository,
-	private val masterDataRepository: MasterDataRepository,
-	private val clock: Clock,
-	private val userDao: UserDao,
 ) : TimetableDependantWorker(context, params, timetableRepository) {
-	private val timetableMapper = timetableMapperFactory.create()
-
 	companion object {
 		private const val LOG_TAG = "NotificationSetup"
 		private const val TAG_NOTIFICATION_SETUP_WORK = "NotificationSetupWork"
