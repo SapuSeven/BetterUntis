@@ -195,7 +195,6 @@ fun ElementPickerDialogFullscreen(
 				.padding(innerPadding)
 				.fillMaxSize()
 		) {
-			//Text(text = "${elements.get(ElementType.ROOM)?.size ?: "?"} rooms")
 			ElementPickerElements(
 				selectedType = selectedType,
 				masterDataRepository = masterDataRepository,
@@ -333,7 +332,7 @@ fun ElementPickerElements(
 					) {
 						if (multiSelect)
 							Checkbox(
-								checked = items[item.element] ?: false,
+								checked = items[item.element] == true,
 								onCheckedChange = { items[item.element] = it },
 								interactionSource = interactionSource,
 								enabled = item.enabled

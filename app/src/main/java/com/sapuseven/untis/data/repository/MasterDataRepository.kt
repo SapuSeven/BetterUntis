@@ -79,16 +79,16 @@ class UntisMasterDataRepository @Inject constructor(
 		get() = _userData.value
 
 	private val _allClasses = MutableStateFlow<Map<Long, KlasseEntity>>(emptyMap())
-	override val allClasses: StateFlow<List<PeriodElement>> = _allClasses.mapToPeriodElements(scope)
+	override val allClasses: StateFlow<List<PeriodElement>> = _allClasses.mapToPeriodElements(scope, ElementType.CLASS)
 
 	private val _allTeachers = MutableStateFlow<Map<Long, TeacherEntity>>(emptyMap())
-	override val allTeachers: StateFlow<List<PeriodElement>> = _allTeachers.mapToPeriodElements(scope)
+	override val allTeachers: StateFlow<List<PeriodElement>> = _allTeachers.mapToPeriodElements(scope, ElementType.TEACHER)
 
 	private val _allSubjects = MutableStateFlow<Map<Long, SubjectEntity>>(emptyMap())
-	override val allSubjects: StateFlow<List<PeriodElement>> = _allSubjects.mapToPeriodElements(scope)
+	override val allSubjects: StateFlow<List<PeriodElement>> = _allSubjects.mapToPeriodElements(scope, ElementType.SUBJECT)
 
 	private val _allRooms = MutableStateFlow<Map<Long, RoomEntity>>(emptyMap())
-	override val allRooms: StateFlow<List<PeriodElement>> = _allRooms.mapToPeriodElements(scope)
+	override val allRooms: StateFlow<List<PeriodElement>> = _allRooms.mapToPeriodElements(scope, ElementType.ROOM)
 
 	init {
 		scope.launch {
@@ -154,10 +154,10 @@ class UntisMasterDataRepository @Inject constructor(
 	override fun isAllowed(periodElement: PeriodElement) = isAllowed(periodElement.id, periodElement.type)
 }
 
-private fun <T : ElementEntity> StateFlow<Map<Long, T>>.mapToPeriodElements(scope: CoroutineScope): StateFlow<List<PeriodElement>> {
-	return this.map { it.values.map { PeriodElement(ElementType.CLASS, it.id) }}.stateIn(
+private fun <T : ElementEntity> StateFlow<Map<Long, T>>.mapToPeriodElements(scope: CoroutineScope, type: ElementType): StateFlow<List<PeriodElement>> {
+	return this.map { it.values.map { PeriodElement(type, it.id) }}.stateIn(
 		scope = scope,
-		started = SharingStarted.WhileSubscribed(),
+		started = SharingStarted.Eagerly,
 		initialValue = emptyList()
 	)
 }
