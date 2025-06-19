@@ -2,7 +2,7 @@ version: 2.1
 orbs:
   gh: circleci/github-cli@2.2.0
   jq: circleci/jq@2.2.0
-  android: circleci/android@3.0.2
+  android: circleci/android@3.1.0
 filters: &release
   branches:
     ignore: /.*/
