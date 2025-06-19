@@ -6,6 +6,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -153,8 +156,7 @@ class TimetableViewModel @Inject constructor(
 					range = userSettings.timetableRange.convertRangeToPair(),
 					rangeIndexReset = userSettings.timetableRangeIndexReset
 				)
-				/*_weekViewColorScheme.value = WeekViewColorScheme(
-					dividerColor = colorScheme.outline,
+				_weekViewColorScheme.value = WeekViewColorScheme(
 					pastBackgroundColor = Color(userSettings.backgroundPast),
 					futureBackgroundColor = Color(userSettings.backgroundFuture),
 					indicatorColor = Color(userSettings.marker),
@@ -162,13 +164,15 @@ class TimetableViewModel @Inject constructor(
 				_weekViewEventStyle.value = WeekViewEventStyle(
 					padding = userSettings.timetableItemPadding,
 					cornerRadius = userSettings.timetableItemCornerRadius,
-					lessonNameStyle = typography.bodyLarge.copy(
+					lessonNameStyle = TextStyle(
 						fontSize = userSettings.timetableLessonNameFontSize.sp,
 						fontWeight = if (userSettings.timetableBoldLessonName) FontWeight.Bold else FontWeight.Normal
 					),
-					lessonInfoStyle = typography.bodySmall.copy(fontSize = userSettings.timetableLessonInfoFontSize.sp),
+					lessonInfoStyle = TextStyle(
+						fontSize = userSettings.timetableLessonInfoFontSize.sp
+					),
 					lessonInfoCentered = userSettings.timetableCenteredLessonInfo,
-				)*/
+				)
 				_weekViewScale.value = userSettings.timetableZoomLevel
 				_weekViewZoomEnabled.value = userSettings.timetableZoomEnabled
 			}

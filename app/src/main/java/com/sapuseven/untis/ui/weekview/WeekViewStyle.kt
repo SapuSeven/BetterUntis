@@ -19,7 +19,7 @@ data class WeekViewEventStyle(
 		fun default(): WeekViewEventStyle = WeekViewEventStyle(
 			padding = 2,
 			cornerRadius = 4,
-			lessonNameStyle = TextStyle.Default.copy(fontWeight = FontWeight.Bold),
+			lessonNameStyle = TextStyle.Default,
 			lessonInfoStyle = TextStyle.Default,
 			lessonInfoCentered = false,
 		)
