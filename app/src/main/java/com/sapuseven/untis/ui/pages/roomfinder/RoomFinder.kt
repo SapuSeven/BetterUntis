@@ -1,6 +1,10 @@
 package com.sapuseven.untis.ui.pages.roomfinder
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,6 +21,7 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -59,7 +64,11 @@ import java.util.Locale
 fun RoomFinder(
 	viewModel: RoomFinderViewModel = hiltViewModel()
 ) {
+	val roomList by viewModel.roomList.collectAsStateWithLifecycle()
 	var showElementPicker by rememberSaveable { mutableStateOf(false) }
+
+	val hours by viewModel.hourList.collectAsStateWithLifecycle()
+	val selectedIndex by viewModel.selectedHourIndex.collectAsStateWithLifecycle()
 
 	AppScaffold(
 		modifier = Modifier.bottomInsets(),
@@ -76,15 +85,30 @@ fun RoomFinder(
 						)
 					}
 				},
-				actions = {
-					IconButton(onClick = { showElementPicker = true }) {
-						Icon(
-							imageVector = Icons.Outlined.Add,
-							contentDescription = stringResource(id = R.string.all_add)
-						)
-					}
-				}
 			)
+		},
+		floatingActionButton = {
+			FloatingActionButton(
+				//modifier = Modifier.bottomInsets(),
+				containerColor = MaterialTheme.colorScheme.primary,
+				onClick = { showElementPicker = true }
+			) {
+				Icon(
+					imageVector = Icons.Outlined.Add,
+					contentDescription = stringResource(id = R.string.all_add)
+				)
+			}
+		},
+		bottomBar = {
+			AnimatedVisibility(
+				visible = roomList.isNotEmpty(),
+				enter = fadeIn() + expandVertically(),
+				exit = fadeOut() + shrinkVertically()
+			) {
+				RoomFinderHourSelector(hours, selectedIndex) {
+					viewModel.selectHour(it)
+				}
+			}
 		}
 	) { innerPadding ->
 		Column(
@@ -99,11 +123,6 @@ fun RoomFinder(
 					.fillMaxWidth()
 					.weight(1f)
 			) {
-				val roomList by viewModel.roomList.collectAsStateWithLifecycle()
-
-				val hours by viewModel.hourList.collectAsStateWithLifecycle()
-				val selectedIndex by viewModel.selectedHourIndex.collectAsStateWithLifecycle()
-
 				LazyColumn(
 					Modifier
 						.fillMaxWidth()
@@ -131,10 +150,6 @@ fun RoomFinder(
 							.align(Alignment.CenterHorizontally)
 							.weight(1f)
 					)
-				else
-					RoomFinderHourSelector(hours, selectedIndex) {
-						viewModel.selectHour(it)
-					}
 			}
 		}
 	}
@@ -253,8 +268,8 @@ fun RoomListItem(
 	item: RoomFinderItem,
 	hours: List<RoomFinderHour>,
 	hourIndex: Int,
-	onDelete: (() -> Unit)? = null,
 	modifier: Modifier = Modifier,
+	onDelete: (() -> Unit)? = null,
 ) {
 	// Potential improvement: handle loading errors
 
