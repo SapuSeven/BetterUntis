@@ -20,7 +20,7 @@ jobs:
       - android/restore_gradle_cache
       - run:
           name: Download Dependencies
-          command: ./gradlew androidDependencies
+          command: ./gradlew --no-daemon androidDependencies
       - run:
           name: Prepare signing config
           command: |
@@ -31,7 +31,7 @@ jobs:
             echo 'export KEY_RELEASE_PASSWORD=$(echo "$KEY_RELEASE_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
       - run:
           name: Initial build
-          command: ./gradlew --no-configuration-cache --no-daemon assemble bundle
+          command: ./gradlew --no-daemon assemble bundle
           environment:
             GRADLE_OPTS: '
               -Dorg.gradle.daemon=false
