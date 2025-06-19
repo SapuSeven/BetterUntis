@@ -29,6 +29,7 @@ import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
 import com.sapuseven.untis.ui.preferences.toPeriodElement
 import com.sapuseven.untis.ui.weekview.Event
+import com.sapuseven.untis.ui.weekview.EventColor
 import com.sapuseven.untis.ui.weekview.Holiday
 import com.sapuseven.untis.ui.weekview.WeekViewColorScheme
 import com.sapuseven.untis.ui.weekview.WeekViewEventStyle
@@ -184,7 +185,7 @@ class TimetableViewModel @Inject constructor(
 				.map { holiday ->
 						Holiday(
 							title = holiday.name,
-							color = Color(0xFFBB86FC),
+							colorScheme = EventColor.Custom(Color(0xFFBB86FC)),
 							textColor = Color.White,
 							start = holiday.startDate!!,
 							end = holiday.endDate!!,

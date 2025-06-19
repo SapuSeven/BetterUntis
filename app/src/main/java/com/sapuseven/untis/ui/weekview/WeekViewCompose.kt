@@ -58,6 +58,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
@@ -75,6 +76,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
+import androidx.core.graphics.ColorUtils
 import com.sapuseven.untis.R
 import com.sapuseven.untis.services.WeekLogicService
 import com.sapuseven.untis.ui.common.conditional
@@ -92,13 +94,38 @@ import java.time.temporal.ChronoUnit
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
+sealed class EventColor(
+	private val colorForScheme: (ColorScheme) -> Color,
+	private val textColorForScheme: (ColorScheme) -> Color
+) {
+	object Debug : EventColor({ Color.Magenta }, { Color.Black }) // Used for debugging to highlight potential issues
+	object ThemePrimary : EventColor({ it.primary }, { it.onPrimary })
+	object ThemeSecondary : EventColor({ it.secondary }, { it.onSecondary })
+	object ThemeTertiary : EventColor({ it.tertiary }, { it.onTertiary })
+	object ThemeError : EventColor({ it.error }, { it.onError })
+
+	data class Custom(val color: Color, val textColor: Color? = null) : EventColor(
+		colorForScheme = { color },
+		textColorForScheme = {
+			textColor ?: if (ColorUtils.calculateLuminance(color.toArgb()) < 0.5) Color.White else Color.Black
+		}
+	)
+
+	@Composable
+	fun color() = colorForScheme(MaterialTheme.colorScheme)
+
+	@Composable
+	fun pastColor() = color().copy(alpha = .7f)
+
+	@Composable
+	fun textColor() = textColorForScheme(MaterialTheme.colorScheme)
+}
+
 data class Event<T>(
 	var title: CharSequence,
 	var top: CharSequence = "",
 	var bottom: CharSequence = "",
-	var color: Color,
-	var pastColor: Color,
-	var textColor: Color,
+	var colorScheme: EventColor,
 	var start: LocalDateTime,
 	var end: LocalDateTime,
 	val data: T? = null
@@ -110,7 +137,7 @@ data class Event<T>(
 
 data class Holiday(
 	var title: CharSequence,
-	var color: Color,
+	var colorScheme: EventColor,
 	var textColor: Color,
 	var start: LocalDate,
 	var end: LocalDate,
@@ -127,6 +154,10 @@ fun <T> WeekViewEvent(
 	val eventStyle = LocalWeekViewEventStyle.current
 	val outerPadding = eventStyle.padding.dp
 
+	val color = event.colorScheme.color()
+	val pastColor = event.colorScheme.pastColor()
+	val textColor = event.colorScheme.textColor()
+
 	Box(
 		modifier = modifier
 			.fillMaxSize()
@@ -134,12 +165,12 @@ fun <T> WeekViewEvent(
 			.clip(RoundedCornerShape(eventStyle.cornerRadius.dp))
 			.drawBehind {
 				drawVerticalSplitRect(
-					event.pastColor,
-					event.color,
+					pastColor,
+					color,
 					topLeft = Offset(-outerPadding.toPx(), -outerPadding.toPx()),
 					size = Size(size.width + outerPadding.toPx() * 2, size.height + outerPadding.toPx() * 2),
 					division = ((currentTime.seconds() - event.start.seconds()).toFloat()
-						/ (event.end.seconds() - event.start.seconds()).toFloat())
+							/ (event.end.seconds() - event.start.seconds()).toFloat())
 						.coerceIn(0f, 1f)
 				)
 			}
@@ -153,7 +184,7 @@ fun <T> WeekViewEvent(
 			style = eventStyle.lessonInfoStyle,
 			textAlign = if (eventStyle.lessonInfoCentered) TextAlign.Center else TextAlign.Start,
 			maxLines = 1,
-			color = event.textColor,
+			color = textColor,
 			modifier = Modifier
 				.fillMaxWidth()
 				.align(Alignment.TopCenter)
@@ -164,7 +195,7 @@ fun <T> WeekViewEvent(
 			style = eventStyle.lessonNameStyle,
 			textAlign = TextAlign.Center,
 			maxLines = 1,
-			color = event.textColor,
+			color = textColor,
 			modifier = Modifier.align(Alignment.Center)
 		)
 
@@ -173,7 +204,7 @@ fun <T> WeekViewEvent(
 			style = eventStyle.lessonInfoStyle,
 			textAlign = if (eventStyle.lessonInfoCentered) TextAlign.Center else TextAlign.End,
 			maxLines = 1,
-			color = event.textColor,
+			color = textColor,
 			modifier = Modifier
 				.fillMaxWidth()
 				.align(Alignment.BottomCenter)
@@ -194,9 +225,7 @@ fun EventPreview() {
 		WeekViewEvent(
 			event = Event<Nothing>(
 				title = "Test",
-				color = MaterialTheme.colorScheme.primary,
-				pastColor = MaterialTheme.colorScheme.primary,
-				textColor = MaterialTheme.colorScheme.onPrimary,
+				colorScheme = EventColor.ThemePrimary,
 				start = LocalDateTime.parse("2021-05-18T09:00:00"),
 				end = LocalDateTime.parse("2021-05-18T11:00:00"),
 				top = "This is a",
@@ -222,9 +251,7 @@ fun EventStyledPreview() {
 		WeekViewEvent(
 			event = Event<Nothing>(
 				title = "Styled",
-				color = MaterialTheme.colorScheme.primary,
-				pastColor = MaterialTheme.colorScheme.primary,
-				textColor = MaterialTheme.colorScheme.onPrimary,
+				colorScheme = EventColor.ThemePrimary,
 				start = LocalDateTime.parse("2021-05-18T09:00:00"),
 				end = LocalDateTime.parse("2021-05-18T11:00:00"),
 				top = "This is a",
@@ -863,7 +890,8 @@ fun <T> WeekViewCompose(
 
 		HorizontalPager(state = pagerState) { index ->
 			val pageOffset = index - startPage
-			val visibleStartDate = weekLogicService.currentWeekStartDate().plusWeeks(pageOffset.toLong()) // 1 = Monday, 7 = Sunday
+			val visibleStartDate =
+				weekLogicService.currentWeekStartDate().plusWeeks(pageOffset.toLong()) // 1 = Monday, 7 = Sunday
 
 			Column {
 				WeekViewHeader(
@@ -888,13 +916,12 @@ fun <T> WeekViewCompose(
 
 					val holidayEvents = remember {
 						holidays.filter { holiday ->
-							visibleStartDate.isBefore(holiday.end) && visibleStartDate.plusDays(numDays.toLong()).isAfter(holiday.start)
+							visibleStartDate.isBefore(holiday.end) && visibleStartDate.plusDays(numDays.toLong())
+								.isAfter(holiday.start)
 						}.map {
 							Event<T>(
 								title = it.title,
-								color = it.color,
-								pastColor = it.color,
-								textColor = it.textColor,
+								colorScheme = it.colorScheme,
 								start = it.start.atStartOfDay(),
 								end = it.end.atTime(LocalTime.MAX),
 							)
