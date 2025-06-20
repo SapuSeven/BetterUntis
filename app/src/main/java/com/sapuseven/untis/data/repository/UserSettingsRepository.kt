@@ -19,14 +19,14 @@ class UserSettingsRepository @Inject constructor(
 		return getAllSettings().map { userSettings -> userSettings.userSettingsMap.getOrDefault(userId, UserSettings.getDefaultInstance()) }
 	}
 
-	private fun getUserSettings(dataStore: Settings, userId: Long): UserSettings {
+	private fun getUserSettings(dataStore: Settings, userId: Long?): UserSettings {
 		Log.d("SettingsRepository", "DataStore getUserSettings #$userId")
 
 		return dataStore.userSettingsMap.getOrDefault(userId, UserSettings.getDefaultInstance())
 	}
 
 	override fun getUserSettings(dataStore: Settings): UserSettings {
-		return getUserSettings(dataStore, userRepository.currentUser!!.id)
+		return getUserSettings(dataStore, userRepository.currentUser?.id)
 	}
 
 	override fun updateUserSettings(currentData: Settings, userSettings: UserSettings): Settings {
