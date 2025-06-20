@@ -26,12 +26,17 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Prepare signing config
+        env:
+          KEYSTORE_ENCODED: ${{ secrets.KEYSTORE_ENCODED }}
+          KEYSTORE_PASSWORD_ENCODED: ${{ secrets.KEYSTORE_PASSWORD_ENCODED }}
+          KEY_DEBUG_PASSWORD_ENCODED: ${{ secrets.KEY_DEBUG_PASSWORD_ENCODED }}
+          KEY_RELEASE_PASSWORD_ENCODED: ${{ secrets.KEY_RELEASE_PASSWORD_ENCODED }}
         run: |
-          if [[ ! -v KEYSTORE_ENCODED ]]; then exit 0; fi
+          if [[ ! -v KEYSTORE_ENCODED ]]; then exit 1; fi
           echo $KEYSTORE_ENCODED | base64 --decode >> app/BetterUntis.jks
-          echo 'export KEYSTORE_PASSWORD=$(echo "$KEYSTORE_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
-          echo 'export KEY_DEBUG_PASSWORD=$(echo "$KEY_DEBUG_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
-          echo 'export KEY_RELEASE_PASSWORD=$(echo "$KEY_RELEASE_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
+          echo 'KEYSTORE_PASSWORD=$(echo "$KEYSTORE_PASSWORD_ENCODED" | base64 --decode)' >> $GITHUB_ENV
+          echo 'KEY_DEBUG_PASSWORD=$(echo "$KEY_DEBUG_PASSWORD_ENCODED" | base64 --decode)' >> $GITHUB_ENV
+          echo 'KEY_RELEASE_PASSWORD=$(echo "$KEY_RELEASE_PASSWORD_ENCODED" | base64 --decode)' >> $GITHUB_ENV
 
       - name: Assemble release
         run: ./gradlew assembleGmsRelease bundleGmsRelease
@@ -64,3 +69,34 @@ jobs:
               --title "BetterUntis $TAG" \
               --notes-file "./fastlane/metadata/android/en-US/changelogs/$TAG.txt" \
               "./app/build/outputs/apk/gms/release/app-gms-release.apk#BetterUntis $TAG.apk"
+
+  fastlane:
+    name: Create Release on Google Play Store
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: betteruntis-release
+          path: app/build/outputs
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          
+      - name: Prepare credentials
+        env:
+          GOOGLE_PLAY_KEY_ENCODED: ${{ secrets.GOOGLE_PLAY_KEY_ENCODED }}
+        run: |
+          echo $GOOGLE_PLAY_KEY_ENCODED | base64 --decode > fastlane/key.json
+
+      - name: Deploy to Play Store
+        env:
+          TAG: 5.0.0-beta01 #${{ github.ref_name }}
+        run: |
+            for f in fastlane/metadata/android/*/changelogs; do [[ -e "$f/$TAG.txt" ]] && cp "$f/$TAG.txt" "$f/default.txt"; done;
+            bundle exec fastlane deploy aab:'./app/build/outputs/bundle/gmsRelease/app-gms-release.aab'
