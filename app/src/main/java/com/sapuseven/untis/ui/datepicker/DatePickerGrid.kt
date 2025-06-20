@@ -3,7 +3,12 @@ package com.sapuseven.untis.ui.datepicker
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -18,11 +23,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.ui.common.conditional
 import com.sapuseven.untis.ui.common.ifNotNull
-import org.joda.time.LocalDate
-import org.joda.time.format.DateTimeFormat
 import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
-import java.util.*
+import java.time.temporal.TemporalAdjusters
+import java.util.Locale
 
 @Composable
 fun DatePickerGrid(
@@ -46,8 +52,8 @@ fun DatePickerGrid(
 			}
 		}
 
-		val weekRange = date.dayOfMonth().minimumValue..date.dayOfMonth().maximumValue
-		val emptySpacesBefore = date.dayOfMonth().withMinimumValue().dayOfWeek - 1
+		val weekRange = date.with(TemporalAdjusters.firstDayOfMonth()).dayOfMonth..date.with(TemporalAdjusters.lastDayOfMonth()).dayOfMonth
+		val emptySpacesBefore = date.with(TemporalAdjusters.firstDayOfMonth()).dayOfWeek.minus(1).value
 		val emptySpacesAfter = WEEK_LENGTH * MAX_WEEK_LINES - emptySpacesBefore - weekRange.count()
 
 		LazyVerticalGrid(
@@ -69,11 +75,11 @@ fun DatePickerGrid(
 					val day = date.withDayOfMonth(it)
 
 					DatePickerGridItem(
-						text = day.toString(DateTimeFormat.forPattern("d")),
+						text = day.format(DateTimeFormatter.ofPattern("d")),
 						modifier = Modifier
 							.fillMaxWidth()
 							.aspectRatio(1f, true),
-						isToday = day == LocalDate(),
+						isToday = day == LocalDate.now(),
 						isSelected = day == selectedDay
 					) {
 						onClick(day)

@@ -1,0 +1,99 @@
+edition = "2023";
+
+option java_package = "com.sapuseven.untis.data.settings.model";
+option java_multiple_files = true;
+
+enum DarkTheme {
+  AUTO = 0;
+  LIGHT = 1;
+  DARK = 2;
+}
+
+enum NotificationVisibility {
+  NONE = 0;
+  SHORT = 1;
+  LONG = 2;
+}
+
+enum AbsencesTimeRange {
+  CURRENT_SCHOOLYEAR = 0;
+  SEVEN_DAYS = 1;
+  FOURTEEN_DAYS = 2;
+  THIRTY_DAYS = 3;
+  NINETY_DAYS = 4;
+}
+
+message UserSettings {
+  bool exitConfirmation = 1;
+  bool flingEnable = 2;
+  bool weekSnapToDays = 3;
+  repeated string weekCustomRange = 4;
+  float weekCustomLength = 5;
+  bool automuteEnable = 6;
+  bool automuteCancelledLessons = 7 [default = true];
+  bool automuteAllowPriority = 56;
+  float automuteMinimumBreakLength = 9 [default = 5.0];
+  bool timetableItemTextLight = 10;
+  uint32 backgroundFuture = 11 [default = 0x00000000];
+  uint32 backgroundPast = 12 [default = 0x40808080];
+  uint32 marker = 13 [default = 0xFFFFFFFF];
+  uint32 backgroundRegular = 14;
+  uint32 backgroundRegularPast = 15;
+  uint32 backgroundExam = 16;
+  uint32 backgroundExamPast = 17;
+  uint32 backgroundIrregular = 18;
+  uint32 backgroundIrregularPast = 19;
+  uint32 backgroundCancelled = 20;
+  uint32 backgroundCancelledPast = 21;
+  uint32 themeColor = 22;
+  DarkTheme darkTheme = 23;
+  bool darkThemeOled = 24;
+  TimetableElement timetablePersonalTimetable = 25;
+  bool timetableHideTimeStamps = 26;
+  bool timetableHideCancelled = 27;
+  bool timetableSubstitutionsIrregular = 28 [default = true];
+  bool timetableBackgroundIrregular = 29;
+  string timetableRange = 30;
+  bool timetableRangeIndexReset = 31;
+  uint32 timetableItemPadding = 33 [default = 2];
+  uint32 timetableItemCornerRadius = 34 [default = 4];
+  bool timetableCenteredLessonInfo = 35 [default = true];
+  bool timetableBoldLessonName = 36 [default = true];
+  uint32 timetableLessonNameFontSize = 37 [default = 16];
+  uint32 timetableLessonInfoFontSize = 38 [default = 12];
+  bool timetableZoomEnabled = 54 [default = true];
+  float timetableZoomLevel = 55 [default = 1.0];
+  bool notificationsEnable = 39;
+  bool notificationsInMultiple = 40;
+  bool notificationsBeforeFirst = 41;
+  int32 notificationsBeforeFirstTime = 42 [default = 30];
+  NotificationVisibility notificationsVisibilitySubjects = 43 [default = LONG];
+  NotificationVisibility notificationsVisibilityRooms = 44 [default = SHORT];
+  NotificationVisibility notificationsVisibilityTeachers = 45 [default = SHORT];
+  NotificationVisibility notificationsVisibilityClasses = 46 [default = SHORT];
+  bool connectivityRefreshInBackground = 47 [default = true];
+  string proxyHost = 48;
+  repeated string schoolBackground = 49;
+  bool infocenterAbsencesOnlyUnexcused = 50;
+  bool infocenterAbsencesSortReverse = 51;
+  AbsencesTimeRange infocenterAbsencesTimeRange = 52;
+  repeated TimetableElement bookmarks = 57;
+}
+
+message GlobalSettings {
+  bool initialized = 1;
+  bool errorReportingSet = 2;
+  bool errorReportingEnable = 3 [default = true];
+  bool errorReportingEnableBreadcrumbs = 4 [default = true];
+}
+
+message Settings {
+  uint64 activeUser = 1;
+  map<uint64, UserSettings> userSettings = 2;
+  GlobalSettings globalSettings = 3;
+}
+
+message TimetableElement {
+  uint64 elementId = 1;
+  uint32 elementType = 2;
+}

@@ -2,11 +2,17 @@ package com.sapuseven.untis.utils
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
+import android.util.Log
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
@@ -17,9 +23,8 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
-private const val TAG_SCREENSHOT = "screenshot"
+const val TAG_SCREENSHOT = "screenshot"
 const val SCREENSHOT_PROFILE_NAME = "Example School"
-const val SCREENSHOT_API_URL = "https://api.sapuseven.com/untis/testing"
 
 fun ComposeContentTestRule.takeScreenshot(file: String, useRoot: Boolean = false) {
 	(if (useRoot) onRoot() else onNodeWithTag(TAG_SCREENSHOT))
@@ -34,6 +39,7 @@ fun Bitmap.save(file: String) {
 	FileOutputStream(File(basePath, file)).use { out ->
 		compress(Bitmap.CompressFormat.PNG, 100, out)
 	}
+	Log.d("Screenshot", "Saved screenshot to $basePath/$file")
 }
 
 fun loadScreenshot(file: String): Bitmap {
@@ -42,5 +48,12 @@ fun loadScreenshot(file: String): Bitmap {
 }
 
 @Composable
-fun WithScreenshot(content: @Composable ColumnScope.() -> Unit) =
-	Column(modifier = Modifier.testTag(TAG_SCREENSHOT), content = content)
+fun WithScreenshot(content: @Composable BoxScope.() -> Unit) = with(LocalDensity.current) {
+	Box(
+		modifier = Modifier
+			.size(1080.toDp(), 1920.toDp())
+			.testTag(TAG_SCREENSHOT)
+			.consumeWindowInsets(WindowInsets.systemBars),
+		content = content
+	)
+}

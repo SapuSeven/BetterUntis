@@ -2,7 +2,7 @@
 <resources>
     <string name="app_desc">Eine alternative App für das Untis-Stundenplansystem.</string>
     <string name="all_success">erfolgreich</string>
-    <string name="all_exam">Klausur</string>
+    <string name="all_exam">Prüfung</string>
     <string name="all_exit">Verlassen</string>
     <string name="all_failed">fehlgeschlagen</string>
     <string name="all_personal">Persönlich</string>
@@ -106,7 +106,7 @@
     <string name="errormessagedictionary_invalid_time_settings">Zeit und/oder Datum sind falsch eingestellt!</string>
     <string name="errormessagedictionary_user_locked">Benutzer gesperrt!</string>
     <string name="errormessagedictionary_no_right">Keine Berechtigung für den Stundenplan</string>
-    <string name="roomfinder_current_hour">%1$s, %2$d. Stunde</string>
+    <string name="roomfinder_current_hour">%1$s, Stunde %2$s</string>
     <string name="roomfinder_current_hour_time">%1$s - %2$s</string>
     <string name="roomfinder_delete_item">Raum löschen</string>
     <string name="roomfinder_image_availability_indicator">Freier-Raum-Anzeige</string>
@@ -121,12 +121,11 @@
     <string name="infocenter_timeformat_sameday">%2$s - %4$s, %1$s</string>
     <string name="infocenter_officehours_empty">Keine Sprechstunden</string>
     <string name="infocenter_messages_empty">Keine Nachrichten</string>
-    <string name="infocenter_events_empty">Keine Termine</string>
     <string name="infocenter_absences_empty">Keine Abwesenheiten</string>
     <string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
     <string name="infocenter_absence_excused">Entschuldigt</string>
     <string name="infocenter_absence_unexcused">Unentschuldigt</string>
-    <string name="infocenter_absence_unknown_reason">Unbekannter Grund</string>
+    <string name="infocenter_absence_reason_unknown">Unbekannt</string>
     <string name="elementpicker_hint_search">Suchen…</string>
     <string name="elementpicker_hint_search_classes">Klassen durchsuchen…</string>
     <string name="elementpicker_hint_search_teachers">Lehrer durchsuchen…</string>
@@ -190,10 +189,10 @@
     <string name="preference_info_license">Lizenz</string>
     <string name="preference_info_privacy">Externe Inhalte</string>
     <string name="preference_info_privacy_desc">Mitwirkende werden von GitHub geladen. Lesen Sie deren Datenschutzrichtlinie für weitere Informationen.</string>
-    <string name="preference_info_privacy_policy">Datenschutz-Bestimmungen</string>
+    <string name="preference_info_privacy_policy">Datenschutzbestimmungen</string>
     <string name="preference_marker">Zeitanzeige</string>
     <string name="preference_notifications_clear">Alle Benachrichtigungen löschen</string>
-    <string name="preference_notifications_enable">Benachrichtigungen aktivieren</string>
+    <string name="preference_notifications_enable">Pausenbenachrichtigungen aktivieren</string>
     <string name="preference_notifications_enable_desc">Zeigt während Pausen eine Benachrichtigung mit Infos zur nächsten Stunde an</string>
     <string name="preference_notifications_first_lesson">Benachrichtigung vor der ersten Stunde</string>
     <string name="preference_notifications_first_lesson_desc">Zeigt eine zusätzliche Benachrichtigung vor Beginn der ersten Stunde an</string>
@@ -219,10 +218,9 @@
     <string name="preference_timetable_background_irregular_desc">Kennzeichne Stunden mit einem anderen Hintergrund als irregulär</string>
     <string name="preference_timetable_bold_lesson_name">Fetter Stundenname</string>
     <string name="preference_timetable_centered_lesson_info">Stundeninfo zentrieren</string>
-    <string name="preference_timetable_colors_reset">Farben zurücksetzen</string>
+    <string name="preference_timetable_colors_reset">Stundenfarben zurücksetzen</string>
     <string name="preference_timetable_colors_reset_button_positive">Zurücksetzen</string>
     <string name="preference_timetable_hide_cancelled">Entfallene Stunden ausblenden</string>
-    <string name="preference_timetable_hide_cancelled_desc">Wird erst bei erneutem Laden des Stundenplans aktiv</string>
     <string name="preference_timetable_hide_timestamps">Zeitstempel ausblenden</string>
     <string name="preference_timetable_hide_timestamps_desc">Start- und Endzeit von Stunden neben dem Stundenplan ausblenden</string>
     <string name="preference_timetable_item_corner_radius">Abgerundete Ecken</string>
@@ -237,13 +235,11 @@
     <string name="preference_timetable_range_index_reset">Stundennummerierung zurücksetzen</string>
     <string name="preference_timetable_substitutions_irregular">Irreguläre Stunden erkennen</string>
     <string name="preference_timetable_substitutions_irregular_desc">Vertretungsstunden als irregulär behandeln</string>
-    <string name="preference_school_background">Farben der Schule verwenden</string>
+    <string name="preference_school_background">Von der Schule zur Verfügung gestellten Designfarben verwenden</string>
     <string name="preference_school_background_desc">Manche Schulen senden eigene Hintergrundfarben</string>
     <string name="preference_use_theme_background">Designfarben verwenden</string>
     <string name="preference_use_theme_background_desc">Dies gilt nur für normale Stunden</string>
     <string name="preference_week_custom_range">Wochenlänge</string>
-    <string name="preference_week_custom_range_summary">%1$s bis %2$s</string>
-    <string name="preference_week_custom_range_summary_short">%1$s</string>
     <string name="preference_week_display_length">Anzuzeigende Tage</string>
     <string name="preference_week_display_length_summary">Auf 0 setzen, um die Wochenlänge zu verwenden</string>
     <string name="preference_week_snap_to_days">Tageweise scrollen</string>
@@ -276,14 +272,12 @@
     <string name="loading">Wird geladen</string>
     <string name="loading_failed">Ladevorgang fehlgeschlagen</string>
     <string name="settings_dialog_url_open_title">Keine kompatible App gefunden</string>
-    <string name="settings_dialog_url_open_text">BetterUntis konnte keine App finden, die mit dem Öffnen von Links umgehen kann.
-\nBitte stelle sicher, dass du einen Webbrowser installiert hast oder öffne den Link auf einem anderen Gerät:</string>
+    <string name="settings_dialog_url_open_text">BetterUntis konnte keine App finden, die mit dem Öffnen von Links umgehen kann.\nBitte stelle sicher, dass du einen Webbrowser installiert hast oder öffne den Link auf einem anderen Gerät:</string>
     <string name="widget_configuration">Widget-Konfiguration</string>
     <string name="widget_timetable">Stundenplan</string>
     <string name="widget_timetable_empty">Kein Stundenplan für heute verfügbar</string>
     <string name="widget_daily_messages">Tagesnachrichten</string>
     <string name="widget_select_profile">Bitte wähle ein Profil für das Widget aus</string>
-    <string name="widget_timetable_link">Stundenplanlink</string>
     <plurals name="main_time_diff_minutes">
         <item quantity="one">vor einer Minute</item>
         <item quantity="other">vor %d Minuten</item>
@@ -341,8 +335,6 @@
     <string name="mainactivitydrawer_profile_edit_hint">Tippe auf ein Profil, um es zu bearbeiten</string>
     <string name="all_lesson_online">Findet online statt</string>
     <string name="all_open_link">Link öffnen</string>
-    <string name="preference_range_from">von</string>
-    <string name="preference_range_to">bis</string>
     <string name="preference_dialog_permission_alarms_title">Berechtigung erforderlich</string>
     <string name="preference_dialog_permission_alarms_text">Diese Funktion erfordert zusätzliche Berechtigungen. Bitte erlaube BetterUntis, genaue Alarme zu planen.</string>
     <string name="all_dialog_open_settings">Einstellungen öffnen</string>
@@ -356,9 +348,7 @@
     <string name="infocenter_absences_filter_time_ranges">Zeitraum</string>
     <string name="preference_reports_breadcrumbs">Detaillierte Fehlerberichte senden</string>
     <string name="preference_category_reports">Fehlerberichte</string>
-    <string name="preference_reports_info_desc">Diese Einstellungen helfen dabei, die App zu verbessern.
-\nPersönliche Daten werden nie gesammelt.
-\nÄnderungen benötigen einen App-Neustart, um wirksam zu werden.</string>
+    <string name="preference_reports_info_desc">Diese Einstellungen betreffen alle Profile und helfen dabei, die App zu verbessern.\nPersönliche Daten werden nie gesammelt.\nÄnderungen benötigen einen App-Neustart, um wirksam zu werden.</string>
     <string name="preference_reports_breadcrumbs_desc">Beinhaltet zusätzliche Informationen darüber, was passiert ist, bevor ein Fehler aufgetreten ist.</string>
     <string name="main_dialog_reports_info_2">Du kannst diese Werte jederzeit in den App-Einstellungen ändern.</string>
     <string name="main_dialog_reports_title">Fehlerberichte</string>
@@ -370,7 +360,40 @@
     <string name="infocenter_absences_list_schoolyear">Aktuelles Schuljahr</string>
     <string name="all_timepicker_select">Zeit auswählen</string>
     <string name="all_start_time">Startzeit</string>
-	  <string name="all_end_time">Endzeit</string>
+    <string name="all_end_time">Endzeit</string>
     <string name="preference_app_language">App-Sprache</string>
-	  <string name="preference_category_app_language">App-Sprache</string>
+    <string name="preference_category_app_language">App-Sprache</string>
+    <string name="infocenter_absences_timerange">%1$s - %2$s</string>
+    <string name="infocenter_absence_unexcused_status">Unentschuldigt (%1$s)</string>
+    <string name="infocenter_absence_reason">Grund: %1$s</string>
+    <string name="infocenter_homework">Hausaufgaben</string>
+    <string name="infocenter_homework_empty">Keine Hausaufgaben</string>
+    <string name="infocenter_absence_excused_status">Entschuldigt (%1$s)</string>
+    <string name="all_dialog_absences_save_detailed">Detaillierte Abwesenheitskontrolle absenden</string>
+    <string name="all_api_error_generic">Schnittstellen-Fehler: %1$s</string>
+    <string name="preference_timetable_range_index_reset_desc">Stundennamen immer mit 1 beginnen</string>
+    <string name="roomfinder_item_desc_free_day">Dieser Raum ist den restlichen Tag frei.</string>
+    <string name="roomfinder_item_desc_free_week">Dieser Raum ist die restliche Woche frei.</string>
+    <string name="preferences_default_color">Standardfarbe</string>
+    <string name="infocenter_exams">Prüfungen</string>
+    <string name="infocenter_exams_empty">Keine Prüfungen</string>
+    <string name="preference_timetable_colors_reset_desc">Die Farben werden auf das Systemdesign zurückgesetzt.</string>
+    <string name="preference_info_contributors_error">Fehler beim Laden der Mitwirkenden von GitHub.</string>
+    <string name="preference_category_notifications_break">Pausenbenachrichtigungen</string>
+    <string name="preference_notifications_exact_alarms_unavailable">Exakte Benachrichtigungen sind nicht verfügbar</string>
+    <string name="preference_notifications_unavailable">Benachrichtigungen sind nicht verfügbar</string>
+    <string name="preference_notifications_unavailable_desc">Um Benachrichtigungen zu aktivieren muss die Berechtigung zum Senden von Benachrichtigungen für %1$s erteilt werden.\nTippen, um die Einstellungen zu öffnen.</string>
+    <string name="preference_timetable_zoom_gesture">Zoom-Geste aktivieren</string>
+    <string name="preference_timetable_zoom_level">Zoomstufe des Stundenplans</string>
+    <string name="all_warning">Warnung</string>
+    <string name="preference_notifications_exact_alarms_unavailable_desc">Um sicherzustellen, dass alle Benachrichtigungen zur richtigen Zeit zugestellt werden, muss die Berechtigung zum Einrichten von Wecker und Erinnerungen für %1$s erteilt werden.\nTippen, um die Einstellungen zu öffnen.</string>
+    <string name="all_open_datepicker">Datum auswählen</string>
+    <string name="preference_automute_exact_alarms_unavailable">Exaktes automatisches Stummschalten ist nicht verfügbar</string>
+    <string name="preference_automute_exact_alarms_unavailable_desc">Um sicherzustellen, dass die automatische Stummschaltung zur richtigen Zeit aktiviert wird, muss die Berechtigung zum Einrichten von Wecker und Erinnerungen für %1$s erteilt werden.\nTippen, um die Einstellungen zu öffnen.</string>
+    <string name="preference_reports_enable">Automatische Fehlerberichterstattung aktivieren</string>
+    <string name="all_save">Speichern</string>
+    <string name="preference_automute_allow_priority">Prioritätstermine dürfen die automatische Stummschaltung ignorieren</string>
+    <string name="widget_timetable_link">Verknüpfung erstellen für…</string>
+    <string name="automute_zen_rule_name">Schule - %1$s</string>
+	<string name="preference_automute_preferences">Einstellungen für automatisches Stummschalten</string>
 </resources>

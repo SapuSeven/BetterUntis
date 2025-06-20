@@ -88,7 +88,6 @@
     <string name="errormessagedictionary_invalid_time_settings">Ugyldige innstillinger for dato og/eller klokkeslett!</string>
     <string name="errormessagedictionary_user_locked">Brukeren er låst!</string>
     <string name="errormessagedictionary_no_right">Utilstrekkelige rettigheter for timeplan</string>
-    <string name="roomfinder_current_hour">%1$s, %2$d. Leksjon</string>
     <string name="roomfinder_current_hour_time">%1$s - %2$s</string>
     <string name="roomfinder_delete_item">Slett element</string>
     <string name="roomfinder_image_availability_indicator">Tilgjengelighetsindikator for rom</string>
@@ -102,7 +101,6 @@
     <string name="infocenter_timeformat">%2$s, %1$s - %4$s, %3$s</string>
     <string name="infocenter_timeformat_sameday">%2$s - %4$s, %1$s</string>
     <string name="infocenter_messages_empty">Ingen meldinger</string>
-    <string name="infocenter_events_empty">Ingen hendelser</string>
     <string name="infocenter_absences_empty">Ingen fravær</string>
     <string name="infocenter_events_exam_name_long">%1$s - %2$s</string>
     <string name="elementpicker_hint_search">Søk…</string>
@@ -181,7 +179,6 @@
     <string name="preference_timetable_centered_lesson_info">Sentrer leksjonsinformasjon</string>
     <string name="preference_timetable_colors_reset">Tilbakestill farger</string>
     <string name="preference_timetable_hide_cancelled">Skjul kansellerte leksjoner</string>
-    <string name="preference_timetable_hide_cancelled_desc">Du må laste inn timeplanen på nytt etter at du har endret denne innstillingen</string>
     <string name="preference_timetable_item_corner_radius">Radius for hjørner på element</string>
     <string name="preference_timetable_item_padding">Indre margin på element</string>
     <string name="preference_timetable_item_padding_overlap">Indre margin for overlappende elementer</string>
@@ -199,8 +196,6 @@
     <string name="preference_use_theme_background">Bruk temafarger</string>
     <string name="preference_use_theme_background_desc">Dette gjelder bare for vanlige leksjoner</string>
     <string name="preference_week_custom_range">Egendefinert ukeanpassning</string>
-    <string name="preference_week_custom_range_summary">%1$s til %2$s</string>
-    <string name="preference_week_custom_range_summary_short">%1$s</string>
     <string name="preference_week_display_length">Dager å vise</string>
     <string name="preference_week_display_length_summary">Sett til 0 for å bruke ukelengde</string>
     <string name="preference_week_snap_to_days">Sett visning på linje med dagene</string>
@@ -262,7 +257,6 @@
         <item quantity="one">%1$d bidrag</item>
         <item quantity="other">%1$d bidrag</item>
     </plurals>
-    <string name="widget_timetable_link">Timeplan-lenke</string>
     <string name="widget_select_profile">Velg en profil for miniprogrammet</string>
     <string name="widget_daily_messages">Daglige meldinger</string>
     <string name="widget_timetable_empty">Ingen timeplan i dag</string>
@@ -270,7 +264,6 @@
     <string name="widget_configuration">Miniprogramsoppsett</string>
     <string name="preference_timetable_colors_reset_button_positive">Tilbakestill</string>
     <string name="preference_theme_pixel">Piksel</string>
-    <string name="infocenter_absence_unknown_reason">Ukjent grunn</string>
     <string name="infocenter_messages_attachments">Vedlegg</string>
     <string name="logindatainput_skip_app_secret">Hopp over programhemmeligehtsutledelse</string>
     <string name="logindatainput_error_invalid_url">Ugyldig nettadresse.</string>

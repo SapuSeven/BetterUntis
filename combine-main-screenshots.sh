@@ -1,7 +1,7 @@
 #!/bin/sh
 cd screenshots
 
-files=(activity-main-*.png)
+files=(timetable-*.png)
 total=${#files[@]}
 i=0
 

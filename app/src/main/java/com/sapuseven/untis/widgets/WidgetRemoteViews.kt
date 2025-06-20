@@ -47,7 +47,7 @@ package com.sapuseven.untis.widgets
 		query.proxyHost = applicationContext.getSharedPreferences("preferences_${user.id}", Context.MODE_PRIVATE).getString("preference_connectivity_proxy_host", null)
 		query.data.params = listOf(MessageParams(
 				UntisDate.fromLocalDate(LocalDate.now()),
-				auth = UntisAuthentication.createAuthObject(user)
+				auth = Authentication.createAuthObject(user)
 		))
 
 		return runBlocking {
@@ -85,7 +85,7 @@ package com.sapuseven.untis.widgets
 				user.masterDataTimestamp,
 				0,
 				emptyList(),
-				if (user.anonymous) UntisAuthentication.createAuthObject() else UntisAuthentication.createAuthObject(user.user, user.key)
+				if (user.anonymous) Authentication.createAuthObject() else Authentication.createAuthObject(user.user, user.key)
 		)
 
 		query.data.id = "-1"

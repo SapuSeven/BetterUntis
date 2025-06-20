@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+		<include
+			domain="file"
+			path="datastore/." />
+		<include
+			domain="database"
+			path="userdata.db" />
+		<include
+			domain="database"
+			path="roomfinder.db" />
+    </cloud-backup>
+</data-extraction-rules>

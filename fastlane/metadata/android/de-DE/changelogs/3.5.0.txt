@@ -1,4 +1,4 @@
-- Neue Funktion: Lesezeichen für Stundenpläne
+- Neu: Lesezeichen für Stundenpläne
 - Info-Seite aktualisiert
 - Fehler mit Widgets auf Android 12 behoben
 - Fehler und Abstürze behoben

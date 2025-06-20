@@ -1,0 +1,9 @@
+- Umstellung auf moderne Frameworks
+  - Dagger/Hilt
+  - Compose Navigation
+  - Und viele mehr
+- Vollständige Umstellung auf WeekView-Compose
+- Optimierung der Einstellungen für bessere und schnellere Verarbeitung
+- Möglichkeit zur vollständigen Deaktivierung der Fehlerberichterstattung
+- Integration der automatischen Stummschaltung mit dem Android-Zen-Modus
+- Viele weitere Fehlerbehebungen und Verbesserungen

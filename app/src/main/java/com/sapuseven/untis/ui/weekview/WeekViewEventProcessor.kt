@@ -1,7 +1,9 @@
 package com.sapuseven.untis.ui.weekview
 
-import org.joda.time.LocalDateTime
-import java.util.*
+import java.time.LocalDateTime
+import java.util.LinkedList
+import java.util.PriorityQueue
+import java.util.Queue
 
 
 private enum class EventType {
@@ -13,7 +15,7 @@ private data class TimelineEvent(
 	val eventTime: LocalDateTime,
 	val eventType: EventType,
 	val eventId: Int,
-	val eventData: Event
+	val eventData: Event<*>
 )
 
 private class EventComparator : Comparator<TimelineEvent> {
@@ -30,7 +32,7 @@ private class EventComparator : Comparator<TimelineEvent> {
 
 // Based on https://stackoverflow.com/questions/53215825/return-optimized-x-coordinates-to-normalize-maximize-area-for-an-array-of-rectan#answer-53222638
 // (Archive: https://web.archive.org/web/20230222010425/https://stackoverflow.com/questions/53215825/return-optimized-x-coordinates-to-normalize-maximize-area-for-an-array-of-rectan)
-internal fun arrangeEvents(events: List<Event>, maxSimultaneous: Int) {
+internal fun <T> arrangeEvents(events: List<Event<T>>, maxSimultaneous: Int) {
 	val eventQueue: PriorityQueue<TimelineEvent> = PriorityQueue(EventComparator())
 	val regionQueue: Queue<TimelineEvent> = LinkedList()
 	val startedEventIds: MutableList<Int> = mutableListOf()

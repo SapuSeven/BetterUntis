@@ -1,38 +1,24 @@
 package com.sapuseven.untis.workers
 
 import android.content.Context
-import android.util.Log
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.unit.dp
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.longPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.glance.GlanceModifier
-import androidx.glance.appwidget.GlanceAppWidgetManager
-import androidx.glance.appwidget.state.getAppWidgetState
-import androidx.glance.background
-import androidx.glance.layout.*
-import androidx.glance.text.Text
-import androidx.room.Room
+import androidx.hilt.work.HiltWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import com.sapuseven.untis.ui.widgets.WidgetListItemModel
-import com.sapuseven.untis.widgets.BaseComposeWidget.Companion.PREFERENCE_KEY_INT_ELEMENT_ID
-import com.sapuseven.untis.widgets.BaseComposeWidget.Companion.PREFERENCE_KEY_LONG_USER
-import com.sapuseven.untis.widgets.BaseComposeWidget.Companion.PREFERENCE_KEY_STRING_ELEMENT_TYPE
-import com.sapuseven.untis.widgets.TimetableWidget
-import com.sapuseven.untis.widgets.toGlanceTextStyle
-import org.joda.time.format.DateTimeFormat
+import com.sapuseven.untis.data.repository.TimetableRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 
 /**
  * This worker loads the data for widgets.
  */
-class WidgetUpdateWorker(context: Context, params: WorkerParameters) :
-	TimetableDependantWorker(context, params) {
+@HiltWorker
+class WidgetUpdateWorker @AssistedInject constructor(
+	@Assisted context: Context,
+	@Assisted params: WorkerParameters,
+	timetableRepository: TimetableRepository,
+) :
+	TimetableDependantWorker(context, params, timetableRepository) {
 	companion object {
 		private const val LOG_TAG = "WidgetUpdate"
 		private const val TAG_WIDGET_UPDATE_WORK = "WidgetUpdateWork"
@@ -47,7 +33,7 @@ class WidgetUpdateWorker(context: Context, params: WorkerParameters) :
 	}
 
 	override suspend fun doWork(): Result {
-		val userDatabase = UserDatabase.getInstance(applicationContext)
+		/*val userDatabase = UserDatabase.getInstance(applicationContext)
 
 		val timeFormatter = DateTimeFormat.forPattern("HH:mm")
 
@@ -62,7 +48,7 @@ class WidgetUpdateWorker(context: Context, params: WorkerParameters) :
 
 				val user = userDatabase.userDao().getById(userId)
 
-				user?.let {
+				/*user?.let {
 					try {
 						val timetable = loadTimetable(
 							user,
@@ -82,7 +68,7 @@ class WidgetUpdateWorker(context: Context, params: WorkerParameters) :
 
 								WidgetListItemModel(
 									headlineContent = item.periodData.getLong(
-										TimetableDatabaseInterface.Type.SUBJECT
+										ElementType.SUBJECT
 									),
 									supportingContent = arrayOf(item.top, item.bottom)
 										.filter { s -> s.isNotBlank() }
@@ -137,8 +123,8 @@ class WidgetUpdateWorker(context: Context, params: WorkerParameters) :
 						//setError(e) TODO
 						Log.e(LOG_TAG, "Timetable loading error", e)
 					}
-				}
-			}
+				}*/
+			}*/
 
 		return Result.success()
 	}

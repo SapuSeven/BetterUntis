@@ -2,35 +2,48 @@ package com.sapuseven.untis.workers
 
 import android.content.Context
 import android.util.Log
-import androidx.room.Room
-import androidx.work.*
-import com.sapuseven.untis.data.databases.UserDatabase
-import com.sapuseven.untis.helpers.config.booleanDataStore
-import com.sapuseven.untis.helpers.timetable.TimetableDatabaseInterface
-import org.joda.time.LocalDateTime
-import org.joda.time.Seconds
+import androidx.hilt.work.HiltWorker
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
+import androidx.work.WorkerParameters
+import com.sapuseven.untis.data.database.entities.UserDao
+import com.sapuseven.untis.data.repository.TimetableRepository
+import com.sapuseven.untis.data.repository.UserSettingsRepository
+import crocodile8.universal_cache.FromCache
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.first
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 
 /**
  * This worker caches the personal timetable if it exists and starts all other daily workers
  * which can then use the cached timetable.
  */
-class DailyWorker(context: Context, params: WorkerParameters) :
-	TimetableDependantWorker(context, params) {
+@HiltWorker
+class DailyWorker @AssistedInject constructor(
+	@Assisted context: Context,
+	@Assisted params: WorkerParameters,
+	private val userSettingsRepository: UserSettingsRepository,
+	timetableRepository: TimetableRepository,
+	private val userDao: UserDao,
+) : TimetableDependantWorker(context, params, timetableRepository) {
 	companion object {
 		const val TAG_DAILY_WORK = "DailyWork"
-		const val WORKER_DATA_USER_ID = "UserId"
 
 		private fun nextWorkRequest(hourOfDay: Int = 2): WorkRequest {
-			val currentTime = LocalDateTime.now()
-			var dueTime = currentTime.withMillisOfDay(hourOfDay * 60 * 60 * 1000)
+			val currentDateTime = LocalDateTime.now()
+			var dueDateTime = LocalDate.now().atTime(hourOfDay, 0)
 
-			if (dueTime <= currentTime)
-				dueTime = dueTime.plusDays(1)
+			if (currentDateTime.isAfter(dueDateTime))
+				dueDateTime = dueDateTime.plusDays(1)
 
 			return OneTimeWorkRequestBuilder<DailyWorker>()
 				.setInitialDelay(
-					Seconds.secondsBetween(currentTime, dueTime).seconds.toLong(),
+					ChronoUnit.SECONDS.between(currentDateTime, dueDateTime),
 					TimeUnit.SECONDS
 				)
 				.addTag(TAG_DAILY_WORK)
@@ -43,36 +56,26 @@ class DailyWorker(context: Context, params: WorkerParameters) :
 	}
 
 	override suspend fun doWork(): Result {
-		val userDatabase = UserDatabase.getInstance(applicationContext)
-
 		val workManager = WorkManager.getInstance(applicationContext)
 
-		userDatabase.userDao().getAll().forEach { user ->
-			val personalTimetable = loadPersonalTimetableElement(user, applicationContext)
+		userDao.getAllFlow().first().forEach { user ->
+			val userSettings = userSettingsRepository.getSettings(user.id).first()
+			val personalTimetable = getPersonalTimetableElement(user, userSettings)
 				?: return@forEach // Anonymous / no custom personal timetable
 
 			try {
 				// Load timetable to cache
 				loadTimetable(
 					user,
-					TimetableDatabaseInterface(userDatabase, user.id),
-					personalTimetable
+					personalTimetable,
+					FromCache.NEVER
 				)
 
-				val notificationsEnable = applicationContext.booleanDataStore(
-					user.id,
-					"preference_notifications_enable"
-				).getValue()
-				val automuteEnable = applicationContext.booleanDataStore(
-					user.id,
-					"preference_automute_enable"
-				).getValue()
-
 				workManager.let {
-					if (notificationsEnable)
+					if (userSettings.notificationsEnable)
 						NotificationSetupWorker.enqueue(it, user)
 
-					if (automuteEnable)
+					if (userSettings.automuteEnable)
 						AutoMuteSetupWorker.enqueue(it, user)
 				}
 			} catch (e: Exception) {

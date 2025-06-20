@@ -33,19 +33,24 @@ object ErrorMessageDictionary {
 	const val ERROR_CODE_NO_SERVER_FOUND = 100
 	const val ERROR_CODE_WEBUNTIS_NOT_INSTALLED = 101
 
-	@JvmOverloads
 	fun getErrorMessage(resources: Resources, code: Int?, fallback: String? = null): String {
+		return getErrorMessageResource(code, false)?.let { resources.getString(it) }
+			?: fallback
+			?: resources.getString(R.string.errormessagedictionary_generic)
+	}
+
+	fun getErrorMessageResource(code: Int?, fallbackToGeneric: Boolean = true): Int? {
 		return when (code) {
-			ERROR_CODE_TOO_MANY_RESULTS -> resources.getString(R.string.errormessagedictionary_too_many_results)
-			ERROR_CODE_INVALID_SCHOOLNAME -> resources.getString(R.string.errormessagedictionary_invalid_school)
-			ERROR_CODE_INVALID_CREDENTIALS -> resources.getString(R.string.errormessagedictionary_invalid_credentials)
-			ERROR_CODE_NO_RIGHT -> resources.getString(R.string.errormessagedictionary_no_right)
-			ERROR_CODE_USER_LOCKED -> resources.getString(R.string.errormessagedictionary_user_locked)
-			ERROR_CODE_NO_PUBLIC_ACCESS_AVAILABLE -> resources.getString(R.string.errormessagedictionary_no_public_access)
-			ERROR_CODE_INVALID_CLIENT_TIME -> resources.getString(R.string.errormessagedictionary_invalid_time_settings)
-			ERROR_CODE_NO_SERVER_FOUND -> resources.getString(R.string.errormessagedictionary_invalid_server_url)
-			ERROR_CODE_WEBUNTIS_NOT_INSTALLED -> resources.getString(R.string.errormessagedictionary_server_webuntis_not_installed)
-			else -> fallback ?: resources.getString(R.string.errormessagedictionary_generic)
+			ERROR_CODE_TOO_MANY_RESULTS -> R.string.errormessagedictionary_too_many_results
+			ERROR_CODE_INVALID_SCHOOLNAME -> R.string.errormessagedictionary_invalid_school
+			ERROR_CODE_INVALID_CREDENTIALS -> R.string.errormessagedictionary_invalid_credentials
+			ERROR_CODE_NO_RIGHT -> R.string.errormessagedictionary_no_right
+			ERROR_CODE_USER_LOCKED -> R.string.errormessagedictionary_user_locked
+			ERROR_CODE_NO_PUBLIC_ACCESS_AVAILABLE -> R.string.errormessagedictionary_no_public_access
+			ERROR_CODE_INVALID_CLIENT_TIME -> R.string.errormessagedictionary_invalid_time_settings
+			ERROR_CODE_NO_SERVER_FOUND -> R.string.errormessagedictionary_invalid_server_url
+			ERROR_CODE_WEBUNTIS_NOT_INSTALLED -> R.string.errormessagedictionary_server_webuntis_not_installed
+			else -> if (fallbackToGeneric) R.string.errormessagedictionary_generic else null
 		}
 	}
 }

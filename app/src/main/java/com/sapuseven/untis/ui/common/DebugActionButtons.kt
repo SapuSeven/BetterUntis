@@ -1,13 +1,16 @@
 package com.sapuseven.untis.ui.common
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,7 +33,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.R
-import com.sapuseven.untis.data.timetable.PeriodData
+import com.sapuseven.untis.models.PeriodItem
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -76,19 +79,34 @@ fun DebugDesclaimerAction() {
 	DebugInfoAction(
 		title = { Text("Debug information") }
 	) {
-		Text(
-			"You are running a debug build of the app.\n\n" +
+		Column(
+			verticalArrangement = Arrangement.spacedBy(8.dp),
+			modifier = Modifier.verticalScroll(rememberScrollState())
+		) {
+			Text(
+				"You are running a debug build of the app.\n\n" +
 					"This means that the app is not optimized and you will see some additional settings and functions.\n" +
 					"It is only recommended to use this variant when developing or gathering information about specific issues.\n" +
 					"For normal daily use, you should switch to a stable release build of the app.\n\n" +
 					"Please remember that diagnostic data may include personal details, " +
 					"so it is your responsibility to check and obfuscate any gathered data before uploading."
-		)
+			)
+			Text(style = MaterialTheme.typography.titleLarge, text = "Debug Data")
+			Text(style = MaterialTheme.typography.titleMedium, text = "ColorScheme")
+			RawText(
+				item = MaterialTheme.colorScheme.toString()
+					.replace("(\\w+=\\w+\\([^)]*\\))".toRegex(), "\$1\n")
+					.replace(", sRGB IEC61966-2.1", "")
+					.removePrefix("ColorScheme(")
+					.removeSuffix("\n)"),
+				encode = false
+			)
+		}
 	}
 }
 
 @Composable
-fun DebugTimetableItemDetailsAction(timegridItems: List<PeriodData>) {
+fun DebugTimetableItemDetailsAction(timegridItems: List<PeriodItem>) {
 	DebugInfoAction(
 		title = { Text("Raw lesson details") }
 	) {
@@ -98,39 +116,40 @@ fun DebugTimetableItemDetailsAction(timegridItems: List<PeriodData>) {
 				.fillMaxWidth()
 		) {
 			items(timegridItems) {
-				Column(
-					horizontalAlignment = Alignment.End,
-					modifier = Modifier
-						.clip(RoundedCornerShape(8.dp))
-						.background(MaterialTheme.colorScheme.background)
-						.padding(8.dp)
-				) {
-					RawText(item = it)
-				}
+				RawText(item = it)
 			}
 		}
 	}
 }
 
 @Composable
-private inline fun <reified T> RawText(item: T) {
+private inline fun <reified T> RawText(item: T, encode: Boolean = true) {
 	val clipboardManager: ClipboardManager = LocalClipboardManager.current
-	val itemText = remember { json.encodeToString(item) }
+	val itemText = remember { if (encode) json.encodeToString(item) else item.toString() }
 
-	Text(
-		color = MaterialTheme.colorScheme.onSurface,
-		fontFamily = FontFamily.Monospace,
-		text = itemText
-	)
-	TextButton(
-		onClick = { clipboardManager.setText(AnnotatedString(itemText)) }
+	Column(
+		horizontalAlignment = Alignment.End,
+		modifier = Modifier
+			.clip(RoundedCornerShape(8.dp))
+			.background(MaterialTheme.colorScheme.background)
+			.padding(8.dp)
 	) {
-		Icon(
-			painter = painterResource(R.drawable.all_copy),
-			contentDescription = "Copy",
-			modifier = Modifier
-				.padding(end = 8.dp)
+		Text(
+			color = MaterialTheme.colorScheme.onSurface,
+			fontFamily = FontFamily.Monospace,
+			text = itemText,
+			modifier = Modifier.horizontalScroll(rememberScrollState())
 		)
-		Text("Copy")
+		TextButton(
+			onClick = { clipboardManager.setText(AnnotatedString(itemText)) }
+		) {
+			Icon(
+				painter = painterResource(R.drawable.all_copy),
+				contentDescription = "Copy",
+				modifier = Modifier
+					.padding(end = 8.dp)
+			)
+			Text("Copy")
+		}
 	}
 }
