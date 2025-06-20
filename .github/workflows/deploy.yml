@@ -25,20 +25,18 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Prepare signing config
-        env:
-          KEYSTORE_ENCODED: ${{ secrets.KEYSTORE_ENCODED }}
-          KEYSTORE_PASSWORD_ENCODED: ${{ secrets.KEYSTORE_PASSWORD_ENCODED }}
-          KEY_DEBUG_PASSWORD_ENCODED: ${{ secrets.KEY_DEBUG_PASSWORD_ENCODED }}
-          KEY_RELEASE_PASSWORD_ENCODED: ${{ secrets.KEY_RELEASE_PASSWORD_ENCODED }}
-        run: |
-          if [[ ! -v KEYSTORE_ENCODED ]]; then exit 1; fi
-          echo $KEYSTORE_ENCODED | base64 -di >> app/BetterUntis.jks
-          echo 'KEYSTORE_PASSWORD=$(echo "$KEYSTORE_PASSWORD_ENCODED" | base64 -di)' >> $GITHUB_ENV
-          echo 'KEY_DEBUG_PASSWORD=$(echo "$KEY_DEBUG_PASSWORD_ENCODED" | base64 -di)' >> $GITHUB_ENV
-          echo 'KEY_RELEASE_PASSWORD=$(echo "$KEY_RELEASE_PASSWORD_ENCODED" | base64 -di)' >> $GITHUB_ENV
+      - name: Decode keystore
+        uses: timheuer/base64-to-file@v1.2
+        with:
+          fileName: 'BetterUntis.jks'
+          fileDir: './app/'
+          encodedString: ${{ secrets.KEYSTORE_ENCODED }}
 
       - name: Assemble release
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_DEBUG_PASSWORD: ${{ secrets.KEY_DEBUG_PASSWORD }}
+          KEY_RELEASE_PASSWORD: ${{ secrets.KEY_RELEASE_PASSWORD }}
         run: ./gradlew assembleGmsRelease bundleGmsRelease
 
       - name: Upload release files
@@ -87,12 +85,13 @@ jobs:
         with:
           ruby-version: '3.3'
           bundler-cache: true
-          
-      - name: Prepare credentials
-        env:
-          GOOGLE_PLAY_KEY_ENCODED: ${{ secrets.GOOGLE_PLAY_KEY_ENCODED }}
-        run: |
-          echo $GOOGLE_PLAY_KEY_ENCODED | base64 -di > fastlane/key.json
+
+      - name: Decode Google Play Key
+        uses: timheuer/base64-to-file@v1.2
+        with:
+          fileName: 'key.json'
+          fileDir: './fastlane/'
+          encodedString: ${{ secrets.GOOGLE_PLAY_KEY_ENCODED }}
 
       - name: Deploy to Play Store
         env:
