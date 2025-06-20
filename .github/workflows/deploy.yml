@@ -33,10 +33,10 @@ jobs:
           KEY_RELEASE_PASSWORD_ENCODED: ${{ secrets.KEY_RELEASE_PASSWORD_ENCODED }}
         run: |
           if [[ ! -v KEYSTORE_ENCODED ]]; then exit 1; fi
-          echo $KEYSTORE_ENCODED | base64 --decode >> app/BetterUntis.jks
-          echo 'KEYSTORE_PASSWORD=$(echo "$KEYSTORE_PASSWORD_ENCODED" | base64 --decode)' >> $GITHUB_ENV
-          echo 'KEY_DEBUG_PASSWORD=$(echo "$KEY_DEBUG_PASSWORD_ENCODED" | base64 --decode)' >> $GITHUB_ENV
-          echo 'KEY_RELEASE_PASSWORD=$(echo "$KEY_RELEASE_PASSWORD_ENCODED" | base64 --decode)' >> $GITHUB_ENV
+          echo $KEYSTORE_ENCODED | base64 -di >> app/BetterUntis.jks
+          echo 'KEYSTORE_PASSWORD=$(echo "$KEYSTORE_PASSWORD_ENCODED" | base64 -di)' >> $GITHUB_ENV
+          echo 'KEY_DEBUG_PASSWORD=$(echo "$KEY_DEBUG_PASSWORD_ENCODED" | base64 -di)' >> $GITHUB_ENV
+          echo 'KEY_RELEASE_PASSWORD=$(echo "$KEY_RELEASE_PASSWORD_ENCODED" | base64 -di)' >> $GITHUB_ENV
 
       - name: Assemble release
         run: ./gradlew assembleGmsRelease bundleGmsRelease
@@ -92,7 +92,7 @@ jobs:
         env:
           GOOGLE_PLAY_KEY_ENCODED: ${{ secrets.GOOGLE_PLAY_KEY_ENCODED }}
         run: |
-          echo $GOOGLE_PLAY_KEY_ENCODED | base64 --decode > fastlane/key.json
+          echo $GOOGLE_PLAY_KEY_ENCODED | base64 -di > fastlane/key.json
 
       - name: Deploy to Play Store
         env:
