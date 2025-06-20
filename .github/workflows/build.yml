@@ -1,0 +1,58 @@
+name: Build App
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches-ignore:
+      'fdroid-*'
+
+jobs:
+  build:
+    name: Build APKs (${{ matrix.target }})
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [ debug, release ]
+        target: [ Gms, Foss ]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+  
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          # Only write to the cache for builds on the 'main' and 'develop' branches. (Default is 'main' only.)
+          # Builds on other branches will only read existing entries from the cache.
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop' }}
+  
+      - name: Prepare signing config
+        if: ${{ matrix.variant == 'release' }}
+        run: |
+          if [[ ! -v KEYSTORE_ENCODED ]]; then exit 0; fi
+          echo $KEYSTORE_ENCODED | base64 --decode >> app/BetterUntis.jks
+          echo 'export KEYSTORE_PASSWORD=$(echo "$KEYSTORE_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
+          echo 'export KEY_DEBUG_PASSWORD=$(echo "$KEY_DEBUG_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
+          echo 'export KEY_RELEASE_PASSWORD=$(echo "$KEY_RELEASE_PASSWORD_ENCODED" | base64 --decode)' >> $BASH_ENV
+
+      - name: Assemble ${{ matrix.target }} debug APK
+        if: ${{ matrix.variant == 'debug' }}
+        run: ./gradlew assemble${{ matrix.target }}Debug
+  
+      - name: Assemble ${{ matrix.target }} release APK
+        if: ${{ matrix.variant == 'release' }}
+        run: ./gradlew assemble${{ matrix.target }}Release
+  
+      - name: Upload ${{ matrix.target }} ${{ matrix.variant }} APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: betteruntis-${{ matrix.target }}-${{ matrix.variant }}
+          path: app/build/outputs/apk/*/${{ matrix.variant }}/*.apk
+

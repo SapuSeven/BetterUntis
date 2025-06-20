@@ -1,0 +1,142 @@
+name: Deploy App
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+-[a-zA-Z0-9]+"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build release APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+  
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+          
+      - name: Decode keystore
+        uses: timheuer/base64-to-file@v1.2
+        with:
+          fileName: 'BetterUntis.jks'
+          fileDir: './app/'
+          encodedString: ${{ secrets.KEYSTORE_ENCODED }}
+
+      - name: Assemble release
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_DEBUG_PASSWORD: ${{ secrets.KEY_DEBUG_PASSWORD }}
+          KEY_RELEASE_PASSWORD: ${{ secrets.KEY_RELEASE_PASSWORD }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        run: ./gradlew assembleRelease bundleRelease
+
+      - name: Upload release files
+        uses: actions/upload-artifact@v4
+        with:
+          name: betteruntis-release
+          path: app/build/outputs
+
+  github:
+    name: Create Release on GitHub
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: betteruntis-release
+          path: app/build/outputs
+          
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$TAG" \
+              --prerelease \
+              --title "BetterUntis $TAG" \
+              --notes-file "./fastlane/metadata/android/en-US/changelogs/$TAG.txt" \
+              "./app/build/outputs/apk/gms/release/app-gms-release.apk#BetterUntis $TAG.apk"
+
+  fastlane:
+    name: Create Release on Google Play Store
+    needs: build
+    runs-on: ubuntu-latest
+    if: false #TODO
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: betteruntis-release
+          path: app/build/outputs
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Decode Google Play Key
+        uses: timheuer/base64-to-file@v1.2
+        with:
+          fileName: 'key.json'
+          fileDir: './fastlane/'
+          encodedString: ${{ secrets.GOOGLE_PLAY_KEY_ENCODED }}
+
+      - name: Deploy to Play Store
+        env:
+          TAG: 5.0.0-beta01 #${{ github.ref_name }}
+        run: |
+            for f in fastlane/metadata/android/*/changelogs; do [[ -e "$f/$TAG.txt" ]] && cp "$f/$TAG.txt" "$f/default.txt"; done;
+            bundle exec fastlane deploy aab:'./app/build/outputs/bundle/gmsRelease/app-gms-release.aab'
+
+  fdroid:
+    name: Create Release for FDroid
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fdroid
+          fetch-depth: 2
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: betteruntis-release
+          path: app/build/outputs
+
+      - name: Prepare release for F-Droid
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          git reset --hard $TAG
+          
+          versionCode=$(jq '.elements[0].versionCode' ./app/build/outputs/apk/gms/release/output-metadata.json)
+          sed -i "s/versionCode = generateVersionCode()/versionCode = $versionCode/" ./app/build.gradle.kts
+
+          git add ./app/build.gradle.kts
+          git commit -m "[skip ci] Update F-Droid release"
+          git tag fdroid-$TAG
+          git push --force --set-upstream origin fdroid
+          git push origin fdroid-$TAG
