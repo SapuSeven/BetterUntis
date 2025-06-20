@@ -49,6 +49,7 @@ jobs:
     name: Create Release on GitHub
     needs: build
     runs-on: ubuntu-latest
+    if: false #TODO
 
     steps:
       - uses: actions/checkout@v4
@@ -73,6 +74,7 @@ jobs:
     name: Create Release on Google Play Store
     needs: build
     runs-on: ubuntu-latest
+    if: false #TODO
 
     steps:
       - uses: actions/checkout@v4
@@ -101,3 +103,38 @@ jobs:
         run: |
             for f in fastlane/metadata/android/*/changelogs; do [[ -e "$f/$TAG.txt" ]] && cp "$f/$TAG.txt" "$f/default.txt"; done;
             bundle exec fastlane deploy aab:'./app/build/outputs/bundle/gmsRelease/app-gms-release.aab'
+
+  fdroid:
+    name: Create Release for FDroid
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fdroid
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: betteruntis-release
+          path: app/build/outputs
+
+      - name: Prepare release for F-Droid
+        env:
+          TAG: 5.0.0-beta01 #${{ github.ref_name }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          git reset --hard HEAD~1
+          git merge $TAG
+          
+          versionCode=$(jq '.elements[0].versionCode' ./app/build/outputs/apk/gms/release/output-metadata.json)
+          sed -i "s/versionCode = generateVersionCode()/versionCode = $versionCode/" ./app/build.gradle.kts
+
+          git add ./app/build.gradle.kts
+          git commit -m "[skip ci] Update F-Droid release"
+          git tag fdroid-$TAG
+          git push --force --set-upstream origin fdroid
+          git push origin fdroid-$TAG
