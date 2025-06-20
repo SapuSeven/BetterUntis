@@ -132,7 +132,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          git reset --hard $TAG
+          git reset --hard origiin/$TAG
           
           versionCode=$(jq '.elements[0].versionCode' ./app/build/outputs/apk/gms/release/output-metadata.json)
           sed -i "s/versionCode = generateVersionCode()/versionCode = $versionCode/" ./app/build.gradle.kts
