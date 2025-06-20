@@ -2,9 +2,9 @@ name: Deploy App
 
 on:
   push:
-    #tags:
-      #- "[0-9]+.[0-9]+.[0-9]+"
-      #- "[0-9]+.[0-9]+.[0-9]+-[a-zA-Z0-9]+"
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+-[a-zA-Z0-9]+"
 
 permissions:
   contents: write
@@ -24,8 +24,6 @@ jobs:
   
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: false #TODO delete
           
       - name: Decode keystore
         uses: timheuer/base64-to-file@v1.2
@@ -39,6 +37,9 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_DEBUG_PASSWORD: ${{ secrets.KEY_DEBUG_PASSWORD }}
           KEY_RELEASE_PASSWORD: ${{ secrets.KEY_RELEASE_PASSWORD }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         run: ./gradlew assembleRelease bundleRelease
 
       - name: Upload release files
@@ -51,7 +52,6 @@ jobs:
     name: Create Release on GitHub
     needs: build
     runs-on: ubuntu-latest
-    if: false #TODO
 
     steps:
       - uses: actions/checkout@v4
@@ -64,7 +64,7 @@ jobs:
       - name: Create release
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: 5.0.0-beta01 #${{ github.ref_name }}
+          TAG: ${{ github.ref_name }}
         run: |
           gh release create "$TAG" \
               --prerelease \
@@ -125,13 +125,12 @@ jobs:
 
       - name: Prepare release for F-Droid
         env:
-          TAG: 5.0.0-beta01 #${{ github.ref_name }}
+          TAG: ${{ github.ref_name }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          git reset --hard HEAD~1
-          git merge $TAG
+          git reset --hard $TAG
           
           versionCode=$(jq '.elements[0].versionCode' ./app/build/outputs/apk/gms/release/output-metadata.json)
           sed -i "s/versionCode = generateVersionCode()/versionCode = $versionCode/" ./app/build.gradle.kts
