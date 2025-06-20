@@ -24,7 +24,9 @@ jobs:
   
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-
+        with:
+          cache-read-only: false #TODO delete
+          
       - name: Decode keystore
         uses: timheuer/base64-to-file@v1.2
         with:
