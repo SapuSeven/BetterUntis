@@ -416,4 +416,5 @@
 	<string name="preference_automute_exact_alarms_unavailable_desc">To ensure auto-mute is toggled at the correct time, please grant %1$s permission to schedule exact alarms.\nTap to go to settings.</string>
     <string name="preference_reports_enable">Enable automatic error reporting</string>
     <string name="automute_zen_rule_name">School - %1$s</string>
+	<string name="preference_automute_preferences">Auto-mute preferences</string>
 </resources>

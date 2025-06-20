@@ -28,13 +28,13 @@ import javax.inject.Named
 @SuppressLint("NewApi")
 @HiltViewModel(assistedFactory = SettingsScreenViewModel.Factory::class)
 class SettingsScreenViewModel @AssistedInject constructor(
-	val userSettingsRepository: UserSettingsRepository,
 	globalSettingsRepository: GlobalSettingsRepository,
+	private val userRepository: UserRepository,
+	internal val userSettingsRepository: UserSettingsRepository,
+	internal val autoMuteService: AutoMuteService,
+	internal val savedStateHandle: SavedStateHandle,
 	internal val masterDataRepository: MasterDataRepository,
-	userRepository: UserRepository,
-	val autoMuteService: AutoMuteService,
 	@Named("json") private val httpClient: HttpClient,
-	val savedStateHandle: SavedStateHandle,
 	@Assisted val colorScheme: ColorScheme,
 ) : ViewModel() {
 	@AssistedFactory
@@ -68,6 +68,8 @@ class SettingsScreenViewModel @AssistedInject constructor(
 			clearBackgroundCancelledPast()
 		}
 	}
+
+	fun currentUserId() = userRepository.currentUser?.id
 
 	suspend fun loadContributors() {
 		_contributorsError.value = null

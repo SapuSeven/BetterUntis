@@ -26,6 +26,7 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.AutoMuteConfigurationActivity
 import com.sapuseven.untis.services.AutoMuteServiceZenRuleImpl
 import com.sapuseven.untis.ui.pages.settings.SettingsScreenViewModel
+import com.sapuseven.untis.ui.pages.settings.automute.AutoMuteSettingsViewModel.Companion.EXTRA_USER_ID
 import io.sentry.Sentry
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -141,7 +142,7 @@ fun SettingsCategoryGeneral(viewModel: SettingsScreenViewModel) {
 				)
 
 				Preference(
-					title = { Text("Auto-mute preferences") },
+					title = { Text(stringResource(R.string.preference_automute_preferences)) },
 					trailingContent = {
 						Icon(
 							painter = painterResource(R.drawable.settings_external),
@@ -149,7 +150,9 @@ fun SettingsCategoryGeneral(viewModel: SettingsScreenViewModel) {
 						)
 					},
 					onClick = {
-						context.startActivity(Intent(context, AutoMuteConfigurationActivity::class.java))
+						context.startActivity(Intent(context, AutoMuteConfigurationActivity::class.java).apply {
+							putExtra(EXTRA_USER_ID, viewModel.currentUserId())
+						})
 					}
 				)
 			}

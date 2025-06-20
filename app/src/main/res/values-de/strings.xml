@@ -395,4 +395,5 @@
     <string name="preference_automute_allow_priority">Prioritätstermine dürfen die automatische Stummschaltung ignorieren</string>
     <string name="widget_timetable_link">Verknüpfung erstellen für…</string>
     <string name="automute_zen_rule_name">Schule - %1$s</string>
+	<string name="preference_automute_preferences">Einstellungen für automatisches Stummschalten</string>
 </resources>
