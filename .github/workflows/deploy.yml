@@ -37,7 +37,7 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_DEBUG_PASSWORD: ${{ secrets.KEY_DEBUG_PASSWORD }}
           KEY_RELEASE_PASSWORD: ${{ secrets.KEY_RELEASE_PASSWORD }}
-        run: ./gradlew assembleGmsRelease bundleGmsRelease
+        run: ./gradlew assembleRelease bundleRelease
 
       - name: Upload release files
         uses: actions/upload-artifact@v4
@@ -51,6 +51,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -74,6 +75,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
