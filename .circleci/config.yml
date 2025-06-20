@@ -165,9 +165,9 @@ jobs:
             git merge $CIRCLE_TAG
             
             versionCode=$(jq '.elements[0].versionCode' ./workspace/outputs/apk/gms/release/output-metadata.json)
-            sed -i "s/versionCode generateVersionCode()/versionCode $versionCode/" ./app/build.gradle
+            sed -i "s/versionCode = generateVersionCode()/versionCode = $versionCode/" ./app/build.gradle.kts
 
-            git add ./app/build.gradle
+            git add ./app/build.gradle.kts
             git commit -m "[skip ci] Update F-Droid release"
             git tag fdroid-$CIRCLE_TAG
             git push --force --set-upstream origin release
