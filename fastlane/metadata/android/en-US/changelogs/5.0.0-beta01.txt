@@ -1,0 +1,9 @@
+- Migrate to modern frameworks
+  - Dagger/Hilt
+  - Compose Navigation
+  - And many more
+- Fully switch to WeekView-Compose
+- Improve settings handling to increase responsiveness
+- Allow to disable error reporting completely
+- Integrate auto-mute with Android Zen Mode
+- Many bug fixes and improvements
