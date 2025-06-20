@@ -20,8 +20,8 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keepattributes *Annotation*, InnerClasses
 -dontnote kotlinx.serialization.SerializationKt
+-keepattributes *Annotation*, InnerClasses
 -keep,includedescriptorclasses class com.sapuseven.untis.**$$serializer { *; }
 -keepclassmembers class com.sapuseven.untis.** {
     *** Companion;
@@ -32,10 +32,11 @@
 -keepclassmembernames class kotlinx.** {
     volatile <fields>;
 }
--keepclasseswithmembers class com.sapuseven.untis.** implements com.sapuseven.untis.interfaces.TableModel { *; }
+-keepclassmembers class * extends com.google.protobuf.GeneratedMessageLite {
+    <fields>;
+}
 
 -keep public class * extends androidx.lifecycle.ViewModel {*;}
-
 
 
 # Please add these rules to your existing keep rules in order to suppress warnings.
