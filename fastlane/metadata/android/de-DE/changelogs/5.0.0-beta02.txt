@@ -1,0 +1,1 @@
+- Absturz beim ersten Starten der App behoben
