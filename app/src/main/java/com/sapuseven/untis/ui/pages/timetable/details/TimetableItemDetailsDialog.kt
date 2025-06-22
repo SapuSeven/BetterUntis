@@ -154,7 +154,7 @@ fun TimetableItemDetailsDialog(
 				},
 				actions = {
 					if (BuildConfig.DEBUG)
-						DebugTimetableItemDetailsAction(periodItems)
+						DebugTimetableItemDetailsAction(periodItems, periodDataMap)
 				}
 			)
 		},

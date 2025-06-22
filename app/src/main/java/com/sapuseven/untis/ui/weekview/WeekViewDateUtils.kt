@@ -27,17 +27,15 @@ internal fun pageIndexForDate(
 	defaultToNext: Boolean = true,
 ): Long {
 	val weeks = ChronoUnit.WEEKS.between(
-		weekStartForDate(LocalDate.now(clock), firstDayOfWeek),
-		weekStartForDate(date, firstDayOfWeek)
+		weekStartForDate(LocalDate.now(clock), firstDayOfWeek), weekStartForDate(date, firstDayOfWeek)
 	)
 
-	return if (
-		ChronoUnit.DAYS.between(weekStartForDate(date, firstDayOfWeek), date) >= weekLength
-		&& defaultToNext
-	)
-		weeks + 1
-	else
-		weeks
+	return if (ChronoUnit.DAYS.between(
+			weekStartForDate(date, firstDayOfWeek),
+			date
+		) >= weekLength && defaultToNext
+	) weeks + 1
+	else weeks
 }
 
 /**
@@ -59,11 +57,33 @@ internal fun startDateForPageIndex(
 }
 
 private fun weekStartForDate(
-	date: LocalDate,
-	firstDayOfWeek: DayOfWeek = DayOfWeek.MONDAY
+	date: LocalDate, firstDayOfWeek: DayOfWeek = DayOfWeek.MONDAY
 ): LocalDate = date.with(WeekFields.of(firstDayOfWeek, 4).dayOfWeek(), 1).let {
-	if (it.isAfter(date))
-		it.minusWeeks(1)
-	else
-		it
+	if (it.isAfter(date)) it.minusWeeks(1)
+	else it
 }
+
+internal class DateIterator(
+	val startDate: LocalDate, val endDateInclusive: LocalDate, val stepDays: Long
+) : Iterator<LocalDate> {
+	private var currentDate = startDate
+
+	override fun hasNext() = currentDate <= endDateInclusive
+
+	override fun next(): LocalDate {
+		val next = currentDate
+		currentDate = currentDate.plusDays(stepDays)
+		return next
+	}
+}
+
+internal class DateProgression(
+	override val start: LocalDate, override val endInclusive: LocalDate, val stepDays: Long = 1
+) : Iterable<LocalDate>, ClosedRange<LocalDate> {
+
+	override fun iterator(): Iterator<LocalDate> = DateIterator(start, endInclusive, stepDays)
+
+	infix fun step(days: Long) = DateProgression(start, endInclusive, days)
+}
+
+internal operator fun LocalDate.rangeTo(other: LocalDate) = DateProgression(this, other)

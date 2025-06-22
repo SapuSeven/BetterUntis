@@ -39,7 +39,7 @@ android {
 		minSdk = 21
 		targetSdk = 35
 		versionCode = generateVersionCode()
-		versionName = "5.0.0-beta02"
+		versionName = "5.0.0-beta03"
 		vectorDrawables.useSupportLibrary = true
 		testInstrumentationRunner = "com.sapuseven.untis.HiltTestRunner"
 
@@ -259,6 +259,22 @@ dependencies {
 	androidTestImplementation(libs.androidx.compose.ui.test)
 	androidTestImplementation(libs.hilt.android.testing)
 	debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+	// fix for Crash from missing `beginTransactionReadOnly()` method in Room due to sqlite version mismatch
+	// see https://issuetracker.google.com/issues/400483860#comment7
+	implementation("androidx.sqlite:sqlite:2.5.1") {
+		exclude(group = "io.sentry", module = "sentry-android-sqlite")
+	}
+	implementation("androidx.sqlite:sqlite-ktx:2.5.1") {
+		exclude(group = "io.sentry", module = "sentry-android-sqlite")
+	}
+	configurations.configureEach {
+		resolutionStrategy {
+			force("androidx.sqlite:sqlite:2.5.1")
+			force("androidx.sqlite:sqlite-ktx:2.5.1")
+		}
+	}
+	// end fix
 
 	implementation(project(":api"))
 	implementation(project(":material-color-utils"))

@@ -182,14 +182,13 @@ class TimetableViewModel @Inject constructor(
 			delay(1000) // FIXME How can I get the currentUserData after it is initialized in masterDataRepository?
 			val holidays = (masterDataRepository.userData?.holidays ?: emptyList())
 				.map { holiday ->
-						Holiday(
-							title = holiday.name,
-							colorScheme = EventColor.Custom(Color(0xFFBB86FC)),
-							textColor = Color.White,
-							start = holiday.startDate!!,
-							end = holiday.endDate!!,
-						)
-					}
+					Holiday(
+						title = holiday.name,
+						colorScheme = EventColor.Transparent,
+						start = holiday.startDate!!,
+						end = holiday.endDate!!,
+					)
+				}
 			_holidays.emit(holidays)
 		}
 	}

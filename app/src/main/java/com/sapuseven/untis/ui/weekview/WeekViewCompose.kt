@@ -51,14 +51,12 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
@@ -68,7 +66,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
@@ -76,7 +73,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
-import androidx.core.graphics.ColorUtils
 import com.sapuseven.untis.R
 import com.sapuseven.untis.services.WeekLogicService
 import com.sapuseven.untis.ui.common.conditional
@@ -88,7 +84,6 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import kotlin.math.abs
@@ -648,15 +643,21 @@ fun <T> WeekViewCompose(
 
 	val earliestEventTime by remember(events) {
 		derivedStateOf {
-			// TODO: Not efficient for large amounts of events
-			events.values.flatten().minByOrNull { it.start.toLocalTime() }?.start?.toLocalTime()
+			events.values
+				.asSequence()
+				.flatten()
+				.filter { it.end.toLocalTime().isBefore(startTime) }
+				.minByOrNull { it.start.toLocalTime() }?.start?.toLocalTime()
 		}
 	}
 
 	val latestEventTime by remember(events) {
 		derivedStateOf {
-			// TODO: Not efficient for large amounts of events
-			events.values.flatten().maxByOrNull { it.end.toLocalTime() }?.end?.toLocalTime()
+			events.values
+				.asSequence()
+				.flatten()
+				.filter { it.start.toLocalTime().isAfter(endTime) }
+				.maxByOrNull { it.end.toLocalTime() }?.end?.toLocalTime()
 		}
 	}
 
@@ -750,13 +751,15 @@ fun <T> WeekViewCompose(
 						holidays.filter { holiday ->
 							visibleStartDate.isBefore(holiday.end) && visibleStartDate.plusDays(numDays.toLong())
 								.isAfter(holiday.start)
-						}.map {
-							Event<T>(
-								title = it.title,
-								colorScheme = it.colorScheme,
-								start = it.start.atStartOfDay(),
-								end = it.end.atTime(LocalTime.MAX),
-							)
+						}.flatMap {
+							(it.start..it.end).map { date ->
+								Event<T>(
+									title = it.title,
+									colorScheme = it.colorScheme,
+									start = date.atTime(startTime),
+									end = date.atTime(endTime)
+								)
+							}
 						}
 					}
 
