@@ -260,6 +260,22 @@ dependencies {
 	androidTestImplementation(libs.hilt.android.testing)
 	debugImplementation(libs.androidx.compose.ui.test.manifest)
 
+	// fix for Crash from missing `beginTransactionReadOnly()` method in Room due to sqlite version mismatch
+	// see https://issuetracker.google.com/issues/400483860#comment7
+	implementation("androidx.sqlite:sqlite:2.5.1") {
+		exclude(group = "io.sentry", module = "sentry-android-sqlite")
+	}
+	implementation("androidx.sqlite:sqlite-ktx:2.5.1") {
+		exclude(group = "io.sentry", module = "sentry-android-sqlite")
+	}
+	configurations.configureEach {
+		resolutionStrategy {
+			force("androidx.sqlite:sqlite:2.5.1")
+			force("androidx.sqlite:sqlite-ktx:2.5.1")
+		}
+	}
+	// end fix
+
 	implementation(project(":api"))
 	implementation(project(":material-color-utils"))
 }
