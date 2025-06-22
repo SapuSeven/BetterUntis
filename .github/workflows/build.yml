@@ -81,6 +81,6 @@ jobs:
           key: ${{ secrets.SSH_DEPLOY_KEY }}
           fingerprint: ${{ secrets.SSH_DEPLOY_FINGERPRINT }}
           source: |
-            outputs/debug/*
+            outputs/foss/debug/*
           target: ${{ secrets.SSH_DEPLOY_PATH }}/debug/${{github.run_number}}
-          strip_components: 2
+          strip_components: 3
