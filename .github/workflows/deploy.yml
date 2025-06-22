@@ -24,6 +24,8 @@ jobs:
   
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
           
       - name: Decode keystore
         uses: timheuer/base64-to-file@v1.2
@@ -76,7 +78,6 @@ jobs:
     name: Create Release on Google Play Store
     needs: build
     runs-on: ubuntu-latest
-    if: false #TODO
 
     steps:
       - uses: actions/checkout@v4
@@ -101,7 +102,7 @@ jobs:
 
       - name: Deploy to Play Store
         env:
-          TAG: 5.0.0-beta01 #${{ github.ref_name }}
+          TAG: ${{ github.ref_name }}
         run: |
             for f in fastlane/metadata/android/*/changelogs; do [[ -e "$f/$TAG.txt" ]] && cp "$f/$TAG.txt" "$f/default.txt"; done;
             bundle exec fastlane deploy aab:'./app/build/outputs/bundle/gmsRelease/app-gms-release.aab'
@@ -116,6 +117,7 @@ jobs:
         with:
           ref: fdroid
           fetch-depth: 2
+          fetch-tags: true
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
