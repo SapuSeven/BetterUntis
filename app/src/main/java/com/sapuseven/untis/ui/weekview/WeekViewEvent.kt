@@ -101,7 +101,7 @@ fun <T> WeekViewEvent(
 	val pastColor = event.colorScheme.pastColor()
 	val textColor = event.colorScheme.textColor()
 
-	val isFullDayEvent = event.start.hour == 0 && event.end.hour == 23 && event.data == null
+	val isFullDayEvent = event.data == null
 
 	val holidayTextStyle = MaterialTheme.typography.bodyLarge + eventStyle.lessonNameStyle
 

@@ -750,8 +750,8 @@ fun <T> WeekViewCompose(
 								Event<T>(
 									title = it.title,
 									colorScheme = it.colorScheme,
-									start = date.atStartOfDay(),
-									end = date.atTime(LocalTime.MAX)
+									start = date.atTime(startTime),
+									end = date.atTime(endTime)
 								)
 							}
 						}
