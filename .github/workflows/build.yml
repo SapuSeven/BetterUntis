@@ -11,7 +11,6 @@ jobs:
   build:
     name: Build ${{ matrix.variant }} APKs (${{ matrix.target }})
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main'
     strategy:
       fail-fast: false
       matrix:
@@ -34,7 +33,7 @@ jobs:
           cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop' }}
   
       - name: Prepare signing config
-        if: ${{ matrix.variant == 'release' }}
+        if: github.ref == 'refs/heads/develop'
         run: |
           if [[ ! -v KEYSTORE_ENCODED ]]; then exit 0; fi
           echo $KEYSTORE_ENCODED | base64 --decode >> app/BetterUntis.jks
