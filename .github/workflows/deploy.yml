@@ -178,4 +178,4 @@ jobs:
           fingerprint: ${{ secrets.SSH_DEPLOY_FINGERPRINT }}
           source: app/build/outputs/mapping/gmsRelease/*
           target: ${{ secrets.SSH_DEPLOY_PATH }}/debug/${{ github.ref_name }}
-          strip_components: 7
+          strip_components: 5
