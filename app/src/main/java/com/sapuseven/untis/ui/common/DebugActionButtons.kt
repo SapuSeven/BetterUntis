@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,9 +34,10 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.R
+import com.sapuseven.untis.api.model.untis.timetable.PeriodData
 import com.sapuseven.untis.models.PeriodItem
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.encodeToString
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -106,7 +108,10 @@ fun DebugDesclaimerAction() {
 }
 
 @Composable
-fun DebugTimetableItemDetailsAction(timegridItems: List<PeriodItem>) {
+fun DebugTimetableItemDetailsAction(
+	timegridItems: List<PeriodItem>,
+	periodDataMap: SnapshotStateMap<Long, PeriodData?>
+) {
 	DebugInfoAction(
 		title = { Text("Raw lesson details") }
 	) {
@@ -116,11 +121,17 @@ fun DebugTimetableItemDetailsAction(timegridItems: List<PeriodItem>) {
 				.fillMaxWidth()
 		) {
 			items(timegridItems) {
-				RawText(item = it)
+				RawText(item = DebugPeriodInfo(it, periodDataMap[it.originalPeriod.id]))
 			}
 		}
 	}
 }
+
+@Serializable
+private data class DebugPeriodInfo(
+	val periodItem: PeriodItem,
+	val periodData: PeriodData?
+)
 
 @Composable
 private inline fun <reified T> RawText(item: T, encode: Boolean = true) {
