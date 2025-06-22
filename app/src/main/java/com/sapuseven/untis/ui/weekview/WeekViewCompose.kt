@@ -745,14 +745,15 @@ fun <T> WeekViewCompose(
 						holidays.filter { holiday ->
 							visibleStartDate.isBefore(holiday.end) && visibleStartDate.plusDays(numDays.toLong())
 								.isAfter(holiday.start)
-						}.map {
-							// TODO Handle multi-day holidays
-							Event<T>(
-								title = it.title,
-								colorScheme = it.colorScheme,
-								start = it.start.atStartOfDay(),
-								end = it.end.atTime(LocalTime.MAX),
-							)
+						}.flatMap {
+							(it.start..it.end).map { date ->
+								Event<T>(
+									title = it.title,
+									colorScheme = it.colorScheme,
+									start = date.atStartOfDay(),
+									end = date.atTime(LocalTime.MAX)
+								)
+							}
 						}
 					}
 
