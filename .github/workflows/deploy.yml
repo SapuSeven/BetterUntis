@@ -140,3 +140,40 @@ jobs:
           git tag fdroid-$TAG
           git push --force --set-upstream origin fdroid
           git push origin fdroid-$TAG
+
+  sapuseven:
+    name: Create Release on sapuseven.com
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: betteruntis-release
+          path: app/build/outputs
+
+      - name: Upload APK via SSH
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_DEPLOY_HOST }}
+          port: ${{ secrets.SSH_DEPLOY_PORT }}
+          username: ${{ secrets.SSH_DEPLOY_USER }}
+          key: ${{ secrets.SSH_DEPLOY_KEY }}
+          fingerprint: ${{ secrets.SSH_DEPLOY_FINGERPRINT }}
+          source: app/build/outputs/apk/gms/release/*
+          target: ${{ secrets.SSH_DEPLOY_PATH }}/debug/${{ github.ref_name }}
+          strip_components: 6
+
+      - name: Upload mapping via SSH
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_DEPLOY_HOST }}
+          port: ${{ secrets.SSH_DEPLOY_PORT }}
+          username: ${{ secrets.SSH_DEPLOY_USER }}
+          key: ${{ secrets.SSH_DEPLOY_KEY }}
+          fingerprint: ${{ secrets.SSH_DEPLOY_FINGERPRINT }}
+          source: app/build/outputs/mapping/gmsRelease/*
+          target: ${{ secrets.SSH_DEPLOY_PATH }}/debug/${{ github.ref_name }}
+          strip_components: 7
