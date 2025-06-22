@@ -643,15 +643,21 @@ fun <T> WeekViewCompose(
 
 	val earliestEventTime by remember(events) {
 		derivedStateOf {
-			// TODO: Not efficient for large amounts of events
-			events.values.flatten().minByOrNull { it.start.toLocalTime() }?.start?.toLocalTime()
+			events.values
+				.asSequence()
+				.flatten()
+				.filter { it.end.toLocalTime().isBefore(startTime) }
+				.minByOrNull { it.start.toLocalTime() }?.start?.toLocalTime()
 		}
 	}
 
 	val latestEventTime by remember(events) {
 		derivedStateOf {
-			// TODO: Not efficient for large amounts of events
-			events.values.flatten().maxByOrNull { it.end.toLocalTime() }?.end?.toLocalTime()
+			events.values
+				.asSequence()
+				.flatten()
+				.filter { it.start.toLocalTime().isAfter(endTime) }
+				.maxByOrNull { it.end.toLocalTime() }?.end?.toLocalTime()
 		}
 	}
 
