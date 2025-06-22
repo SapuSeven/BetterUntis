@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: Build APKs (${{ matrix.target }})
+    name: Build ${{ matrix.variant }} APKs (${{ matrix.target }})
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
     strategy:
@@ -54,5 +54,33 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: betteruntis-${{ matrix.target }}-${{ matrix.variant }}
-          path: app/build/outputs/apk/*/${{ matrix.variant }}/*.apk
+          path: |
+            app/build/outputs/apk/*/${{ matrix.variant }}/*.apk
+            app/build/outputs/apk/*/${{ matrix.variant }}/output-metadata.json
 
+  publish-develop:
+    name: Publish debug build on sapuseven.com
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: betteruntis-Foss-debug
+          path: outputs
+         
+      - name: Upload build artifacts via SSH
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_DEPLOY_HOST }}
+          port: ${{ secrets.SSH_DEPLOY_PORT }}
+          username: ${{ secrets.SSH_DEPLOY_USER }}
+          key: ${{ secrets.SSH_DEPLOY_KEY }}
+          fingerprint: ${{ secrets.SSH_DEPLOY_FINGERPRINT }}
+          source: |
+            outputs/debug/*
+          target: ${{ secrets.SSH_DEPLOY_PATH }}/debug/${{github.run_number}}
+          strip_components: 2
