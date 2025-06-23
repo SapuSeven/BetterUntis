@@ -142,7 +142,9 @@ fun <T> WeekViewEvent(
 				}
 			}
 			.ifNotNull(onClick) {
-				clickable(onClick = it)
+				if (event.data != null) {
+					clickable(onClick = it)
+				} else this
 			}
 			.padding(horizontal = innerPadding)
 	) {
@@ -152,6 +154,7 @@ fun <T> WeekViewEvent(
 				style = MaterialTheme.typography.bodySmall + eventStyle.lessonInfoStyle,
 				textAlign = if (eventStyle.lessonInfoCentered) TextAlign.Center else TextAlign.Start,
 				maxLines = 1,
+				overflow = TextOverflow.Ellipsis,
 				color = textColor,
 				modifier = Modifier
 					.fillMaxWidth()
@@ -163,6 +166,7 @@ fun <T> WeekViewEvent(
 				style = MaterialTheme.typography.bodyLarge + eventStyle.lessonNameStyle,
 				textAlign = TextAlign.Center,
 				maxLines = 1,
+				overflow = TextOverflow.Ellipsis,
 				color = textColor,
 				modifier = Modifier.align(Alignment.Center)
 			)
@@ -172,6 +176,7 @@ fun <T> WeekViewEvent(
 				style = MaterialTheme.typography.bodySmall + eventStyle.lessonInfoStyle,
 				textAlign = if (eventStyle.lessonInfoCentered) TextAlign.Center else TextAlign.End,
 				maxLines = 1,
+				overflow = TextOverflow.Ellipsis,
 				color = textColor,
 				modifier = Modifier
 					.fillMaxWidth()
