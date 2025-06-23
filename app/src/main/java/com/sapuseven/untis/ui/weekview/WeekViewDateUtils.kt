@@ -14,7 +14,7 @@ import java.time.temporal.WeekFields
  * @param clock The clock to use for the current date
  * @param firstDayOfWeek The first day of the week on a page
  * @param weekLength The number of days displayed per page
- * @param defaultToNext Wether to return the next or the previous week if the specified [date] isn't visible
+ * @param defaultToNext Whether to return the next or the previous week if the specified [date] isn't visible
  * (e.g. for weekends when only week days are displayed)
  * @return The page index relative to the page corresponding to today
  * @see startDateForPageIndex
@@ -41,10 +41,9 @@ internal fun pageIndexForDate(
 /**
  * Calculates the start date for a specific page.
  *
- * @param pageIndex The page index relative to todays page
+ * @param pageIndex The page index relative to today's page
  * @param clock The clock to use for the current date
  * @param firstDayOfWeek The first day of the week on a page
- * @param weekLength The number of days displayed per page
  * @return The date of the first visible day on the page specified by [pageIndex]
  * @see pageIndexForDate
  */
