@@ -32,7 +32,7 @@ import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
 import com.sapuseven.untis.ui.preferences.toPeriodElement
 import com.sapuseven.untis.ui.weekview.Event
-import com.sapuseven.untis.ui.weekview.EventColor
+import com.sapuseven.untis.ui.weekview.EventStyle
 import com.sapuseven.untis.ui.weekview.Holiday
 import com.sapuseven.untis.ui.weekview.WeekViewColorScheme
 import com.sapuseven.untis.ui.weekview.WeekViewEventStyle
@@ -184,7 +184,7 @@ class TimetableViewModel @Inject constructor(
 				.map { holiday ->
 					Holiday(
 						title = holiday.name,
-						colorScheme = EventColor.Transparent,
+						colorScheme = EventStyle.Transparent,
 						start = holiday.startDate!!,
 						end = holiday.endDate!!,
 					)
@@ -335,7 +335,7 @@ class TimetableViewModel @Inject constructor(
 	) = collect { result ->
 		val events = timetableMapper.mapTimetablePeriodsToWeekViewEvents(result.value, ElementType.STUDENT)
 		val refreshTimestamp = result.originTimeStamp?.let { Instant.ofEpochMilli(it) } ?: Instant.now()
-		emitEvents(mapOf(startDate to timetableMapper.colorWeekViewTimetableEvents(events)))
+		emitEvents(mapOf(startDate to events))
 		if (updateLastRefresh)
 			_lastRefresh.emit(refreshTimestamp)
 	}

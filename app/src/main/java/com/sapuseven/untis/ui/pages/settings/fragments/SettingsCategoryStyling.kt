@@ -18,20 +18,20 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.data.repository.withDefault
 import com.sapuseven.untis.data.settings.model.DarkTheme
 import com.sapuseven.untis.ui.pages.settings.SettingsScreenViewModel
-import com.sapuseven.untis.ui.weekview.EventColor
+import com.sapuseven.untis.ui.weekview.EventStyle
 
 @Composable
 fun SettingsCategoryStyling(viewModel: SettingsScreenViewModel) {
 	// *past colors are currently disabled as an "experiment" to simplify color preferences
 
 	val defaultThemeColor = MaterialTheme.colorScheme.primary
-	val defaultBackgroundRegular = EventColor.ThemePrimary.color()
+	val defaultBackgroundRegular = EventStyle.ThemePrimary.color()
 	//val defaultBackgroundRegularPast = EventColor.ThemePrimary.pastColor()
-	val defaultBackgroundExam = EventColor.ThemeError.color()
+	val defaultBackgroundExam = EventStyle.ThemeError.color()
 	//val defaultBackgroundExamPast = EventColor.ThemeError.pastColor()
-	val defaultBackgroundIrregular = EventColor.ThemeTertiary.color()
+	val defaultBackgroundIrregular = EventStyle.ThemeTertiary.color()
 	//val defaultBackgroundIrregularPast = EventColor.ThemeTertiary.pastColor()
-	val defaultBackgroundCancelled = EventColor.ThemeSecondary.color()
+	val defaultBackgroundCancelled = EventStyle.ThemeSecondary.color()
 	//val defaultBackgroundCancelledPast = EventColor.ThemeSecondary.pastColor()
 
 	PreferenceGroup(stringResource(id = R.string.preference_category_styling_colors)) {

@@ -747,7 +747,7 @@ fun <T> WeekViewCompose(
 							(it.start..it.end).map { date ->
 								Event<T>(
 									title = it.title,
-									colorScheme = it.colorScheme,
+									eventStyle = it.colorScheme,
 									start = date.atTime(startTime),
 									end = date.atTime(endTime)
 								)
