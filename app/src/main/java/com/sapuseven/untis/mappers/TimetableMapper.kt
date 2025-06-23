@@ -114,7 +114,6 @@ class TimetableMapper @Inject constructor(
 		periodItem: PeriodItem
 	): EventStyle = with(userSettings) {
 		val subjectEntity = masterDataRepository.userData?.subjects?.find { it.id == periodItem.subjects.firstOrNull()?.id }
-		val textDecoration = if (periodItem.isCancelled()) TextDecoration.LineThrough else TextDecoration.None
 
 		val defaultColor = EventStyle.Custom(
 			color = Color((subjectEntity?.backColor ?: periodItem.originalPeriod.backColor).toColorInt()),
@@ -131,7 +130,7 @@ class TimetableMapper @Inject constructor(
 			periodItem.isCancelled() -> (if (schoolBackgroundList.contains("cancelled")) defaultColor else cancelledColor)
 			periodItem.isIrregular() -> if (schoolBackgroundList.contains("irregular")) defaultColor else irregularColor
 			else -> if (schoolBackgroundList.contains("regular")) defaultColor else regularColor
-		}.withTextStyle(TextStyle(textDecoration = textDecoration))
+		}.withTextStyle(TextStyle(textDecoration = if (periodItem.isCancelled()) TextDecoration.LineThrough else TextDecoration.None))
 	}
 
 	/**
