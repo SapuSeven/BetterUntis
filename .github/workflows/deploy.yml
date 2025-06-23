@@ -165,7 +165,7 @@ jobs:
           key: ${{ secrets.SSH_DEPLOY_KEY }}
           fingerprint: ${{ secrets.SSH_DEPLOY_FINGERPRINT }}
           source: app/build/outputs/apk/gms/release/*
-          target: ${{ secrets.SSH_DEPLOY_PATH }}/debug/${{ github.ref_name }}
+          target: ${{ secrets.SSH_DEPLOY_PATH }}/release/${{ github.ref_name }}
           strip_components: 6
 
       - name: Upload mapping via SSH
@@ -177,5 +177,5 @@ jobs:
           key: ${{ secrets.SSH_DEPLOY_KEY }}
           fingerprint: ${{ secrets.SSH_DEPLOY_FINGERPRINT }}
           source: app/build/outputs/mapping/gmsRelease/*
-          target: ${{ secrets.SSH_DEPLOY_PATH }}/debug/${{ github.ref_name }}
+          target: ${{ secrets.SSH_DEPLOY_PATH }}/release/${{ github.ref_name }}
           strip_components: 5
