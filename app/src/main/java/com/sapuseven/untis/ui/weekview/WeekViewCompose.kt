@@ -1,7 +1,6 @@
 package com.sapuseven.untis.ui.weekview
 
 import android.text.format.DateFormat
-import android.util.Log
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -629,13 +628,7 @@ fun <T> WeekViewCompose(
 	val currentOnPageChange by rememberUpdatedState(onPageChange)
 
 	var datePickerDialog by remember { mutableStateOf(false) }
-	var jumpToDate by remember { mutableStateOf<LocalDate?>(null) }
-
-	LaunchedEffect(jumpToDate) {
-		jumpToDate?.let {
-			pagerState.scrollToPage((startPage + pageIndexForDate(it)).toInt())
-		}
-	}
+	var datePickerDialogLastSelection by remember { mutableStateOf<LocalDate>(LocalDate.now()) }
 
 	scale.useDebounce {
 		scope.launch { onZoom(it) }
@@ -706,7 +699,6 @@ fun <T> WeekViewCompose(
 				hourList = hourList,
 				modifier = Modifier
 					.onGloballyPositioned {
-						Log.d("WeekViewCompose", "Sidebar width: ${it.size.width}")
 						if (it.size.width > 0)
 							sidebarWidth = it.size.width
 					}
@@ -832,11 +824,16 @@ fun <T> WeekViewCompose(
 
 	if (datePickerDialog)
 		DatePickerDialog(
-			initialSelection = jumpToDate ?: LocalDate.now(),
+			initialSelection = datePickerDialogLastSelection,
 			onDismiss = { datePickerDialog = false }
 		) {
 			datePickerDialog = false
-			jumpToDate = it
+			datePickerDialogLastSelection = it
+
+			scope.launch {
+				val targetPage = (startPage + pageIndexForDate(it)).toInt()
+				pagerState.scrollToPage(targetPage)
+			}
 		}
 }
 
