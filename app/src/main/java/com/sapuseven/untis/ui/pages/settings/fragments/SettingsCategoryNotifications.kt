@@ -18,6 +18,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -30,6 +32,8 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.data.settings.model.NotificationVisibility
 import com.sapuseven.untis.ui.common.disabled
 import com.sapuseven.untis.ui.pages.settings.SettingsScreenViewModel
+import com.sapuseven.untis.workers.NotificationSetupWorker
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -53,6 +57,17 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 		}
 	else null
 
+	fun enqueueNotificationSetup() = scope.launch {
+		delay(1000) // Delay to ensure the settings are updated before worker is enqueued
+		WorkManager.getInstance(context).apply {
+			enqueue(OneTimeWorkRequestBuilder<NotificationSetupWorker>().build())
+		}
+	}
+
+	fun clearNotifications() {
+		(context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager)?.cancelAll()
+	}
+
 	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
 		val visible by viewModel.userSettingsRepository.getSettings().map { it.notificationsEnable }.collectAsState(initial = false)
 		ScheduleExactAlarmInfoMessage(
@@ -70,7 +85,6 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 	PreferenceGroup(
 		title = stringResource(R.string.preference_category_notifications_break)
 	) {
-		// TODO: This is used to make sure that the setting will match the permission status. Not sure if there is a better way to do this.
 		LaunchedEffect(Unit) {
 			notificationPermissionsState?.let {
 				if (!it.status.isGranted) {
@@ -89,15 +103,15 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 			onValueChange = {
 				notificationsEnable = if (it) {
 					if (notificationPermissionsState?.status?.isGranted != false) {
-						//enqueueNotificationSetup()
 						notificationsMessageVisible = false
+						enqueueNotificationSetup()
 						true
 					} else {
 						notificationPermissionsState.launchPermissionRequest()
 						false
 					}
 				} else {
-					//clearNotifications()
+					clearNotifications()
 					false
 				}
 			}
@@ -110,8 +124,8 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 			settingsRepository = viewModel.userSettingsRepository,
 			value = { it.notificationsInMultiple },
 			onValueChange = {
-				//enqueueNotificationSetup()
 				notificationsInMultiple = it
+				enqueueNotificationSetup()
 			}
 		)
 
@@ -122,8 +136,8 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 			settingsRepository = viewModel.userSettingsRepository,
 			value = { it.notificationsBeforeFirst },
 			onValueChange = {
-				//enqueueNotificationSetup()
 				notificationsBeforeFirst = it
+				enqueueNotificationSetup()
 			}
 		)
 
@@ -134,8 +148,8 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 			settingsRepository = viewModel.userSettingsRepository,
 			value = { it.notificationsBeforeFirstTime },
 			onValueChange = {
-				//enqueueNotificationSetup()
 				notificationsBeforeFirstTime = it
+				enqueueNotificationSetup()
 			}
 		)
 	}
@@ -232,7 +246,7 @@ fun SettingsCategoryNotifications(viewModel: SettingsScreenViewModel) {
 	Preference(
 		title = { Text(stringResource(R.string.preference_notifications_clear)) },
 		onClick = {
-			(context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager)?.cancelAll()
+			clearNotifications()
 		},
 		leadingContent = {
 			Icon(

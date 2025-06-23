@@ -190,7 +190,9 @@
     <string name="notifications_channel_backgrounderrors_desc">Shows error messages of background tasks</string>
     <string name="notifications_channel_breakinfo">Break info</string>
     <string name="notifications_channel_breakinfo_desc">Shows information about the current break and the following lesson</string>
-    <string name="notifications_text_error_message">You won\'t get any notifications today.</string>
+	<string name="notifications_channel_firstlesson">First lesson</string>
+	<string name="notifications_channel_firstlesson_desc">Shows information about the first lesson and daily messages</string>
+	<string name="notifications_text_error_message">You won\'t get any notifications today.</string>
     <string name="notifications_text_error_title">Failed to load timetable</string>
     <string name="notifications_text_first_title">School starts at %1$s</string>
     <string name="notifications_text_message_classes">Class: %1$s</string>
@@ -199,6 +201,8 @@
     <string name="notifications_text_message_subjects">Next lesson: %1$s</string>
     <string name="notifications_text_message_teachers">Teacher: %1$s</string>
     <string name="notifications_text_title">Break until %1$s</string>
+    <string name="notifications_text_motd_title">Today\'s school messages</string>
+    <string name="notifications_text_motd_message">%1$d messages</string>
     <string name="preference_automute_cancelled_lessons">Also mute in cancelled lessons</string>
     <string name="preference_automute_enable">Enable auto-mute</string>
     <string name="preference_automute_enable_summary">Automatically turns on Do Not Disturb during lessons</string>
