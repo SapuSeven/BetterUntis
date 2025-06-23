@@ -831,8 +831,8 @@ fun <T> WeekViewCompose(
 			datePickerDialogLastSelection = it
 
 			scope.launch {
-				val targetPage = (startPage + pageIndexForDate(it)).toInt()
-				pagerState.scrollToPage(targetPage)
+				val targetPage = (startPage + pageIndexForDate(date = it)).toInt()
+				pagerState.animateScrollToPage(targetPage)
 			}
 		}
 }
