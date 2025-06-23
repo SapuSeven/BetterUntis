@@ -115,9 +115,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: fdroid
-          fetch-depth: 2
-          fetch-tags: true
+          fetch-depth: 0
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -128,10 +126,12 @@ jobs:
       - name: Prepare release for F-Droid
         env:
           TAG: ${{ github.ref_name }}
+          FDROID_BRANCH: fdroid
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
+          git checkout $FDROID_BRANCH
           git reset --hard $TAG
           
           versionCode=$(jq '.elements[0].versionCode' ./app/build/outputs/apk/gms/release/output-metadata.json)
@@ -140,7 +140,7 @@ jobs:
           git add ./app/build.gradle.kts
           git commit -m "[skip ci] Update F-Droid release"
           git tag fdroid-$TAG
-          git push --force --set-upstream origin fdroid
+          git push --force --set-upstream origin $FDROID_BRANCH
           git push origin fdroid-$TAG
 
   sapuseven:
