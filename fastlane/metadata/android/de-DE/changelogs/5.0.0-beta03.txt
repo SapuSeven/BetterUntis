@@ -1,0 +1,3 @@
+- Verbessertes Feriendesign
+- Behebung der unnötigen Verlängerung der Zeitspanne für sehr lange Ereignisse
+- Behebung eines möglichen Absturzes bei der Verwendung von Sentry
