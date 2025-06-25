@@ -193,6 +193,53 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /profile/user-contact-data:
+    get:
+      summary: Get user contact data
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserContactData'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update user contact data
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: User contact data to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserContactData'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/UserContactData'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+
 components:
   schemas:
     ErrorResponse:
@@ -500,6 +547,32 @@ components:
             - WEB
         appId:
           type: string
+
+    UserContactData:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        telephoneNumber:
+          type: string
+          nullable: true
+        mobileNumber:
+          type: string
+          nullable: true
+        street:
+          type: string
+          nullable: true
+        postCode:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        areContactDetailsWriteable:
+          type: boolean
+        userEmailMissingOrDifferentToMasterData:
+          type: boolean
 
   securitySchemes:
     bearerAuth:

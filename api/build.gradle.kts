@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
+import java.util.Locale
 
 plugins {
 	alias(libs.plugins.kotlin.jvm)
@@ -35,38 +37,41 @@ dependencies {
 	testImplementation(libs.junit)
 }
 
-/* Auto-generate api code from untis-extern spec - disabled for now, since not in use
-def apiSpecList = []
-def dir = new File("$projectDir/spec/untis-extern/".toString())
-dir.eachFileRecurse(groovy.io.FileType.FILES) { file ->
-	if (file.getName().endsWith(".yaml"))
-		apiSpecList << file
+// Build Untis Internal OpenAPI specs
+val apiSpecList = mutableListOf<File>()
+val dir = file("${layout.projectDirectory}/spec/untis-intern/")
+dir.walk().filter { it.isFile && Regex("""untis-.*-v\d\.yaml""").matches(it.name) }.forEach { file ->
+	apiSpecList.add(file)
 }
-apiSpecList.each {
-	def fileName = it.getName().replace(".yaml", "");
-	def taskName = fileName.split('-').collect { it.capitalize() }.join();
-	def packageName = fileName.replace("-", "_");
+apiSpecList.forEach { file ->
+	val fileName = file.name.replace(".yaml", "")
+	val taskName = fileName.split('-').joinToString("") { it.replaceFirstChar { c -> c.titlecase(Locale.getDefault()) } }
+	val packageName = fileName.replace("-", "_")
 
-	tasks.register("openApiGenerate" + taskName, org.openapitools.generator.gradle.plugin.tasks.GenerateTask.class, {
-		generatorName = "kotlin"
-		inputSpec = "$projectDir/spec/untis-extern/".toString() + "${fileName}.yaml"
-		outputDir = "$buildDir/generated".toString()
-		apiPackage = "com.sapuseven.untis.api.".toString() + "${packageName}"
-		modelPackage = "com.sapuseven.untis.model.".toString() + "${packageName}"
-		//templateDir = "$rootDir/src/main/resources/api/templates".toString()
-		//    https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/jaxrs-spec.md
-		configOptions = [
-			library: 'jvm-ktor',
-			dateLibrary: 'java8',
-			serializationLibrary: 'kotlinx_serialization',
-		]
-	})
-	compileJava.dependsOn("openApiGenerate" + taskName)
-}*/
+	tasks.register("openApiGenerate$taskName", GenerateTask::class) {
+		generatorName.set("kotlin")
+		inputSpec.set("${layout.projectDirectory}/spec/untis-intern/$fileName.yaml")
+		outputDir.set("${layout.buildDirectory.get()}/generated")
+		apiPackage.set("com.sapuseven.untis.api.$packageName")
+		modelPackage.set("com.sapuseven.untis.model.$packageName")
+		// templateDir.set("$rootDir/src/main/resources/api/templates")
+		// https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/jaxrs-spec.md
+		configOptions.set(
+			mapOf(
+				"library" to "jvm-ktor",
+				"dateLibrary" to "java8",
+				"serializationLibrary" to "kotlinx_serialization"
+			)
+		)
+	}
+	tasks.named("compileKotlin").configure {
+		dependsOn("openApiGenerate$taskName")
+	}
+}
 
-openApiGenerate {
+/*openApiGenerate {
 	generatorName.set("kotlin")
-	inputSpec.set("$projectDir/spec/untis.yaml")
+	inputSpec.set("${layout.projectDirectory}/spec/untis.yaml")
 	outputDir.set("$buildDir/generated")
 	apiPackage.set("com.sapuseven.untis.api")
 	modelPackage.set("com.sapuseven.untis.model")
@@ -77,8 +82,8 @@ openApiGenerate {
 			"serializationLibrary" to "kotlinx_serialization",
 		)
 	)
-}
+}*/
 
 kotlin.sourceSets.named("main") {
-	kotlin.srcDir("$buildDir/generated/src/main/kotlin")
+	kotlin.srcDir("${layout.buildDirectory.get()}/generated/src/main/kotlin")
 }
