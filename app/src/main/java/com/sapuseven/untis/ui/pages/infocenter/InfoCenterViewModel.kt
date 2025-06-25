@@ -3,11 +3,13 @@ package com.sapuseven.untis.ui.pages.infocenter
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sapuseven.untis.api.model.untis.enumeration.Right
-import com.sapuseven.untis.data.repository.UserRepository
 import com.sapuseven.untis.data.repository.MasterDataRepository
+import com.sapuseven.untis.data.repository.UserRepository
+import com.sapuseven.untis.data.repository.UserSettingsRepository
 import com.sapuseven.untis.domain.GetAbsencesUseCase
 import com.sapuseven.untis.domain.GetExamsUseCase
 import com.sapuseven.untis.domain.GetHomeworkUseCase
+import com.sapuseven.untis.domain.GetMessagesOfDayUseCase
 import com.sapuseven.untis.domain.GetMessagesUseCase
 import com.sapuseven.untis.domain.GetOfficeHoursUseCase
 import com.sapuseven.untis.ui.navigation.AppNavigator
@@ -15,7 +17,6 @@ import com.sapuseven.untis.ui.pages.infocenter.fragments.AbsencesUiState
 import com.sapuseven.untis.ui.pages.infocenter.fragments.EventsUiState
 import com.sapuseven.untis.ui.pages.infocenter.fragments.MessagesUiState
 import com.sapuseven.untis.ui.pages.infocenter.fragments.OfficeHoursUiState
-import com.sapuseven.untis.data.repository.UserSettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +33,7 @@ class InfoCenterViewModel @Inject constructor(
 	private val navigator: AppNavigator,
 	internal val userSettingsRepository: UserSettingsRepository,
 	getMessages: GetMessagesUseCase,
+	getMessagesOfDay: GetMessagesOfDayUseCase,
 	getExams: GetExamsUseCase,
 	getHomework: GetHomeworkUseCase,
 	getAbsences: GetAbsencesUseCase,
@@ -47,15 +49,17 @@ class InfoCenterViewModel @Inject constructor(
 		get() = Right.W_OWN_ABSENCEREASON in userRepository.currentUser!!.userData.rights
 
 	val shouldShowOfficeHours: Boolean
-		get()= Right.R_OFFICEHOURS in userRepository.currentUser!!.userData.rights
+		get() = Right.R_OFFICEHOURS in userRepository.currentUser!!.userData.rights
 
-	val messagesState: StateFlow<MessagesUiState> = getMessages()
-		.map(MessagesUiState::Success)
-		.stateIn(
-			scope = viewModelScope,
-			started = SharingStarted.WhileSubscribed(5_000),
-			initialValue = MessagesUiState.Loading
-		)
+	val messagesState: StateFlow<MessagesUiState> = combine(
+		getMessagesOfDay(),
+		getMessages(),
+		MessagesUiState::Success
+	).stateIn(
+		scope = viewModelScope,
+		started = SharingStarted.WhileSubscribed(5_000),
+		initialValue = MessagesUiState.Loading
+	)
 
 	val eventsState: StateFlow<EventsUiState> = combine(
 		getExams(),

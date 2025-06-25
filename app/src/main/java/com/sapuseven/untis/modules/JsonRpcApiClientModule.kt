@@ -23,7 +23,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object ApiClientModule {
+object JsonRpcApiClientModule {
 	@Provides
 	@Singleton
 	fun provideHttpClientEngineFactory(): HttpClientEngineFactory<*> = CIO

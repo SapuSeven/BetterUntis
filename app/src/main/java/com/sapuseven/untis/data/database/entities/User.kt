@@ -1,8 +1,10 @@
 package com.sapuseven.untis.data.database.entities
 
 import android.content.Context
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import androidx.core.net.toUri
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Embedded
@@ -51,6 +53,31 @@ data class User(
 			anonymous -> stringResource(R.string.all_anonymous)
 			else -> userData.displayName
 		}
+	}
+
+	val apiUrlBuilder: Uri.Builder by lazy {
+		Uri.Builder()
+			.scheme("https")
+			.authority(apiUrl.toUri().host)
+			.appendPath("WebUntis")
+	}
+
+	val jsonRpcApiUrl: Uri by lazy {
+		apiUrlBuilder
+			.appendEncodedPath("jsonrpc_intern.do")
+			.build()
+	}
+
+	val restApiUrl: Uri by lazy {
+		apiUrlBuilder
+			.appendEncodedPath("api/rest")
+			.build()
+	}
+
+	val restApiAuthUrl: Uri by lazy {
+		apiUrlBuilder
+			.appendEncodedPath("api/mobile/v2")
+			.build()
 	}
 }
 

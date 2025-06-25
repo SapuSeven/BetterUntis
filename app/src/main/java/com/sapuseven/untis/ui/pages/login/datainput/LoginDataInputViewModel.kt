@@ -8,6 +8,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
@@ -21,9 +22,9 @@ import com.sapuseven.untis.api.model.response.UserDataResult
 import com.sapuseven.untis.api.model.untis.MasterData
 import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.api.model.untis.masterdata.TimeGrid
-import com.sapuseven.untis.data.repository.UserRepository
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
+import com.sapuseven.untis.data.repository.UserRepository
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.ErrorMessageDictionary.ERROR_CODE_TOO_MANY_RESULTS
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
@@ -251,7 +252,7 @@ class LoginDataInputViewModel @Inject constructor(
 	private fun buildUntisApiUrl(schoolInfo: SchoolInfo): String {
 		return if (advanced && !loginData.apiUrl.value.isNullOrBlank()) loginData.apiUrl.value ?: ""
 		else if (schoolInfo.useMobileServiceUrlAndroid && !schoolInfo.mobileServiceUrl.isNullOrBlank()) schoolInfo.mobileServiceUrl!!
-		else Uri.parse(schoolInfo.serverUrl).buildUpon().appendEncodedPath("jsonrpc_intern.do")
+		else schoolInfo.serverUrl.toUri().buildUpon().appendEncodedPath("jsonrpc_intern.do")
 			.build().toString()
 	}
 

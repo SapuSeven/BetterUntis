@@ -40,21 +40,20 @@ dependencies {
 // Build Untis Internal OpenAPI specs
 val apiSpecList = mutableListOf<File>()
 val dir = file("${layout.projectDirectory}/spec/untis-intern/")
-dir.walk().filter { it.isFile && Regex("""untis-.*-v\d\.yaml""").matches(it.name) }.forEach { file ->
+dir.walk().filter { it.isFile && Regex("""untis-.*\.yaml""").matches(it.name) }.forEach { file ->
 	apiSpecList.add(file)
 }
 apiSpecList.forEach { file ->
-	val fileName = file.name.replace(".yaml", "")
-	val taskName = fileName.split('-').joinToString("") { it.replaceFirstChar { c -> c.titlecase(Locale.getDefault()) } }
-	val packageName = fileName.replace("-", "_")
+	val apiName = file.name.replace(".yaml", "").replace("untis-", "")
+	val taskName = "Untis" + apiName.split('-').joinToString("") { it.replaceFirstChar { c -> c.titlecase(Locale.getDefault()) } }
+	val packageName = apiName.replace("-", "_")
 
 	tasks.register("openApiGenerate$taskName", GenerateTask::class) {
 		generatorName.set("kotlin")
-		inputSpec.set("${layout.projectDirectory}/spec/untis-intern/$fileName.yaml")
+		inputSpec.set("${layout.projectDirectory}/spec/untis-intern/untis-$apiName.yaml")
 		outputDir.set("${layout.buildDirectory.get()}/generated")
 		apiPackage.set("com.sapuseven.untis.api.$packageName")
 		modelPackage.set("com.sapuseven.untis.model.$packageName")
-		// templateDir.set("$rootDir/src/main/resources/api/templates")
 		// https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/jaxrs-spec.md
 		configOptions.set(
 			mapOf(

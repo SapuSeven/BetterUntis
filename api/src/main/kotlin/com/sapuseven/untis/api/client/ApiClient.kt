@@ -87,6 +87,7 @@ open class ApiClient() {
 		const val METHOD_DELETE_ABSENCE = "deleteAbsence2017"
 		const val METHOD_GET_ABSENCES = "getStudentAbsences2017"
 		const val METHOD_GET_APP_SHARED_SECRET = "getAppSharedSecret"
+		const val METHOD_GET_AUTH_TOKEN = "getAuthToken"
 		const val METHOD_GET_EXAMS = "getExams2017"
 		const val METHOD_GET_HOMEWORK = "getHomeWork2017"
 		const val METHOD_GET_MESSAGES = "getMessagesOfDay2017"

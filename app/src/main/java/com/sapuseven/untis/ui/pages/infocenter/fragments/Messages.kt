@@ -29,9 +29,10 @@ import androidx.core.text.HtmlCompat
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.model.untis.Attachment
 import com.sapuseven.untis.api.model.untis.MessageOfDay
+import com.sapuseven.untis.model.rest.Message
 import com.sapuseven.untis.ui.dialogs.AttachmentsDialog
 import com.sapuseven.untis.ui.pages.infocenter.ErrorPreviewParameterProvider
-import com.sapuseven.untis.ui.pages.infocenter.InfoCenterPreviewParameterProvider
+import kotlinx.serialization.json.Json
 
 @Composable
 fun InfoCenterMessages(uiState: MessagesUiState) {
@@ -41,9 +42,9 @@ fun InfoCenterMessages(uiState: MessagesUiState) {
 		when (state) {
 			MessagesUiState.Loading -> InfoCenterLoading()
 			is MessagesUiState.Success -> {
-				state.messages.fold(
+				state.messagesOfDay.fold(
 					onSuccess = {
-						if (state.isEmpty) {
+						if (state.isMessagesOfDayEmpty) {
 							Text(
 								text = stringResource(R.string.infocenter_messages_empty),
 								textAlign = TextAlign.Center,
@@ -57,6 +58,27 @@ fun InfoCenterMessages(uiState: MessagesUiState) {
 									MessageItem(it) { attachments -> attachmentsDialog = attachments }
 								}
 							}
+						}
+					},
+					onFailure = { InfoCenterError(it) }
+				)
+				state.messages.fold(
+					onSuccess = {
+						if (state.isMessagesEmpty) {
+							Text(
+								text = stringResource(R.string.infocenter_messages_empty),
+								textAlign = TextAlign.Center,
+								modifier = Modifier.fillMaxWidth()
+							)
+						} else {
+							Json.encodeToString(it)
+							/*LazyColumn(
+								horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()
+							) {
+								items(it) { message ->
+									Text(Json.encodeToString(message))
+								}
+							}*/
 						}
 					},
 					onFailure = { InfoCenterError(it) }
@@ -107,8 +129,17 @@ private fun MessageItem(
 sealed interface MessagesUiState {
 	data object Loading : MessagesUiState
 
-	data class Success(val messages: Result<List<MessageOfDay>>) : MessagesUiState {
-		val isEmpty: Boolean get() = messages.getOrDefault(emptyList()).isEmpty()
+	data class Success(
+		val messagesOfDay: Result<List<MessageOfDay>>,
+		val messages: Result<List<Message>>
+	) : MessagesUiState {
+		constructor(messagesOfDay: List<MessageOfDay>, messages: List<Message>) : this(
+			Result.success(messagesOfDay),
+			Result.success(messages)
+		)
+
+		val isMessagesOfDayEmpty: Boolean get() = messagesOfDay.getOrDefault(emptyList()).isEmpty()
+		val isMessagesEmpty: Boolean get() = messages.getOrDefault(emptyList()).isEmpty()
 	}
 }
 
@@ -127,17 +158,19 @@ private fun InfoCenterMessagesErrorPreview(
 	error: Throwable,
 ) {
 	InfoCenterMessages(
-		uiState = MessagesUiState.Success(Result.failure(error))
+		uiState = MessagesUiState.Success(Result.failure(error), Result.failure(error))
 	)
 }
 
-@Preview
+/*@Preview
 @Composable
 private fun InfoCenterMessagesContentPreview(
-	@PreviewParameter(InfoCenterPreviewParameterProvider::class)
-	messages: List<MessageOfDay>,
+	@PreviewParameter(InfoCenterMessagesOfDayPreviewParameterProvider::class)
+	messagesOfDay: List<MessageOfDay>,
+	@PreviewParameter(InfoCenterMessagesPreviewParameterProvider::class)
+	messages: List<Message>,
 ) {
 	InfoCenterMessages(
-		uiState = MessagesUiState.Success(Result.success(messages))
+		uiState = MessagesUiState.Success(Result.success(messagesOfDay), Result.success(messages))
 	)
-}
+}*/

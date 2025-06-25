@@ -17,7 +17,7 @@ import com.sapuseven.untis.api.model.untis.MessageOfDay
 import com.sapuseven.untis.data.repository.UserSettingsRepository
 import com.sapuseven.untis.data.settings.model.NotificationVisibility
 import com.sapuseven.untis.data.settings.model.UserSettings
-import com.sapuseven.untis.domain.GetMessagesUseCase
+import com.sapuseven.untis.domain.GetMessagesOfDayUseCase
 import com.sapuseven.untis.workers.NotificationSetupWorker.Companion.CHANNEL_ID_BREAKINFO
 import com.sapuseven.untis.workers.NotificationSetupWorker.Companion.CHANNEL_ID_FIRSTLESSON
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,7 +32,7 @@ class NotificationReceiver : BroadcastReceiver() {
 	lateinit var userSettingsRepository: UserSettingsRepository
 
 	@Inject
-	lateinit var getMessages: GetMessagesUseCase
+	lateinit var getMessages: GetMessagesOfDayUseCase
 
 	companion object {
 		private const val LOG_TAG = "NotificationReceiver"

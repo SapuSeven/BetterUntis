@@ -9,7 +9,7 @@ info:
   version: 1.0.0
 
 servers:
-  - url: https://{host}.webuntis.com/WebUntis/api/rest/view/v1
+  - url: https://{host}.webuntis.com/WebUntis/api/rest
     variables:
       host:
         enum:
@@ -38,7 +38,7 @@ servers:
           - tipo
           - tritone
           - urania
-        default: hektor
+        default: null
 
 tags:
   - name: messages
@@ -50,9 +50,10 @@ security:
   - bearerAuth: []
 
 paths:
-  /messages:
+  /view/v1/messages:
     get:
       summary: Get a list of received messages
+      operationId: getMessages
       tags:
         - messages
       security:
@@ -70,9 +71,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /messages/sent:
+  /view/v1/messages/sent:
     get:
       summary: Get a list of sent messages
+      operationId: getMessagesSent
       tags:
         - messages
       security:
@@ -90,9 +92,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /messages/drafts:
+  /view/v1/messages/drafts:
     get:
       summary: Get a list of message drafts
+      operationId: getMessagesDrafts
       tags:
         - messages
       security:
@@ -110,9 +113,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /messages/status:
+  /view/v1/messages/status:
     get:
       summary: Get a status summary for messages
+      operationId: getMessagesStatus
       tags:
         - messages
       security:
@@ -130,9 +134,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /messages/permissions:
+  /view/v1/messages/permissions:
     get:
       summary: Get message-related permissions
+      operationId: getMessagesPermissions
       tags:
         - messages
       security:
@@ -150,10 +155,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /view/v1/messages/recipients/static/persons:
+    get:
+      summary: Get static recipient persons
+      operationId: getMessagesRecipientsStaticPersons
+      tags:
+        - messages
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipientsPersonGroup'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
-  /mobile/data:
+  /view/v1/mobile/data:
     get:
       summary: Get user data
+      operationId: getMobileData
       tags:
         - user
       security:
@@ -172,9 +201,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /home:
+  /view/v1/home:
     get:
       summary: Get information about the user home page
+      operationId: getHome
       tags:
         - user
       security:
@@ -193,9 +223,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /profile/user-contact-data:
+  /view/v1/profile/user-contact-data:
     get:
       summary: Get user contact data
+      operationId: getUserContactData
       tags:
         - user
       security:
@@ -215,6 +246,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     put:
       summary: Update user contact data
+      operationId: updateUserContactData
       tags:
         - user
       security:
@@ -298,8 +330,12 @@ components:
         recipientOptions:
           type: string
           enum:
+            - STUDENTS
+            - PARENTS
+            - CUSTOM
+            - REPLY
             - TEACHER
-            # Other values unknown
+            - STAFF
         allowRequestReadConfirmation:
           type: boolean
         recipientSearchMaxResult:
@@ -410,23 +446,174 @@ components:
 
     MessageAttachment:
       type: object
-      description: TODO
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the attachment.
+        attachmentType:
+          $ref: '#/components/schemas/MessageAttachmentType'
+          description: The type of the attachment.
+        name:
+          type: string
+          description: The name of the attachment.
+        fileName:
+          type: string
+          description: The name of the attachment file.
+        attachmentFile:
+          type: string
+          format: binary
+          description: The file associated with the attachment.
+        downloadable:
+          type: boolean
+          description: Indicates if the attachment is downloadable.
+        downloadUrl:
+          type: string
+          description: The URL to download the attachment.
+        driveId:
+          type: string
+          description: The ID of the drive where the attachment is stored.
+
+    MessageAttachmentType:
+      type: string
+      enum:
+        - ONE_DRIVE
+        - STORAGE_ATTACHMENT
+        - BLOB_ATTACHMENT
 
     MessageRequestConfirmation:
       type: object
-      description: TODO
+      properties:
+        allowMessageDeletion:
+          type: boolean
+          description: Indicates if message deletion is allowed.
+        allowSendRequestConfirmation:
+          type: boolean
+          description: Indicates if sending request confirmation is allowed.
+        confirmationDate:
+          type: string
+          format: date-time
+          description: The date of confirmation.
+        confirmerUserDisplayName:
+          type: string
+          description: The display name of the user who confirmed the request.
+        confirmerUserId:
+          type: string
+          description: The unique identifier of the user who confirmed the request.
+        isReplyAllowed:
+          type: boolean
+          description: Indicates if replies are allowed for this message.
 
     RequestConfirmationStatus:
       type: object
-      description: TODO
+      properties:
+        totalRequestCount:
+          type: integer
+          description: The total number of requests.
+        confirmedRequestCount:
+          type: integer
+          description: The number of confirmed requests.
 
     Sender:
       type: object
-      description: TODO
+      properties:
+        userId:
+          type: string
+          description: The unique identifier for the user who sent the message.
+        displayName:
+          type: string
+          description: The display name of the sender.
+        imageUrl:
+          type: string
+          description: The URL of the sender's image.
+          nullable: true
+        className:
+          type: string
+          description: The class name of the sender.
+
+    RecipientsPersonGroup:
+      type: object
+      properties:
+        persons:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recipient'
+        type:
+          type: string
+          enum:
+            - CLASS_TEACHERS
+            - TEACHERS
+            - OTHERS
 
     Recipient:
       type: object
-      description: TODO
+      description: A recipient or group of recipients for a message.
+      properties:
+        type:
+          type: string
+          enum:
+            - RECIPIENT
+            - GROUP
+          description: The type of recipient (group vs individual recipient).
+        id:
+          type: integer
+          format: int64
+          description: The unique identifier for the recipient.
+        personId:
+          type: integer
+          format: int64
+          description: The unique identifier for the person associated with the recipient.
+        userId:
+          type: string
+          description: The unique identifier for the user associated with the recipient.
+        groupId:
+          type: string
+          description: The ID of the group to which the recipient belongs.
+        groupRecipients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recipient'
+          description: A set of recipients in the group.
+        groupSelectedRecipients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recipient'
+          description: A set of selected recipients in the group.
+        imageUrl:
+          type: string
+          description: The URL of the recipient's image.
+          nullable: true
+        className:
+          type: string
+          description: The class name of the recipient.
+        displayName:
+          type: string
+          description: The display name of the recipient.
+        subtitle:
+          type: string
+          description: The subtitle for the recipient.
+        role:
+          type: string
+          enum:
+            - ADMIN
+            - DIRECTORATE
+            - STAFF
+            - TEACHER
+            - STUDENT
+            - PARENT
+            - LEGAL_GUARDIAN
+            - APPRENTICE_REPRESENTATIVE
+            - UNTIS
+            - OTHER
+            - KLASSE
+          description: The role of the recipient.
+        tags:
+          type: array
+          items:
+            type: string
+          description: A list of tags associated with the recipient.
+        selected:
+          type: boolean
+          description: Indicates if the recipient is selected.D
 
     DateRange:
       type: object
