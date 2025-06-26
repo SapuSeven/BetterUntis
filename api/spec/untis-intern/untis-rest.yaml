@@ -397,7 +397,8 @@ components:
         hasAttachments:
           type: boolean
         id:
-          type: string
+          type: integer
+          format: int64
         isMessageRead:
           type: boolean
         isReply:
@@ -497,7 +498,8 @@ components:
           type: string
           description: The display name of the user who confirmed the request.
         confirmerUserId:
-          type: string
+          type: integer
+          format: int64
           description: The unique identifier of the user who confirmed the request.
         isReplyAllowed:
           type: boolean
@@ -517,7 +519,8 @@ components:
       type: object
       properties:
         userId:
-          type: string
+          type: integer
+          format: int64
           description: The unique identifier for the user who sent the message.
         displayName:
           type: string
@@ -563,10 +566,12 @@ components:
           format: int64
           description: The unique identifier for the person associated with the recipient.
         userId:
-          type: string
+          type: integer
+          format: int64
           description: The unique identifier for the user associated with the recipient.
         groupId:
-          type: string
+          type: integer
+          format: int64
           description: The ID of the group to which the recipient belongs.
         groupRecipients:
           type: array
@@ -631,7 +636,8 @@ components:
         dateRange:
           $ref: '#/components/schemas/DateRange'
         id:
-          type: number
+          type: integer
+          format: int64
         name:
           type: string
           example: '2023/2024'
@@ -640,7 +646,8 @@ components:
       type: object
       properties:
         id:
-          type: string
+          type: integer
+          format: int64
         displayName:
           type: string
         wuVersion:
@@ -650,7 +657,8 @@ components:
       type: object
       properties:
         id:
-          type: number
+          type: integer
+          format: int64
         displayName:
           type: string
         imageUrl:
@@ -661,7 +669,8 @@ components:
       type: object
       properties:
         id:
-          type: number
+          type: integer
+          format: int64
         username:
           type: string
         person:
@@ -674,7 +683,8 @@ components:
         locale:
           type: string
         departmentId:
-          type: number
+          type: integer
+          format: int64
         role:
           type: string
         permissions:
@@ -719,7 +729,8 @@ components:
       type: object
       properties:
         id:
-          type: number
+          type: integer
+          format: int64
         name:
           type: string
         url:

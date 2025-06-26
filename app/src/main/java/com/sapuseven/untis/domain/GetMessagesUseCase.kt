@@ -22,7 +22,7 @@ class GetMessagesUseCaseImpl @Inject constructor(
 	}
 
 	override operator fun invoke(): Flow<Result<List<Message>>> = messagesRepository.messagesSource()
-		.get(Unit, FromCache.CACHED_THEN_LOAD, maxAge = ONE_HOUR, additionalKey = userRepository.currentUser!!.id)
+		.get(Unit, FromCache.NEVER, maxAge = ONE_HOUR, additionalKey = userRepository.currentUser!!.id)
 		.map { (it.incomingMessages ?: emptyList()) + (it.readConfirmationMessages ?: emptyList()) }
 		.map(Result.Companion::success)
 		.catch { emit(Result.failure(it)) }

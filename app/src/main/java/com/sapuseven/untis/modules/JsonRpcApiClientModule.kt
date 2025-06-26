@@ -1,7 +1,6 @@
 package com.sapuseven.untis.modules
 
 import com.sapuseven.untis.api.client.AbsenceApi
-import com.sapuseven.untis.api.client.ApiClient.Companion.DEFAULT_JSON
 import com.sapuseven.untis.api.client.ClassRegApi
 import com.sapuseven.untis.api.client.MessagesApi
 import com.sapuseven.untis.api.client.OfficeHoursApi
@@ -17,7 +16,6 @@ import io.ktor.client.engine.HttpClientEngineFactory
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.http.ContentType
 import io.ktor.serialization.kotlinx.json.json
 import javax.inject.Named
 import javax.inject.Singleton
@@ -35,7 +33,7 @@ object JsonRpcApiClientModule {
 	fun provideJsonHttpClient(httpClientEngineFactory: HttpClientEngineFactory<*>): HttpClient =
 		HttpClient(httpClientEngineFactory.create()) {
 			install(ContentNegotiation) {
-				json(DEFAULT_JSON, contentType = ContentType.Application.Json)
+				json()
 			}
 			install(HttpRequestRetry) {
 				retryOnServerErrors(maxRetries = 3)

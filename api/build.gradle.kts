@@ -54,7 +54,6 @@ apiSpecList.forEach { file ->
 		outputDir.set("${layout.buildDirectory.get()}/generated")
 		apiPackage.set("com.sapuseven.untis.api.$packageName")
 		modelPackage.set("com.sapuseven.untis.model.$packageName")
-		// https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/jaxrs-spec.md
 		configOptions.set(
 			mapOf(
 				"library" to "jvm-ktor",
@@ -62,26 +61,16 @@ apiSpecList.forEach { file ->
 				"serializationLibrary" to "kotlinx_serialization"
 			)
 		)
+		typeMappings.set(
+			mapOf(
+				"java.time.OffsetDateTime" to "com.sapuseven.untis.api.serializer.DateTime"
+			)
+		)
 	}
 	tasks.named("compileKotlin").configure {
 		dependsOn("openApiGenerate$taskName")
 	}
 }
-
-/*openApiGenerate {
-	generatorName.set("kotlin")
-	inputSpec.set("${layout.projectDirectory}/spec/untis.yaml")
-	outputDir.set("$buildDir/generated")
-	apiPackage.set("com.sapuseven.untis.api")
-	modelPackage.set("com.sapuseven.untis.model")
-	configOptions.set(
-		mapOf(
-			"library" to "jvm-ktor",
-			"dateLibrary" to "java8",
-			"serializationLibrary" to "kotlinx_serialization",
-		)
-	)
-}*/
 
 kotlin.sourceSets.named("main") {
 	kotlin.srcDir("${layout.buildDirectory.get()}/generated/src/main/kotlin")

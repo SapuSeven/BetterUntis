@@ -1,6 +1,5 @@
 package com.sapuseven.untis.modules
 
-import com.sapuseven.untis.api.client.ApiClient.Companion.DEFAULT_JSON
 import com.sapuseven.untis.api.client.UserDataApi
 import com.sapuseven.untis.api.rest.MessagesApi
 import com.sapuseven.untis.data.repository.UserRepository
@@ -11,7 +10,6 @@ import dagger.hilt.components.SingletonComponent
 import io.ktor.client.engine.HttpClientEngineFactory
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.http.ContentType
 import io.ktor.serialization.kotlinx.json.json
 import javax.inject.Inject
 import kotlin.reflect.KProperty
@@ -43,7 +41,7 @@ class DefaultMessagesApiFactory @Inject constructor(
 			httpClientEngine = httpClientEngineFactory.create()
 		) {
 			it.install(ContentNegotiation) {
-				json(DEFAULT_JSON, contentType = ContentType.Application.Json)
+				json()
 			}
 			it.install(HttpRequestRetry) {
 				retryOnServerErrors(maxRetries = 3)
