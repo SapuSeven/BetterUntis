@@ -51,6 +51,7 @@ paths:
   /{schoolName}/authentication:
     post:
       summary: Get a list of received messages
+      operationId: getToken
       tags:
         - authentication
       security:

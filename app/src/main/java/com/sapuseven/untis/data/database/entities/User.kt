@@ -18,6 +18,7 @@ import androidx.room.Update
 import androidx.room.Upsert
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.model.untis.MasterData
+import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.api.model.untis.Settings
 import com.sapuseven.untis.api.model.untis.UserData
 import com.sapuseven.untis.api.model.untis.masterdata.TimeGrid
@@ -27,8 +28,12 @@ import kotlinx.coroutines.flow.Flow
 data class User(
 	@PrimaryKey(autoGenerate = true) val id: Long,
 	val profileName: String = "",
-	val apiUrl: String,
-	val schoolId: String,
+	val apiHost: String, // When populated before schema version 12, this may be a full URL, not just the host
+	val schoolInfo: SchoolInfo? = null,
+	@Deprecated(
+		"Not populated with schema version 12",
+		ReplaceWith("schoolInfo.schoolId")
+	) val schoolId: String? = null,
 	val user: String? = null,
 	val key: String? = null,
 	val anonymous: Boolean = false,
@@ -55,27 +60,30 @@ data class User(
 		}
 	}
 
-	val apiUrlBuilder: Uri.Builder by lazy {
+	val apiUrl: Uri by lazy {
 		Uri.Builder()
 			.scheme("https")
-			.authority(apiUrl.toUri().host)
+			.authority(apiHost.toUri().host)
 			.appendPath("WebUntis")
+			.build()
 	}
 
 	val jsonRpcApiUrl: Uri by lazy {
-		apiUrlBuilder
+		val schoolName = schoolInfo?.loginName ?: apiHost.toUri().getQueryParameter("school") ?: ""
+		apiUrl.buildUpon()
 			.appendEncodedPath("jsonrpc_intern.do")
+			.appendQueryParameter("school", schoolName)
 			.build()
 	}
 
 	val restApiUrl: Uri by lazy {
-		apiUrlBuilder
+		apiUrl.buildUpon()
 			.appendEncodedPath("api/rest")
 			.build()
 	}
 
 	val restApiAuthUrl: Uri by lazy {
-		apiUrlBuilder
+		apiUrl.buildUpon()
 			.appendEncodedPath("api/mobile/v2")
 			.build()
 	}

@@ -225,7 +225,8 @@ class LoginDataInputViewModel @Inject constructor(
 			existingUserId ?: 0,
 			loginData.profileName.value ?: "",
 			untisApiUrl,
-			schoolInfo.schoolId.toString(),
+			schoolInfo,
+			null,
 			if (loginData.anonymous.value != true) loginData.username.value else null,
 			if (loginData.anonymous.value != true) appSharedSecret else null,
 			loginData.anonymous.value == true,
@@ -355,7 +356,7 @@ class LoginDataInputViewModel @Inject constructor(
 			schoolId.value = user.schoolId
 			anonymous.value = user.anonymous
 			username.value = user.user
-			apiUrl.value = user.apiUrl
+			apiUrl.value = user.jsonRpcApiUrl.toString()
 			storedPassword = user.key
 		}
 	}

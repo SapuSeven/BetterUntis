@@ -20,16 +20,14 @@ interface MessagesRepository {
 }
 
 class UntisMessagesRepository @Inject constructor(
-	private val userRepository: UserRepository,
 	private val messagesApiFactory: MessagesApiFactory,
 	@Named("cacheDir") private val cacheDir: File,
 	private val timeProvider: TimeProvider,
 ) : MessagesRepository {
 	override fun messagesSource(): CachedSource<Unit, MessagesResponse> {
-		val user = userRepository.currentUser!!
 		return CachedSource(
 			source = { params ->
-				messagesApiFactory.create(user.restApiUrl).getMessages().body()
+				messagesApiFactory.create().getMessages().body()
 			},
 			cache = DiskCache(File(cacheDir, "messenger/messages"), serializer()),
 			timeProvider = timeProvider
@@ -37,10 +35,9 @@ class UntisMessagesRepository @Inject constructor(
 	}
 
 	override fun messagesSentSource(): CachedSource<Unit, List<Message>> {
-		val user = userRepository.currentUser!!
 		return CachedSource(
 			source = { params ->
-				messagesApiFactory.create(user.restApiUrl).getMessagesSent().body().sentMessages ?: emptyList()
+				messagesApiFactory.create().getMessagesSent().body().sentMessages ?: emptyList()
 			},
 			cache = DiskCache(File(cacheDir, "messenger/messagesSent"), serializer()),
 			timeProvider = timeProvider
@@ -48,10 +45,9 @@ class UntisMessagesRepository @Inject constructor(
 	}
 
 	override fun messagesDraftsSource(): CachedSource<Unit, List<Message>> {
-		val user = userRepository.currentUser!!
 		return CachedSource(
 			source = { params ->
-				messagesApiFactory.create(user.restApiUrl).getMessagesDrafts().body().draftMessages ?: emptyList()
+				messagesApiFactory.create().getMessagesDrafts().body().draftMessages ?: emptyList()
 			},
 			cache = DiskCache(File(cacheDir, "messenger/messagesDrafts"), serializer()),
 			timeProvider = timeProvider

@@ -5,7 +5,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.HttpClientEngineFactory
-import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -31,11 +30,6 @@ open class ApiClient() {
 				it.install(ContentNegotiation) {
 					json(jsonBlock, contentType = ContentType.Application.Json)
 					json(jsonBlock, contentType = ContentType.Application.JsonRpc)
-				}
-				it.install(HttpRequestRetry) {
-					retryOnServerErrors(maxRetries = 3)
-					retryOnException(maxRetries = 3)
-					exponentialDelay()
 				}
 				httpClientConfig?.invoke(it)
 			}

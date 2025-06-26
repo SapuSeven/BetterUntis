@@ -55,7 +55,7 @@ class UntisTimetableRepository @Inject constructor(
 					startDate = params.startDate,
 					endDate = params.endDate,
 					masterDataTimestamp = user.masterDataTimestamp,
-					apiUrl = user.apiUrl,
+					apiUrl = user.jsonRpcApiUrl.toString(),
 					user = user.user,
 					key = user.key
 				)
@@ -73,7 +73,7 @@ class UntisTimetableRepository @Inject constructor(
 			source = { params ->
 				api.getPeriodData(
 					periodIds = params.map { it.id }.toSet(),
-					apiUrl = user.apiUrl,
+					apiUrl = user.jsonRpcApiUrl.toString(),
 					user = user.user,
 					key = user.key
 				)
@@ -89,7 +89,7 @@ class UntisTimetableRepository @Inject constructor(
 			api.postLessonTopic(
 				periodId = periodId,
 				lessonTopic = lessonTopic,
-				apiUrl = user.apiUrl,
+				apiUrl = user.jsonRpcApiUrl.toString(),
 				user = user.user,
 				key = user.key
 			)
@@ -104,7 +104,7 @@ class UntisTimetableRepository @Inject constructor(
 				studentId = studentId,
 				startTime = startTime,
 				endTime = endTime,
-				apiUrl = user.apiUrl,
+				apiUrl = user.jsonRpcApiUrl.toString(),
 				user = user.user,
 				key = user.key
 			)
@@ -115,7 +115,7 @@ class UntisTimetableRepository @Inject constructor(
 		val user = userRepository.currentUser!!
 		return runCatching {
 			api.deleteAbsence(
-				absenceId = absenceId, apiUrl = user.apiUrl, user = user.user, key = user.key
+				absenceId = absenceId, apiUrl = user.jsonRpcApiUrl.toString(), user = user.user, key = user.key
 			)
 		}
 	}
@@ -124,7 +124,7 @@ class UntisTimetableRepository @Inject constructor(
 		val user = userRepository.currentUser!!
 		return runCatching {
 			api.postAbsencesChecked(
-				periodIds = periodIds, apiUrl = user.apiUrl, user = user.user, key = user.key
+				periodIds = periodIds, apiUrl = user.jsonRpcApiUrl.toString(), user = user.user, key = user.key
 			)
 		}
 	}

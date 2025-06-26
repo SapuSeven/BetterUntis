@@ -66,7 +66,7 @@ class UntisInfoCenterRepository @Inject constructor(
 			source = { params ->
 				messagesApi.getMessagesOfDay(
 					date = params,
-					apiUrl = user.apiUrl,
+					apiUrl = user.jsonRpcApiUrl.toString(),
 					user = user.user,
 					key = user.key
 				).messages
@@ -85,7 +85,7 @@ class UntisInfoCenterRepository @Inject constructor(
 					type = params.elementType,
 					startDate = params.startDate,
 					endDate = params.endDate,
-					apiUrl = user.apiUrl,
+					apiUrl = user.jsonRpcApiUrl.toString(),
 					user = user.user,
 					key = user.key
 				).exams
@@ -104,7 +104,7 @@ class UntisInfoCenterRepository @Inject constructor(
 					type = params.elementType,
 					startDate = params.startDate,
 					endDate = params.endDate,
-					apiUrl = user.apiUrl,
+					apiUrl = user.jsonRpcApiUrl.toString(),
 					user = user.user,
 					key = user.key
 				).homeWorks
@@ -123,7 +123,7 @@ class UntisInfoCenterRepository @Inject constructor(
 					endDate = params.endDate,
 					includeExcused = params.includeExcused,
 					includeUnExcused = params.includeUnExcused,
-					apiUrl = user.apiUrl,
+					apiUrl = user.jsonRpcApiUrl.toString(),
 					user = user.user,
 					key = user.key
 				).absences
@@ -140,7 +140,7 @@ class UntisInfoCenterRepository @Inject constructor(
 				officeHoursApi.getOfficeHours(
 					klasseId = params.klasseId,
 					startDate = params.startDate,
-					apiUrl = user.apiUrl,
+					apiUrl = user.jsonRpcApiUrl.toString(),
 					user = user.user,
 					key = user.key
 				).officeHours

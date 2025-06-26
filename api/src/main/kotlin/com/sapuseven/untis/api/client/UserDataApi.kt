@@ -41,8 +41,8 @@ open class UserDataApi(
 
 	open suspend fun getAuthToken(
 		apiUrl: String,
-		user: String,
-		key: String
+		user: String?,
+		key: String?
 	): String {
 		val body = RequestData(
 			method = METHOD_GET_AUTH_TOKEN,
