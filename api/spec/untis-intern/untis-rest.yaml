@@ -284,7 +284,6 @@ components:
             # Other values unknown
         requestId:
           type: string
-          format: uuid
         traceId:
           type: string
         errorMessage:

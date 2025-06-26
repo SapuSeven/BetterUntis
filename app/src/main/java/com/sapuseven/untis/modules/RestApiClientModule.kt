@@ -3,12 +3,17 @@ package com.sapuseven.untis.modules
 import com.sapuseven.untis.api.client.UserDataApi
 import com.sapuseven.untis.api.rest.MessagesApi
 import com.sapuseven.untis.data.repository.UserRepository
+import com.sapuseven.untis.exceptions.UntisRestApiException
+import com.sapuseven.untis.model.rest.ErrorResponse
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngineFactory
+import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import javax.inject.Inject
@@ -40,6 +45,7 @@ class DefaultMessagesApiFactory @Inject constructor(
 			baseUrl = userRepository.currentUser!!.restApiUrl.toString(),
 			httpClientEngine = httpClientEngineFactory.create()
 		) {
+			it.expectSuccess = true
 			it.install(ContentNegotiation) {
 				json()
 			}
@@ -48,7 +54,14 @@ class DefaultMessagesApiFactory @Inject constructor(
 				retryOnException(maxRetries = 3)
 				exponentialDelay()
 			}
-			it.expectSuccess = true
+			it.HttpResponseValidator {
+				handleResponseExceptionWithRequest { exception, request ->
+					val clientException = exception as? ClientRequestException ?: return@handleResponseExceptionWithRequest
+					val exceptionResponse = clientException.response
+					val errorResponse = exceptionResponse.body<ErrorResponse>()
+					throw UntisRestApiException(errorResponse)
+				}
+			}
 		}
 	}
 
