@@ -401,4 +401,9 @@
     <string name="notifications_text_motd_message">%1$d Nachrichten</string>
     <string name="notifications_channel_firstlesson">Erste Stunde</string>
     <string name="notifications_channel_firstlesson_desc">Informationen über die erste Stunde und tägliche Nachrichten anzeigen</string>
+    <string name="preferences_info_summary">Version, Lizenz, Mitwirkende</string>
+    <string name="preferences_notifications_summary">Pausenbenachrichtigungen, sichtbare Felder</string>
+    <string name="preferences_styling_summary">Farben, Dunkler Modus</string>
+    <string name="preferences_timetable_summary">Anzeigeoptionen, Aussehen der Elemente</string>
+    <string name="preferences_general_summary">Automatische Stummschaltung, Fehlermeldungen</string>
 </resources>
