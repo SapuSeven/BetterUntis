@@ -16,8 +16,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,6 +28,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalButton
@@ -179,10 +182,10 @@ fun InfoCenterMessages(viewModel: InfoCenterViewModel = hiltViewModel()) {
 			MessageDetails(
 				message = selectedMessage,
 				messageContent = selectedMessageContent,
-				canReply = selectedMessage?.isReplyAllowed == true,
-				canDelete = selectedMessage?.allowMessageDeletion == true,
-				onReply = {},
-				onDelete = {},
+				canReply = false, // TODO not yet implemented - selectedMessage?.isReplyAllowed == true,
+				canDelete = false, // TODO not yet implemented - selectedMessage?.allowMessageDeletion == true,
+				onReply = { viewModel.onMessageReply() },
+				onDelete = { viewModel.onMessageDelete() },
 			)
 
 			BackHandler(selectedMessage != null) {
@@ -279,14 +282,30 @@ private fun SharedTransitionScope.MessageDetails(
 											}
 										}
 										if (canDelete) {
+											var showDeleteConfirmation by remember { mutableStateOf(false) }
+
 											FilledTonalButton(
 												modifier = Modifier.weight(1f),
-												onClick = { onDelete() }
+												colors = if (showDeleteConfirmation)
+													ButtonDefaults.filledTonalButtonColors(
+														containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.8f),
+														contentColor = MaterialTheme.colorScheme.onError,
+													)
+												else
+													ButtonDefaults.filledTonalButtonColors(),
+												onClick = {
+													if (showDeleteConfirmation)
+														onDelete()
+													else
+														showDeleteConfirmation = true
+												}
 											) {
-												Text(text = "Delete")
+												Text(text = if (showDeleteConfirmation) "Confirm" else "Delete")
 											}
 										}
 									}
+								} else {
+									Spacer(modifier = Modifier.height(12.dp))
 								}
 							}
 						}
