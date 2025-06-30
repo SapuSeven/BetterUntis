@@ -11,6 +11,8 @@ import javax.inject.Inject
 
 interface GetMessagesUseCase {
 	operator fun invoke(): Flow<Result<List<Message>>>
+
+	operator fun invoke(id: Long): Flow<Result<Message>>
 }
 
 class GetMessagesUseCaseImpl @Inject constructor(
@@ -24,6 +26,11 @@ class GetMessagesUseCaseImpl @Inject constructor(
 	override operator fun invoke(): Flow<Result<List<Message>>> = messagesRepository.messagesSource()
 		.get(Unit, FromCache.CACHED_THEN_LOAD, maxAge = ONE_HOUR, additionalKey = userRepository.currentUser!!.id)
 		.map { (it.incomingMessages ?: emptyList()) + (it.readConfirmationMessages ?: emptyList()) }
+		.map(Result.Companion::success)
+		.catch { emit(Result.failure(it)) }
+
+	override operator fun invoke(id: Long): Flow<Result<Message>> = messagesRepository.messageSource()
+		.get(id, FromCache.IF_HAVE, maxAge = ONE_HOUR, additionalKey = userRepository.currentUser!!.id)
 		.map(Result.Companion::success)
 		.catch { emit(Result.failure(it)) }
 }

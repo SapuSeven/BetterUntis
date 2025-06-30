@@ -12,6 +12,8 @@ import javax.inject.Inject
 import javax.inject.Named
 
 interface MessagesRepository {
+	fun messageSource(): CachedSource<Long, Message>
+
 	fun messagesSource(): CachedSource<Unit, MessagesResponse>
 
 	fun messagesSentSource(): CachedSource<Unit, List<Message>>
@@ -24,6 +26,16 @@ class UntisMessagesRepository @Inject constructor(
 	@Named("cacheDir") private val cacheDir: File,
 	private val timeProvider: TimeProvider,
 ) : MessagesRepository {
+	override fun messageSource(): CachedSource<Long, Message> {
+		return CachedSource(
+			source = { params ->
+				messagesApiFactory.create().getMessage(params).body()
+			},
+			cache = DiskCache(File(cacheDir, "messenger/message"), serializer()),
+			timeProvider = timeProvider
+		)
+	}
+
 	override fun messagesSource(): CachedSource<Unit, MessagesResponse> {
 		return CachedSource(
 			source = { params ->

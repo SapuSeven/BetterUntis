@@ -71,6 +71,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /view/v1/messages/{messageId}:
+    get:
+      summary: Get details of a specific message
+      operationId: getMessage
+      tags:
+        - messages
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          description: The ID of the message to retrieve
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /view/v1/messages/sent:
     get:
       summary: Get a list of sent messages
@@ -385,41 +414,21 @@ components:
       required:
         - id
       properties:
-        allowMessageDeletion:
-          type: boolean
-        attachments:
-          type: array
-          items:
-            $ref: '#/components/schemas/MessageAttachment'
-        content:
-          type: string
-        contentPreview:
-          type: string
-        hasAttachments:
-          type: boolean
         id:
           type: integer
           format: int64
-        isMessageRead:
-          type: boolean
-        isReply:
-          type: boolean
-        isReplyAllowed:
-          type: boolean
-        isReportMessage:
-          type: boolean
-        isRevoked:
-          type: boolean
-        blobAttachment:
-          $ref: '#/components/schemas/MessageAttachment'
-        requestConfirmation:
-          $ref: '#/components/schemas/MessageRequestConfirmation'
-        storageAttachments:
-          type: array
-          items:
-            $ref: '#/components/schemas/MessageAttachment'
+        subject:
+          type: string
+        contentPreview:
+          type: string
+        content:
+          type: string
         numberOfRecipients:
           type: integer
+        recipients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recipient'
         recipientGroups:
           type: array
           items:
@@ -428,23 +437,49 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Recipient'
-        recipients:
-          type: array
-          items:
-            $ref: '#/components/schemas/Recipient'
-        replyHistory:
-          type: array
-          items:
-            $ref: '#/components/schemas/Message'
-        requestConfirmationStatus:
-          $ref: '#/components/schemas/RequestConfirmationStatus'
         sender:
           $ref: '#/components/schemas/Sender'
         sentDateTime:
           type: string
           format: date-time
-        subject:
-          type: string
+        allowMessageDeletion:
+          type: boolean
+        hasAttachments:
+          type: boolean
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageAttachment'
+        blobAttachment:
+          $ref: '#/components/schemas/MessageAttachment'
+        storageAttachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageAttachment'
+        isMessageRead:
+          type: boolean
+        isRevoked:
+          type: boolean
+        isReply:
+          type: boolean
+        isReplyAllowed:
+          type: boolean
+        isReplyForbidden:
+          type: boolean
+          description: |
+            Still returned in the API, but not present in the mobile app sources.
+            Likely replaced by `isReplyAllowed`.
+          deprecated: true
+        isReportMessage:
+          type: boolean
+        replyHistory:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+        requestConfirmation:
+          $ref: '#/components/schemas/MessageRequestConfirmation'
+        requestConfirmationStatus:
+          $ref: '#/components/schemas/RequestConfirmationStatus'
 
     MessageAttachment:
       type: object

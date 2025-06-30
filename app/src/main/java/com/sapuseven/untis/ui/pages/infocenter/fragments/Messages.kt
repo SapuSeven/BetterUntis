@@ -8,10 +8,8 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -51,11 +49,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.sapuseven.untis.R
@@ -63,7 +61,7 @@ import com.sapuseven.untis.api.model.untis.Attachment
 import com.sapuseven.untis.api.model.untis.MessageOfDay
 import com.sapuseven.untis.model.rest.Message
 import com.sapuseven.untis.ui.dialogs.AttachmentsDialog
-import com.sapuseven.untis.ui.pages.infocenter.ErrorPreviewParameterProvider
+import com.sapuseven.untis.ui.pages.infocenter.InfoCenterViewModel
 import io.github.fornewid.placeholder.foundation.PlaceholderDefaults
 import io.github.fornewid.placeholder.foundation.PlaceholderHighlight
 import io.github.fornewid.placeholder.foundation.placeholder
@@ -78,9 +76,12 @@ import java.time.format.FormatStyle
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun InfoCenterMessages(uiState: MessagesUiState) {
+fun InfoCenterMessages(viewModel: InfoCenterViewModel = hiltViewModel()) {
+	val uiState by viewModel.messagesState.collectAsStateWithLifecycle()
+	val selectedMessage by viewModel.selectedMessage.collectAsStateWithLifecycle()
+	val selectedMessageContent by viewModel.selectedMessageContent.collectAsStateWithLifecycle()
+
 	var attachmentsDialog by remember { mutableStateOf<List<Attachment>?>(null) }
-	var selectedMessage by remember { mutableStateOf<Message?>(null) }
 
 	Crossfade(targetState = uiState, label = "InfoCenter Messages Content") { state ->
 		SharedTransitionLayout(modifier = Modifier.fillMaxSize()) {
@@ -131,8 +132,6 @@ fun InfoCenterMessages(uiState: MessagesUiState) {
 									items(it) { message ->
 										AnimatedVisibility(
 											visible = message != selectedMessage,
-											enter = expandVertically(),
-											exit = shrinkVertically(),
 											modifier = Modifier.animateItem()
 										) {
 											Card(
@@ -145,7 +144,7 @@ fun InfoCenterMessages(uiState: MessagesUiState) {
 													)
 													.clip(CardDefaults.shape),
 												onClick = {
-													selectedMessage = message
+													viewModel.onMessageClicked(message)
 												}
 											) {
 												MessagePreview(
@@ -160,7 +159,7 @@ fun InfoCenterMessages(uiState: MessagesUiState) {
 													imageUrl = message.sender?.imageUrl,
 													time = message.sentDateTime,
 													read = message.isMessageRead ?: true,
-													attachments = null
+													attachments = null // TODO: Support attachments (message.hasAttachments)
 												)
 											}
 										}
@@ -178,11 +177,16 @@ fun InfoCenterMessages(uiState: MessagesUiState) {
 			}
 
 			MessageDetails(
-				message = selectedMessage
+				message = selectedMessage,
+				messageContent = selectedMessageContent,
+				canReply = selectedMessage?.isReplyAllowed == true,
+				canDelete = selectedMessage?.allowMessageDeletion == true,
+				onReply = {},
+				onDelete = {},
 			)
 
 			BackHandler(selectedMessage != null) {
-				selectedMessage = null
+				viewModel.onMessageDismiss()
 			}
 		}
 	}
@@ -195,9 +199,14 @@ fun InfoCenterMessages(uiState: MessagesUiState) {
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun SharedTransitionScope.MessageDetails(
+private fun SharedTransitionScope.MessageDetails(
 	message: Message?,
-	modifier: Modifier = Modifier
+	messageContent: String?,
+	modifier: Modifier = Modifier,
+	canReply: Boolean = false,
+	canDelete: Boolean = false,
+	onReply: () -> Unit,
+	onDelete: () -> Unit,
 ) {
 	AnimatedContent(
 		modifier = modifier.fillMaxSize(),
@@ -244,33 +253,39 @@ fun SharedTransitionScope.MessageDetails(
 										.padding(horizontal = 16.dp)
 										.verticalScroll(rememberScrollState())
 										.placeholder(
-											visible = true,
+											visible = messageContent == null,
 											color = PlaceholderDefaults.color(),
 											shape = RoundedCornerShape(4.dp),
 											highlight = PlaceholderHighlight.shimmer(
 												PlaceholderDefaults.shimmerHighlightColor()
 											)
 										),
-									text = ""
+									text = messageContent ?: ""
 								)
 
-								Row(
-									modifier = Modifier
-										.fillMaxWidth()
-										.padding(horizontal = 16.dp, vertical = 12.dp),
-									horizontalArrangement = Arrangement.spacedBy(12.dp)
-								) {
-									FilledTonalButton(
-										modifier = Modifier.weight(1f),
-										onClick = {}
+								if (canReply || canDelete) {
+									Row(
+										modifier = Modifier
+											.fillMaxWidth()
+											.padding(horizontal = 16.dp, vertical = 12.dp),
+										horizontalArrangement = Arrangement.spacedBy(12.dp)
 									) {
-										Text(text = "Reply")
-									}
-									FilledTonalButton(
-										modifier = Modifier.weight(1f),
-										onClick = {}
-									) {
-										Text(text = "Delete")
+										if (canReply) {
+											FilledTonalButton(
+												modifier = Modifier.weight(1f),
+												onClick = { onReply() }
+											) {
+												Text(text = "Reply")
+											}
+										}
+										if (canDelete) {
+											FilledTonalButton(
+												modifier = Modifier.weight(1f),
+												onClick = { onDelete() }
+											) {
+												Text(text = "Delete")
+											}
+										}
 									}
 								}
 							}
@@ -282,8 +297,9 @@ fun SharedTransitionScope.MessageDetails(
 	}
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun MessagePreview(
+private fun SharedTransitionScope.MessagePreview(
 	subject: String,
 	modifier: Modifier = Modifier,
 	body: String? = null,
@@ -404,45 +420,8 @@ sealed interface MessagesUiState {
 		val messagesOfDay: Result<List<MessageOfDay>>,
 		val messages: Result<List<Message>>
 	) : MessagesUiState {
-		constructor(messagesOfDay: List<MessageOfDay>, messages: List<Message>) : this(
-			Result.success(messagesOfDay),
-			Result.success(messages)
-		)
-
 		val isMessagesEmpty: Boolean
 			get() = messagesOfDay.getOrDefault(emptyList()).isEmpty()
 				&& messages.getOrDefault(emptyList()).isEmpty()
 	}
 }
-
-@Preview
-@Composable
-private fun InfoCenterMessagesLoadingPreview() {
-	InfoCenterMessages(
-		uiState = MessagesUiState.Loading
-	)
-}
-
-@Preview
-@Composable
-private fun InfoCenterMessagesErrorPreview(
-	@PreviewParameter(ErrorPreviewParameterProvider::class)
-	error: Throwable,
-) {
-	InfoCenterMessages(
-		uiState = MessagesUiState.Success(Result.failure(error), Result.failure(error))
-	)
-}
-
-/*@Preview
-@Composable
-private fun InfoCenterMessagesContentPreview(
-	@PreviewParameter(InfoCenterMessagesOfDayPreviewParameterProvider::class)
-	messagesOfDay: List<MessageOfDay>,
-	@PreviewParameter(InfoCenterMessagesPreviewParameterProvider::class)
-	messages: List<Message>,
-) {
-	InfoCenterMessages(
-		uiState = MessagesUiState.Success(Result.success(messagesOfDay), Result.success(messages))
-	)
-}*/

@@ -35,8 +35,7 @@ fun NavGraphBuilder.infoCenterNav(
         popEnterTransition = { slideIntoContainer(slideDirection()) },
         popExitTransition = { slideOutOfContainer(slideDirection()) }
     ) {
-		val messagesState by viewModel.messagesState.collectAsStateWithLifecycle()
-        InfoCenterMessages(messagesState)
+        InfoCenterMessages(viewModel)
     }
 
     composable<AppRoutes.InfoCenter.Events>(
