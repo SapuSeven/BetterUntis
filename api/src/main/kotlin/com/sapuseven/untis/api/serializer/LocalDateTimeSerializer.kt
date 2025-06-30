@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
 object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
-	private val format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'")
+	private val format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm[:ss]['Z']")
 
 	override val descriptor: SerialDescriptor =
 		PrimitiveSerialDescriptor("java.time.LocalDateTime", PrimitiveKind.STRING)

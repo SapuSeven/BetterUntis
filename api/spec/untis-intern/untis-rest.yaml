@@ -382,6 +382,8 @@ components:
         Model can be found in Untis Mobile source:
         com/untis/mobile/messages/data/model
       type: object
+      required:
+        - id
       properties:
         allowMessageDeletion:
           type: boolean

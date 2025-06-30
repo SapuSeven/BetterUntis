@@ -1,4 +1,4 @@
-package com.sapuseven.untis.widgets
+/*package com.sapuseven.untis.widgets
 
 import android.content.Context
 import android.util.Log
@@ -24,3 +24,4 @@ class TimetableItemActionCallback : ActionCallback {
 		// TODO
 	}
 }
+*/

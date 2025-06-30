@@ -193,7 +193,6 @@ dependencies {
 	implementation(libs.androidx.constraintlayout)
 	implementation(libs.androidx.datastore)
 	implementation(libs.androidx.fragment)
-	implementation(libs.androidx.glance)
 	implementation(libs.androidx.hilt.navigation.compose)
 	implementation(libs.androidx.hilt.work)
 	implementation(libs.androidx.lifecycle)

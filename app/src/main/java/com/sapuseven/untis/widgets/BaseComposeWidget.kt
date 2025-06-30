@@ -1,4 +1,4 @@
-package com.sapuseven.untis.widgets
+/*package com.sapuseven.untis.widgets
 
 import android.content.Context
 import androidx.compose.material3.ColorScheme
@@ -130,4 +130,4 @@ open class BaseComposeWidget : GlanceAppWidget() {
 	override suspend fun provideGlance(context: Context, id: GlanceId) {
 		TODO("Not yet implemented")
 	}
-}
+}*/
