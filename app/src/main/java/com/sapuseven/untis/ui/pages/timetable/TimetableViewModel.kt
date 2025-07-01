@@ -333,7 +333,7 @@ class TimetableViewModel @Inject constructor(
 		startDate: LocalDate,
 		updateLastRefresh: Boolean = true
 	) = collect { result ->
-		val events = timetableMapper.mapTimetablePeriodsToWeekViewEvents(result.value, ElementType.STUDENT)
+		val events = timetableMapper.mapTimetablePeriodsToWeekViewEvents(result.value, requestedElement?.type ?: ElementType.STUDENT)
 		val refreshTimestamp = result.originTimeStamp?.let { Instant.ofEpochMilli(it) } ?: Instant.now()
 		emitEvents(mapOf(startDate to events))
 		if (updateLastRefresh)
