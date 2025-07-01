@@ -42,7 +42,6 @@ sealed class EventStyle(
 	private val textStyleForScheme: (ColorScheme) -> TextStyle,
 	private var textStyleOverride: TextStyle? = null
 ) {
-	object Debug : EventStyle({ Color.Magenta }, { TextStyle(color = Color.Black) }) // Used for debugging to highlight potential issues
 	object Transparent : EventStyle({ Color.Transparent }, { TextStyle(color = it.onSurface) })
 	object ThemePrimary : EventStyle({ it.primary }, { TextStyle(color = it.onPrimary) })
 	object ThemeSecondary : EventStyle({ it.secondary }, { TextStyle(color = it.onSecondary) })
@@ -52,7 +51,12 @@ sealed class EventStyle(
 	data class Custom(val color: Color, val textStyle: TextStyle? = null) : EventStyle(
 		colorForScheme = { color },
 		textStyleForScheme = {
-			textStyle ?: TextStyle(color = if (ColorUtils.calculateLuminance(color.toArgb()) < 0.5) Color.White else Color.Black)
+			textStyle ?: TextStyle(
+				color = if (
+					ColorUtils.calculateContrast(Color.Black.toArgb(), color.toArgb()) >
+					ColorUtils.calculateContrast(Color.White.toArgb(), color.toArgb())
+				) Color.Black else Color.White
+			)
 		}
 	)
 
@@ -124,9 +128,8 @@ fun <T> WeekViewEvent(
 						color,
 						topLeft = Offset(-outerPadding.toPx(), -outerPadding.toPx()),
 						size = Size(size.width + outerPadding.toPx() * 2, size.height + outerPadding.toPx() * 2),
-						division = ((currentTime.seconds() - event.start.seconds()).toFloat()
-							/ (event.end.seconds() - event.start.seconds()).toFloat())
-							.coerceIn(0f, 1f)
+						division = ((currentTime.seconds() - event.start.seconds()).toFloat() /
+								(event.end.seconds() - event.start.seconds()).toFloat()).coerceIn(0f, 1f)
 					)
 				}
 			}
