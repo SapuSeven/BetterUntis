@@ -4,8 +4,12 @@ info:
   description: |
     A reverse-engineered documentation of the Untis Mobile REST API.
     
-    Keep in mind that this API seems to be a new JSON REST API.
-    The older JSONRPC-API is still being used for most content (like user info and timetable).
+    This API uses a different path than other REST APIs.
+    At this point, the only observed use case is authentication by username and password.
+    It may be possible that it is used for more complex authentication flows as well, for example 2FA.
+    
+    Another way of obtaining a JWT is by using the (old) JSONRPC API.
+    This makes it possible to use the Untis REST API without asking the user for their password directly.
   version: 1.0.0
 
 servers:
@@ -38,14 +42,12 @@ servers:
           - tipo
           - tritone
           - urania
-        default: hektor
+        default: null
+        description: The host of the Untis instance. This list is not exhaustive, no good sources have been found yet.
 
 tags:
   - name: authentication
     description: Authentication operations
-
-security:
-  - bearerAuth: []
 
 paths:
   /{schoolName}/authentication:
@@ -54,8 +56,6 @@ paths:
       operationId: getToken
       tags:
         - authentication
-      security:
-        - bearerAuth: []
       parameters:
         - in: path
           name: schoolName
@@ -137,7 +137,7 @@ components:
           type: boolean
           description: |
             Indicates if the user should be prompted to update their email address.
-            Use `PUT /profile/user-contact-data` from the rest-view-v1 API to update the email address.
+            Use `PUT /profile/user-contact-data` from the REST API to update the email address.
         isPasswordChangeRequired:
           type: boolean
           description: |

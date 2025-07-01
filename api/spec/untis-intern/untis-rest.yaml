@@ -2,10 +2,7 @@ openapi: 3.0.0
 info:
   title: Untis Mobile API
   description: |
-    A reverse-engineered documentation of the Untis Mobile REST API.
-    
-    Keep in mind that this API seems to be a new JSON REST API.
-    The older JSONRPC-API is still being used for most content (like user info and timetable).
+    A reverse-engineered documentation of the Untis REST API.
   version: 1.0.0
 
 servers:
@@ -39,6 +36,7 @@ servers:
           - tritone
           - urania
         default: null
+        description: The host of the Untis instance. This list is not exhaustive, no good sources have been found yet.
 
 tags:
   - name: messages
