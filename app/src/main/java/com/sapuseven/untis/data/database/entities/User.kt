@@ -43,6 +43,31 @@ data class User(
 	val settings: Settings? = null,
 	val created: Long? = null,
 ) {
+	companion object {
+		fun buildApiUrl(
+			apiHost: String,
+			schoolInfo: SchoolInfo? = null
+		): Uri {
+			val host = apiHost.ifBlank {
+				if (schoolInfo?.useMobileServiceUrlAndroid == true && !schoolInfo.mobileServiceUrl.isNullOrBlank()) schoolInfo.mobileServiceUrl
+				else schoolInfo?.serverUrl
+			}!!.toUri().host
+
+			return Uri.Builder()
+				.scheme("https")
+				.authority(host)
+				.appendPath("WebUntis")
+				.build()
+		}
+
+		fun buildJsonRpcApiUrl(apiUrl: Uri, schoolName: String): Uri {
+			return apiUrl.buildUpon()
+				.appendEncodedPath("jsonrpc_intern.do")
+				.appendQueryParameter("school", schoolName)
+				.build()
+		}
+	}
+
 	fun getDisplayedName(context: Context): String {
 		return when {
 			profileName.isNotBlank() -> profileName
@@ -61,19 +86,12 @@ data class User(
 	}
 
 	val apiUrl: Uri by lazy {
-		Uri.Builder()
-			.scheme("https")
-			.authority(apiHost.toUri().host)
-			.appendPath("WebUntis")
-			.build()
+		buildApiUrl(apiHost, schoolInfo)
 	}
 
 	val jsonRpcApiUrl: Uri by lazy {
 		val schoolName = schoolInfo?.loginName ?: apiHost.toUri().getQueryParameter("school") ?: ""
-		apiUrl.buildUpon()
-			.appendEncodedPath("jsonrpc_intern.do")
-			.appendQueryParameter("school", schoolName)
-			.build()
+		buildJsonRpcApiUrl(apiUrl, schoolName)
 	}
 
 	val restApiUrl: Uri by lazy {

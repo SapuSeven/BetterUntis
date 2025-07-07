@@ -171,15 +171,15 @@ fun LoginDataInput(
 						modifier = Modifier
 							.fillMaxWidth()
 							.weight(1f),
-						searchText = viewModel.loginData.schoolId.value ?: "",
+						searchText = viewModel.loginData.schoolName.value ?: "",
 						onSchoolSelected = { viewModel.selectSchool(it) }
 					)
 
 					InputField(
-						state = viewModel.loginData.schoolId,
+						state = viewModel.loginData.schoolName,
 						label = { Text(stringResource(id = R.string.logindatainput_school)) },
 						enabled = !viewModel.loading && !viewModel.schoolIdLocked,
-						valid = !viewModel.validate || viewModel.schoolIdValid.value,
+						valid = !viewModel.validate || viewModel.schoolNameValid.value,
 						errorText = stringResource(id = R.string.logindatainput_error_field_empty),
 						trailingIcon = {
 							IconButton(
@@ -244,10 +244,10 @@ fun LoginDataInput(
 						focusManager = focusManager
 					)
 					InputField(
-						state = viewModel.loginData.schoolId,
+						state = viewModel.loginData.schoolName,
 						label = { Text(stringResource(id = R.string.logindatainput_school)) },
 						enabled = !viewModel.loading && !viewModel.schoolIdLocked,
-						valid = !viewModel.validate || viewModel.schoolIdValid.value,
+						valid = !viewModel.validate || viewModel.schoolNameValid.value,
 						errorText = stringResource(id = R.string.logindatainput_error_field_empty),
 						trailingIcon = {
 							IconButton(
