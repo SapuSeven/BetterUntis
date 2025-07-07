@@ -3,6 +3,7 @@ package com.sapuseven.untis.ui.pages.infocenter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.sapuseven.untis.api.exception.UntisApiException
 import com.sapuseven.untis.api.model.response.Error
+import com.sapuseven.untis.api.model.response.UntisErrorCode
 import com.sapuseven.untis.api.model.untis.Attachment
 import com.sapuseven.untis.api.model.untis.MessageOfDay
 import com.sapuseven.untis.model.rest.Message
@@ -34,7 +35,7 @@ private object PreviewParameterData {
 	// TODO: Move this elsewhere when reusing
 	val untisApiException = UntisApiException(
 		Error(
-			code = 1,
+			code = UntisErrorCode.UNKNOWN,
 			message = "Loading failed: API is not supported during previews"
 		)
 	)

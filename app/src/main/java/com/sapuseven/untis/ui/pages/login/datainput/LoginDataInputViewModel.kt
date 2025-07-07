@@ -18,6 +18,7 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.api.client.SchoolSearchApi
 import com.sapuseven.untis.api.client.UserDataApi
 import com.sapuseven.untis.api.exception.UntisApiException
+import com.sapuseven.untis.api.model.response.UntisErrorCode
 import com.sapuseven.untis.api.model.response.UserDataResult
 import com.sapuseven.untis.api.model.untis.MasterData
 import com.sapuseven.untis.api.model.untis.SchoolInfo
@@ -26,7 +27,6 @@ import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.data.repository.UserRepository
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
-import com.sapuseven.untis.helpers.ErrorMessageDictionary.ERROR_CODE_TOO_MANY_RESULTS
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.services.CodeScanService
 import com.sapuseven.untis.ui.navigation.AppNavigator
@@ -203,7 +203,6 @@ class LoginDataInputViewModel @Inject constructor(
 			val errorTextRes = ErrorMessageDictionary.getErrorMessageResource(e.error?.code, false)
 			errorText = errorTextRes ?: R.string.errormessagedictionary_generic
 			errorTextRaw = when (e.error?.code) {
-				ERROR_CODE_TOO_MANY_RESULTS -> "Check the school id" // TODO: This is an example. Add detailed descriptions to errormessagedictionary
 				else -> if (errorTextRes == null) e.error?.message else null
 			}
 		} catch (e: Exception) {
@@ -306,9 +305,9 @@ class LoginDataInputViewModel @Inject constructor(
 				untisApiUrl, loginData.username.value ?: "", loginData.password.value ?: ""
 			)
 		} catch (e: UntisApiException) {
-			// If we want to filter for some exceptions and throw others, we can implement it here
-			/*if (e.error?.code != SOME_ERROR_CODE) throw e
-			else */loginData.password.value ?: ""
+			// Throw certain errors, ignore others
+			if (e.error?.code == UntisErrorCode.REQUIRE2_FACTOR_AUTHENTICATION_TOKEN) throw e
+			else loginData.password.value ?: ""
 		}
 	}
 
