@@ -1,0 +1,9 @@
+- Add direct message viewing in InfoCenter
+- Add support for login with 2FA
+- Add message of day notification
+- Improve event text formatting
+- Improve settings categories design
+- Fix event style customization not being applied
+- Fix unpredictable date picker behavior
+- Fix event text color contrast calculation for custom colors
+- Fix not displaying appropriate element types in timetables for non-student elements
