@@ -1,6 +1,5 @@
 package com.sapuseven.untis.ui.pages.login.datainput
 
-import android.net.Uri
 import android.util.Log
 import android.util.Patterns
 import androidx.activity.compose.ManagedActivityResultLauncher
@@ -80,6 +79,9 @@ class LoginDataInputViewModel @Inject constructor(
 	var showQrCodeErrorDialog by mutableStateOf(false)
 		private set
 
+	var showSecondFactorInput by mutableStateOf(false)
+		private set
+
 	val showProfileUpdate = args.profileUpdate
 
 	var schoolIdLocked by mutableStateOf(false)
@@ -105,7 +107,7 @@ class LoginDataInputViewModel @Inject constructor(
 	val codeScanResultHandler: (String?) -> Unit = {
 		try {
 			it?.let { loadFromData(it) }
-		} catch (e: Exception) {
+		} catch (_: Exception) {
 			showQrCodeErrorDialog = true
 		}
 	}
@@ -154,9 +156,9 @@ class LoginDataInputViewModel @Inject constructor(
 
 	private fun loadFromData(data: String?) {
 		if (data == null) return
-		val appLinkData = Uri.parse(data)
+		val appLinkData = data.toUri()
 
-		if (appLinkData?.isHierarchical == true && appLinkData.scheme == "untis" && appLinkData.host == "setschool") {
+		if (appLinkData.isHierarchical && appLinkData.scheme == "untis" && appLinkData.host == "setschool") {
 			// Untis-native values
 			loginData.schoolId.value = appLinkData.getQueryParameter("school")
 			loginData.username.value = appLinkData.getQueryParameter("user")
@@ -200,10 +202,15 @@ class LoginDataInputViewModel @Inject constructor(
 			}
 		} catch (e: UntisApiException) {
 			Log.e(LoginDataInputViewModel::class.simpleName, "loadData Untis error", e)
+
 			val errorTextRes = ErrorMessageDictionary.getErrorMessageResource(e.error?.code, false)
 			errorText = errorTextRes ?: R.string.errormessagedictionary_generic
-			errorTextRaw = when (e.error?.code) {
-				else -> if (errorTextRes == null) e.error?.message else null
+			if (e.error?.code == UntisErrorCode.REQUIRE2_FACTOR_AUTHENTICATION_TOKEN) {
+				showSecondFactorInput = true
+			} else {
+				errorTextRaw = when (e.error?.code) {
+					else -> if (errorTextRes == null) e.error?.message else null
+				}
 			}
 		} catch (e: Exception) {
 			Log.e(LoginDataInputViewModel::class.simpleName, "loadData error", e)
@@ -302,7 +309,7 @@ class LoginDataInputViewModel @Inject constructor(
 
 		return try {
 			userDataApi.getAppSharedSecret(
-				untisApiUrl, loginData.username.value ?: "", loginData.password.value ?: ""
+				untisApiUrl, loginData.username.value ?: "", loginData.password.value ?: "", loginData.secondFactor.value
 			)
 		} catch (e: UntisApiException) {
 			// Throw certain errors, ignore others
@@ -346,13 +353,14 @@ class LoginDataInputViewModel @Inject constructor(
 		val anonymous = mutableStateOf(initialAnonymous)
 		val username = mutableStateOf(initialUsername)
 		val password = mutableStateOf<String?>(null)
+		val secondFactor = mutableStateOf<String?>(null)
 		val apiUrl = mutableStateOf(initialApiUrl)
 		val skipAppSecret = mutableStateOf<Boolean?>(null)
 		var storedPassword: String? = null
 
 		fun loadFromUser(user: User) {
 			profileName.value = user.profileName
-			schoolId.value = user.schoolId
+			schoolId.value = user.schoolId ?: user.schoolInfo?.schoolId?.toString()
 			anonymous.value = user.anonymous
 			username.value = user.user
 			apiUrl.value = user.jsonRpcApiUrl.toString()

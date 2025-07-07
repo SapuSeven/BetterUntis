@@ -13,6 +13,7 @@ object ErrorMessageDictionary {
 			UntisErrorCode.LOCKED_ACCESS -> R.string.errormessagedictionary_user_locked
 			UntisErrorCode.NO_PUBLIC_ACCESS -> R.string.errormessagedictionary_no_public_access
 			UntisErrorCode.INVALID_CLIENT_TIME -> R.string.errormessagedictionary_invalid_time_settings
+			UntisErrorCode.REQUIRE2_FACTOR_AUTHENTICATION_TOKEN -> R.string.errormessagedictionary_second_factor_requried
 			else -> if (fallbackToGeneric) R.string.errormessagedictionary_generic else null
 		}
 	}

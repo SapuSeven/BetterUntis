@@ -96,6 +96,7 @@
     <string name="logindatainput_profilename">Profilname (optional)</string>
     <string name="logindatainput_proxy_host">Proxy-Server (optional)</string>
     <string name="logindatainput_show_advanced">Erweiterte Einstellungen anzeigen</string>
+    <string name="logindatainput_2fa">Zwei-Faktor-Authentifizierung</string>
     <string name="errormessagedictionary_generic">Unbekannter Fehler</string>
     <string name="errormessagedictionary_too_many_results">Zu viele Ergebnisse</string>
     <string name="errormessagedictionary_invalid_school">Die angegebene Schule existiert nicht!</string>

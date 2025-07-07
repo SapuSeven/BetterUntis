@@ -27,11 +27,12 @@ open class UserDataApi(
 	open suspend fun getAppSharedSecret(
 		apiUrl: String,
 		user: String,
-		password: String
+		password: String,
+		token: String? = null
 	): String {
 		val body = RequestData(
 			method = METHOD_GET_APP_SHARED_SECRET,
-			params = listOf(AppSharedSecretParams(user, password))
+			params = listOf(AppSharedSecretParams(user, password, token))
 		)
 
 		val response: AppSharedSecretResponse = request(apiUrl, body).body()

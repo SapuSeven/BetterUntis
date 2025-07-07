@@ -70,6 +70,7 @@
     <string name="errormessagedictionary_server_webuntis_not_installed">The specified Server doesn\'t have WebUntis installed!</string>
     <string name="errormessagedictionary_too_many_results">Too many results</string>
     <string name="errormessagedictionary_user_locked">User locked!</string>
+    <string name="errormessagedictionary_second_factor_requried">2FA token required.</string>
     <string name="errors_button_dismiss">Dismiss all</string>
     <string name="errors_button_report">Report all</string>
     <string name="errors_crash_message">Sorry for that.</string>
@@ -146,6 +147,7 @@
     <string name="logindatainput_error_invalid_url">Invalid URL!</string>
     <string name="logindatainput_key">Key or Password</string>
     <string name="logindatainput_key_saved">Key or Password (saved)</string>
+    <string name="logindatainput_2fa">Two-Factor Authentication</string>
     <string name="logindatainput_loading_user_data">Loading user data…</string>
     <string name="logindatainput_login">Login</string>
     <string name="logindatainput_profilename">Profile name (optional)</string>

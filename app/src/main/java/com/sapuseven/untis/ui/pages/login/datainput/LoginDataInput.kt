@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -43,14 +44,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.autofill.AutofillType
+import androidx.compose.ui.autofill.ContentType
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentType
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -64,7 +71,6 @@ import com.sapuseven.untis.ui.common.LabeledCheckbox
 import com.sapuseven.untis.ui.common.LabeledSwitch
 import com.sapuseven.untis.ui.common.MessageBubble
 import com.sapuseven.untis.ui.common.SmallCircularProgressIndicator
-import com.sapuseven.untis.ui.common.autofill
 import com.sapuseven.untis.ui.common.ifNotNull
 import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.pages.login.schoolsearch.SchoolSearch
@@ -152,6 +158,7 @@ fun LoginDataInput(
 			}
 		) { innerPadding ->
 			val focusRequester = remember { FocusRequester() }
+			val focusManager = LocalFocusManager.current
 
 			if (viewModel.searchMode) {
 				Column(
@@ -185,6 +192,7 @@ fun LoginDataInput(
 								)
 							}
 						},
+						focusManager = focusManager,
 						modifier = Modifier
 							.focusRequester(focusRequester)
 							.padding(bottom = 8.dp)
@@ -199,7 +207,9 @@ fun LoginDataInput(
 					modifier = Modifier
 						.padding(innerPadding)
 						.fillMaxSize()
+						.bottomInsets()
 						.verticalScroll(rememberScrollState())
+						.padding(bottom = 88.dp) // Space for FAB
 				) {
 					if (LocalConfiguration.current.orientation != Configuration.ORIENTATION_LANDSCAPE)
 						Icon(
@@ -230,7 +240,8 @@ fun LoginDataInput(
 					InputField(
 						state = viewModel.loginData.profileName,
 						label = { Text(stringResource(id = R.string.logindatainput_profilename)) },
-						enabled = !viewModel.loading
+						enabled = !viewModel.loading,
+						focusManager = focusManager
 					)
 					InputField(
 						state = viewModel.loginData.schoolId,
@@ -248,7 +259,8 @@ fun LoginDataInput(
 									contentDescription = stringResource(R.string.login_search_by_school_name_or_address)
 								)
 							}
-						}
+						},
+						focusManager = focusManager
 					)
 					Spacer(
 						modifier = Modifier.height(32.dp)
@@ -266,7 +278,8 @@ fun LoginDataInput(
 								enabled = !viewModel.loading,
 								valid = !viewModel.validate || viewModel.usernameValid.value,
 								errorText = stringResource(id = R.string.logindatainput_error_field_empty),
-								autofillType = AutofillType.Username
+								contentType = ContentType.Username,
+								focusManager = focusManager
 							)
 							InputField(
 								state = viewModel.loginData.password,
@@ -280,8 +293,30 @@ fun LoginDataInput(
 									)
 								},
 								enabled = !viewModel.loading,
-								autofillType = AutofillType.Password
+								contentType = ContentType.Password,
+								focusManager = focusManager
 							)
+							AnimatedVisibility(visible = viewModel.showSecondFactorInput) {
+								val focusRequester = remember { FocusRequester() }
+
+								InputField(
+									state = viewModel.loginData.secondFactor,
+									type = KeyboardType.NumberPassword,
+									label = {
+										Text(
+											stringResource(id = R.string.logindatainput_2fa)
+										)
+									},
+									enabled = !viewModel.loading,
+									focusManager = focusManager,
+									modifier = Modifier
+										.focusRequester(focusRequester)
+								)
+
+								LaunchedEffect(Unit) {
+									focusRequester.requestFocus()
+								}
+							}
 							Spacer(
 								modifier = Modifier.height(32.dp)
 							)
@@ -313,15 +348,11 @@ fun LoginDataInput(
 								label = { Text(stringResource(id = R.string.logindatainput_api_url)) },
 								enabled = !viewModel.loading,
 								valid = !viewModel.validate || viewModel.apiUrlValid.value,
-								errorText = stringResource(id = R.string.logindatainput_error_invalid_url)
+								errorText = stringResource(id = R.string.logindatainput_error_invalid_url),
+								focusManager = focusManager
 							)
 						}
 					}
-					Spacer(
-						modifier = Modifier
-							.bottomInsets()
-							.height(80.dp)
-					)
 
 					if (viewModel.showQrCodeErrorDialog) {
 						AlertDialog(
@@ -361,8 +392,9 @@ private fun InputField(
 	enabled: Boolean = true,
 	valid: Boolean = true,
 	errorText: String = "",
-	autofillType: AutofillType? = null,
+	contentType: ContentType? = null,
 	trailingIcon: @Composable (() -> Unit)? = null,
+	focusManager: FocusManager? = null,
 	modifier: Modifier = Modifier
 ) {
 	val bringIntoViewRequester = remember { BringIntoViewRequester() }
@@ -370,34 +402,40 @@ private fun InputField(
 
 	Column(
 		modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .bringIntoViewRequester(bringIntoViewRequester)
+			.fillMaxWidth()
+			.padding(horizontal = 16.dp, vertical = 8.dp)
+			.bringIntoViewRequester(bringIntoViewRequester)
 	) {
 		OutlinedTextField(
 			value = state.value ?: "",
 			onValueChange = { state.value = it },
 			singleLine = true,
-			keyboardOptions = KeyboardOptions(keyboardType = type),
+			keyboardOptions = KeyboardOptions(
+				keyboardType = type,
+				imeAction = if (focusManager == null) ImeAction.Unspecified else ImeAction.Next
+			),
+			keyboardActions = KeyboardActions(
+				onNext = {
+					focusManager?.moveFocus(FocusDirection.Next)
+				}
+			),
 			visualTransformation = if (type == KeyboardType.Password) PasswordVisualTransformation() else VisualTransformation.None,
 			label = label,
 			enabled = enabled,
 			isError = !valid,
 			trailingIcon = trailingIcon,
 			modifier = modifier
-                .fillMaxWidth()
-                .onFocusEvent { focusState ->
-                    if (focusState.isFocused) {
-                        coroutineScope.launch {
-                            bringIntoViewRequester.bringIntoView()
-                        }
-                    }
-                }
-                .ifNotNull(autofillType) {
-                    autofill(listOf(it)) {
-                        state.value = it
-                    }
-                }
+				.fillMaxWidth()
+				.onFocusChanged {
+					if (it.isFocused) {
+						coroutineScope.launch {
+							bringIntoViewRequester.bringIntoView()
+						}
+					}
+				}
+				.ifNotNull(contentType) {
+					semantics { this.contentType = it }
+				}
 		)
 
 		AnimatedVisibility(visible = !valid) {
@@ -420,8 +458,8 @@ private fun InputSwitch(
 	LabeledSwitch(
 		label = label,
 		modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+			.fillMaxWidth()
+			.padding(horizontal = 16.dp),
 		checked = state.value ?: false,
 		onCheckedChange = { state.value = it },
 		enabled = enabled
@@ -437,8 +475,8 @@ private fun InputCheckbox(
 	LabeledCheckbox(
 		label = label,
 		modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+			.fillMaxWidth()
+			.padding(horizontal = 16.dp),
 		checked = state.value ?: false,
 		onCheckedChange = { state.value = it },
 		enabled = enabled
