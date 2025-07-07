@@ -40,7 +40,7 @@
     <string name="activity_title_settings">Einstellungen</string>
     <string name="errors_github_attach_file_message">Bitte füge die komprimierten Log-Dateien als Anhang hinzu.\nDiese wurden hier gespeichert: `%1$s`</string>
     <string name="nav_all_timetables">Stundenpläne</string>
-    <string name="menu_infocenter_messagesofday">Messages</string>
+    <string name="menu_infocenter_messagesofday">Nachrichten</string>
     <string name="menu_infocenter_officehours">Sprechstunden</string>
     <string name="menu_infocenter_events">Termine</string>
     <string name="menu_infocenter_absences">Abwesenheiten</string>
@@ -312,7 +312,7 @@
     <string name="all_hint_tap_to_edit">(Tippen um zu bearbeiten)</string>
     <string name="all_dialog_crash_copied">Absturzprotokoll wurde in die Zwischenablage kopiert.</string>
     <string name="all_dialog_crash_title">Absturzprotokoll gefunden</string>
-    <string name="all_lessontopic_edit">Lehrstof bearbeiten</string>
+    <string name="all_lessontopic_edit">Lehrstoff bearbeiten</string>
     <string name="all_lessontopic_none">(Kein Lehrstoff)</string>
     <string name="main_dialog_itemdetails_timeformat">%1$s - %2$s</string>
     <string name="main_dialog_delete_bookmark">Dieses Lesezeichen löschen?</string>
@@ -396,5 +396,14 @@
     <string name="preference_automute_allow_priority">Prioritätstermine dürfen die automatische Stummschaltung ignorieren</string>
     <string name="widget_timetable_link">Verknüpfung erstellen für…</string>
     <string name="automute_zen_rule_name">Schule - %1$s</string>
-	<string name="preference_automute_preferences">Einstellungen für automatisches Stummschalten</string>
+    <string name="preference_automute_preferences">Einstellungen für automatisches Stummschalten</string>
+    <string name="notifications_text_motd_title">Aktuelle Nachrichten der Schule</string>
+    <string name="notifications_text_motd_message">%1$d Nachrichten</string>
+    <string name="notifications_channel_firstlesson">Erste Stunde</string>
+    <string name="notifications_channel_firstlesson_desc">Informationen über die erste Stunde und tägliche Nachrichten anzeigen</string>
+    <string name="preferences_info_summary">Version, Lizenz, Mitwirkende</string>
+    <string name="preferences_notifications_summary">Pausenbenachrichtigungen, sichtbare Felder</string>
+    <string name="preferences_styling_summary">Farben, Dunkler Modus</string>
+    <string name="preferences_timetable_summary">Anzeigeoptionen, Aussehen der Elemente</string>
+    <string name="preferences_general_summary">Automatische Stummschaltung, Fehlermeldungen</string>
 </resources>
