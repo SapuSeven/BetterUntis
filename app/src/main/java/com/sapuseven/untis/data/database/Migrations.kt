@@ -2,6 +2,7 @@ package com.sapuseven.untis.data.database
 
 import android.provider.BaseColumns
 import androidx.room.DeleteColumn
+import androidx.room.RenameColumn
 import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -190,3 +191,10 @@ val MIGRATION_USER_7_8 = object : Migration(7, 8) {
 	)
 )
 class MigrationSpec10to11 : AutoMigrationSpec
+
+@RenameColumn(
+	tableName = "User",
+	fromColumnName = "apiUrl",
+	toColumnName = "apiHost"
+)
+class MigrationSpec11to12 : AutoMigrationSpec

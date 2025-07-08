@@ -13,9 +13,13 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.MainActivity
+import com.sapuseven.untis.api.model.untis.MessageOfDay
 import com.sapuseven.untis.data.repository.UserSettingsRepository
 import com.sapuseven.untis.data.settings.model.NotificationVisibility
+import com.sapuseven.untis.data.settings.model.UserSettings
+import com.sapuseven.untis.domain.GetMessagesOfDayUseCase
 import com.sapuseven.untis.workers.NotificationSetupWorker.Companion.CHANNEL_ID_BREAKINFO
+import com.sapuseven.untis.workers.NotificationSetupWorker.Companion.CHANNEL_ID_FIRSTLESSON
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -26,6 +30,9 @@ import javax.inject.Inject
 class NotificationReceiver : BroadcastReceiver() {
 	@Inject
 	lateinit var userSettingsRepository: UserSettingsRepository
+
+	@Inject
+	lateinit var getMessages: GetMessagesOfDayUseCase
 
 	companion object {
 		private const val LOG_TAG = "NotificationReceiver"
@@ -67,62 +74,100 @@ class NotificationReceiver : BroadcastReceiver() {
 					.isBefore(LocalTime.now())
 			) return@runBlocking // Break is already over
 
-			val pendingIntent = PendingIntent.getActivity(
-				context,
-				0,
-				Intent(context, MainActivity::class.java),
-				FLAG_IMMUTABLE
-			) // TODO: Ensure that the appropriate profile is shown
+			val isFirst = intent.getBooleanExtra(EXTRA_BOOLEAN_FIRST, false)
 
-			val title = context.getString(
-				if (intent.getBooleanExtra(
-						EXTRA_BOOLEAN_FIRST,
-						false
-					)
-				) R.string.notifications_text_first_title else R.string.notifications_text_title,
-				intent.getStringExtra(EXTRA_STRING_BREAK_END_TIME)
-			)
-			val message = buildMessage(
-				null,
-				intent,
-				context.getString(R.string.notifications_text_message_separator),
-				userSettings.notificationsVisibilitySubjects,
-				userSettings.notificationsVisibilityRooms,
-				userSettings.notificationsVisibilityTeachers,
-				userSettings.notificationsVisibilityClasses
-			)
-			val longMessage = buildMessage(
-				context,
-				intent,
-				"\n",
-				userSettings.notificationsVisibilitySubjects,
-				userSettings.notificationsVisibilityRooms,
-				userSettings.notificationsVisibilityTeachers,
-				userSettings.notificationsVisibilityClasses
-			)
+			sendBreakNotification(context, intent, userSettings)
 
-			val builder = NotificationCompat.Builder(context, CHANNEL_ID_BREAKINFO)
-				.setContentTitle(title)
-				.setContentText(message)
-				.setSmallIcon(R.drawable.notification_clock)
-				.setContentIntent(pendingIntent)
-				.setStyle(NotificationCompat.BigTextStyle().bigText(longMessage))
-				.setAutoCancel(false)
-				.setOngoing(true)
-				.setCategory(NotificationCompat.CATEGORY_STATUS)
-
-			with(NotificationManagerCompat.from(context)) {
-				if (ActivityCompat.checkSelfPermission(
-						context,
-						Manifest.permission.POST_NOTIFICATIONS
-					) != PackageManager.PERMISSION_GRANTED
-				) {
-					Log.e(LOG_TAG, "Notification permission not granted!")
-					return@runBlocking
-				}
-				notify(intent.getIntExtra(EXTRA_INT_ID, -1), builder.build())
+			if (isFirst) {
+				// TODO This doesn't take user id into account
+				getMessages().first().fold(
+					onSuccess = { messages ->
+						if (messages.isNotEmpty()) {
+							sendMessagesNotification(context, messages)
+						}
+					},
+					onFailure = { exception ->
+						//sendErrorNotification(context)
+					}
+				)
 			}
-			Log.d(LOG_TAG, "Notification delivered: $title")
+		}
+	}
+
+	private fun sendMessagesNotification(context: Context, messages: List<MessageOfDay>) {
+		val builder = NotificationCompat.Builder(context, CHANNEL_ID_FIRSTLESSON)
+			.setContentTitle(context.getString(R.string.notifications_text_motd_title))
+			.setContentText(context.getString(R.string.notifications_text_motd_message, messages.size))
+			.setSmallIcon(R.drawable.infocenter_messages)
+			//TODO .setContentIntent(pendingIntent)
+			.setStyle(NotificationCompat.BigTextStyle().bigText(messages.joinToString("\n") { it.subject }))
+			.setAutoCancel(false)
+			.setCategory(NotificationCompat.CATEGORY_EMAIL)
+
+		sendNotification(context, builder, 1)
+	}
+
+	private fun sendBreakNotification(context: Context, intent: Intent, userSettings: UserSettings) {
+		val isFirst = intent.getBooleanExtra(EXTRA_BOOLEAN_FIRST, false)
+
+		val title = context.getString(
+			if (isFirst) R.string.notifications_text_first_title else R.string.notifications_text_title,
+			intent.getStringExtra(EXTRA_STRING_BREAK_END_TIME)
+		)
+		val message = buildMessage(
+			null,
+			intent,
+			context.getString(R.string.notifications_text_message_separator),
+			userSettings.notificationsVisibilitySubjects,
+			userSettings.notificationsVisibilityRooms,
+			userSettings.notificationsVisibilityTeachers,
+			userSettings.notificationsVisibilityClasses
+		)
+		val longMessage = buildMessage(
+			context,
+			intent,
+			"\n",
+			userSettings.notificationsVisibilitySubjects,
+			userSettings.notificationsVisibilityRooms,
+			userSettings.notificationsVisibilityTeachers,
+			userSettings.notificationsVisibilityClasses
+		)
+
+		// Action on notification click
+		// TODO: Ensure that the appropriate profile is shown
+		val pendingIntent = PendingIntent.getActivity(
+			context,
+			0,
+			Intent(context, MainActivity::class.java),
+			FLAG_IMMUTABLE
+		)
+
+		val builder = NotificationCompat.Builder(context, CHANNEL_ID_BREAKINFO)
+			.setContentTitle(title)
+			.setContentText(message)
+			.setSmallIcon(R.drawable.notification_clock)
+			.setContentIntent(pendingIntent)
+			.setStyle(NotificationCompat.BigTextStyle().bigText(longMessage))
+			.setAutoCancel(false)
+			.setOngoing(true)
+			.setCategory(NotificationCompat.CATEGORY_STATUS)
+
+		if (sendNotification(context, builder, intent.getIntExtra(EXTRA_INT_ID, -1)))
+			Log.d(LOG_TAG, "Break notification delivered: $title")
+	}
+
+	private fun sendNotification(context: Context, builder: NotificationCompat.Builder, id: Int): Boolean {
+		with(NotificationManagerCompat.from(context)) {
+			if (ActivityCompat.checkSelfPermission(
+					context,
+					Manifest.permission.POST_NOTIFICATIONS
+				) != PackageManager.PERMISSION_GRANTED
+			) {
+				Log.e(LOG_TAG, "Notification permission not granted!")
+				return false
+			}
+			notify(id, builder.build())
+			return true
 		}
 	}
 

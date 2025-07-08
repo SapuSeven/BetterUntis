@@ -72,6 +72,7 @@ class NotificationSetupWorker @AssistedInject constructor(
 		const val CHANNEL_ID_DEBUG = "notifications.debug"
 		const val CHANNEL_ID_BACKGROUNDERRORS = "notifications.backgrounderrors"
 		const val CHANNEL_ID_BREAKINFO = "notifications.breakinfo"
+		const val CHANNEL_ID_FIRSTLESSON = "notifications.firstlesson"
 
 		fun enqueue(workManager: WorkManager, user: User) {
 			workManager.enqueue(
@@ -313,6 +314,13 @@ class NotificationSetupWorker @AssistedInject constructor(
 					NotificationManager.IMPORTANCE_LOW
 				).apply {
 					description = applicationContext.getString(R.string.notifications_channel_breakinfo_desc)
+				},
+				NotificationChannel(
+					CHANNEL_ID_FIRSTLESSON,
+					applicationContext.getString(R.string.notifications_channel_firstlesson),
+					NotificationManager.IMPORTANCE_LOW
+				).apply {
+					description = applicationContext.getString(R.string.notifications_channel_firstlesson_desc)
 				},
 			).forEach {
 				notificationManager.createNotificationChannel(it)

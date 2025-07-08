@@ -1,7 +1,6 @@
 package com.sapuseven.untis.modules
 
 import com.sapuseven.untis.api.client.AbsenceApi
-import com.sapuseven.untis.api.client.ApiClient.Companion.DEFAULT_JSON
 import com.sapuseven.untis.api.client.ClassRegApi
 import com.sapuseven.untis.api.client.MessagesApi
 import com.sapuseven.untis.api.client.OfficeHoursApi
@@ -15,15 +14,15 @@ import dagger.hilt.components.SingletonComponent
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngineFactory
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.http.ContentType
 import io.ktor.serialization.kotlinx.json.json
 import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object ApiClientModule {
+object JsonRpcApiClientModule {
 	@Provides
 	@Singleton
 	fun provideHttpClientEngineFactory(): HttpClientEngineFactory<*> = CIO
@@ -34,14 +33,20 @@ object ApiClientModule {
 	fun provideJsonHttpClient(httpClientEngineFactory: HttpClientEngineFactory<*>): HttpClient =
 		HttpClient(httpClientEngineFactory.create()) {
 			install(ContentNegotiation) {
-				json(DEFAULT_JSON, contentType = ContentType.Application.Json)
+				json()
+			}
+			install(HttpRequestRetry) {
+				retryOnServerErrors(maxRetries = 3)
+				retryOnException(maxRetries = 3)
+				exponentialDelay()
 			}
 			expectSuccess = true
 		}
 
 	@Provides
 	@Singleton
-	fun provideSchoolSearchApi(engineFactory: HttpClientEngineFactory<*>): SchoolSearchApi = SchoolSearchApi(engineFactory)
+	fun provideSchoolSearchApi(engineFactory: HttpClientEngineFactory<*>): SchoolSearchApi =
+		SchoolSearchApi(engineFactory)
 
 	@Provides
 	@Singleton

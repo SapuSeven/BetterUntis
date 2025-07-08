@@ -1,7 +1,6 @@
 package com.sapuseven.untis.ui.pages.infocenter
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +12,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -41,8 +41,7 @@ import com.sapuseven.untis.ui.pages.infocenter.fragments.AbsenceFilterDialog
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InfoCenter(
-	bottomNavController: NavHostController = rememberNavController(),
-	viewModel: InfoCenterViewModel = hiltViewModel()
+	bottomNavController: NavHostController = rememberNavController(), viewModel: InfoCenterViewModel = hiltViewModel()
 ) {
 	var absenceFilterDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -51,55 +50,47 @@ fun InfoCenter(
 	fun <T : Any> isCurrentRoute(route: T) = currentRoute?.destination?.route == route::class.qualifiedName
 
 	fun <T : Any> navigate(route: T): () -> Unit = {
-		if (!isCurrentRoute(route))
-			bottomNavController.navigate(route) {
-				bottomNavController.graph.startDestinationRoute?.let { route ->
-					popUpTo(route)
-				}
-				launchSingleTop = true
+		if (!isCurrentRoute(route)) bottomNavController.navigate(route) {
+			bottomNavController.graph.startDestinationRoute?.let { route ->
+				popUpTo(route)
 			}
+			launchSingleTop = true
+		}
 	}
 
 	AppScaffold(
 		topBar = {
-			CenterAlignedTopAppBar(
-				title = {
-					Text(stringResource(id = R.string.activity_title_info_center))
-				},
-				navigationIcon = {
-					IconButton(onClick = { viewModel.goBack() }) {
-						Icon(
-							imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-							contentDescription = stringResource(id = R.string.all_back)
-						)
-					}
-				},
-				actions = {
-					if (isCurrentRoute(AppRoutes.InfoCenter.Absences)) {
-						IconButton(
-							onClick = { absenceFilterDialog = true }
-						) {
-							Icon(painter = painterResource(id = R.drawable.all_filter), contentDescription = null)
-						}
+			CenterAlignedTopAppBar(title = {
+				Text(stringResource(id = R.string.activity_title_info_center))
+			}, navigationIcon = {
+				IconButton(onClick = { viewModel.goBack() }) {
+					Icon(
+						imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+						contentDescription = stringResource(id = R.string.all_back)
+					)
+				}
+			}, actions = {
+				if (isCurrentRoute(AppRoutes.InfoCenter.Absences)) {
+					IconButton(
+						onClick = { absenceFilterDialog = true }) {
+						Icon(painter = painterResource(id = R.drawable.all_filter), contentDescription = null)
 					}
 				}
-			)
-		}
-	) { innerPadding ->
+			})
+		}) { innerPadding ->
 		Column(
 			modifier = Modifier
 				.padding(innerPadding)
 				.fillMaxSize()
 		) {
 			CompositionLocalProvider(LocalMasterDataRepository provides viewModel.masterDataRepository) {
-				Box(
+				Surface(
 					modifier = Modifier
 						.fillMaxWidth()
 						.weight(1f)
 				) {
 					NavHost(
-						navController = bottomNavController,
-						startDestination = AppRoutes.InfoCenter.Messages
+						navController = bottomNavController, startDestination = AppRoutes.InfoCenter.Messages
 					) {
 						infoCenterNav(viewModel = viewModel)
 					}
@@ -110,7 +101,12 @@ fun InfoCenter(
 				NavigationBarItem(
 					icon = {
 						Icon(
-							painterResource(id = R.drawable.infocenter_messages),
+							painterResource(
+								id = if (isCurrentRoute(AppRoutes.InfoCenter.Messages))
+									R.drawable.infocenter_messages_active
+								else
+									R.drawable.infocenter_messages
+							),
 							contentDescription = null
 						)
 					},
@@ -122,8 +118,12 @@ fun InfoCenter(
 				NavigationBarItem(
 					icon = {
 						Icon(
-							painterResource(id = R.drawable.infocenter_events),
-							contentDescription = null
+							painterResource(
+								id = if (isCurrentRoute(AppRoutes.InfoCenter.Events))
+									R.drawable.infocenter_events_active
+								else
+									R.drawable.infocenter_events
+							), contentDescription = null
 						)
 					},
 					label = { Text(stringResource(id = R.string.menu_infocenter_events)) },
@@ -131,39 +131,43 @@ fun InfoCenter(
 					onClick = navigate(AppRoutes.InfoCenter.Events)
 				)
 
-				if (viewModel.shouldShowAbsences)
-					NavigationBarItem(
-						icon = {
-							Icon(
-								painterResource(id = R.drawable.infocenter_absences),
-								contentDescription = null
-							)
-						},
-						label = { Text(stringResource(id = R.string.menu_infocenter_absences)) },
-						selected = isCurrentRoute(AppRoutes.InfoCenter.Absences),
-						onClick = navigate(AppRoutes.InfoCenter.Absences)
-					)
+				if (viewModel.shouldShowAbsences) NavigationBarItem(
+					icon = {
+						Icon(
+							painterResource(
+								id = if (isCurrentRoute(AppRoutes.InfoCenter.Absences))
+									R.drawable.infocenter_absences_active
+								else
+									R.drawable.infocenter_absences
+							), contentDescription = null
+						)
+					},
+					label = { Text(stringResource(id = R.string.menu_infocenter_absences)) },
+					selected = isCurrentRoute(AppRoutes.InfoCenter.Absences),
+					onClick = navigate(AppRoutes.InfoCenter.Absences)
+				)
 
-				if (viewModel.shouldShowOfficeHours)
-					NavigationBarItem(
-						icon = {
-							Icon(
-								painterResource(id = R.drawable.infocenter_contact),
-								contentDescription = null
-							)
-						},
-						label = { Text(stringResource(id = R.string.menu_infocenter_officehours)) },
-						selected = isCurrentRoute(AppRoutes.InfoCenter.OfficeHours),
-						onClick = navigate(AppRoutes.InfoCenter.OfficeHours)
-					)
+				if (viewModel.shouldShowOfficeHours) NavigationBarItem(
+					icon = {
+						Icon(
+							painterResource(
+								id = if (isCurrentRoute(AppRoutes.InfoCenter.OfficeHours))
+									R.drawable.infocenter_officehours_active
+								else
+									R.drawable.infocenter_officehours
+							), contentDescription = null
+						)
+					},
+					label = { Text(stringResource(id = R.string.menu_infocenter_officehours)) },
+					selected = isCurrentRoute(AppRoutes.InfoCenter.OfficeHours),
+					onClick = navigate(AppRoutes.InfoCenter.OfficeHours)
+				)
 			}
 		}
 	}
 
 	AnimatedVisibility(
-		visible = absenceFilterDialog,
-		enter = fullscreenDialogAnimationEnter(),
-		exit = fullscreenDialogAnimationExit()
+		visible = absenceFilterDialog, enter = fullscreenDialogAnimationEnter(), exit = fullscreenDialogAnimationExit()
 	) {
 		AbsenceFilterDialog(viewModel.userSettingsRepository) {
 			absenceFilterDialog = false

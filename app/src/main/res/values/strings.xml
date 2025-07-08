@@ -70,6 +70,7 @@
     <string name="errormessagedictionary_server_webuntis_not_installed">The specified Server doesn\'t have WebUntis installed!</string>
     <string name="errormessagedictionary_too_many_results">Too many results</string>
     <string name="errormessagedictionary_user_locked">User locked!</string>
+    <string name="errormessagedictionary_second_factor_requried">2FA token required.</string>
     <string name="errors_button_dismiss">Dismiss all</string>
     <string name="errors_button_report">Report all</string>
     <string name="errors_crash_message">Sorry for that.</string>
@@ -146,6 +147,7 @@
     <string name="logindatainput_error_invalid_url">Invalid URL!</string>
     <string name="logindatainput_key">Key or Password</string>
     <string name="logindatainput_key_saved">Key or Password (saved)</string>
+    <string name="logindatainput_2fa">Two-Factor Authentication</string>
     <string name="logindatainput_loading_user_data">Loading user data…</string>
     <string name="logindatainput_login">Login</string>
     <string name="logindatainput_profilename">Profile name (optional)</string>
@@ -190,7 +192,9 @@
     <string name="notifications_channel_backgrounderrors_desc">Shows error messages of background tasks</string>
     <string name="notifications_channel_breakinfo">Break info</string>
     <string name="notifications_channel_breakinfo_desc">Shows information about the current break and the following lesson</string>
-    <string name="notifications_text_error_message">You won\'t get any notifications today.</string>
+	<string name="notifications_channel_firstlesson">First lesson</string>
+	<string name="notifications_channel_firstlesson_desc">Shows information about the first lesson and daily messages</string>
+	<string name="notifications_text_error_message">You won\'t get any notifications today.</string>
     <string name="notifications_text_error_title">Failed to load timetable</string>
     <string name="notifications_text_first_title">School starts at %1$s</string>
     <string name="notifications_text_message_classes">Class: %1$s</string>
@@ -199,6 +203,8 @@
     <string name="notifications_text_message_subjects">Next lesson: %1$s</string>
     <string name="notifications_text_message_teachers">Teacher: %1$s</string>
     <string name="notifications_text_title">Break until %1$s</string>
+    <string name="notifications_text_motd_title">Today\'s school messages</string>
+    <string name="notifications_text_motd_message">%1$d messages</string>
     <string name="preference_automute_cancelled_lessons">Also mute in cancelled lessons</string>
     <string name="preference_automute_enable">Enable auto-mute</string>
     <string name="preference_automute_enable_summary">Automatically turns on Do Not Disturb during lessons</string>
@@ -232,7 +238,7 @@
     <string name="preference_connectivity_proxy_host">Proxy server host</string>
     <string name="preference_connectivity_refresh_in_background">Always refresh timetable</string>
     <string name="preference_connectivity_refresh_in_background_desc">Disable to save data with less frequent timetable updates</string>
-    <string name="preference_dark_theme">Dark theme</string>
+    <string name="preference_dark_theme">Dark mode</string>
     <string name="preference_dark_theme_auto">Follow system</string>
     <string name="preference_dark_theme_off">Always off</string>
     <string name="preference_dark_theme_oled">Use total black background</string>
@@ -313,10 +319,15 @@
     <string name="preference_week_snap_to_days_summary">instead of weeks</string>
     <string name="preferences_connectivity">Connectivity</string>
     <string name="preferences_general">General</string>
+    <string name="preferences_general_summary">Auto-Mute, error reporting</string>
     <string name="preferences_info">About</string>
+    <string name="preferences_info_summary">Version, license, contributors</string>
     <string name="preferences_notifications">Notifications</string>
+    <string name="preferences_notifications_summary">Break notifications, visible fields</string>
     <string name="preferences_styling">Theme</string>
+    <string name="preferences_styling_summary">Colors, dark mode</string>
     <string name="preferences_timetable">Timetable</string>
+    <string name="preferences_timetable_summary">Display options, item appearance</string>
     <string name="preferences_theme_color">Theme color</string>
     <string name="preferences_theme_color_system">System theme color</string>
     <string name="roomfinder_current_hour">%1$s, Lesson %2$s</string>

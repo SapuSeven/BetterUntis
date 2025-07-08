@@ -5,13 +5,11 @@ import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.HttpClientEngineFactory
-import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
@@ -31,11 +29,6 @@ open class ApiClient() {
 				it.install(ContentNegotiation) {
 					json(jsonBlock, contentType = ContentType.Application.Json)
 					json(jsonBlock, contentType = ContentType.Application.JsonRpc)
-				}
-				it.install(HttpRequestRetry) {
-					retryOnServerErrors(maxRetries = 3)
-					retryOnException(maxRetries = 3)
-					exponentialDelay()
 				}
 				httpClientConfig?.invoke(it)
 			}
@@ -71,8 +64,6 @@ open class ApiClient() {
 		get() = ContentType("application", "json-rpc")
 
 	companion object {
-		const val DEFAULT_WEBUNTIS_HOST = "mobile.webuntis.com"
-		const val DEFAULT_WEBUNTIS_PATH = "/ms/app/"
 		const val DEFAULT_SCHOOLSEARCH_URL = "https://schoolsearch.webuntis.com/schoolquery2"
 		val DEFAULT_JSON = Json {
 			ignoreUnknownKeys = true
@@ -81,12 +72,11 @@ open class ApiClient() {
 			prettyPrint = true // TODO only for DEV
 		}
 
-		protected val UNSAFE_HEADERS = listOf(HttpHeaders.ContentType)
-
 		const val METHOD_CREATE_IMMEDIATE_ABSENCE = "createImmediateAbsence2017"
 		const val METHOD_DELETE_ABSENCE = "deleteAbsence2017"
 		const val METHOD_GET_ABSENCES = "getStudentAbsences2017"
 		const val METHOD_GET_APP_SHARED_SECRET = "getAppSharedSecret"
+		const val METHOD_GET_AUTH_TOKEN = "getAuthToken"
 		const val METHOD_GET_EXAMS = "getExams2017"
 		const val METHOD_GET_HOMEWORK = "getHomeWork2017"
 		const val METHOD_GET_MESSAGES = "getMessagesOfDay2017"

@@ -2,7 +2,7 @@ package com.sapuseven.untis.modules
 
 import com.sapuseven.untis.api.model.untis.MessageOfDay
 import com.sapuseven.untis.data.database.entities.RoomEntity
-import com.sapuseven.untis.domain.GetMessagesUseCase
+import com.sapuseven.untis.domain.GetMessagesOfDayUseCase
 import com.sapuseven.untis.domain.GetRoomFinderItemsUseCase
 import com.sapuseven.untis.models.RoomFinderItem
 import dagger.Module
@@ -22,7 +22,7 @@ import javax.inject.Singleton
 class ScreenshotUseCaseModule {
 	@Singleton
 	@Provides
-	fun provideGetMessagesUseCase(): GetMessagesUseCase = object : GetMessagesUseCase {
+	fun provideGetMessagesUseCase(): GetMessagesOfDayUseCase = object : GetMessagesOfDayUseCase {
 		override operator fun invoke(): Flow<Result<List<MessageOfDay>>> = flow {
 			emit(
 				Result.success(

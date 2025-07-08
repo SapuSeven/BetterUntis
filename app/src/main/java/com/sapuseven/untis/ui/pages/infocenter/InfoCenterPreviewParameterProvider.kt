@@ -3,13 +3,19 @@ package com.sapuseven.untis.ui.pages.infocenter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.sapuseven.untis.api.exception.UntisApiException
 import com.sapuseven.untis.api.model.response.Error
+import com.sapuseven.untis.api.model.response.UntisErrorCode
 import com.sapuseven.untis.api.model.untis.Attachment
 import com.sapuseven.untis.api.model.untis.MessageOfDay
+import com.sapuseven.untis.model.rest.Message
 import com.sapuseven.untis.ui.pages.infocenter.PreviewParameterData.messagesOfDay
 import com.sapuseven.untis.ui.pages.infocenter.PreviewParameterData.untisApiException
 
-class InfoCenterPreviewParameterProvider : PreviewParameterProvider<List<MessageOfDay>> {
+class InfoCenterMessagesOfDayPreviewParameterProvider : PreviewParameterProvider<List<MessageOfDay>> {
 	override val values: Sequence<List<MessageOfDay>> = sequenceOf(messagesOfDay)
+}
+
+class InfoCenterMessagesPreviewParameterProvider : PreviewParameterProvider<List<Message>> {
+	override val values: Sequence<List<Message>> = sequenceOf()
 }
 
 private object PreviewParameterData {
@@ -29,7 +35,7 @@ private object PreviewParameterData {
 	// TODO: Move this elsewhere when reusing
 	val untisApiException = UntisApiException(
 		Error(
-			code = 1,
+			code = UntisErrorCode.UNKNOWN,
 			message = "Loading failed: API is not supported during previews"
 		)
 	)

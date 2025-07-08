@@ -1,8 +1,11 @@
 package com.sapuseven.untis.ui.pages.infocenter.fragments
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
@@ -22,6 +25,22 @@ import io.github.fornewid.placeholder.foundation.placeholder
 import io.github.fornewid.placeholder.foundation.shimmer
 import io.github.fornewid.placeholder.material3.color
 import io.github.fornewid.placeholder.material3.shimmerHighlightColor
+
+@Composable
+internal fun CardLoading() {
+	Card(
+		modifier = Modifier
+			.fillMaxWidth()
+			.height(96.dp)
+			.padding(horizontal = 16.dp, vertical = 8.dp)
+			.placeholder(
+				visible = true,
+				color = PlaceholderDefaults.color(),
+				shape = CardDefaults.shape,
+				highlight = PlaceholderHighlight.shimmer(PlaceholderDefaults.shimmerHighlightColor())
+			)
+	) {}
+}
 
 @Composable
 internal fun InfoCenterLoading() {

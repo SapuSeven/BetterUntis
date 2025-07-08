@@ -1,4 +1,4 @@
-package com.sapuseven.untis.ui.widgets
+/*package com.sapuseven.untis.ui.widgets
 
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
@@ -146,3 +146,4 @@ data class WidgetListItemModel(
 	val supportingContent: String,
 	val leadingContent: @Composable ((surfaceColor: ColorProvider, textColor: ColorProvider) -> Unit)?
 )
+*/

@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.api.model.untis.Settings
 import com.sapuseven.untis.api.model.untis.UserData
 import com.sapuseven.untis.api.model.untis.masterdata.TimeGrid
@@ -23,14 +24,13 @@ import com.sapuseven.untis.data.database.entities.TeacherEntity
 import com.sapuseven.untis.data.database.entities.TeachingMethodEntity
 import com.sapuseven.untis.data.database.entities.User
 import com.sapuseven.untis.data.database.entities.UserDao
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 @Database(
-	version = 11,
+	version = 12,
 	entities = [
 		User::class,
 		AbsenceReasonEntity::class,
@@ -50,7 +50,8 @@ import java.time.format.DateTimeFormatter
 	autoMigrations = [
 		AutoMigration(from = 8, to = 9),
 		AutoMigration(from = 9, to = 10),
-		AutoMigration(from = 10, to = 11, spec = MigrationSpec10to11::class)
+		AutoMigration(from = 10, to = 11, spec = MigrationSpec10to11::class),
+		AutoMigration(from = 11, to = 12, spec = MigrationSpec11to12::class)
 	]
 )
 @TypeConverters(UserConverters::class)
@@ -82,6 +83,12 @@ internal class UserConverters {
 
 	@TypeConverter
 	fun decodeUntisSettings(string: String?): Settings? = decode(string)
+
+	@TypeConverter
+	fun encodeUntisSchoolInfo(untisSchoolInfo: SchoolInfo?): String? = encode(untisSchoolInfo)
+
+	@TypeConverter
+	fun decodeUntisSchoolInfo(string: String?): SchoolInfo? = decode(string)
 
 	@TypeConverter
 	fun encodeLongList(intList: List<Long>?): String? = encode(intList)

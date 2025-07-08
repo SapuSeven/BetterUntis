@@ -1,6 +1,5 @@
 package com.sapuseven.untis.ui.pages.login.datainput
 
-import android.net.Uri
 import android.util.Log
 import android.util.Patterns
 import androidx.activity.compose.ManagedActivityResultLauncher
@@ -8,6 +7,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
@@ -17,15 +17,16 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.api.client.SchoolSearchApi
 import com.sapuseven.untis.api.client.UserDataApi
 import com.sapuseven.untis.api.exception.UntisApiException
+import com.sapuseven.untis.api.model.response.UntisErrorCode
 import com.sapuseven.untis.api.model.response.UserDataResult
 import com.sapuseven.untis.api.model.untis.MasterData
 import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.api.model.untis.masterdata.TimeGrid
-import com.sapuseven.untis.data.repository.UserRepository
 import com.sapuseven.untis.data.database.entities.User
+import com.sapuseven.untis.data.database.entities.User.Companion.buildApiUrl
 import com.sapuseven.untis.data.database.entities.UserDao
+import com.sapuseven.untis.data.repository.UserRepository
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
-import com.sapuseven.untis.helpers.ErrorMessageDictionary.ERROR_CODE_TOO_MANY_RESULTS
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON
 import com.sapuseven.untis.services.CodeScanService
 import com.sapuseven.untis.ui.navigation.AppNavigator
@@ -79,12 +80,15 @@ class LoginDataInputViewModel @Inject constructor(
 	var showQrCodeErrorDialog by mutableStateOf(false)
 		private set
 
+	var showSecondFactorInput by mutableStateOf(false)
+		private set
+
 	val showProfileUpdate = args.profileUpdate
 
 	var schoolIdLocked by mutableStateOf(false)
 
-	val schoolIdValid = derivedStateOf {
-		loginData.schoolId.value?.isNotEmpty() ?: false
+	val schoolNameValid = derivedStateOf {
+		loginData.schoolName.value?.isNotEmpty() ?: false
 	}
 
 	val usernameValid = derivedStateOf {
@@ -104,7 +108,7 @@ class LoginDataInputViewModel @Inject constructor(
 	val codeScanResultHandler: (String?) -> Unit = {
 		try {
 			it?.let { loadFromData(it) }
-		} catch (e: Exception) {
+		} catch (_: Exception) {
 			showQrCodeErrorDialog = true
 		}
 	}
@@ -119,7 +123,7 @@ class LoginDataInputViewModel @Inject constructor(
 
 		if (args.demoLogin) {
 			loginData.anonymous.value = true
-			loginData.schoolId.value = "demo"
+			loginData.schoolName.value = "demo"
 			advanced = true
 			loginData.apiUrl.value = DEMO_API_URL
 
@@ -127,7 +131,7 @@ class LoginDataInputViewModel @Inject constructor(
 		}
 
 		schoolInfoFromSearch?.let {
-			loginData.schoolId.value = schoolInfoFromSearch.schoolId.toString()
+			loginData.schoolName.value = schoolInfoFromSearch.loginName
 			schoolIdLocked = true
 		}
 
@@ -144,7 +148,7 @@ class LoginDataInputViewModel @Inject constructor(
 
 	fun onLoginClick() {
 		validate = true
-		if (schoolIdValid.value && usernameValid.value && apiUrlValid.value) {
+		if (schoolNameValid.value && usernameValid.value && apiUrlValid.value) {
 			errorText = null
 			errorTextRaw = null
 			loadData()
@@ -153,11 +157,11 @@ class LoginDataInputViewModel @Inject constructor(
 
 	private fun loadFromData(data: String?) {
 		if (data == null) return
-		val appLinkData = Uri.parse(data)
+		val appLinkData = data.toUri()
 
-		if (appLinkData?.isHierarchical == true && appLinkData.scheme == "untis" && appLinkData.host == "setschool") {
+		if (appLinkData.isHierarchical && appLinkData.scheme == "untis" && appLinkData.host == "setschool") {
 			// Untis-native values
-			loginData.schoolId.value = appLinkData.getQueryParameter("school")
+			loginData.schoolName.value = appLinkData.getQueryParameter("school")
 			loginData.username.value = appLinkData.getQueryParameter("user")
 			loginData.password.value = appLinkData.getQueryParameter("key")
 
@@ -183,12 +187,16 @@ class LoginDataInputViewModel @Inject constructor(
 				return@launch
 			}
 
-			val untisApiUrl = buildUntisApiUrl(schoolInfo)
+			val apiHost = if (advanced) loginData.apiUrl.value.orEmpty() else ""
+			val untisApiUrl = User.buildJsonRpcApiUrl(
+				buildApiUrl(apiHost, schoolInfo),
+				schoolInfo.loginName
+			).toString()
 
 			val appSharedSecret = loadAppSharedSecret(untisApiUrl)
 
 			val userData = loadUserData(untisApiUrl, appSharedSecret)
-			val user = buildUser(untisApiUrl, appSharedSecret, schoolInfo, userData)
+			val user = buildUser(apiHost, appSharedSecret, schoolInfo, userData)
 
 			withContext(Dispatchers.IO) {
 				val userId = saveUser(user, userData.masterData)
@@ -199,11 +207,15 @@ class LoginDataInputViewModel @Inject constructor(
 			}
 		} catch (e: UntisApiException) {
 			Log.e(LoginDataInputViewModel::class.simpleName, "loadData Untis error", e)
+
 			val errorTextRes = ErrorMessageDictionary.getErrorMessageResource(e.error?.code, false)
 			errorText = errorTextRes ?: R.string.errormessagedictionary_generic
-			errorTextRaw = when (e.error?.code) {
-				ERROR_CODE_TOO_MANY_RESULTS -> "Check the school id" // TODO: This is an example. Add detailed descriptions to errormessagedictionary
-				else -> if (errorTextRes == null) e.error?.message else null
+			if (e.error?.code == UntisErrorCode.REQUIRE2_FACTOR_AUTHENTICATION_TOKEN) {
+				showSecondFactorInput = true
+			} else {
+				errorTextRaw = when (e.error?.code) {
+					else -> if (errorTextRes == null) e.error?.message else null
+				}
 			}
 		} catch (e: Exception) {
 			Log.e(LoginDataInputViewModel::class.simpleName, "loadData error", e)
@@ -215,16 +227,17 @@ class LoginDataInputViewModel @Inject constructor(
 	}
 
 	private fun buildUser(
-		untisApiUrl: String,
+		apiHost: String,
 		appSharedSecret: String,
 		schoolInfo: SchoolInfo,
 		userData: UserDataResult
 	): User {
 		val user = User(
 			existingUserId ?: 0,
-			loginData.profileName.value ?: "",
-			untisApiUrl,
-			schoolInfo.schoolId.toString(),
+			loginData.profileName.value.orEmpty(),
+			apiHost,
+			schoolInfo,
+			null,
 			if (loginData.anonymous.value != true) loginData.username.value else null,
 			if (loginData.anonymous.value != true) appSharedSecret else null,
 			loginData.anonymous.value == true,
@@ -248,13 +261,6 @@ class LoginDataInputViewModel @Inject constructor(
 		return userId
 	}
 
-	private fun buildUntisApiUrl(schoolInfo: SchoolInfo): String {
-		return if (advanced && !loginData.apiUrl.value.isNullOrBlank()) loginData.apiUrl.value ?: ""
-		else if (schoolInfo.useMobileServiceUrlAndroid && !schoolInfo.mobileServiceUrl.isNullOrBlank()) schoolInfo.mobileServiceUrl!!
-		else Uri.parse(schoolInfo.serverUrl).buildUpon().appendEncodedPath("jsonrpc_intern.do")
-			.build().toString()
-	}
-
 	private suspend fun loadSchoolInfo(): SchoolInfo? {
 		return schoolInfoFromSearch ?: run {
 			if (advanced && !loginData.apiUrl.value.isNullOrBlank()) SchoolInfo(
@@ -262,24 +268,23 @@ class LoginDataInputViewModel @Inject constructor(
 				useMobileServiceUrlAndroid = true,
 				useMobileServiceUrlIos = true,
 				address = "",
-				displayName = loginData.schoolId.value ?: "",
-				loginName = loginData.schoolId.value ?: "",
-				schoolId = loginData.schoolId.value?.toLongOrNull() ?: 0,
-				serverUrl = loginData.apiUrl.value ?: "",
+				displayName = loginData.schoolName.value.orEmpty(),
+				loginName = loginData.schoolName.value.orEmpty(),
+				schoolId = loginData.schoolName.value?.toLongOrNull() ?: 0,
+				serverUrl = loginData.apiUrl.value.orEmpty(),
 				mobileServiceUrl = loginData.apiUrl.value
 			)
 			else {
-				val school = loginData.schoolId.value ?: ""
+				val school = loginData.schoolName.value.orEmpty()
 				val schoolId = school.toLongOrNull()
 
 				val schoolSearchResult = schoolId?.let {
 					schoolSearchApi.searchSchools(schoolId = it)
-				} ?: schoolSearchApi.searchSchools(search = school)
+				} ?: schoolSearchApi.searchSchools(schoolName = school)
 
 				if (schoolSearchResult.size == 1) schoolSearchResult.schools.first()
 				else
-				// TODO: Show manual selection dialog when more than one results are returned.
-				//       This workaround tries to find a matching school regardless.
+					// Usually, there is only one result, but if there are multiple, we try to find the one that matches the loginName or schoolId
 					schoolSearchResult.schools.find { schoolInfoResult ->
 						schoolInfoResult.schoolId == schoolId || schoolInfoResult.loginName.equals(
 							school,
@@ -301,12 +306,15 @@ class LoginDataInputViewModel @Inject constructor(
 
 		return try {
 			userDataApi.getAppSharedSecret(
-				untisApiUrl, loginData.username.value ?: "", loginData.password.value ?: ""
+				untisApiUrl,
+				loginData.username.value.orEmpty(),
+				loginData.password.value.orEmpty(),
+				loginData.secondFactor.value
 			)
 		} catch (e: UntisApiException) {
-			// If we want to filter for some exceptions and throw others, we can implement it here
-			/*if (e.error?.code != SOME_ERROR_CODE) throw e
-			else */loginData.password.value ?: ""
+			// Throw certain errors, ignore others
+			if (e.error?.code == UntisErrorCode.REQUIRE2_FACTOR_AUTHENTICATION_TOKEN) throw e
+			else loginData.password.value.orEmpty()
 		}
 	}
 
@@ -329,32 +337,33 @@ class LoginDataInputViewModel @Inject constructor(
 	}
 
 	fun selectSchool(it: SchoolInfo) {
-		loginData.schoolId.value = it.schoolId.toString()
+		loginData.schoolName.value = it.loginName
 		searchMode = false
 	}
 
 	class LoginData(
 		initialProfileName: String? = null,
-		initialSchoolId: String? = null,
+		initialSchoolName: String? = null,
 		initialAnonymous: Boolean? = null,
 		initialUsername: String? = null,
 		initialApiUrl: String? = null,
 	) {
 		val profileName = mutableStateOf(initialProfileName)
-		val schoolId = mutableStateOf(initialSchoolId)
+		val schoolName = mutableStateOf(initialSchoolName)
 		val anonymous = mutableStateOf(initialAnonymous)
 		val username = mutableStateOf(initialUsername)
 		val password = mutableStateOf<String?>(null)
+		val secondFactor = mutableStateOf<String?>(null)
 		val apiUrl = mutableStateOf(initialApiUrl)
 		val skipAppSecret = mutableStateOf<Boolean?>(null)
 		var storedPassword: String? = null
 
 		fun loadFromUser(user: User) {
 			profileName.value = user.profileName
-			schoolId.value = user.schoolId
+			schoolName.value = user.schoolId ?: user.schoolInfo?.loginName
 			anonymous.value = user.anonymous
 			username.value = user.user
-			apiUrl.value = user.apiUrl
+			apiUrl.value = user.apiHost
 			storedPassword = user.key
 		}
 	}

@@ -4,10 +4,14 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -27,31 +31,32 @@ fun NavGraphBuilder.settingsNav(
 	navController: NavHostController
 ) {
 	composable<AppRoutes.Settings.Categories>(
-		enterTransition = {
-			slideInHorizontally() { it / 2 } + fadeIn()
-		},
+		enterTransition = { slideInHorizontally { it / 2 } + fadeIn() },
 		exitTransition = { materialSharedAxisXOut(true, 30) },
 		popEnterTransition = { materialSharedAxisXIn(false, 30) },
-		popExitTransition = {
-			slideOutHorizontally() { it / 2 } + fadeOut()
-		},
+		popExitTransition = { slideOutHorizontally { it / 2 } + fadeOut() },
 	) {
 		SettingsScreen(navController = navController, title = null) {
-			PreferenceScreen(
+			Spacer(modifier = Modifier.height(8.dp))
+
+			SettingsCategory(
 				key = AppRoutes.Settings.General,
 				title = { Text(stringResource(id = R.string.preferences_general)) },
+				summary = { Text(stringResource(id = R.string.preferences_general_summary)) },
 				icon = {
 					Icon(
 						painter = painterResource(id = R.drawable.settings_general),
 						contentDescription = null
 					)
 				},
-				navController = navController
+				navController = navController,
+				isFirst = true
 			)
 
-			PreferenceScreen(
+			SettingsCategory(
 				key = AppRoutes.Settings.Styling,
 				title = { Text(stringResource(id = R.string.preferences_styling)) },
+				summary = { Text(stringResource(id = R.string.preferences_styling_summary)) },
 				icon = {
 					Icon(
 						painter = painterResource(id = R.drawable.settings_styling),
@@ -61,9 +66,10 @@ fun NavGraphBuilder.settingsNav(
 				navController = navController
 			)
 
-			PreferenceScreen(
+			SettingsCategory(
 				key = AppRoutes.Settings.Timetable(),
 				title = { Text(stringResource(id = R.string.preferences_timetable)) },
+				summary = { Text(stringResource(id = R.string.preferences_timetable_summary)) },
 				icon = {
 					Icon(
 						painter = painterResource(id = R.drawable.settings_timetable),
@@ -73,9 +79,10 @@ fun NavGraphBuilder.settingsNav(
 				navController = navController
 			)
 
-			PreferenceScreen(
+			SettingsCategory(
 				key = AppRoutes.Settings.Notifications,
 				title = { Text(stringResource(id = R.string.preferences_notifications)) },
+				summary = { Text(stringResource(id = R.string.preferences_notifications_summary)) },
 				icon = {
 					Icon(
 						painter = painterResource(id = R.drawable.settings_notifications),
@@ -85,16 +92,18 @@ fun NavGraphBuilder.settingsNav(
 				navController = navController
 			)
 
-			PreferenceScreen(
+			SettingsCategory(
 				key = AppRoutes.Settings.About,
 				title = { Text(stringResource(id = R.string.preferences_info)) },
+				summary = { Text(stringResource(id = R.string.preferences_info_summary)) },
 				icon = {
 					Icon(
 						painter = painterResource(id = R.drawable.settings_info),
 						contentDescription = null
 					)
 				},
-				navController = navController
+				navController = navController,
+				isLast = true
 			)
 		}
 	}
@@ -104,7 +113,7 @@ fun NavGraphBuilder.settingsNav(
 			navController = navController,
 			title = stringResource(id = R.string.preferences_general)
 		) { viewModel ->
-			SettingsCategoryGeneral(viewModel);
+			SettingsCategoryGeneral(viewModel)
 		}
 	}
 

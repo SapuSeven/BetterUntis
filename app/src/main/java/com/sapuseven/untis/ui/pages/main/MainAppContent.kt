@@ -1,10 +1,16 @@
 package com.sapuseven.untis.ui.pages.main
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -13,15 +19,17 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import com.sapuseven.untis.R
 import com.sapuseven.untis.data.repository.GlobalSettingsRepository
 import com.sapuseven.untis.data.repository.UserRepository
 import com.sapuseven.untis.data.settings.model.DarkTheme
 import com.sapuseven.untis.data.settings.model.UserSettings
 import com.sapuseven.untis.helpers.AppTheme
 import com.sapuseven.untis.helpers.ThemeMode
+import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.ReportsInfoBottomSheet
 import com.sapuseven.untis.ui.navigation.AppNavHost
 import com.sapuseven.untis.ui.navigation.AppNavigator
@@ -37,19 +45,6 @@ fun MainAppContent(
 	settingsFlow: Flow<UserSettings>,
 	navigator: AppNavigator
 ) {
-	// TODO Build a nice loading screen - a skeleton ui perhaps?
-	if (userState is UserRepository.UserState.Loading) {
-		Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-			CircularProgressIndicator()
-		}
-		return
-	}
-
-	// FIXME There is still one big issue with this approach - since the colorScheme is injected into TimetableMapper
-	//  as soon as the Timetable ViewModel is created, and the settings take a while to load, the old colorScheme
-	//  is used for assisted injection.
-	//  Either find a way to dynamically update the colorScheme used for WeekView events,
-	//  or delay the creation of the ViewModel until the settings are loaded.
 	val settings by settingsFlow.collectAsState(initial = UserSettings.getDefaultInstance())
 
 	val darkTheme = when (settings.darkTheme) {
@@ -63,12 +58,36 @@ fun MainAppContent(
 	AppTheme(darkTheme, darkThemeOled, themeColor) {
 		Surface(modifier = Modifier.fillMaxSize()) {
 			when (userState) {
+				is UserRepository.UserState.Loading -> {
+					AppScaffold(
+						topBar = {
+							CenterAlignedTopAppBar(
+								title = { Text(stringResource(id = R.string.app_name)) },
+								navigationIcon = {
+									IconButton(onClick = {}) {
+										Icon(
+											imageVector = Icons.Outlined.Menu,
+											contentDescription = null
+										)
+									}
+								},
+								colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+									containerColor = Color.Transparent,
+									scrolledContainerColor = Color.Transparent
+								)
+							)
+						},
+						modifier = Modifier.safeDrawingPadding()
+					) {}
+				}
+
 				is UserRepository.UserState.NoUsers -> {
 					AppNavHost(
 						navigator = navigator,
 						startDestination = AppRoutes.Login
 					)
 				}
+
 				is UserRepository.UserState.User -> {
 					key(userState.user.id) {
 						AppNavHost(
@@ -87,8 +106,6 @@ fun MainAppContent(
 					}
 					ReportsInfoBottomSheet(globalSettingsRepository, bottomSheetState)
 				}
-				// (UserState.Loading is already handled above)
-				else -> { /* no‐op */ }
 			}
 		}
 	}

@@ -2,9 +2,11 @@ package com.sapuseven.untis.api.client
 
 import com.sapuseven.untis.api.exception.UntisApiException
 import com.sapuseven.untis.api.model.request.AppSharedSecretParams
+import com.sapuseven.untis.api.model.request.AuthTokenParams
 import com.sapuseven.untis.api.model.request.RequestData
 import com.sapuseven.untis.api.model.request.UserDataParams
 import com.sapuseven.untis.api.model.response.AppSharedSecretResponse
+import com.sapuseven.untis.api.model.response.AuthTokenResponse
 import com.sapuseven.untis.api.model.response.UserDataResponse
 import com.sapuseven.untis.api.model.response.UserDataResult
 import com.sapuseven.untis.api.model.untis.Auth
@@ -25,16 +27,32 @@ open class UserDataApi(
 	open suspend fun getAppSharedSecret(
 		apiUrl: String,
 		user: String,
-		password: String
+		password: String,
+		token: String? = null
 	): String {
 		val body = RequestData(
 			method = METHOD_GET_APP_SHARED_SECRET,
-			params = listOf(AppSharedSecretParams(user, password))
+			params = listOf(AppSharedSecretParams(user, password, token))
 		)
 
 		val response: AppSharedSecretResponse = request(apiUrl, body).body()
 
 		return response.result ?: throw UntisApiException(response.error)
+	}
+
+	open suspend fun getAuthToken(
+		apiUrl: String,
+		user: String?,
+		key: String?
+	): String {
+		val body = RequestData(
+			method = METHOD_GET_AUTH_TOKEN,
+			params = listOf(AuthTokenParams(auth = Auth(user, key)))
+		)
+
+		val response: AuthTokenResponse = request(apiUrl, body).body()
+
+		return response.result?.token ?: throw UntisApiException(response.error)
 	}
 
 	open suspend fun getUserData(

@@ -1,0 +1,812 @@
+openapi: 3.0.0
+info:
+  title: Untis Mobile API
+  description: |
+    A reverse-engineered documentation of the Untis REST API.
+  version: 1.0.0
+
+servers:
+  - url: https://{host}.webuntis.com/WebUntis/api/rest
+    variables:
+      host:
+        enum:
+          - achilles
+          - antiope
+          - aoide
+          - arche
+          - asopo
+          - cissa
+          - erato
+          - euterpe
+          - hektor
+          - hepta
+          - herakles
+          - hypate
+          - kalliope
+          - kephiso
+          - klio
+          - melete
+          - melpomene
+          - mese
+          - nete
+          - niobe
+          - terpsichore
+          - thalia
+          - tipo
+          - tritone
+          - urania
+        default: null
+        description: The host of the Untis instance. This list is not exhaustive, no good sources have been found yet.
+
+tags:
+  - name: messages
+    description: Send and receive messages
+  - name: user
+    description: Get information about the user
+
+security:
+  - bearerAuth: []
+
+paths:
+  /view/v1/messages:
+    get:
+      summary: Get a list of received messages
+      operationId: getMessages
+      tags:
+        - messages
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /view/v1/messages/{messageId}:
+    get:
+      summary: Get details of a specific message
+      operationId: getMessage
+      tags:
+        - messages
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          description: The ID of the message to retrieve
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /view/v1/messages/sent:
+    get:
+      summary: Get a list of sent messages
+      operationId: getMessagesSent
+      tags:
+        - messages
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesSentResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /view/v1/messages/drafts:
+    get:
+      summary: Get a list of message drafts
+      operationId: getMessagesDrafts
+      tags:
+        - messages
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesDraftsResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /view/v1/messages/status:
+    get:
+      summary: Get a status summary for messages
+      operationId: getMessagesStatus
+      tags:
+        - messages
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesStatusResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /view/v1/messages/permissions:
+    get:
+      summary: Get message-related permissions
+      operationId: getMessagesPermissions
+      tags:
+        - messages
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesPermissionsResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /view/v1/messages/recipients/static/persons:
+    get:
+      summary: Get static recipient persons
+      operationId: getMessagesRecipientsStaticPersons
+      tags:
+        - messages
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipientsPersonGroup'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /view/v1/mobile/data:
+    get:
+      summary: Get user data
+      operationId: getMobileData
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileDataResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /view/v1/home:
+    get:
+      summary: Get information about the user home page
+      operationId: getHome
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HomeResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /view/v1/profile/user-contact-data:
+    get:
+      summary: Get user contact data
+      operationId: getUserContactData
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserContactData'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update user contact data
+      operationId: updateUserContactData
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: User contact data to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserContactData'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/UserContactData'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          enum:
+            - INTERNAL_ERROR
+            # Other values unknown
+        requestId:
+          type: string
+        traceId:
+          type: string
+        errorMessage:
+          type: string
+
+    MessagesResponse:
+      type: object
+      properties:
+        incomingMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+        readConfirmationMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+
+    MessagesSentResponse:
+      type: object
+      properties:
+        sentMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+
+    MessagesDraftsResponse:
+      type: object
+      properties:
+        draftMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+
+    MessagesStatusResponse:
+      type: object
+      properties:
+        unreadMessagesCount:
+          type: number
+
+    MessagesPermissionsResponse:
+      type: object
+      properties:
+        recipientOptions:
+          type: string
+          enum:
+            - STUDENTS
+            - PARENTS
+            - CUSTOM
+            - REPLY
+            - TEACHER
+            - STAFF
+        allowRequestReadConfirmation:
+          type: boolean
+        recipientSearchMaxResult:
+          type: number
+          example: 100
+        showDraftsTab:
+          type: boolean
+        showSentTab:
+          type: boolean
+        canForbidReplies:
+          type: boolean
+        maxFileSize:
+          type: number
+          example: 7000000
+        maxFileCount:
+          type: number
+          example: 5
+
+    MobileDataResponse:
+      type: object
+      properties:
+        schoolYear:
+          $ref: '#/components/schemas/SchoolYear'
+        tenant:
+          $ref: '#/components/schemas/Tenant'
+        user:
+          $ref: '#/components/schemas/User'
+
+    HomeResponse:
+      type: object
+      properties:
+        schoolname:
+          type: string
+        sections:
+          type: array
+          items:
+            $ref: '#/components/schemas/HomeSection'
+        integrationsSection:
+          type: array
+          items:
+            $ref: '#/components/schemas/HomeIntegrationSection'
+
+    Message:
+      description: |
+        Model can be found in Untis Mobile source:
+        com/untis/mobile/messages/data/model
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          format: int64
+        subject:
+          type: string
+        contentPreview:
+          type: string
+        content:
+          type: string
+        numberOfRecipients:
+          type: integer
+        recipients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recipient'
+        recipientGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recipient'
+        recipientPersons:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recipient'
+        sender:
+          $ref: '#/components/schemas/Sender'
+        sentDateTime:
+          type: string
+          format: date-time
+        allowMessageDeletion:
+          type: boolean
+        hasAttachments:
+          type: boolean
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageAttachment'
+        blobAttachment:
+          $ref: '#/components/schemas/MessageAttachment'
+        storageAttachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageAttachment'
+        isMessageRead:
+          type: boolean
+        isRevoked:
+          type: boolean
+        isReply:
+          type: boolean
+        isReplyAllowed:
+          type: boolean
+        isReplyForbidden:
+          type: boolean
+          description: |
+            Still returned in the API, but not present in the mobile app sources.
+            Likely replaced by `isReplyAllowed`.
+          deprecated: true
+        isReportMessage:
+          type: boolean
+        replyHistory:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+        requestConfirmation:
+          $ref: '#/components/schemas/MessageRequestConfirmation'
+        requestConfirmationStatus:
+          $ref: '#/components/schemas/RequestConfirmationStatus'
+
+    MessageAttachment:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the attachment.
+        attachmentType:
+          $ref: '#/components/schemas/MessageAttachmentType'
+          description: The type of the attachment.
+        name:
+          type: string
+          description: The name of the attachment.
+        fileName:
+          type: string
+          description: The name of the attachment file.
+        attachmentFile:
+          type: string
+          format: binary
+          description: The file associated with the attachment.
+        downloadable:
+          type: boolean
+          description: Indicates if the attachment is downloadable.
+        downloadUrl:
+          type: string
+          description: The URL to download the attachment.
+        driveId:
+          type: string
+          description: The ID of the drive where the attachment is stored.
+
+    MessageAttachmentType:
+      type: string
+      enum:
+        - ONE_DRIVE
+        - STORAGE_ATTACHMENT
+        - BLOB_ATTACHMENT
+
+    MessageRequestConfirmation:
+      type: object
+      properties:
+        allowMessageDeletion:
+          type: boolean
+          description: Indicates if message deletion is allowed.
+        allowSendRequestConfirmation:
+          type: boolean
+          description: Indicates if sending request confirmation is allowed.
+        confirmationDate:
+          type: string
+          format: date-time
+          description: The date of confirmation.
+        confirmerUserDisplayName:
+          type: string
+          description: The display name of the user who confirmed the request.
+        confirmerUserId:
+          type: integer
+          format: int64
+          description: The unique identifier of the user who confirmed the request.
+        isReplyAllowed:
+          type: boolean
+          description: Indicates if replies are allowed for this message.
+
+    RequestConfirmationStatus:
+      type: object
+      properties:
+        totalRequestCount:
+          type: integer
+          description: The total number of requests.
+        confirmedRequestCount:
+          type: integer
+          description: The number of confirmed requests.
+
+    Sender:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+          description: The unique identifier for the user who sent the message.
+        displayName:
+          type: string
+          description: The display name of the sender.
+        imageUrl:
+          type: string
+          description: The URL of the sender's image.
+          nullable: true
+        className:
+          type: string
+          description: The class name of the sender.
+
+    RecipientsPersonGroup:
+      type: object
+      properties:
+        persons:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recipient'
+        type:
+          type: string
+          enum:
+            - CLASS_TEACHERS
+            - TEACHERS
+            - OTHERS
+
+    Recipient:
+      type: object
+      description: A recipient or group of recipients for a message.
+      properties:
+        type:
+          type: string
+          enum:
+            - RECIPIENT
+            - GROUP
+          description: The type of recipient (group vs individual recipient).
+        id:
+          type: integer
+          format: int64
+          description: The unique identifier for the recipient.
+        personId:
+          type: integer
+          format: int64
+          description: The unique identifier for the person associated with the recipient.
+        userId:
+          type: integer
+          format: int64
+          description: The unique identifier for the user associated with the recipient.
+        groupId:
+          type: integer
+          format: int64
+          description: The ID of the group to which the recipient belongs.
+        groupRecipients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recipient'
+          description: A set of recipients in the group.
+        groupSelectedRecipients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recipient'
+          description: A set of selected recipients in the group.
+        imageUrl:
+          type: string
+          description: The URL of the recipient's image.
+          nullable: true
+        className:
+          type: string
+          description: The class name of the recipient.
+        displayName:
+          type: string
+          description: The display name of the recipient.
+        subtitle:
+          type: string
+          description: The subtitle for the recipient.
+        role:
+          type: string
+          enum:
+            - ADMIN
+            - DIRECTORATE
+            - STAFF
+            - TEACHER
+            - STUDENT
+            - PARENT
+            - LEGAL_GUARDIAN
+            - APPRENTICE_REPRESENTATIVE
+            - UNTIS
+            - OTHER
+            - KLASSE
+          description: The role of the recipient.
+        tags:
+          type: array
+          items:
+            type: string
+          description: A list of tags associated with the recipient.
+        selected:
+          type: boolean
+          description: Indicates if the recipient is selected.D
+
+    DateRange:
+      type: object
+      properties:
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+
+    SchoolYear:
+      type: object
+      properties:
+        dateRange:
+          $ref: '#/components/schemas/DateRange'
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          example: '2023/2024'
+
+    Tenant:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        displayName:
+          type: string
+        wuVersion:
+          type: string
+
+    Person:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        displayName:
+          type: string
+        imageUrl:
+          type: string
+          format: uri
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        person:
+          $ref: '#/components/schemas/Person'
+        referencedStudents:
+          type: array
+          # Item type unknown
+          items:
+            type: object
+        locale:
+          type: string
+        departmentId:
+          type: integer
+          format: int64
+        role:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string
+
+    HomeSection:
+      type: object
+      properties:
+        cells:
+          type: array
+          items:
+            $ref: '#/components/schemas/HomeSectionCell'
+
+    HomeSectionCell:
+      type: object
+      properties:
+        badge:
+          $ref: '#/components/schemas/HomeSectionCellBadge'
+        type:
+          type: string
+          enum:
+            - MY_EVENTS
+            - CLASS_TEACHER
+            - PARENTS_DAYS
+            - CONTACT_HOURS
+            - STUDENT_ABSENCES
+            - TEACHER_ABSENCES
+            - SUBSTITUTION_REQUESTS
+            - STUDENT_ABSENCES_ADMINISTRATION
+            - n/a
+
+    HomeSectionCellBadge:
+      type: object
+      nullable: true
+      properties:
+        count:
+          type: number
+
+    HomeIntegrationSection:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        url:
+          type: string
+          format: uri
+        iconName:
+          type: string
+        type:
+          type: string
+          enum:
+            - APP
+            - WEB
+        appId:
+          type: string
+
+    UserContactData:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        telephoneNumber:
+          type: string
+          nullable: true
+        mobileNumber:
+          type: string
+          nullable: true
+        street:
+          type: string
+          nullable: true
+        postCode:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        areContactDetailsWriteable:
+          type: boolean
+        userEmailMissingOrDifferentToMasterData:
+          type: boolean
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer

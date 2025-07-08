@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
@@ -36,23 +37,33 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-sealed class EventColor(
+sealed class EventStyle(
 	private val colorForScheme: (ColorScheme) -> Color,
-	private val textColorForScheme: (ColorScheme) -> Color
+	private val textStyleForScheme: (ColorScheme) -> TextStyle,
+	private var textStyleOverride: TextStyle? = null
 ) {
-	object Debug : EventColor({ Color.Magenta }, { Color.Black }) // Used for debugging to highlight potential issues
-	object Transparent : EventColor({ Color.Transparent }, { it.onSurface })
-	object ThemePrimary : EventColor({ it.primary }, { it.onPrimary })
-	object ThemeSecondary : EventColor({ it.secondary }, { it.onSecondary })
-	object ThemeTertiary : EventColor({ it.tertiary }, { it.onTertiary })
-	object ThemeError : EventColor({ it.error }, { it.onError })
+	object Transparent : EventStyle({ Color.Transparent }, { TextStyle(color = it.onSurface) })
+	object ThemePrimary : EventStyle({ it.primary }, { TextStyle(color = it.onPrimary) })
+	object ThemeSecondary : EventStyle({ it.secondary }, { TextStyle(color = it.onSecondary) })
+	object ThemeTertiary : EventStyle({ it.tertiary }, { TextStyle(color = it.onTertiary) })
+	object ThemeError : EventStyle({ it.error }, { TextStyle(color = it.onError) })
 
-	data class Custom(val color: Color, val textColor: Color? = null) : EventColor(
+	data class Custom(val color: Color, val textStyle: TextStyle? = null) : EventStyle(
 		colorForScheme = { color },
-		textColorForScheme = {
-			textColor ?: if (ColorUtils.calculateLuminance(color.toArgb()) < 0.5) Color.White else Color.Black
+		textStyleForScheme = {
+			textStyle ?: TextStyle(
+				color = if (
+					ColorUtils.calculateContrast(Color.Black.toArgb(), color.toArgb()) >
+					ColorUtils.calculateContrast(Color.White.toArgb(), color.toArgb())
+				) Color.Black else Color.White
+			)
 		}
 	)
+
+	fun withTextStyle(textStyle: TextStyle): EventStyle {
+		textStyleOverride = textStyle
+		return this
+	}
 
 	@Composable
 	fun color() = colorForScheme(MaterialTheme.colorScheme)
@@ -61,14 +72,14 @@ sealed class EventColor(
 	fun pastColor() = color().copy(alpha = color().alpha * .7f)
 
 	@Composable
-	fun textColor() = textColorForScheme(MaterialTheme.colorScheme)
+	fun textStyle() = textStyleForScheme(MaterialTheme.colorScheme) + (textStyleOverride ?: TextStyle())
 }
 
 data class Event<T>(
 	var title: CharSequence,
 	var top: CharSequence = "",
 	var bottom: CharSequence = "",
-	var colorScheme: EventColor,
+	var eventStyle: EventStyle,
 	var start: LocalDateTime,
 	var end: LocalDateTime,
 	val data: T? = null
@@ -80,7 +91,7 @@ data class Event<T>(
 
 data class Holiday(
 	var title: CharSequence,
-	var colorScheme: EventColor,
+	var colorScheme: EventStyle,
 	var start: LocalDate,
 	var end: LocalDate,
 )
@@ -97,9 +108,9 @@ fun <T> WeekViewEvent(
 	val eventStyle = LocalWeekViewEventStyle.current
 	val outerPadding = eventStyle.padding.dp
 
-	val color = event.colorScheme.color()
-	val pastColor = event.colorScheme.pastColor()
-	val textColor = event.colorScheme.textColor()
+	val color = event.eventStyle.color()
+	val pastColor = event.eventStyle.pastColor()
+	val textStyle = event.eventStyle.textStyle()
 
 	val isFullDayEvent = event.data == null
 
@@ -117,9 +128,8 @@ fun <T> WeekViewEvent(
 						color,
 						topLeft = Offset(-outerPadding.toPx(), -outerPadding.toPx()),
 						size = Size(size.width + outerPadding.toPx() * 2, size.height + outerPadding.toPx() * 2),
-						division = ((currentTime.seconds() - event.start.seconds()).toFloat()
-							/ (event.end.seconds() - event.start.seconds()).toFloat())
-							.coerceIn(0f, 1f)
+						division = ((currentTime.seconds() - event.start.seconds()).toFloat() /
+								(event.end.seconds() - event.start.seconds()).toFloat()).coerceIn(0f, 1f)
 					)
 				}
 			}
@@ -133,7 +143,7 @@ fun <T> WeekViewEvent(
 							drawText(
 								textMeasurer,
 								text = event.title.asAnnotatedString(),
-								style = holidayTextStyle.copy(color = textColor),
+								style = holidayTextStyle + textStyle,
 								overflow = TextOverflow.Visible,
 								softWrap = false
 							)
@@ -142,17 +152,19 @@ fun <T> WeekViewEvent(
 				}
 			}
 			.ifNotNull(onClick) {
-				clickable(onClick = it)
+				if (event.data != null) {
+					clickable(onClick = it)
+				} else this
 			}
 			.padding(horizontal = innerPadding)
 	) {
 		if (!isFullDayEvent) {
 			Text(
 				text = event.top.asAnnotatedString(),
-				style = MaterialTheme.typography.bodySmall + eventStyle.lessonInfoStyle,
+				style = MaterialTheme.typography.bodySmall + eventStyle.lessonInfoStyle + textStyle,
 				textAlign = if (eventStyle.lessonInfoCentered) TextAlign.Center else TextAlign.Start,
 				maxLines = 1,
-				color = textColor,
+				overflow = TextOverflow.Ellipsis,
 				modifier = Modifier
 					.fillMaxWidth()
 					.align(Alignment.TopCenter)
@@ -160,19 +172,19 @@ fun <T> WeekViewEvent(
 
 			Text(
 				text = event.title.asAnnotatedString(),
-				style = MaterialTheme.typography.bodyLarge + eventStyle.lessonNameStyle,
+				style = MaterialTheme.typography.bodyLarge + eventStyle.lessonNameStyle + textStyle,
 				textAlign = TextAlign.Center,
 				maxLines = 1,
-				color = textColor,
+				overflow = TextOverflow.Ellipsis,
 				modifier = Modifier.align(Alignment.Center)
 			)
 
 			Text(
 				text = event.bottom.asAnnotatedString(),
-				style = MaterialTheme.typography.bodySmall + eventStyle.lessonInfoStyle,
+				style = MaterialTheme.typography.bodySmall + eventStyle.lessonInfoStyle + textStyle,
 				textAlign = if (eventStyle.lessonInfoCentered) TextAlign.Center else TextAlign.End,
 				maxLines = 1,
-				color = textColor,
+				overflow = TextOverflow.Ellipsis,
 				modifier = Modifier
 					.fillMaxWidth()
 					.align(Alignment.BottomCenter)
@@ -194,7 +206,7 @@ fun EventPreview() {
 		WeekViewEvent(
 			event = Event<Nothing>(
 				title = "Test",
-				colorScheme = EventColor.ThemePrimary,
+				eventStyle = EventStyle.ThemePrimary,
 				start = LocalDateTime.parse("2021-05-18T09:00:00"),
 				end = LocalDateTime.parse("2021-05-18T11:00:00"),
 				top = "This is a",
@@ -220,7 +232,7 @@ fun EventStyledPreview() {
 		WeekViewEvent(
 			event = Event<Nothing>(
 				title = "Styled",
-				colorScheme = EventColor.ThemePrimary,
+				eventStyle = EventStyle.ThemePrimary,
 				start = LocalDateTime.parse("2021-05-18T09:00:00"),
 				end = LocalDateTime.parse("2021-05-18T11:00:00"),
 				top = "This is a",
@@ -238,7 +250,7 @@ fun HolidayEventPreview() {
 		WeekViewEvent(
 			event = Event<Nothing>(
 				title = "Test Holiday",
-				colorScheme = EventColor.Transparent,
+				eventStyle = EventStyle.Transparent,
 				start = LocalDateTime.parse("2021-05-18T00:00:00"),
 				end = LocalDateTime.parse("2021-05-18T23:59:59"),
 			),

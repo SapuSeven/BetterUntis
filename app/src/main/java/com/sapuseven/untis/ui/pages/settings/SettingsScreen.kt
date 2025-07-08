@@ -1,10 +1,12 @@
 package com.sapuseven.untis.ui.pages.settings
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,7 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.sapuseven.untis.R
 import com.sapuseven.untis.ui.common.AppScaffold
-import com.sapuseven.untis.ui.common.VerticalScrollColumn
+import com.sapuseven.untis.ui.functional.bottomInsets
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,55 +34,6 @@ fun SettingsScreen(
 	),
 	content: @Composable (SettingsScreenViewModel) -> Unit
 ) {
-	/*val autoMutePref = dataStorePreferences.automuteEnable
-	val scope = rememberCoroutineScope()
-	val autoMuteSettingsLauncher =
-		rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-			updateAutoMutePref(user, scope, autoMutePref, true)
-		}
-	updateAutoMutePref(user, scope, autoMutePref)
-
-	var dialogScheduleExactAlarms by remember { mutableStateOf(false) }
-
-	val notificationPref = dataStorePreferences.notificationsEnable
-	val notificationSettingsLauncher =
-		rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-			if (canPostNotifications())
-				scope.launch {
-					notificationPref.saveValue(true)
-					enqueueNotificationSetup(user)
-				}
-		}
-	val requestNotificationPermissionLauncher =
-		rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-			if (isGranted)
-				scope.launch {
-					notificationPref.saveValue(true)
-					enqueueNotificationSetup(user)
-				}
-			else
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-					notificationSettingsLauncher.launch(
-						Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-							.putExtra(
-								android.provider.Settings.EXTRA_APP_PACKAGE,
-								BuildConfig.APPLICATION_ID
-							)
-					)
-				}
-		}
-	val alarmSettingsLauncher =
-		rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-			if (canScheduleExactAlarms())
-				scope.launch {
-					notificationPref.saveValue(true)
-					enqueueNotificationSetup(user)
-				}
-		}
-
-	val languageSettingsLauncher =
-		rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}*/
-
 	AppScaffold(
 		topBar = {
 			CenterAlignedTopAppBar(
@@ -93,7 +46,7 @@ fun SettingsScreen(
 				navigationIcon = {
 					IconButton(onClick = { navController.navigateUp() }) {
 						Icon(
-							imageVector = Icons.Outlined.ArrowBack,
+							imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
 							contentDescription = stringResource(id = R.string.all_back)
 						)
 					}
@@ -101,44 +54,14 @@ fun SettingsScreen(
 			)
 		}
 	) { innerPadding ->
-		Box(
+		Column(
 			modifier = Modifier
+				.verticalScroll(rememberScrollState())
                 .padding(innerPadding)
+				.bottomInsets()
                 .fillMaxSize()
 		) {
-			VerticalScrollColumn {
-				content(viewModel)
-			}
+			content(viewModel)
 		}
 	}
-
-	/*if (dialogScheduleExactAlarms)
-		AlertDialog(
-			onDismissRequest = {
-				dialogScheduleExactAlarms = false
-			},
-			title = {
-				Text(text = stringResource(R.string.preference_dialog_permission_alarms_title))
-			},
-			text = {
-				Text(text = stringResource(R.string.preference_dialog_permission_alarms_text))
-			},
-			dismissButton = {
-				TextButton(onClick = {
-					dialogScheduleExactAlarms = false
-				}) {
-					Text(text = stringResource(id = R.string.all_cancel))
-				}
-			},
-			confirmButton = {
-				TextButton(onClick = {
-					dialogScheduleExactAlarms = false
-					alarmSettingsLauncher.launch(
-						Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-					)
-				}) {
-					Text(text = stringResource(R.string.all_dialog_open_settings))
-				}
-			}
-		)*/
 }

@@ -1,8 +1,10 @@
 package com.sapuseven.untis.data.database.entities
 
 import android.content.Context
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import androidx.core.net.toUri
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Embedded
@@ -16,6 +18,7 @@ import androidx.room.Update
 import androidx.room.Upsert
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.model.untis.MasterData
+import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.api.model.untis.Settings
 import com.sapuseven.untis.api.model.untis.UserData
 import com.sapuseven.untis.api.model.untis.masterdata.TimeGrid
@@ -25,8 +28,12 @@ import kotlinx.coroutines.flow.Flow
 data class User(
 	@PrimaryKey(autoGenerate = true) val id: Long,
 	val profileName: String = "",
-	val apiUrl: String,
-	val schoolId: String,
+	val apiHost: String, // When populated before schema version 12, this may be a full URL, not just the host
+	val schoolInfo: SchoolInfo? = null,
+	@Deprecated(
+		"Not populated with schema version 12",
+		ReplaceWith("schoolInfo.schoolId")
+	) val schoolId: String? = null,
 	val user: String? = null,
 	val key: String? = null,
 	val anonymous: Boolean = false,
@@ -36,6 +43,31 @@ data class User(
 	val settings: Settings? = null,
 	val created: Long? = null,
 ) {
+	companion object {
+		fun buildApiUrl(
+			apiHost: String,
+			schoolInfo: SchoolInfo? = null
+		): Uri {
+			val host = apiHost.ifBlank {
+				if (schoolInfo?.useMobileServiceUrlAndroid == true && !schoolInfo.mobileServiceUrl.isNullOrBlank()) schoolInfo.mobileServiceUrl
+				else schoolInfo?.serverUrl
+			}!!.toUri().host
+
+			return Uri.Builder()
+				.scheme("https")
+				.authority(host)
+				.appendPath("WebUntis")
+				.build()
+		}
+
+		fun buildJsonRpcApiUrl(apiUrl: Uri, schoolName: String): Uri {
+			return apiUrl.buildUpon()
+				.appendEncodedPath("jsonrpc_intern.do")
+				.appendQueryParameter("school", schoolName)
+				.build()
+		}
+	}
+
 	fun getDisplayedName(context: Context): String {
 		return when {
 			profileName.isNotBlank() -> profileName
@@ -51,6 +83,27 @@ data class User(
 			anonymous -> stringResource(R.string.all_anonymous)
 			else -> userData.displayName
 		}
+	}
+
+	val apiUrl: Uri by lazy {
+		buildApiUrl(apiHost, schoolInfo)
+	}
+
+	val jsonRpcApiUrl: Uri by lazy {
+		val schoolName = schoolInfo?.loginName ?: apiHost.toUri().getQueryParameter("school") ?: ""
+		buildJsonRpcApiUrl(apiUrl, schoolName)
+	}
+
+	val restApiUrl: Uri by lazy {
+		apiUrl.buildUpon()
+			.appendEncodedPath("api/rest")
+			.build()
+	}
+
+	val restApiAuthUrl: Uri by lazy {
+		apiUrl.buildUpon()
+			.appendEncodedPath("api/mobile/v2")
+			.build()
 	}
 }
 

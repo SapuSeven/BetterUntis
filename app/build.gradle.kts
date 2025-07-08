@@ -39,7 +39,7 @@ android {
 		minSdk = 21
 		targetSdk = 35
 		versionCode = generateVersionCode()
-		versionName = "5.0.0-beta03"
+		versionName = "5.0.0-beta04"
 		vectorDrawables.useSupportLibrary = true
 		testInstrumentationRunner = "com.sapuseven.untis.HiltTestRunner"
 
@@ -193,7 +193,6 @@ dependencies {
 	implementation(libs.androidx.constraintlayout)
 	implementation(libs.androidx.datastore)
 	implementation(libs.androidx.fragment)
-	implementation(libs.androidx.glance)
 	implementation(libs.androidx.hilt.navigation.compose)
 	implementation(libs.androidx.hilt.work)
 	implementation(libs.androidx.lifecycle)

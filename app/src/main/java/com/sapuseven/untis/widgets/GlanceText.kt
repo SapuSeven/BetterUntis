@@ -1,4 +1,4 @@
-package com.sapuseven.untis.widgets
+/*package com.sapuseven.untis.widgets
 
 import androidx.compose.ui.unit.TextUnit
 import androidx.glance.text.FontStyle
@@ -64,3 +64,4 @@ internal fun androidx.compose.ui.text.style.TextDecoration.toGlanceTextDecoratio
 		)
 		else -> TextDecoration.None
 	}
+*/
