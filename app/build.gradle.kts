@@ -38,7 +38,7 @@ android {
 		applicationId = "com.sapuseven.untis"
 		minSdk = 21
 		targetSdk = 35
-		versionCode = generateVersionCode()
+		versionCode = 29198884
 		versionName = "5.0.0-beta04"
 		vectorDrawables.useSupportLibrary = true
 		testInstrumentationRunner = "com.sapuseven.untis.HiltTestRunner"
