@@ -1,0 +1,9 @@
+- Direkte Nachrichtenanzeige im InfoCenter hinzugefügt
+- Unterstützung für die Anmeldung mit 2FA hinzugefügt
+- Benachrichtigung über die Nachricht des Tages hinzugefügt
+- Verbesserte Textformatierung für Ereignisse
+- Verbessertes Design der Einstellungskategorien
+- Anpassungen des Ereignisstils werden jetzt nicht mehr angewendet
+- Behebung des unvorhersehbaren Verhaltens der Datumsauswahl
+- Korrektur der Berechnung des Farbkontrasts von Veranstaltungstext für benutzerdefinierte Farben
+- Behebung des Problems, dass in Stundenplänen keine geeigneten Elementtypen für Nicht-Studenten-Elemente angezeigt werden
