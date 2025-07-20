@@ -406,4 +406,5 @@
     <string name="preferences_styling_summary">Farben, Dunkler Modus</string>
     <string name="preferences_timetable_summary">Anzeigeoptionen, Aussehen der Elemente</string>
     <string name="preferences_general_summary">Automatische Stummschaltung, Fehlermeldungen</string>
+    <string name="errormessagedictionary_second_factor_requried">2FA-Token erforderlich.</string>
 </resources>
