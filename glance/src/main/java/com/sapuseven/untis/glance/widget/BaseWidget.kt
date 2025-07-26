@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.glance.GlanceId
 import androidx.glance.GlanceTheme
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.provideContent
 
 abstract class BaseWidget : GlanceAppWidget() {
@@ -73,6 +74,8 @@ abstract class BaseWidget : GlanceAppWidget() {
 			)
 		)*/
 	}
+
+	suspend fun getGlanceIds(context: Context) = GlanceAppWidgetManager(context).getGlanceIds(this.javaClass)
 
 	/*@Composable
 	fun Content2() {

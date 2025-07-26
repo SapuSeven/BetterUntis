@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:description="@string/timetable_widget_description"
+	android:configure="com.sapuseven.untis.glance.activity.TimetableWidgetConfigActivity"
+    android:initialLayout="@layout/glance_default_loading_layout"
     android:initialKeyguardLayout="@layout/glance_default_loading_layout"
 	android:minWidth="180dp"
 	android:minHeight="180dp"
@@ -8,4 +10,5 @@
 	android:minResizeHeight="80dp"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="0"
-    android:widgetCategory="home_screen" />
+    android:widgetCategory="home_screen|keyguard"
+	android:widgetFeatures="reconfigurable" />

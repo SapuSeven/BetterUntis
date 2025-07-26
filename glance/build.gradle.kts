@@ -30,6 +30,11 @@ android {
 dependencies {
 	implementation(libs.androidx.glance)
 	implementation(libs.androidx.glance.material3)
+	implementation(libs.androidx.activity.compose)
+	implementation(libs.androidx.compose.ui)
+	implementation(libs.androidx.compose.material3)
+	implementation(libs.hilt.android)
 
+	implementation(project(":persistence"))
 	implementation(project(":material-color-utils"))
 }

@@ -22,6 +22,7 @@ class WidgetUpdateWorker @AssistedInject constructor(
 	companion object {
 		private const val LOG_TAG = "WidgetUpdate"
 		private const val TAG_WIDGET_UPDATE_WORK = "WidgetUpdateWork"
+		private const val WORKER_DATA_USER_ID = "UserId"
 
 		fun enqueue(workManager: WorkManager) {
 			workManager.enqueue(
@@ -33,14 +34,14 @@ class WidgetUpdateWorker @AssistedInject constructor(
 	}
 
 	override suspend fun doWork(): Result {
-		/*val userDatabase = UserDatabase.getInstance(applicationContext)
+		val userId = inputData.getLong(WORKER_DATA_USER_ID, -1)
+		//val userSettings = userSettingsRepository.getSettings(userId).first()
 
-		val timeFormatter = DateTimeFormat.forPattern("HH:mm")
+		/*val widget = TimetableWidget()
 
-		GlanceAppWidgetManager(applicationContext).getGlanceIds(TimetableWidget::class.java)
+		widget.getGlanceIds(applicationContext)
 			.forEach { glanceId ->
-				val prefs =
-					TimetableWidget().getAppWidgetState<Preferences>(applicationContext, glanceId)
+				val prefs = widget.getAppWidgetState<Preferences>(applicationContext, glanceId)
 
 				val userId = prefs[longPreferencesKey(PREFERENCE_KEY_LONG_USER)] ?: -1
 				val id = prefs[intPreferencesKey(PREFERENCE_KEY_INT_ELEMENT_ID)] ?: -1
