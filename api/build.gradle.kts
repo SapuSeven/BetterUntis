@@ -4,8 +4,8 @@ import java.util.Locale
 
 plugins {
 	alias(libs.plugins.kotlin.jvm)
-	alias(libs.plugins.openapi.generator)
 	alias(libs.plugins.kotlin.serialization)
+	alias(libs.plugins.openapi.generator)
 }
 
 java {

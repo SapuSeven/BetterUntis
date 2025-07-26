@@ -27,8 +27,8 @@ fun generateVersionCode(): Int {
 val gmsImplementation: Configuration by configurations.creating
 
 android {
-	compileSdk = 35
 	namespace = "com.sapuseven.untis"
+	compileSdk = 35
 
 	androidResources {
 		generateLocaleConfig = true
@@ -276,5 +276,6 @@ dependencies {
 	// end fix
 
 	implementation(project(":api"))
+	implementation(project(":glance"))
 	implementation(project(":material-color-utils"))
 }
