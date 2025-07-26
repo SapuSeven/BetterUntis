@@ -2,4 +2,5 @@
 <resources>
     <string name="timetable_widget_name">Daily Timetable</string>
     <string name="timetable_widget_description">View all lessons for today</string>
+	<string name="widget_loading">Loading data…</string>
 </resources>
