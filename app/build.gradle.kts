@@ -44,10 +44,6 @@ android {
 		testInstrumentationRunner = "com.sapuseven.untis.HiltTestRunner"
 
 		buildConfigField("String", "SENTRY_DSN", "\"https://d3b77222abce4fcfa74fda2185e0f8dc@o1136770.ingest.sentry.io/6188900\"")
-
-		ksp {
-			arg("room.schemaLocation", "$projectDir/schemas")
-		}
 	}
 
 	signingConfigs {
@@ -200,8 +196,6 @@ dependencies {
 	implementation(libs.androidx.navigation.compose)
 	implementation(libs.androidx.preference)
 	implementation(libs.androidx.recyclerview)
-	implementation(libs.androidx.room.ktx)
-	implementation(libs.androidx.room.runtime)
 	implementation(libs.androidx.swiperefreshlayout)
 	implementation(libs.androidx.work)
 	implementation(libs.colormath)
@@ -236,7 +230,6 @@ dependencies {
 
 	coreLibraryDesugaring(libs.desugar.jdk.libs)
 
-	ksp(libs.androidx.room.compiler)
 	ksp(libs.androidx.hilt.compiler)
 	ksp(libs.dagger.compiler)
 	ksp(libs.hilt.compiler)
@@ -259,23 +252,8 @@ dependencies {
 	androidTestImplementation(libs.hilt.android.testing)
 	debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-	// fix for Crash from missing `beginTransactionReadOnly()` method in Room due to sqlite version mismatch
-	// see https://issuetracker.google.com/issues/400483860#comment7
-	implementation("androidx.sqlite:sqlite:2.5.1") {
-		exclude(group = "io.sentry", module = "sentry-android-sqlite")
-	}
-	implementation("androidx.sqlite:sqlite-ktx:2.5.1") {
-		exclude(group = "io.sentry", module = "sentry-android-sqlite")
-	}
-	configurations.configureEach {
-		resolutionStrategy {
-			force("androidx.sqlite:sqlite:2.5.1")
-			force("androidx.sqlite:sqlite-ktx:2.5.1")
-		}
-	}
-	// end fix
-
 	implementation(project(":api"))
 	implementation(project(":glance"))
+	implementation(project(":persistence"))
 	implementation(project(":material-color-utils"))
 }

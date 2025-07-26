@@ -22,10 +22,6 @@ android {
 		viewBinding = true
 	}
 
-	/*composeOptions {
-		kotlinCompilerExtensionVersion = "1.5.15"
-	}*/
-
 	kotlinOptions {
 		jvmTarget = JavaVersion.VERSION_17.toString()
 	}
