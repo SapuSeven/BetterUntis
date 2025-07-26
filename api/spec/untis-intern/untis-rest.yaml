@@ -308,13 +308,34 @@ components:
           type: string
           enum:
             - INTERNAL_ERROR
-            # Other values unknown
+            - VALIDATION_ERROR
+            - NOT_FOUND
+            - NO_CONTENT
+            # Exact values unknown
         requestId:
           type: string
         traceId:
           type: string
         errorMessage:
           type: string
+        validationErrors:
+          description: |
+            This contains a list of several error messages for the request associated with a specific path.
+            If present, it replaces the `errorMessage` field.
+          type: array
+          items:
+            type: object
+            properties:
+              path:
+                description: |
+                  A description of the part of the request that caused the error.
+                  It may be empty if the error is not related to a specific part of the request.
+                type: string
+              errorMessage:
+                type: string
+            required:
+              - path
+              - errorMessage
 
     MessagesResponse:
       type: object

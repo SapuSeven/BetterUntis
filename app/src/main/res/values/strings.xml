@@ -428,4 +428,5 @@
     <string name="preference_reports_enable">Enable automatic error reporting</string>
     <string name="automute_zen_rule_name">School - %1$s</string>
 	<string name="preference_automute_preferences">Auto-mute preferences</string>
+    <string name="infocenter_messages_details_error">Error loading message details</string>
 </resources>

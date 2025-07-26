@@ -19,6 +19,7 @@ import com.sapuseven.untis.ui.pages.infocenter.fragments.EventsUiState
 import com.sapuseven.untis.ui.pages.infocenter.fragments.MessagesUiState
 import com.sapuseven.untis.ui.pages.infocenter.fragments.OfficeHoursUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.sentry.Sentry
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -68,9 +69,13 @@ class InfoCenterViewModel @Inject constructor(
 	val selectedMessage: StateFlow<Message?> = _selectedMessage
 	private val _selectedMessageContent = MutableStateFlow<String?>(null)
 	val selectedMessageContent: StateFlow<String?> = _selectedMessageContent
+	private val _selectedMessageError = MutableStateFlow<String?>(null)
+	val selectedMessageError: StateFlow<String?> = _selectedMessageError
 
 	fun onMessageClicked(message: Message) {
 		_selectedMessage.value = message
+		_selectedMessageContent.value = null
+		_selectedMessageError.value = null
 		viewModelScope.launch {
 			getMessages(message.id)
 				.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
@@ -78,8 +83,9 @@ class InfoCenterViewModel @Inject constructor(
 					result?.fold(
 						onSuccess = { _selectedMessageContent.value = it.content },
 						onFailure = {
-							_selectedMessage.value = null
-						} // TODO: Instead of having `null` as loading, use a sealed class to handle error responses as well.
+							Sentry.captureException(it)
+							_selectedMessageError.value = it.message ?: ""
+						}
 					)
 				}
 		}

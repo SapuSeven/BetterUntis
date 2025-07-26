@@ -8,9 +8,6 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -63,6 +60,8 @@ import com.sapuseven.untis.R
 import com.sapuseven.untis.api.model.untis.Attachment
 import com.sapuseven.untis.api.model.untis.MessageOfDay
 import com.sapuseven.untis.model.rest.Message
+import com.sapuseven.untis.ui.common.MessageBubble
+import com.sapuseven.untis.ui.common.MessageBubbleDefaults
 import com.sapuseven.untis.ui.dialogs.AttachmentsDialog
 import com.sapuseven.untis.ui.pages.infocenter.InfoCenterViewModel
 import io.github.fornewid.placeholder.foundation.PlaceholderDefaults
@@ -83,6 +82,7 @@ fun InfoCenterMessages(viewModel: InfoCenterViewModel = hiltViewModel()) {
 	val uiState by viewModel.messagesState.collectAsStateWithLifecycle()
 	val selectedMessage by viewModel.selectedMessage.collectAsStateWithLifecycle()
 	val selectedMessageContent by viewModel.selectedMessageContent.collectAsStateWithLifecycle()
+	val selectedMessageError by viewModel.selectedMessageError.collectAsStateWithLifecycle()
 
 	var attachmentsDialog by remember { mutableStateOf<List<Attachment>?>(null) }
 
@@ -116,8 +116,7 @@ fun InfoCenterMessages(viewModel: InfoCenterViewModel = hiltViewModel()) {
 												subject = message.subject,
 												body = message.body,
 												attachments = message.attachments,
-												onShowAttachments = { attachmentsDialog = message.attachments },
-											)
+											) { attachmentsDialog = message.attachments }
 										}
 									}
 								}
@@ -143,7 +142,8 @@ fun InfoCenterMessages(viewModel: InfoCenterViewModel = hiltViewModel()) {
 													.sharedBounds(
 														sharedContentState = rememberSharedContentState(key = "${message.id}-bounds"),
 														animatedVisibilityScope = this@AnimatedVisibility,
-														clipInOverlayDuringTransition = OverlayClip(CardDefaults.shape)
+														clipInOverlayDuringTransition = OverlayClip(CardDefaults.shape),
+														resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds
 													)
 													.clip(CardDefaults.shape),
 												onClick = {
@@ -151,11 +151,6 @@ fun InfoCenterMessages(viewModel: InfoCenterViewModel = hiltViewModel()) {
 												}
 											) {
 												MessagePreview(
-													modifier = Modifier
-														.sharedElement(
-															sharedContentState = rememberSharedContentState(key = message.id),
-															animatedVisibilityScope = this@AnimatedVisibility,
-														),
 													subject = message.subject ?: "",
 													body = message.contentPreview ?: "",
 													sender = message.sender?.displayName,
@@ -182,6 +177,7 @@ fun InfoCenterMessages(viewModel: InfoCenterViewModel = hiltViewModel()) {
 			MessageDetails(
 				message = selectedMessage,
 				messageContent = selectedMessageContent,
+				messageError = selectedMessageError,
 				canReply = false, // TODO not yet implemented - selectedMessage?.isReplyAllowed == true,
 				canDelete = false, // TODO not yet implemented - selectedMessage?.allowMessageDeletion == true,
 				onReply = { viewModel.onMessageReply() },
@@ -205,6 +201,7 @@ fun InfoCenterMessages(viewModel: InfoCenterViewModel = hiltViewModel()) {
 private fun SharedTransitionScope.MessageDetails(
 	message: Message?,
 	messageContent: String?,
+	messageError: String?,
 	modifier: Modifier = Modifier,
 	canReply: Boolean = false,
 	canDelete: Boolean = false,
@@ -214,9 +211,6 @@ private fun SharedTransitionScope.MessageDetails(
 	AnimatedContent(
 		modifier = modifier.fillMaxSize(),
 		targetState = message,
-		transitionSpec = {
-			fadeIn() togetherWith fadeOut()
-		},
 		label = "MessageDetails"
 	) { targetMessage ->
 		Box(
@@ -231,40 +225,57 @@ private fun SharedTransitionScope.MessageDetails(
 								.sharedBounds(
 									sharedContentState = rememberSharedContentState(key = "${targetMessage.id}-bounds"),
 									animatedVisibilityScope = this@AnimatedContent,
-									clipInOverlayDuringTransition = OverlayClip(CardDefaults.shape)
+									clipInOverlayDuringTransition = OverlayClip(CardDefaults.shape),
+									resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds
 								)
 								.clip(CardDefaults.shape)
 						) {
 							Column {
 								MessagePreview(
+									subject = targetMessage.subject ?: "",
 									modifier = Modifier
 										.sharedElement(
 											sharedContentState = rememberSharedContentState(key = targetMessage.id),
 											animatedVisibilityScope = this@AnimatedContent,
 										),
-									subject = targetMessage.subject ?: "",
 									sender = targetMessage.sender?.displayName,
 									imageUrl = targetMessage.sender?.imageUrl,
 									time = targetMessage.sentDateTime,
-									read = targetMessage.isMessageRead ?: true,
-									attachments = null
+									read = targetMessage.isMessageRead ?: true
 								)
 
-								Text(
+								MessageBubble(
 									modifier = Modifier
 										.fillMaxWidth()
-										.padding(horizontal = 16.dp)
-										.verticalScroll(rememberScrollState())
-										.placeholder(
-											visible = messageContent == null,
-											color = PlaceholderDefaults.color(),
-											shape = RoundedCornerShape(4.dp),
-											highlight = PlaceholderHighlight.shimmer(
-												PlaceholderDefaults.shimmerHighlightColor()
-											)
-										),
-									text = messageContent ?: ""
+										.padding(horizontal = 16.dp, vertical = 8.dp),
+									icon = {
+										Icon(
+											painter = painterResource(id = R.drawable.all_error),
+											contentDescription = stringResource(id = R.string.all_error)
+										)
+									},
+									colors = MessageBubbleDefaults.errorColors(),
+									messageText = R.string.infocenter_messages_details_error.takeIf { messageError != null },
+									messageTextRaw = messageError
 								)
+
+								AnimatedVisibility(messageError == null) {
+									Text(
+										modifier = Modifier
+											.fillMaxWidth()
+											.padding(horizontal = 16.dp)
+											.verticalScroll(rememberScrollState())
+											.placeholder(
+												visible = messageContent == null && messageError == null,
+												color = PlaceholderDefaults.color(),
+												shape = RoundedCornerShape(4.dp),
+												highlight = PlaceholderHighlight.shimmer(
+													PlaceholderDefaults.shimmerHighlightColor()
+												)
+											),
+										text = messageContent ?: ""
+									)
+								}
 
 								if (canReply || canDelete) {
 									Row(
@@ -318,7 +329,7 @@ private fun SharedTransitionScope.MessageDetails(
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun SharedTransitionScope.MessagePreview(
+private fun MessagePreview(
 	subject: String,
 	modifier: Modifier = Modifier,
 	body: String? = null,
