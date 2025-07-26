@@ -13,8 +13,8 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
-import com.sapuseven.untis.data.database.entities.User
-import com.sapuseven.untis.data.database.entities.UserDao
+import com.sapuseven.untis.persistence.entity.User
+import com.sapuseven.untis.persistence.entity.UserDao
 import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.data.repository.TimetableRepository
 import com.sapuseven.untis.data.repository.UserSettingsRepository

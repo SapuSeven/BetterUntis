@@ -1,14 +1,13 @@
-package com.sapuseven.untis.data.database.entities
+package com.sapuseven.untis.persistence.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import com.sapuseven.untis.api.model.untis.enumeration.ElementType
-import com.sapuseven.untis.api.model.untis.masterdata.EventReason
-import com.sapuseven.untis.data.database.Mapper
+import com.sapuseven.untis.api.model.untis.masterdata.EventReasonGroup
+import com.sapuseven.untis.persistence.utils.EntityMapper
 
 @Entity(
-	tableName = "EventReason",
+	tableName = "EventReasonGroup",
 	primaryKeys = ["id", "userId"],
 	indices = [Index("id"), Index("userId")],
 	foreignKeys = [ForeignKey(
@@ -18,23 +17,19 @@ import com.sapuseven.untis.data.database.Mapper
 		onDelete = ForeignKey.CASCADE
 	)]
 )
-data class EventReasonEntity(
+data class EventReasonGroupEntity(
 	val id: Long,
 	val userId: Long = -1,
 	val name: String,
 	val longName: String,
-	val elementType: ElementType,
-	val groupId: Long,
 	val active: Boolean
 ) {
-	companion object : Mapper<EventReason, EventReasonEntity> {
-		override fun map(from: EventReason, userId: Long) = EventReasonEntity(
+	companion object : EntityMapper<EventReasonGroup, EventReasonGroupEntity> {
+		override fun map(from: EventReasonGroup, userId: Long) = EventReasonGroupEntity(
 			id = from.id,
 			userId = userId,
 			name = from.name,
 			longName = from.longName,
-			elementType = from.elementType,
-			groupId = from.groupId,
 			active = from.active,
 		)
 	}

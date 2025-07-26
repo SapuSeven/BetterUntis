@@ -1,14 +1,14 @@
-package com.sapuseven.untis.data.database.entities
+package com.sapuseven.untis.persistence.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import com.sapuseven.untis.api.model.untis.masterdata.SchoolYear
-import com.sapuseven.untis.data.database.Mapper
+import com.sapuseven.untis.api.model.untis.masterdata.Holiday
+import com.sapuseven.untis.persistence.utils.EntityMapper
 import java.time.LocalDate
 
 @Entity(
-	tableName = "SchoolYear",
+	tableName = "Holiday",
 	primaryKeys = ["id", "userId"],
 	indices = [Index("id"), Index("userId")],
 	foreignKeys = [ForeignKey(
@@ -18,18 +18,20 @@ import java.time.LocalDate
 		onDelete = ForeignKey.CASCADE
 	)]
 )
-data class SchoolYearEntity(
+data class HolidayEntity(
 	val id: Long = 0,
 	val userId: Long = -1,
 	val name: String = "",
-	val startDate: LocalDate,
-	val endDate: LocalDate
+	val longName: String = "",
+	val startDate: LocalDate? = null,
+	val endDate: LocalDate? = null
 ) {
-	companion object : Mapper<SchoolYear, SchoolYearEntity> {
-		override fun map(from: SchoolYear, userId: Long) = SchoolYearEntity(
+	companion object : EntityMapper<Holiday, HolidayEntity> {
+		override fun map(from: Holiday, userId: Long) = HolidayEntity(
 			id = from.id,
 			userId = userId,
 			name = from.name,
+			longName = from.longName,
 			startDate = from.startDate,
 			endDate = from.endDate,
 		)

@@ -1,10 +1,10 @@
-package com.sapuseven.untis.data.database.entities
+package com.sapuseven.untis.persistence.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import com.sapuseven.untis.api.model.untis.masterdata.Klasse
-import com.sapuseven.untis.data.database.Mapper
+import com.sapuseven.untis.persistence.utils.EntityMapper
 import java.time.LocalDate
 
 @Entity(
@@ -31,7 +31,7 @@ data class KlasseEntity(
 	override val active: Boolean = false,
 	val displayable: Boolean = false
 ) : ElementEntity(), Comparable<String> {
-	companion object : Mapper<Klasse, KlasseEntity> {
+	companion object : EntityMapper<Klasse, KlasseEntity> {
 		override fun map(from: Klasse, userId: Long) = KlasseEntity(
 			id = from.id,
 			userId = userId,

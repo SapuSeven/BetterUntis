@@ -1,9 +1,9 @@
 package com.sapuseven.untis.data.repository
 
 import androidx.datastore.core.DataStore
-import com.sapuseven.untis.data.database.entities.User
-import com.sapuseven.untis.data.database.entities.UserDao
 import com.sapuseven.untis.data.settings.model.Settings
+import com.sapuseven.untis.persistence.entity.User
+import com.sapuseven.untis.persistence.entity.UserDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -81,7 +81,7 @@ class UserRepository @Inject constructor(
 	sealed class UserState {
 		data object Loading : UserState()
 		data object NoUsers : UserState()
-		data class User(val user: com.sapuseven.untis.data.database.entities.User) : UserState()
+		data class User(val user: com.sapuseven.untis.persistence.entity.User) : UserState()
 	}
 }
 

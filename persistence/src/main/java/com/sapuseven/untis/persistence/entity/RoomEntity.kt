@@ -1,10 +1,10 @@
-package com.sapuseven.untis.data.database.entities
+package com.sapuseven.untis.persistence.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import com.sapuseven.untis.api.model.untis.masterdata.Room
-import com.sapuseven.untis.data.database.Mapper
+import com.sapuseven.untis.persistence.utils.EntityMapper
 
 @Entity(
 	tableName = "Room",
@@ -28,7 +28,7 @@ data class RoomEntity(
 	override val active: Boolean = false,
 	val displayAllowed: Boolean = false
 ) : ElementEntity(), Comparable<String> {
-	companion object : Mapper<Room, RoomEntity> {
+	companion object : EntityMapper<Room, RoomEntity> {
 		override fun map(from: Room, userId: Long) = RoomEntity(
 			id = from.id,
 			userId = userId,

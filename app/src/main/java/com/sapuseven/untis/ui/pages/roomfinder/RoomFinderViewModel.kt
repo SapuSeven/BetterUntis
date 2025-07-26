@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.data.repository.UserRepository
-import com.sapuseven.untis.data.database.entities.RoomFinderDao
-import com.sapuseven.untis.data.database.entities.RoomFinderEntity
+import com.sapuseven.untis.persistence.entity.RoomFinderDao
+import com.sapuseven.untis.persistence.entity.RoomFinderEntity
 import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.domain.GetRoomFinderItemsUseCase
 import com.sapuseven.untis.models.RoomFinderHour

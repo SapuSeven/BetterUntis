@@ -1,6 +1,7 @@
 plugins {
 	alias(libs.plugins.agp.library)
 	alias(libs.plugins.kotlin.android)
+	alias(libs.plugins.dagger.hilt)
 	alias(libs.plugins.ksp)
 }
 
@@ -27,9 +28,18 @@ android {
 }
 
 dependencies {
+	implementation(libs.androidx.core.ktx)
 	implementation(libs.androidx.room.ktx)
 	implementation(libs.androidx.room.runtime)
+	implementation(libs.kotlinx.serialization.json)
+	implementation(libs.hilt.android)
+	implementation(libs.hilt.compiler)
+	implementation(libs.andrew0000.cache)
+	implementation(libs.sapuseven.protostore)
 
+	implementation(project(":api"))
+
+	ksp(libs.hilt.compiler)
 	ksp(libs.androidx.room.compiler)
 
 	// <editor-fold desc="Fix crash from missing `beginTransactionReadOnly()` method in Room due to sqlite version mismatch">

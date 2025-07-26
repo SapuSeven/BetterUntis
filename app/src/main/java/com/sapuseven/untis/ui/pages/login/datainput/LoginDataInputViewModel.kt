@@ -22,9 +22,9 @@ import com.sapuseven.untis.api.model.response.UserDataResult
 import com.sapuseven.untis.api.model.untis.MasterData
 import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.api.model.untis.masterdata.TimeGrid
-import com.sapuseven.untis.data.database.entities.User
-import com.sapuseven.untis.data.database.entities.User.Companion.buildApiUrl
-import com.sapuseven.untis.data.database.entities.UserDao
+import com.sapuseven.untis.persistence.entity.User
+import com.sapuseven.untis.persistence.entity.User.Companion.buildApiUrl
+import com.sapuseven.untis.persistence.entity.UserDao
 import com.sapuseven.untis.data.repository.UserRepository
 import com.sapuseven.untis.helpers.ErrorMessageDictionary
 import com.sapuseven.untis.helpers.SerializationUtils.getJSON

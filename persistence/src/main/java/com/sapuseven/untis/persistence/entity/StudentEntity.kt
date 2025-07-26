@@ -1,11 +1,10 @@
-package com.sapuseven.untis.data.database.entities
+package com.sapuseven.untis.persistence.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import com.sapuseven.untis.api.model.untis.masterdata.Student
-import com.sapuseven.untis.data.database.Mapper
-import kotlinx.serialization.Transient
+import com.sapuseven.untis.persistence.utils.EntityMapper
 import java.time.LocalDate
 
 @Entity(
@@ -27,7 +26,7 @@ data class StudentEntity(
 	val lastName: String,
 	val birthDate: LocalDate? = null
 ) {
-	companion object : Mapper<Student, StudentEntity> {
+	companion object : EntityMapper<Student, StudentEntity> {
 		override fun map(from: Student, userId: Long) = StudentEntity(
 			id = from.id,
 			userId = userId,

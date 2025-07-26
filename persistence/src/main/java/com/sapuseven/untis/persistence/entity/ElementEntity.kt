@@ -1,4 +1,4 @@
-package com.sapuseven.untis.data.database.entities
+package com.sapuseven.untis.persistence.entity
 
 abstract class ElementEntity {
 	abstract val id: Long

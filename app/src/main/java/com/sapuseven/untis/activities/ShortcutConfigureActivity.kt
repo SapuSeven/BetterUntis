@@ -18,8 +18,8 @@ import androidx.core.content.pm.ShortcutManagerCompat.createShortcutResultIntent
 import androidx.core.graphics.drawable.IconCompat
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
-import com.sapuseven.untis.data.database.entities.User
-import com.sapuseven.untis.data.database.entities.UserDao
+import com.sapuseven.untis.persistence.entity.User
+import com.sapuseven.untis.persistence.entity.UserDao
 import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.helpers.AppTheme
 import com.sapuseven.untis.ui.common.ProfileSelectorAction

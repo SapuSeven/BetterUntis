@@ -11,7 +11,7 @@ import androidx.annotation.RequiresApi
 import com.sapuseven.untis.BuildConfig
 import com.sapuseven.untis.R
 import com.sapuseven.untis.activities.AutoMuteConfigurationActivity
-import com.sapuseven.untis.data.database.entities.User
+import com.sapuseven.untis.persistence.entity.User
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 

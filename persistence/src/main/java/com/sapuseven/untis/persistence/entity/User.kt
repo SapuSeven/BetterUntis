@@ -1,9 +1,7 @@
-package com.sapuseven.untis.data.database.entities
+package com.sapuseven.untis.persistence.entity
 
 import android.content.Context
 import android.net.Uri
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import androidx.room.Dao
 import androidx.room.Delete
@@ -16,7 +14,6 @@ import androidx.room.Relation
 import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
-import com.sapuseven.untis.R
 import com.sapuseven.untis.api.model.untis.MasterData
 import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.api.model.untis.Settings
@@ -48,6 +45,7 @@ data class User(
 			apiHost: String,
 			schoolInfo: SchoolInfo? = null
 		): Uri {
+
 			val host = apiHost.ifBlank {
 				if (schoolInfo?.useMobileServiceUrlAndroid == true && !schoolInfo.mobileServiceUrl.isNullOrBlank()) schoolInfo.mobileServiceUrl
 				else schoolInfo?.serverUrl
@@ -68,19 +66,20 @@ data class User(
 		}
 	}
 
+	@Deprecated("TODO")
 	fun getDisplayedName(context: Context): String {
 		return when {
 			profileName.isNotBlank() -> profileName
-			anonymous -> context.getString(R.string.all_anonymous)
+			anonymous -> "(anonymous)"// TODO find a solution without resource strings for context.getString(R.string.all_anonymous)
 			else -> userData.displayName
 		}
 	}
 
-	@Composable
+	@Deprecated("Use getDisplayedName() with context")
 	fun getDisplayedName(): String {
 		return when {
 			profileName.isNotBlank() -> profileName
-			anonymous -> stringResource(R.string.all_anonymous)
+			anonymous -> "(anonymous)"// TODO find a solution without resource strings for stringResource(R.string.all_anonymous)
 			else -> userData.displayName
 		}
 	}

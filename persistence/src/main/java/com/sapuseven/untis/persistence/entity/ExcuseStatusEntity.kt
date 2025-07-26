@@ -1,13 +1,13 @@
-package com.sapuseven.untis.data.database.entities
+package com.sapuseven.untis.persistence.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import com.sapuseven.untis.api.model.untis.masterdata.EventReasonGroup
-import com.sapuseven.untis.data.database.Mapper
+import com.sapuseven.untis.api.model.untis.masterdata.ExcuseStatus
+import com.sapuseven.untis.persistence.utils.EntityMapper
 
 @Entity(
-	tableName = "EventReasonGroup",
+	tableName = "ExcuseStatus",
 	primaryKeys = ["id", "userId"],
 	indices = [Index("id"), Index("userId")],
 	foreignKeys = [ForeignKey(
@@ -17,19 +17,21 @@ import com.sapuseven.untis.data.database.Mapper
 		onDelete = ForeignKey.CASCADE
 	)]
 )
-data class EventReasonGroupEntity(
+data class ExcuseStatusEntity(
 	val id: Long,
 	val userId: Long = -1,
 	val name: String,
 	val longName: String,
+	val excused: Boolean,
 	val active: Boolean
 ) {
-	companion object : Mapper<EventReasonGroup, EventReasonGroupEntity> {
-		override fun map(from: EventReasonGroup, userId: Long) = EventReasonGroupEntity(
+	companion object : EntityMapper<ExcuseStatus, ExcuseStatusEntity> {
+		override fun map(from: ExcuseStatus, userId: Long) = ExcuseStatusEntity(
 			id = from.id,
 			userId = userId,
 			name = from.name,
 			longName = from.longName,
+			excused = from.excused,
 			active = from.active,
 		)
 	}

@@ -1,7 +1,7 @@
 package com.sapuseven.untis.modules
 
 import com.sapuseven.untis.api.model.untis.MessageOfDay
-import com.sapuseven.untis.data.database.entities.RoomEntity
+import com.sapuseven.untis.persistence.entity.RoomEntity
 import com.sapuseven.untis.domain.GetMessagesOfDayUseCase
 import com.sapuseven.untis.domain.GetRoomFinderItemsUseCase
 import com.sapuseven.untis.models.RoomFinderItem

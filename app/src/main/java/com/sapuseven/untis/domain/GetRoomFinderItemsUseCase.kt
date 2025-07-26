@@ -3,12 +3,12 @@ package com.sapuseven.untis.domain
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.enumeration.PeriodState
 import com.sapuseven.untis.api.model.untis.timetable.Period
-import com.sapuseven.untis.data.repository.UserRepository
-import com.sapuseven.untis.data.database.entities.RoomEntity
-import com.sapuseven.untis.data.database.entities.RoomFinderDao
 import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.data.repository.TimetableRepository
+import com.sapuseven.untis.data.repository.UserRepository
 import com.sapuseven.untis.models.RoomFinderItem
+import com.sapuseven.untis.persistence.entity.RoomEntity
+import com.sapuseven.untis.persistence.entity.RoomFinderDao
 import com.sapuseven.untis.services.WeekLogicService
 import crocodile8.universal_cache.FromCache
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -42,7 +42,7 @@ class GetRoomFinderItemsUseCaseImpl @Inject constructor(
 	@OptIn(ExperimentalCoroutinesApi::class)
 	override operator fun invoke(): Flow<List<RoomFinderItem>> = roomFinderDao.getAllByUserId(userRepository.currentUser!!.id)
 		.mapNotNull { roomFinderEntities ->
-			roomFinderEntities?.mapNotNull { roomFinderEntity ->
+			roomFinderEntities.mapNotNull { roomFinderEntity ->
 				rooms.find { it.id == roomFinderEntity.id }
 			}
 		}

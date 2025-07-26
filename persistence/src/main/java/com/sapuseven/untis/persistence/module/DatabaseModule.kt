@@ -1,11 +1,11 @@
-package com.sapuseven.untis.modules
+package com.sapuseven.untis.persistence.module
 
 import android.content.Context
 import androidx.room.Room
-import com.sapuseven.untis.data.database.MIGRATIONS_USER_LEGACY
-import com.sapuseven.untis.data.database.MIGRATION_USER_7_8
-import com.sapuseven.untis.data.database.RoomFinderDatabase
-import com.sapuseven.untis.data.database.UserDatabase
+import com.sapuseven.untis.persistence.database.MIGRATIONS_USER_LEGACY
+import com.sapuseven.untis.persistence.database.MIGRATION_USER_7_8
+import com.sapuseven.untis.persistence.database.RoomFinderDatabase
+import com.sapuseven.untis.persistence.database.UserDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

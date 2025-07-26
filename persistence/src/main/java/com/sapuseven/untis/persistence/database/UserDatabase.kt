@@ -1,4 +1,4 @@
-package com.sapuseven.untis.data.database
+package com.sapuseven.untis.persistence.database
 
 import androidx.room.AutoMigration
 import androidx.room.Database
@@ -9,21 +9,21 @@ import com.sapuseven.untis.api.model.untis.SchoolInfo
 import com.sapuseven.untis.api.model.untis.Settings
 import com.sapuseven.untis.api.model.untis.UserData
 import com.sapuseven.untis.api.model.untis.masterdata.TimeGrid
-import com.sapuseven.untis.data.database.entities.AbsenceReasonEntity
-import com.sapuseven.untis.data.database.entities.DepartmentEntity
-import com.sapuseven.untis.data.database.entities.DutyEntity
-import com.sapuseven.untis.data.database.entities.EventReasonEntity
-import com.sapuseven.untis.data.database.entities.EventReasonGroupEntity
-import com.sapuseven.untis.data.database.entities.ExcuseStatusEntity
-import com.sapuseven.untis.data.database.entities.HolidayEntity
-import com.sapuseven.untis.data.database.entities.KlasseEntity
-import com.sapuseven.untis.data.database.entities.RoomEntity
-import com.sapuseven.untis.data.database.entities.SchoolYearEntity
-import com.sapuseven.untis.data.database.entities.SubjectEntity
-import com.sapuseven.untis.data.database.entities.TeacherEntity
-import com.sapuseven.untis.data.database.entities.TeachingMethodEntity
-import com.sapuseven.untis.data.database.entities.User
-import com.sapuseven.untis.data.database.entities.UserDao
+import com.sapuseven.untis.persistence.entity.AbsenceReasonEntity
+import com.sapuseven.untis.persistence.entity.DepartmentEntity
+import com.sapuseven.untis.persistence.entity.DutyEntity
+import com.sapuseven.untis.persistence.entity.EventReasonEntity
+import com.sapuseven.untis.persistence.entity.EventReasonGroupEntity
+import com.sapuseven.untis.persistence.entity.ExcuseStatusEntity
+import com.sapuseven.untis.persistence.entity.HolidayEntity
+import com.sapuseven.untis.persistence.entity.KlasseEntity
+import com.sapuseven.untis.persistence.entity.RoomEntity
+import com.sapuseven.untis.persistence.entity.SchoolYearEntity
+import com.sapuseven.untis.persistence.entity.SubjectEntity
+import com.sapuseven.untis.persistence.entity.TeacherEntity
+import com.sapuseven.untis.persistence.entity.TeachingMethodEntity
+import com.sapuseven.untis.persistence.entity.User
+import com.sapuseven.untis.persistence.entity.UserDao
 import kotlinx.serialization.json.Json
 import java.time.LocalDate
 import java.time.LocalTime
@@ -104,9 +104,9 @@ internal class UserConverters {
 		date?.let { runCatching { LocalDate.parse(it, DateTimeFormatter.ISO_LOCAL_DATE) }.getOrNull() }
 
 	@TypeConverter
-	fun encodeTime(date: LocalTime?): String? = date?.format(DateTimeFormatter.ISO_LOCAL_TIME)
+	fun encodeTime(time: LocalTime?): String? = time?.format(DateTimeFormatter.ISO_LOCAL_TIME)
 
 	@TypeConverter
-	fun decodeTime(date: String?): LocalTime? =
-		date?.let { runCatching { LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME) }.getOrNull() }
+	fun decodeTime(time: String?): LocalTime? =
+		time?.let { runCatching { LocalTime.parse(it, DateTimeFormatter.ISO_LOCAL_TIME) }.getOrNull() }
 }

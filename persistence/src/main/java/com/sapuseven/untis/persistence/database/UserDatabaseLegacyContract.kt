@@ -1,4 +1,4 @@
-package com.sapuseven.untis.data.database
+package com.sapuseven.untis.persistence.database
 
 import android.provider.BaseColumns
 

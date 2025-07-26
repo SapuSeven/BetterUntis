@@ -1,4 +1,4 @@
-package com.sapuseven.untis.data.database.entities
+package com.sapuseven.untis.persistence.entity
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -28,5 +28,5 @@ interface RoomFinderDao {
 	suspend fun delete(roomFinderEntity: RoomFinderEntity)
 
 	@Query("SELECT * FROM rooms WHERE userId LIKE :userId")
-	fun getAllByUserId(userId: Long): Flow<List<RoomFinderEntity>?>
+	fun getAllByUserId(userId: Long): Flow<List<RoomFinderEntity>>
 }

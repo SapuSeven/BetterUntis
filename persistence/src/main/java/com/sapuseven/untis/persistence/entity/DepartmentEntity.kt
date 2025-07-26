@@ -1,13 +1,13 @@
-package com.sapuseven.untis.data.database.entities
+package com.sapuseven.untis.persistence.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import com.sapuseven.untis.api.model.untis.masterdata.AbsenceReason
-import com.sapuseven.untis.data.database.Mapper
+import com.sapuseven.untis.api.model.untis.masterdata.Department
+import com.sapuseven.untis.persistence.utils.EntityMapper
 
 @Entity(
-	tableName = "AbsenceReason",
+	tableName = "Department",
 	primaryKeys = ["id", "userId"],
 	indices = [Index("id"), Index("userId")],
 	foreignKeys = [ForeignKey(
@@ -17,20 +17,18 @@ import com.sapuseven.untis.data.database.Mapper
 		onDelete = ForeignKey.CASCADE
 	)]
 )
-data class AbsenceReasonEntity(
+data class DepartmentEntity(
 	val id: Long,
 	val userId: Long = -1,
 	val name: String,
-	val longName: String,
-	val active: Boolean
+	val longName: String
 ) {
-	companion object : Mapper<AbsenceReason, AbsenceReasonEntity> {
-		override fun map(from: AbsenceReason, userId: Long) = AbsenceReasonEntity(
+	companion object : EntityMapper<Department, DepartmentEntity> {
+		override fun map(from: Department, userId: Long) = DepartmentEntity(
 			id = from.id,
 			userId = userId,
 			name = from.name,
 			longName = from.longName,
-			active = from.active,
 		)
 	}
 }

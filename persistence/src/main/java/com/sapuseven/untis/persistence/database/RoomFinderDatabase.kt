@@ -1,11 +1,11 @@
-package com.sapuseven.untis.data.database
+package com.sapuseven.untis.persistence.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.sapuseven.untis.data.database.entities.RoomFinderDao
-import com.sapuseven.untis.data.database.entities.RoomFinderEntity
+import com.sapuseven.untis.persistence.entity.RoomFinderDao
+import com.sapuseven.untis.persistence.entity.RoomFinderEntity
 
 
 @Database(

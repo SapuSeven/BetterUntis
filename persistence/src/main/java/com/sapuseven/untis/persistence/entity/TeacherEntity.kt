@@ -1,13 +1,14 @@
-package com.sapuseven.untis.data.database.entities
+package com.sapuseven.untis.persistence.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import com.sapuseven.untis.api.model.untis.masterdata.Subject
-import com.sapuseven.untis.data.database.Mapper
+import com.sapuseven.untis.api.model.untis.masterdata.Teacher
+import com.sapuseven.untis.persistence.utils.EntityMapper
+import java.time.LocalDate
 
 @Entity(
-	tableName = "Subject",
+	tableName = "Teacher",
 	primaryKeys = ["id", "userId"],
 	indices = [Index("id"), Index("userId")],
 	foreignKeys = [ForeignKey(
@@ -17,26 +18,32 @@ import com.sapuseven.untis.data.database.Mapper
 		onDelete = ForeignKey.CASCADE
 	)]
 )
-data class SubjectEntity(
+data class TeacherEntity(
 	override val id: Long = 0,
 	override val userId: Long = -1,
 	override val name: String = "",
-	val longName: String = "",
+	val firstName: String = "",
+	val lastName: String = "",
 	val departmentIds: List<Long> = emptyList(),
 	override val foreColor: String? = null,
 	override val backColor: String? = null,
+	val entryDate: LocalDate? = null,
+	val exitDate: LocalDate? = null,
 	override val active: Boolean = false,
 	val displayAllowed: Boolean = false
 ) : ElementEntity(), Comparable<String> {
-	companion object : Mapper<Subject, SubjectEntity> {
-		override fun map(from: Subject, userId: Long) = SubjectEntity(
+	companion object : EntityMapper<Teacher, TeacherEntity> {
+		override fun map(from: Teacher, userId: Long) = TeacherEntity(
 			id = from.id,
 			userId = userId,
 			name = from.name,
-			longName = from.longName,
+			firstName = from.firstName,
+			lastName = from.lastName,
 			departmentIds = from.departmentIds,
 			foreColor = from.foreColor,
 			backColor = from.backColor,
+			entryDate = from.entryDate,
+			exitDate = from.exitDate,
 			active = from.active,
 			displayAllowed = from.displayAllowed,
 		)
@@ -44,6 +51,7 @@ data class SubjectEntity(
 
 	override fun compareTo(other: String) = if (
 		name.contains(other, true)
-		|| longName.contains(other, true)
+		|| firstName.contains(other, true)
+		|| lastName.contains(other, true)
 	) 0 else name.compareTo(other)
 }

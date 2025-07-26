@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
-import com.sapuseven.untis.data.database.entities.UserDao
+import com.sapuseven.untis.persistence.entity.UserDao
 import com.sapuseven.untis.data.repository.UserSettingsRepository
 import com.sapuseven.untis.services.AutoMuteService
 import com.sapuseven.untis.services.AutoMuteServiceZenRuleImpl

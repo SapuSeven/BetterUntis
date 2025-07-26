@@ -7,7 +7,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import androidx.work.WorkerParameters
-import com.sapuseven.untis.data.database.entities.UserDao
+import com.sapuseven.untis.persistence.entity.UserDao
 import com.sapuseven.untis.data.repository.TimetableRepository
 import com.sapuseven.untis.data.repository.UserSettingsRepository
 import crocodile8.universal_cache.FromCache
