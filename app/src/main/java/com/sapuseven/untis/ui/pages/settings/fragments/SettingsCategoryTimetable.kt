@@ -3,8 +3,10 @@ package com.sapuseven.untis.ui.pages.settings.fragments
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.toRoute
 import com.sapuseven.compose.protostore.ui.preferences.NumericInputPreference
 import com.sapuseven.compose.protostore.ui.preferences.PreferenceGroup
@@ -19,6 +21,7 @@ import kotlin.math.roundToInt
 @Composable
 fun SettingsCategoryTimetable(viewModel: SettingsScreenViewModel) {
 	val args = viewModel.savedStateHandle.toRoute<AppRoutes.Settings.Timetable>()
+	val elements by viewModel.elements.collectAsStateWithLifecycle()
 
 	ElementPickerPreference(
 		title = { Text(stringResource(R.string.preference_timetable_personal_timetable)) },
@@ -31,7 +34,7 @@ fun SettingsCategoryTimetable(viewModel: SettingsScreenViewModel) {
 		settingsRepository = viewModel.userSettingsRepository,
 		value = { it.timetablePersonalTimetable },
 		onValueChange = { timetablePersonalTimetable = it },
-		masterDataRepository = viewModel.masterDataRepository,
+		elements = elements,
 		highlight = args.highlightTitle == R.string.preference_timetable_personal_timetable,
 	)
 

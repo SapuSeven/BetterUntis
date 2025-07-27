@@ -17,6 +17,7 @@ import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.data.settings.model.TimetableElement
+import com.sapuseven.untis.persistence.entity.ElementEntity
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
@@ -33,17 +34,21 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ElementPickerPrefe
 	enabledCondition: (Model) -> Boolean = { true },
 	highlight: Boolean = false,
 	onValueChange: (ModelBuilder.(value: TimetableElement) -> Unit)? = null,
-	masterDataRepository: MasterDataRepository
+	elements: Map<ElementType, List<ElementEntity>>,
 ) {
-	val selectedTypeState: State<ElementType?> = remember { settingsRepository.getSettings().map { value(it).toPeriodElement()?.type } }.collectAsState(initial = null)
+	val selectedTypeState: State<ElementType?> = remember {
+		settingsRepository.getSettings().map { settings ->
+			ElementType.entries.firstOrNull { it.id == value(settings).elementType }
+		}
+	}.collectAsState(initial = null)
 	var showDialog by remember { mutableStateOf(false) }
 
 	Preference(
 		title = title,
 		summary = summary,
 		supportingContent = { currentValue, _ ->
-			currentValue.toPeriodElement()?.let {
-				ElementItem(it, masterDataRepository) { shortName, _, _ ->
+			currentValue.toElementEntity(elements)?.let {
+				ElementItem(it) { shortName, _, _ ->
 					Text(shortName)
 				}
 			}
@@ -61,8 +66,8 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ElementPickerPrefe
 
 	if (showDialog)
 		ElementPickerDialog(
-			masterDataRepository = masterDataRepository,
 			title = title,
+			elements = elements,
 			onDismiss = {
 				showDialog = false
 			},
@@ -84,8 +89,22 @@ fun <Model : MessageLite, ModelBuilder : MessageLite.Builder> ElementPickerPrefe
 fun TimetableElement.toPeriodElement(): PeriodElement? =
 	ElementType.entries.firstOrNull { it.id == elementType }?.let { PeriodElement(it, elementId) }
 
+fun TimetableElement.toElementEntity(elements: Map<ElementType, List<ElementEntity>>): ElementEntity? =
+	elements[ElementType.entries.firstOrNull { it.id == elementType }]?.firstOrNull { it.id == elementId }
+
+fun TimetableElement.toElementEntity(masterDataRepository: MasterDataRepository): ElementEntity? =
+	ElementType.entries.firstOrNull { it.id == elementType }?.let { type ->
+		masterDataRepository.getElement(elementId, type)
+	}
+
 fun PeriodElement.toTimetableElement(): TimetableElement =
 	TimetableElement.newBuilder().apply {
 		elementId = id
 		elementType = type.id
+	}.build()
+
+fun ElementEntity.toTimetableElement(): TimetableElement =
+	TimetableElement.newBuilder().apply {
+		elementId = id
+		elementType = getType().id
 	}.build()

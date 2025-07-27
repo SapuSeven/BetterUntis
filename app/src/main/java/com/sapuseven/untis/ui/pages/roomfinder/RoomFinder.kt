@@ -64,6 +64,8 @@ import java.util.Locale
 fun RoomFinder(
 	viewModel: RoomFinderViewModel = hiltViewModel()
 ) {
+	val elements by viewModel.elements.collectAsStateWithLifecycle()
+
 	val roomList by viewModel.roomList.collectAsStateWithLifecycle()
 	var showElementPicker by rememberSaveable { mutableStateOf(false) }
 
@@ -166,7 +168,7 @@ fun RoomFinder(
 			initialType = ElementType.ROOM,
 			onDismiss = { showElementPicker = false },
 			onMultiSelect = { viewModel.addRooms(it) },
-			masterDataRepository = viewModel.masterDataRepository
+			elements = elements
 		)
 	}
 }

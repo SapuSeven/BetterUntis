@@ -3,14 +3,14 @@ package com.sapuseven.untis.ui.pages.roomfinder
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
-import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
-import com.sapuseven.untis.data.repository.UserRepository
-import com.sapuseven.untis.persistence.entity.RoomFinderDao
-import com.sapuseven.untis.persistence.entity.RoomFinderEntity
 import com.sapuseven.untis.data.repository.MasterDataRepository
+import com.sapuseven.untis.data.repository.UserRepository
 import com.sapuseven.untis.domain.GetRoomFinderItemsUseCase
 import com.sapuseven.untis.models.RoomFinderHour
 import com.sapuseven.untis.models.RoomFinderItem
+import com.sapuseven.untis.persistence.entity.ElementEntity
+import com.sapuseven.untis.persistence.entity.RoomFinderDao
+import com.sapuseven.untis.persistence.entity.RoomFinderEntity
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,6 +35,14 @@ class RoomFinderViewModel @Inject constructor(
 	getRoomFinderItems: GetRoomFinderItemsUseCase
 ) : ViewModel() {
 	private val currentDateTime = LocalDateTime.now(clock)
+
+	val elements: StateFlow<Map<ElementType, List<ElementEntity>>> = masterDataRepository.rooms
+		.map { mapOf(ElementType.ROOM to it) }
+		.stateIn(
+			scope = viewModelScope,
+			started = SharingStarted.WhileSubscribed(5_000),
+			initialValue = emptyMap()
+		)
 
 	private val _hourList = userRepository.userState.map { userState ->
 		(userState as? UserRepository.UserState.User)?.let {
@@ -83,7 +91,7 @@ class RoomFinderViewModel @Inject constructor(
 		navigator.popBackStack()
 	}
 
-	fun addRooms(rooms: List<PeriodElement>) = viewModelScope.launch {
+	fun addRooms(rooms: List<ElementEntity>) = viewModelScope.launch {
 		roomFinderDao.insertAll(*rooms.map { RoomFinderEntity(it.id, userRepository.currentUser!!.id) }.toTypedArray())
 	}
 

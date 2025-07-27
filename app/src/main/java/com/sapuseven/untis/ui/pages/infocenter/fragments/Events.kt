@@ -94,10 +94,10 @@ fun InfoCenterEvents(uiState: EventsUiState) {
 
 @Composable
 private fun ExamItem(item: Exam) {
-	val subject = LocalMasterDataRepository.current.getShortName(
+	val subject = LocalMasterDataRepository.current.getElement(
 		item.subjectId,
 		ElementType.SUBJECT
-	)
+	)!!.getShortName() // TODO handle null case
 	ListItem(
 		overlineContent = {
 			Text(formatExamTime(item.startDateTime, item.endDateTime))

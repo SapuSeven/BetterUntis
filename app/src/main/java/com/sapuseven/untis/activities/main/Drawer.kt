@@ -15,14 +15,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
-import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
+import com.sapuseven.untis.persistence.entity.ElementEntity
 import com.sapuseven.untis.ui.navigation.AppRoutes
 
 
 @Composable
 fun DrawerItems(
 	disableTypeSelection: Boolean = false,
-	displayedElement: PeriodElement? = null,
+	displayedElement: ElementEntity? = null,
 	onTimetableClick: (item: NavItemTimetable) -> Unit,
 	onNavigationClick: (item: NavItemNavigation) -> Unit,
 ) {
@@ -66,7 +66,7 @@ fun DrawerItems(
 		NavigationDrawerItem(
 			icon = { Icon(item.icon, contentDescription = null) },
 			label = { Text(item.label) },
-			selected = !disableTypeSelection && item.elementType == displayedElement?.type,
+			selected = !disableTypeSelection && item.elementType == displayedElement?.getType(),
 			onClick = { onTimetableClick(item) },
 			modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
 		)

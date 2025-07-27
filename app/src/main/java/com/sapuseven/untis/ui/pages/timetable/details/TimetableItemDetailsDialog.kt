@@ -68,6 +68,7 @@ import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
 import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.data.repository.TimetableRepository
 import com.sapuseven.untis.models.PeriodItem
+import com.sapuseven.untis.persistence.entity.ElementEntity
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.ClickableUrlText
 import com.sapuseven.untis.ui.common.DebugTimetableItemDetailsAction
@@ -90,7 +91,7 @@ fun TimetableItemDetailsDialog(
 	timetableRepository: TimetableRepository,
 	masterDataRepository: MasterDataRepository,
 	initialPage: Int = 0,
-	onDismiss: (requestedElement: PeriodElement?) -> Unit
+	onDismiss: (requestedElement: ElementEntity?) -> Unit
 ) {
 	var dismissed by rememberSaveable { mutableStateOf(false) }
 	val pagerState = rememberPagerState(initialPage) { periodItems.size }
@@ -107,7 +108,7 @@ fun TimetableItemDetailsDialog(
 		periodDataMap[it.ttId] = it
 	}
 
-	fun dismiss(requestedElement: PeriodElement? = null) {
+	fun dismiss(requestedElement: ElementEntity? = null) {
 		onDismiss(requestedElement)
 		dismissed = true
 	}
@@ -138,7 +139,11 @@ fun TimetableItemDetailsDialog(
 	AppScaffold(
 		topBar = {
 			CenterAlignedTopAppBar(
-				title = { Text(absenceCheckState.detailedPerson?.fullName() ?: stringResource(id = R.string.all_lesson_details)) },
+				title = {
+					Text(
+						absenceCheckState.detailedPerson?.fullName() ?: stringResource(id = R.string.all_lesson_details)
+					)
+				},
 				navigationIcon = {
 					IconButton(onClick = {
 						if (absenceCheckState.visible)
@@ -258,7 +263,7 @@ private fun TimetableItemDetailsDialogPage(
 	periodItem: PeriodItem,
 	periodData: PeriodData?,
 	error: Throwable? = null,
-	onElementClick: (element: PeriodElement) -> Unit,
+	onElementClick: (element: ElementEntity) -> Unit,
 	onAbsenceCheck: (periodData: PeriodData) -> Unit
 ) {
 	val context = LocalContext.current
@@ -646,12 +651,16 @@ private fun TimetableItemDetailsDialogPage(
 											lessonTopicNew = text
 											lessonTopicEditDialog = null
 										} else {
-											dialogError = StringResourceDescriptor(R.string.errormessagedictionary_generic)
+											dialogError =
+												StringResourceDescriptor(R.string.errormessagedictionary_generic)
 											loading = false
 										}
 									}
 									.onFailure {
-										dialogError = StringResourceDescriptor(R.string.all_api_error_generic, it.message ?: "null")
+										dialogError = StringResourceDescriptor(
+											R.string.all_api_error_generic,
+											it.message ?: "null"
+										)
 										loading = false
 									}
 							}
@@ -702,7 +711,7 @@ private fun MasterDataRepository.TimetableItemDetailsDialogElement(
 	elements: Set<PeriodElement>,
 	icon: (@Composable () -> Unit)? = null,
 	useLongName: Boolean = false,
-	onElementClick: (element: PeriodElement) -> Unit
+	onElementClick: (element: ElementEntity) -> Unit
 ) {
 	if (elements.isNotEmpty())
 		ListItem(
@@ -711,9 +720,12 @@ private fun MasterDataRepository.TimetableItemDetailsDialogElement(
 					modifier = Modifier.horizontalScroll(rememberScrollState()),
 					horizontalArrangement = Arrangement.spacedBy(8.dp)
 				) {
-					elements.forEach { element ->
+					elements.forEach { periodElement ->
+						val element = getElement(periodElement.id, periodElement.type)
+							?: return@forEach // Skip if element not found
+
 						Text(
-							text = if (useLongName) getLongName(element) else getShortName(element),
+							text = if (useLongName) element.getLongName() else element.getShortName(),
 							modifier = Modifier
 								.clip(RoundedCornerShape(50))
 								.clickable {
@@ -722,21 +734,20 @@ private fun MasterDataRepository.TimetableItemDetailsDialogElement(
 								.padding(8.dp)
 						)
 
-						if (element.id != element.orgId)
-							element.copy(id = element.orgId).let { orgElement ->
-								Text(
-									text = if (useLongName) getLongName(orgElement) else getShortName(
-										orgElement
-									),
-									style = LocalTextStyle.current.copy(textDecoration = TextDecoration.LineThrough),
-									modifier = Modifier
-										.clip(RoundedCornerShape(50))
-										.clickable {
-											onElementClick(orgElement)
-										}
-										.padding(8.dp)
-								)
-							}
+						if (periodElement.id != periodElement.orgId) {
+							val orgElement = getElement(periodElement.orgId, periodElement.type) ?: return@forEach
+
+							Text(
+								text = if (useLongName) orgElement.getLongName() else orgElement.getShortName(),
+								style = LocalTextStyle.current.copy(textDecoration = TextDecoration.LineThrough),
+								modifier = Modifier
+									.clip(RoundedCornerShape(50))
+									.clickable {
+										onElementClick(orgElement)
+									}
+									.padding(8.dp)
+							)
+						}
 					}
 				}
 			},

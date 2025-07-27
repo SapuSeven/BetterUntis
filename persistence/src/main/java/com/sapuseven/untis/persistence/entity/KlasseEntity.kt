@@ -3,6 +3,7 @@ package com.sapuseven.untis.persistence.entity
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.masterdata.Klasse
 import com.sapuseven.untis.persistence.utils.EntityMapper
 import java.time.LocalDate
@@ -51,4 +52,12 @@ data class KlasseEntity(
 		name.contains(other, true)
 		|| longName.contains(other, true)
 	) 0 else name.compareTo(other)
+
+	override fun getType() = ElementType.CLASS
+
+	override fun getShortName(default: String) = name
+
+	override fun getLongName(default: String) = longName
+
+	override fun isAllowed() = displayable
 }

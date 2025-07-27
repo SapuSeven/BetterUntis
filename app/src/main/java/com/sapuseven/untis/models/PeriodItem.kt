@@ -58,12 +58,12 @@ class PeriodItem(
 
 	fun getShort(type: ElementType, list: HashSet<PeriodElement> = getListFor(type)) =
 		list.joinToString(ELEMENT_NAME_SEPARATOR) {
-			masterDataRepository?.getShortName(it.id, type) ?: ELEMENT_NAME_UNKNOWN
+			masterDataRepository?.getElement(it.id, type)?.getShortName() ?: ELEMENT_NAME_UNKNOWN
 		}
 
 	fun getLong(type: ElementType, list: HashSet<PeriodElement> = getListFor(type)) =
 		list.joinToString(ELEMENT_NAME_SEPARATOR) {
-			masterDataRepository?.getLongName(it.id, type) ?: ELEMENT_NAME_UNKNOWN
+			masterDataRepository?.getElement(it.id, type)?.getLongName() ?: ELEMENT_NAME_UNKNOWN
 		}
 
 	fun getShortAnnotated(
@@ -74,12 +74,12 @@ class PeriodItem(
 		return buildAnnotatedString {
 			list.forEach {
 				if (length > 0) append(ELEMENT_NAME_SEPARATOR)
-				append(masterDataRepository?.getShortName(it.id, type) ?: ELEMENT_NAME_UNKNOWN)
+				append(masterDataRepository?.getElement(it.id, type)?.getShortName() ?: ELEMENT_NAME_UNKNOWN)
 
 				if (includeOrgIds && it.id != it.orgId && it.orgId != 0L) {
 					append(ELEMENT_NAME_SEPARATOR)
 					withStyle(SpanStyle(textDecoration = TextDecoration.LineThrough)) {
-						append(masterDataRepository?.getShortName(it.orgId, type) ?: ELEMENT_NAME_UNKNOWN)
+						append(masterDataRepository?.getElement(it.orgId, type)?.getShortName() ?: ELEMENT_NAME_UNKNOWN)
 					}
 				}
 			}

@@ -56,8 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.sapuseven.untis.R
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
-import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
-import com.sapuseven.untis.data.repository.MasterDataRepository
+import com.sapuseven.untis.persistence.entity.ElementEntity
 import com.sapuseven.untis.ui.common.AbbreviatedText
 import com.sapuseven.untis.ui.common.AppScaffold
 import com.sapuseven.untis.ui.common.NavigationBarInset
@@ -68,29 +67,23 @@ import com.sapuseven.untis.ui.functional.insetsPaddingValues
 @Composable
 fun ElementPickerDialogFullscreen(
 	title: @Composable () -> Unit,
-	masterDataRepository: MasterDataRepository,
+	elements: Map<ElementType, List<ElementEntity>>,
 	initialType: ElementType? = null,
 	multiSelect: Boolean = false,
 	hideTypeSelection: Boolean = false,
 	hideTypeSelectionPersonal: Boolean = false,
 	onDismiss: (success: Boolean) -> Unit = {},
-	onSelect: (selectedItem: PeriodElement?) -> Unit = {},
-	onMultiSelect: (selectedItems: List<PeriodElement>) -> Unit = {},
+	onSelect: (selectedItem: ElementEntity?) -> Unit = {},
+	onMultiSelect: (selectedItems: List<ElementEntity>) -> Unit = {},
 	additionalActions: (@Composable () -> Unit) = {}
 ) {
 	var selectedType by remember { mutableStateOf(initialType) }
 	var showSearch by remember { mutableStateOf(false) }
 	var search by remember { mutableStateOf("") }
 
-	val items = remember { mutableStateMapOf<PeriodElement, Boolean>() }
-	LaunchedEffect(selectedType) {
-		items.clear()
-		when (selectedType) {
-			ElementType.CLASS -> masterDataRepository.allClasses.value.associateWith { false }.let { items.putAll(it) }
-			ElementType.TEACHER -> masterDataRepository.allTeachers.value.associateWith { false }.let { items.putAll(it) }
-			ElementType.SUBJECT -> masterDataRepository.allSubjects.value.associateWith { false }.let { items.putAll(it) }
-			ElementType.ROOM -> masterDataRepository.allRooms.value.associateWith { false }.let { items.putAll(it) }
-			else -> {}
+	val items = remember(selectedType) {
+		mutableStateMapOf<ElementEntity, Boolean>().apply {
+			elements[selectedType]?.forEach { put(it, false) }
 		}
 	}
 
@@ -197,7 +190,6 @@ fun ElementPickerDialogFullscreen(
 		) {
 			ElementPickerElements(
 				selectedType = selectedType,
-				masterDataRepository = masterDataRepository,
 				multiSelect = multiSelect,
 				onDismiss = onDismiss,
 				onSelect = onSelect,
@@ -223,25 +215,19 @@ fun ElementPickerDialogFullscreen(
 
 @Composable
 fun ElementPickerDialog(
-	masterDataRepository: MasterDataRepository,
 	title: (@Composable () -> Unit)?,
+	elements: Map<ElementType, List<ElementEntity>>,
 	initialType: ElementType? = null,
 	hideTypeSelection: Boolean = false,
 	hideTypeSelectionPersonal: Boolean = false,
 	onDismiss: (success: Boolean) -> Unit = {},
-	onSelect: (selectedItem: PeriodElement?) -> Unit = {}
+	onSelect: (selectedItem: ElementEntity?) -> Unit = {}
 ) {
 	var selectedType by remember { mutableStateOf(initialType) }
 
-	val items = remember { mutableStateMapOf<PeriodElement, Boolean>() }
-	LaunchedEffect(selectedType) {
-		items.clear()
-		when (selectedType) {
-			ElementType.CLASS -> masterDataRepository.allClasses.value.associateWith { false }.let { items.putAll(it) }
-			ElementType.TEACHER -> masterDataRepository.allTeachers.value.associateWith { false }.let { items.putAll(it) }
-			ElementType.SUBJECT -> masterDataRepository.allSubjects.value.associateWith { false }.let { items.putAll(it) }
-			ElementType.ROOM -> masterDataRepository.allRooms.value.associateWith { false }.let { items.putAll(it) }
-			else -> {}
+	val items = remember(selectedType) {
+		mutableStateMapOf<ElementEntity, Boolean>().apply {
+			elements[selectedType]?.forEach { put(it, false) }
 		}
 	}
 
@@ -267,7 +253,6 @@ fun ElementPickerDialog(
 
 				ElementPickerElements(
 					selectedType = selectedType,
-					masterDataRepository = masterDataRepository,
 					onDismiss = onDismiss,
 					onSelect = onSelect,
 					items = items,
@@ -293,12 +278,11 @@ fun ElementPickerDialog(
 @Composable
 fun ElementPickerElements(
 	selectedType: ElementType?,
-	masterDataRepository: MasterDataRepository,
 	multiSelect: Boolean = false,
 	modifier: Modifier,
 	onDismiss: (success: Boolean) -> Unit = {},
-	onSelect: (selectedItem: PeriodElement?) -> Unit = {},
-	items: MutableMap<PeriodElement, Boolean>,
+	onSelect: (selectedItem: ElementEntity?) -> Unit = {},
+	items: MutableMap<ElementEntity, Boolean>,
 	filter: String = "",
 	contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
@@ -317,8 +301,8 @@ fun ElementPickerElements(
 						.map {
 							object {
 								val element = it
-								val name = masterDataRepository.getShortName(it)
-								val enabled = masterDataRepository.isAllowed(it)
+								val name = it.getShortName()
+								val enabled = it.isAllowed()
 							}
 						}
 						.filter { it.name.contains(filter, true) }
@@ -389,7 +373,7 @@ fun ElementPickerTypeSelection(
 	hideTypeSelectionPersonal: Boolean = false,
 	onTypeChange: (ElementType?) -> Unit,
 	onDismiss: (success: Boolean) -> Unit = {},
-	onSelect: (selectedItem: PeriodElement?) -> Unit = {}
+	onSelect: (selectedItem: ElementEntity?) -> Unit = {}
 ) {
 	NavigationBarInset {
 		if (!hideTypeSelectionPersonal)

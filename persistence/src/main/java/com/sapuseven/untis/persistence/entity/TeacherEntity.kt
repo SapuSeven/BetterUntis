@@ -3,6 +3,7 @@ package com.sapuseven.untis.persistence.entity
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
+import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.masterdata.Teacher
 import com.sapuseven.untis.persistence.utils.EntityMapper
 import java.time.LocalDate
@@ -54,4 +55,12 @@ data class TeacherEntity(
 		|| firstName.contains(other, true)
 		|| lastName.contains(other, true)
 	) 0 else name.compareTo(other)
+
+	override fun getType() = ElementType.TEACHER
+
+	override fun getShortName(default: String) = name
+
+	override fun getLongName(default: String) = "$firstName $lastName"
+
+	override fun isAllowed() = displayAllowed
 }

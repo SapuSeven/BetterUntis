@@ -67,29 +67,6 @@
 			</intent-filter>
 		</activity>
 
-		<!-- TODO: Implement
-		<activity
-			android:name=".activities.ShortcutConfigureActivity"
-			android:exported="true"
-			android:icon="@mipmap/ic_shortcut"
-			android:label="@string/widget_timetable_link">
-
-			<intent-filter>
-				<category android:name="android.intent.category.DEFAULT" />
-				<action android:name="android.intent.action.CREATE_SHORTCUT" />
-			</intent-filter>
-		</activity>
-
-		<activity
-			android:name=".activities.ElementPickerWidgetConfigureActivity"
-			android:exported="true"
-			android:label="@string/widget_configuration">
-
-			<intent-filter>
-				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
-			</intent-filter>
-		</activity>-->
-
 		<activity
 			android:name=".activities.AutoMuteConfigurationActivity"
 			android:exported="true">

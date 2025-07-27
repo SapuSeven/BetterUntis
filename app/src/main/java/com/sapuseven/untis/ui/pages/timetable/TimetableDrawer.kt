@@ -41,12 +41,11 @@ import com.sapuseven.untis.activities.main.DrawerItems
 import com.sapuseven.untis.activities.main.DrawerText
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
-import com.sapuseven.untis.data.repository.MasterDataRepository
-import com.sapuseven.untis.data.settings.model.TimetableElement
+import com.sapuseven.untis.persistence.entity.ElementEntity
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationEnter
 import com.sapuseven.untis.ui.animations.fullscreenDialogAnimationExit
 import com.sapuseven.untis.ui.dialogs.ElementPickerDialogFullscreen
-import com.sapuseven.untis.ui.preferences.toPeriodElement
+import com.sapuseven.untis.ui.preferences.toElementEntity
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
@@ -54,9 +53,8 @@ import kotlinx.serialization.json.Json
 fun TimetableDrawer(
 	viewModel: TimetableDrawerViewModel = hiltViewModel(),
 	drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
-	masterDataRepository: MasterDataRepository,
-	displayedElement: PeriodElement? = null,
-	onElementPicked: (PeriodElement?) -> Unit,
+	displayedElement: ElementEntity? = null,
+	onElementPicked: (ElementEntity?) -> Unit,
 	content: @Composable () -> Unit
 ) {
 	val scope = rememberCoroutineScope()
@@ -73,6 +71,8 @@ fun TimetableDrawer(
 			null
 		)
 	}
+
+	val elements by viewModel.elements.collectAsStateWithLifecycle()
 
 	val shortcutLauncher =
 		rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
@@ -142,15 +142,15 @@ fun TimetableDrawer(
 				)
 
 				val bookmarks by viewModel.bookmarks.collectAsStateWithLifecycle()
-				var isBookmarkSelected = bookmarks.mapNotNull(TimetableElement::toPeriodElement).any { bookmark ->
+				val isBookmarkSelected = bookmarks.mapNotNull { it.toElementEntity(elements) }.any { bookmark ->
 					displayedElement?.equals(bookmark) == true
 				}
-				bookmarks.mapNotNull(TimetableElement::toPeriodElement).forEach { bookmark ->
+				bookmarks.mapNotNull { it.toElementEntity(elements) }.forEach { bookmark ->
 					NavigationDrawerItem(
 						icon = {
 							Icon(
 								painter = painterResource(
-									id = when (bookmark.type) {
+									id = when (bookmark.getType()) {
 										ElementType.CLASS -> R.drawable.all_classes
 										ElementType.TEACHER -> R.drawable.all_teachers
 										ElementType.SUBJECT -> R.drawable.all_subject
@@ -176,7 +176,7 @@ fun TimetableDrawer(
 						onClick = {
 							scope.launch {
 								scope.launch { drawerState.close() }
-								viewModel.onBookmarkClick(bookmark);
+								viewModel.onBookmarkClick(bookmark)
 							}
 						},
 						modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -224,7 +224,7 @@ fun TimetableDrawer(
 	) {
 		ElementPickerDialogFullscreen(
 			title = { /*TODO*/ },
-			masterDataRepository = masterDataRepository,
+			elements = elements,
 			onDismiss = { showElementPicker = null },
 			onSelect = { item ->
 				item?.let {
@@ -244,7 +244,7 @@ fun TimetableDrawer(
 	) {
 		ElementPickerDialogFullscreen(
 			title = { /*TODO*/ },
-			masterDataRepository = masterDataRepository,
+			elements = elements,
 			hideTypeSelectionPersonal = true,
 			onDismiss = { bookmarksElementPicker = null },
 			onSelect = { item ->

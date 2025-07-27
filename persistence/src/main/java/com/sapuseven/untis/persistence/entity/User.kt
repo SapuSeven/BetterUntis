@@ -167,6 +167,18 @@ interface UserDao {
 	@Query("SELECT * FROM user WHERE id LIKE :userId")
 	fun getByIdWithDataFlow(userId: Long): Flow<UserWithData?>
 
+	@Query("SELECT * FROM Klasse WHERE userId = :userId AND active = 1 ORDER BY name")
+	fun getActiveClassesFlow(userId: Long): Flow<List<KlasseEntity>>
+
+	@Query("SELECT * FROM Teacher WHERE userId = :userId AND active = 1 ORDER BY name")
+	fun getActiveTeachersFlow(userId: Long): Flow<List<TeacherEntity>>
+
+	@Query("SELECT * FROM Subject WHERE userId = :userId AND active = 1 ORDER BY name")
+	fun getActiveSubjectsFlow(userId: Long): Flow<List<SubjectEntity>>
+
+	@Query("SELECT * FROM Room WHERE userId = :userId AND active = 1 ORDER BY name")
+	fun getActiveRoomsFlow(userId: Long): Flow<List<RoomEntity>>
+
 	@Insert
 	suspend fun insert(user: User): Long
 

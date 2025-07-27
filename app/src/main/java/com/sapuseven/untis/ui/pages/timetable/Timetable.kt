@@ -95,7 +95,6 @@ fun Timetable(
 
 	TimetableDrawer(
 		drawerState = drawerState,
-		masterDataRepository = viewModel.masterDataRepository,
 		displayedElement = viewModel.requestedElement,
 		onElementPicked = {
 			viewModel.showElement(it)

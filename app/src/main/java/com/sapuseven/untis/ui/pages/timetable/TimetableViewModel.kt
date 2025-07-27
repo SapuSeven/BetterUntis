@@ -19,7 +19,6 @@ import com.sapuseven.untis.api.exception.UntisApiException
 import com.sapuseven.untis.api.model.untis.enumeration.ElementType
 import com.sapuseven.untis.api.model.untis.timetable.Period
 import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
-import com.sapuseven.untis.persistence.entity.User
 import com.sapuseven.untis.data.repository.MasterDataRepository
 import com.sapuseven.untis.data.repository.TimetableRepository
 import com.sapuseven.untis.data.repository.UserRepository
@@ -27,6 +26,8 @@ import com.sapuseven.untis.data.repository.UserSettingsRepository
 import com.sapuseven.untis.helpers.BuildConfigFieldsProvider
 import com.sapuseven.untis.mappers.TimetableMapper
 import com.sapuseven.untis.models.PeriodItem
+import com.sapuseven.untis.persistence.entity.ElementEntity
+import com.sapuseven.untis.persistence.entity.User
 import com.sapuseven.untis.services.WeekLogicService
 import com.sapuseven.untis.ui.navigation.AppNavigator
 import com.sapuseven.untis.ui.navigation.AppRoutes
@@ -75,7 +76,7 @@ class TimetableViewModel @Inject constructor(
 ) : ViewModel() {
 	private val args = savedStateHandle.toRoute<AppRoutes.Timetable>()
 
-	val requestedElement = args.getElement()
+	val requestedElement = args.getElement()?.let { masterDataRepository.getElement(it.id, it.type) }
 
 	var profileManagementDialog by mutableStateOf(false)
 	var timetableItemDetailsDialog by mutableStateOf<Pair<List<Event<PeriodItem>>, Int>?>(null)
@@ -244,7 +245,7 @@ class TimetableViewModel @Inject constructor(
 
 	private suspend fun loadEvents(startDate: LocalDate, fromCache: FromCache): Flow<CachedSourceResult<List<Period>>> {
 		// Load the requested element (nav args) or the personal element
-		val elementToLoad = requestedElement ?: _personalElement
+		val elementToLoad = requestedElement?.let { PeriodElement(it.getType(), it.id) } ?: _personalElement
 			.combine(_needsPersonalTimetable) { element, _ -> element } // Emit a value if _personalElement or _needsPersonalTimetable changes
 			.first { it != null || _needsPersonalTimetable.value } // Take the first non-null _personalElement or null if _needsPersonalTimetable
 
@@ -316,13 +317,13 @@ class TimetableViewModel @Inject constructor(
 
 	fun getTitle(context: Context) = requestedElement?.let {
 		if (it == _personalElement.value) null // Use Profile name for personal timetable
-		else masterDataRepository.getLongName(it)
+		else it.getLongName()
 	}
 		?: (currentUser.getDisplayedName(context) + (if (isDebug) " (${currentUser.id})" else ""))
 
-	fun showElement(element: PeriodElement?) {
+	fun showElement(element: ElementEntity?) {
 		if (requestedElement != element)
-			navigator.navigate(AppRoutes.Timetable(element)) {
+			navigator.navigate(AppRoutes.Timetable(element?.let { PeriodElement(it.getType(), it.id) })) {
 				if (element == null) {
 					popUpTo(0)
 				}
@@ -333,7 +334,10 @@ class TimetableViewModel @Inject constructor(
 		startDate: LocalDate,
 		updateLastRefresh: Boolean = true
 	) = collect { result ->
-		val events = timetableMapper.mapTimetablePeriodsToWeekViewEvents(result.value, requestedElement?.type ?: ElementType.STUDENT)
+		val events = timetableMapper.mapTimetablePeriodsToWeekViewEvents(
+			result.value,
+			requestedElement?.getType() ?: ElementType.STUDENT
+		)
 		val refreshTimestamp = result.originTimeStamp?.let { Instant.ofEpochMilli(it) } ?: Instant.now()
 		emitEvents(mapOf(startDate to events))
 		if (updateLastRefresh)

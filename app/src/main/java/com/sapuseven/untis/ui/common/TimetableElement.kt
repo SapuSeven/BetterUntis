@@ -1,13 +1,11 @@
 
 import androidx.compose.runtime.Composable
-import com.sapuseven.untis.api.model.untis.timetable.PeriodElement
-import com.sapuseven.untis.data.repository.MasterDataRepository
+import com.sapuseven.untis.persistence.entity.ElementEntity
 
 @Composable
 fun ElementItem(
-	element: PeriodElement,
-	masterDataRepository: MasterDataRepository,
+	element: ElementEntity,
 	content: @Composable (shortName: String, longName: String, isAllowed: Boolean) -> Unit
 ) {
-	content(masterDataRepository.getShortName(element), masterDataRepository.getLongName(element), masterDataRepository.isAllowed(element))
+	content(element.getShortName(), element.getLongName(), element.isAllowed())
 }
