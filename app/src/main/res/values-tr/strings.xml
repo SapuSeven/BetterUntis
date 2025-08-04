@@ -24,7 +24,7 @@
     <string name="all_failed">başarısız</string>
     <string name="all_success">başarılı</string>
     <string name="app_desc">Untis ajanda sistemi için alternatif bir mobil istemci.</string>
-    <string name="preference_dark_theme">Karanlık tema</string>
+    <string name="preference_dark_theme">Karanlık mod</string>
     <string name="preference_connectivity_refresh_in_background_desc">Az sıklıktaki zaman çizelgesi güncellemeleri için devre dışı bırak</string>
     <string name="preference_connectivity_refresh_in_background">Zaman çizelgesini her zaman yenile</string>
     <string name="preference_connectivity_proxy_host">Vekil sunucu sahibi</string>
@@ -346,4 +346,15 @@
     <string name="roomfinder_error_details">Hata: %1$s.</string>
     <string name="roomfinder_item_desc_free_day">Bu Alan günün geri kalanında boş.</string>
     <string name="roomfinder_item_desc_free_week">Bu Alan haftanın geri kalanında boş.</string>
+    <string name="errormessagedictionary_second_factor_requried">2FA tokeni gereklidir.</string>
+    <string name="logindatainput_2fa">2 faktörlü kimlik doğrulama</string>
+    <string name="notifications_channel_firstlesson">İlk ders</string>
+    <string name="notifications_channel_firstlesson_desc">İlk ders ve günlük mesajlar hakkında bilgi verir</string>
+    <string name="notifications_text_motd_title">Bugünün okul mesajları</string>
+    <string name="notifications_text_motd_message">%1$d mesajları</string>
+    <string name="preferences_general_summary">Otomatik sessize alma, hata raporlanıyor</string>
+    <string name="preferences_info_summary">Sürüm, lisans, katkıda bulunanlar</string>
+    <string name="preferences_notifications_summary">Bildirimleri böl, görünür alanlar</string>
+    <string name="preferences_styling_summary">Renkler, karanlık mod</string>
+    <string name="preferences_timetable_summary">Görüntüleme ayarları, öğe görünümü</string>
 </resources>
