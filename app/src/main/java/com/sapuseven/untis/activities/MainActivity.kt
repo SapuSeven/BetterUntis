@@ -73,6 +73,7 @@ import com.sapuseven.untis.ui.functional.bottomInsets
 import com.sapuseven.untis.ui.functional.insetsPaddingValues
 import com.sapuseven.untis.ui.models.NavItemShortcut
 import com.sapuseven.untis.ui.preferences.convertRangeToPair
+import com.sapuseven.untis.ui.preferences.decodeStoredTimetableValue
 import com.sapuseven.untis.ui.weekview.*
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
