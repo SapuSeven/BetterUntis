@@ -27,7 +27,7 @@ android {
 		minSdkVersion 21
 		targetSdkVersion 33
 		versionCode generateVersionCode()
-		versionName "4.0.3"
+		versionName "4.1.0-beta01"
 		vectorDrawables.useSupportLibrary = true
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -172,8 +172,8 @@ dependencies {
 	implementation "com.google.accompanist:accompanist-pager-indicators:$accompanist_version"
 	implementation "com.google.accompanist:accompanist-flowlayout:$accompanist_version"
     implementation 'androidx.work:work-runtime-ktx:2.7.1'
-	implementation "io.sentry:sentry-android:$sentry_version"
-	implementation "io.sentry:sentry-compose-android:$sentry_version"
+	implementation 'io.sentry:sentry-android:6.33.1'
+	implementation 'io.sentry:sentry-compose-android:6.33.1'
 	implementation 'io.coil-kt:coil-compose:2.2.2'
 	implementation "com.mikepenz:aboutlibraries-core:$aboutlibraries_version"
 	implementation "com.mikepenz:aboutlibraries-compose:$aboutlibraries_version"
@@ -183,8 +183,10 @@ dependencies {
 
 	ksp "androidx.room:room-compiler:$room_version"
 
-	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+	testImplementation "org.junit.jupiter:junit-jupiter-api:$junit_version"
+	testImplementation "org.junit.jupiter:junit-jupiter-params:$junit_version"
+	testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit_version"
+	testRuntimeOnly "org.junit.vintage:junit-vintage-engine:$junit_version"
 
 	testImplementation 'junit:junit:4.13.2'
 	testImplementation 'io.mockk:mockk:1.13.4'

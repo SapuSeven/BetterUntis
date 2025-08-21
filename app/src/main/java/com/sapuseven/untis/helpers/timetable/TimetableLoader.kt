@@ -15,8 +15,15 @@ import com.sapuseven.untis.models.untis.timetable.Period
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.cancel
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.flow.transformWhile
 import org.joda.time.Instant
 import java.lang.ref.WeakReference
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class TimetableLoader(
 	private val context: WeakReference<Context>,
@@ -95,6 +102,32 @@ class TimetableLoader(
 				}
 			}
 		}
+	}
+
+	fun loadFlow(
+		target: TimetableLoaderTarget,
+		proxyHost: String? = null,
+		loadFromServer: Boolean = false,
+		loadFromCache: Boolean = false,
+		loadFromCacheOnly: Boolean = false
+	): Flow<TimetableItems> = flow {
+		requestList.add(target)
+
+		var shouldLoadFromServer = loadFromServer
+
+		if (loadFromCache)
+			loadFromCache(target, requestList.size - 1)?.let {
+				emit(it)
+			} ?: run {
+				shouldLoadFromServer = !loadFromCacheOnly // fall back to server loading
+			}
+
+		if (shouldLoadFromServer)
+			loadFromServerResult(target, requestList.size - 1, proxyHost).fold({
+				emit(it)
+			}, {
+				// TODO: Show error
+			})
 	}
 
 	private fun loadFromCache(
@@ -248,6 +281,122 @@ class TimetableLoader(
 			sendBreadcrumb(target, "network failure local", throwable = e)
 			throw e
 		})
+	}
+
+	private suspend fun loadFromServerResult(
+		target: TimetableLoaderTarget,
+		requestId: Int,
+		proxyHost: String? = null
+	): Result<TimetableItems> {
+		val cache = TimetableCache(context)
+		cache.setTarget(target.startDate, target.endDate, target.id, target.type, user.id)
+
+		query.proxyHost = proxyHost
+
+		val params = TimetableParams(
+			target.id,
+			target.type,
+			target.startDate,
+			target.endDate,
+			user.masterDataTimestamp,
+			0, // TODO: Figure out how timetableTimestamp works
+			emptyList(),
+			if (user.anonymous) UntisAuthentication.createAuthObject() else UntisAuthentication.createAuthObject(
+				user.user,
+				user.key
+			)
+		)
+
+		query.data.id = requestId.toString()
+		query.data.method = UntisApiConstants.METHOD_GET_TIMETABLE
+		query.data.params = listOf(params)
+
+		val request = api.request<TimetableResponse>(query)
+
+		return suspendCoroutine { cont ->
+			request.fold({ untisResponse ->
+				if (untisResponse.result != null) {
+					Log.d(
+						"TimetableLoaderDebug",
+						"target $target (requestId $requestId): network request success, returning"
+					)
+					sendBreadcrumb(target, "network success")
+
+					val items = untisResponse.result.timetable.periods
+					val timestamp = Instant.now().millis
+
+					Log.d(
+						"TimetableLoaderDebug",
+						"target $target (requestId $requestId): saving to cache: $cache"
+					)
+					cache.save(TimetableCache.CacheObject(timestamp, items))
+					sendBreadcrumb(target, "cache save", cache = cache)
+
+					cont.resume(
+						Result.success(
+							TimetableItems(
+								items = items.map {
+									periodToTimegridItem(
+										it,
+										target.type
+									)
+								},
+								startDate = target.startDate,
+								endDate = target.endDate,
+								timestamp = timestamp
+							)
+						)
+					)
+					// TODO: Interpret masterData in the response
+				} else {
+					val e = TimetableLoaderException(
+						requestId,
+						CODE_REQUEST_FAILED,
+						untisResponse.error?.message
+					)
+					Log.d(
+						"TimetableLoaderDebug",
+						"target $target (requestId $requestId): network request failed at Untis API level",
+						e
+					)
+					sendBreadcrumb(
+						target,
+						"network failure api",
+						throwable = e
+					)
+					cont.resume(
+						Result.failure(
+							TimetableLoaderException(
+								requestId,
+								untisResponse.error?.code,
+								untisResponse.error?.message
+							)
+						)
+					)
+				}
+			}, { error ->
+				val e = TimetableLoaderException(
+					requestId,
+					CODE_REQUEST_FAILED,
+					error.message
+				)
+				Log.d(
+					"TimetableLoaderDebug",
+					"target $target (requestId $requestId): network request failed at OS level",
+					e
+				)
+				sendBreadcrumb(target, "network failure local", throwable = e)
+				cont.resume(
+					Result.failure(
+						TimetableLoaderException(
+							requestId,
+							CODE_REQUEST_FAILED,
+							error.message
+						)
+					)
+				)
+			})
+		}
 	}
 
 	/*private fun formatJsonParsingException(e: JsonDecodingException, jsonData: String): String {

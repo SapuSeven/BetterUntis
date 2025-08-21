@@ -73,7 +73,7 @@ import org.joda.time.format.DateTimeFormat
 	ExperimentalAnimationApi::class
 )
 @Composable
-fun BaseComposeActivity.TimetableItemDetailsDialog(
+fun TimetableItemDetailsDialog(
 	timegridItems: List<PeriodData>,
 	initialPage: Int = 0,
 	user: User,
@@ -375,7 +375,7 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 								ListItem(
 									headlineContent = {
 										ClickableUrlText(it.text) {
-											openUrl(it)
+											BaseComposeActivity.openUrl(context, it)
 										}
 									},
 									supportingContent = {
@@ -442,7 +442,7 @@ fun BaseComposeActivity.TimetableItemDetailsDialog(
 									trailingContent = periodData.element.onlinePeriodLink?.let {
 										{
 											IconButton(onClick = {
-												openUrl(it)
+												//openUrl(it) // TODO: Implement
 											}) {
 												Icon(
 													painter = painterResource(id = R.drawable.all_open_in_new),
