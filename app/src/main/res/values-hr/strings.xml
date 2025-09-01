@@ -394,4 +394,21 @@
     <string name="preference_notifications_exact_alarms_unavailable_desc">Da bi se osiguralo pravovremeno dobivanje obavijesti, dozvoli da %1$s postavlja točne alarme.\nDodirni za otvaranje postavki.</string>
     <string name="preference_notifications_unavailable">Obavijesti nisu dostupne</string>
     <string name="preference_notifications_unavailable_desc">Za aktiviranje obavijesti, dozvoli da %1$s šalje obavijesti.\nDodirni za otvaranje postavki.</string>
+    <string name="widget_timetable_link">Stvori prečac za …</string>
+    <string name="all_save">Spremi</string>
+    <string name="errormessagedictionary_second_factor_requried">Potreban je token za dvofaktorsku autentifikaciju.</string>
+    <string name="logindatainput_2fa">Dvofaktorska autentifikacija</string>
+    <string name="notifications_channel_firstlesson">Prva nastava</string>
+    <string name="notifications_channel_firstlesson_desc">Prikazuje informacije o prvoj nastavi i dnevne poruke</string>
+    <string name="notifications_text_motd_title">Današnje školske poruke</string>
+    <string name="notifications_text_motd_message">%1$d poruke(a)</string>
+    <string name="preference_automute_allow_priority">Dopusti prioritetnim događajima da zanemare automatsko isključivanje zvuka</string>
+    <string name="preferences_general_summary">Automatsko isključivanje zvuka, prijavljivanje grešaka</string>
+    <string name="preferences_info_summary">Verzija, licenca, suradnici</string>
+    <string name="preferences_notifications_summary">Obavijesti o pauzama, vidljiva polja</string>
+    <string name="preferences_styling_summary">Boje, tamna tema</string>
+    <string name="preferences_timetable_summary">Opcije prikaza, izgled stavke</string>
+    <string name="automute_zen_rule_name">Škola – %1$s</string>
+    <string name="preference_automute_preferences">Postavke za automatsko isključivanje zvuka</string>
+    <string name="infocenter_messages_details_error">Greška pri učitavanju detalja poruke</string>
 </resources>
