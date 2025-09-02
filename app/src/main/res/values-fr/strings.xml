@@ -87,7 +87,7 @@
     <string name="preference_notifications_first_lesson_time">Heure de la notification</string>
     <string name="preference_notifications_first_lesson_desc">Affiche une notification juste avant le début des cours</string>
     <string name="preference_notifications_first_lesson">Notification avec le premier cours</string>
-    <string name="preference_notifications_enable_desc">Affiche une notification avec des infos à propos du cours suivant pendant que vous êtes en pause.</string>
+    <string name="preference_notifications_enable_desc">Affiche une notification avec des infos à propos du cours suivant pendant les pauses.</string>
     <string name="preference_notifications_enable">Activer les notifications</string>
     <string name="preference_notifications_clear">Effacer toutes les notifications</string>
     <string name="preference_marker">Indicateur horaire</string>
@@ -107,7 +107,7 @@
     <string name="preference_dark_theme_oled_desc">Utile pour les écrans OLED</string>
     <string name="preference_dark_theme_oled">Utiliser un arrière-plan totalement noir</string>
     <string name="preference_dark_theme_off">Toujours désactivé</string>
-    <string name="preference_dark_theme">Thème sombre</string>
+    <string name="preference_dark_theme">Mode sombre</string>
     <string name="preference_connectivity_refresh_in_background_desc">Désactiver pour enregistrer des données avec des mises à jour moins fréquentes</string>
     <string name="preference_connectivity_refresh_in_background">Toujours rafraîchir l’emploi du temps</string>
     <string name="preference_connectivity_proxy_host">Hôte du serveur mandataire</string>
@@ -131,7 +131,7 @@
     <string name="preference_category_timetable_range">Plage horaire</string>
     <string name="preference_category_timetable_lesson_text">Texte des cours</string>
     <string name="preference_category_timetable_item_appearance">Apparence des éléments</string>
-    <string name="preference_category_styling_themes">Thèmes</string>
+    <string name="preference_category_styling_themes">Thème</string>
     <string name="preference_category_styling_colors">Couleurs</string>
     <string name="preference_category_styling_backgrounds">Couleurs des éléments</string>
     <string name="preference_category_notifications_visible_fields">Champs visibles</string>
@@ -355,4 +355,16 @@
     <string name="infocenter_absences_list_ninety_days">Afficher les 90 derniers jours</string>
     <string name="infocenter_absences_list_schoolyear">Année scolaire en cours</string>
     <string name="infocenter_absences_filter">Filtrer les absences</string>
+    <string name="all_save">Sauvegarder</string>
+    <string name="errormessagedictionary_second_factor_requried">Facteur d\'authentification demandé.</string>
+    <string name="infocenter_absence_reason_unknown">Inconnu</string>
+    <string name="infocenter_homework">Devoir maison</string>
+    <string name="infocenter_homework_empty">Pas de devoir maison</string>
+    <string name="logindatainput_key_saved">Clé ou mot de passe (enregistré)</string>
+    <string name="notifications_channel_firstlesson">Première leçon</string>
+    <string name="preferences_styling_summary">Couleurs, mode sombre</string>
+    <string name="preferences_timetable_summary">Options d\'affichag, apparence</string>
+    <string name="widget_timetable_link">Créer un raccourci vers…</string>
+    <string name="preference_category_app_language">Languages de l\'application</string>
+    <string name="preferences_default_color">Couleur par défaut</string>
 </resources>
