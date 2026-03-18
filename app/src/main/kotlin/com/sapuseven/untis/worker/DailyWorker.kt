@@ -1,22 +1,17 @@
 package com.sapuseven.untis.worker
 
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import androidx.work.WorkerParameters
-import com.sapuseven.untis.core.datastore.UserSettingsDataSource
-import com.sapuseven.untis.core.domain.cache.FromCache
-import com.sapuseven.untis.core.domain.repository.TimetableRepository
 import com.sapuseven.untis.core.domain.repository.UserRepository
-import com.sapuseven.untis.core.domain.worker.TimetableHandler
+import com.sapuseven.untis.core.domain.worker.TimetableActionService
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
@@ -29,16 +24,14 @@ import java.util.concurrent.TimeUnit
 
 /**
  * This worker fetches the personal timetable for all users and calls all registered handlers with the result.
- * It is scheduled to run once a day, but can also be used for manual refreshes.
+ * It will reschedule itself to run once a day, but can also be used for manual refreshes.
  */
 @HiltWorker
 class DailyWorker @AssistedInject constructor(
 	@Assisted context: Context,
 	@Assisted params: WorkerParameters,
 	private val userRepository: UserRepository,
-	private val userSettingsDataSource: UserSettingsDataSource,
-	private val timetableRepository: TimetableRepository,
-	private val handlers: @JvmSuppressWildcards Set<TimetableHandler>,
+	private val actionService: TimetableActionService,
 	private val clock: Clock = Clock.System,
 	private val zone: TimeZone = TimeZone.currentSystemDefault(),
 ) : CoroutineWorker(context, params) {
@@ -63,41 +56,8 @@ class DailyWorker @AssistedInject constructor(
 	}
 
 	override suspend fun doWork(): Result {
-		val today = clock.todayIn(zone)
-
 		userRepository.observeAllUsers().first().forEach { user ->
-			val userSettings = userSettingsDataSource.getSettings(user.id).first()
-			val element = user.element // TODO: Honor personal timetable setting
-				?: return@forEach // Anonymous / no custom personal timetable
-
-			try {
-				val timetable = timetableRepository.getTimetable(
-					user,
-					TimetableRepository.TimetableParams(
-						element.id,
-						element.type,
-						today,
-						today
-					),
-					FromCache.NEVER
-				).firstOrNull() ?: return@forEach
-
-				handlers.forEach { handler ->
-					if (handler.isEnabled(user)) {
-						try {
-							handler.onNewTimetable(user, timetable)
-						} catch (e: Exception) {
-							Log.e(
-								TAG_DAILY_WORK,
-								"Handler ${handler::class.simpleName} failed for user ${user.id}",
-								e
-							)
-						}
-					}
-				}
-			} catch (e: Exception) {
-				Log.e(TAG_DAILY_WORK, "Timetable loading failed for user ${user.id}", e)
-			}
+			actionService.triggerActions(user)
 		}
 
 		enqueueNext(applicationContext, clock, zone)

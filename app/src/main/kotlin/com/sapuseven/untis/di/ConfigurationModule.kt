@@ -1,8 +1,10 @@
 package com.sapuseven.untis.di
 
 import android.content.Context
+import com.sapuseven.untis.core.domain.worker.TimetableActionService
 import com.sapuseven.untis.util.ApplicationBuildConfigFieldsProvider
 import com.sapuseven.untis.util.BuildConfigFieldsProvider
+import com.sapuseven.untis.worker.TimetableActionServiceImpl
 import crocodile8.universal_cache.time.SystemTimeProvider
 import crocodile8.universal_cache.time.TimeProvider
 import dagger.Module
@@ -35,4 +37,9 @@ object ConfigurationModule {
 
 	@Provides
 	fun provideBuildConfigFieldsProvider(): BuildConfigFieldsProvider = ApplicationBuildConfigFieldsProvider()
+
+	@Provides
+	fun provideTimetableActionService(
+		impl: TimetableActionServiceImpl
+	): TimetableActionService = impl
 }

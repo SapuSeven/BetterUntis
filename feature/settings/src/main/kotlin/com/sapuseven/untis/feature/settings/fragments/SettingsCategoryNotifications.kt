@@ -1,8 +1,6 @@
 package com.sapuseven.untis.feature.settings.fragments
 
 import android.Manifest
-import android.app.NotificationManager
-import android.content.Context
 import android.os.Build
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -15,7 +13,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
@@ -31,15 +28,12 @@ import com.sapuseven.untis.core.datastore.model.NotificationVisibility
 import com.sapuseven.untis.core.ui.common.disabled
 import com.sapuseven.untis.feature.settings.R
 import com.sapuseven.untis.feature.settings.SettingsViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun SettingsCategoryNotifications(viewModel: SettingsViewModel) {
 	val scope = rememberCoroutineScope()
-	val context = LocalContext.current
 
 	var notificationsMessageVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -48,27 +42,13 @@ fun SettingsCategoryNotifications(viewModel: SettingsViewModel) {
 			notificationsMessageVisible = !it
 
 			scope.launch {
-				viewModel.userSettingsDataSource.updateSettings {
-					notificationsEnable = it
-				}
+				viewModel.toggleNotifications(it)
 			}
 		}
 	else null
 
-	fun enqueueNotificationSetup() = scope.launch {
-		delay(1000) // Non-time-critical; Delay a bit to ensure the settings are updated before worker is enqueued
-		/*WorkManager.getInstance(context).apply {
-			enqueue(OneTimeWorkRequestBuilder<NotificationSetupWorker>().build())
-		}*/
-	}
-
-	fun clearNotifications() {
-		(context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager)?.cancelAll()
-	}
-
 	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-		val visible by viewModel.userSettingsDataSource.getSettings().map { it.notificationsEnable }
-			.collectAsState(initial = false)
+		val visible by viewModel.notificationsEnabled.collectAsState()
 		ScheduleExactAlarmInfoMessage(
 			visible = visible,
 			primaryText = R.string.feature_settings_preference_notifications_exact_alarms_unavailable,
@@ -80,8 +60,7 @@ fun SettingsCategoryNotifications(viewModel: SettingsViewModel) {
 	}
 
 	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-		val notificationsEnabled by viewModel.userSettingsDataSource.getSettings().map { it.notificationsEnable }
-			.collectAsState(initial = false)
+		val notificationsEnabled by viewModel.notificationsEnabled.collectAsState()
 		NotificationsInfoMessage(visible = !notificationsEnabled && notificationsMessageVisible)
 	}
 
@@ -91,9 +70,7 @@ fun SettingsCategoryNotifications(viewModel: SettingsViewModel) {
 		LaunchedEffect(Unit) {
 			notificationPermissionsState?.let {
 				if (!it.status.isGranted) {
-					viewModel.userSettingsDataSource.updateSettings {
-						notificationsEnable = false
-					}
+					viewModel.toggleNotifications(false)
 				}
 			}
 		}
@@ -104,18 +81,12 @@ fun SettingsCategoryNotifications(viewModel: SettingsViewModel) {
 			settingsDataSource = viewModel.userSettingsDataSource,
 			value = { it.notificationsEnable },
 			onValueChange = {
-				notificationsEnable = if (it) {
-					if (notificationPermissionsState?.status?.isGranted != false) {
-						notificationsMessageVisible = false
-						enqueueNotificationSetup()
-						true
-					} else {
-						notificationPermissionsState.launchPermissionRequest()
-						false
-					}
+				if (it && notificationPermissionsState?.status?.isGranted == false) {
+					notificationPermissionsState.launchPermissionRequest()
 				} else {
-					clearNotifications()
-					false
+					scope.launch {
+						viewModel.toggleNotifications(it)
+					}
 				}
 			}
 		)
@@ -128,7 +99,9 @@ fun SettingsCategoryNotifications(viewModel: SettingsViewModel) {
 			value = { it.notificationsInMultiple },
 			onValueChange = {
 				notificationsInMultiple = it
-				enqueueNotificationSetup()
+				scope.launch {
+					viewModel.toggleNotifications(true)
+				}
 			}
 		)
 
@@ -140,7 +113,9 @@ fun SettingsCategoryNotifications(viewModel: SettingsViewModel) {
 			value = { it.notificationsBeforeFirst },
 			onValueChange = {
 				notificationsBeforeFirst = it
-				enqueueNotificationSetup()
+				scope.launch {
+					viewModel.toggleNotifications(true)
+				}
 			}
 		)
 
@@ -152,7 +127,9 @@ fun SettingsCategoryNotifications(viewModel: SettingsViewModel) {
 			value = { it.notificationsBeforeFirstTime },
 			onValueChange = {
 				notificationsBeforeFirstTime = it
-				enqueueNotificationSetup()
+				scope.launch {
+					viewModel.toggleNotifications(true)
+				}
 			}
 		)
 	}
@@ -249,7 +226,7 @@ fun SettingsCategoryNotifications(viewModel: SettingsViewModel) {
 	Preference(
 		title = { Text(stringResource(R.string.feature_settings_preference_notifications_clear)) },
 		onClick = {
-			clearNotifications()
+			viewModel.clearNotifications()
 		},
 		leadingContent = {
 			Icon(

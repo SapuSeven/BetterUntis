@@ -81,7 +81,6 @@ class NotificationReceiver : BroadcastReceiver() {
 			sendBreakNotification(context, intent, userSettings)
 
 			if (isFirst) {
-				// TODO This doesn't take user id into account
 				getMessages(user).first().fold(
 					onSuccess = { messages ->
 						if (messages.isNotEmpty()) {

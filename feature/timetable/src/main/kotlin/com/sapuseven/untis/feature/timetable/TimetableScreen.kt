@@ -1,6 +1,5 @@
 package com.sapuseven.untis.feature.timetable
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -21,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -32,7 +30,6 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sapuseven.untis.core.domain.navigation.FeatureRoute
 import com.sapuseven.untis.core.domain.navigation.FeatureRouteItem
@@ -66,28 +63,6 @@ internal fun TimetableScreen(
 	val scope = rememberCoroutineScope()
 	val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 	val drawerState = rememberDrawerState(DrawerValue.Closed)
-
-	/*
-	val user = viewModel.currentUser
-	val users by viewModel.allUsersState.collectAsStateWithLifecycle()
-
-	val needsPersonalTimetable by viewModel.needsPersonalTimetable.collectAsStateWithLifecycle()
-	val hourList by viewModel.hourList.collectAsStateWithLifecycle()
-	val events by viewModel.events.collectAsStateWithLifecycle()
-	val holidays by viewModel.holidays.collectAsStateWithLifecycle()
-	val lastRefresh by viewModel.lastRefresh.collectAsStateWithLifecycle()
-	val weekViewColorScheme by viewModel.weekViewColorScheme.collectAsStateWithLifecycle()
-	val weekViewScale by viewModel.weekViewScale.collectAsStateWithLifecycle()
-	val weekViewZoomEnabled by viewModel.weekViewZoomEnabled.collectAsStateWithLifecycle()
-	val weekViewEventStyle by viewModel.weekViewEventStyle.collectAsStateWithLifecycle()*/
-
-	DisposableEffect(LocalLifecycleOwner.current) {
-		Log.d("Timetable", "Creating TimetableViewModel")
-
-		onDispose {
-			Log.d("Timetable", "Disposing TimetableViewModel")
-		}
-	}
 
 	TimetableDrawer(
 		drawerState = drawerState,
