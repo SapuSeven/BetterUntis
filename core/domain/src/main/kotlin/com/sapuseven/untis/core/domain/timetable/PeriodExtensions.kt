@@ -59,12 +59,12 @@ operator fun Period.plus(other: Period) = copy(elements = this.elements + other.
  * Groups all lessons by start time and merges them into a single PeriodItem for each start time.
  * After this operation, every time period only has a single lesson containing all subjects, teachers, rooms and classes.
  */
-internal fun List<Period>.merged(): List<Period> = groupBy { it.startDateTime }
+fun List<Period>.merged(): List<Period> = groupBy { it.startDateTime }
 	.map { (_, items) -> items.reduce { acc, item -> acc + item } }
 
 /**
  * Creates a copy of a zipped list with the very last element duplicated into a new Pair whose second element is null.
  */
-internal fun <E> List<Pair<E?, E?>>.withLast(): List<Pair<E?, E?>> =
+fun <E> List<Pair<E?, E?>>.withLast(): List<Pair<E?, E?>> =
 	if (this.isEmpty()) this
 	else this.toMutableList().apply { add(Pair(this.last().second, null)) }.toList()

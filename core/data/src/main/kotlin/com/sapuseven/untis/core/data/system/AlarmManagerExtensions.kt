@@ -5,22 +5,20 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.os.Build
 import androidx.annotation.RequiresPermission
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
+import kotlinx.datetime.Instant
 
-@RequiresPermission(Manifest.permission.SCHEDULE_EXACT_ALARM)
-fun AlarmManager.setBest(time: LocalDateTime, pendingIntent: PendingIntent) {
+@RequiresPermission(Manifest.permission.SCHEDULE_EXACT_ALARM, conditional = true)
+fun AlarmManager.setBest(time: Instant, pendingIntent: PendingIntent) {
 	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && canScheduleExactAlarms()) {
 		setExact(
 			AlarmManager.RTC_WAKEUP,
-			time.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds(),
+			time.toEpochMilliseconds(),
 			pendingIntent
 		)
 	} else {
 		setWindow(
 			AlarmManager.RTC_WAKEUP,
-			time.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds(),
+			time.toEpochMilliseconds(),
 			600_000, // 10 minutes
 			pendingIntent
 		)

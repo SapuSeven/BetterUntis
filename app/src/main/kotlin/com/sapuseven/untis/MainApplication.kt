@@ -7,12 +7,15 @@ import android.os.StrictMode.ThreadPolicy.Builder
 import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.sapuseven.untis.core.datastore.GlobalSettingsDataSource
+import com.sapuseven.untis.worker.DailyWorker
+import com.sapuseven.untis.worker.DailyWorker.Companion.TAG_DAILY_WORK
 import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -23,26 +26,16 @@ class MainApplication : Application(), Configuration.Provider {
 	@Inject
 	lateinit var workerFactory: HiltWorkerFactory;
 
-	private val ioScope: CoroutineScope = CoroutineScope(Dispatchers.IO + Job())
-
 	@OptIn(DelicateCoroutinesApi::class)
 	override fun onCreate() {
 		super.onCreate()
-
-		/*TODO ioScope.launch {
-			val settings = globalSettings.getSettings().first()
-			initSentry(
-				settings.errorReportingEnable,
-				settings.errorReportingEnableBreadcrumbs
-			)
-		}
 
 		GlobalScope.launch {
 			WorkManager.getInstance(applicationContext).apply {
 				cancelAllWorkByTag(TAG_DAILY_WORK)
 				enqueue(OneTimeWorkRequestBuilder<DailyWorker>().build())
 			}
-		}*/
+		}
 	}
 
 	override val workManagerConfiguration: Configuration
@@ -50,6 +43,7 @@ class MainApplication : Application(), Configuration.Provider {
 			.setMinimumLoggingLevel(Log.VERBOSE)
 			.setWorkerFactory(workerFactory)
 			.build()
+
 	/**
 	 * Return true if the application is debuggable.
 	 */

@@ -111,18 +111,21 @@ dependencies {
 	implementation(libs.androidx.compose.material3)
 	implementation(libs.androidx.core.splashscreen)
 	implementation(libs.androidx.hilt.navigation.compose)
+	implementation(libs.androidx.hilt.work)
 	implementation(libs.androidx.lifecycle)
+	implementation(libs.androidx.work)
 	implementation(libs.material)
 	implementation(libs.coil)
 	implementation(libs.kotlinx.serialization.json)
 
+	ksp(libs.hilt.compiler)
+	ksp(libs.androidx.hilt.compiler)
+
+	kspTest(libs.hilt.compiler)
+
 	// TODO: Move to feature module
 	implementation(libs.mikepenz.aboutlibraries.core)
 	implementation(libs.mikepenz.aboutlibraries.compose)
-
-	// TODO: Move to feature module
-	implementation(libs.androidx.hilt.work)
-	implementation(libs.androidx.work)
 
 	// TODO: Move to relevant modules
 	implementation(libs.ktor.client.cio)
@@ -131,10 +134,6 @@ dependencies {
 
 	// TODO: Move to relevant modules
 	implementation(libs.andrew0000.cache)
-
-	ksp(libs.hilt.compiler)
-
-	kspTest(libs.hilt.compiler)
 
 	//implementation(libs.accompanist.swiperefresh)
 	//implementation(libs.accompanist.systemuicontroller)

@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
 import android.content.Context.ALARM_SERVICE
+import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.os.Build
 import android.util.Log
@@ -35,14 +36,17 @@ import com.sapuseven.untis.feature.notifications.receiver.NotificationReceiver.C
 import com.sapuseven.untis.feature.notifications.receiver.NotificationReceiver.Companion.EXTRA_STRING_NEXT_TEACHER
 import com.sapuseven.untis.feature.notifications.receiver.NotificationReceiver.Companion.EXTRA_STRING_NEXT_TEACHER_LONG
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import kotlinx.datetime.toJavaLocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import javax.inject.Inject
 
 class NotificationRepository @Inject constructor(
-	@field:ApplicationContext private val context: Context,
+	@ApplicationContext private val context: Context,
+	private val zone: TimeZone = TimeZone.currentSystemDefault(),
 ) {
 	companion object {
 		private val LOG_TAG = NotificationRepository::class.simpleName
@@ -56,7 +60,7 @@ class NotificationRepository @Inject constructor(
 	internal fun setupNotificationChannels() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			val notificationManager: NotificationManager =
-				context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+				context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
 			listOfNotNull(
 				if (BuildConfig.DEBUG)
@@ -81,14 +85,16 @@ class NotificationRepository @Inject constructor(
 					context.getString(R.string.feature_notifications_channel_breakinfo),
 					NotificationManager.IMPORTANCE_LOW
 				).apply {
-					description = context.getString(R.string.feature_notifications_channel_breakinfo_desc)
+					description =
+						context.getString(R.string.feature_notifications_channel_breakinfo_desc)
 				},
 				NotificationChannel(
 					CHANNEL_ID_FIRSTLESSON,
 					context.getString(R.string.feature_notifications_channel_firstlesson),
 					NotificationManager.IMPORTANCE_LOW
 				).apply {
-					description = context.getString(R.string.feature_notifications_channel_firstlesson_desc)
+					description =
+						context.getString(R.string.feature_notifications_channel_firstlesson_desc)
 				},
 			).forEach {
 				notificationManager.createNotificationChannel(it)
@@ -96,20 +102,18 @@ class NotificationRepository @Inject constructor(
 		}
 	}
 
-
-	private fun scheduleNotification(
-		context: Context,
+	internal fun scheduleNotification(
 		userId: Long,
-		notificationTime: LocalDateTime,
+		notificationTime: Instant,
 		notificationEndPeriod: Period,
 		isFirst: Boolean = false
 	) {
 		val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
-		val id = notificationTime.time.second // generate a unique id
+		val notificationId = ("${userId}_${notificationTime.epochSeconds}").hashCode()
 
 		// TODO: Include state (cancelled, irregular etc)
 		val intent = Intent(context, NotificationReceiver::class.java)
-			.putExtra(EXTRA_INT_ID, id)
+			.putExtra(EXTRA_INT_ID, notificationId)
 			.putExtra(EXTRA_LONG_USER_ID, userId)
 			.putExtra(
 				EXTRA_INT_BREAK_END_TIME,
@@ -157,7 +161,7 @@ class NotificationRepository @Inject constructor(
 
 		val pendingIntent = PendingIntent.getBroadcast(
 			context,
-			notificationTime.time.toSecondOfDay(),
+			notificationId,
 			intent,
 			FLAG_IMMUTABLE
 		)
@@ -169,16 +173,16 @@ class NotificationRepository @Inject constructor(
 		)
 
 		val deletingIntent = Intent(context, NotificationReceiver::class.java)
-			.putExtra(EXTRA_INT_ID, id)
+			.putExtra(EXTRA_INT_ID, notificationId)
 			.putExtra(EXTRA_BOOLEAN_CLEAR, true)
 		val deletingPendingIntent = PendingIntent.getBroadcast(
 			context,
-			notificationTime.time.toSecondOfDay() + 1, // Different id to previous intent
+			("${userId}_${notificationTime.epochSeconds}_DEL").hashCode(),
 			deletingIntent,
 			FLAG_IMMUTABLE
 		)
 		alarmManager.setBest(
-			notificationEndPeriod.startDateTime,
+			notificationEndPeriod.startDateTime.toInstant(zone),
 			deletingPendingIntent
 		)
 		Log.d(
@@ -187,19 +191,24 @@ class NotificationRepository @Inject constructor(
 		)
 	}
 
-	private fun clearNotification(
-		context: Context,
-		notificationTime: LocalDateTime,
+	internal fun clearNotification(
+		userId: Long,
+		notificationTime: Instant,
 	) {
 		(context.getSystemService(ALARM_SERVICE) as AlarmManager).run {
 			cancel(
 				PendingIntent.getBroadcast(
 					context,
-					notificationTime.time.toSecondOfDay(),
+					("${userId}_${notificationTime.epochSeconds}").hashCode(),
 					Intent(context, NotificationReceiver::class.java),
 					FLAG_IMMUTABLE
 				)
 			)
 		}
+	}
+
+	internal fun canPostNotifications(): Boolean {
+		val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+		return (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || notificationManager.areNotificationsEnabled())
 	}
 }

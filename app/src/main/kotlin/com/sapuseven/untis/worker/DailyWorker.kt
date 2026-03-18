@@ -28,8 +28,8 @@ import java.util.concurrent.TimeUnit
 
 
 /**
- * This worker caches the personal timetable if it exists and starts all other daily workers
- * which can then use the cached timetable.
+ * This worker fetches the personal timetable for all users and calls all registered handlers with the result.
+ * It is scheduled to run once a day, but can also be used for manual refreshes.
  */
 @HiltWorker
 class DailyWorker @AssistedInject constructor(
@@ -38,7 +38,7 @@ class DailyWorker @AssistedInject constructor(
 	private val userRepository: UserRepository,
 	private val userSettingsDataSource: UserSettingsDataSource,
 	private val timetableRepository: TimetableRepository,
-	private val handlers: Set<TimetableHandler>,
+	private val handlers: @JvmSuppressWildcards Set<TimetableHandler>,
 	private val clock: Clock = Clock.System,
 	private val zone: TimeZone = TimeZone.currentSystemDefault(),
 ) : CoroutineWorker(context, params) {
@@ -99,8 +99,6 @@ class DailyWorker @AssistedInject constructor(
 				Log.e(TAG_DAILY_WORK, "Timetable loading failed for user ${user.id}", e)
 			}
 		}
-
-		//WidgetUpdateWorker.enqueue(workManager)
 
 		enqueueNext(applicationContext, clock, zone)
 		return Result.success()
