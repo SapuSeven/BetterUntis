@@ -1,7 +1,6 @@
 package com.sapuseven.untis.core.domain.infocenter
 
 import com.sapuseven.untis.core.domain.repository.DirectMessageRepository
-import com.sapuseven.untis.core.domain.repository.UserRepository
 import com.sapuseven.untis.core.model.messages.DirectMessage
 import com.sapuseven.untis.core.model.user.User
 import kotlinx.coroutines.flow.Flow
@@ -10,7 +9,6 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class GetDirectMessagesUseCase @Inject constructor(
-	userRepository: UserRepository,
 	private val directMessageRepository: DirectMessageRepository,
 ) {
 	operator fun invoke(user: User): Flow<Result<List<DirectMessage>>> =

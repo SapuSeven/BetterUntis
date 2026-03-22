@@ -18,7 +18,7 @@ import com.sapuseven.untis.feature.infocenter.InfoCenterViewModel
 import com.sapuseven.untis.feature.infocenter.R
 import com.sapuseven.untis.feature.infocenter.pages.InfoCenterAbsences
 import com.sapuseven.untis.feature.infocenter.pages.InfoCenterEvents
-import com.sapuseven.untis.feature.infocenter.pages.InfoCenterMessages
+import com.sapuseven.untis.feature.infocenter.pages.messages.InfoCenterMessages
 import com.sapuseven.untis.feature.infocenter.pages.InfoCenterOfficeHours
 import kotlinx.serialization.Serializable
 

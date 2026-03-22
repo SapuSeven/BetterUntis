@@ -13,10 +13,10 @@ import com.sapuseven.untis.core.domain.repository.UserRepository
 import com.sapuseven.untis.core.model.user.UserRight
 import com.sapuseven.untis.feature.infocenter.pages.AbsencesUiState
 import com.sapuseven.untis.feature.infocenter.pages.EventsUiState
-import com.sapuseven.untis.feature.infocenter.pages.Message
-import com.sapuseven.untis.feature.infocenter.pages.MessagesUiState
 import com.sapuseven.untis.feature.infocenter.pages.OfficeHoursUiState
-import com.sapuseven.untis.feature.infocenter.pages.SelectedMessageState
+import com.sapuseven.untis.feature.infocenter.pages.messages.Message
+import com.sapuseven.untis.feature.infocenter.pages.messages.MessageDetailsState
+import com.sapuseven.untis.feature.infocenter.pages.messages.MessagesUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -52,7 +52,9 @@ class InfoCenterViewModel @Inject constructor(
 	val shouldShowAbsencesAddReason = hasRight(UserRight.W_OWN_ABSENCEREASON)
 	val shouldShowOfficeHours = hasRight(UserRight.R_OFFICEHOURS)
 
-	val messagesState = currentUser
+	private val _selectedMessage = MutableStateFlow<Message?>(null)
+
+	private val _messageListState = currentUser
 		.filterNotNull()
 		.flatMapLatest { user ->
 			combine(getMessagesOfDay(user), getDirectMessages(user)) { day, direct ->
@@ -61,6 +63,42 @@ class InfoCenterViewModel @Inject constructor(
 					messages = day.getOrDefault(emptyList()).map(Message::Day) +
 						direct.getOrDefault(emptyList()).map(Message::Direct)
 				)
+			}
+		}.stateIn(
+			scope = viewModelScope,
+			started = SharingStarted.WhileSubscribed(5_000),
+			initialValue = MessagesUiState.Loading
+		)
+
+	private val _messageDetailsState = _selectedMessage.flatMapLatest { message ->
+		if (message == null) return@flatMapLatest flowOf(null)
+
+		if (message is Message.Day) {
+			flowOf(MessageDetailsState.Success(message, message.content))
+		} else
+			currentUser.filterNotNull().flatMapLatest { user ->
+				getDirectMessages(user, message.id.removePrefix("direct-").toLong())
+					.map { result ->
+						result.fold(
+							onSuccess = { MessageDetailsState.Success(message, it.body) },
+							onFailure = {
+								MessageDetailsState.Error(
+									message,
+									it.message ?: "Unknown error"
+								)
+							}
+						)
+					}
+					.onStart { emit(MessageDetailsState.Loading(message)) }
+			}
+	}
+
+	val messagesState =
+		combine(_messageListState, _messageDetailsState) { listState, detailsState ->
+			if (detailsState != null) {
+				MessagesUiState.Details(detailsState)
+			} else {
+				listState
 			}
 		}.stateIn(
 			scope = viewModelScope,
@@ -100,33 +138,6 @@ class InfoCenterViewModel @Inject constructor(
 			scope = viewModelScope,
 			started = SharingStarted.WhileSubscribed(5_000),
 			initialValue = OfficeHoursUiState.Loading
-		)
-
-	private val _selectedMessage = MutableStateFlow<Message?>(null)
-
-	val selectedMessage: StateFlow<SelectedMessageState?> = _selectedMessage
-		.flatMapLatest { message ->
-			if (message == null) return@flatMapLatest flowOf(null)
-
-			if (message is Message.Day) {
-				flowOf(SelectedMessageState.Success(message, message.content))
-			} else
-
-			currentUser.filterNotNull().flatMapLatest { user ->
-				getDirectMessages(user, message.id.removePrefix("direct-").toLong())
-					.map { result ->
-						result.fold(
-							onSuccess = { SelectedMessageState.Success(message, it.body) },
-							onFailure = { SelectedMessageState.Error(message, it.message ?: "Unknown error") }
-						)
-					}
-					.onStart { emit(SelectedMessageState.Loading(message)) }
-			}
-		}
-		.stateIn(
-			scope = viewModelScope,
-			started = SharingStarted.WhileSubscribed(5_000),
-			initialValue = null
 		)
 
 	fun onMessageClicked(message: Message) {

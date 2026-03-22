@@ -44,3 +44,5 @@ captures/
 
 # Kotlin
 .kotlin
+
+/app_old
