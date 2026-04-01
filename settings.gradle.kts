@@ -12,6 +12,9 @@ pluginManagement {
 		gradlePluginPortal()
 	}
 }
+plugins {
+	id("org.gradle.toolchains.foojay-resolver-convention") version "0.10.0"
+}
 
 dependencyResolutionManagement {
 	repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
@@ -58,3 +61,4 @@ check(JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)) {
     """.trimIndent()
 }
 include(":feature:notifications")
+include(":feature:automute")

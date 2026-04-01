@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="feature_automute_zen_rule_name">School - %1$s</string>
+	<string name="feature_automute_title">Auto-Mute</string>
+	<string name="feature_automute_cancelled_lessons">Also mute in cancelled lessons</string>
+	<string name="feature_automute_enable">Enable auto-mute</string>
+	<string name="feature_automute_enable_summary">Automatically turns on Do Not Disturb during lessons</string>
+	<string name="feature_automute_minimum_break_length">Minimum break length</string>
+	<string name="feature_automute_minimum_break_length_summary">Don\'t unmute the device during breaks shorter than the specified length (in minutes)</string>
+	<string name="feature_automute_mute_priority">Don\'t allow priority events to ignore aute-mute</string>
+	<string name="feature_automute_allow_priority">Allow priority events to ignore aute-mute</string>
+</resources>

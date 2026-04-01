@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+	<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
+	<application>
+		<activity
+			android:name=".activity.AutoMuteConfigurationActivity"
+			android:exported="true">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<data
+					android:scheme="betteruntis"
+					android:host="automute"
+					android:path="/configure" />
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.app.action.AUTOMATIC_ZEN_RULE" />
+				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+		</activity>
+
+		<receiver android:name=".receiver.AutoMuteReceiver" />
+	</application>
+</manifest>

@@ -45,7 +45,7 @@ import java.time.format.FormatStyle
 import javax.inject.Inject
 
 class NotificationRepository @Inject constructor(
-	@ApplicationContext private val context: Context,
+	@param:ApplicationContext private val context: Context,
 	private val zone: TimeZone = TimeZone.currentSystemDefault(),
 ) {
 	companion object {

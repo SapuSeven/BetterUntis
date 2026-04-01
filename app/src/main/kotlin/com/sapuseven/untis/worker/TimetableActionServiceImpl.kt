@@ -14,7 +14,6 @@ import kotlinx.datetime.todayIn
 import javax.inject.Inject
 import javax.inject.Singleton
 
-// In :app module
 @Singleton
 class TimetableActionServiceImpl @Inject constructor(
 	private val timetableRepository: TimetableRepository,

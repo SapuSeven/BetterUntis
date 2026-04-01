@@ -92,6 +92,7 @@ aboutLibraries {
 
 dependencies {
 	//implementation(projects.feature.glance)
+	implementation(projects.feature.automute)
 	implementation(projects.feature.infocenter)
 	implementation(projects.feature.login)
 	implementation(projects.feature.notifications)

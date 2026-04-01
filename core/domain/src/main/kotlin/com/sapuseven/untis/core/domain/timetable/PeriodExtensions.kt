@@ -64,7 +64,8 @@ fun List<Period>.merged(): List<Period> = groupBy { it.startDateTime }
 
 /**
  * Creates a copy of a zipped list with the very last element duplicated into a new Pair whose second element is null.
+ * If the list is empty or the last element doesn't have a second value, it is returned as is.
  */
-fun <E> List<Pair<E?, E?>>.withLast(): List<Pair<E?, E?>> =
-	if (this.isEmpty()) this
-	else this.toMutableList().apply { add(Pair(this.last().second, null)) }.toList()
+fun <E> List<Pair<E, E?>>.withLast(): List<Pair<E, E?>> =
+	if (this.isEmpty() || this.last().second == null) this
+	else this.toMutableList().apply { add(Pair(this.last().second!!, null)) }.toList()

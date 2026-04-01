@@ -2,22 +2,31 @@ package com.sapuseven.untis.feature.settings.fragments
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sapuseven.compose.protostore.ui.preferences.Preference
 import com.sapuseven.compose.protostore.ui.preferences.PreferenceGroup
 import com.sapuseven.compose.protostore.ui.preferences.SwitchPreference
 import com.sapuseven.untis.feature.settings.R
 import com.sapuseven.untis.feature.settings.SettingsViewModel
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlin.jvm.java
 
 @SuppressLint("InlinedApi")
 @Composable
@@ -86,70 +95,66 @@ fun SettingsCategoryGeneral(viewModel: SettingsViewModel) {
 		)
 	}
 
-	/*TODO when (viewModel.autoMuteService) {
-		is AutoMuteServiceZenRuleImpl -> {
-			PreferenceGroup(stringResource(id = R.string.feature_settings_preference_category_general_automute)) {
-				val context = LocalContext.current
-				val scope = rememberCoroutineScope()
-				val permissionLauncher =
-					rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-						if (viewModel.autoMuteService.isPermissionGranted()) {
-							scope.launch {
-								viewModel.userSettingsDataSource.updateSettings {
-									automuteEnable = true
-								}
-								viewModel.autoMuteService.autoMuteEnable()
-							}
+	PreferenceGroup(stringResource(id = R.string.feature_settings_preference_category_general_automute)) {
+		val context = LocalContext.current
+		val scope = rememberCoroutineScope()
+		val permissionLauncher =
+			rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+				if (viewModel.autoMuteService.isPermissionGranted()) {
+					scope.launch {
+						viewModel.userSettingsDataSource.updateSettings {
+							automuteEnable = true
 						}
-					}
-
-				LaunchedEffect(Unit) {
-					viewModel.userSettingsDataSource.updateSettings {
-						automuteEnable = viewModel.autoMuteService.isAutoMuteEnabled()
+						viewModel.autoMuteService.autoMuteEnable()
 					}
 				}
+			}
 
-				SwitchPreference(
-					title = { Text(stringResource(R.string.feature_settings_preference_automute_enable)) },
-					summary = { Text(stringResource(R.string.feature_settings_preference_automute_enable_summary)) },
-					settingsDataSource = viewModel.userSettingsDataSource,
-					value = { it.automuteEnable },
-					onValueChange = {
-						if (it) {
-							if (viewModel.autoMuteService.isPermissionGranted()) {
-								viewModel.autoMuteService.autoMuteEnable()
-								automuteEnable = true
-							} else {
-								permissionLauncher.launch(Intent(ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
-								automuteEnable = false
-							}
-						} else {
-							viewModel.autoMuteService.autoMuteDisable()
-							automuteEnable = false
-						}
-					}
-				)
-
-				Preference(
-					title = { Text(stringResource(R.string.feature_settings_preference_automute_preferences)) },
-					trailingContent = {
-						Icon(
-							painter = painterResource(R.drawable.settings_external),
-							contentDescription = null
-						)
-					},
-					onClick = {
-						context.startActivity(Intent(context, AutoMuteConfigurationActivity::class.java).apply {
-							putExtra(EXTRA_USER_ID, viewModel.currentUserId())
-						})
-					}
-				)
+		LaunchedEffect(Unit) {
+			viewModel.userSettingsDataSource.updateSettings {
+				automuteEnable = viewModel.autoMuteService.isAutoMuteEnabled()
 			}
 		}
-		else -> {
-			// Auto-Mute is not supported on this device - hide the category
-		}
-	}*/
+
+		SwitchPreference(
+			title = { Text(stringResource(R.string.feature_settings_preference_automute_enable)) },
+			summary = { Text(stringResource(R.string.feature_settings_preference_automute_enable_summary)) },
+			settingsDataSource = viewModel.userSettingsDataSource,
+			value = { it.automuteEnable },
+			onValueChange = {
+				if (it) {
+					if (viewModel.autoMuteService.isPermissionGranted()) {
+						viewModel.autoMuteService.autoMuteEnable()
+						automuteEnable = true
+					} else {
+						permissionLauncher.launch(Intent(ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
+						automuteEnable = false
+					}
+				} else {
+					viewModel.autoMuteService.autoMuteDisable()
+					automuteEnable = false
+				}
+			}
+		)
+
+		Preference(
+			title = { Text(stringResource(R.string.feature_settings_preference_automute_preferences)) },
+			trailingContent = {
+				Icon(
+					painter = painterResource(R.drawable.settings_external),
+					contentDescription = null
+				)
+			},
+			onClick = {
+				val uri = "betteruntis://automute/configure".toUri()
+					.buildUpon()
+					//.appendQueryParameter("userId", viewModel.currentUserId().toString())
+					.build()
+
+				context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+			}
+		)
+	}
 
 	PreferenceGroup(stringResource(R.string.feature_settings_preference_category_reports)) {
 		Preference(

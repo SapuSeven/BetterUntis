@@ -10,6 +10,7 @@ import com.sapuseven.untis.core.datastore.GlobalSettingsDataSource
 import com.sapuseven.untis.core.datastore.UserSettingsDataSource
 import com.sapuseven.untis.core.domain.repository.ElementRepository
 import com.sapuseven.untis.core.domain.repository.UserRepository
+import com.sapuseven.untis.core.domain.service.AutoMuteService
 import com.sapuseven.untis.core.domain.worker.TimetableActionService
 import com.sapuseven.untis.core.model.timetable.Element
 import com.sapuseven.untis.core.model.timetable.ElementType
@@ -32,7 +33,7 @@ class SettingsViewModel @AssistedInject constructor(
 	internal val globalSettingsDataSource: GlobalSettingsDataSource,
 	internal val userSettingsDataSource: UserSettingsDataSource,
 	elementRepository: ElementRepository,
-	//internal val autoMuteService: AutoMuteService,
+	internal val autoMuteService: AutoMuteService,
 	//@Named("json") private val httpClient: HttpClient,
 	@Assisted val colorScheme: ColorScheme,
 	private val timetableActionService: TimetableActionService,
@@ -44,9 +45,7 @@ class SettingsViewModel @AssistedInject constructor(
 	}
 
 	init {
-		/*if (autoMuteService is AutoMuteServiceZenRuleImpl) {
-			autoMuteService.setUser(userRepository.currentUser!!)
-		}*/
+		autoMuteService.setUser(userRepository.getActiveUser())
 	}
 
 	val elements: StateFlow<Map<ElementType, List<Element>>> = elementRepository.timetableElements.stateIn(
