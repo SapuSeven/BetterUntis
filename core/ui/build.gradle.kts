@@ -9,15 +9,15 @@ android {
 }
 
 dependencies {
-	api(projects.core.model)
+	implementation(projects.core.datastore)
+	implementation(projects.core.model)
+	implementation(projects.materialColorUtils)
 
-//	api(libs.androidx.compose.foundation)
-//	api(libs.androidx.compose.foundation.layout)
-//	api(libs.androidx.compose.material.iconsExtended)
-	api(libs.accompanist.flowlayout)
-	api(libs.androidx.activity.compose)
-	api(libs.androidx.compose.ui)
 	api(libs.androidx.compose.material3)
 	api(libs.androidx.compose.material.icons)
-//	api(libs.androidx.compose.runtime)
+	api(libs.material)
+
+	implementation(libs.accompanist.flowlayout)
+	implementation(libs.androidx.activity.compose)
+	implementation(libs.androidx.compose.ui)
 }

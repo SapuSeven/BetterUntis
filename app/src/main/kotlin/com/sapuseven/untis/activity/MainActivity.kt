@@ -16,10 +16,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.sapuseven.untis.core.ui.theme.AppTheme
 import com.sapuseven.untis.feature.login.navigation.LoginRoute
 import com.sapuseven.untis.feature.timetable.navigation.TimetableBaseRoute
 import com.sapuseven.untis.ui.MainApp
-import com.sapuseven.untis.ui.theme.AppTheme
 import com.sapuseven.untis.util.isSystemInDarkTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
@@ -65,8 +65,8 @@ class MainActivity : ComponentActivity() {
 						// Turn off the decor fitting system windows, which allows us to handle insets,
 						// including IME animations, and go edge-to-edge.
 						// This is the same parameters as the default enableEdgeToEdge call, but we manually
-						// resolve whether or not to show dark theme using uiState, since it can be different
-						// than the configuration's dark theme value based on the user preference.
+						// resolve whether to show dark theme using uiState, since it can be different
+						// from the configuration's dark theme value based on the user preference.
 						enableEdgeToEdge(
 							statusBarStyle = SystemBarStyle.auto(
 								lightScrim = android.graphics.Color.TRANSPARENT,

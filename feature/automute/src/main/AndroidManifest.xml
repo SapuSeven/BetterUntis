@@ -5,7 +5,8 @@
 	<application>
 		<activity
 			android:name=".activity.AutoMuteConfigurationActivity"
-			android:exported="true">
+			android:exported="true"
+			android:theme="@style/Theme.Material3Expressive.DayNight.NoActionBar">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />

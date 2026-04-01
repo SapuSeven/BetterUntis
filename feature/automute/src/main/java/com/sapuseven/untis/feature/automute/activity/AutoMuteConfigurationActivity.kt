@@ -4,7 +4,9 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Text
+import com.sapuseven.untis.core.ui.theme.AppTheme
 import com.sapuseven.untis.feature.automute.ui.AutoMuteSettings
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -13,14 +15,16 @@ class AutoMuteConfigurationActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
+		enableEdgeToEdge()
+
 		setContent {
-			//TODO AppTheme {
+			AppTheme {
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 					AutoMuteSettings() { finish() }
 				} else {
 					Text("Auto-Mute is not supported on this device.")
 				}
-			//}
+			}
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package com.sapuseven.untis.ui.theme
+package com.sapuseven.untis.core.ui.theme
 
 import android.content.Context
 import android.os.Build

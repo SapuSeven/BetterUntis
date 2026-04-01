@@ -106,7 +106,6 @@ dependencies {
 	implementation(projects.core.datastore)
 	implementation(projects.core.domain)
 	implementation(projects.core.ui)
-	implementation(projects.materialColorUtils)
 
 	implementation(libs.androidx.activity.compose)
 	implementation(libs.androidx.compose.material3)
