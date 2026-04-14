@@ -53,11 +53,8 @@ class TimetableMapper @Inject constructor(
 			return preparePeriods(items, timetableHideCancelled)
 				.mapToEvents(
 					this,
-					contextType
-				)
-				.prepareEvents(
-					timetableSubstitutionsIrregular,
-					timetableBackgroundIrregular
+					contextType,
+					substitutionsIrregular = timetableSubstitutionsIrregular
 				)
 		}
 	}
@@ -68,12 +65,21 @@ class TimetableMapper @Inject constructor(
 		userSettings: UserSettings,
 		contextType: ElementType,
 		includeOrgIds: Boolean = true,
+		substitutionsIrregular: Boolean = false,
 	): List<Event<PeriodItem>> {
 		return map { period ->
 			val periodItem = PeriodItem(
 				masterDataRepository = masterDataRepository,
 				originalPeriod = period
 			)
+
+			if (substitutionsIrregular) {
+				periodItem.forceIrregular =
+					periodItem.classes.find { it.id != it.orgId } != null
+						|| periodItem.teachers.find { it.id != it.orgId } != null
+						|| periodItem.subjects.find { it.id != it.orgId } != null
+						|| periodItem.rooms.find { it.id != it.orgId } != null
+			}
 
 			Event(
 				title = periodItem.getShort(ElementType.SUBJECT),
@@ -145,32 +151,6 @@ class TimetableMapper @Inject constructor(
 		hideCancelled: Boolean,
 	): List<Period> = mapNotNull { item ->
 		if (hideCancelled && item.`is`(PeriodState.CANCELLED)) return@mapNotNull null
-		item
-	}
-
-	/**
-	 * Prepares the items for the timetable.
-	 *
-	 * This function marks items as irregular when they match certain rules
-	 *
-	 * @param substitutionsIrregular Whether items with substitutions should be marked as irregular
-	 * @param backgroundIrregular Whether irregular items should have a different background color
-	 * @return A list of prepared items
-	 */
-	private fun List<Event<PeriodItem>>.prepareEvents(
-		substitutionsIrregular: Boolean,
-		backgroundIrregular: Boolean
-	): List<Event<PeriodItem>> = mapNotNull { item ->
-		if (substitutionsIrregular) {
-			item.data?.apply {
-				forceIrregular =
-					classes.find { it.id != it.orgId } != null
-						|| teachers.find { it.id != it.orgId } != null
-						|| subjects.find { it.id != it.orgId } != null
-						|| rooms.find { it.id != it.orgId } != null
-				//TODO|| backgroundIrregular.getValue() && item.data.element.backColor != UNTIS_DEFAULT_COLOR
-			}
-		}
 		item
 	}
 

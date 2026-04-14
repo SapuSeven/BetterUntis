@@ -53,8 +53,8 @@ sealed class EventStyle(
 		textStyleForScheme = {
 			textStyle ?: TextStyle(
 				color = if (
-					ColorUtils.calculateContrast(Color.Black.toArgb(), color.toArgb()) >
-					ColorUtils.calculateContrast(Color.White.toArgb(), color.toArgb())
+					ColorUtils.calculateContrast(Color.Black.toArgb(), color.compositeOverWhite().toArgb()) >
+					ColorUtils.calculateContrast(Color.White.toArgb(), color.compositeOverWhite().toArgb())
 				) Color.Black else Color.White
 			)
 		}
@@ -196,6 +196,17 @@ fun <T> WeekViewEvent(
 private fun CharSequence.asAnnotatedString(): AnnotatedString = let {
 	it as? AnnotatedString ?: AnnotatedString(it.toString())
 }
+
+/**
+ * Composites this color over a white background, giving back a fully opaque color.
+ * Required because ColorUtils.calculateContrast throws IllegalArgumentException if either color has alpha < 1.0 (is semi-transparent).
+ */
+private fun Color.compositeOverWhite() = Color(
+	red = red * alpha + (1f - alpha),
+	green = green * alpha + (1f - alpha),
+	blue = blue * alpha + (1f - alpha),
+	alpha = 1f
+)
 
 private fun LocalDateTime.seconds() = atZone(ZoneId.systemDefault()).toEpochSecond()
 
