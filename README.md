@@ -35,7 +35,7 @@ You can also download the latest automated build [from my website](https://sapus
 
 ### v3.x
 The [original version](https://github.com/SapuSeven/BetterUntis-Legacy) of BetterUntis had many design and performance flaws.
-Since development became increasingly more difficult, the project was scrapepd and I started over from scratch.
+Since development became increasingly more difficult, the project was scrapped and I started over from scratch.
 
 Although some parts of the original code were reused, the codebase was entirely switched to Kotlin.
 Kotlin has many features and libraries that immensely help to communicate with the Untis API and process the timetable data.
