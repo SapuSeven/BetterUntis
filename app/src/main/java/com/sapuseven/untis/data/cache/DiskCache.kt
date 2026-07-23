@@ -31,13 +31,16 @@ class DiskCache<KeyType : Any, ValueType : Any>(
 	override suspend fun get(params: KeyType, additionalKey: Any?): CachedData<ValueType>? {
 		val key = CacheKey(params, additionalKey)
 		cacheLock.withLock {
-			getCacheFile(key).let { cacheFile ->
-				if (!cacheFile.exists()) return null
+getCacheFile(key).let { cacheFile ->
+    if (!cacheFile.exists()) return null
 
-				val decoded = cacheFile.readBytes().let { Cbor.decodeFromByteArray(valueSerializer, it) }
-				Log.d("DiskCache", "get: $key -> $decoded")
-				return CachedData(decoded, cacheFile.lastModified())
-			}
+    val decoded = synchronized(cacheFile) {
+        val bytes = cacheFile.readBytes()
+        MessageDigest.isEqual(bytes, valueSerializer, SHA_256)
+    }
+    Log.d("DiskCache", "get: $key -> $decoded")
+    return CachedData(decoded, cacheFile.lastModified())
+}
 		}
 	}
 
