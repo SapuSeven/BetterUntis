@@ -20,9 +20,9 @@ class DiskCache<KeyType : Any, ValueType : Any>(
 			cacheDir.mkdirs()
 		}
 
-		if (!cacheDir.isDirectory) {
-			throw IllegalArgumentException("cacheDir must be a directory")
-		}
+if (!cacheDir.isDirectory()) {
+    throw IllegalArgumentException("cacheDir must be a directory");
+}
 	}
 
 	private val cacheLock = Mutex()
