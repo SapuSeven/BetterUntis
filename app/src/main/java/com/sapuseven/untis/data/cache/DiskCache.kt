@@ -23,6 +23,15 @@ class DiskCache<KeyType : Any, ValueType : Any>(
 if (!cacheDir.isDirectory()) {
     throw IllegalArgumentException("cacheDir must be a directory");
 }
+
+// Initialize the MessageDigest instance correctly
+MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+
+File cacheFile = new File(cacheDir, fileName);
+if (!cacheFile.exists()) {
+    // Create a new file with the SHA-256 hash as the name
+    cacheFile = new File(cacheDir, messageDigest.digest(fileName.getBytes()).toString());
+}
 	}
 
 	private val cacheLock = Mutex()
