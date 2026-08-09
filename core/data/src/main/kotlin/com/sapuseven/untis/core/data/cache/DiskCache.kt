@@ -58,8 +58,9 @@ class DiskCache<KeyType : Any, ValueType : Any>(
 	}
 
 	@OptIn(ExperimentalStdlibApi::class)
-	private fun getCacheFile(key: CacheKey<KeyType>): File {
-		val md = MessageDigest.getInstance("MD5")
-		return File(cacheDir, md.digest(key.toString().toByteArray()).toHexString())
-	}
+@OptIn(ExperimentalStdlibApi::class)
+private fun getCacheFile(key: CacheKey<KeyType>): File {
+    val md = MessageDigest.getInstance("SHA-256")
+    return File(cacheDir, md.digest(key.toString().toByteArray()).toHexString())
+}
 }
